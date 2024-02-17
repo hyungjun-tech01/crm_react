@@ -11,7 +11,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 docker  실행 확인 : docker ps  
 docker 중지 : docker stop <container name or ID>  
 도커 컨테이너 삭제 : docker rm <docker 컨테이너 id>       
-도커 이미지 삭제 : dodker rmi <image id>   
+도커 이미지 삭제 : dodker rmi <이미지 id>     
 
 docker 실행 명령   
 docker run -p 5000:3001 app    
