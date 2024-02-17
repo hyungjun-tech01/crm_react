@@ -5,3 +5,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - docker 사용시 wsl 설치 및 docker desktop 설치 필요.   
    wsl 설치 : https://blog.naver.com/whmoon00/223352656433  
    docker desktop 설치 : https://blog.naver.com/whmoon00/223353329298  
+
+docker 실행 명령   
+docker run -p 5000:3001 app    
+5000은 접속할 포트 , 필요에 따라 바꾸면 됨, 3001 은 app이 구동되는 포트 , 변경하려면 소스까지 같이 변경해야 함.  
