@@ -11,7 +11,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 도커 빌드 : docker build -t app .  
 도커이미지 확인 : docker images  
 docker  실행 확인 : docker ps  
-docker 중지 : docker stop <container name or ID>  
+docker 중지 : docker stop <컨테이너 name or ID>  
 도커 컨테이너 삭제 : docker rm <docker 컨테이너 id>       
 도커 이미지 삭제 : dodker rmi <이미지 id>     
 
