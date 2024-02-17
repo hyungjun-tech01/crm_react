@@ -1,4 +1,6 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+충돌 무시하고 설치해야 설치됨. npm install --legacy-peer-deps  
+
 
 - multi node 사용시 nvm install 필요, node 20.2 사용함.  
    nvm 설치 : https://blog.naver.com/whmoon00/223348535059  
