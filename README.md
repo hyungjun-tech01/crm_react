@@ -1,4 +1,4 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).  
 충돌 무시하고 설치해야 설치됨. npm install --legacy-peer-deps  
 
 
