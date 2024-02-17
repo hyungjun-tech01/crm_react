@@ -45,6 +45,7 @@
     "google-maps-react": "^2.0.6",
     "html-loader": "^4.2.0",
     "html-webpack-plugin": "^5.5.1",
+    "install": "^0.13.0",
     "jquery": "^3.7.0",
     "material-icons-react": "^1.0.4",
     "material-ui-dropzone": "^3.5.0",
