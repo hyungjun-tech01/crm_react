@@ -91,6 +91,7 @@
     "react-sticky-box": "^2.0.4",
     "react-tag-input-component": "^2.0.2",
     "recharts": "^2.0.9",
+    "recoil": "^0.7.7",
     "sass-loader": "^13.3.1",
     "simple-react-lightbox": "^3.6.9-0",
     "slick-carousel": "^1.8.1",

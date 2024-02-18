@@ -1,59 +1,68 @@
-import React, { Component, useState } from "react";
+import React, { Component, useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
 import { Helmet } from "react-helmet";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
-import { C_logo,C_logo2,C_logo3 } from "../imagepath"
 import {itemRender,onShowSizeChange} from "../paginationfunction"
 import CompanyDetailsModel from "./CompanyDetailsModel";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { BiData } from "react-icons/bi";
+import { CompanyRepo } from "../../repository/company";
+import { atomAllCompanies } from "../../atoms/atoms";
 
 const Company =()=> {
+  const { loadAllCompanies } = useRecoilValue(CompanyRepo);
+  const { allCompanyData } = useRecoilValue(atomAllCompanies);
   const [selectedDate1, setSelectedDate1] = useState(new Date());
+
+  useEffect(() => {
+    loadAllCompanies();
+  },[allCompanyData, loadAllCompanies]);
+  
   const handleDateChange1 = (date) => {
     setSelectedDate1(date);
   };
 
-      const data = [
-        {
-          id: 1,
-        company:"Clampett Oil and Gas Corp.",
-        phone: "8754554531",
-        billing: "Palo Alto",
-        state:"CA",
-        country: "USA",
-        image :C_logo
-         },
-         {
-            id: 2,
-          company:"Soylent Corp",
-          phone: "8754554531",
-          billing: "Havier Street",
-          state:"CA",
-          country: "India",
-          image :C_logo2
-           },
-           {
-            id: 3,
-          company:"Umbrella",
-          phone: "8754554531",
-          billing: "Havier Street",
-          state:"CA",
-          country: "India",
-          image :C_logo3
-           },
-           {
-            id: 4,
-          company:"Umbrella",
-          phone: "8754554531",
-          billing: "Havier Street",
-          state:"CA",
-          country: "India",
-          image :C_logo2
-           },
+      // const data = [
+      //   {
+      //     id: 1,
+      //   company:"Clampett Oil and Gas Corp.",
+      //   phone: "8754554531",
+      //   billing: "Palo Alto",
+      //   state:"CA",
+      //   country: "USA",
+      //   image :C_logo
+      //    },
+      //    {
+      //       id: 2,
+      //     company:"Soylent Corp",
+      //     phone: "8754554531",
+      //     billing: "Havier Street",
+      //     state:"CA",
+      //     country: "India",
+      //     image :C_logo2
+      //      },
+      //      {
+      //       id: 3,
+      //     company:"Umbrella",
+      //     phone: "8754554531",
+      //     billing: "Havier Street",
+      //     state:"CA",
+      //     country: "India",
+      //     image :C_logo3
+      //      },
+      //      {
+      //       id: 4,
+      //     company:"Umbrella",
+      //     phone: "8754554531",
+      //     billing: "Havier Street",
+      //     state:"CA",
+      //     country: "India",
+      //     image :C_logo2
+      //      },
   
-      ];
+      // ];
 
       const columns = [
      
@@ -215,13 +224,13 @@ const Company =()=> {
                     <div className="table-responsive">
                       <Table
                         rowSelection={rowSelection}
-                        pagination= { {total : data.length,
+                        pagination= { {total : allCompanyData.length,
                           showTotal : (total, range) => `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                           showSizeChanger : true,onShowSizeChange: onShowSizeChange ,itemRender : itemRender } }
                         className="table"
                         style={{ overflowX: "auto" }}
                         columns={columns}
-                        dataSource={data}
+                        dataSource={allCompanyData}
                         rowKey={(record) => record.id}
                       />
                     </div>
