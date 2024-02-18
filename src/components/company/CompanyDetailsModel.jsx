@@ -1,5 +1,6 @@
 import React from 'react';
-import { C_logo, C_logo2, Circle1, CircleImg } from '../imagepath';
+//import { C_logo, C_logo2, Circle1, CircleImg } from '../imagepath';
+import { C_logo, C_logo2, CircleImg } from '../imagepath';
 import { Collapse } from 'antd';
 import { Link } from "react-router-dom";
 
@@ -310,7 +311,7 @@ const CompanyDetailsModel = () => {
                         <img
                           src={CircleImg}
                           className="card-img-absolute"
-                          alt="circle-image"
+                          alt="circle"
                         />
                         <h4 className="font-weight-normal mb-3">Companies</h4>
                         <span>2</span>
@@ -323,7 +324,7 @@ const CompanyDetailsModel = () => {
                         <img
                           src={CircleImg}
                           className="card-img-absolute"
-                          alt="circle-image"
+                          alt="circle"
                         />
                         <h4 className="font-weight-normal mb-3">Deals</h4>
                         <span>2</span>
@@ -336,7 +337,7 @@ const CompanyDetailsModel = () => {
                         <img
                           src={CircleImg}
                           className="card-img-absolute"
-                          alt="circle-image"
+                          alt="circle"
                         />
                         <h4 className="font-weight-normal mb-3">Projects</h4>
                         <span>1</span>
@@ -351,7 +352,7 @@ const CompanyDetailsModel = () => {
                         <img
                           src={CircleImg}
                           className="card-img-absolute"
-                          alt="circle-image"
+                          alt="circle"
                         />
                         <h4 className="font-weight-normal mb-3">Contacts</h4>
                         <span>2</span>
@@ -364,7 +365,7 @@ const CompanyDetailsModel = () => {
                         <img
                           src={CircleImg}
                           className="card-img-absolute"
-                          alt="circle-image"
+                          alt="circle"
                         />
                         <h4 className="font-weight-normal mb-3">Notes</h4>
                         <span>2</span>
@@ -377,7 +378,7 @@ const CompanyDetailsModel = () => {
                         <img
                           src={CircleImg}
                           className="card-img-absolute"
-                          alt="circle-image"
+                          alt="circle"
                         />
                         <h4 className="font-weight-normal mb-3">Files</h4>
                         <span>2</span>
@@ -861,7 +862,7 @@ const CompanyDetailsModel = () => {
                         <img
                           src={CircleImg}
                           className="card-img-absolute"
-                          alt="circle-image"
+                          alt="circle"
                         />
                         <h4 className="font-weight-normal mb-3">
                           Total Activities
@@ -876,7 +877,7 @@ const CompanyDetailsModel = () => {
                         <img
                           src={CircleImg}
                           className="card-img-absolute"
-                          alt="circle-image"
+                          alt="circle"
                         />
                         <h4 className="font-weight-normal mb-3">
                           Last Activity

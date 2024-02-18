@@ -106,16 +106,16 @@ const Company =()=> {
           render: (text, record) => (
           <>{text}</>
             ),
-          sorter: (a, b) => a.status.length - b.status.length,
+          sorter: (a, b) => a.country.length - b.country.length,
         },
-        {
-          title: "",
-          dataIndex: "star",
-          render: (text, record) => (
-            <i className="fa fa-star" aria-hidden="true" />
-          ),
-          sorter: (a, b) => a.status.length - b.status.length,
-        },
+        // {
+        //   title: "",
+        //   dataIndex: "star",
+        //   render: (text, record) => (
+        //     <i className="fa fa-star" aria-hidden="true" />
+        //   ),
+        //   sorter: (a, b) => a.status.length - b.status.length,
+        // },
   
         {
           title: "Actions",

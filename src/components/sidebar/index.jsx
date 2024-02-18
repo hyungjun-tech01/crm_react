@@ -39,7 +39,7 @@ const SidebarNav = (props) => {
             <li className="menu-title">
               <span>Main</span>
             </li>
-            <li className="submenu">
+            {/* <li className="submenu">
               <Link to="#" className={`${pathname === "/" || pathname === "/projects-dashboard" || pathname === "/index" ||
                 pathname === "/leads-dashboard" ? "active subdrop" : ""}`}><BiHomeAlt /> <span> Dashboard</span> <span className="menu-arrow" /></Link>
               <ul className="sub-menus">
@@ -47,7 +47,7 @@ const SidebarNav = (props) => {
                 <li><Link to="/projects-dashboard" className={`${pathname === "/projects-dashboard" ? "active" : ""}`}>Projects Dashboard</Link></li>
                 <li><Link to="/leads-dashboard" className={`${pathname === "/leads-dashboard" ? "active" : ""}`}>Leads Dashboard</Link></li>
               </ul>
-            </li>
+            </li> */}
             <li>
               <Link className={`${pathname.includes("tasks") ? "active" : ""}`} to="/tasks"><BiTask /><span>Tasks</span></Link>
             </li>
@@ -72,7 +72,7 @@ const SidebarNav = (props) => {
             <li>
               <Link className={`${pathname.includes("activities") ? "active" : ""}`} to="/activities"><BiClipboard/> <span>Activities</span></Link>
             </li>
-            <li className="submenu">
+            {/* <li className="submenu">
               <Link to="#" className={`${pathname === "/blog" || pathname === "/add-blog" ||
                 pathname === "/edit-blog" || pathname === "categories" ? "active subdrop" : ""}`}><BiGridAlt /> <span>Blogs</span> <span className="menu-arrow" /></Link>
               <ul className="sub-menus">
@@ -81,7 +81,7 @@ const SidebarNav = (props) => {
                 <li><Link to="/edit-blog" className={`${pathname === "/edit-blog" ? "active" : ""}`}>Edit Blog</Link></li>
                 <li><Link to="/categories" className={`${pathname === "/categories" ? "active" : ""}`}>Categories</Link></li>
               </ul>
-            </li>
+            </li> */}
             <li className="submenu">
               <Link to="#" className={`${pathname === "/invoices" || pathname === "/invoice-grid" ||
                 pathname === "/add-invoice" || pathname === "edit-invoice" || pathname === "view-invoice" || pathname === "invoices-settings" ? "active subdrop" : ""}`}><BiCalendarAlt /> <span>Invoices </span> <span className="menu-arrow" /></Link>
@@ -94,9 +94,9 @@ const SidebarNav = (props) => {
                 <li><Link to="/invoices-settings" className={`${pathname === "/invoices-settings" || pathname === "/tax-settings" || pathname === "/bank-settings" ? "active" : ""}`}>Invoices Settings</Link></li>
               </ul>
             </li>
-            <li>
+            {/* <li>
               <Link className={`${pathname.includes("email") ? "active" : ""}`} to="/email"><BiEnvelope /> <span>Email</span></Link>
-            </li>
+            </li> */}
             <li>
               <Link className={`${pathname.includes("settings") ? "active" : ""}`} to="/settings"><BiCog /> <span>Settings</span></Link>
             </li>

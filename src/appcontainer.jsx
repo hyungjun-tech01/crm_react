@@ -118,10 +118,11 @@ import Company from "./components/company";
 import Sidebarnav from "./components/sidebar";
 
 
+
 // Login & Register
 import Login from "./components/login";
 import Register from "./components/register";
-
+import ForgotPassword from "./components/forgotpassword";
 
 import 'antd/dist/antd.css';
 import "./assets/css/bootstrap.min.css"
@@ -326,6 +327,7 @@ const AppUniversal = (props) => {
           <Route path="/settings" exact component={Settings} />
           <Route path="/login" exact component={Login} />
           <Route path="/register" exact component={Register} />
+          <Route path="/forgot-password" exact component={ForgotPassword} />
 
         </Switch>
       </div>      
