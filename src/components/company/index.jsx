@@ -13,7 +13,7 @@ import { atomAllCompanies } from "../../atoms/atoms";
 
 const Company =()=> {
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
-  const { allCompanyData } = useRecoilValue(atomAllCompanies);
+  const allCompanyData = useRecoilValue(atomAllCompanies);
   const [selectedDate1, setSelectedDate1] = useState(new Date());
 
   useEffect(() => {
