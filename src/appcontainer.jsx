@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
+import { CompanyRepo } from "./repository/company.jsx";
 import config from "config";
 
 import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
@@ -118,7 +120,6 @@ import Company from "./components/company";
 import Sidebarnav from "./components/sidebar";
 
 
-
 // Login & Register
 import Login from "./components/login";
 import Register from "./components/register";
@@ -148,7 +149,8 @@ import CompanyDetails from "./components/deals/CompanyDetails";
 import ProjectDetailsModel from "./components/project/ProjectDetailsModel";
 import InvoicesReport from "./components/invoices/invoicesgrid/report";
 
-const AppUniversal = (props) => {  
+const AppUniversal = (props) => {
+  const { loadAllCompanies } = useRecoilValue(CompanyRepo);
 //   function toggleTheme(e) {     
 //   if($('.themecls').length > 0) {    
 //     const currentTheme = localStorage.getItem('theme');
@@ -159,7 +161,6 @@ const AppUniversal = (props) => {
 //         app.href = "../src/css/"+e+".css";
 //         localStorage.setItem('theme', e);
 //     }
-
 // }
   useEffect(() => {    
     document.querySelector(".roboto-font").onclick = function () {
@@ -193,8 +194,11 @@ const AppUniversal = (props) => {
       document.body.classList.add("inter");
       document.body.classList.remove("monstret");
       document.body.classList.remove("poppins");
-    }
-  }, [])
+    };
+
+    // At the begining, load all company infos
+    loadAllCompanies();
+  }, [loadAllCompanies]);
 
   const url = props.location.pathname.split("/")[1];
   const exclusionArray = ["login", "register", "forgot-password", "error-404", "error-500"];
@@ -205,7 +209,7 @@ const AppUniversal = (props) => {
             <Route render={(props) => <Sidebarnav {...props} />} />
         <Switch>
           {/* Dashboard */}
-          <Route path="/" exact component={Dashboard} />
+          <Route path="/" exact component={Company} />
           <Route path="/index" exact component={Dashboard} />
           <Route path="/projects-dashboard" exact component={ProjectDashboard} />
           <Route path="/leads-dashboard" exact component={LeadDashboard} />
