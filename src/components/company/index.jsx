@@ -1,18 +1,25 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet } from "react-helmet";
 import { Table } from "antd";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
 import CompanyDetailsModel from "./CompanyDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { BiData } from "react-icons/bi";
+import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies } from "../../atoms/atoms";
 
 const Company = () => {
+  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const [selectedDate1, setSelectedDate1] = useState(new Date());
+
+  const handleCompanyClick = useCallback((id) => {
+    setCurrentCompany(id);
+    Redirect("/projects-dashboard");
+  }, [setCurrentCompany]);
 
   const handleDateChange1 = (date) => {
     setSelectedDate1(date);
@@ -67,9 +74,8 @@ const Company = () => {
           <a href="#" className="avatar">
             <img alt="" src={record.image} />
           </a>
-          <a href="#" data-bs-toggle="modal" data-bs-target="#company-details">
-            {text}
-          </a>
+          {/* <a href="#" data-bs-toggle="modal" data-bs-target="#company-details">{text}</a> */}
+          <button onClick={() => handleCompanyClick(record.id)}>{text}</button>
         </>
       ),
       sorter: (a, b) => a.company.length - b.company.length,
