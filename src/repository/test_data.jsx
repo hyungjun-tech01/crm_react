@@ -38,3 +38,25 @@ export const data_company = [
     image: C_logo2,
   },
 ];
+
+export const data_user = [
+  {
+    userId: "demo", 
+    userName: "demo", 
+    name: "demo", 
+    email: "demo@demo.com", 
+    isAdmin: false, 
+    password: "", 
+    phone: "02-123-1234",
+    organization: "", 
+    subscribeToOwnCards: false, 
+    createdAt: "2024-02-01", 
+    updatedAt: "2024-02-01", 
+    deletedAt: "", 
+    language: "ko",
+    passwordChangeAt: "", 
+    avatar: "", 
+    detail: "test demo user"
+  },
+ 
+];
