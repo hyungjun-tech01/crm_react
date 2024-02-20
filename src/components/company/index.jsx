@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet } from "react-helmet";
 import { Table } from "antd";
-import { Link, Redirect } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
 import CompanyDetailsModel from "./CompanyDetailsModel";
 import DatePicker from "react-datepicker";
@@ -14,12 +14,13 @@ import { atomAllCompanies } from "../../atoms/atoms";
 const Company = () => {
   const { setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
+  const history = useHistory();
   const [selectedDate1, setSelectedDate1] = useState(new Date());
 
   const handleCompanyClick = useCallback((id) => {
     setCurrentCompany(id);
-    Redirect("/projects-dashboard");
-  }, [setCurrentCompany]);
+    history.push("/projects-dashboard");
+  }, [history, setCurrentCompany]);
 
   const handleDateChange1 = (date) => {
     setSelectedDate1(date);
