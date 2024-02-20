@@ -115,6 +115,7 @@ import Socialmedia from "./components/settings/socialmedia";
 
 import FormValidation from "./components/forms/form-validation";
 import Profile from "./components/profile";
+import UserInfo from "./components/userinfo";
 import Contacts from "./components/contact";
 import Company from "./components/company";
 import Sidebarnav from "./components/sidebar";
@@ -254,6 +255,7 @@ const AppUniversal = (props) => {
           <Route path="/bank-settings" exact component={Banksettings} />
 
           {/* Settings */}
+          <Route path="/userinfo" exact component={UserInfo} />
           <Route path="/email-settings" exact component={Emailsettings} />
           <Route path="/localization-details" exact component={Localization} />
           <Route path="/others-settings" exact component={Othersettings} />
