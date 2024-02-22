@@ -38,8 +38,12 @@ const SidebarNav = (props) => {
                   <img src={avatar17} alt="profile" />
                 </div>
                 <div className="nav-profile-text d-flex flex-column">
-                  <span className="font-weight-bold mb-2">David Grey. H</span>
-                  <span className="text-white text-small">Project Manager</span>
+                  { currentCompany && (
+                    <>
+                      <span className="font-weight-bold mb-2">{currentCompany.company}</span>
+                      <span className="text-white text-small">Company</span>
+                    </>)
+                  }
                 </div>
                 <i className="mdi mdi-bookmark-check text-success nav-profile-badge" />
               </Link>
@@ -56,19 +60,42 @@ const SidebarNav = (props) => {
                 <li><Link to="/leads-dashboard" className={`${pathname === "/leads-dashboard" ? "active" : ""}`}>Leads Dashboard</Link></li>
               </ul>
             </li> */}
-            {/* { currentCompany === defaultCompany ? (
-              <li>
-                <Link className={`${pathname.includes("companies") ? "active" : ""}`} to="/companies"><BiData /> <span>Companies</span></Link>
-              </li>
-            ):(
-               */}
-
+            { currentCompany === defaultCompany ? (
+              <>
                 <li>
                   <Link className={`${pathname.includes("companies") ? "active" : ""}`} to="/companies"><BiData /> <span>Companies</span></Link>
-                </li>   
+                </li>
+                <li className="menu-title">
+                  <span>Settings</span>
+                </li>
                 <li>
                   <Link className={`${pathname.includes("userinfo") ? "active" : ""}`} to="/userinfo"><BiCog /> <span>UserInfo</span></Link>
                 </li>
+              </>
+            ):(
+              <>
+                <li>
+                  <Link className={`${pathname.includes("CompanyDetailsModel") ? "active" : ""}`} to="/CompanyDetailsModel"><BiTask /><span>Company Details</span></Link>
+                </li>
+                <li>
+                  <Link className={`${pathname.includes("leads") ? "active" : ""}`} to="/leads"><BiData /> <span>Leads</span></Link>
+                </li>
+                <li>
+                  <Link className={`${pathname.includes("deals") ? "active" : ""}`} to="/deals"><BiData /> <span>Deals</span></Link>
+                </li>
+                <li>
+                  <Link className={`${pathname.includes("invoices") ? "active" : ""}`} to="/invoices"><BiData /> <span>Invoices</span></Link>
+                </li>
+                <li className="menu-title">
+                  <span>Settings</span>
+                </li>
+                <li>
+                  <Link className={`${pathname.includes("userinfo") ? "active" : ""}`} to="/userinfo"><BiCog /> <span>UserInfo</span></Link>
+                </li>
+              </>
+            )}
+
+                
 
                 {/* <li>
                   <Link className={`${pathname.includes("tasks") ? "active" : ""}`} to="/tasks"><BiTask /><span>Tasks</span></Link>
