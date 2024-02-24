@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useCallback } from "react";
+import { Link , useHistory} from "react-router-dom";
+import {useCookies} from "react-cookie";
 import { Logo,S_Logo,avatar02,avatar03,avatar05,avatar06,avatar08,avatar09,
       avatar13,avatar17,avatar21,Flag_de,Flag_es,Flag_fr,Flag_us } from '../imagepath';
 import { FiBell, FiSearch } from "react-icons/fi";
@@ -7,6 +8,29 @@ import { BiMessageRounded } from "react-icons/bi";
 
 const Header =(props)=> {
     const exclusionArray = ["login", "register", "forgot-password", "error-404", "error-500"];
+
+// cookie 사용하여 로그인 여부 체크 
+const [cookies, removeCookie] = useCookies(['myLationCrmUserId','myLationCrmUserName', 'myLationCrmAuthToken']);
+const history = useHistory();
+
+const handleLogout = useCallback( ()=>{
+  removeCookie('myLationCrmUserId');
+  removeCookie('myLationCrmUserName');
+  removeCookie('myLationCrmAuthToken');
+  history.push("/login");
+},  [history, cookies]);
+
+const handelLogin = useCallback(() => {
+  history.push("/login");
+}, [history, cookies]);
+
+if(cookies.myLationCrmAuthToken === undefined || cookies.myLationCrmAuthToken === "" || cookies.myLationCrmAuthToken === null){
+  // removeCookie('myLationCrmUserId');
+  // removeCookie('myLationCrmUserName');
+  // removeCookie('myLationCrmAuthToken');
+  handelLogin();
+}
+
     if (
       exclusionArray.indexOf(props.location.pathname.split("/")[1]) >= 0
     ) {
@@ -14,6 +38,7 @@ const Header =(props)=> {
     }
     const {  location } = props
     let pathname = location.pathname
+
 
     return (
       <div className="header" id="heading">
@@ -273,7 +298,7 @@ const Header =(props)=> {
             <div className="dropdown-menu">
               <Link className="dropdown-item" to="/profile">My Profile</Link>
               <Link className="dropdown-item" to="/settings">Settings</Link>
-              <Link className="dropdown-item" to="/login">Logout</Link>
+              <Link className="dropdown-item" onClick={()=>handleLogout()}to="/login">Logout</Link>
             </div>
           </li>
         </ul>

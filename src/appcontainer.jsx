@@ -3,7 +3,8 @@ import { useRecoilValue } from "recoil";
 import { CompanyRepo } from "./repository/company.jsx";
 import config from "config";
 
-import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
+import { Route, BrowserRouter as Router, Switch , useHistory} from "react-router-dom";
+
 
 import Header from "./components/header/index";
 //dashboard

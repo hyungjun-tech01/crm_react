@@ -1,8 +1,19 @@
-import React from "react";
+import React, {useCallback} from "react";
 import { Helmet } from "react-helmet";
-import { Link } from "react-router-dom";
+import {useCookies} from "react-cookie";
+import { Link , useHistory } from "react-router-dom";
 import IMG01 from "../../assets/images/logo.png";
 const Login =()=> {
+  const [cookies, setCookie, ] = useCookies(['myLationCrmUserId','myLationCrmUserName', 'myLationCrmAuthToken']);
+  const history = useHistory();
+
+  const handleCheckLogin = () => {
+    setCookie('myLationCrmUserId', 'A');
+    setCookie('myLationCrmUserName', 'A');
+    setCookie('myLationCrmAuthToken','AAA');
+    history.push("/");
+  }   
+
   return(
 <>
   {/* Main Wrapper */}
@@ -44,7 +55,8 @@ const Login =()=> {
                 <input className="form-control" type="password" />
               </div>
               <div className="form-group text-center">
-                <Link to="/" className="btn btn-primary account-btn">
+                {/* <Link onClick = {()=>handleCheckLogin()} to="/" className="btn btn-primary account-btn"> */}
+                <Link onClick = {()=>handleCheckLogin()} to="/" className="btn btn-primary account-btn">
                   Login
                 </Link>
               </div>
