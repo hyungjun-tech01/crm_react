@@ -75,7 +75,7 @@ const SidebarNav = (props) => {
             ):(
               <>
                 <li>
-                  <Link className={`${pathname.includes("CompanyDetailsModel") ? "active" : ""}`} to="/CompanyDetailsModel"><BiTask /><span>Company Details</span></Link>
+                  <Link className={`${pathname.includes("company_detail") ? "active" : ""}`} to="/CompanyDetailInfo"><BiTask /><span>Company Details</span></Link>
                 </li>
                 <li>
                   <Link className={`${pathname.includes("leads") ? "active" : ""}`} to="/leads"><BiData /> <span>Leads</span></Link>

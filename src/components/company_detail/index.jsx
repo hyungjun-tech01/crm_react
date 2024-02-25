@@ -1,190 +1,19 @@
 import React, { useCallback, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet } from "react-helmet";
-import { Table } from "antd";
 import { Link, useHistory } from "react-router-dom";
-import { itemRender, onShowSizeChange } from "../paginationfunction";
-import CompanyDetailsModel from "./CompanyDetailsModel";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { BiData } from "react-icons/bi";
-import { CompanyRepo } from "../../repository/company";
-import { atomAllCompanies } from "../../atoms/atoms";
+import DatePicker from "react-datepicker";
+import { C_logo, C_logo2, CircleImg } from '../imagepath';
+import { atomCurrentCompany } from "../../atoms/atoms";
 
-const Company = () => {
-  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
-  const allCompanyData = useRecoilValue(atomAllCompanies);
-  const history = useHistory();
+const CompanyDetailInfo = () => {
+  const currentCompany = useRecoilValue(atomCurrentCompany);
   const [selectedDate1, setSelectedDate1] = useState(new Date());
-
-  const handleCompanyClick = useCallback((id) => {
-    setCurrentCompany(id);
-    history.push("/CompanyDetailInfo");
-  }, [history, setCurrentCompany]);
 
   const handleDateChange1 = (date) => {
     setSelectedDate1(date);
-  };
-
-  // const data = [
-  //   {
-  //     id: 1,
-  //   company:"Clampett Oil and Gas Corp.",
-  //   phone: "8754554531",
-  //   billing: "Palo Alto",
-  //   state:"CA",
-  //   country: "USA",
-  //   image :C_logo
-  //    },
-  //    {
-  //       id: 2,
-  //     company:"Soylent Corp",
-  //     phone: "8754554531",
-  //     billing: "Havier Street",
-  //     state:"CA",
-  //     country: "India",
-  //     image :C_logo2
-  //      },
-  //      {
-  //       id: 3,
-  //     company:"Umbrella",
-  //     phone: "8754554531",
-  //     billing: "Havier Street",
-  //     state:"CA",
-  //     country: "India",
-  //     image :C_logo3
-  //      },
-  //      {
-  //       id: 4,
-  //     company:"Umbrella",
-  //     phone: "8754554531",
-  //     billing: "Havier Street",
-  //     state:"CA",
-  //     country: "India",
-  //     image :C_logo2
-  //      },
-
-  // ];
-
-  const columns = [
-    {
-      title: "Company Name",
-      dataIndex: "company",
-      render: (text, record) => (
-        <>
-          <a href="#" className="avatar">
-            <img alt="" src={record.image} />
-          </a>
-          {/* <a href="#" data-bs-toggle="modal" data-bs-target="#company-details">{text}</a> */}
-          <button onClick={() => handleCompanyClick(record.id)}>{text}</button>
-        </>
-      ),
-      sorter: (a, b) => a.company.length - b.company.length,
-    },
-    {
-      title: "Phone",
-      dataIndex: "phone",
-      render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.phone.length - b.phone.length,
-    },
-    {
-      title: "Billing Street",
-      dataIndex: "billing",
-      render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.billing.length - b.billing.length,
-    },
-    {
-      title: "Billing State",
-      dataIndex: "state",
-      render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.state.length - b.state.length,
-    },
-    {
-      title: "Billing Country",
-      dataIndex: "country",
-      render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.country.length - b.country.length,
-    },
-    // {
-    //   title: "",
-    //   dataIndex: "star",
-    //   render: (text, record) => (
-    //     <i className="fa fa-star" aria-hidden="true" />
-    //   ),
-    //   sorter: (a, b) => a.status.length - b.status.length,
-    // },
-    {
-      title: "Actions",
-      dataIndex: "status",
-      render: (text, record) => (
-        <div className="dropdown dropdown-action">
-          <a
-            href="#"
-            className="action-icon dropdown-toggle"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            <i className="material-icons">more_vert</i>
-          </a>
-          <div className="dropdown-menu dropdown-menu-right">
-            <a className="dropdown-item" href="#">
-              Edit This Company
-            </a>
-            <a className="dropdown-item" href="#">
-              Change Organization Image
-            </a>
-            <a className="dropdown-item" href="#">
-              Delete This Organization
-            </a>
-            <a className="dropdown-item" href="#">
-              Change Record Owner
-            </a>
-            <a className="dropdown-item" href="#">
-              Generate Merge Document
-            </a>
-            <a className="dropdown-item" href="#">
-              Print This Organization
-            </a>
-            <a className="dropdown-item" href="#">
-              Add New Task For Organization
-            </a>
-            <a className="dropdown-item" href="#">
-              Add New Event For Organization
-            </a>
-            <a className="dropdown-item" href="#">
-              Add Activity Set To Organization
-            </a>
-            <a className="dropdown-item" href="#">
-              Add New Contact For Organization
-            </a>
-            <a className="dropdown-item" href="#">
-              Add New Opportunity For Organization
-            </a>
-            <a className="dropdown-item" href="#">
-              Add New Opportunity For Organization
-            </a>
-            <a className="dropdown-item" href="#">
-              Add New Project For Organization
-            </a>
-          </div>
-        </div>
-      ),
-    },
-  ];
-
-  const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
-    },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
-      name: record.name,
-      className: "checkbox-red",
-    }),
   };
 
   return (
@@ -203,7 +32,7 @@ const Company = () => {
                   <BiData />
                 </i>
               </span>{" "}
-              Companies{" "}
+              Company Detail Infos.{" "}
             </h3>
           </div>
           <div className="col text-end">
@@ -218,43 +47,6 @@ const Company = () => {
         {/* Page Header */}
         <div className="page-header pt-3 mb-0 ">
           <div className="row">
-            <div className="col">
-              <div className="dropdown">
-                <a
-                  className="dropdown-toggle recently-viewed"
-                  href="#"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  {" "}
-                  Recently Viewed
-                </a>
-                <div className="dropdown-menu">
-                  <a className="dropdown-item" href="#">
-                    Recently Viewed
-                  </a>
-                  <a className="dropdown-item" href="#">
-                    Items I'm following
-                  </a>
-                  <a className="dropdown-item" href="#">
-                    All Companies
-                  </a>
-                  <a className="dropdown-item" href="#">
-                    Companies added in the last 24 hours
-                  </a>
-                  <a className="dropdown-item" href="#">
-                    Companies added in the last 7 days
-                  </a>
-                  <a className="dropdown-item" href="#">
-                    Companies with no notes in the last month
-                  </a>
-                  <a className="dropdown-item" href="#">
-                    Companies with no notes in the last 7 days
-                  </a>
-                </div>
-              </div>
-            </div>
             <div className="col text-end">
               <ul className="list-inline-item pl-0">
                 <li className="nav-item dropdown list-inline-item add-lists">
@@ -299,138 +91,25 @@ const Company = () => {
         </div>
         {/* /Page Header */}
 
-        <div className="row">
-          <div className="col-md-12">
-            <div className="card mb-0">
-              <div className="card-body">
-                <div className="table-responsive">
-                  <Table
-                    rowSelection={rowSelection}
-                    pagination={{
-                      total: allCompanyData.length,
-                      showTotal: (total, range) =>
-                        `Showing ${range[0]} to ${range[1]} of ${total} entries`,
-                      showSizeChanger: true,
-                      onShowSizeChange: onShowSizeChange,
-                      itemRender: itemRender,
-                    }}
-                    className="table"
-                    style={{ overflowX: "auto" }}
-                    columns={columns}
-                    dataSource={allCompanyData}
-                    rowKey={(record) => record.id}
-                  />
-                </div>
+        <div className="row w-100">
+            <div className="col-md-7 account d-flex">
+              <div className="company_img">
+                <img
+                  src={C_logo}
+                  alt="User"
+                  className="user-image"
+                />
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/*modal section starts here*/}
-      <div className="modal fade" id="add-new-list">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            {/* Modal Header */}
-            <div className="modal-header">
-              <h4 className="modal-title">Add New List View</h4>
-              <button type="button" className="close" data-bs-dismiss="modal">
-                ×
-              </button>
-            </div>
-            {/* Modal body */}
-            <div className="modal-body">
-              <form className="forms-sample">
-                <div className="form-group row">
-                  <label
-                    htmlFor="view-name"
-                    className="col-sm-4 col-form-label"
-                  >
-                    New View Name
-                  </label>
-                  <div className="col-sm-8">
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="view-name"
-                      placeholder="New View Name"
-                    />
-                  </div>
-                </div>
-                <div className="form-group row pt-4">
-                  <label className="col-sm-4 col-form-label">
-                    Sharing Settings
-                  </label>
-                  <div className="col-sm-8">
-                    <div className="form-group">
-                      <div className="form-check">
-                        <label className="form-check-label">
-                          <input
-                            type="radio"
-                            className="form-check-input"
-                            name="optionsRadios"
-                            id="optionsRadios1"
-                            defaultValue
-                          />{" "}
-                          Just For Me <i className="input-helper" />
-                        </label>
-                      </div>
-                      <br />
-                      <div className="form-check">
-                        <label className="form-check-label">
-                          <input
-                            type="radio"
-                            className="form-check-input"
-                            name="optionsRadios"
-                            id="optionsRadios2"
-                            defaultValue="option2"
-                            defaultChecked
-                          />{" "}
-                          Share Filter with Everyone{" "}
-                          <i className="input-helper" />
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <button
-                    type="submit"
-                    className="btn btn-gradient-primary me-2"
-                  >
-                    Submit
-                  </button>
-                  <button className="btn btn-light">Cancel</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* Modal */}
-      <div
-        className="modal right fade"
-        id="add_company"
-        tabIndex={-1}
-        role="dialog"
-        aria-modal="true"
-      >
-        <div className="modal-dialog" role="document">
-          <button
-            type="button"
-            className="close md-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          >
-            <span aria-hidden="true">×</span>
-          </button>
-          <div className="modal-content">
-            <div className="modal-header">
-              <h4 className="modal-title text-center">Add Company</h4>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-              ></button>
+              <div>
+                <p className="mb-0">Company</p>
+                <span className="modal-title">Clampett Oil and Gas Corp</span>
+                <span className="rating-star">
+                  <i className="fa fa-star" aria-hidden="true" />
+                </span>
+                <span className="lock">
+                  <i className="fa fa-lock" aria-hidden="true" />
+                </span>
+              </div>
             </div>
             <div className="modal-body">
               <div className="row">
@@ -448,6 +127,7 @@ const Company = () => {
                           type="text"
                           placeholder="Organization Name"
                           name="organization"
+                          value={currentCompany.company_name}
                         />
                       </div>
                     </div>
@@ -486,6 +166,7 @@ const Company = () => {
                           className="form-control"
                           name="fax"
                           placeholder="Fax"
+                          value={currentCompany.company_telephone1}
                         />
                       </div>
                     </div>
@@ -715,12 +396,8 @@ const Company = () => {
               </div>
             </div>
           </div>
-          {/* modal-content */}
-        </div>
-        {/* modal-dialog */}
       </div>
-      <CompanyDetailsModel />
     </div>
   );
 };
-export default Company;
+export default CompanyDetailInfo;

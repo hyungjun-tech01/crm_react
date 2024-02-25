@@ -84,7 +84,6 @@ import Timeline from './components/elements/timeline/index'
 import Horizontaltimeline from './components/elements/horizontaltimeline/index'
 import Formwizard from './components/elements/formwizard/index'
 
-
 // Charts
 import ApexCharts from "./components/charts/apexcharts/index";
 import ChartJs from "./components/charts/chartjs/index";
@@ -119,6 +118,7 @@ import Profile from "./components/profile";
 import UserInfo from "./components/userinfo";
 import Contacts from "./components/contact";
 import Company from "./components/company";
+import CompanyDetailInfo from "./components/company_detail/index.jsx";
 import Sidebarnav from "./components/sidebar";
 
 
@@ -220,6 +220,7 @@ const AppUniversal = (props) => {
           <Route path="/TaskDetailModel" exact component={TaskDetailModel} />
           <Route path="/contacts" exact component={Contacts} />
           <Route path="/companies" exact component={Company} />
+          <Route path="/CompanyDetailInfo" exact component={CompanyDetailInfo} />
           <Route path="/CompanyDetailsModel" exact component={CompanyDetailsModel} />
           <Route path="/leads" exact component={Lead} />
           <Route path="/LeadsDetailsModel" exact component={LeadsDetailsModel} />
