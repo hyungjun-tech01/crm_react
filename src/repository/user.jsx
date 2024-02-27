@@ -20,7 +20,7 @@ export const UserRepo = selector({
                 //     return;
                 // }
                 // set(atomAllCompanies, data);
-                set(atomCurrentUser, data_company);
+                set(atomCurrentUser, data_user);
             }
             catch(err){
                 console.error(`loadUser / Error : ${err}`);

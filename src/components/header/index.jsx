@@ -13,22 +13,18 @@ const Header =(props)=> {
 const [cookies, removeCookie] = useCookies(['myLationCrmUserId','myLationCrmUserName', 'myLationCrmAuthToken']);
 const history = useHistory();
 
-const handleLogout = useCallback( ()=>{
+const handleLogout = ()=>{
+  console.log('handleLogout');
   removeCookie('myLationCrmUserId');
   removeCookie('myLationCrmUserName');
   removeCookie('myLationCrmAuthToken');
-  history.push("/login");
-},  [history, cookies]);
-
-const handelLogin = useCallback(() => {
-  history.push("/login");
-}, [history, cookies]);
+};
 
 if(cookies.myLationCrmAuthToken === undefined || cookies.myLationCrmAuthToken === "" || cookies.myLationCrmAuthToken === null){
-  // removeCookie('myLationCrmUserId');
-  // removeCookie('myLationCrmUserName');
-  // removeCookie('myLationCrmAuthToken');
-  handelLogin();
+//   removeCookie('myLationCrmUserId');
+//   removeCookie('myLationCrmUserName');
+//   removeCookie('myLationCrmAuthToken');
+   history.push("/login");
 }
 
     if (

@@ -1,4 +1,4 @@
-import React, {useCallback} from "react";
+import React from "react";
 import { Helmet } from "react-helmet";
 import {useCookies} from "react-cookie";
 import { Link , useHistory } from "react-router-dom";
@@ -7,6 +7,7 @@ const Login =()=> {
   const [cookies, setCookie, ] = useCookies(['myLationCrmUserId','myLationCrmUserName', 'myLationCrmAuthToken']);
   const history = useHistory();
 
+  console.log('Login index');
   const handleCheckLogin = () => {
     setCookie('myLationCrmUserId', 'A');
     setCookie('myLationCrmUserName', 'A');
@@ -14,7 +15,7 @@ const Login =()=> {
     history.push("/");
   }   
 
-  return(
+return(
 <>
   {/* Main Wrapper */}
     <Helmet>
@@ -56,9 +57,10 @@ const Login =()=> {
               </div>
               <div className="form-group text-center">
                 {/* <Link onClick = {()=>handleCheckLogin()} to="/" className="btn btn-primary account-btn"> */}
-                <Link onClick = {()=>handleCheckLogin()} to="/" className="btn btn-primary account-btn">
+                <button onClick = {()=>handleCheckLogin()} className="btn btn-primary account-btn">Login </button>
+                {/* <Link onClick = {()=>handleCheckLogin()} to="/" className="btn btn-primary account-btn">
                   Login
-                </Link>
+                </Link> */}
               </div>
               <div className="account-footer">
                 <p>
@@ -77,4 +79,5 @@ const Login =()=> {
 </>
 
 )};
+
 export default Login;
