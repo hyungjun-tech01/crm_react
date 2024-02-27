@@ -153,6 +153,8 @@ import InvoicesReport from "./components/invoices/invoicesgrid/report";
 
 const AppUniversal = (props) => {
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
+
+  
 //   function toggleTheme(e) {     
 //   if($('.themecls').length > 0) {    
 //     const currentTheme = localStorage.getItem('theme');

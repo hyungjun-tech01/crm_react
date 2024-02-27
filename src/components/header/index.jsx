@@ -24,7 +24,7 @@ if(cookies.myLationCrmAuthToken === undefined || cookies.myLationCrmAuthToken ==
 //   removeCookie('myLationCrmUserId');
 //   removeCookie('myLationCrmUserName');
 //   removeCookie('myLationCrmAuthToken');
-   history.push("/login");
+//   history.push("/login");
 }
 
     if (
