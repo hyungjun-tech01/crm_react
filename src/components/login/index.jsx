@@ -1,14 +1,25 @@
-import React from "react";
+import React , {useState} from "react";
 import { Helmet } from "react-helmet";
 import {useCookies} from "react-cookie";
 import { Link , useHistory } from "react-router-dom";
+import { useRecoilValue } from "recoil";
 import IMG01 from "../../assets/images/logo.png";
+import { UserRepo } from "../../repository/user.jsx";
+
 const Login =()=> {
   const [cookies, setCookie, ] = useCookies(['myLationCrmUserId','myLationCrmUserName', 'myLationCrmAuthToken']);
   const history = useHistory();
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const { loadUser } = useRecoilValue(UserRepo);
+
+  console.log('Login index');
+  console.log('Login index', loginEmail);
+
 
   console.log('Login index');
   const handleCheckLogin = () => {
+    loadUser();
     setCookie('myLationCrmUserId', 'A');
     setCookie('myLationCrmUserName', 'A');
     setCookie('myLationCrmAuthToken','AAA');
@@ -40,7 +51,7 @@ return(
             <form>
               <div className="form-group">
                 <label>Email Address</label>
-                <input className="form-control" type="text" />
+                <input type="text" className="form-control" onChange={(e)=>setLoginEmail(e.target.value)} />
               </div>
               <div className="form-group">
                 <div className="row">
