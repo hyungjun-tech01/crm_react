@@ -14,12 +14,10 @@ const Login =()=> {
   const { loadUser } = useRecoilValue(UserRepo);
 
   console.log('Login index');
-  console.log('Login index', loginEmail);
-
-
-  console.log('Login index');
+ 
   const handleCheckLogin = () => {
-    loadUser();
+    console.log('Login index', loginEmail, loginPassword);
+    loadUser(loginEmail, loginPassword);
     setCookie('myLationCrmUserId', 'A');
     setCookie('myLationCrmUserName', 'A');
     setCookie('myLationCrmAuthToken','AAA');
@@ -64,7 +62,7 @@ return(
                     </Link>
                   </div>
                 </div>
-                <input className="form-control" type="password" />
+                <input className="form-control" type="password" onChange={(e)=> setLoginPassword(e.target.value)} />
               </div>
               <div className="form-group text-center">
                 {/* <Link onClick = {()=>handleCheckLogin()} to="/" className="btn btn-primary account-btn"> */}
