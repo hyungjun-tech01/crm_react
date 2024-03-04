@@ -10,12 +10,19 @@ import "react-datepicker/dist/react-datepicker.css";
 import { BiData } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies } from "../../atoms/atoms";
+import {useCookies} from "react-cookie";
 
 const Company = () => {
   const { setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const history = useHistory();
   const [selectedDate1, setSelectedDate1] = useState(new Date());
+  const [cookies, removeCookie] = useCookies(['myLationCrmUserId','myLationCrmUserName', 'myLationCrmAuthToken']);
+
+  if(cookies.myLationCrmAuthToken === 'undefined' || cookies.myLationCrmAuthToken === "" || cookies.myLationCrmAuthToken === null){
+    console.log("no cookies");
+    history.push("/login");
+  }  
 
   const handleCompanyClick = useCallback((id) => {
     setCurrentCompany(id);
