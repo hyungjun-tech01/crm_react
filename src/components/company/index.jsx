@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet } from "react-helmet";
 import { Table } from "antd";
@@ -15,6 +15,7 @@ import {useCookies} from "react-cookie";
 const Company = () => {
   const { setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
+  const [ companyData, setCompanyData ] = useState([]);
   const history = useHistory();
   const [selectedDate1, setSelectedDate1] = useState(new Date());
   const [cookies, removeCookie] = useCookies(['myLationCrmUserId','myLationCrmUserName', 'myLationCrmAuthToken']);
@@ -22,7 +23,7 @@ const Company = () => {
   if(cookies.myLationCrmAuthToken === 'undefined' || cookies.myLationCrmAuthToken === "" || cookies.myLationCrmAuthToken === null){
     console.log("no cookies");
     history.push("/login");
-  }  
+  } 
 
   const handleCompanyClick = useCallback((id) => {
     setCurrentCompany(id);
@@ -33,50 +34,10 @@ const Company = () => {
     setSelectedDate1(date);
   };
 
-  // const data = [
-  //   {
-  //     id: 1,
-  //   company:"Clampett Oil and Gas Corp.",
-  //   phone: "8754554531",
-  //   billing: "Palo Alto",
-  //   state:"CA",
-  //   country: "USA",
-  //   image :C_logo
-  //    },
-  //    {
-  //       id: 2,
-  //     company:"Soylent Corp",
-  //     phone: "8754554531",
-  //     billing: "Havier Street",
-  //     state:"CA",
-  //     country: "India",
-  //     image :C_logo2
-  //      },
-  //      {
-  //       id: 3,
-  //     company:"Umbrella",
-  //     phone: "8754554531",
-  //     billing: "Havier Street",
-  //     state:"CA",
-  //     country: "India",
-  //     image :C_logo3
-  //      },
-  //      {
-  //       id: 4,
-  //     company:"Umbrella",
-  //     phone: "8754554531",
-  //     billing: "Havier Street",
-  //     state:"CA",
-  //     country: "India",
-  //     image :C_logo2
-  //      },
-
-  // ];
-
   const columns = [
     {
       title: "Company Name",
-      dataIndex: "company",
+      dataIndex: "name",
       render: (text, record) => (
         <>
           <a href="#" className="avatar">
@@ -95,20 +56,20 @@ const Company = () => {
       sorter: (a, b) => a.phone.length - b.phone.length,
     },
     {
-      title: "Billing Street",
-      dataIndex: "billing",
+      title: "Address",
+      dataIndex: "address",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => a.billing.length - b.billing.length,
     },
     {
-      title: "Billing State",
-      dataIndex: "state",
+      title: "Zip Code",
+      dataIndex: "zip_code",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => a.state.length - b.state.length,
     },
     {
-      title: "Billing Country",
-      dataIndex: "country",
+      title: "Website",
+      dataIndex: "homepage",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => a.country.length - b.country.length,
     },
@@ -120,63 +81,63 @@ const Company = () => {
     //   ),
     //   sorter: (a, b) => a.status.length - b.status.length,
     // },
-    {
-      title: "Actions",
-      dataIndex: "status",
-      render: (text, record) => (
-        <div className="dropdown dropdown-action">
-          <a
-            href="#"
-            className="action-icon dropdown-toggle"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            <i className="material-icons">more_vert</i>
-          </a>
-          <div className="dropdown-menu dropdown-menu-right">
-            <a className="dropdown-item" href="#">
-              Edit This Company
-            </a>
-            <a className="dropdown-item" href="#">
-              Change Organization Image
-            </a>
-            <a className="dropdown-item" href="#">
-              Delete This Organization
-            </a>
-            <a className="dropdown-item" href="#">
-              Change Record Owner
-            </a>
-            <a className="dropdown-item" href="#">
-              Generate Merge Document
-            </a>
-            <a className="dropdown-item" href="#">
-              Print This Organization
-            </a>
-            <a className="dropdown-item" href="#">
-              Add New Task For Organization
-            </a>
-            <a className="dropdown-item" href="#">
-              Add New Event For Organization
-            </a>
-            <a className="dropdown-item" href="#">
-              Add Activity Set To Organization
-            </a>
-            <a className="dropdown-item" href="#">
-              Add New Contact For Organization
-            </a>
-            <a className="dropdown-item" href="#">
-              Add New Opportunity For Organization
-            </a>
-            <a className="dropdown-item" href="#">
-              Add New Opportunity For Organization
-            </a>
-            <a className="dropdown-item" href="#">
-              Add New Project For Organization
-            </a>
-          </div>
-        </div>
-      ),
-    },
+    // {
+    //   title: "Actions",
+    //   dataIndex: "status",
+    //   render: (text, record) => (
+    //     <div className="dropdown dropdown-action">
+    //       <a
+    //         href="#"
+    //         className="action-icon dropdown-toggle"
+    //         data-bs-toggle="dropdown"
+    //         aria-expanded="false"
+    //       >
+    //         <i className="material-icons">more_vert</i>
+    //       </a>
+    //       <div className="dropdown-menu dropdown-menu-right">
+    //         <a className="dropdown-item" href="#">
+    //           Edit This Company
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Change Organization Image
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Delete This Organization
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Change Record Owner
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Generate Merge Document
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Print This Organization
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Add New Task For Organization
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Add New Event For Organization
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Add Activity Set To Organization
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Add New Contact For Organization
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Add New Opportunity For Organization
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Add New Opportunity For Organization
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Add New Project For Organization
+    //         </a>
+    //       </div>
+    //     </div>
+    //   ),
+    // },
   ];
 
   const rowSelection = {
@@ -193,6 +154,18 @@ const Company = () => {
       className: "checkbox-red",
     }),
   };
+
+  useEffect(()=>{
+    const companyDataForTable = allCompanyData.map((data, index) => ({
+      id: index.toString(),
+      name: data.company_name,
+      phone: data.company_phone_number,
+      address: data.company_address,
+      zip_code: data.company_zip_code,
+      homepage: data.homepage,
+    }));
+    setCompanyData(companyDataForTable);
+  }, [allCompanyData]);
 
   return (
     <div className="page-wrapper">
@@ -324,7 +297,7 @@ const Company = () => {
                     className="table"
                     style={{ overflowX: "auto" }}
                     columns={columns}
-                    dataSource={allCompanyData}
+                    dataSource={companyData}
                     rowKey={(record) => record.id}
                   />
                 </div>

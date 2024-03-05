@@ -1,10 +1,9 @@
 import React from 'react';
 import { selector } from "recoil";
 import { atomCurrentCompany, atomAllCompanies } from '../atoms/atoms';
-import { data_company } from './test_data';
 
-// import Paths from "../constants/Paths";
-// const BASE_PATH = Paths.BASE_PATH;
+import Paths from "../constants/Paths";
+const BASE_PATH = Paths.BASE_PATH;
 
 
 export const CompanyRepo = selector({
@@ -12,15 +11,14 @@ export const CompanyRepo = selector({
     get: ({getCallback}) => {
         const loadAllCompanies = getCallback(({set}) => async () => {
             try{
-                // const response = await fetch(`${BASE_PATH}/company/all`);
-                // const data = await response.json();
-                // if(data.message){
-                //     console.log('loadCurrentCompany message:', data.message);
-                //     set(atomAllCompanies, []);
-                //     return;
-                // }
-                // set(atomAllCompanies, data);
-                set(atomAllCompanies, data_company);
+                const response = await fetch(`${BASE_PATH}/companies`);
+                const data = await response.json();
+                if(data.message){
+                    console.log('loadAllCompanies message:', data.message);
+                    set(atomAllCompanies, []);
+                    return;
+                }
+                set(atomAllCompanies, data);
             }
             catch(err){
                 console.error(`loadAllCompanies / Error : ${err}`);
