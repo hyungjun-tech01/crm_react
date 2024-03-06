@@ -1,14 +1,16 @@
 
 import React, { useEffect } from "react";
 import { useRecoilValue } from "recoil";
-import { Link, withRouter } from "react-router-dom";
+import { Link, withRouter , useHistory} from "react-router-dom";
 import { Scrollbars } from "react-custom-scrollbars";
 import { avatar17 } from '../imagepath';
 import { BiAward, BiBarChartAlt2, BiCalendarAlt, BiClipboard, BiCog, BiCoinStack, BiCommand, BiCube, BiData, BiDockLeft, BiDockTop, BiEnvelope, BiError, BiGridAlt, BiHomeAlt, BiMenu, BiMobileAlt, BiPodcast, BiSearchAlt2, BiStation, BiTask, BiUser } from "react-icons/bi";
 import { atomCurrentCompany, defaultCompany } from "../../atoms/atoms";
+import {useCookies} from "react-cookie";
 
 const SidebarNav = (props) => {
   const currentCompany = useRecoilValue(atomCurrentCompany);
+  
   useEffect(()=>{
     console.log("Current Company is changed");
   }, [currentCompany]);
