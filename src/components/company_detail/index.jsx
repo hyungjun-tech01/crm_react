@@ -6,7 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { BiData } from "react-icons/bi";
 import DatePicker from "react-datepicker";
 import { C_logo, C_logo2, CircleImg } from '../imagepath';
-import { atomCurrentCompany } from "../../atoms/atoms";
+import { atomCurrentCompany, defaultCompany } from "../../atoms/atoms";
 
 const CompanyDetailInfo = () => {
   const currentCompany = useRecoilValue(atomCurrentCompany);
@@ -14,6 +14,10 @@ const CompanyDetailInfo = () => {
 
   const handleDateChange1 = (date) => {
     setSelectedDate1(date);
+  };
+
+  if(currentCompany === defaultCompany){
+    return (<></>);
   };
 
   return (

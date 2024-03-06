@@ -25,8 +25,8 @@ const Company = () => {
     history.push("/login");
   } 
 
-  const handleCompanyClick = useCallback((id) => {
-    setCurrentCompany(id);
+  const handleCompanyClick = useCallback((code) => {
+    setCurrentCompany(code);
     history.push("/CompanyDetailInfo");
   }, [history, setCurrentCompany]);
 
@@ -44,7 +44,7 @@ const Company = () => {
             <img alt="" src={record.image} />
           </a>
           {/* <a href="#" data-bs-toggle="modal" data-bs-target="#company-details">{text}</a> */}
-          <button onClick={() => handleCompanyClick(record.id)}>{text}</button>
+          <button onClick={() => handleCompanyClick(record.code)}>{text}</button>
         </>
       ),
       sorter: (a, b) => a.company.length - b.company.length,
@@ -158,6 +158,7 @@ const Company = () => {
   useEffect(()=>{
     const companyDataForTable = allCompanyData.map((data, index) => ({
       id: index.toString(),
+      code: data.company_code,
       name: data.company_name,
       phone: data.company_phone_number,
       address: data.company_address,

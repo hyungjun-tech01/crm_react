@@ -24,10 +24,12 @@ export const CompanyRepo = selector({
                 console.error(`loadAllCompanies / Error : ${err}`);
             };
         });
-        const setCurrentCompany = getCallback(({set, snapshot}) => async (company_id) => {
+        const setCurrentCompany = getCallback(({set, snapshot}) => async (company_code) => {
             try{
                 const allCompanies = await snapshot.getPromise(atomAllCompanies);
-                const selected = allCompanies.filter(company => company.id === company_id)[0];
+                console.log(`[CompanyRepo] setCurrentCompany - input : ${company_code}`);
+                const selected = allCompanies.filter(company => company.company_code === company_code)[0];
+                console.log(`[CompanyRepo] setCurrentCompany : ${selected}`);
                 set(atomCurrentCompany, selected);
             }
             catch(err){
