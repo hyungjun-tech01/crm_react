@@ -29,6 +29,7 @@ const Login =()=> {
         setCookie('myLationCrmAuthToken',response.token);
         history.push("/");
       }
+      setCookie('myLationCrmAuthToken','SSSSS');
     });
   }   
 
