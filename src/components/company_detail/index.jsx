@@ -6,7 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { BiData } from "react-icons/bi";
 import DatePicker from "react-datepicker";
 import { C_logo, C_logo2, CircleImg } from '../imagepath';
-import { atomCurrentCompany } from "../../atoms/atoms";
+import { atomCurrentCompany, defaultCompany } from "../../atoms/atoms";
 
 const CompanyDetailInfo = () => {
   const currentCompany = useRecoilValue(atomCurrentCompany);
@@ -14,6 +14,10 @@ const CompanyDetailInfo = () => {
 
   const handleDateChange1 = (date) => {
     setSelectedDate1(date);
+  };
+
+  if(currentCompany === defaultCompany){
+    return (<></>);
   };
 
   return (
@@ -102,7 +106,7 @@ const CompanyDetailInfo = () => {
               </div>
               <div>
                 <p className="mb-0">Company</p>
-                <span className="modal-title">Clampett Oil and Gas Corp</span>
+                <span className="modal-title">{currentCompany.company_name}</span>
                 <span className="rating-star">
                   <i className="fa fa-star" aria-hidden="true" />
                 </span>
@@ -157,6 +161,7 @@ const CompanyDetailInfo = () => {
                           className="form-control"
                           name="phone"
                           placeholder="Phone"
+                          value={currentCompany.company_phone_number}
                         />
                       </div>
                       <div className="col-sm-6">
@@ -166,7 +171,7 @@ const CompanyDetailInfo = () => {
                           className="form-control"
                           name="fax"
                           placeholder="Fax"
-                          value={currentCompany.company_telephone1}
+                          value={currentCompany.company_fax_number}
                         />
                       </div>
                     </div>
@@ -178,6 +183,7 @@ const CompanyDetailInfo = () => {
                           className="form-control"
                           name="website"
                           placeholder="Website"
+                          value={currentCompany.homepage}
                         />
                       </div>
                       <div className="col-sm-6">
@@ -218,6 +224,7 @@ const CompanyDetailInfo = () => {
                           className="form-control"
                           name="domains"
                           placeholder="Email Domains"
+                          value={currentCompany.email}
                         />
                       </div>
                     </div>
@@ -233,6 +240,7 @@ const CompanyDetailInfo = () => {
                           name="billing-address"
                           placeholder="Billing Address"
                           defaultValue={""}
+                          value={currentCompany.company_address}
                         />
                       </div>
                       <div className="col-sm-6 mt-3">
@@ -261,6 +269,7 @@ const CompanyDetailInfo = () => {
                           className="form-control"
                           placeholder="Billing Postal code"
                           name="billing-postal-code"
+                          value={currentCompany.company_zip_code}
                         />
                       </div>
                     </div>
