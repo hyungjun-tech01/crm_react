@@ -15,53 +15,6 @@ const Lead = () => {
   const allLeadData = useRecoilValue(atomAllLeads);
   const [ leadData, setLeadData ] = useState([]);
 
-  // const data = [
-  //   {
-  //     id: 1,
-  //     name: "Anne Lynch",
-  //     title: "VP of Sales",
-  //     company: "Umbrella",
-  //     phone: "(406) 653-3860",
-  //     email: "abc@gmail.com",
-  //     status: "OPEN - NotContacted",
-  //     created: "03-Jun-20 1:14 AM",
-  //     owner: "John Doe",
-  //   },
-
-  //   {
-  //     id: 2,
-  //     name: "Sales",
-  //     title: "Blanda",
-  //     company: "Umbrella",
-  //     phone: "(406) 653-3860",
-  //     email: "abc@gmail.com",
-  //     status: "OPEN - NotContacted",
-  //     created: "03-Jun-20 1:14 AM",
-  //     owner: "John Doe",
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "VP of Sales",
-  //     title: "Howe-Blanda LLC",
-  //     company: "Umbrella",
-  //     phone: "(406) 653-3860",
-  //     email: "abc@gmail.com",
-  //     status: "OPEN - NotContacted",
-  //     created: "03-Jun-20 1:14 AM",
-  //     owner: "John Doe",
-  //   },
-  //   {
-  //     id: 4,
-  //     name: "VP of Sales",
-  //     title: "Acme Corporation",
-  //     company: "Umbrella",
-  //     phone: "(406) 653-3860",
-  //     email: "abc@gmail.com",
-  //     status: "OPEN - NotContacted",
-  //     created: "03-Jun-20 1:14 AM",
-  //     owner: "John Doe",
-  //   },
-  // ];
   const columns = [
     {
       title: "Full Name",
