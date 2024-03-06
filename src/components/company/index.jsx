@@ -20,8 +20,8 @@ const Company = () => {
   const [selectedDate1, setSelectedDate1] = useState(new Date());
   const [cookies, removeCookie] = useCookies(['myLationCrmUserId','myLationCrmUserName', 'myLationCrmAuthToken']);
 
+  console.log("no cookies", cookies.myLationCrmAuthToken);
   if(cookies.myLationCrmAuthToken === 'undefined' || cookies.myLationCrmAuthToken === "" || cookies.myLationCrmAuthToken === null){
-    console.log("no cookies");
     history.push("/login");
   } 
 

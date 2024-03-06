@@ -4,24 +4,33 @@ import {useCookies} from "react-cookie";
 import { Link , useHistory } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import IMG01 from "../../assets/images/logo.png";
-import { UserRepo } from "../../repository/user.jsx";
+import { apiLoginValidate } from "../../repository/user.jsx";
 
 const Login =()=> {
   const [cookies, setCookie, ] = useCookies(['myLationCrmUserId','myLationCrmUserName', 'myLationCrmAuthToken']);
   const history = useHistory();
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
-  const { loadUser } = useRecoilValue(UserRepo);
 
-  console.log('Login index');
+  console.log('Login index Login', cookies.myLationCrmAuthToken);
  
+ // if(cookies.myLationCrmAuthToken !== 'undefined' ){
+ //   history.push("/");
+ // }  
+
   const handleCheckLogin = () => {
     console.log('Login index', loginEmail, loginPassword);
-    loadUser(loginEmail, loginPassword);
-    setCookie('myLationCrmUserId', 'A');
-    setCookie('myLationCrmUserName', 'A');
-    setCookie('myLationCrmAuthToken','AAA');
-    history.push("/");
+    const response = apiLoginValidate(loginEmail, loginPassword);
+    response.then((res) => {
+      console.log('res', res);
+      if(response.message === 'success'){
+        setCookie('myLationCrmUserId', response.userId);
+        setCookie('myLationCrmUserName', response.userName);
+        setCookie('myLationCrmAuthToken',response.token);
+        history.push("/");
+      }
+      setCookie('myLationCrmAuthToken','SSSSS');
+    });
   }   
 
 return(
