@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { CompanyRepo } from "./repository/company.jsx";
+import { LeadRepo } from "./repository/lead.jsx";
 import config from "config";
 
 import { Route, BrowserRouter as Router, Switch , useHistory} from "react-router-dom";
@@ -153,7 +154,7 @@ import InvoicesReport from "./components/invoices/invoicesgrid/report";
 
 const AppUniversal = (props) => {
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
-
+  const { loadAllLeads } = useRecoilValue(LeadRepo);
   
 //   function toggleTheme(e) {     
 //   if($('.themecls').length > 0) {    
@@ -202,7 +203,8 @@ const AppUniversal = (props) => {
 
     // At the begining, load all company infos
     loadAllCompanies();
-  }, [loadAllCompanies]);
+    loadAllLeads();
+  }, [loadAllCompanies, loadAllLeads]);
 
   const url = props.location.pathname.split("/")[1];
   const exclusionArray = ["login", "register", "forgot-password", "error-404", "error-500"];
