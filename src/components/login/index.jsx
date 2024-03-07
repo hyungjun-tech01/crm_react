@@ -14,9 +14,11 @@ const Login =()=> {
 
   // console.log('Login index Login', cookies.myLationCrmAuthToken);
  
- // if(cookies.myLationCrmAuthToken !== 'undefined' ){
- //   history.push("/");
- // }  
+  if(cookies.myLationCrmAuthToken === 'undefined' ){
+    setCookie('myLationCrmAuthToken','AAA');
+    
+//    history.push("/");
+  }  
 
   const handleCheckLogin = () => {
     console.log('Login index', loginEmail, loginPassword);
@@ -29,7 +31,7 @@ const Login =()=> {
         setCookie('myLationCrmAuthToken',response.token);
         history.push("/");
       }
-      setCookie('myLationCrmAuthToken','SSSSS');
+      setCookie('myLationCrmAuthToken','AAA');
     });
   }   
 
