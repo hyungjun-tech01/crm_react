@@ -16,6 +16,7 @@ const Login =()=> {
  
   if(cookies.myLationCrmAuthToken === 'undefined' ){
     setCookie('myLationCrmAuthToken','AAA');
+    
 //    history.push("/");
   }  
 
