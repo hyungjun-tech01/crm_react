@@ -13,7 +13,7 @@ import { atomAllCompanies } from "../../atoms/atoms";
 import {useCookies} from "react-cookie";
 
 const Company = () => {
-  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
+  const { loadAllCompanies } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const [ companyData, setCompanyData ] = useState([]);
   const history = useHistory();
@@ -23,12 +23,7 @@ const Company = () => {
   console.log("no cookies", cookies.myLationCrmAuthToken);
   if(cookies.myLationCrmAuthToken === 'undefined' || cookies.myLationCrmAuthToken === "" || cookies.myLationCrmAuthToken === null){
     history.push("/login");
-  } 
-
-  const handleCompanyClick = useCallback((code) => {
-    setCurrentCompany(code);
-    history.push("/CompanyDetailInfo");
-  }, [history, setCurrentCompany]);
+  };
 
   const handleDateChange1 = (date) => {
     setSelectedDate1(date);
@@ -43,8 +38,7 @@ const Company = () => {
           <a href="#" className="avatar">
             <img alt="" src={record.image} />
           </a>
-          {/* <a href="#" data-bs-toggle="modal" data-bs-target="#company-details">{text}</a> */}
-          <button onClick={() => handleCompanyClick(record.code)}>{text}</button>
+          <a href="#" data-bs-toggle="modal" data-bs-target="#company-details">{text}</a>
         </>
       ),
       sorter: (a, b) => a.company.length - b.company.length,
@@ -156,6 +150,9 @@ const Company = () => {
   };
 
   useEffect(()=>{
+    if(allCompanyData.length === 0){
+      loadAllCompanies();
+    };
     const companyDataForTable = allCompanyData.map((data, index) => ({
       id: index.toString(),
       code: data.company_code,
@@ -166,7 +163,7 @@ const Company = () => {
       homepage: data.homepage,
     }));
     setCompanyData(companyDataForTable);
-  }, [allCompanyData]);
+  }, [allCompanyData, loadAllCompanies]);
 
   return (
     <div className="page-wrapper">

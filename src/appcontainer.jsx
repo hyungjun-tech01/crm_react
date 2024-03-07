@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
-import { CompanyRepo } from "./repository/company.jsx";
-import { LeadRepo } from "./repository/lead.jsx";
 import config from "config";
 
-import { Route, BrowserRouter as Router, Switch , useHistory} from "react-router-dom";
-
+import {
+  Route,
+  BrowserRouter as Router,
+  Switch,
+  useHistory,
+} from "react-router-dom";
 
 import Header from "./components/header/index";
 //dashboard
@@ -65,25 +66,25 @@ import Taxsettings from "./components/invoices/invoicesettings/taxsettings";
 import Banksettings from "./components/invoices/invoicesettings/banksettings";
 
 // Elements
-import Sweetalerts from './components/elements/sweetalerts/index'
-import Tooltip from './components/elements/tooltip/index'
-import Popover from './components/elements/popover/index'
-import Ribbon from './components/elements/ribbon/index'
-import Clipboard from './components/elements/clipboard/index'
-import Dragdrop from './components/elements/dragdrop/dragdrop'
-import Rangeslider from './components/elements/rangeslider/index'
-import Rating from './components/elements/rating/index'
-import Toastr from './components/elements/toastr/index'
-import Texteditor from './components/elements/texteditor/index'
-import Counter from './components/elements/counter/index'
-import Scrollbar from './components/elements/scrollbar/index'
-import Spinner from './components/elements/spinner/index'
-import Notification from './components/elements/notification/index'
-import Lightbox from './components/elements/lightbox/index'
-import Stickynote from './components/elements/stickynote/index'
-import Timeline from './components/elements/timeline/index'
-import Horizontaltimeline from './components/elements/horizontaltimeline/index'
-import Formwizard from './components/elements/formwizard/index'
+import Sweetalerts from "./components/elements/sweetalerts/index";
+import Tooltip from "./components/elements/tooltip/index";
+import Popover from "./components/elements/popover/index";
+import Ribbon from "./components/elements/ribbon/index";
+import Clipboard from "./components/elements/clipboard/index";
+import Dragdrop from "./components/elements/dragdrop/dragdrop";
+import Rangeslider from "./components/elements/rangeslider/index";
+import Rating from "./components/elements/rating/index";
+import Toastr from "./components/elements/toastr/index";
+import Texteditor from "./components/elements/texteditor/index";
+import Counter from "./components/elements/counter/index";
+import Scrollbar from "./components/elements/scrollbar/index";
+import Spinner from "./components/elements/spinner/index";
+import Notification from "./components/elements/notification/index";
+import Lightbox from "./components/elements/lightbox/index";
+import Stickynote from "./components/elements/stickynote/index";
+import Timeline from "./components/elements/timeline/index";
+import Horizontaltimeline from "./components/elements/horizontaltimeline/index";
+import Formwizard from "./components/elements/formwizard/index";
 
 // Charts
 import ApexCharts from "./components/charts/apexcharts/index";
@@ -122,20 +123,18 @@ import Company from "./components/company";
 import CompanyDetailInfo from "./components/company_detail/index.jsx";
 import Sidebarnav from "./components/sidebar";
 
-
 // Login & Register
 import Login from "./components/login";
 import Register from "./components/register";
 import ForgotPassword from "./components/forgotpassword";
 
-import 'antd/dist/antd.css';
-import "./assets/css/bootstrap.min.css"
-import "./assets/css/font-awesome.min.css"
+import "antd/dist/antd.css";
+import "./assets/css/bootstrap.min.css";
+import "./assets/css/font-awesome.min.css";
 import "./assets/css/feather.css";
 import "./assets/css/line-awesome.min.css";
 import "./assets/css/theme-settings.css";
 import "./assets/css/style.css";
-
 
 import "react-datepicker/dist/react-datepicker.css";
 import "./assets/js/bootstrap.bundle.js";
@@ -153,21 +152,18 @@ import ProjectDetailsModel from "./components/project/ProjectDetailsModel";
 import InvoicesReport from "./components/invoices/invoicesgrid/report";
 
 const AppUniversal = (props) => {
-  const { loadAllCompanies } = useRecoilValue(CompanyRepo);
-  const { loadAllLeads } = useRecoilValue(LeadRepo);
-  
-//   function toggleTheme(e) {     
-//   if($('.themecls').length > 0) {    
-//     const currentTheme = localStorage.getItem('theme');
-//     var app = document.getElementsByClassName("themecls")[0];
-//     if (currentTheme) {
-//         app.href = "../src/css/"+currentTheme+".css";
-//     }    
-//         app.href = "../src/css/"+e+".css";
-//         localStorage.setItem('theme', e);
-//     }
-// }
-  useEffect(() => {    
+  //   function toggleTheme(e) {
+  //   if($('.themecls').length > 0) {
+  //     const currentTheme = localStorage.getItem('theme');
+  //     var app = document.getElementsByClassName("themecls")[0];
+  //     if (currentTheme) {
+  //         app.href = "../src/css/"+currentTheme+".css";
+  //     }
+  //         app.href = "../src/css/"+e+".css";
+  //         localStorage.setItem('theme', e);
+  //     }
+  // }
+  useEffect(() => {
     document.querySelector(".roboto-font").onclick = function () {
       document.body.classList.add("roboto");
       document.body.classList.remove("inter");
@@ -200,42 +196,68 @@ const AppUniversal = (props) => {
       document.body.classList.remove("monstret");
       document.body.classList.remove("poppins");
     };
-
-    // At the begining, load all company infos
-    loadAllCompanies();
-    loadAllLeads();
-  }, [loadAllCompanies, loadAllLeads]);
+  }, []);
 
   const url = props.location.pathname.split("/")[1];
-  const exclusionArray = ["login", "register", "forgot-password", "error-404", "error-500"];
+  const exclusionArray = [
+    "login",
+    "register",
+    "forgot-password",
+    "error-404",
+    "error-500",
+  ];
   return (
     <Router basename={`${config.publicPath}`}>
       <div className="main-wrapper">
-        <Route render={(props) => <Header {...props} />} />        
-            <Route render={(props) => <Sidebarnav {...props} />} />
+        <Route render={(props) => <Header {...props} />} />
+        <Route render={(props) => <Sidebarnav {...props} />} />
         <Switch>
           {/* Dashboard */}
           <Route path="/" exact component={Company} />
           <Route path="/index" exact component={Dashboard} />
-          <Route path="/projects-dashboard" exact component={ProjectDashboard} />
+          <Route
+            path="/projects-dashboard"
+            exact
+            component={ProjectDashboard}
+          />
           <Route path="/leads-dashboard" exact component={LeadDashboard} />
           <Route path="/tasks" exact component={Task} />
           <Route path="/SystemUserModel" exact component={SystemUserModel} />
           <Route path="/TaskDetailModel" exact component={TaskDetailModel} />
           <Route path="/contacts" exact component={Contacts} />
           <Route path="/companies" exact component={Company} />
-          <Route path="/CompanyDetailInfo" exact component={CompanyDetailInfo} />
-          <Route path="/CompanyDetailsModel" exact component={CompanyDetailsModel} />
+          <Route
+            path="/CompanyDetailInfo"
+            exact
+            component={CompanyDetailInfo}
+          />
+          <Route
+            path="/CompanyDetailsModel"
+            exact
+            component={CompanyDetailsModel}
+          />
           <Route path="/leads" exact component={Lead} />
-          <Route path="/LeadsDetailsModel" exact component={LeadsDetailsModel} />
+          <Route
+            path="/LeadsDetailsModel"
+            exact
+            component={LeadsDetailsModel}
+          />
           <Route path="/leads-kanban-view" exact component={Leadskanbanview} />
           <Route path="/deals" exact component={Deals} />
           <Route path="/DealDetailsModel" exact component={DealDetailsModel} />
           <Route path="/CompanyDetails" exact component={CompanyDetails} />
           <Route path="/deals-kanban-view" exact component={Dealskanbanview} />
           <Route path="/projects" exact component={Project} />
-          <Route path="/ProjectDetailsModel" exact component={ProjectDetailsModel} />
-          <Route path="/projects-kanban-view" exact component={Projectkanbanview} />
+          <Route
+            path="/ProjectDetailsModel"
+            exact
+            component={ProjectDetailsModel}
+          />
+          <Route
+            path="/projects-kanban-view"
+            exact
+            component={Projectkanbanview}
+          />
           <Route path="/reports" exact component={Reports} />
           <Route path="/activities" exact component={Activities} />
           <Route path="/blog" exact component={Blogs} />
@@ -249,8 +271,16 @@ const AppUniversal = (props) => {
           <Route path="/invoices-paid" exact component={InvoicesPaid} />
           <Route path="/invoices-overdue" exact component={InvoicesOverdue} />
           <Route path="/invoices-draft" exact component={InvoicesDraft} />
-          <Route path="/invoices-recurring" exact component={InvoicesRecurring} />
-          <Route path="/invoices-cancelled" exact component={InvoicesCancelled} />
+          <Route
+            path="/invoices-recurring"
+            exact
+            component={InvoicesRecurring}
+          />
+          <Route
+            path="/invoices-cancelled"
+            exact
+            component={InvoicesCancelled}
+          />
           <Route path="/invoice-grid" exact component={InvoicesGrid} />
           <Route path="/InvoicesReport" exact component={InvoicesReport} />
           <Route path="/add-invoice" exact component={AddInvoices} />
@@ -302,7 +332,11 @@ const AppUniversal = (props) => {
 
           <Route path="/tooltip" exact component={Tooltip} />
           <Route path="/rangeslider" exact component={Rangeslider} />
-          <Route path="/horizontal-timeline" exact component={Horizontaltimeline} />
+          <Route
+            path="/horizontal-timeline"
+            exact
+            component={Horizontaltimeline}
+          />
           <Route path="/form-wizard" exact component={Formwizard} />
 
           {/* Charts */}
@@ -340,20 +374,36 @@ const AppUniversal = (props) => {
           <Route path="/login" exact component={Login} />
           <Route path="/register" exact component={Register} />
           <Route path="/forgot-password" exact component={ForgotPassword} />
-
         </Switch>
-      </div>      
+      </div>
       {/*theme settings modal*/}
-      <div className="modal right fade settings" id="settings" role="dialog" aria-modal="true">
+      <div
+        className="modal right fade settings"
+        id="settings"
+        role="dialog"
+        aria-modal="true"
+      >
         <div className="toggle-close">
-          <div className="toggle" data-bs-toggle="modal" data-bs-target="#settings"><i className="fa fa-cog fa-w-16 fa-spin fa-2x" />
+          <div
+            className="toggle"
+            data-bs-toggle="modal"
+            data-bs-target="#settings"
+          >
+            <i className="fa fa-cog fa-w-16 fa-spin fa-2x" />
           </div>
         </div>
         <div className="modal-dialog" role="document">
           <div className="modal-content">
             <div className="modal-header p-3">
-              <h4 className="modal-title" id="myModalLabel2">Theme Customizer</h4>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <h4 className="modal-title" id="myModalLabel2">
+                Theme Customizer
+              </h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
             </div>
             <div className="modal-body pb-3">
               <div className="scroll">
@@ -407,30 +457,66 @@ const AppUniversal = (props) => {
                           <h5 className="pb-2">Header Style</h5>
                         </div>
                         <div className="col text-end">
-                          <a className="reset text-white bg-dark" id="ChageheaderDefault">Reset Default</a>
+                          <a
+                            className="reset text-white bg-dark"
+                            id="ChageheaderDefault"
+                          >
+                            Reset Default
+                          </a>
                         </div>
                       </div>
                       <div className="theme-settings-swatches">
                         <div className="themes">
                           <div className="themes-body">
-                            <ul id="theme-change1" className="theme-colors border-0 list-inline-item list-unstyled mb-0">
+                            <ul
+                              id="theme-change1"
+                              className="theme-colors border-0 list-inline-item list-unstyled mb-0"
+                            >
                               <li className="theme-title">Solid Color</li>
-                              <li className="list-inline-item"><span className="header-solid-black bg-black" /></li>
-                              <li className="list-inline-item"><span className="header-solid-pink bg-primary" /></li>
-                              <li className="list-inline-item"><span className="header-solid-orange bg-secondary1" /></li>
-                              <li className="list-inline-item"><span className="header-solid-purple bg-success" /></li>
+                              <li className="list-inline-item">
+                                <span className="header-solid-black bg-black" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="header-solid-pink bg-primary" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="header-solid-orange bg-secondary1" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="header-solid-purple bg-success" />
+                              </li>
                               {/* <li class="list-inline-item"><span class="header-solid-blue bg-info"></span></li> */}
-                              <li className="list-inline-item"><span className="header-solid-green bg-warnings" /></li>
-                              <li><br /></li>
-                              <li><hr /></li>
+                              <li className="list-inline-item">
+                                <span className="header-solid-green bg-warnings" />
+                              </li>
+                              <li>
+                                <br />
+                              </li>
+                              <li>
+                                <hr />
+                              </li>
                               <li className="theme-title">Gradient Color</li>
-                              <li className="list-inline-item"><span className="header-gradient-color1 bg-sunny-morning" /></li>
-                              <li className="list-inline-item"><span className="header-gradient-color2 bg-tempting-azure" /></li>
-                              <li className="list-inline-item"><span className="header-gradient-color3 bg-amy-crisp" /></li>
-                              <li className="list-inline-item"><span className="header-gradient-color4 bg-mean-fruit" /></li>
-                              <li className="list-inline-item"><span className="header-gradient-color5 bg-malibu-beach" /></li>
-                              <li className="list-inline-item"><span className="header-gradient-color6 bg-ripe-malin" /></li>
-                              <li className="list-inline-item"><span className="header-gradient-color7 bg-plum-plate" /></li>
+                              <li className="list-inline-item">
+                                <span className="header-gradient-color1 bg-sunny-morning" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="header-gradient-color2 bg-tempting-azure" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="header-gradient-color3 bg-amy-crisp" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="header-gradient-color4 bg-mean-fruit" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="header-gradient-color5 bg-malibu-beach" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="header-gradient-color6 bg-ripe-malin" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="header-gradient-color7 bg-plum-plate" />
+                              </li>
                             </ul>
                           </div>
                         </div>
@@ -446,30 +532,66 @@ const AppUniversal = (props) => {
                           <h5 className="pb-2">Apps Sidebar Style</h5>
                         </div>
                         <div className="col  text-end">
-                          <a className="reset text-white bg-dark" id="ChagesidebarDefault">Reset Default</a>
+                          <a
+                            className="reset text-white bg-dark"
+                            id="ChagesidebarDefault"
+                          >
+                            Reset Default
+                          </a>
                         </div>
                       </div>
                       <div className="theme-settings-swatches">
                         <div className="themes">
                           <div className="themes-body">
-                            <ul id="theme-change2" className="theme-colors border-0 list-inline-item list-unstyled">
+                            <ul
+                              id="theme-change2"
+                              className="theme-colors border-0 list-inline-item list-unstyled"
+                            >
                               <li className="theme-title">Solid Color</li>
-                              <li className="list-inline-item"><span className="sidebar-solid-black bg-black" /></li>
-                              <li className="list-inline-item"><span className="sidebar-solid-pink bg-primary" /></li>
-                              <li className="list-inline-item"><span className="sidebar-solid-orange bg-secondary1" /></li>
-                              <li className="list-inline-item"><span className="sidebar-solid-purple bg-success" /></li>
+                              <li className="list-inline-item">
+                                <span className="sidebar-solid-black bg-black" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="sidebar-solid-pink bg-primary" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="sidebar-solid-orange bg-secondary1" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="sidebar-solid-purple bg-success" />
+                              </li>
                               {/* <li class="list-inline-item"><span class="sidebar-solid-blue bg-info"></span></li> */}
-                              <li className="list-inline-item"><span className="sidebar-solid-green bg-warnings" /></li>
-                              <li><br /></li>
-                              <li><hr /></li>
+                              <li className="list-inline-item">
+                                <span className="sidebar-solid-green bg-warnings" />
+                              </li>
+                              <li>
+                                <br />
+                              </li>
+                              <li>
+                                <hr />
+                              </li>
                               <li className="theme-title">Gradient Color</li>
-                              <li className="list-inline-item"><span className="sidebar-gradient-color1 bg-sunny-morning" /></li>
-                              <li className="list-inline-item"><span className="sidebar-gradient-color2 bg-tempting-azure" /></li>
-                              <li className="list-inline-item"><span className="sidebar-gradient-color3 bg-amy-crisp" /></li>
-                              <li className="list-inline-item"><span className="sidebar-gradient-color4 bg-mean-fruit" /></li>
-                              <li className="list-inline-item"><span className="sidebar-gradient-color5 bg-malibu-beach" /></li>
-                              <li className="list-inline-item"><span className="sidebar-gradient-color6 bg-ripe-malin" /></li>
-                              <li className="list-inline-item"><span className="sidebar-gradient-color7 bg-plum-plate" /></li>
+                              <li className="list-inline-item">
+                                <span className="sidebar-gradient-color1 bg-sunny-morning" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="sidebar-gradient-color2 bg-tempting-azure" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="sidebar-gradient-color3 bg-amy-crisp" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="sidebar-gradient-color4 bg-mean-fruit" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="sidebar-gradient-color5 bg-malibu-beach" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="sidebar-gradient-color6 bg-ripe-malin" />
+                              </li>
+                              <li className="list-inline-item">
+                                <span className="sidebar-gradient-color7 bg-plum-plate" />
+                              </li>
                             </ul>
                           </div>
                         </div>
@@ -481,13 +603,17 @@ const AppUniversal = (props) => {
                       <h5 className="pb-2">Font Style</h5>
                     </div>
                     <div className="col text-end">
-                      <a className="reset text-white bg-dark font-Default">Reset Default</a>
+                      <a className="reset text-white bg-dark font-Default">
+                        Reset Default
+                      </a>
                     </div>
                   </div>
                   <ul className="list-inline-item list-unstyled font-family border-0 p-0">
                     <li className="list-inline-item roboto-font">Roboto</li>
                     <li className="list-inline-item poppins-font">Poppins</li>
-                    <li className="list-inline-item montserrat-font">Montserrat</li>
+                    <li className="list-inline-item montserrat-font">
+                      Montserrat
+                    </li>
                     <li className="list-inline-item inter-font">Inter</li>
                   </ul>
                 </div>
@@ -497,12 +623,21 @@ const AppUniversal = (props) => {
         </div>
       </div>
 
-
       {/*theme settings*/}
-      {exclusionArray.indexOf(url) >= 0 ? "" : <div className="sidebar-contact">
-        <div className="toggle" data-bs-toggle="modal" data-bs-target="#settings"><i className="fa fa-cog fa-w-16 fa-spin fa-2x" /></div>
-      </div>}
+      {exclusionArray.indexOf(url) >= 0 ? (
+        ""
+      ) : (
+        <div className="sidebar-contact">
+          <div
+            className="toggle"
+            data-bs-toggle="modal"
+            data-bs-target="#settings"
+          >
+            <i className="fa fa-cog fa-w-16 fa-spin fa-2x" />
+          </div>
+        </div>
+      )}
     </Router>
   );
-}
+};
 export default AppUniversal;

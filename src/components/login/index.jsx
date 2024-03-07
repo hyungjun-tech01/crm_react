@@ -12,7 +12,7 @@ const Login =()=> {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
-  console.log('Login index Login', cookies.myLationCrmAuthToken);
+  // console.log('Login index Login', cookies.myLationCrmAuthToken);
  
  // if(cookies.myLationCrmAuthToken !== 'undefined' ){
  //   history.push("/");

@@ -1,59 +1,75 @@
-
-import React, { useEffect } from "react";
-import { useRecoilValue } from "recoil";
-import { Link, withRouter , useHistory} from "react-router-dom";
+import React from "react";
+import { Link, withRouter } from "react-router-dom";
 import { Scrollbars } from "react-custom-scrollbars";
-import { avatar17 } from '../imagepath';
-import { BiAward, BiBarChartAlt2, BiCalendarAlt, BiClipboard, BiCog, BiCoinStack, BiCommand, BiCube, BiData, BiDockLeft, BiDockTop, BiEnvelope, BiError, BiGridAlt, BiHomeAlt, BiMenu, BiMobileAlt, BiPodcast, BiSearchAlt2, BiStation, BiTask, BiUser } from "react-icons/bi";
-import { atomCurrentCompany, defaultCompany } from "../../atoms/atoms";
-import {useCookies} from "react-cookie";
+import { avatar17 } from "../imagepath";
+import {
+  BiAward,
+  BiBarChartAlt2,
+  BiCalendarAlt,
+  BiClipboard,
+  BiCog,
+  BiCoinStack,
+  BiCommand,
+  BiCube,
+  BiData,
+  BiDockLeft,
+  BiDockTop,
+  BiEnvelope,
+  BiError,
+  BiGridAlt,
+  BiHomeAlt,
+  BiMenu,
+  BiMobileAlt,
+  BiPodcast,
+  BiSearchAlt2,
+  BiStation,
+  BiTask,
+  BiUser,
+} from "react-icons/bi";
 
 const SidebarNav = (props) => {
-  const currentCompany = useRecoilValue(atomCurrentCompany);
-  
-  useEffect(()=>{
-    console.log("Current Company is changed");
-  }, [currentCompany]);
 
   const exclusionArray = ["login", "register", "forgot-password", "error-404", "error-500", "email", "mail-view", "components"];
-  if (
-    exclusionArray.indexOf(props.location.pathname.split("/")[1]) >= 0
-  ) {
+  if (exclusionArray.indexOf(props.location.pathname.split("/")[1]) >= 0) {
     return "";
   }
-  
-  const { location } = props
-  let pathname = location.pathname    
+
+  const { location } = props;
+  let pathname = location.pathname;
   return (
     <div className="sidebar" id="sidebar">
       <Scrollbars>
-      <div className="sidebar-inner slimscroll">
-        <form action="search.html" className="mobile-view">
-          <input className="form-control" type="text" placeholder="Search here" />
-          <button className="btn" type="button"><BiSearchAlt2 /></button>
-        </form>
-        <div id="sidebar-menu" className="sidebar-menu">
-          <ul>
-            <li className="nav-item nav-profile">
-              <Link to="#" className="nav-link">
-                <div className="nav-profile-image">
-                  <img src={avatar17} alt="profile" />
-                </div>
-                <div className="nav-profile-text d-flex flex-column">
-                  { currentCompany && (
-                    <>
-                      <span className="font-weight-bold mb-2">{currentCompany.company}</span>
-                      <span className="text-white text-small">Company</span>
-                    </>)
-                  }
-                </div>
-                <i className="mdi mdi-bookmark-check text-success nav-profile-badge" />
-              </Link>
-            </li>
-            <li className="menu-title">
-              <span>Main</span>
-            </li>
-            {/* <li className="submenu">
+        <div className="sidebar-inner slimscroll">
+          <form action="search.html" className="mobile-view">
+            <input
+              className="form-control"
+              type="text"
+              placeholder="Search here"
+            />
+            <button className="btn" type="button">
+              <BiSearchAlt2 />
+            </button>
+          </form>
+          <div id="sidebar-menu" className="sidebar-menu">
+            <ul>
+              <li className="nav-item nav-profile">
+                <Link to="#" className="nav-link">
+                  <div className="nav-profile-image">
+                    <img src={avatar17} alt="profile" />
+                  </div>
+                  <div className="nav-profile-text d-flex flex-column">
+                        <span className="font-weight-bold mb-2">
+                          {" "}
+                        </span>
+                        <span className="text-white text-small">Company</span>
+                  </div>
+                  <i className="mdi mdi-bookmark-check text-success nav-profile-badge" />
+                </Link>
+              </li>
+              <li className="menu-title">
+                <span>Main</span>
+              </li>
+              {/* <li className="submenu">
               <Link to="#" className={`${pathname === "/" || pathname === "/projects-dashboard" || pathname === "/index" ||
                 pathname === "/leads-dashboard" ? "active subdrop" : ""}`}><BiHomeAlt /> <span> Dashboard</span> <span className="menu-arrow" /></Link>
               <ul className="sub-menus">
@@ -62,44 +78,53 @@ const SidebarNav = (props) => {
                 <li><Link to="/leads-dashboard" className={`${pathname === "/leads-dashboard" ? "active" : ""}`}>Leads Dashboard</Link></li>
               </ul>
             </li> */}
-            { currentCompany === defaultCompany ? (
-              <>
-                <li>
-                  <Link className={`${pathname.includes("companies") ? "active" : ""}`} to="/companies"><BiData /> <span>Companies</span></Link>
-                </li>
-                <li className="menu-title">
-                  <span>Settings</span>
-                </li>
-                <li>
-                  <Link className={`${pathname.includes("userinfo") ? "active" : ""}`} to="/userinfo"><BiCog /> <span>UserInfo</span></Link>
-                </li>
-              </>
-            ):(
-              <>
-                <li>
-                  <Link className={`${pathname.includes("company_detail") ? "active" : ""}`} to="/CompanyDetailInfo"><BiTask /><span>Company Details</span></Link>
-                </li>
-                <li>
-                  <Link className={`${pathname.includes("leads") ? "active" : ""}`} to="/leads"><BiData /> <span>Leads</span></Link>
-                </li>
-                <li>
-                  <Link className={`${pathname.includes("deals") ? "active" : ""}`} to="/deals"><BiData /> <span>Deals</span></Link>
-                </li>
-                <li>
-                  <Link className={`${pathname.includes("invoices") ? "active" : ""}`} to="/invoices"><BiData /> <span>Invoices</span></Link>
-                </li>
-                <li className="menu-title">
-                  <span>Settings</span>
-                </li>
-                <li>
-                  <Link className={`${pathname.includes("userinfo") ? "active" : ""}`} to="/userinfo"><BiCog /> <span>UserInfo</span></Link>
-                </li>
-              </>
-            )}
+              <li>
+                <Link
+                  className={`${
+                    pathname.includes("companies") ? "active" : ""
+                  }`}
+                  to="/companies"
+                >
+                  <BiData /> <span>Companies</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  className={`${pathname.includes("leads") ? "active" : ""}`}
+                  to="/leads"
+                >
+                  <BiData /> <span>Leads</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  className={`${pathname.includes("deals") ? "active" : ""}`}
+                  to="/deals"
+                >
+                  <BiData /> <span>Deals</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  className={`${pathname.includes("invoices") ? "active" : ""}`}
+                  to="/invoices"
+                >
+                  <BiData /> <span>Invoices</span>
+                </Link>
+              </li>
+              <li className="menu-title">
+                <span>Settings</span>
+              </li>
+              <li>
+                <Link
+                  className={`${pathname.includes("userinfo") ? "active" : ""}`}
+                  to="/userinfo"
+                >
+                  <BiCog /> <span>UserInfo</span>
+                </Link>
+              </li>
 
-                
-
-                {/* <li>
+              {/* <li>
                   <Link className={`${pathname.includes("tasks") ? "active" : ""}`} to="/tasks"><BiTask /><span>Tasks</span></Link>
                 </li>
                 <li>
@@ -120,7 +145,7 @@ const SidebarNav = (props) => {
                 <li>
                   <Link className={`${pathname.includes("activities") ? "active" : ""}`} to="/activities"><BiClipboard/> <span>Activities</span></Link>
                 </li> */}
-                {/* <li className="submenu">
+              {/* <li className="submenu">
                   <Link to="#" className={`${pathname === "/blog" || pathname === "/add-blog" ||
                     pathname === "/edit-blog" || pathname === "categories" ? "active subdrop" : ""}`}><BiGridAlt /> <span>Blogs</span> <span className="menu-arrow" /></Link>
                   <ul className="sub-menus">
@@ -130,7 +155,7 @@ const SidebarNav = (props) => {
                     <li><Link to="/categories" className={`${pathname === "/categories" ? "active" : ""}`}>Categories</Link></li>
                   </ul>
                 </li> */}
-                {/* <li className="submenu">
+              {/* <li className="submenu">
                   <Link to="#" className={`${pathname === "/invoices" || pathname === "/invoice-grid" ||
                     pathname === "/add-invoice" || pathname === "edit-invoice" || pathname === "view-invoice" || pathname === "invoices-settings" ? "active subdrop" : ""}`}><BiCalendarAlt /> <span>Invoices </span> <span className="menu-arrow" /></Link>
                   <ul className="sub-menus">
@@ -142,10 +167,10 @@ const SidebarNav = (props) => {
                     <li><Link to="/invoices-settings" className={`${pathname === "/invoices-settings" || pathname === "/tax-settings" || pathname === "/bank-settings" ? "active" : ""}`}>Invoices Settings</Link></li>
                   </ul>
                 </li> */}
-                {/* <li>
+              {/* <li>
                   <Link className={`${pathname.includes("email") ? "active" : ""}`} to="/email"><BiEnvelope /> <span>Email</span></Link>
                 </li> */}
-                {/* <li>
+              {/* <li>
                   <Link className={`${pathname.includes("settings") ? "active" : ""}`} to="/settings"><BiCog /> <span>Settings</span></Link>
                 </li>
                 <li className="menu-title">
@@ -279,12 +304,11 @@ const SidebarNav = (props) => {
                     </li>
                   </ul>
                 </li> */}
-            
-          </ul>
+            </ul>
+          </div>
         </div>
-      </div>
       </Scrollbars>
     </div>
   );
-}
+};
 export default withRouter(SidebarNav);

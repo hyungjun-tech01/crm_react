@@ -11,7 +11,7 @@ import { LeadRepo } from "../../repository/lead";
 import { atomAllLeads } from "../../atoms/atoms"; 
 
 const Lead = () => {
-  const { setCurrentLead } = useRecoilValue(LeadRepo);
+  const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
   const allLeadData = useRecoilValue(atomAllLeads);
   const [ leadData, setLeadData ] = useState([]);
 
@@ -130,6 +130,9 @@ const Lead = () => {
   };
 
   useEffect(()=>{
+    if(allLeadData.length === 0){
+      loadAllLeads();
+    };
     const leadDataForTable = allLeadData.map((data, index) => ({
       id: index.toString(),
       code: data.lead_code,
@@ -143,7 +146,7 @@ const Lead = () => {
       owner: data.create_user,
     }));
     setLeadData(leadDataForTable);
-  }, [allLeadData]);
+  }, [allLeadData, loadAllLeads]);
 
   return (
     <div className="page-wrapper">
