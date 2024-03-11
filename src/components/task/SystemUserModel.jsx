@@ -168,7 +168,7 @@ const SystemUserModel = () => {
                   <div className="tab-pane show active" id="task-details">
                     <div className="crms-tasks">
                       <div className="tasks__item crms-task-item active">
-                         <Collapse accordion expandIconPosition='right'>
+                         <Collapse accordion expandIconPosition='end'>
                           <Panel header=" Name &amp; Occupation" key="1">
                             <table className="table">
                               <tbody>
@@ -194,7 +194,7 @@ const SystemUserModel = () => {
                         </Collapse>
                       </div>
                       <div className="tasks__item crms-task-item active">
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Contact Details" key="1">
                             <table className="table">
                               <tbody>
@@ -264,7 +264,7 @@ const SystemUserModel = () => {
                         </Collapse>
                       </div>
                       <div className="tasks__item crms-task-item active">
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Address Information" key="1">
                             <table className="table">
                               <tbody>
@@ -282,7 +282,7 @@ const SystemUserModel = () => {
                         </Collapse>
                       </div>
                       <div className="tasks__item crms-task-item active">
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Dates To Remember" key="1">
                             <table className="table">
                               <tbody>
@@ -300,7 +300,7 @@ const SystemUserModel = () => {
                         </Collapse>
                       </div>
                       <div className="tasks__item crms-task-item active">
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Additional Information" key="1">
                             <table className="table">
                               <tbody>
@@ -328,7 +328,7 @@ const SystemUserModel = () => {
                         </Collapse>
                       </div>
                       <div className="tasks__item crms-task-item active">
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Description Information" key="1">
                             <table className="table">
                               <tbody>
@@ -342,7 +342,7 @@ const SystemUserModel = () => {
                         </Collapse>
                       </div>
                       <div className="tasks__item crms-task-item active">
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Tag List" key="1">
                             <table className="table">
                               <tbody>
@@ -443,7 +443,7 @@ const SystemUserModel = () => {
                     <div className="row">
                       <div className="crms-tasks p-2">
                         <div className="tasks__item crms-task-item active">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Companies" key="1">
                                 <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                   <thead>
@@ -543,7 +543,7 @@ const SystemUserModel = () => {
                           <div className="accordion-header js-accordion-header">
                             Deals
                           </div>
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Deals" key="1">
                                 <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                   <thead>
@@ -631,7 +631,7 @@ const SystemUserModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Projects" key="1">
                                 <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                   <thead>
@@ -678,7 +678,7 @@ const SystemUserModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Contacts" key="1">
                                 <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                   <thead>
@@ -753,7 +753,7 @@ const SystemUserModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Notes" key="1">
                                 <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                   <thead>
@@ -831,7 +831,7 @@ const SystemUserModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Files" key="1">
                                 <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                   <thead>
@@ -947,7 +947,7 @@ const SystemUserModel = () => {
                     <div className="row">
                       <div className="crms-tasks  p-2">
                         <div className="tasks__item crms-task-item active">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Upcoming Activity" key="1">
                                 <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                   <thead>
@@ -1041,7 +1041,7 @@ const SystemUserModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Past Activity" key="1">
                                 <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                   <thead>

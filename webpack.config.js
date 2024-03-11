@@ -127,11 +127,9 @@ module.exports = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "public", "index.html"),
       filename: "./index.html",
-      // favicon: './public/favicon.ico'
     }),
     new MiniCssExtractPlugin({ // plugin for controlling how compiled css will be outputted and named
       filename: "css/[name].css",

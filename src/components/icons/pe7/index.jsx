@@ -1,254 +1,633 @@
-import React from 'react';
+import React from "react";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
-import MaterialIcon from '@material/react-material-icon';
-const PE7Icons =()=>{
-    return(
-<>
-  {/* Page Wrapper */}
-  <div className="page-wrapper">
-  <Helmet>
-      <title>Dashboard- CRMS admin Template</title>
-      <meta name="description" content="Reactify Blank Page" />
-  </Helmet>
-    <div className="content container-fluid">
-      {/* Page Header */}
-      <div className="crms-title row bg-white mb-4">
-        <div className="col">
-          <h3 className="page-title">
-            <span className="page-title-icon bg-gradient-primary text-white me-2">
-              <i className="fas fa-table" />
-            </span>{" "}
-            <span>Pe7 Icons</span>
-          </h3>
-        </div>
-        <div className="col text-end">
-          <ul className="breadcrumb bg-white float-end m-0 ps-0 pe-0">
-            <li className="breadcrumb-item">
-              <Link to="/index">Dashboard</Link>
-            </li>
-            <li className="breadcrumb-item active">Pe7 Icons</li>
-          </ul>
-        </div>
-      </div>
-      {/* /Page Header */}
-      <div className="row">
-        {/* Chart */}
-        <div className="col-md-12">
-          <div className="card">
-            <div className="card-header">
-              <div className="card-title">Pe7 Icon</div>
-            </div>
-            <div className="card-body">
-              <div className="icons-items">
-                <ul className="icons-list">
-                <li><MaterialIcon icon="dashboard" /></li>
-                <li><MaterialIcon icon="data_usage" /></li>
-                <li><MaterialIcon icon="date_range" /></li>
-                <li><MaterialIcon icon="dehaze" /></li>
-                <li><MaterialIcon icon="delete" /></li>
-                <li><MaterialIcon icon="delete_forever" /></li>
-                <li><MaterialIcon icon="delete_sweep" /></li>
-                <li><MaterialIcon icon="description" /></li>
-                <li><MaterialIcon icon="desktop_mac" /></li>
-                <li><MaterialIcon icon="desktop_windows" /></li>
-                <li><MaterialIcon icon="details" /></li>
-                <li><MaterialIcon icon="developer_board" /></li>
-                <li><MaterialIcon icon="developer_mode" /></li>
-                <li><MaterialIcon icon="device_hub" /></li>
-                <li><MaterialIcon icon="devices" /></li>
-                <li><MaterialIcon icon="devices_other" /></li>
-                <li><MaterialIcon icon="dialer_sip" /></li>
-                <li><MaterialIcon icon="dialpad" /></li>
-                <li><MaterialIcon icon="directions" /></li>
-                <li><MaterialIcon icon="directions_bike" /></li>
-                <li><MaterialIcon icon="directions_boat" /></li>
-                <li><MaterialIcon icon="directions_bus" /></li>
-                <li><MaterialIcon icon="directions_car" /></li>
-                <li><MaterialIcon icon="directions_railway" /></li>
-                <li><MaterialIcon icon="directions_run" /></li>
-                <li><MaterialIcon icon="directions_subway" /></li>
-                <li><MaterialIcon icon="directions_transit" /></li>
-                <li><MaterialIcon icon="directions_walk" /></li>
-                <li><MaterialIcon icon="disc_full" /></li>
-                <li><MaterialIcon icon="dns" /></li>
-                <li><MaterialIcon icon="do_not_disturb" /></li>
-                <li><MaterialIcon icon="do_not_disturb_alt" /></li>
-                <li><MaterialIcon icon="do_not_disturb_off" /></li>
-                <li><MaterialIcon icon="do_not_disturb_on" /></li>
-                <li><MaterialIcon icon="dock" /></li>
-                <li><MaterialIcon icon="domain" /></li>
-                <li><MaterialIcon icon="done" /></li>
-                <li><MaterialIcon icon="done_all" /></li>
-                <li><MaterialIcon icon="donut_large" /></li>
-                <li><MaterialIcon icon="donut_small" /></li>
-                <li><MaterialIcon icon="drafts" /></li>
-                <li><MaterialIcon icon="drag_handle" /></li>
-                <li><MaterialIcon icon="drive_eta" /></li>
-                <li><MaterialIcon icon="dvr" /></li>
-                <li><MaterialIcon icon="edit" /></li>
-                <li><MaterialIcon icon="edit_location" /></li>
-                <li><MaterialIcon icon="eject" /></li>
-                <li><MaterialIcon icon="email" /></li>
-                <li><MaterialIcon icon="enhanced_encryption" /></li>
-                <li><MaterialIcon icon="equalizer" /></li>
-                <li><MaterialIcon icon="error_outline" /></li>
-                <li><MaterialIcon icon="euro_symbol" /></li>
-                <li><MaterialIcon icon="ev_station" /></li>
-                <li><MaterialIcon icon="event" /></li>
-                <li><MaterialIcon icon="event_available" /></li>
-                <li><MaterialIcon icon="event_busy" /></li>
-                <li><MaterialIcon icon="event_note" /></li>
-                <li><MaterialIcon icon="event_seat" /></li>
-                <li><MaterialIcon icon="exit_to_app" /></li>
-                <li><MaterialIcon icon="expand_less" /></li>
-                <li><MaterialIcon icon="expand_more" /></li>
-                <li><MaterialIcon icon="explicit" /></li>
-                <li><MaterialIcon icon="explore" /></li>
-                <li><MaterialIcon icon="exposure" /></li>
-                <li><MaterialIcon icon="exposure_neg_1" /></li>
-                <li><MaterialIcon icon="exposure_neg_2" /></li>
-                <li><MaterialIcon icon="exposure_plus_1" /></li>
-                <li><MaterialIcon icon="exposure_plus_2" /></li>
-                <li><MaterialIcon icon="exposure_zero" /></li>
-                <li><MaterialIcon icon="extension" /></li>
-                <li><MaterialIcon icon="face" /></li>
-                <li><MaterialIcon icon="fast_forward" /></li>
-                <li><MaterialIcon icon="fast_rewind" /></li>
-                <li><MaterialIcon icon="favorite" /></li>
-                <li><MaterialIcon icon="favorite_border" /></li>
-                <li><MaterialIcon icon="featured_play_list" /></li>
-                <li><MaterialIcon icon="featured_video" /></li>
-                <li><MaterialIcon icon="feedback" /></li>
-                <li><MaterialIcon icon="fiber_dvr" /></li>
-                <li><MaterialIcon icon="fiber_manual_record" /></li>
-                <li><MaterialIcon icon="fiber_new" /></li>
-                <li><MaterialIcon icon="fiber_pin" /></li>
-                <li><MaterialIcon icon="fiber_smart_record" /></li>
-                <li><MaterialIcon icon="file_download" /></li>
-                <li><MaterialIcon icon="file_upload" /></li>
-                <li><MaterialIcon icon="filter" /></li>
-                <li><MaterialIcon icon="filter_1" /></li>
-                <li><MaterialIcon icon="filter_2" /></li>
-                <li><MaterialIcon icon="filter_3" /></li>
-                <li><MaterialIcon icon="filter_4" /></li>
-                <li><MaterialIcon icon="filter_5" /></li>
-                <li><MaterialIcon icon="filter_6" /></li>
-                <li><MaterialIcon icon="filter_7" /></li>
-                <li><MaterialIcon icon="filter_8" /></li>
-                <li><MaterialIcon icon="filter_9" /></li>
-                <li><MaterialIcon icon="filter_9_plus" /></li>
-                <li><MaterialIcon icon="filter_b_and_w" /></li>
-                <li><MaterialIcon icon="filter_center_focus" /></li>
-                <li><MaterialIcon icon="filter_drama" /></li>
-                <li><MaterialIcon icon="filter_frames" /></li>
-                <li><MaterialIcon icon="filter_hdr" /></li>
-                <li><MaterialIcon icon="filter_list" /></li>
-                <li><MaterialIcon icon="filter_none" /></li>
-                <li><MaterialIcon icon="filter_tilt_shift" /></li>
-                <li><MaterialIcon icon="filter_vintage" /></li>
-                <li><MaterialIcon icon="find_in_page" /></li>
-                <li><MaterialIcon icon="find_replace" /></li>
-                <li><MaterialIcon icon="fingerprint" /></li>
-                <li><MaterialIcon icon="first_page" /></li>
-                <li><MaterialIcon icon="fitness_center" /></li>
-                <li><MaterialIcon icon="flag" /></li>
-                <li><MaterialIcon icon="flare" /></li>
-                <li><MaterialIcon icon="flash_auto" /></li>
-                <li><MaterialIcon icon="flash_off" /></li>
-                <li><MaterialIcon icon="flash_on" /></li>
-                <li><MaterialIcon icon="flight" /></li>
-                <li><MaterialIcon icon="flight_land" /></li>
-                <li><MaterialIcon icon="flight_takeoff" /></li>
-                <li><MaterialIcon icon="flip" /></li>
-                <li><MaterialIcon icon="flip_to_back" /></li>
-                <li><MaterialIcon icon="flip_to_front" /></li>
-                <li><MaterialIcon icon="folder" /></li>
-                <li><MaterialIcon icon="folder_open" /></li>
-                <li><MaterialIcon icon="folder_shared" /></li>
-                <li><MaterialIcon icon="font_download" /></li>
-                <li><MaterialIcon icon="format_align_center" /></li>
-                <li><MaterialIcon icon="format_align_justify" /></li>
-                <li><MaterialIcon icon="format_align_left" /></li>
-                <li><MaterialIcon icon="format_align_right" /></li>
-                <li><MaterialIcon icon="format_bold" /></li>
-                <li><MaterialIcon icon="format_clear" /></li>
-                <li><MaterialIcon icon="format_color_fill" /></li>
-                <li><MaterialIcon icon="format_color_reset" /></li>
-                <li><MaterialIcon icon="format_color_text" /></li>
-                <li><MaterialIcon icon="format_indent_decrease" /></li>
-                <li><MaterialIcon icon="format_indent_increase" /></li>
-                <li><MaterialIcon icon="format_italic" /></li>
-                <li><MaterialIcon icon="format_line_spacing" /></li>
-                <li><MaterialIcon icon="format_list_bulleted" /></li>
-                <li><MaterialIcon icon="format_list_numbered" /></li>
-                <li><MaterialIcon icon="format_paint" /></li>
-                <li><MaterialIcon icon="format_quote" /></li>
-                <li><MaterialIcon icon="format_shapes" /></li>
-                <li><MaterialIcon icon="format_size" /></li>
-                <li><MaterialIcon icon="format_strikethrough" /></li>
-                <li><MaterialIcon icon="format_textdirection_l_to_r" /></li>
-                <li><MaterialIcon icon="format_textdirection_r_to_l" /></li>
-                <li><MaterialIcon icon="format_underlined" /></li>
-                <li><MaterialIcon icon="forum" /></li>
-                <li><MaterialIcon icon="forward" /></li>
-                <li><MaterialIcon icon="forward_10" /></li>
-                <li><MaterialIcon icon="forward_30" /></li>
-                <li><MaterialIcon icon="forward_5" /></li>
-                <li><MaterialIcon icon="free_breakfast" /></li>
-                <li><MaterialIcon icon="fullscreen" /></li>
-                <li><MaterialIcon icon="fullscreen_exit" /></li>
-                <li><MaterialIcon icon="functions" /></li>
-                <li><MaterialIcon icon="g_translate" /></li>
-                <li><MaterialIcon icon="gamepad" /></li>
-                <li><MaterialIcon icon="games" /></li>
-                <li><MaterialIcon icon="gavel" /></li>
-                <li><MaterialIcon icon="gesture" /></li>
-                <li><MaterialIcon icon="get_app" /></li>
-                <li><MaterialIcon icon="gif" /></li>
-                <li><MaterialIcon icon="golf_course" /></li>
-                <li><MaterialIcon icon="gps_fixed" /></li>
-                <li><MaterialIcon icon="gps_not_fixed" /></li>
-                <li><MaterialIcon icon="gps_off" /></li>
-                <li><MaterialIcon icon="grade" /></li>
-                <li><MaterialIcon icon="gradient" /></li>
-                <li><MaterialIcon icon="grain" /></li>
-                <li><MaterialIcon icon="graphic_eq" /></li>
-                <li><MaterialIcon icon="grid_off" /></li>
-                <li><MaterialIcon icon="grid_on" /></li>
-                <li><MaterialIcon icon="group" /></li>
-                <li><MaterialIcon icon="group_add" /></li>
-                <li><MaterialIcon icon="group_work" /></li>
-                <li><MaterialIcon icon="hd" /></li>
-                <li><MaterialIcon icon="hdr_off" /></li>
-                <li><MaterialIcon icon="hdr_on" /></li>
-                <li><MaterialIcon icon="hdr_strong" /></li>
-                <li><MaterialIcon icon="hdr_weak" /></li>
-                <li><MaterialIcon icon="headset" /></li>
-                <li><MaterialIcon icon="headset_mic" /></li>
-                <li><MaterialIcon icon="healing" /></li>
-                <li><MaterialIcon icon="hearing" /></li>
-                <li><MaterialIcon icon="help" /></li>
-                <li><MaterialIcon icon="help_outline" /></li>
-                <li><MaterialIcon icon="high_quality" /></li>
-                <li><MaterialIcon icon="highlight" /></li>
-                <li><MaterialIcon icon="highlight_off" /></li>
-                <li><MaterialIcon icon="history" /></li>
-                <li><MaterialIcon icon="home" /></li>
-                <li><MaterialIcon icon="hot_tub" /></li>
-                <li><MaterialIcon icon="hotel" /></li>
-                <li><MaterialIcon icon="hourglass_empty" /></li>
+import { Helmet, HelmetProvider } from "react-helmet-async";
+import * as MaterialIcon from "@mui/icons-material";
+const PE7Icons = () => {
+  return (
+    <>
+      {/* Page Wrapper */}
+      <HelmetProvider>
+        <div className="page-wrapper">
+          <Helmet>
+            <title>Dashboard- CRMS admin Template</title>
+            <meta name="description" content="Reactify Blank Page" />
+          </Helmet>
+          <div className="content container-fluid">
+            {/* Page Header */}
+            <div className="crms-title row bg-white mb-4">
+              <div className="col">
+                <h3 className="page-title">
+                  <span className="page-title-icon bg-gradient-primary text-white me-2">
+                    <i className="fas fa-table" />
+                  </span>{" "}
+                  <span>Pe7 Icons</span>
+                </h3>
+              </div>
+              <div className="col text-end">
+                <ul className="breadcrumb bg-white float-end m-0 ps-0 pe-0">
+                  <li className="breadcrumb-item">
+                    <Link to="/index">Dashboard</Link>
+                  </li>
+                  <li className="breadcrumb-item active">Pe7 Icons</li>
                 </ul>
               </div>
             </div>
+            {/* /Page Header */}
+            <div className="row">
+              {/* Chart */}
+              <div className="col-md-12">
+                <div className="card">
+                  <div className="card-header">
+                    <div className="card-title">Pe7 Icon</div>
+                  </div>
+                  <div className="card-body">
+                    <div className="icons-items">
+                      <ul className="icons-list">
+                        <li>
+                          <MaterialIcon.Dashboard />
+                        </li>
+                        <li>
+                          <MaterialIcon.DataUsage />
+                        </li>
+                        <li>
+                          <MaterialIcon.DateRange />
+                        </li>
+                        <li>
+                          <MaterialIcon.Dehaze />
+                        </li>
+                        <li>
+                          <MaterialIcon.Delete />
+                        </li>
+                        <li>
+                          <MaterialIcon.DeleteForever />
+                        </li>
+                        <li>
+                          <MaterialIcon.DeleteSweep />
+                        </li>
+                        <li>
+                          <MaterialIcon.Description />
+                        </li>
+                        <li>
+                          <MaterialIcon.DesktopMac />
+                        </li>
+                        <li>
+                          <MaterialIcon.DesktopWindows />
+                        </li>
+                        <li>
+                          <MaterialIcon.Details />
+                        </li>
+                        <li>
+                          <MaterialIcon.DeveloperBoard />
+                        </li>
+                        <li>
+                          <MaterialIcon.DeveloperMode />
+                        </li>
+                        <li>
+                          <MaterialIcon.DeviceHub />
+                        </li>
+                        <li>
+                          <MaterialIcon.Devices />
+                        </li>
+                        <li>
+                          <MaterialIcon.DevicesOther />
+                        </li>
+                        <li>
+                          <MaterialIcon.DialerSip />
+                        </li>
+                        <li>
+                          <MaterialIcon.Dialpad />
+                        </li>
+                        <li>
+                          <MaterialIcon.Directions />
+                        </li>
+                        <li>
+                          <MaterialIcon.DirectionsBike />
+                        </li>
+                        <li>
+                          <MaterialIcon.DirectionsBoat />
+                        </li>
+                        <li>
+                          <MaterialIcon.DirectionsBus />
+                        </li>
+                        <li>
+                          <MaterialIcon.DirectionsCar />
+                        </li>
+                        <li>
+                          <MaterialIcon.DirectionsRailway />
+                        </li>
+                        <li>
+                          <MaterialIcon.DirectionsRun />
+                        </li>
+                        <li>
+                          <MaterialIcon.DirectionsSubway />
+                        </li>
+                        <li>
+                          <MaterialIcon.DirectionsTransit />
+                        </li>
+                        <li>
+                          <MaterialIcon.DirectionsWalk />
+                        </li>
+                        <li>
+                          <MaterialIcon.DiscFull />
+                        </li>
+                        <li>
+                          <MaterialIcon.Dns />
+                        </li>
+                        <li>
+                          <MaterialIcon.DoNotDisturb />
+                        </li>
+                        <li>
+                          <MaterialIcon.DoNotDisturbAlt />
+                        </li>
+                        <li>
+                          <MaterialIcon.DoNotDisturbOff />
+                        </li>
+                        <li>
+                          <MaterialIcon.DoNotDisturbOn />
+                        </li>
+                        <li>
+                          <MaterialIcon.Dock />
+                        </li>
+                        <li>
+                          <MaterialIcon.Domain />
+                        </li>
+                        <li>
+                          <MaterialIcon.Done />
+                        </li>
+                        <li>
+                          <MaterialIcon.DoneAll />
+                        </li>
+                        <li>
+                          <MaterialIcon.DonutLarge />
+                        </li>
+                        <li>
+                          <MaterialIcon.DonutSmall />
+                        </li>
+                        <li>
+                          <MaterialIcon.Drafts />
+                        </li>
+                        <li>
+                          <MaterialIcon.DragHandle />
+                        </li>
+                        <li>
+                          <MaterialIcon.DriveEta />
+                        </li>
+                        <li>
+                          <MaterialIcon.Dvr />
+                        </li>
+                        <li>
+                          <MaterialIcon.Edit />
+                        </li>
+                        <li>
+                          <MaterialIcon.EditLocation />
+                        </li>
+                        <li>
+                          <MaterialIcon.Eject />
+                        </li>
+                        <li>
+                          <MaterialIcon.Email />
+                        </li>
+                        <li>
+                          <MaterialIcon.EnhancedEncryption />
+                        </li>
+                        <li>
+                          <MaterialIcon.Equalizer />
+                        </li>
+                        <li>
+                          <MaterialIcon.ErrorOutline />
+                        </li>
+                        <li>
+                          <MaterialIcon.EuroSymbol />
+                        </li>
+                        <li>
+                          <MaterialIcon.EvStation />
+                        </li>
+                        <li>
+                          <MaterialIcon.Event />
+                        </li>
+                        <li>
+                          <MaterialIcon.EventAvailable />
+                        </li>
+                        <li>
+                          <MaterialIcon.EventBusy />
+                        </li>
+                        <li>
+                          <MaterialIcon.EventNote />
+                        </li>
+                        <li>
+                          <MaterialIcon.EventSeat />
+                        </li>
+                        <li>
+                          <MaterialIcon.ExitToApp />
+                        </li>
+                        <li>
+                          <MaterialIcon.ExpandLess />
+                        </li>
+                        <li>
+                          <MaterialIcon.ExpandMore />
+                        </li>
+                        <li>
+                          <MaterialIcon.Explicit />
+                        </li>
+                        <li>
+                          <MaterialIcon.Explore />
+                        </li>
+                        <li>
+                          <MaterialIcon.Exposure />
+                        </li>
+                        <li>
+                          <MaterialIcon.Extension />
+                        </li>
+                        <li>
+                          <MaterialIcon.Face />
+                        </li>
+                        <li>
+                          <MaterialIcon.FastForward />
+                        </li>
+                        <li>
+                          <MaterialIcon.FastRewind />
+                        </li>
+                        <li>
+                          <MaterialIcon.Favorite />
+                        </li>
+                        <li>
+                          <MaterialIcon.FavoriteBorder />
+                        </li>
+                        <li>
+                          <MaterialIcon.FeaturedPlayList />
+                        </li>
+                        <li>
+                          <MaterialIcon.FeaturedVideo />
+                        </li>
+                        <li>
+                          <MaterialIcon.Feedback />
+                        </li>
+                        <li>
+                          <MaterialIcon.FiberDvr />
+                        </li>
+                        <li>
+                          <MaterialIcon.FiberManualRecord />
+                        </li>
+                        <li>
+                          <MaterialIcon.FiberNew />
+                        </li>
+                        <li>
+                          <MaterialIcon.FiberPin />
+                        </li>
+                        <li>
+                          <MaterialIcon.FiberSmartRecord />
+                        </li>
+                        <li>
+                          <MaterialIcon.FileDownload />
+                        </li>
+                        <li>
+                          <MaterialIcon.FileUpload />
+                        </li>
+                        <li>
+                          <MaterialIcon.Filter />
+                        </li>
+                        <li>
+                          <MaterialIcon.Filter1 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Filter2 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Filter3 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Filter4 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Filter5 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Filter6 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Filter7 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Filter8 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Filter9 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Filter9Plus />
+                        </li>
+                        <li>
+                          <MaterialIcon.FilterBAndW />
+                        </li>
+                        <li>
+                          <MaterialIcon.FilterCenterFocus />
+                        </li>
+                        <li>
+                          <MaterialIcon.FilterDrama />
+                        </li>
+                        <li>
+                          <MaterialIcon.FilterFrames />
+                        </li>
+                        <li>
+                          <MaterialIcon.FilterHdr />
+                        </li>
+                        <li>
+                          <MaterialIcon.FilterList />
+                        </li>
+                        <li>
+                          <MaterialIcon.FilterNone />
+                        </li>
+                        <li>
+                          <MaterialIcon.FilterTiltShift />
+                        </li>
+                        <li>
+                          <MaterialIcon.FilterVintage />
+                        </li>
+                        <li>
+                          <MaterialIcon.FindInPage />
+                        </li>
+                        <li>
+                          <MaterialIcon.FindReplace />
+                        </li>
+                        <li>
+                          <MaterialIcon.Fingerprint />
+                        </li>
+                        <li>
+                          <MaterialIcon.FirstPage />
+                        </li>
+                        <li>
+                          <MaterialIcon.FitnessCenter />
+                        </li>
+                        <li>
+                          <MaterialIcon.Flag />
+                        </li>
+                        <li>
+                          <MaterialIcon.Flare />
+                        </li>
+                        <li>
+                          <MaterialIcon.FlashAuto />
+                        </li>
+                        <li>
+                          <MaterialIcon.FlashOff />
+                        </li>
+                        <li>
+                          <MaterialIcon.FlashOn />
+                        </li>
+                        <li>
+                          <MaterialIcon.Flight />
+                        </li>
+                        <li>
+                          <MaterialIcon.FlightLand />
+                        </li>
+                        <li>
+                          <MaterialIcon.FlightTakeoff />
+                        </li>
+                        <li>
+                          <MaterialIcon.Flip />
+                        </li>
+                        <li>
+                          <MaterialIcon.FlipToBack />
+                        </li>
+                        <li>
+                          <MaterialIcon.FlipToFront />
+                        </li>
+                        <li>
+                          <MaterialIcon.Folder />
+                        </li>
+                        <li>
+                          <MaterialIcon.FolderOpen />
+                        </li>
+                        <li>
+                          <MaterialIcon.FolderShared />
+                        </li>
+                        <li>
+                          <MaterialIcon.FontDownload />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatAlignCenter />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatAlignJustify />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatAlignLeft />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatAlignRight />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatBold />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatClear />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatColorFill />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatColorReset />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatColorText />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatIndentDecrease />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatIndentIncrease />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatItalic />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatLineSpacing />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatListBulleted />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatListNumbered />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatPaint />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatQuote />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatShapes />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatSize />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatStrikethrough />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatTextdirectionLToR />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatTextdirectionRToL />
+                        </li>
+                        <li>
+                          <MaterialIcon.FormatUnderlined />
+                        </li>
+                        <li>
+                          <MaterialIcon.Forum />
+                        </li>
+                        <li>
+                          <MaterialIcon.Forward />
+                        </li>
+                        <li>
+                          <MaterialIcon.Forward10 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Forward30 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Forward5 />
+                        </li>
+                        <li>
+                          <MaterialIcon.FreeBreakfast />
+                        </li>
+                        <li>
+                          <MaterialIcon.Fullscreen />
+                        </li>
+                        <li>
+                          <MaterialIcon.FullscreenExit />
+                        </li>
+                        <li>
+                          <MaterialIcon.Functions />
+                        </li>
+                        <li>
+                          <MaterialIcon.GTranslate />
+                        </li>
+                        <li>
+                          <MaterialIcon.Gamepad />
+                        </li>
+                        <li>
+                          <MaterialIcon.Games />
+                        </li>
+                        <li>
+                          <MaterialIcon.Gavel />
+                        </li>
+                        <li>
+                          <MaterialIcon.Gesture />
+                        </li>
+                        <li>
+                          <MaterialIcon.GetApp />
+                        </li>
+                        <li>
+                          <MaterialIcon.Gif />
+                        </li>
+                        <li>
+                          <MaterialIcon.GolfCourse />
+                        </li>
+                        <li>
+                          <MaterialIcon.GpsFixed />
+                        </li>
+                        <li>
+                          <MaterialIcon.GpsNotFixed />
+                        </li>
+                        <li>
+                          <MaterialIcon.GpsOff />
+                        </li>
+                        <li>
+                          <MaterialIcon.Grade />
+                        </li>
+                        <li>
+                          <MaterialIcon.Gradient />
+                        </li>
+                        <li>
+                          <MaterialIcon.Grain />
+                        </li>
+                        <li>
+                          <MaterialIcon.GraphicEq />
+                        </li>
+                        <li>
+                          <MaterialIcon.GridOff />
+                        </li>
+                        <li>
+                          <MaterialIcon.GridOn />
+                        </li>
+                        <li>
+                          <MaterialIcon.Group />
+                        </li>
+                        <li>
+                          <MaterialIcon.GroupAdd />
+                        </li>
+                        <li>
+                          <MaterialIcon.GroupWork />
+                        </li>
+                        <li>
+                          <MaterialIcon.Hd />
+                        </li>
+                        <li>
+                          <MaterialIcon.HdrOff />
+                        </li>
+                        <li>
+                          <MaterialIcon.HdrOn />
+                        </li>
+                        <li>
+                          <MaterialIcon.HdrStrong />
+                        </li>
+                        <li>
+                          <MaterialIcon.HdrWeak />
+                        </li>
+                        <li>
+                          <MaterialIcon.Headset />
+                        </li>
+                        <li>
+                          <MaterialIcon.HeadsetMic />
+                        </li>
+                        <li>
+                          <MaterialIcon.Healing />
+                        </li>
+                        <li>
+                          <MaterialIcon.Hearing />
+                        </li>
+                        <li>
+                          <MaterialIcon.Help />
+                        </li>
+                        <li>
+                          <MaterialIcon.HelpOutline />
+                        </li>
+                        <li>
+                          <MaterialIcon.HighQuality />
+                        </li>
+                        <li>
+                          <MaterialIcon.Highlight />
+                        </li>
+                        <li>
+                          <MaterialIcon.HighlightOff />
+                        </li>
+                        <li>
+                          <MaterialIcon.History />
+                        </li>
+                        <li>
+                          <MaterialIcon.Home />
+                        </li>
+                        <li>
+                          <MaterialIcon.HotTub />
+                        </li>
+                        <li>
+                          <MaterialIcon.Hotel />
+                        </li>
+                        <li>
+                          <MaterialIcon.HourglassEmpty />
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* /Chart */}
+            </div>
           </div>
         </div>
-        {/* /Chart */}
-      </div>
-    </div>
-  </div>
-  {/* /Page Wrapper */}
-</>
-
-)};
-export default PE7Icons;        
+      </HelmetProvider>
+      {/* /Page Wrapper */}
+    </>
+  );
+};
+export default PE7Icons;

@@ -240,7 +240,7 @@ const LeadsDetailsModel = () => {
                     >
                       <div className="crms-tasks">
                         <div className="tasks__item crms-task-item active">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Lead Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -298,7 +298,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Additional Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -344,7 +344,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Address Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -361,7 +361,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Description Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -377,7 +377,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Tag Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -391,7 +391,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Lead Conversion Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -448,7 +448,7 @@ const LeadsDetailsModel = () => {
                       <div className="row">
                         <div className="crms-tasks  p-2">
                           <div className="tasks__item crms-task-item">
-                            <Collapse accordion expandIconPosition='right'>
+                            <Collapse accordion expandIconPosition='end'>
                           <Panel header="Notes" key="1">
                                   <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                     <thead>
@@ -538,7 +538,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                           </div>
                           <div className="tasks__item crms-task-item">
-                            <Collapse accordion expandIconPosition='right'>
+                            <Collapse accordion expandIconPosition='end'>
                           <Panel header="Files" key="1">
                                   <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                     <thead>
@@ -668,7 +668,7 @@ const LeadsDetailsModel = () => {
                       <div className="row">
                         <div className="crms-tasks  p-2">
                           <div className="tasks__item crms-task-item active">
-                            <Collapse accordion expandIconPosition='right'>
+                            <Collapse accordion expandIconPosition='end'>
                           <Panel header="Upcoming Activity" key="1">
                                   <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                     <thead>
@@ -774,7 +774,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                           </div>
                           <div className="tasks__item crms-task-item">
-                            <Collapse accordion expandIconPosition='right'>
+                            <Collapse accordion expandIconPosition='end'>
                           <Panel header="Past Activity" key="1">
                                   <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                     <thead>
@@ -884,7 +884,7 @@ const LeadsDetailsModel = () => {
                       id="attempted-task-details" >
                       <div className="crms-tasks">
                         <div className="tasks__item crms-task-item active">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Lead Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -942,7 +942,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Additional Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -988,7 +988,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Address Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -1005,7 +1005,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Description Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -1021,7 +1021,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Tag Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -1035,7 +1035,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Lead Conversion Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -1093,7 +1093,7 @@ const LeadsDetailsModel = () => {
                       <div className="row">
                         <div className="crms-tasks  p-2">
                           <div className="tasks__item crms-task-item">
-                            <Collapse accordion expandIconPosition='right'>
+                            <Collapse accordion expandIconPosition='end'>
                           <Panel header="Notes" key="1">
                                   <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                     <thead>
@@ -1183,7 +1183,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                           </div>
                           <div className="tasks__item crms-task-item">
-                            <Collapse accordion expandIconPosition='right'>
+                            <Collapse accordion expandIconPosition='end'>
                           <Panel header="Files" key="1">
                                   <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                     <thead>
@@ -1311,7 +1311,7 @@ const LeadsDetailsModel = () => {
                       <div className="row">
                         <div className="crms-tasks  p-2">
                           <div className="tasks__item crms-task-item active">
-                            <Collapse accordion expandIconPosition='right'>
+                            <Collapse accordion expandIconPosition='end'>
                           <Panel header="Upcoming Activity" key="1">
                                   <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                     <thead>
@@ -1417,7 +1417,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                           </div>
                           <div className="tasks__item crms-task-item">
-                            <Collapse accordion expandIconPosition='right'>
+                            <Collapse accordion expandIconPosition='end'>
                           <Panel header="Past Activity" key="1">
                                   <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                     <thead>
@@ -1525,7 +1525,7 @@ const LeadsDetailsModel = () => {
                     >
                       <div className="crms-tasks">
                         <div className="tasks__item crms-task-item active">
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Lead Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -1583,7 +1583,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Additional Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -1629,7 +1629,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Address Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -1646,7 +1646,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Description Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -1662,7 +1662,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Tag Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -1676,7 +1676,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Lead Conversion Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -1733,7 +1733,7 @@ const LeadsDetailsModel = () => {
                       <div className="row">
                         <div className="crms-tasks  p-2">
                           <div className="tasks__item crms-task-item">
-                            <Collapse accordion expandIconPosition='right'>
+                            <Collapse accordion expandIconPosition='end'>
                           <Panel header="Notes" key="1">
                                   <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                     <thead>
@@ -1826,7 +1826,7 @@ const LeadsDetailsModel = () => {
                             <div className="accordion-header js-accordion-header">
                               Files{" "}
                             </div>
-                            <Collapse accordion expandIconPosition='right'>
+                            <Collapse accordion expandIconPosition='end'>
                           <Panel header="Files" key="1">
                                   <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                     <thead>
@@ -1956,7 +1956,7 @@ const LeadsDetailsModel = () => {
                       <div className="row">
                         <div className="crms-tasks  p-2">
                           <div className="tasks__item crms-task-item active">
-                            <Collapse accordion expandIconPosition='right'>
+                            <Collapse accordion expandIconPosition='end'>
                           <Panel header="Upcoming Activity" key="1">
                                   <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                     <thead>
@@ -2062,7 +2062,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                           </div>
                           <div className="tasks__item crms-task-item">
-                            <Collapse accordion expandIconPosition='right'>
+                            <Collapse accordion expandIconPosition='end'>
                           <Panel header="Past Activity" key="1">
                                   <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                     <thead>
@@ -2172,7 +2172,7 @@ const LeadsDetailsModel = () => {
                       id="attempted-task-details" >
                       <div className="crms-tasks">
                         <div className="tasks__item crms-task-item active">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Lead Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -2230,7 +2230,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Additional Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -2276,7 +2276,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Address Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -2293,7 +2293,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Description Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -2312,7 +2312,7 @@ const LeadsDetailsModel = () => {
                           <div className="accordion-header js-accordion-header">
                             Tag Information
                           </div>
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Tag Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -2326,7 +2326,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                           <Panel header="Lead Conversion Information" key="1">
                               <table className="table">
                                 <tbody>
@@ -2384,7 +2384,7 @@ const LeadsDetailsModel = () => {
                       <div className="row">
                         <div className="crms-tasks  p-2">
                           <div className="tasks__item crms-task-item">
-                            <Collapse accordion expandIconPosition='right'>
+                            <Collapse accordion expandIconPosition='end'>
                           <Panel header="Notes" key="1">
                                   <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                     <thead>
@@ -2474,7 +2474,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                           </div>
                           <div className="tasks__item crms-task-item">
-                            <Collapse accordion expandIconPosition='right'>
+                            <Collapse accordion expandIconPosition='end'>
                           <Panel header="Files" key="1">
                                   <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                     <thead>
@@ -2602,7 +2602,7 @@ const LeadsDetailsModel = () => {
                       <div className="row">
                         <div className="crms-tasks  p-2">
                           <div className="tasks__item crms-task-item active">
-                            <Collapse accordion expandIconPosition='right'>
+                            <Collapse accordion expandIconPosition='end'>
                           <Panel header="Upcoming Activity" key="1">
                                   <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                     <thead>
@@ -2708,7 +2708,7 @@ const LeadsDetailsModel = () => {
                         </Collapse>
                           </div>
                           <div className="tasks__item crms-task-item">
-                            <Collapse accordion expandIconPosition='right'>
+                            <Collapse accordion expandIconPosition='end'>
                           <Panel header="Past Activity" key="1">
                                   <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                     <thead>

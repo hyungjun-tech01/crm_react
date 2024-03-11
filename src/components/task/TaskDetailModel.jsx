@@ -1,6 +1,6 @@
 import React from 'react';
 import { Circle1, CircleImg, Task1 } from '../imagepath';
-import 'antd/dist/antd.css';
+import 'antd/dist/reset.css';
 import { Collapse } from 'antd';
 import { Link } from "react-router-dom";
 
@@ -92,7 +92,7 @@ const TaskDetailModel = () => {
                     <div className="crms-tasks">
                       <div className="tasks__item crms-task-item active">
 
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header=" Name &amp; Occupation" key="1">
 
 
@@ -123,7 +123,7 @@ const TaskDetailModel = () => {
                       </div>
                       <div className="tasks__item crms-task-item">
 
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Task Details" key="1">
                             <table className="table">
                               <tbody>
@@ -158,7 +158,7 @@ const TaskDetailModel = () => {
 
                       </div>
                       <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Additional Information" key="1">
                             <table className="table">
                               <tbody>
@@ -208,7 +208,7 @@ const TaskDetailModel = () => {
                         </Collapse>
                       </div>
                       <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Related To" key="1">
                             <table className="table">
                               <tbody>
@@ -223,7 +223,7 @@ const TaskDetailModel = () => {
                       </div>
                       <div className="tasks__item crms-task-item">
 
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Description Information" key="1">
                             <table className="table">
                               <tbody>
@@ -238,7 +238,7 @@ const TaskDetailModel = () => {
                       </div>
                       <div className="tasks__item crms-task-item">
 
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Task Comments" key="1">
                             <button className="btn btn-secondary text-white w-25">
                               Add Comments
@@ -248,7 +248,7 @@ const TaskDetailModel = () => {
                       </div>
                       <div className="tasks__item crms-task-item">
 
-                        <Collapse accordion expandIconPosition='right'>
+                        <Collapse accordion expandIconPosition='end'>
                           <Panel header="Permissions" key="1">
                             <table className="table">
                               <tbody>
@@ -337,7 +337,7 @@ const TaskDetailModel = () => {
                       <div className="crms-tasks  p-2">
                         <div className="tasks__item crms-task-item active">
 
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                             <Panel header="Contacts" key="1">
                               <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                 <thead>
@@ -424,7 +424,7 @@ const TaskDetailModel = () => {
                         </div>
                         <div className="tasks__item crms-task-item">
 
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                             <Panel header="Deals " key="1">
                               <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                 <thead>
@@ -513,7 +513,7 @@ const TaskDetailModel = () => {
                         </div>
                         <div className="tasks__item crms-task-item">
 
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                             <Panel header="Projects " key="1">
                               <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                 <thead>
@@ -561,7 +561,7 @@ const TaskDetailModel = () => {
                         </div>
                         <div className="tasks__item crms-task-item">
 
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                             <Panel header="Companies" key="1">
                               <p>There are no companies added.</p>
                             </Panel>
@@ -569,7 +569,7 @@ const TaskDetailModel = () => {
                         </div>
                         <div className="tasks__item crms-task-item">
 
-                          <Collapse accordion expandIconPosition='right'>
+                          <Collapse accordion expandIconPosition='end'>
                             <Panel header="Leads " key="1">
                               <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                 <thead>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { C_logo, C_logo2, Circle1, CircleImg } from '../imagepath';
-import 'antd/dist/antd.css';
+import 'antd/dist/reset.css';
 import { Collapse } from 'antd';
 import { Link } from "react-router-dom";
 
@@ -230,7 +230,7 @@ const DealDetailsModel = () => {
               <div className="tab-pane show active" id="pipeline-task-details">
                 <div className="crms-tasks">
                   <div className="tasks__item crms-task-item active">
-                    <Collapse accordion expandIconPosition='right'>
+                    <Collapse accordion expandIconPosition='end'>
                           <Panel header="Task Details" key="1">
                         <table className="table">
                           <tbody>
@@ -256,7 +256,7 @@ const DealDetailsModel = () => {
                         </Collapse>
                   </div>
                   <div className="tasks__item crms-task-item">
-                    <Collapse accordion expandIconPosition='right'>
+                    <Collapse accordion expandIconPosition='end'>
                           <Panel header="Additional Information" key="1">
                         <table className="table">
                           <tbody>
@@ -306,7 +306,7 @@ const DealDetailsModel = () => {
                         </Collapse>
                   </div>
                   <div className="tasks__item crms-task-item">
-                    <Collapse accordion expandIconPosition='right'>
+                    <Collapse accordion expandIconPosition='end'>
                           <Panel header="Related To" key="1">
                         <table className="table">
                           <tbody>
@@ -320,7 +320,7 @@ const DealDetailsModel = () => {
                         </Collapse>
                   </div>
                   <div className="tasks__item crms-task-item">
-                    <Collapse accordion expandIconPosition='right'>
+                    <Collapse accordion expandIconPosition='end'>
                           <Panel header="Description Information" key="1">
                         <table className="table">
                           <tbody>
@@ -334,7 +334,7 @@ const DealDetailsModel = () => {
                         </Collapse>
                   </div>
                   <div className="tasks__item crms-task-item">
-                    <Collapse accordion expandIconPosition='right'>
+                    <Collapse accordion expandIconPosition='end'>
                           <Panel header="Task Comments" key="1">
                         <button className="btn btn-secondary text-white w-25">
                           Add Comments
@@ -343,7 +343,7 @@ const DealDetailsModel = () => {
                         </Collapse>
                   </div>
                   <div className="tasks__item crms-task-item">
-                    <Collapse accordion expandIconPosition='right'>
+                    <Collapse accordion expandIconPosition='end'>
                           <Panel header="Permissions" key="1">
                         <table className="table">
                           <tbody>
@@ -444,7 +444,7 @@ const DealDetailsModel = () => {
                 <div className="row">
                   <div className="crms-tasks  p-2">
                     <div className="tasks__item crms-task-item active">
-                      <Collapse accordion expandIconPosition='right'>
+                      <Collapse accordion expandIconPosition='end'>
                           <Panel header="Companies" key="1">
                             <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                               <thead>
@@ -541,7 +541,7 @@ const DealDetailsModel = () => {
                         </Collapse>
                     </div>
                     <div className="tasks__item crms-task-item">
-                      <Collapse accordion expandIconPosition='right'>
+                      <Collapse accordion expandIconPosition='end'>
                           <Panel header="Deals" key="1">
                             <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                               <thead>
@@ -629,7 +629,7 @@ const DealDetailsModel = () => {
                         </Collapse>
                     </div>
                     <div className="tasks__item crms-task-item">
-                      <Collapse accordion expandIconPosition='right'>
+                      <Collapse accordion expandIconPosition='end'>
                           <Panel header="Projects" key="1">
                             <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                               <thead>
@@ -676,7 +676,7 @@ const DealDetailsModel = () => {
                         </Collapse>
                     </div>
                     <div className="tasks__item crms-task-item">
-                      <Collapse accordion expandIconPosition='right'>
+                      <Collapse accordion expandIconPosition='end'>
                           <Panel header="Contacts" key="1">
                             <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                               <thead>
@@ -751,7 +751,7 @@ const DealDetailsModel = () => {
                         </Collapse>
                     </div>
                     <div className="tasks__item crms-task-item">
-                      <Collapse accordion expandIconPosition='right'>
+                      <Collapse accordion expandIconPosition='end'>
                           <Panel header="Notes" key="1">
                             <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                               <thead>
@@ -829,7 +829,7 @@ const DealDetailsModel = () => {
                         </Collapse>
                     </div>
                     <div className="tasks__item crms-task-item">
-                      <Collapse accordion expandIconPosition='right'>
+                      <Collapse accordion expandIconPosition='end'>
                           <Panel header="Files" key="1">
                             <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                               <thead>

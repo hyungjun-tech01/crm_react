@@ -1,11 +1,11 @@
 import React, { useCallback, useState } from "react";
 import { useRecoilValue } from "recoil";
-import { Helmet } from "react-helmet";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link, useHistory } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
 import { BiData } from "react-icons/bi";
 import DatePicker from "react-datepicker";
-import { C_logo, C_logo2, CircleImg } from '../imagepath';
+import { C_logo, C_logo2, CircleImg } from "../imagepath";
 import { atomCurrentCompany, defaultCompany } from "../../atoms/atoms";
 
 const CompanyDetailInfo = () => {
@@ -16,97 +16,96 @@ const CompanyDetailInfo = () => {
     setSelectedDate1(date);
   };
 
-  if(currentCompany === defaultCompany){
-    return (<></>);
-  };
+  if (currentCompany === defaultCompany) {
+    return <></>;
+  }
 
   return (
-    <div className="page-wrapper">
-      <Helmet>
-        <title>Companies - CRMS admin Template</title>
-        <meta name="description" content="Reactify Blank Page" />
-      </Helmet>
-      <div className="content container-fluid">
-        <div className="crms-title row bg-white">
-          <div className="col">
-            <h3 className="page-title m-0">
-              <span className="page-title-icon bg-gradient-primary text-white me-2">
-                {/* <i className="feather-database" /> */}
-                <i>
-                  <BiData />
-                </i>
-              </span>{" "}
-              Company Detail Infos.{" "}
-            </h3>
-          </div>
-          <div className="col text-end">
-            <ul className="breadcrumb bg-white float-end m-0 pl-0 pr-0">
-              <li className="breadcrumb-item">
-                <Link to="/">Dashboard</Link>
-              </li>
-              <li className="breadcrumb-item active">Companies</li>
-            </ul>
-          </div>
-        </div>
-        {/* Page Header */}
-        <div className="page-header pt-3 mb-0 ">
-          <div className="row">
+    <HelmetProvider>
+      <div className="page-wrapper">
+        <Helmet>
+          <title>Companies - CRMS admin Template</title>
+          <meta name="description" content="Reactify Blank Page" />
+        </Helmet>
+        <div className="content container-fluid">
+          <div className="crms-title row bg-white">
+            <div className="col">
+              <h3 className="page-title m-0">
+                <span className="page-title-icon bg-gradient-primary text-white me-2">
+                  {/* <i className="feather-database" /> */}
+                  <i>
+                    <BiData />
+                  </i>
+                </span>{" "}
+                Company Detail Infos.{" "}
+              </h3>
+            </div>
             <div className="col text-end">
-              <ul className="list-inline-item pl-0">
-                <li className="nav-item dropdown list-inline-item add-lists">
-                  <a
-                    className="nav-link dropdown-toggle"
-                    id="profileDropdown"
-                    href="#"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <div className="nav-profile-text">
-                      <i className="fa fa-th" aria-hidden="true" />
-                    </div>
-                  </a>
-                  <div
-                    className="dropdown-menu navbar-dropdown"
-                    aria-labelledby="profileDropdown"
-                  >
-                    <a
-                      className="dropdown-item"
-                      href="#"
-                      data-bs-toggle="modal"
-                      data-bs-target="#add-new-list"
-                    >
-                      Add New List View
-                    </a>
-                  </div>
+              <ul className="breadcrumb bg-white float-end m-0 pl-0 pr-0">
+                <li className="breadcrumb-item">
+                  <Link to="/">Dashboard</Link>
                 </li>
-                <li className="list-inline-item">
-                  <button
-                    className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
-                    id="add-task"
-                    data-bs-toggle="modal"
-                    data-bs-target="#add_company"
-                  >
-                    New Company
-                  </button>
-                </li>
+                <li className="breadcrumb-item active">Companies</li>
               </ul>
             </div>
           </div>
-        </div>
-        {/* /Page Header */}
+          {/* Page Header */}
+          <div className="page-header pt-3 mb-0 ">
+            <div className="row">
+              <div className="col text-end">
+                <ul className="list-inline-item pl-0">
+                  <li className="nav-item dropdown list-inline-item add-lists">
+                    <a
+                      className="nav-link dropdown-toggle"
+                      id="profileDropdown"
+                      href="#"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      <div className="nav-profile-text">
+                        <i className="fa fa-th" aria-hidden="true" />
+                      </div>
+                    </a>
+                    <div
+                      className="dropdown-menu navbar-dropdown"
+                      aria-labelledby="profileDropdown"
+                    >
+                      <a
+                        className="dropdown-item"
+                        href="#"
+                        data-bs-toggle="modal"
+                        data-bs-target="#add-new-list"
+                      >
+                        Add New List View
+                      </a>
+                    </div>
+                  </li>
+                  <li className="list-inline-item">
+                    <button
+                      className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
+                      id="add-task"
+                      data-bs-toggle="modal"
+                      data-bs-target="#add_company"
+                    >
+                      New Company
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          {/* /Page Header */}
 
-        <div className="row w-100">
+          <div className="row w-100">
             <div className="col-md-7 account d-flex">
               <div className="company_img">
-                <img
-                  src={C_logo}
-                  alt="User"
-                  className="user-image"
-                />
+                <img src={C_logo} alt="User" className="user-image" />
               </div>
               <div>
                 <p className="mb-0">Company</p>
-                <span className="modal-title">{currentCompany.company_name}</span>
+                <span className="modal-title">
+                  {currentCompany.company_name}
+                </span>
                 <span className="rating-star">
                   <i className="fa fa-star" aria-hidden="true" />
                 </span>
@@ -405,8 +404,9 @@ const CompanyDetailInfo = () => {
               </div>
             </div>
           </div>
+        </div>
       </div>
-    </div>
+    </HelmetProvider>
   );
 };
 export default CompanyDetailInfo;

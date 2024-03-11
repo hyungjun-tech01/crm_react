@@ -1,15 +1,16 @@
 import React from "react";
-import { Helmet } from "react-helmet";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
-const Emailsettings =()=> {
-    return(
-        <>
-        {/* Page Wrapper */}
+const Emailsettings = () => {
+  return (
+    <>
+      {/* Page Wrapper */}
+      <HelmetProvider>
         <div className="page-wrapper">
-        <Helmet>
+          <Helmet>
             <title>Settings- CRMS admin Template</title>
             <meta name="description" content="Reactify Blank Page" />
-        </Helmet>
+          </Helmet>
           {/* Page Content */}
           <div className="content container-fluid">
             <div className="crms-title row bg-white">
@@ -91,7 +92,8 @@ const Emailsettings =()=> {
                       <div className="settings-form">
                         <div className="form-group form-placeholder">
                           <label>
-                            Email From Address <span className="star-red">*</span>
+                            Email From Address{" "}
+                            <span className="star-red">*</span>
                           </label>
                           <input type="text" className="form-control" />
                         </div>
@@ -150,7 +152,8 @@ const Emailsettings =()=> {
                       <div className="settings-form">
                         <div className="form-group form-placeholder">
                           <label>
-                            Email From Address <span className="star-red">*</span>
+                            Email From Address{" "}
+                            <span className="star-red">*</span>
                           </label>
                           <input type="text" className="form-control" />
                         </div>
@@ -198,9 +201,9 @@ const Emailsettings =()=> {
           </div>
           {/* /Page Content */}
         </div>
-        {/* /Page Wrapper */}
-      </>
-      
-
-)};
-export default Emailsettings;        
+      </HelmetProvider>
+      {/* /Page Wrapper */}
+    </>
+  );
+};
+export default Emailsettings;

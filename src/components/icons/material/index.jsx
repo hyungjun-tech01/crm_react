@@ -1,412 +1,663 @@
-import React from 'react';
+import React from "react";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
-import MaterialIcon from '@material/react-material-icon';
-const MaterialIcons =()=>{
-    return(
-<>
-  {/* Page Wrapper */}
-  <div className="page-wrapper">
-  <Helmet>
-      <title>Dashboard- CRMS admin Template</title>
-      <meta name="description" content="Reactify Blank Page" />
-  </Helmet>
-    <div className="content container-fluid">
-      {/* Page Header */}
-      <div className="crms-title row bg-white mb-4">
-        <div className="col">
-          <h3 className="page-title">
-            <span className="page-title-icon bg-gradient-primary text-white me-2">
-              <i className="fas fa-table" />
-            </span>{" "}
-            <span>Material Icons</span>
-          </h3>
-        </div>
-        <div className="col text-end">
-          <ul className="breadcrumb bg-white float-end m-0 ps-0 pe-0">
-            <li className="breadcrumb-item">
-              <Link to="/index">Dashboard</Link>
-            </li>
-            <li className="breadcrumb-item active">Material Icons</li>
-          </ul>
-        </div>
-      </div>
-      {/* /Page Header */}
-      <div className="row">
-        {/* Chart */}
-        <div className="col-md-12">
-          <div className="card">
-            <div className="card-header">
-              <div className="card-title">Material Icons</div>
-            </div>
-            <div className="card-body">
-              <div className="icons-items">
-                <ul className="icons-list">
-                  <li><MaterialIcon icon="menu" /></li>
-                  <li>
-                    <MaterialIcon icon="accessible"
-                    />
+import { Helmet, HelmetProvider } from "react-helmet-async";
+import * as MaterialIcon from "@mui/icons-material";
+const MaterialIcons = () => {
+  return (
+    <>
+      {/* Page Wrapper */}
+      <HelmetProvider>
+        <div className="page-wrapper">
+          <Helmet>
+            <title>Dashboard- CRMS admin Template</title>
+            <meta name="description" content="Reactify Blank Page" />
+          </Helmet>
+          <div className="content container-fluid">
+            {/* Page Header */}
+            <div className="crms-title row bg-white mb-4">
+              <div className="col">
+                <h3 className="page-title">
+                  <span className="page-title-icon bg-gradient-primary text-white me-2">
+                    <i className="fas fa-table" />
+                  </span>{" "}
+                  <span>Material Icons</span>
+                </h3>
+              </div>
+              <div className="col text-end">
+                <ul className="breadcrumb bg-white float-end m-0 ps-0 pe-0">
+                  <li className="breadcrumb-item">
+                    <Link to="/index">Dashboard</Link>
                   </li>
-                  <li>
-                    <MaterialIcon icon="accessibility"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="account_box"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="adb"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="add"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="add_a_photo"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="account_balance_wallet"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="add_alert"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="add_a_photo"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="add_box "
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="add_circle"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="add_circle_outline"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="add_location"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="add_shopping_cart"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="add_to_photos"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="add_shopping_cart"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="add_to_photos"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="add_to_queue"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="adjust"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="airline_seat_flat"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="airline_seat_flat_angled"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="airline_seat_individual_suite"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="airline_seat_legroom_extra"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="airline_seat_legroom_normal"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="airline_seat_legroom_reduced"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="airline_seat_recline_extra"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="airline_seat_recline_normal"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="airplanemode_active"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="airplanemode_inactive"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="airplay"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="airport_shuttle"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="alarm"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="alarm_add"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="alarm_off"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="alarm_on"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="album"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="all_inclusive"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="all_out"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="android"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="announcement"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="apps"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="archive"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="arrow_back"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="arrow_downward"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="arrow_drop_down"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="arrow_drop_down_circle"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="arrow_drop_up"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="arrow_forward"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="art_track"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="aspect_ratio"
-                    />
-                  </li>
-                  <li>
-                    <MaterialIcon icon="assessment"
-                    />
-                  </li>
-                  <li><MaterialIcon icon="assignment_late"  /></li>
-                    <li><MaterialIcon icon="assignment_return" /></li>
-                    <li><MaterialIcon icon="assignment_returned" /></li>
-                    <li><MaterialIcon icon="assignment_turned_in" /></li>
-                    <li><MaterialIcon icon="assistant" /></li>
-                    <li><MaterialIcon icon="assistant_photo" /></li>
-                    <li><MaterialIcon icon="attach_file" /></li>
-                    <li><MaterialIcon icon="attach_money" /></li>
-                    <li><MaterialIcon icon="attachment" /></li>
-                    <li><MaterialIcon icon="audiotrack" /></li>
-                    <li><MaterialIcon icon="autorenew" /></li>
-                    <li><MaterialIcon icon="av_timer" /></li>
-                    <li><MaterialIcon icon="backspace" /></li>
-                    <li><MaterialIcon icon="backup" /></li>
-                    <li><MaterialIcon icon="battery_alert" /></li>
-                    <li><MaterialIcon icon="battery_charging_full" /></li>
-                    <li><MaterialIcon icon="battery_full" /></li>
-                    <li><MaterialIcon icon="battery_std" /></li>
-                    <li><MaterialIcon icon="battery_unknown" /></li>
-                    <li><MaterialIcon icon="beach_access" /></li>
-                    <li><MaterialIcon icon="beenhere" /></li>
-                    <li><MaterialIcon icon="block" /></li>
-                    <li><MaterialIcon icon="bluetooth" /></li>
-                    <li><MaterialIcon icon="bluetooth_audio" /></li>
-                    <li><MaterialIcon icon="bluetooth_connected" /></li>
-                    <li><MaterialIcon icon="bluetooth_disabled" /></li>
-                    <li><MaterialIcon icon="bluetooth_searching" /></li>
-                    <li><MaterialIcon icon="blur_circular" /></li>
-                    <li><MaterialIcon icon="blur_linear" /></li>
-                    <li><MaterialIcon icon="blur_off" /></li>
-                    <li><MaterialIcon icon="blur_on" /></li>
-                    <li><MaterialIcon icon="book" /></li>
-                    <li><MaterialIcon icon="bookmark" /></li>
-                    <li><MaterialIcon icon="bookmark_border" /></li>
-                    <li><MaterialIcon icon="border_all" /></li>
-                    <li><MaterialIcon icon="border_bottom" /></li>
-                    <li><MaterialIcon icon="border_clear" /></li>
-                    <li><MaterialIcon icon="border_color" /></li>
-                    <li><MaterialIcon icon="border_horizontal" /></li>
-                    <li><MaterialIcon icon="border_inner" /></li>
-                    <li><MaterialIcon icon="border_left" /></li>
-                    <li><MaterialIcon icon="border_outer" /></li>
-                    <li><MaterialIcon icon="border_right" /></li>
-                    <li><MaterialIcon icon="border_style" /></li>
-                    <li><MaterialIcon icon="border_top" /></li>
-                    <li><MaterialIcon icon="border_vertical" /></li>
-                    <li><MaterialIcon icon="branding_watermark" /></li>
-                    <li><MaterialIcon icon="brightness_1" /></li>
-                    <li><MaterialIcon icon="brightness_3" /></li>
-                    <li><MaterialIcon icon="brightness_4" /></li>
-                    <li><MaterialIcon icon="brightness_5" /></li>
-                    <li><MaterialIcon icon="brightness_6" /></li>
-                    <li><MaterialIcon icon="brightness_7" /></li>
-                    <li><MaterialIcon icon="brightness_auto" /></li>
-                    <li><MaterialIcon icon="brightness_high" /></li>
-                    <li><MaterialIcon icon="brightness_low" /></li>
-                    <li><MaterialIcon icon="brightness_medium" /></li>
-                    <li><MaterialIcon icon="broken_image" /></li>
-                    <li><MaterialIcon icon="brush" /></li>
-                    <li><MaterialIcon icon="bubble_chart" /></li>
-                    <li><MaterialIcon icon="bug_report" /></li>
-                    <li><MaterialIcon icon="build" /></li>
-                    <li><MaterialIcon icon="burst_mode" /></li>
-                    <li><MaterialIcon icon="business" /></li>
-                    <li><MaterialIcon icon="business_center" /></li>
-                    <li><MaterialIcon icon="cached" /></li>
-                    <li><MaterialIcon icon="cake" /></li>
-                    <li><MaterialIcon icon="call" /></li>
-                    <li><MaterialIcon icon="call_end" /></li>
-                    <li><MaterialIcon icon="call_made" /></li>
-                    <li><MaterialIcon icon="call_merge" /></li>
-                    <li><MaterialIcon icon="call_missed" /></li>
-                    <li><MaterialIcon icon="call_missed_outgoing" /></li>
-                    <li><MaterialIcon icon="call_received" /></li>
-                    <li><MaterialIcon icon="call_split" /></li>
-                    <li><MaterialIcon icon="call_to_action" /></li>
-                    <li><MaterialIcon icon="camera" /></li>
-                    <li><MaterialIcon icon="camera_alt" /></li>
-                    <li><MaterialIcon icon="camera_enhance" /></li>
-                    <li><MaterialIcon icon="camera_front" /></li>
-                    <li><MaterialIcon icon="camera_rear" /></li>
-                    <li><MaterialIcon icon="camera_roll" /></li>
-                    <li><MaterialIcon icon="cancel" /></li>
-                    <li><MaterialIcon icon="card_giftcard" /></li>
-                    <li><MaterialIcon icon="card_membership" /></li>
-                    <li><MaterialIcon icon="card_travel" /></li>
-                    <li><MaterialIcon icon="casino" /></li>
-                    <li><MaterialIcon icon="cast" /></li>
-                    <li><MaterialIcon icon="cast_connected" /></li>
-                    <li><MaterialIcon icon="center_focus_strong" /></li>
-                    <li><MaterialIcon icon="center_focus_weak" /></li>
-                    <li><MaterialIcon icon="change_history" /></li>
-                    <li><MaterialIcon icon="chat" /></li>
-                    <li><MaterialIcon icon="chat_bubble" /></li>
-                    <li><MaterialIcon icon="chat_bubble_outline" /></li>
-                    <li><MaterialIcon icon="check" /></li>
-                    <li><MaterialIcon icon="check_box" /></li>
-                    <li><MaterialIcon icon="check_box_outline_blank" /></li>
-                    <li><MaterialIcon icon="check_circle" /></li>
-                    <li><MaterialIcon icon="chevron_left" /></li>
-                    <li><MaterialIcon icon="chevron_right" /></li>
-                    <li><MaterialIcon icon="child_care" /></li>
-                    <li><MaterialIcon icon="child_friendly" /></li>
-                    <li><MaterialIcon icon="chrome_reader_mode" /></li>
-                    <li><MaterialIcon icon="class" /></li>
-                    <li><MaterialIcon icon="clear" /></li>
-                    <li><MaterialIcon icon="clear_all" /></li>
-                    <li><MaterialIcon icon="close" /></li>
-                    <li><MaterialIcon icon="closed_caption" /></li>
-                    <li><MaterialIcon icon="cloud" /></li>
-                    <li><MaterialIcon icon="cloud_circle" /></li>
-                    <li><MaterialIcon icon="cloud_done" /></li>
-                    <li><MaterialIcon icon="cloud_download" /></li>
-                    <li><MaterialIcon icon="cloud_off" /></li>
-                    <li><MaterialIcon icon="cloud_queue" /></li>
-                    <li><MaterialIcon icon="cloud_upload" /></li>
-                    <li><MaterialIcon icon="code" /></li>
-                    <li><MaterialIcon icon="collections" /></li>
-                    <li><MaterialIcon icon="collections_bookmark" /></li>
-                    <li><MaterialIcon icon="color_lens" /></li>
-                    <li><MaterialIcon icon="colorize" /></li>
-                    <li><MaterialIcon icon="comment" /></li>
-                    <li><MaterialIcon icon="compare" /></li>
-                    <li><MaterialIcon icon="compare_arrows" /></li>
-                    <li><MaterialIcon icon="confirmation_number" /></li>
-                    <li><MaterialIcon icon="contact_mail" /></li>
-                    <li><MaterialIcon icon="contact_phone" /></li>
-                    <li><MaterialIcon icon="contacts" /></li>
-                    <li><MaterialIcon icon="content_copy" /></li>
-                    <li><MaterialIcon icon="content_cut" /></li>
-                    <li><MaterialIcon icon="content_paste" /></li>
-                    <li><MaterialIcon icon="control_point" /></li>
-                    <li><MaterialIcon icon="control_point_duplicate" /></li>
-                    <li><MaterialIcon icon="copyright" /></li>
-                    <li><MaterialIcon icon="create" /></li>
-                    <li><MaterialIcon icon="create_new_folder" /></li>
-                    <li><MaterialIcon icon="credit_card" /></li>
-                    <li><MaterialIcon icon="crop" /></li>
-                    <li><MaterialIcon icon="crop_16_9" /></li>
-                    <li><MaterialIcon icon="crop_3_2" /></li>
-                    <li><MaterialIcon icon="crop_5_4" /></li>
-                    <li><MaterialIcon icon="crop_7_5" /></li>
-                    <li><MaterialIcon icon="crop_din" /></li>
-                    <li><MaterialIcon icon="crop_free" /></li>
-                    <li><MaterialIcon icon="crop_landscape" /></li>
-                    <li><MaterialIcon icon="crop_original" /></li>
-                    <li><MaterialIcon icon="crop_portrait" /></li>
-                    <li><MaterialIcon icon="crop_rotate" /></li>
-                    <li><MaterialIcon icon="crop_square" /></li>
+                  <li className="breadcrumb-item active">Material Icons</li>
                 </ul>
               </div>
             </div>
+            {/* /Page Header */}
+            <div className="row">
+              {/* Chart */}
+              <div className="col-md-12">
+                <div className="card">
+                  <div className="card-header">
+                    <div className="card-title">Material Icons</div>
+                  </div>
+                  <div className="card-body">
+                    <div className="icons-items">
+                      <ul className="icons-list">
+                        <li>
+                          <MaterialIcon.Menu />
+                        </li>
+                        <li>
+                          <MaterialIcon.Accessible />
+                        </li>
+                        <li>
+                          <MaterialIcon.Accessibility />
+                        </li>
+                        <li>
+                          <MaterialIcon.AccountBalanceWallet />
+                        </li>
+                        <li>
+                          <MaterialIcon.AccountBox />
+                        </li>
+                        <li>
+                          <MaterialIcon.Adb />
+                        </li>
+                        <li>
+                          <MaterialIcon.Add />
+                        </li>
+                        <li>
+                          <MaterialIcon.AddAPhoto />
+                        </li>
+                        <li>
+                          <MaterialIcon.AddAPhotoOutlined />
+                        </li>
+                        <li>
+                          <MaterialIcon.AddAlert />
+                        </li>
+                        <li>
+                          <MaterialIcon.AddBox />
+                        </li>
+                        <li>
+                          <MaterialIcon.AddCircle />
+                        </li>
+                        <li>
+                          <MaterialIcon.AddCircleOutline />
+                        </li>
+                        <li>
+                          <MaterialIcon.AddLocation />
+                        </li>
+                        <li>
+                          <MaterialIcon.AddShoppingCart />
+                        </li>
+                        <li>
+                          <MaterialIcon.AddShoppingCartOutlined />
+                        </li>
+                        <li>
+                          <MaterialIcon.AddToPhotos />
+                        </li>
+                        <li>
+                          <MaterialIcon.AddToPhotosOutlined />
+                        </li>
+                        <li>
+                          <MaterialIcon.AddToQueue />
+                        </li>
+                        <li>
+                          <MaterialIcon.Adjust />
+                        </li>
+                        <li>
+                          <MaterialIcon.AirlineSeatFlat />
+                        </li>
+                        <li>
+                          <MaterialIcon.AirlineSeatFlatAngled />
+                        </li>
+                        <li>
+                          <MaterialIcon.AirlineSeatIndividualSuite />
+                        </li>
+                        <li>
+                          <MaterialIcon.AirlineSeatLegroomExtra />
+                        </li>
+                        <li>
+                          <MaterialIcon.AirlineSeatLegroomNormal />
+                        </li>
+                        <li>
+                          <MaterialIcon.AirlineSeatLegroomReduced />
+                        </li>
+                        <li>
+                          <MaterialIcon.AirlineSeatReclineExtra />
+                        </li>
+                        <li>
+                          <MaterialIcon.AirlineSeatReclineNormal />
+                        </li>
+                        <li>
+                          <MaterialIcon.AirplanemodeActive />
+                        </li>
+                        <li>
+                          <MaterialIcon.AirplanemodeInactive />
+                        </li>
+                        <li>
+                          <MaterialIcon.Airplay />
+                        </li>
+                        <li>
+                          <MaterialIcon.AirportShuttle />
+                        </li>
+                        <li>
+                          <MaterialIcon.Alarm />
+                        </li>
+                        <li>
+                          <MaterialIcon.AlarmAdd />
+                        </li>
+                        <li>
+                          <MaterialIcon.AlarmOff />
+                        </li>
+                        <li>
+                          <MaterialIcon.AlarmOn />
+                        </li>
+                        <li>
+                          <MaterialIcon.Album />
+                        </li>
+                        <li>
+                          <MaterialIcon.AllInclusive />
+                        </li>
+                        <li>
+                          <MaterialIcon.AllOut />
+                        </li>
+                        <li>
+                          <MaterialIcon.Android />
+                        </li>
+                        <li>
+                          <MaterialIcon.Announcement />
+                        </li>
+                        <li>
+                          <MaterialIcon.Apps />
+                        </li>
+                        <li>
+                          <MaterialIcon.Archive />
+                        </li>
+                        <li>
+                          <MaterialIcon.ArrowBack />
+                        </li>
+                        <li>
+                          <MaterialIcon.ArrowDownward />
+                        </li>
+                        <li>
+                          <MaterialIcon.ArrowDropDown />
+                        </li>
+                        <li>
+                          <MaterialIcon.ArrowDropDownCircle />
+                        </li>
+                        <li>
+                          <MaterialIcon.ArrowDropUp />
+                        </li>
+                        <li>
+                          <MaterialIcon.ArrowForward />
+                        </li>
+                        <li>
+                          <MaterialIcon.ArtTrack />
+                        </li>
+                        <li>
+                          <MaterialIcon.AspectRatio />
+                        </li>
+                        <li>
+                          <MaterialIcon.Assessment />
+                        </li>
+                        <li>
+                          <MaterialIcon.AssignmentLate />
+                        </li>
+                        <li>
+                          <MaterialIcon.AssignmentReturn />
+                        </li>
+                        <li>
+                          <MaterialIcon.AssignmentReturned />
+                        </li>
+                        <li>
+                          <MaterialIcon.AssignmentTurnedIn />
+                        </li>
+                        <li>
+                          <MaterialIcon.Assistant />
+                        </li>
+                        <li>
+                          <MaterialIcon.AssistantPhoto />
+                        </li>
+                        <li>
+                          <MaterialIcon.AttachFile />
+                        </li>
+                        <li>
+                          <MaterialIcon.AttachMoney />
+                        </li>
+                        <li>
+                          <MaterialIcon.Attachment />
+                        </li>
+                        <li>
+                          <MaterialIcon.Audiotrack />
+                        </li>
+                        <li>
+                          <MaterialIcon.Autorenew />
+                        </li>
+                        <li>
+                          <MaterialIcon.AvTimer />
+                        </li>
+                        <li>
+                          <MaterialIcon.Backspace />
+                        </li>
+                        <li>
+                          <MaterialIcon.Backup />
+                        </li>
+                        <li>
+                          <MaterialIcon.BatteryAlert />
+                        </li>
+                        <li>
+                          <MaterialIcon.BatteryChargingFull />
+                        </li>
+                        <li>
+                          <MaterialIcon.BatteryFull />
+                        </li>
+                        <li>
+                          <MaterialIcon.BatteryStd />
+                        </li>
+                        <li>
+                          <MaterialIcon.BatteryUnknown />
+                        </li>
+                        <li>
+                          <MaterialIcon.BeachAccess />
+                        </li>
+                        <li>
+                          <MaterialIcon.Beenhere />
+                        </li>
+                        <li>
+                          <MaterialIcon.Block />
+                        </li>
+                        <li>
+                          <MaterialIcon.Bluetooth />
+                        </li>
+                        <li>
+                          <MaterialIcon.BluetoothAudio />
+                        </li>
+                        <li>
+                          <MaterialIcon.BluetoothConnected />
+                        </li>
+                        <li>
+                          <MaterialIcon.BluetoothDisabled />
+                        </li>
+                        <li>
+                          <MaterialIcon.BluetoothSearching />
+                        </li>
+                        <li>
+                          <MaterialIcon.BlurCircular />
+                        </li>
+                        <li>
+                          <MaterialIcon.BlurLinear />
+                        </li>
+                        <li>
+                          <MaterialIcon.BlurOff />
+                        </li>
+                        <li>
+                          <MaterialIcon.BlurOn />
+                        </li>
+                        <li>
+                          <MaterialIcon.Book />
+                        </li>
+                        <li>
+                          <MaterialIcon.Bookmark />
+                        </li>
+                        <li>
+                          <MaterialIcon.BookmarkBorder />
+                        </li>
+                        <li>
+                          <MaterialIcon.BorderAll />
+                        </li>
+                        <li>
+                          <MaterialIcon.BorderBottom />
+                        </li>
+                        <li>
+                          <MaterialIcon.BorderClear />
+                        </li>
+                        <li>
+                          <MaterialIcon.BorderColor />
+                        </li>
+                        <li>
+                          <MaterialIcon.BorderHorizontal />
+                        </li>
+                        <li>
+                          <MaterialIcon.BorderInner />
+                        </li>
+                        <li>
+                          <MaterialIcon.BorderLeft />
+                        </li>
+                        <li>
+                          <MaterialIcon.BorderOuter />
+                        </li>
+                        <li>
+                          <MaterialIcon.BorderRight />
+                        </li>
+                        <li>
+                          <MaterialIcon.BorderStyle />
+                        </li>
+                        <li>
+                          <MaterialIcon.BorderTop />
+                        </li>
+                        <li>
+                          <MaterialIcon.BorderVertical />
+                        </li>
+                        <li>
+                          <MaterialIcon.BrandingWatermark />
+                        </li>
+                        <li>
+                          <MaterialIcon.Brightness1 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Brightness3 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Brightness4 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Brightness5 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Brightness6 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Brightness7 />
+                        </li>
+                        <li>
+                          <MaterialIcon.BrightnessAuto />
+                        </li>
+                        <li>
+                          <MaterialIcon.BrightnessHigh />
+                        </li>
+                        <li>
+                          <MaterialIcon.BrightnessLow />
+                        </li>
+                        <li>
+                          <MaterialIcon.BrightnessMedium />
+                        </li>
+                        <li>
+                          <MaterialIcon.BrokenImage />
+                        </li>
+                        <li>
+                          <MaterialIcon.Brush />
+                        </li>
+                        <li>
+                          <MaterialIcon.BubbleChart />
+                        </li>
+                        <li>
+                          <MaterialIcon.BugReport />
+                        </li>
+                        <li>
+                          <MaterialIcon.Build />
+                        </li>
+                        <li>
+                          <MaterialIcon.BurstMode />
+                        </li>
+                        <li>
+                          <MaterialIcon.Business />
+                        </li>
+                        <li>
+                          <MaterialIcon.BusinessCenter />
+                        </li>
+                        <li>
+                          <MaterialIcon.Cached />
+                        </li>
+                        <li>
+                          <MaterialIcon.Cake />
+                        </li>
+                        <li>
+                          <MaterialIcon.Call />
+                        </li>
+                        <li>
+                          <MaterialIcon.CallEnd />
+                        </li>
+                        <li>
+                          <MaterialIcon.CallMade />
+                        </li>
+                        <li>
+                          <MaterialIcon.CallMerge />
+                        </li>
+                        <li>
+                          <MaterialIcon.CallMissed />
+                        </li>
+                        <li>
+                          <MaterialIcon.CallMissedOutgoing />
+                        </li>
+                        <li>
+                          <MaterialIcon.CallReceived />
+                        </li>
+                        <li>
+                          <MaterialIcon.CallSplit />
+                        </li>
+                        <li>
+                          <MaterialIcon.CallToAction />
+                        </li>
+                        <li>
+                          <MaterialIcon.Camera />
+                        </li>
+                        <li>
+                          <MaterialIcon.CameraAlt />
+                        </li>
+                        <li>
+                          <MaterialIcon.CameraEnhance />
+                        </li>
+                        <li>
+                          <MaterialIcon.CameraFront />
+                        </li>
+                        <li>
+                          <MaterialIcon.CameraRear />
+                        </li>
+                        <li>
+                          <MaterialIcon.CameraRoll />
+                        </li>
+                        <li>
+                          <MaterialIcon.Cancel />
+                        </li>
+                        <li>
+                          <MaterialIcon.CardGiftcard />
+                        </li>
+                        <li>
+                          <MaterialIcon.CardMembership />
+                        </li>
+                        <li>
+                          <MaterialIcon.CardTravel />
+                        </li>
+                        <li>
+                          <MaterialIcon.Casino />
+                        </li>
+                        <li>
+                          <MaterialIcon.Cast />
+                        </li>
+                        <li>
+                          <MaterialIcon.CastConnected />
+                        </li>
+                        <li>
+                          <MaterialIcon.CenterFocusStrong />
+                        </li>
+                        <li>
+                          <MaterialIcon.CenterFocusWeak />
+                        </li>
+                        <li>
+                          <MaterialIcon.ChangeHistory />
+                        </li>
+                        <li>
+                          <MaterialIcon.Chat />
+                        </li>
+                        <li>
+                          <MaterialIcon.ChatBubble />
+                        </li>
+                        <li>
+                          <MaterialIcon.ChatBubbleOutline />
+                        </li>
+                        <li>
+                          <MaterialIcon.Check />
+                        </li>
+                        <li>
+                          <MaterialIcon.CheckBox />
+                        </li>
+                        <li>
+                          <MaterialIcon.CheckBoxOutlineBlank />
+                        </li>
+                        <li>
+                          <MaterialIcon.CheckCircle />
+                        </li>
+                        <li>
+                          <MaterialIcon.ChevronLeft />
+                        </li>
+                        <li>
+                          <MaterialIcon.ChevronRight />
+                        </li>
+                        <li>
+                          <MaterialIcon.ChildCare />
+                        </li>
+                        <li>
+                          <MaterialIcon.ChildFriendly />
+                        </li>
+                        <li>
+                          <MaterialIcon.ChromeReaderMode />
+                        </li>
+                        <li>
+                          <MaterialIcon.Class />
+                        </li>
+                        <li>
+                          <MaterialIcon.Clear />
+                        </li>
+                        <li>
+                          <MaterialIcon.ClearAll />
+                        </li>
+                        <li>
+                          <MaterialIcon.Close />
+                        </li>
+                        <li>
+                          <MaterialIcon.ClosedCaption />
+                        </li>
+                        <li>
+                          <MaterialIcon.Cloud />
+                        </li>
+                        <li>
+                          <MaterialIcon.CloudCircle />
+                        </li>
+                        <li>
+                          <MaterialIcon.CloudDone />
+                        </li>
+                        <li>
+                          <MaterialIcon.CloudDownload />
+                        </li>
+                        <li>
+                          <MaterialIcon.CloudOff />
+                        </li>
+                        <li>
+                          <MaterialIcon.CloudQueue />
+                        </li>
+                        <li>
+                          <MaterialIcon.CloudUpload />
+                        </li>
+                        <li>
+                          <MaterialIcon.Code />
+                        </li>
+                        <li>
+                          <MaterialIcon.Collections />
+                        </li>
+                        <li>
+                          <MaterialIcon.CollectionsBookmark />
+                        </li>
+                        <li>
+                          <MaterialIcon.ColorLens />
+                        </li>
+                        <li>
+                          <MaterialIcon.Colorize />
+                        </li>
+                        <li>
+                          <MaterialIcon.Comment />
+                        </li>
+                        <li>
+                          <MaterialIcon.Compare />
+                        </li>
+                        <li>
+                          <MaterialIcon.CompareArrows />
+                        </li>
+                        <li>
+                          <MaterialIcon.ConfirmationNumber />
+                        </li>
+                        <li>
+                          <MaterialIcon.ContactMail />
+                        </li>
+                        <li>
+                          <MaterialIcon.ContactPhone />
+                        </li>
+                        <li>
+                          <MaterialIcon.Contacts />
+                        </li>
+                        <li>
+                          <MaterialIcon.ContentCopy />
+                        </li>
+                        <li>
+                          <MaterialIcon.ContentCut />
+                        </li>
+                        <li>
+                          <MaterialIcon.ContentPaste />
+                        </li>
+                        <li>
+                          <MaterialIcon.ControlPoint />
+                        </li>
+                        <li>
+                          <MaterialIcon.ControlPointDuplicate />
+                        </li>
+                        <li>
+                          <MaterialIcon.Copyright />
+                        </li>
+                        <li>
+                          <MaterialIcon.Create />
+                        </li>
+                        <li>
+                          <MaterialIcon.CreateNewFolder />
+                        </li>
+                        <li>
+                          <MaterialIcon.CreditCard />
+                        </li>
+                        <li>
+                          <MaterialIcon.Crop />
+                        </li>
+                        <li>
+                          <MaterialIcon.Crop169 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Crop32 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Crop54 />
+                        </li>
+                        <li>
+                          <MaterialIcon.Crop75 />
+                        </li>
+                        <li>
+                          <MaterialIcon.CropDin />
+                        </li>
+                        <li>
+                          <MaterialIcon.CropFree />
+                        </li>
+                        <li>
+                          <MaterialIcon.CropLandscape />
+                        </li>
+                        <li>
+                          <MaterialIcon.CropOriginal />
+                        </li>
+                        <li>
+                          <MaterialIcon.CropPortrait />
+                        </li>
+                        <li>
+                          <MaterialIcon.CropRotate />
+                        </li>
+                        <li>
+                          <MaterialIcon.CropSquare />
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* /Chart */}
+            </div>
           </div>
         </div>
-        {/* /Chart */}
-      </div>
-    </div>
-  </div>
-  {/* /Page Wrapper */}
-</>
-
-)};
-export default MaterialIcons;        
+      </HelmetProvider>
+      {/* /Page Wrapper */}
+    </>
+  );
+};
+export default MaterialIcons;

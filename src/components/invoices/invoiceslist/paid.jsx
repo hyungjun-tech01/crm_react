@@ -1,11 +1,11 @@
-import React from 'react';
+import React from "react";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import { IMG06, IMG07, IMG08, IMG09, IMG10 } from "./img";
-import Breadcrumb from './common.jsx'
+import Breadcrumb from "./common.jsx";
 import { Table } from "antd";
-import { itemRender, onShowSizeChange } from "../../paginationfunction"
-import "../../antdstyle.css"
+import { itemRender, onShowSizeChange } from "../../paginationfunction";
+import "../../antdstyle.css";
 const PaidInvoices = () => {
   const data = [
     {
@@ -16,7 +16,7 @@ const PaidInvoices = () => {
       Amount: "$1,54,220",
       Paid: "23 Mar 2022",
       Status: "Paid",
-      image: IMG06
+      image: IMG06,
     },
     {
       id: 2,
@@ -26,7 +26,7 @@ const PaidInvoices = () => {
       Amount: "$1,222",
       Paid: "18 Mar 2022",
       Status: "Paid",
-      image: IMG07
+      image: IMG07,
     },
     {
       id: 3,
@@ -36,7 +36,7 @@ const PaidInvoices = () => {
       Amount: "$3,470",
       Paid: "10 Mar 2022",
       Status: "Paid",
-      image: IMG08
+      image: IMG08,
     },
     {
       id: 4,
@@ -46,7 +46,7 @@ const PaidInvoices = () => {
       Amount: "$8,265",
       Paid: "30 Mar 2022",
       Status: "Paid",
-      image: IMG09
+      image: IMG09,
     },
     {
       id: 5,
@@ -56,16 +56,19 @@ const PaidInvoices = () => {
       Amount: "$5,200",
       Paid: "20 Mar 2022",
       Status: "Paid",
-      image: IMG10
-    }
+      image: IMG10,
+    },
   ];
   const columns = [
-
     {
       title: "Invoice number",
       dataIndex: "Invoice",
       render: (text, record) => (
-        <><Link to="/view-invoice" className="invoice-link">{text}</Link></>
+        <>
+          <Link to="/view-invoice" className="invoice-link">
+            {text}
+          </Link>
+        </>
       ),
       sorter: (a, b) => a.Invoice.length - b.Invoice.length,
     },
@@ -73,23 +76,23 @@ const PaidInvoices = () => {
     {
       title: "Created on",
       dataIndex: "on",
-      render: (text, record) => (
-        <>{text}</>
-      ),
+      render: (text, record) => <>{text}</>,
       sorter: (a, b) => a.on.length - b.on.length,
     },
     {
       title: "Invoice to",
       dataIndex: "to",
       render: (text, record) => (
-        <><Link to="/profile">
-          <img
-            className="avatar avatar-sm me-2 avatar-img rounded-circle"
-            src={record.image}
-            alt="User Image"
-          />{" "}
-          {text}
-        </Link></>
+        <>
+          <Link to="/profile">
+            <img
+              className="avatar avatar-sm me-2 avatar-img rounded-circle"
+              src={record.image}
+              alt="User Image"
+            />{" "}
+            {text}
+          </Link>
+        </>
       ),
       sorter: (a, b) => a.to.length - b.to.length,
     },
@@ -97,23 +100,26 @@ const PaidInvoices = () => {
       title: "Amount",
       dataIndex: "Amount",
       render: (text, record) => (
-        <><div className="text-primary">{text}</div></>
+        <>
+          <div className="text-primary">{text}</div>
+        </>
       ),
       sorter: (a, b) => a.Amount.length - b.Amount.length,
     },
     {
       title: "Paid on",
       dataIndex: "Paid",
-      render: (text, record) => (
-        <>{text}</>
-      ),
+      render: (text, record) => <>{text}</>,
       sorter: (a, b) => a.Paid.length - b.Paid.length,
     },
     {
       title: "Status",
       dataIndex: "Status",
       render: (text, record) => (
-        <> <span className="badge bg-success-light">{text}</span></>
+        <>
+          {" "}
+          <span className="badge bg-success-light">{text}</span>
+        </>
       ),
       sorter: (a, b) => a.Status.length - b.Status.length,
     },
@@ -122,7 +128,8 @@ const PaidInvoices = () => {
       className: "text-end",
       render: (text, record) => (
         <div className="text-end">
-          <Link to="/edit-invoice"
+          <Link
+            to="/edit-invoice"
             className="btn btn-sm btn-white text-success me-2"
           >
             <i className="fa fa-edit me-1" /> Edit
@@ -138,7 +145,7 @@ const PaidInvoices = () => {
           </a>
         </div>
       ),
-    }
+    },
   ];
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
@@ -148,52 +155,58 @@ const PaidInvoices = () => {
         selectedRows
       );
     },
-    getCheckboxProps: record => ({
+    getCheckboxProps: (record) => ({
       disabled: record.name === "Disabled User", // Column configuration not to be checked
       name: record.name,
-      className: "checkbox-red"
-    })
+      className: "checkbox-red",
+    }),
   };
   return (
     <>
       {/* Page Wrapper */}
-      <div className="page-wrapper">
-        <Helmet>
-          <title>Invoice- CRMS admin Template</title>
-          <meta name="description" content="Reactify Blank Page" />
-        </Helmet>
-        {/* Page Content */}
-        <div className="content container-fluid">
-          <Breadcrumb />
-          <>
-            <div className="row">
-              <div className="col-sm-12">
-                <div className="card card-table">
-                  <div className="card-body p-4">
-                    <div className="table-responsive">
-                      <Table
-                        rowSelection={rowSelection}
-                        pagination={{
-                          total: data.length,
-                          showTotal: (total, range) => `Showing ${range[0]} to ${range[1]} of ${total} entries`,
-                          showSizeChanger: true, onShowSizeChange: onShowSizeChange, itemRender: itemRender
-                        }}
-                        className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
-                        style={{ overflowX: "auto" }}
-                        columns={columns}
-                        dataSource={data}
-                        rowKey={(record) => record.id} />
+      <HelmetProvider>
+        <div className="page-wrapper">
+          <Helmet>
+            <title>Invoice- CRMS admin Template</title>
+            <meta name="description" content="Reactify Blank Page" />
+          </Helmet>
+          {/* Page Content */}
+          <div className="content container-fluid">
+            <Breadcrumb />
+            <>
+              <div className="row">
+                <div className="col-sm-12">
+                  <div className="card card-table">
+                    <div className="card-body p-4">
+                      <div className="table-responsive">
+                        <Table
+                          rowSelection={rowSelection}
+                          pagination={{
+                            total: data.length,
+                            showTotal: (total, range) =>
+                              `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+                            showSizeChanger: true,
+                            onShowSizeChange: onShowSizeChange,
+                            itemRender: itemRender,
+                          }}
+                          className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
+                          style={{ overflowX: "auto" }}
+                          columns={columns}
+                          dataSource={data}
+                          rowKey={(record) => record.id}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </>
+            </>
+          </div>
+          {/* /Page Content */}
         </div>
-        {/* /Page Content */}
-      </div>
+      </HelmetProvider>
       {/* /Page Wrapper */}
     </>
-  )
+  );
 };
 export default PaidInvoices;

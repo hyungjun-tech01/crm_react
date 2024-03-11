@@ -128,7 +128,7 @@ import Login from "./components/login";
 import Register from "./components/register";
 import ForgotPassword from "./components/forgotpassword";
 
-import "antd/dist/antd.css";
+import "antd/dist/reset.css";
 import "./assets/css/bootstrap.min.css";
 import "./assets/css/font-awesome.min.css";
 import "./assets/css/feather.css";

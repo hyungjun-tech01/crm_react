@@ -1,16 +1,40 @@
-import React from 'react';
-import { Helmet } from "react-helmet";
+import React from "react";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import { IMG01, IMG02, IMG03, IMG04, IMG05,IMG06,AVATHAR01,AVATHAR02,AVATHAR03,AVATHAR04,AVATHAR05,AVATHAR06 } from "./img"
+import {
+  IMG01,
+  IMG02,
+  IMG03,
+  IMG04,
+  IMG05,
+  IMG06,
+  AVATHAR01,
+  AVATHAR02,
+  AVATHAR03,
+  AVATHAR04,
+  AVATHAR05,
+  AVATHAR06,
+} from "./img";
 import { AiOutlinePlusCircle } from "react-icons/ai";
-import { FiChevronLeft, FiChevronRight, FiEdit, FiEye, FiEyeOff, FiPlusCircle, FiTrash2, FiXCircle } from 'react-icons/fi';
-const Blogs =()=>{
-    return(
+import {
+  FiChevronLeft,
+  FiChevronRight,
+  FiEdit,
+  FiEye,
+  FiEyeOff,
+  FiPlusCircle,
+  FiTrash2,
+  FiXCircle,
+} from "react-icons/fi";
+
+const Blogs = () => {
+  return (
+    <HelmetProvider>
         <div className="page-wrapper">
-    <Helmet>
-      <title>Dashboard - CRMS admin Template</title>
-      <meta name="description" content="Reactify Blank Page" />
-  </Helmet>
+        <Helmet>
+            <title>Dashboard - CRMS admin Template</title>
+            <meta name="description" content="Reactify Blank Page" />
+        </Helmet>
         <div className="content container-fluid">
             {/* Page Header */}
             {/* Blog List */}
@@ -37,11 +61,7 @@ const Blogs =()=>{
                 <div className="blog grid-blog flex-fill">
                 <div className="blog-image">
                     <Link to="/blog-details">
-                    <img
-                        className="img-fluid"
-                        src={IMG01}
-                        alt="Post Image"
-                    />
+                    <img className="img-fluid" src={IMG01} alt="Post Image" />
                     </Link>
                     <div className="blog-views">
                     <FiEye className="feather-eye me-1" /> 225
@@ -52,10 +72,7 @@ const Blogs =()=>{
                     <li>
                         <div className="post-author">
                         <Link to="/profile">
-                            <img
-                            src={AVATHAR01}
-                            alt="Post Author"
-                            />
+                            <img src={AVATHAR01} alt="Post Author" />
                             <span>
                             <span className="post-title">Vincent</span>
                             <span className="post-date">
@@ -72,8 +89,8 @@ const Blogs =()=>{
                     </Link>
                     </h3>
                     <p>
-                    Lorem ipsum dolor sit amet, consectetur em adipiscing elit, sed do
-                    eiusmod tempor.
+                    Lorem ipsum dolor sit amet, consectetur em adipiscing elit,
+                    sed do eiusmod tempor.
                     </p>
                 </div>
                 <div className="row">
@@ -111,11 +128,7 @@ const Blogs =()=>{
                 <div className="blog grid-blog flex-fill">
                 <div className="blog-image">
                     <Link to="/blog-details">
-                    <img
-                        className="img-fluid"
-                        src={IMG02}
-                        alt="Post Image"
-                    />
+                    <img className="img-fluid" src={IMG02} alt="Post Image" />
                     </Link>
                     <div className="blog-views">
                     <FiEye className="feather-eye me-1" /> 132
@@ -126,10 +139,7 @@ const Blogs =()=>{
                     <li>
                         <div className="post-author">
                         <Link to="/profile">
-                            <img
-                            src={AVATHAR02}
-                            alt="Post Author"
-                            />
+                            <img src={AVATHAR02} alt="Post Author" />
                             <span>
                             <span className="post-title">Lois A</span>
                             <span className="post-date">
@@ -146,8 +156,8 @@ const Blogs =()=>{
                     </Link>
                     </h3>
                     <p>
-                    Lorem ipsum dolor sit amet, consectetur em adipiscing elit, sed do
-                    eiusmod tempor.
+                    Lorem ipsum dolor sit amet, consectetur em adipiscing elit,
+                    sed do eiusmod tempor.
                     </p>
                 </div>
                 <div className="row">
@@ -185,11 +195,7 @@ const Blogs =()=>{
                 <div className="blog grid-blog flex-fill">
                 <div className="blog-image">
                     <Link to="/blog-details">
-                    <img
-                        className="img-fluid"
-                        src={IMG03}
-                        alt="Post Image"
-                    />
+                    <img className="img-fluid" src={IMG03} alt="Post Image" />
                     </Link>
                     <div className="blog-views">
                     <FiEye className="feather-eye me-1" /> 344
@@ -200,10 +206,7 @@ const Blogs =()=>{
                     <li>
                         <div className="post-author">
                         <Link to="/profile">
-                            <img
-                            src={AVATHAR03}
-                            alt="Post Author"
-                            />
+                            <img src={AVATHAR03} alt="Post Author" />
                             <span>
                             <span className="post-title">Levell Scott</span>
                             <span className="post-date">
@@ -216,13 +219,13 @@ const Blogs =()=>{
                     </ul>
                     <h3 className="blog-title">
                     <Link to="/blog-details">
-                        5 Powerful and Key CRM Trends and Statistics You Should Know in
-                        2022
+                        5 Powerful and Key CRM Trends and Statistics You Should Know
+                        in 2022
                     </Link>
                     </h3>
                     <p>
-                    Lorem ipsum dolor sit amet, consectetur em adipiscing elit, sed do
-                    eiusmod tempor.
+                    Lorem ipsum dolor sit amet, consectetur em adipiscing elit,
+                    sed do eiusmod tempor.
                     </p>
                 </div>
                 <div className="row">
@@ -260,11 +263,7 @@ const Blogs =()=>{
                 <div className="blog grid-blog flex-fill">
                 <div className="blog-image">
                     <Link to="/blog-details">
-                    <img
-                        className="img-fluid"
-                        src={IMG04}
-                        alt="Post Image"
-                    />
+                    <img className="img-fluid" src={IMG04} alt="Post Image" />
                     </Link>
                     <div className="blog-views">
                     <FiEye className="feather-eye me-1" /> 215
@@ -275,10 +274,7 @@ const Blogs =()=>{
                     <li>
                         <div className="post-author">
                         <Link to="/profile">
-                            <img
-                            src={AVATHAR04}
-                            alt="Post Author"
-                            />
+                            <img src={AVATHAR04} alt="Post Author" />
                             <span>
                             <span className="post-title">Calvin</span>
                             <span className="post-date">
@@ -295,8 +291,8 @@ const Blogs =()=>{
                     </Link>
                     </h3>
                     <p>
-                    Lorem ipsum dolor sit amet, consectetur em adipiscing elit, sed do
-                    eiusmod tempor.
+                    Lorem ipsum dolor sit amet, consectetur em adipiscing elit,
+                    sed do eiusmod tempor.
                     </p>
                 </div>
                 <div className="row">
@@ -334,11 +330,7 @@ const Blogs =()=>{
                 <div className="blog grid-blog flex-fill">
                 <div className="blog-image">
                     <Link to="/blog-details">
-                    <img
-                        className="img-fluid"
-                        src={IMG05}
-                        alt="Post Image"
-                    />
+                    <img className="img-fluid" src={IMG05} alt="Post Image" />
                     </Link>
                     <div className="blog-views">
                     <FiEye className="feather-eye me-1" /> 285
@@ -349,10 +341,7 @@ const Blogs =()=>{
                     <li>
                         <div className="post-author">
                         <Link to="/profile">
-                            <img
-                            src={AVATHAR05}
-                            alt="Post Author"
-                            />
+                            <img src={AVATHAR05} alt="Post Author" />
                             <span>
                             <span className="post-title">Aaliyah </span>
                             <span className="post-date">
@@ -365,12 +354,13 @@ const Blogs =()=>{
                     </ul>
                     <h3 className="blog-title">
                     <Link to="/blog-details">
-                        Best Customer Relationship Management Software for Businesses
+                        Best Customer Relationship Management Software for
+                        Businesses
                     </Link>
                     </h3>
                     <p>
-                    Lorem ipsum dolor sit amet, consectetur em adipiscing elit, sed do
-                    eiusmod tempor.
+                    Lorem ipsum dolor sit amet, consectetur em adipiscing elit,
+                    sed do eiusmod tempor.
                     </p>
                 </div>
                 <div className="row">
@@ -408,11 +398,7 @@ const Blogs =()=>{
                 <div className="blog grid-blog flex-fill">
                 <div className="blog-image">
                     <Link to="/blog-details">
-                    <img
-                        className="img-fluid"
-                        src={IMG06}
-                        alt="Post Image"
-                    />
+                    <img className="img-fluid" src={IMG06} alt="Post Image" />
                     </Link>
                     <div className="blog-views">
                     <FiEye className="feather-eye me-1" /> 654
@@ -423,17 +409,14 @@ const Blogs =()=>{
                     <li>
                         <div className="post-author">
                         <Link to="/profile">
-                            <img
-                            src={AVATHAR06}
-                            alt="Post Author"
-                            />
+                            <img src={AVATHAR06} alt="Post Author" />
                             <span>
                             <span className="post-title">Malynne</span>
                             <span className="post-date">
                                 <i className="far fa-clock" /> 4 Dec 2022
                             </span>
                             </span>
-                            </Link>
+                        </Link>
                         </div>
                     </li>
                     </ul>
@@ -443,8 +426,8 @@ const Blogs =()=>{
                     </Link>
                     </h3>
                     <p>
-                    Lorem ipsum dolor sit amet, consectetur em adipiscing elit, sed do
-                    eiusmod tempor.
+                    Lorem ipsum dolor sit amet, consectetur em adipiscing elit,
+                    sed do eiusmod tempor.
                     </p>
                 </div>
                 <div className="row">
@@ -536,20 +519,28 @@ const Blogs =()=>{
                     data-bs-dismiss="modal"
                     aria-label="Close"
                     >
-                    <i><FiXCircle className="feather-x-circle" /></i>
+                    <i>
+                        <FiXCircle className="feather-x-circle" />
+                    </i>
                     </button>
                 </div>
                 <div className="modal-body">
                     <div className="delete-wrap text-center">
                     <div className="del-icon">
-                        <i><FiXCircle className="feather-x-circle" /></i>
+                        <i>
+                        <FiXCircle className="feather-x-circle" />
+                        </i>
                     </div>
                     <h2>Sure you want to delete</h2>
                     <div className="submit-section">
                         <Link to="/blog" className="btn btn-success me-2">
                         Yes
                         </Link>
-                        <a href="#" className="btn btn-danger" data-bs-dismiss="modal">
+                        <a
+                        href="#"
+                        className="btn btn-danger"
+                        data-bs-dismiss="modal"
+                        >
                         No
                         </a>
                     </div>
@@ -561,39 +552,39 @@ const Blogs =()=>{
         </div>
         <div className="modal fade confirmModal" tabIndex={-1} aria-hidden="true">
             <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content p-3">
-                    <div className="modal-header border-bottom-0">
+            <div className="modal-content p-3">
+                <div className="modal-header border-bottom-0">
+                <button
+                    type="button"
+                    className="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                />
+                </div>
+                <div className="modal-body">
+                <div className="text-center">
+                    <h5 className="mb-3">Confirm Save Changes</h5>
                     <button
-                        type="button"
-                        className="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                    />
-                    </div>
-                    <div className="modal-body">
-                    <div className="text-center">
-                        <h5 className="mb-3">Confirm Save Changes</h5>
-                        <button
-                        type="button"
-                        className="btn btn-dark w-md"
-                        data-bs-dismiss="modal"
-                        >
-                        Close
-                        </button>
-                        <button
-                        type="button"
-                        className="btn btn-primary w-md"
-                        data-bs-dismiss="modal"                        
-                        >
-                        Save changes
-                        </button>
-                    </div>
-                    </div>
+                    type="button"
+                    className="btn btn-dark w-md"
+                    data-bs-dismiss="modal"
+                    >
+                    Close
+                    </button>
+                    <button
+                    type="button"
+                    className="btn btn-primary w-md"
+                    data-bs-dismiss="modal"
+                    >
+                    Save changes
+                    </button>
+                </div>
                 </div>
             </div>
+            </div>
         </div>
-
         </div>
-    )
+    </HelmetProvider>
+  );
 };
- export default Blogs;
+export default Blogs;

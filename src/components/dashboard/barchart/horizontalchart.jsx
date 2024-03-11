@@ -1,5 +1,5 @@
 import React from "react";
-import {HorizontalBar} from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 
 
 const state = {
@@ -23,8 +23,9 @@ const state = {
 const HorizontalBarChart =()=> {
       return (
         <div>
-           <HorizontalBar
-              data={state}          
+           <Bar
+              data={state}
+              indexAxis='y'
               options={{
                 legend:{
                   display:false,
