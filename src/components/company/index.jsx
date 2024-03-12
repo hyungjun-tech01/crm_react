@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
 import CompanyDetailsModel from "./CompanyDetailsModel";
 import DatePicker from "react-datepicker";
@@ -10,28 +10,12 @@ import "react-datepicker/dist/react-datepicker.css";
 import { BiData } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies } from "../../atoms/atoms";
-import { useCookies } from "react-cookie";
 
 const Company = () => {
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const [companyData, setCompanyData] = useState([]);
-  const history = useHistory();
   const [selectedDate1, setSelectedDate1] = useState(new Date());
-  const [cookies, removeCookie] = useCookies([
-    "myLationCrmUserId",
-    "myLationCrmUserName",
-    "myLationCrmAuthToken",
-  ]);
-
-  console.log("no cookies", cookies.myLationCrmAuthToken);
-  if (
-    cookies.myLationCrmAuthToken === "undefined" ||
-    cookies.myLationCrmAuthToken === "" ||
-    cookies.myLationCrmAuthToken === null
-  ) {
-    history.push("/login");
-  }
 
   const handleDateChange1 = (date) => {
     setSelectedDate1(date);

@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
-import config from "config";
+import { Route, BrowserRouter as Router, Switch, useHistory } from "react-router-dom";
+import { useCookies } from "react-cookie";
 
-import {
-  Route,
-  BrowserRouter as Router,
-  Switch,
-  useHistory,
-} from "react-router-dom";
+import config from "config";
 
 import Header from "./components/header/index";
 //dashboard
@@ -163,6 +159,14 @@ const AppUniversal = (props) => {
   //         localStorage.setItem('theme', e);
   //     }
   // }
+  // cookie 사용하여 로그인 여부 체크
+  const [cookies, removeCookie] = useCookies([
+    "myLationCrmUserId",
+    "myLationCrmUserName",
+    "myLationCrmAuthToken",
+  ]);
+  const history = useHistory();
+
   useEffect(() => {
     document.querySelector(".roboto-font").onclick = function () {
       document.body.classList.add("roboto");
@@ -182,21 +186,29 @@ const AppUniversal = (props) => {
       document.body.classList.add("monstret");
       document.body.classList.remove("poppins");
     };
-
     document.querySelector(".inter-font").onclick = function () {
       document.body.classList.remove("roboto");
       document.body.classList.add("inter");
       document.body.classList.remove("monstret");
       document.body.classList.remove("poppins");
     };
-
     document.querySelector(".font-Default").onclick = function () {
       document.body.classList.remove("roboto");
       document.body.classList.add("inter");
       document.body.classList.remove("monstret");
       document.body.classList.remove("poppins");
     };
-  }, []);
+    console.log(`\nCheck cookies: ${cookies.myLationCrmAuthToken}`);
+    if(cookies.myLationCrmAuthToken === undefined
+      || cookies.myLationCrmAuthToken === null
+      || cookies.myLationCrmAuthToken === ""
+    ) {
+      removeCookie('myLationCrmUserId');
+      removeCookie('myLationCrmUserName');
+      removeCookie('myLationCrmAuthToken');
+      history.push("/login");
+    }
+  }, [cookies.myLationCrmAuthToken, history, removeCookie]);
 
   const url = props.location.pathname.split("/")[1];
   const exclusionArray = [
@@ -215,49 +227,25 @@ const AppUniversal = (props) => {
           {/* Dashboard */}
           <Route path="/" exact component={Company} />
           <Route path="/index" exact component={Dashboard} />
-          <Route
-            path="/projects-dashboard"
-            exact
-            component={ProjectDashboard}
-          />
+          <Route path="/projects-dashboard" exact component={ProjectDashboard} />
           <Route path="/leads-dashboard" exact component={LeadDashboard} />
           <Route path="/tasks" exact component={Task} />
           <Route path="/SystemUserModel" exact component={SystemUserModel} />
           <Route path="/TaskDetailModel" exact component={TaskDetailModel} />
           <Route path="/contacts" exact component={Contacts} />
           <Route path="/companies" exact component={Company} />
-          <Route
-            path="/CompanyDetailInfo"
-            exact
-            component={CompanyDetailInfo}
-          />
-          <Route
-            path="/CompanyDetailsModel"
-            exact
-            component={CompanyDetailsModel}
-          />
+          <Route path="/CompanyDetailInfo" exact component={CompanyDetailInfo} />
+          <Route path="/CompanyDetailsModel" exact component={CompanyDetailsModel} />
           <Route path="/leads" exact component={Lead} />
-          <Route
-            path="/LeadsDetailsModel"
-            exact
-            component={LeadsDetailsModel}
-          />
+          <Route path="/LeadsDetailsModel" exact component={LeadsDetailsModel} />
           <Route path="/leads-kanban-view" exact component={Leadskanbanview} />
           <Route path="/deals" exact component={Deals} />
           <Route path="/DealDetailsModel" exact component={DealDetailsModel} />
           <Route path="/CompanyDetails" exact component={CompanyDetails} />
           <Route path="/deals-kanban-view" exact component={Dealskanbanview} />
           <Route path="/projects" exact component={Project} />
-          <Route
-            path="/ProjectDetailsModel"
-            exact
-            component={ProjectDetailsModel}
-          />
-          <Route
-            path="/projects-kanban-view"
-            exact
-            component={Projectkanbanview}
-          />
+          <Route path="/ProjectDetailsModel" exact component={ProjectDetailsModel} />
+          <Route path="/projects-kanban-view" exact component={Projectkanbanview} />
           <Route path="/reports" exact component={Reports} />
           <Route path="/activities" exact component={Activities} />
           <Route path="/blog" exact component={Blogs} />
@@ -271,16 +259,8 @@ const AppUniversal = (props) => {
           <Route path="/invoices-paid" exact component={InvoicesPaid} />
           <Route path="/invoices-overdue" exact component={InvoicesOverdue} />
           <Route path="/invoices-draft" exact component={InvoicesDraft} />
-          <Route
-            path="/invoices-recurring"
-            exact
-            component={InvoicesRecurring}
-          />
-          <Route
-            path="/invoices-cancelled"
-            exact
-            component={InvoicesCancelled}
-          />
+          <Route path="/invoices-recurring" exact component={InvoicesRecurring} />
+          <Route path="/invoices-cancelled" exact component={InvoicesCancelled} />
           <Route path="/invoice-grid" exact component={InvoicesGrid} />
           <Route path="/InvoicesReport" exact component={InvoicesReport} />
           <Route path="/add-invoice" exact component={AddInvoices} />
@@ -289,7 +269,6 @@ const AppUniversal = (props) => {
           <Route path="/invoices-settings" exact component={Invoicesettings} />
           <Route path="/tax-settings" exact component={Taxsettings} />
           <Route path="/bank-settings" exact component={Banksettings} />
-
           {/* Settings */}
           <Route path="/userinfo" exact component={UserInfo} />
           <Route path="/email-settings" exact component={Emailsettings} />
@@ -312,7 +291,6 @@ const AppUniversal = (props) => {
           <Route path="/blank-page" exact component={BlankPage} />
           {/* UI Interface */}
           <Route path="/components" exact component={Components} />
-
           {/* Elements */}
           <Route path="/sweetalerts" exact component={Sweetalerts} />
           <Route path="/popover" exact component={Popover} />
@@ -329,16 +307,10 @@ const AppUniversal = (props) => {
           <Route path="/lightbox" exact component={Lightbox} />
           <Route path="/stickynote" exact component={Stickynote} />
           <Route path="/timeline" exact component={Timeline} />
-
           <Route path="/tooltip" exact component={Tooltip} />
           <Route path="/rangeslider" exact component={Rangeslider} />
-          <Route
-            path="/horizontal-timeline"
-            exact
-            component={Horizontaltimeline}
-          />
+          <Route path="/horizontal-timeline" exact component={Horizontaltimeline} />
           <Route path="/form-wizard" exact component={Formwizard} />
-
           {/* Charts */}
           <Route path="/chart-apex" exact component={ApexCharts} />
           <Route path="/chart-js" exact component={ChartJs} />
@@ -346,7 +318,6 @@ const AppUniversal = (props) => {
           <Route path="/chart-flot" exact component={FlotChart} />
           <Route path="/chart-peity" exact component={PeityCharts} />
           <Route path="/chart-c3" exact component={C3Charts} />
-
           {/* Icons */}
           <Route path="/icon-fontawesome" exact component={Fontawesome} />
           <Route path="/icon-feather" exact component={Feather} />
@@ -358,7 +329,6 @@ const AppUniversal = (props) => {
           <Route path="/icon-weather" exact component={Weather} />
           <Route path="/icon-typicon" exact component={Typicon} />
           <Route path="/icon-flag" exact component={Flag} />
-
           {/* Forms */}
           <Route path="/form-basic-inputs" exact component={BasicInput} />
           <Route path="/form-input-groups" exact component={InputGroup} />
@@ -377,18 +347,9 @@ const AppUniversal = (props) => {
         </Switch>
       </div>
       {/*theme settings modal*/}
-      <div
-        className="modal right fade settings"
-        id="settings"
-        role="dialog"
-        aria-modal="true"
-      >
+      <div className="modal right fade settings" id="settings" role="dialog" aria-modal="true">
         <div className="toggle-close">
-          <div
-            className="toggle"
-            data-bs-toggle="modal"
-            data-bs-target="#settings"
-          >
+          <div className="toggle" data-bs-toggle="modal" data-bs-target="#settings">
             <i className="fa fa-cog fa-w-16 fa-spin fa-2x" />
           </div>
         </div>
@@ -398,12 +359,7 @@ const AppUniversal = (props) => {
               <h4 className="modal-title" id="myModalLabel2">
                 Theme Customizer
               </h4>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div className="modal-body pb-3">
               <div className="scroll">

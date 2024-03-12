@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useCookies } from "react-cookie";
 import { Link, useHistory } from "react-router-dom";
@@ -7,7 +7,7 @@ import IMG01 from "../../assets/images/logo.png";
 import { apiLoginValidate } from "../../repository/user.jsx";
 
 const Login = () => {
-  const [cookies, setCookie] = useCookies([
+  const [ cookies, setCookie, removeCookie ] = useCookies([
     "myLationCrmUserId",
     "myLationCrmUserName",
     "myLationCrmAuthToken",
@@ -16,28 +16,19 @@ const Login = () => {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
-  // console.log('Login index Login', cookies.myLationCrmAuthToken);
-
-  if (cookies.myLationCrmAuthToken === "undefined") {
-    setCookie("myLationCrmAuthToken", "AAA");
-
-    //    history.push("/");
-  }
-
-  const handleCheckLogin = () => {
+  const handleCheckLogin = useCallback(() => {
     console.log("Login index", loginEmail, loginPassword);
     const response = apiLoginValidate(loginEmail, loginPassword);
     response.then((res) => {
       console.log("res", res);
-      if (response.message === "success") {
-        setCookie("myLationCrmUserId", response.userId);
-        setCookie("myLationCrmUserName", response.userName);
-        setCookie("myLationCrmAuthToken", response.token);
+      if (res.message === "success") {
+        setCookie("myLationCrmUserId", res.userId);
+        setCookie("myLationCrmUserName", res.userName);
+        setCookie("myLationCrmAuthToken", res.token);
         history.push("/");
       }
-      setCookie("myLationCrmAuthToken", "AAA");
     });
-  };
+  },[loginEmail, loginPassword]);
 
   return (
     <>
@@ -91,15 +82,15 @@ const Login = () => {
                       </div>
                       <div className="form-group text-center">
                         {/* <Link onClick = {()=>handleCheckLogin()} to="/" className="btn btn-primary account-btn"> */}
-                        <button
-                          onClick={() => handleCheckLogin()}
+                        <div
+                          onClick={handleCheckLogin}
                           className="btn btn-primary account-btn"
                         >
-                          Login{" "}
-                        </button>
+                          Login
+                        </div>
                         {/* <Link onClick = {()=>handleCheckLogin()} to="/" className="btn btn-primary account-btn">
-                  Login
-                </Link> */}
+                          Login
+                        </Link> */}
                       </div>
                       <div className="account-footer">
                         <p>
