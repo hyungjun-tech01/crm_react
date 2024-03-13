@@ -7,7 +7,7 @@ import IMG01 from "../../assets/images/logo.png";
 import { apiLoginValidate } from "../../repository/user.jsx";
 
 const Login = () => {
-  const [ cookies, setCookie, removeCookie ] = useCookies([
+  const [ cookies, setCookie ] = useCookies([
     "myLationCrmUserId",
     "myLationCrmUserName",
     "myLationCrmAuthToken",

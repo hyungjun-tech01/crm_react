@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { useRecoilValue } from "recoil";
+import { useCookies } from "react-cookie";
+
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
@@ -16,6 +19,13 @@ const Company = () => {
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const [companyData, setCompanyData] = useState([]);
   const [selectedDate1, setSelectedDate1] = useState(new Date());
+  // cookie 사용하여 로그인 여부 체크
+  const [cookies, removeCookie] = useCookies([
+    "myLationCrmUserId",
+    "myLationCrmUserName",
+    "myLationCrmAuthToken",
+  ]);
+  const history = useHistory();
 
   const handleDateChange1 = (date) => {
     setSelectedDate1(date);
@@ -144,6 +154,17 @@ const Company = () => {
   };
 
   useEffect(() => {
+    console.log(`\nCheck cookies: ${cookies.myLationCrmAuthToken}`);
+    if(cookies.myLationCrmAuthToken === undefined
+      || cookies.myLationCrmAuthToken === null
+      || cookies.myLationCrmAuthToken === ""
+    ) {
+      removeCookie('myLationCrmUserId');
+      removeCookie('myLationCrmUserName');
+      removeCookie('myLationCrmAuthToken');
+      history.push("/login");
+    }
+    
     if (allCompanyData.length === 0) {
       loadAllCompanies();
     }

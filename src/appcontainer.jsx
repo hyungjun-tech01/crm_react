@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Route, BrowserRouter as Router, Switch, useHistory } from "react-router-dom";
-import { useCookies } from "react-cookie";
+import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
 
 import config from "config";
 
@@ -159,13 +158,6 @@ const AppUniversal = (props) => {
   //         localStorage.setItem('theme', e);
   //     }
   // }
-  // cookie 사용하여 로그인 여부 체크
-  const [cookies, removeCookie] = useCookies([
-    "myLationCrmUserId",
-    "myLationCrmUserName",
-    "myLationCrmAuthToken",
-  ]);
-  const history = useHistory();
 
   useEffect(() => {
     document.querySelector(".roboto-font").onclick = function () {
@@ -198,17 +190,7 @@ const AppUniversal = (props) => {
       document.body.classList.remove("monstret");
       document.body.classList.remove("poppins");
     };
-    console.log(`\nCheck cookies: ${cookies.myLationCrmAuthToken}`);
-    if(cookies.myLationCrmAuthToken === undefined
-      || cookies.myLationCrmAuthToken === null
-      || cookies.myLationCrmAuthToken === ""
-    ) {
-      removeCookie('myLationCrmUserId');
-      removeCookie('myLationCrmUserName');
-      removeCookie('myLationCrmAuthToken');
-      history.push("/login");
-    }
-  }, [cookies.myLationCrmAuthToken, history, removeCookie]);
+  }, []);
 
   const url = props.location.pathname.split("/")[1];
   const exclusionArray = [
