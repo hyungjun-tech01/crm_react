@@ -19,8 +19,8 @@ export async function  apiLoginValidate(email, password) {
             body:JSON.stringify(input_data)
            }); 
         let responseMessage = await response.json();
-        responseMessage  ={...responseMessage, message:'success', token:'AAA'};
-           console.log(responseMessage);
+        responseMessage  ={...responseMessage};
+           console.log('responseMessage', responseMessage);
            return(responseMessage);
     }catch(err){
         console.error(err);

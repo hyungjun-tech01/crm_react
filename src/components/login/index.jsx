@@ -2,9 +2,10 @@ import React, { useCallback, useState } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useCookies } from "react-cookie";
 import { Link, useHistory } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import IMG01 from "../../assets/images/logo.png";
 import { apiLoginValidate } from "../../repository/user.jsx";
+import {atomCurrentUser} from "../../atoms/atomsUser.jsx";
 
 const Login = () => {
   const [ cookies, setCookie ] = useCookies([
@@ -12,19 +13,38 @@ const Login = () => {
     "myLationCrmUserName",
     "myLationCrmAuthToken",
   ]);
+  const [currentUser, setCurrentUser] = useRecoilState(atomCurrentUser);
   const history = useHistory();
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
-  const handleCheckLogin = useCallback(() => {
+
+  // event.preventDefault() 주로 사용되는 경우는
+
+  // 1. a 태그를 눌렀을때도 href 링크로 이동하지 않게 할 경우
+  
+  // 2. form 안에 submit 역할을 하는 버튼을 눌렀어도 새로 실행하지 않게 하고싶을 경우 (submit은 작동됨)
+  
+  //   -> 진짜네..(새로고침이 안됨)
+  
+  //   const onSubmit = (event:React.FormEvent<HTMLFormElement>)=> {
+  //     event.preventDefault();
+  //     console.log("hello", value);
+  //   };
+
+
+  const handleCheckLogin = useCallback((event) => {
+    event.preventDefault();
     console.log("Login index", loginEmail, loginPassword);
     const response = apiLoginValidate(loginEmail, loginPassword);
     response.then((res) => {
       console.log("res", res);
-      if (res.message === "success") {
+      if (res.message === "success") {  
         setCookie("myLationCrmUserId", res.userId);
         setCookie("myLationCrmUserName", res.userName);
         setCookie("myLationCrmAuthToken", res.token);
+        setCurrentUser(res);
+        console.log(currentUser);
         history.push("/");
       }
     });
@@ -82,12 +102,12 @@ const Login = () => {
                       </div>
                       <div className="form-group text-center">
                         {/* <Link onClick = {()=>handleCheckLogin()} to="/" className="btn btn-primary account-btn"> */}
-                        <div
+                        <button
                           onClick={handleCheckLogin}
                           className="btn btn-primary account-btn"
                         >
                           Login
-                        </div>
+                        </button>
                         {/* <Link onClick = {()=>handleCheckLogin()} to="/" className="btn btn-primary account-btn">
                           Login
                         </Link> */}

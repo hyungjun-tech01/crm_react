@@ -1,25 +1,17 @@
-import {atom, selector} from "recoil";
-import React from "react";
+import {atom} from "recoil";
 
 export const defaultUser = {
     userId: "", 
     userName: "", 
-    name: "", 
-    email: "", 
-    isAdmin: false, 
     password: "", 
-    phone: "",
-    organization: "", 
-    subscribeToOwnCards: false, 
-    createdAt: "", 
-    updatedAt: "", 
-    deletedAt: "", 
-    language: "",
-    passwordChangeAt: "", 
-    avatar: "", 
-    detail: ""
+    mobileNumber: "",
+    phoneNumber : "",
+    department: "", 
+    position: "", 
+    email: "", 
+    group_: "", 
+    memo: ""
 }
-
 
 export const atomCurrentUser= atom({
     key: "currentUser",
