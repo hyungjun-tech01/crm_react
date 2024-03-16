@@ -21,6 +21,7 @@ const PieChart = () => {
       <Pie
         data={state}
         options={{
+          responsive: true,
           title: {
             display: true,
             fontSize: 20,

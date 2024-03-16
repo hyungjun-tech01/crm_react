@@ -100,7 +100,7 @@
     "yet-another-react-lightbox": "^3.17.0"
   },
   "scripts": {
-    "start": "webpack-dev-server",
+    "start": "webpack-dev-server --port 3002",
     "dev": "webpack serve",
     "build": "webpack",
     "test": "ec ho \"Error: no test specified\" && exit 1"
