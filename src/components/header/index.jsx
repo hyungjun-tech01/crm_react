@@ -1,5 +1,5 @@
-import React, { useCallback } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
+import { Link, useHistory } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { Logo, S_Logo, avatar02, avatar03, avatar05, avatar06, avatar08, avatar09, avatar13, avatar17, avatar21, Flag_de, Flag_es, Flag_fr, Flag_us } from "../imagepath";
 import { FiBell, FiSearch } from "react-icons/fi";
@@ -7,18 +7,16 @@ import { BiMessageRounded } from "react-icons/bi";
 
 const Header = (props) => {
   const exclusionArray = [ "login", "register", "forgot-password", "error-404", "error-500", ];
-  const [ removeCookie ] = useCookies([
-    "myLationCrmUserId",
-    "myLationCrmUserName",
-    "myLationCrmAuthToken"
-  ]);
-
-  const handleLogout = useCallback(() => {
-    console.log("handleLogout");
+  const [cookies, removeCookie ] = useCookies(["myLationCrmUserId", "myLationCrmUserName", "myLationCrmAuthToken"]);
+  const history = useHistory();
+  const handleLogout = (event) => {
+    event.preventDefault();
+    console.log("handleLogout", cookies);
     removeCookie("myLationCrmUserId");
     removeCookie("myLationCrmUserName");
     removeCookie("myLationCrmAuthToken");
-  }, [removeCookie]);
+    history.push("/login");
+  };
 
   if (exclusionArray.indexOf(props.location.pathname.split("/")[1]) >= 0) {
     return "";
@@ -349,21 +347,34 @@ const Header = (props) => {
         </li>
         {/* /Message Notifications */}
         <li className="nav-item dropdown has-arrow main-drop">
-          <a className="dropdown-toggle nav-link" data-bs-toggle="dropdown">
+          {/* <a className="dropdown-toggle nav-link" data-bs-toggle="dropdown">
+            <span className="user-img"><img src={avatar21} alt="" />
+              <span className="status online" /></span> 
+            <span>Admin</span>
+          </a> */}
+          <Link className="dropdown-toggle nav-link"
+                data-bs-toggle="dropdown"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.querySelector('#dropdown_menu').classList.toggle('show');
+               }}
+          >
             <span className="user-img"><img src={avatar21} alt="" />
               <span className="status online" /></span>
             <span>Admin</span>
-          </a>
-          <div className="dropdown-menu">
-            <Link className="dropdown-item" to="/profile">
+          </Link>
+          <div id="dropdown_menu" className="dropdown-menu">
+            <Link className="dropdown-item" to="/UserInfo" 
+                  onClick={ ()=>{document.querySelector('#dropdown_menu').classList.remove('show');}}>
               My Profile
             </Link>
-            <Link className="dropdown-item" to="/settings">
+            <Link className="dropdown-item" to="/settings"
+               onClick={ ()=>{document.querySelector('#dropdown_menu').classList.remove('show');}}>
               Settings
             </Link>
             <Link
               className="dropdown-item"
-              onClick={() => handleLogout()}
+              onClick={handleLogout}
               to="/login"
             >
               Logout

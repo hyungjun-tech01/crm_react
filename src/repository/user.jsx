@@ -19,8 +19,8 @@ export async function  apiLoginValidate(email, password) {
             body:JSON.stringify(input_data)
            }); 
         let responseMessage = await response.json();
-        responseMessage  ={...responseMessage, message:'success', token:'AAA'};
-           console.log(responseMessage);
+        responseMessage  ={...responseMessage};
+           console.log('responseMessage', responseMessage);
            return(responseMessage);
     }catch(err){
         console.error(err);
@@ -28,6 +28,38 @@ export async function  apiLoginValidate(email, password) {
     }
  }
 
+
+ export const UserRepo = selector({
+    key: "UserRepository",
+    get: ({getCallback}) => {
+        const loadUsers = getCallback(({set}) => async (userId) => {
+            try{
+                const input_data = {
+                    userId: userId,
+                };
+                const response = await fetch(`${BASE_PATH}/getuser`, {
+                 method: 'POST',
+                 headers: {'Content-Type':'application/json'},
+                 body: JSON.stringify(input_data)
+                });
+
+                const data = await response.json();
+                if(data.message){
+                    console.log('loadUsers message:', data.message);
+                    set(atomCurrentUser, []);
+                    return;
+                }
+                set(atomCurrentUser, data);
+            }
+            catch(err){
+                console.error(`loadUsers / Error : ${err}`);
+            };
+        });
+        return {
+            loadUsers,
+        };
+    }
+});
 
 // export const UserRepo = selector({
 //     key: "UserRepo",
