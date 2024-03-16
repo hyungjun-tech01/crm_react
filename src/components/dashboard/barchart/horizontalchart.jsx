@@ -31,23 +31,24 @@ const state = {
   }
 
 const HorizontalBarChart =()=> {
-      return (
-        <div>
-           <Bar
-              data={state}
-              options={{
-                scales: {
-                  x: {
-                    beginAtZero: true
-                  }
-                },
-                legend:{
-                  display:false,
-                },
-                indexAxis: 'y',
-              }}
-            />
-          </div>
-          );
-        }
+  return (
+    <div>
+      <Bar
+        data={state}
+        options={{
+          scales: {
+            x: {
+              beginAtZero: true
+            }
+          },
+          legend:{
+            display:false,
+          },
+          responsive: true,
+          indexAxis: 'y',
+        }}
+      />
+    </div>
+  );
+}
 export default HorizontalBarChart;          
