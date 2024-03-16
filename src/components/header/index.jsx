@@ -349,14 +349,14 @@ const Header = (props) => {
         <li className="nav-item dropdown has-arrow main-drop">
           {/* <a className="dropdown-toggle nav-link" data-bs-toggle="dropdown">
             <span className="user-img"><img src={avatar21} alt="" />
-              <span className="status online" /></span>
+              <span className="status online" /></span> 
             <span>Admin</span>
           </a> */}
           <Link className="dropdown-toggle nav-link"
                 data-bs-toggle="dropdown"
                 onClick={(e) => {
-                   e.preventDefault();
-                 document.querySelector('#dropdown_menu').classList.toggle('show');
+                  e.preventDefault();
+                  document.querySelector('#dropdown_menu').classList.toggle('show');
                }}
           >
             <span className="user-img"><img src={avatar21} alt="" />
@@ -364,10 +364,12 @@ const Header = (props) => {
             <span>Admin</span>
           </Link>
           <div id="dropdown_menu" className="dropdown-menu">
-            <Link className="dropdown-item" to="/profile">
+            <Link className="dropdown-item" to="/UserInfo" 
+                  onClick={ ()=>{document.querySelector('#dropdown_menu').classList.remove('show');}}>
               My Profile
             </Link>
-            <Link className="dropdown-item" to="/settings">
+            <Link className="dropdown-item" to="/settings"
+               onClick={ ()=>{document.querySelector('#dropdown_menu').classList.remove('show');}}>
               Settings
             </Link>
             <Link

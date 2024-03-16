@@ -1,9 +1,29 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
+import { useCookies } from "react-cookie";
 import { avatar02, avatar16 } from "../imagepath";
+import {atomCurrentUser} from "../../atoms/atomsUser.jsx";
+import {useRecoilValue} from "recoil";
+import { UserRepo } from "../../repository/user";
 
 const UserInfo = () => {
+  const currentUser = useRecoilValue(atomCurrentUser);
+  const { loadUsers } = useRecoilValue(UserRepo);
+  const [cookies] = useCookies([
+    "myLationCrmUserId",
+    "myLationCrmUserName",
+    "myLationCrmAuthToken",
+  ]);
+  console.log("currentUser", currentUser.userId);
+
+  useEffect(() => {
+    if (currentUser.userId === "") {
+      loadUsers(cookies.myLationCrmUserId);
+    }
+
+  }, [currentUser, loadUsers]);
+  
   return (
     <HelmetProvider>
       <div className="page-wrapper">
@@ -47,14 +67,14 @@ const UserInfo = () => {
                         <div className="row">
                           <div className="col-md-5">
                             <div className="profile-info-left">
-                              <h3 className="user-name m-t-0 mb-0">John Doe</h3>
-                              <h6 className="text-muted">UI/UX Design Team</h6>
-                              <small className="text-muted">Web Designer</small>
+                              <h3 className="user-name m-t-0 mb-0">{currentUser.userName}</h3>
+                              <h6 className="text-muted">{currentUser.department}</h6>
+                              <small className="text-muted">{currentUser.position}</small>
                               <div className="staff-id">
-                                Employee ID : FT-0001
+                                Employee ID : 
                               </div>
                               <div className="small doj text-muted">
-                                Date of Join : 1st Jan 2013
+                                Date of Join : 
                               </div>
                               <div className="staff-msg">
                                 <a className="btn btn-custom" href="#">
@@ -68,39 +88,25 @@ const UserInfo = () => {
                               <li>
                                 <div className="title">Phone:</div>
                                 <div className="text">
-                                  <a>9876543210</a>
+                                  <a> &nbsp;{currentUser.phoneNumber}</a>
+                                </div>
+                              </li>
+                              <li>
+                                <div className="title">Mobile Phone:</div>
+                                <div className="text">
+                                  <a>&nbsp;{currentUser.mobileNumber}</a>
                                 </div>
                               </li>
                               <li>
                                 <div className="title">Email:</div>
                                 <div className="text">
-                                  <a>johndoe@example.com</a>
+                                  <a>&nbsp;{currentUser.email}</a>
                                 </div>
                               </li>
                               <li>
-                                <div className="title">Birthday:</div>
-                                <div className="text">24th July</div>
-                              </li>
-                              <li>
-                                <div className="title">Address:</div>
+                                <div className="title">Memo:</div>
                                 <div className="text">
-                                  1861 Bayonne Ave, Manchester Township, NJ,
-                                  08759
-                                </div>
-                              </li>
-                              <li>
-                                <div className="title">Gender:</div>
-                                <div className="text">Male</div>
-                              </li>
-                              <li>
-                                <div className="title">Reports to:</div>
-                                <div className="text">
-                                  <div className="avatar-box">
-                                    <div className="avatar avatar-xs">
-                                      <img src={avatar16} alt="" />
-                                    </div>
-                                  </div>
-                                  <Link to="profile">Jeffery Lalor</Link>
+                                &nbsp;{currentUser.memo}
                                 </div>
                               </li>
                             </ul>

@@ -112,7 +112,7 @@ const SidebarNav = (props) => {
                   <BiData /> <span>Invoices</span>
                 </Link>
               </li>
-              <li className="menu-title">
+              {/* <li className="menu-title">
                 <span>Settings</span>
               </li>
               <li>
@@ -122,7 +122,7 @@ const SidebarNav = (props) => {
                 >
                   <BiCog /> <span>UserInfo</span>
                 </Link>
-              </li>
+              </li> */}
 
               {/* <li>
                   <Link className={`${pathname.includes("tasks") ? "active" : ""}`} to="/tasks"><BiTask /><span>Tasks</span></Link>
