@@ -18,8 +18,10 @@ const theme = createTheme({
 // import * as serviceWorker from './client/serviceWorker';
 
 // ReactDOM.render(<AppRouter/>, document.getElementById('root')); // -- react v18 권고에 따라 변경;
-const rootNode = document.getElementById('root');
-ReactDOM.createRoot(rootNode).render(
+const root = ReactDOM.createRoot(
+  document.getElementById('root')
+);
+root.render(
     <React.StrictMode>
         <RecoilRoot>
             <ThemeProvider theme={theme}>

@@ -358,6 +358,7 @@ const Header = (props) => {
                   e.preventDefault();
                   document.querySelector('#dropdown_menu').classList.toggle('show');
                }}
+               to="#"
           >
             <span className="user-img"><img src={avatar21} alt="" />
               <span className="status online" /></span>

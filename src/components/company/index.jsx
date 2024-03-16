@@ -60,14 +60,14 @@ const Company = () => {
       sorter: (a, b) => a.billing.length - b.billing.length,
     },
     {
-      title: "Zip Code",
-      dataIndex: "zip_code",
+      title: "Salesman",
+      dataIndex: "sales_resource",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => a.state.length - b.state.length,
     },
     {
-      title: "Website",
-      dataIndex: "homepage",
+      title: "Engineer",
+      dataIndex: "application_engineer",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => a.country.length - b.country.length,
     },
@@ -174,8 +174,8 @@ const Company = () => {
       name: data.company_name,
       phone: data.company_phone_number,
       address: data.company_address,
-      zip_code: data.company_zip_code,
-      homepage: data.homepage,
+      sales_resource: data.sales_resource,
+      application_engineer: data.application_engineer,
     }));
     setCompanyData(companyDataForTable);
   }, [allCompanyData, loadAllCompanies]);
