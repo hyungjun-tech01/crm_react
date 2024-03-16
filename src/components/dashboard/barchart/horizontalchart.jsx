@@ -1,6 +1,16 @@
 import React from "react";
-import { Bar } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  LinearScale,
+  CategoryScale,
+  BarElement,
+  Legend,
+  Tooltip,
+  BarController,
+} from 'chart.js';
+import { Bar } from "react-chartjs-2";
 
+ChartJS.register(LinearScale, CategoryScale, BarElement, Legend, Tooltip, BarController);
 
 const state = {
     labels: [2000, 2010, 2011,2015, 2020],
@@ -25,11 +35,16 @@ const HorizontalBarChart =()=> {
         <div>
            <Bar
               data={state}
-              indexAxis='y'
               options={{
+                scales: {
+                  x: {
+                    beginAtZero: true
+                  }
+                },
                 legend:{
                   display:false,
-                }
+                },
+                indexAxis: 'y',
               }}
             />
           </div>

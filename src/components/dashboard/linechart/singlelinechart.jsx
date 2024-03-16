@@ -1,6 +1,8 @@
 import React from "react";
+import { Chart as ChartJS, LineElement, PointElement, Tooltip, Legend, LinearScale, LineController } from "chart.js";
 import { Line } from "react-chartjs-2";
 
+ChartJS.register(LinearScale, LineElement, PointElement, Tooltip, Legend, LineController);
 
 const data = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul","Aug","Sep"],

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { Logo, S_Logo, avatar02, avatar03, avatar05, avatar06, avatar08, avatar09, avatar13, avatar17, avatar21, Flag_de, Flag_es, Flag_fr, Flag_us } from "../imagepath";
@@ -7,14 +7,18 @@ import { BiMessageRounded } from "react-icons/bi";
 
 const Header = (props) => {
   const exclusionArray = [ "login", "register", "forgot-password", "error-404", "error-500", ];
-  const [ removeCookie ] = useCookies(["myLationCrmUserId", "myLationCrmUserName", "myLationCrmAuthToken"]);
+  const [ removeCookie ] = useCookies([
+    "myLationCrmUserId",
+    "myLationCrmUserName",
+    "myLationCrmAuthToken"
+  ]);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     console.log("handleLogout");
     removeCookie("myLationCrmUserId");
     removeCookie("myLationCrmUserName");
     removeCookie("myLationCrmAuthToken");
-  };
+  }, [removeCookie]);
 
   if (exclusionArray.indexOf(props.location.pathname.split("/")[1]) >= 0) {
     return "";

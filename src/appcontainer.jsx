@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
 
 import config from "config";
@@ -37,14 +37,12 @@ import Reports from "./components/report";
 import Activities from "./components/activites";
 import Deals from "./components/deals";
 import Dealskanbanview from "./components/deals/dealskanbanview";
-
 //blogs
 import Blogs from "./components/blogs/blogs";
 import PendingBlog from "./components/blogs/blogs/pendingblog";
 import AddBlog from "./components/blogs/addblog/index";
 import EditBlog from "./components/blogs/editblog/index";
 import Categories from "./components/blogs/categories/index";
-
 //Invoices
 import Invoiceslist from "./components/invoices/invoiceslist/invoices";
 import InvoicesPaid from "./components/invoices/invoiceslist/paid";
@@ -59,7 +57,6 @@ import ViewInvoices from "./components/invoices/invocesdetails/index";
 import Invoicesettings from "./components/invoices/invoicesettings/index";
 import Taxsettings from "./components/invoices/invoicesettings/taxsettings";
 import Banksettings from "./components/invoices/invoicesettings/banksettings";
-
 // Elements
 import Sweetalerts from "./components/elements/sweetalerts/index";
 import Tooltip from "./components/elements/tooltip/index";
@@ -80,7 +77,6 @@ import Stickynote from "./components/elements/stickynote/index";
 import Timeline from "./components/elements/timeline/index";
 import Horizontaltimeline from "./components/elements/horizontaltimeline/index";
 import Formwizard from "./components/elements/formwizard/index";
-
 // Charts
 import ApexCharts from "./components/charts/apexcharts/index";
 import ChartJs from "./components/charts/chartjs/index";
@@ -88,7 +84,6 @@ import MorrisChart from "./components/charts/morrischarts/index";
 import FlotChart from "./components/charts/flotcharts/index";
 import C3Charts from "./components/charts/c3charts/index";
 import PeityCharts from "./components/charts/peitycharts/index";
-
 // Icons
 import Fontawesome from "./components/icons/font-awesome/index";
 import Feather from "./components/icons/feather/index";
@@ -117,7 +112,6 @@ import Contacts from "./components/contact";
 import Company from "./components/company";
 import CompanyDetailInfo from "./components/company_detail/index.jsx";
 import Sidebarnav from "./components/sidebar";
-
 // Login & Register
 import Login from "./components/login";
 import Register from "./components/register";
@@ -136,6 +130,7 @@ import "./assets/js/bootstrap.bundle.js";
 import "./assets/js/jquery.slimscroll.min.js";
 import "./assets/js/theme-settings.js";
 import "./assets/js/app.js";
+
 import SystemUserModel from "./components/task/SystemUserModel";
 import TaskDetailModel from "./components/task/TaskDetailModel";
 import CompanyDetailsModel from "./components/company/CompanyDetailsModel";
@@ -147,18 +142,6 @@ import ProjectDetailsModel from "./components/project/ProjectDetailsModel";
 import InvoicesReport from "./components/invoices/invoicesgrid/report";
 
 const AppUniversal = (props) => {
-  //   function toggleTheme(e) {
-  //   if($('.themecls').length > 0) {
-  //     const currentTheme = localStorage.getItem('theme');
-  //     var app = document.getElementsByClassName("themecls")[0];
-  //     if (currentTheme) {
-  //         app.href = "../src/css/"+currentTheme+".css";
-  //     }
-  //         app.href = "../src/css/"+e+".css";
-  //         localStorage.setItem('theme', e);
-  //     }
-  // }
-
   useEffect(() => {
     document.querySelector(".roboto-font").onclick = function () {
       document.body.classList.add("roboto");
@@ -207,7 +190,7 @@ const AppUniversal = (props) => {
         <Route render={(props) => <Sidebarnav {...props} />} />
         <Switch>
           {/* Dashboard */}
-          <Route path="/" exact component={Company} />
+          <Route path="/" exact component={Dashboard} />
           <Route path="/index" exact component={Dashboard} />
           <Route path="/projects-dashboard" exact component={ProjectDashboard} />
           <Route path="/leads-dashboard" exact component={LeadDashboard} />

@@ -64,7 +64,6 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-
             <div className="col-md-6">
               <div className="card h-100">
                 <div className="card-body">
@@ -83,7 +82,6 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-
             <div className="col-md-6">
               <div className="card h-100">
                 <div className="card-body">

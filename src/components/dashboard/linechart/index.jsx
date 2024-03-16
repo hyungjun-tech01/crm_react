@@ -1,5 +1,8 @@
 import React from "react";
+import { Chart as ChartJS, LineElement, Tooltip, Legend, LinearScale, LineController } from "chart.js";
 import { Line } from "react-chartjs-2";
+
+ChartJS.register(LinearScale, LineElement, Tooltip, Legend, LineController);
 
 
 const data = {
