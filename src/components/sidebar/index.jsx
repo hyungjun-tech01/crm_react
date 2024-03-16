@@ -14,6 +14,7 @@ import {
   BiData,
   BiDockLeft,
   BiDockTop,
+  BiEdit,
   BiEnvelope,
   BiError,
   BiGridAlt,
@@ -79,47 +80,32 @@ const SidebarNav = (props) => {
               </ul>
               </li> */}
               <li>
-                <Link
-                  className={`${
-                    pathname.includes("dashboard") ? "active" : ""
-                  }`}
-                  to="/index"
-                >
+                <Link to="/" className={`${pathname === "/" || pathname === "/projects-dashboard" || pathname === "/index" ||
+                  pathname === "/leads-dashboard" ? "active subdrop" : ""}`}><BiHomeAlt /> <span> Dashboard</span> <span className="menu-arrow" /></Link>
+                </li>
+              <li>
+                <Link className={`${pathname.includes("companies") ? "active" : "" }`} to="/companies">
                   <BiData /> <span>Companies</span>
                 </Link>
               </li>
               <li>
-                <Link
-                  className={`${
-                    pathname.includes("companies") ? "active" : ""
-                  }`}
-                  to="/companies"
-                >
-                  <BiData /> <span>Companies</span>
+                <Link className={`${pathname.includes("leads") ? "active" : ""}`} to="/leads">
+                  <BiUser /> <span>Leads</span>
                 </Link>
               </li>
               <li>
-                <Link
-                  className={`${pathname.includes("leads") ? "active" : ""}`}
-                  to="/leads"
-                >
-                  <BiData /> <span>Leads</span>
+                <Link className={`${pathname.includes("activities") ? "active" : ""}`} to="/activities">
+                  <BiClipboard/> <span>Activities</span>
                 </Link>
               </li>
               <li>
-                <Link
-                  className={`${pathname.includes("deals") ? "active" : ""}`}
-                  to="/deals"
-                >
-                  <BiData /> <span>Deals</span>
+                <Link className={`${pathname.includes("invoices") ? "active" : ""}`} to="/invoices">
+                  <BiEdit /> <span>Invoices</span>
                 </Link>
               </li>
               <li>
-                <Link
-                  className={`${pathname.includes("invoices") ? "active" : ""}`}
-                  to="/invoices"
-                >
-                  <BiData /> <span>Invoices</span>
+                <Link className={`${pathname.includes("deals") ? "active" : ""}`} to="/deals">
+                  <BiStation /> <span>Deals</span>
                 </Link>
               </li>
               {/* <li className="menu-title">
@@ -151,9 +137,6 @@ const SidebarNav = (props) => {
                 </li>
                 <li>
                   <Link className={`${pathname.includes("reports") ? "active" : ""}`} to="/reports"><BiBarChartAlt2 /> <span>Reports</span></Link>
-                </li>
-                <li>
-                  <Link className={`${pathname.includes("activities") ? "active" : ""}`} to="/activities"><BiClipboard/> <span>Activities</span></Link>
                 </li> */}
               {/* <li className="submenu">
                   <Link to="#" className={`${pathname === "/blog" || pathname === "/add-blog" ||
