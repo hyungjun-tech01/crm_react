@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
@@ -15,7 +15,7 @@ import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies } from "../../atoms/atoms";
 
 const Company = () => {
-  const { loadAllCompanies } = useRecoilValue(CompanyRepo);
+  const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const [companyData, setCompanyData] = useState([]);
   const [selectedDate1, setSelectedDate1] = useState(new Date());
@@ -31,6 +31,11 @@ const Company = () => {
     setSelectedDate1(date);
   };
 
+  const handleClickCompanyName=useCallback((id)=>{
+    console.log('[Company] set current company : ', id);
+    setCurrentCompany(id);
+  },[setCurrentCompany])
+
   const columns = [
     {
       title: "Company Name",
@@ -40,7 +45,7 @@ const Company = () => {
           <a href="#" className="avatar">
             <img alt="" src={record.image} />
           </a>
-          <a href="#" data-bs-toggle="modal" data-bs-target="#company-details">
+          <a href="#" data-bs-toggle="modal" data-bs-target="#company-details" onClick={()=>{handleClickCompanyName(record.code);}}>
             {text}
           </a>
         </>

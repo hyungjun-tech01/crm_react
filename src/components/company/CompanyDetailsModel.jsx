@@ -1,9 +1,12 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import { atomAllCompanies, atomCurrentCompany } from "../../atoms/atoms";
 import { C_logo, C_logo2, CircleImg } from "../imagepath";
 import { Collapse } from "antd";
-import { Link } from "react-router-dom";
 
 const CompanyDetailsModel = () => {
+  const selectedCompany = useRecoilValue(atomCurrentCompany);
   const { Panel } = Collapse;
   return (
     <>
@@ -33,7 +36,7 @@ const CompanyDetailsModel = () => {
                   <div>
                     <p className="mb-0">Company</p>
                     <span className="modal-title">
-                      Clampett Oil and Gas Corp
+                      {selectedCompany.company_name}
                     </span>
                     <span className="rating-star">
                       <i className="fa fa-star" aria-hidden="true" />
@@ -121,15 +124,15 @@ const CompanyDetailsModel = () => {
                   </div>
                   <div className="col">
                     <span>Phone</span>
-                    <p>9876764875</p>
+                    <p>{selectedCompany.company_phone_number}</p>
                   </div>
                   <div className="col">
-                    <span>Email</span>
-                    <p>johndoe@gmail.com</p>
+                    <span>Fax</span>
+                    <p>{selectedCompany.company_fax_number}</p>
                   </div>
                   <div className="col">
                     <span>Contact owner</span>
-                    <p>John Doe</p>
+                    <p>{selectedCompany.ceo_name}</p>
                   </div>
                 </div>
               </div>
@@ -152,7 +155,34 @@ const CompanyDetailsModel = () => {
                       to="#task-related"
                       data-bs-toggle="tab"
                     >
-                      Related
+                      Lead
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link"
+                      to="#task-related"
+                      data-bs-toggle="tab"
+                    >
+                      Product
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link"
+                      to="#task-related"
+                      data-bs-toggle="tab"
+                    >
+                      Quatation
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link"
+                      to="#task-related"
+                      data-bs-toggle="tab"
+                    >
+                      Invoice
                     </Link>
                   </li>
                   <li className="nav-item">
