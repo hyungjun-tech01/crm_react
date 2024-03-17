@@ -117,6 +117,9 @@ import Login from "./components/login";
 import Register from "./components/register";
 import ForgotPassword from "./components/forgotpassword";
 
+// sample 
+import Sample from "./components/sample";
+
 import "antd/dist/reset.css";
 import "./assets/css/bootstrap.min.css";
 import "./assets/css/font-awesome.min.css";
@@ -309,6 +312,10 @@ const AppUniversal = (props) => {
           <Route path="/login" exact component={Login} />
           <Route path="/register" exact component={Register} />
           <Route path="/forgot-password" exact component={ForgotPassword} />
+
+          {/* Sample */}
+          <Route path="/sample" exact component={Sample} />
+
         </Switch>
       </div>
       {/*theme settings modal*/}
