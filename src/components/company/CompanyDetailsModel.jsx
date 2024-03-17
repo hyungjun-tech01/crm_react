@@ -1,5 +1,4 @@
 import React from "react";
-//import { C_logo, C_logo2, Circle1, CircleImg } from '../imagepath';
 import { C_logo, C_logo2, CircleImg } from "../imagepath";
 import { Collapse } from "antd";
 import { Link } from "react-router-dom";

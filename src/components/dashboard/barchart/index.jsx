@@ -42,6 +42,7 @@ const BarChart = (props) => {
           legend: {
             display: false,
           },
+          responsive: true,
           indexAxis: 'x',
         }}
         {...props}
