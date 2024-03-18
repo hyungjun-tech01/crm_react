@@ -164,7 +164,7 @@ const CompanyDetailsModel = () => {
                       to="#task-related"
                       data-bs-toggle="tab"
                     >
-                      Product
+                      Purchase
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -182,10 +182,10 @@ const CompanyDetailsModel = () => {
                       to="#task-related"
                       data-bs-toggle="tab"
                     >
-                      Invoice
+                      Transaction
                     </Link>
                   </li>
-                  <li className="nav-item">
+                  {/* <li className="nav-item">
                     <Link
                       className="nav-link"
                       to="#task-activity"
@@ -202,7 +202,7 @@ const CompanyDetailsModel = () => {
                     >
                       News
                     </Link>
-                  </li>
+                  </li> */}
                 </ul>
                 <div className="tab-content">
                   <div className="tab-pane show active" id="task-details">
@@ -214,11 +214,15 @@ const CompanyDetailsModel = () => {
                               <tbody>
                                 <tr>
                                   <td className="border-0">Record ID</td>
-                                  <td className="border-0">124192692</td>
+                                  <td className="border-0">{selectedCompany.company_code}</td>
                                 </tr>
                                 <tr>
                                   <td>Organization Name</td>
-                                  <td>Clampett Oil and Gas Corp.</td>
+                                  <td>{selectedCompany.company_name}</td>
+                                </tr>
+                                <tr>
+                                  <td>English Organization Name</td>
+                                  <td>{selectedCompany.company_name_eng}</td>
                                 </tr>
                               </tbody>
                             </table>
@@ -232,31 +236,31 @@ const CompanyDetailsModel = () => {
                               <tbody>
                                 <tr>
                                   <td className="border-0">Phone</td>
-                                  <td className="border-0">(626) 847-1294</td>
+                                  <td className="border-0">{selectedCompany.company_phone_number}</td>
                                 </tr>
                                 <tr>
                                   <td>Fax</td>
-                                  <td>1234</td>
+                                  <td>{selectedCompany.company_fax_number}</td>
                                 </tr>
                                 <tr>
                                   <td>Website</td>
-                                  <td>google.com</td>
+                                  <td>{selectedCompany.homepage}</td>
                                 </tr>
                                 <tr>
                                   <td>LinkedIn</td>
-                                  <td>Lorem ipsum</td>
+                                  <td>{}</td>
                                 </tr>
                                 <tr>
                                   <td>Facebook</td>
-                                  <td>lorem Ipsum</td>
+                                  <td>{}</td>
                                 </tr>
                                 <tr>
-                                  <td>Twitter</td>
-                                  <td>Not Started</td>
+                                  <td>X (Twitter)</td>
+                                  <td>{}</td>
                                 </tr>
                                 <tr>
                                   <td>Email Domains</td>
-                                  <td>abc@gmail.com</td>
+                                  <td>{}</td>
                                 </tr>
                               </tbody>
                             </table>
@@ -271,13 +275,12 @@ const CompanyDetailsModel = () => {
                                 <tr>
                                   <td className="border-0">Billing Address</td>
                                   <td className="border-0">
-                                    1000 Escalon Street, Palo Alto, CA, 94020,
-                                    United States map
+                                    {selectedCompany.company_address}
                                   </td>
                                 </tr>
                                 <tr>
                                   <td>Shipping Addres</td>
-                                  <td>United States</td>
+                                  <td>{}</td>
                                 </tr>
                               </tbody>
                             </table>

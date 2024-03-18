@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
 import { useRecoilValue } from "recoil";
-import { useCookies } from "react-cookie";
 
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
@@ -19,13 +17,6 @@ const Company = () => {
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const [companyData, setCompanyData] = useState([]);
   const [selectedDate1, setSelectedDate1] = useState(new Date());
-  // cookie 사용하여 로그인 여부 체크
-  const [cookies, removeCookie] = useCookies([
-    "myLationCrmUserId",
-    "myLationCrmUserName",
-    "myLationCrmAuthToken",
-  ]);
-  const history = useHistory();
 
   const handleDateChange1 = (date) => {
     setSelectedDate1(date);
@@ -158,18 +149,7 @@ const Company = () => {
     }),
   };
 
-  useEffect(() => {
-    console.log(`\nCheck cookies: ${cookies.myLationCrmAuthToken}`);
-    if(cookies.myLationCrmAuthToken === undefined
-      || cookies.myLationCrmAuthToken === null
-      || cookies.myLationCrmAuthToken === ""
-    ) {
-      removeCookie('myLationCrmUserId');
-      removeCookie('myLationCrmUserName');
-      removeCookie('myLationCrmAuthToken');
-      history.push("/login");
-    }
-    
+  useEffect(() => {    
     if (allCompanyData.length === 0) {
       loadAllCompanies();
     }
@@ -437,7 +417,7 @@ const Company = () => {
                     <form>
                       <h4>Organization Name</h4>
                       <div className="form-group row">
-                        <div className="col-md-12">
+                        {/* <div className="col-md-12">
                           <label className="col-form-label">
                             Organization Name{" "}
                             <span className="text-danger">*</span>
@@ -448,24 +428,90 @@ const Company = () => {
                             placeholder="Organization Name"
                             name="organization"
                           />
+                        </div> */}
+                        <div className="col-sm-6">
+                          <label className="col-form-label">
+                            Organization Name
+                            <span className="text-danger">*</span>
+                          </label>
+                          <input
+                            className="form-control"
+                            type="text"
+                            placeholder="Organization Name"
+                            name="org_name"
+                          />
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">English Name</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            name="eng_org_name"
+                            placeholder="English Name"
+                          />
+                        </div>
+                      </div>
+                      <h4>Organization Info. Details</h4>
+                      <div className="form-group row">
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Group</label>
+                          <select className="form-control">
+                            <option value="">choose proper group</option>
+                            <optgroup label="Shared Group">
+                              <option value="prospective">Prospective Customer</option>
+                              <option value="current">Current Customer</option>
+                              <option value="etc">Etc</option>
+                            </optgroup>
+                          </select>
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Company Scale</label>
+                            <input
+                              className="form-control"
+                              type="text"
+                              placeholder="Company Scale"
+                              name="company_scale"
+                            />
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Deal Type</label>
+                          <select className="form-control">
+                            <option value="">choose proper deal type</option>
+                            <option value="buyer">Buyer</option>
+                            <option value="seller">Seller</option>
+                          </select>
                         </div>
                       </div>
                       <div className="form-group row">
                         <div className="col-sm-6">
-                          <label className="col-form-label">Organization</label>
-                          <select className="form-control">
-                            <option>Select</option>
-                          </select>
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Title</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            name="title"
-                            placeholder="Title"
-                          />
-                        </div>
+                            <label className="col-form-label">Business Type</label>
+                            <input
+                              className="form-control"
+                              type="text"
+                              placeholder="Business Type"
+                              name="business_type"
+                            />
+                          </div>
+                          <div className="col-sm-6">
+                            <label className="col-form-label">Business Item</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              name="business_item"
+                              placeholder="Business Item"
+                            />
+                          </div>
+                      </div>
+                      <div className="form-group row">
+                        <div className="col-sm-12">
+                            <label className="col-form-label">Industry Type</label>
+                            <input
+                              className="form-control"
+                              type="text"
+                              placeholder="Industry Type"
+                              name="industry_type"
+                            />
+                          </div>
                       </div>
                       <h4>Organization Contact Details</h4>
                       <div className="form-group row">
