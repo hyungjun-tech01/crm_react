@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
-
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
@@ -10,22 +9,81 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { BiData } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
-import { atomAllCompanies } from "../../atoms/atoms";
+import { atomAllCompanies, defaultCompany } from "../../atoms/atoms";
 
 const Company = () => {
-  const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
+  const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
-  const [companyData, setCompanyData] = useState([]);
-  const [selectedDate1, setSelectedDate1] = useState(new Date());
+  const [ companyData, setCompanyData ] = useState([]);
+  const [ companyChange, setCompanyChange ] = useState(null);
+  const [ selectedEstablishDate, setSelectedEstablishDate ] = useState(null);
+  const [ selectedCloseDate, setSelectedCloseDate ] = useState(null);
 
-  const handleDateChange1 = (date) => {
-    setSelectedDate1(date);
-  };
-
-  const handleClickCompanyName=useCallback((id)=>{
+  // --- Functions used for Table ------------------------------
+  const handleClickCompanyName = useCallback((id)=>{
     console.log('[Company] set current company : ', id);
     setCurrentCompany(id);
-  },[setCurrentCompany])
+  },[setCurrentCompany]);
+
+  const handleAddNewCompanyClicked = useCallback(() => {
+    initializeCompanyTemplate();
+  }, []);
+
+  // --- Functions used for Add New Company ------------------------------
+  const initializeCompanyTemplate = useCallback(() => {
+    let initialCompany = {
+      ...defaultCompany
+    };
+    delete initialCompany.create_user;
+    delete initialCompany.create_date;
+    delete initialCompany.modify_date;
+    delete initialCompany.recent_user;
+    setCompanyChange(initialCompany);
+  }, []);
+
+  const handleEstablishDateChange = useCallback((date) => {
+    console.log(`[ handleEstablishDateChange ] ${date}`);
+    setSelectedEstablishDate(date);
+    companyChange.establishment_date = date;
+  },[]);
+
+  const handleCloseDateChange = useCallback((date) => {
+    console.log(`[ handleEstablishDateChange ] ${date}`);
+    setSelectedCloseDate(date);
+  },[]);
+
+  const handleCompanyChange = useCallback((e)=>{
+    let input_data = null;
+    if(e.target.name === 'establishment_date' || e.target.name === 'closure_date'){
+      const date_value = new Date(e.target.value);
+      if(date_value.valueOf() !== NaN){
+        input_data = date_value.getFullYear()
+          + "." + (date_value.getMonth() + 1)
+          + "." + date_value.getDay();
+      };
+    } else {
+      input_data = e.target.value;
+    }
+    const modifiedData = {
+      ...companyChange,
+      [e.target.name]: input_data,
+    };
+    setCompanyChange(modifiedData);
+  }, [setCompanyChange]);
+
+  const handleAddNewCompany = useCallback(()=>{
+    const newComData = {
+      action_type: 'ADD',
+      company_number: '99999',
+      ...companyChange
+    };
+    console.log(`[ handleAddNewCompany ] ${[...newComData]}`);
+    const result = modifyCompany(newComData);
+    if(result){
+      initializeCompanyTemplate();
+      //close modal
+    }
+  },[]);
 
   const columns = [
     {
@@ -152,7 +210,8 @@ const Company = () => {
   useEffect(() => {    
     if (allCompanyData.length === 0) {
       loadAllCompanies();
-    }
+    };
+    initializeCompanyTemplate();
     const companyDataForTable = allCompanyData.map((data, index) => ({
       id: index.toString(),
       code: data.company_code,
@@ -268,6 +327,7 @@ const Company = () => {
                       id="add-task"
                       data-bs-toggle="modal"
                       data-bs-target="#add_company"
+                      onClick={handleAddNewCompanyClicked}
                     >
                       New Company
                     </button>
@@ -404,7 +464,7 @@ const Company = () => {
             </button>
             <div className="modal-content">
               <div className="modal-header">
-                <h4 className="modal-title text-center">Add Company</h4>
+                <h4 className="modal-title text-center"><b>Add Company</b></h4>
                 <button
                   type="button"
                   className="btn-close"
@@ -439,6 +499,7 @@ const Company = () => {
                             type="text"
                             placeholder="Organization Name"
                             name="org_name"
+                            onChange={handleCompanyChange}
                           />
                         </div>
                         <div className="col-sm-6">
@@ -448,14 +509,15 @@ const Company = () => {
                             className="form-control"
                             name="eng_org_name"
                             placeholder="English Name"
+                            onChange={handleCompanyChange}
                           />
                         </div>
                       </div>
-                      <h4>Organization Info. Details</h4>
+                      <h4>Organization Information Details</h4>
                       <div className="form-group row">
                         <div className="col-sm-6">
                           <label className="col-form-label">Group</label>
-                          <select className="form-control">
+                          <select className="form-control"  name="group_" onChange={handleCompanyChange}>
                             <option value="">choose proper group</option>
                             <optgroup label="Shared Group">
                               <option value="prospective">Prospective Customer</option>
@@ -471,47 +533,105 @@ const Company = () => {
                               type="text"
                               placeholder="Company Scale"
                               name="company_scale"
+                              onChange={handleCompanyChange}
                             />
                         </div>
                         <div className="col-sm-6">
                           <label className="col-form-label">Deal Type</label>
-                          <select className="form-control">
+                          <select className="form-control" name="deal_type" onChange={handleCompanyChange}>
                             <option value="">choose proper deal type</option>
                             <option value="buyer">Buyer</option>
                             <option value="seller">Seller</option>
                           </select>
                         </div>
-                      </div>
-                      <div className="form-group row">
                         <div className="col-sm-6">
-                            <label className="col-form-label">Business Type</label>
+                          <label className="col-form-label">Bussiness Registration Code</label>
                             <input
                               className="form-control"
                               type="text"
-                              placeholder="Business Type"
-                              name="business_type"
+                              placeholder="Bussiness Registration Code"
+                              name="bussiness_registration_code"
+                              onChange={handleCompanyChange}
                             />
-                          </div>
-                          <div className="col-sm-6">
-                            <label className="col-form-label">Business Item</label>
-                            <input
-                              type="text"
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Establishment Date</label>
+                          <input
+                            className="form-control"
+                            type="date"
+                            placeholder="Establishment Date"
+                            name="establishment_date"
+                            onChange={handleCompanyChange}
+                          />
+                          {/* <div className="cal-icon">
+                            <DatePicker
                               className="form-control"
-                              name="business_item"
-                              placeholder="Business Item"
+                              selected={selectedEstablishDate}
+                              onChange={handleEstablishDateChange}
+                              dateFormat="yyyy.MM.dd"
+                              showDayMonthYearPicker
                             />
-                          </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-12">
-                            <label className="col-form-label">Industry Type</label>
+                          </div> */}
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Closure Date</label>
+                          <input
+                            className="form-control"
+                            type="date"
+                            placeholder="Closure Date"
+                            name="closure_date"
+                            onChange={handleCompanyChange}
+                          />
+                          {/* <div className="cal-icon">
+                            <DatePicker
+                              className="form-control"
+                              selected={selectedCloseDate}
+                              onChange={handleCloseDateChange}
+                              dateFormat="yyyy.MM.dd"
+                              showDayMonthYearPicker
+                            />
+                          </div> */}
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">CEO Name</label>
                             <input
                               className="form-control"
                               type="text"
-                              placeholder="Industry Type"
-                              name="industry_type"
+                              placeholder="CEO Name"
+                              name="ceo_name"
+                              onChange={handleCompanyChange}
                             />
-                          </div>
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Business Type</label>
+                          <input
+                            className="form-control"
+                            type="text"
+                            placeholder="Business Type"
+                            name="business_type"
+                            onChange={handleCompanyChange}
+                          />
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Business Item</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Business Item"
+                            name="business_item"
+                            onChange={handleCompanyChange}
+                          />
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Industry Type</label>
+                          <input
+                            className="form-control"
+                            type="text"
+                            placeholder="Industry Type"
+                            name="industry_type"
+                            onChange={handleCompanyChange}
+                          />
+                        </div>
                       </div>
                       <h4>Organization Contact Details</h4>
                       <div className="form-group row">
@@ -520,8 +640,9 @@ const Company = () => {
                           <input
                             type="text"
                             className="form-control"
-                            name="phone"
                             placeholder="Phone"
+                            name="company_phone_number"
+                            onChange={handleCompanyChange}
                           />
                         </div>
                         <div className="col-sm-6">
@@ -529,8 +650,9 @@ const Company = () => {
                           <input
                             type="text"
                             className="form-control"
-                            name="fax"
                             placeholder="Fax"
+                            name="company_fax_number"
+                            onChange={handleCompanyChange}
                           />
                         </div>
                       </div>
@@ -540,8 +662,9 @@ const Company = () => {
                           <input
                             type="text"
                             className="form-control"
-                            name="website"
                             placeholder="Website"
+                            name="homepage"
+                            onChange={handleCompanyChange}
                           />
                         </div>
                         <div className="col-sm-6">
@@ -590,15 +713,14 @@ const Company = () => {
                       <h4>Address Information</h4>
                       <div className="form-group row">
                         <div className="col-sm-6">
-                          <label className="col-form-label">
-                            Billing Address
-                          </label>
+                          <label className="col-form-label">Address</label>
                           <textarea
                             className="form-control"
                             rows={3}
-                            name="billing-address"
-                            placeholder="Billing Address"
+                            placeholder="Address"
                             defaultValue={""}
+                            name="company_address"
+                            onChange={handleCompanyChange}
                           />
                         </div>
                         <div className="col-sm-6 mt-3">
@@ -607,145 +729,94 @@ const Company = () => {
                           <input
                             type="text"
                             className="form-control"
-                            placeholder="Billing City"
-                            name="billing-city"
+                            placeholder="Postal code"
+                            name="company_zip_code"
+                            onChange={handleCompanyChange}
                           />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Billing State"
-                            name="billing-state"
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Billing Postal code"
-                            name="billing-postal-code"
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">
-                            Billing Country
-                          </label>
-                          <select className="form-control">
-                            <option>India</option>
-                            <option>US</option>
-                            <option>Japan</option>
-                          </select>
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">
-                            Shipping Address
-                          </label>
-                          <textarea
-                            className="form-control"
-                            rows={3}
-                            name="shipping-address"
-                            placeholder="Shipping Address"
-                            defaultValue={""}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Shipping City"
-                            name="shipping-city"
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Shipping State"
-                            name="shipping-state"
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Shipping Postal code"
-                            name="shipping-postal-code"
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <select className="form-control">
-                            <option>India</option>
-                            <option>US</option>
-                            <option>Japan</option>
-                          </select>
                         </div>
                       </div>
                       <h4>Additional Information</h4>
                       <div className="form-group row">
                         <div className="col-sm-6">
-                          <label className="col-form-label">
-                            Dates To Remember{" "}
-                            <span className="text-danger">*</span>
-                          </label>
-                          <div className="cal-icon">
-                            <DatePicker
-                              className="form-control"
-                              selected={selectedDate1}
-                              onChange={handleDateChange1}
-                              dateFormat="dd/MM/yyyy"
-                              showDayMonthYearPicker
-                            />
-                          </div>
+                          <label className="col-form-label">Bank Account</label>
+                          <input
+                            className="form-control"
+                            type="text"
+                            placeholder="Bank Account"
+                            name="acount_code"
+                            onChange={handleCompanyChange}
+                          />
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Bank Name</label>
+                          <input
+                            className="form-control"
+                            type="text"
+                            placeholder="Bank Name"
+                            name="bank_name"
+                            onChange={handleCompanyChange}
+                          />
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Account Owner</label>
+                          <input
+                            className="form-control"
+                            type="text"
+                            placeholder="Account Owner"
+                            name="account_owner"
+                            onChange={handleCompanyChange}
+                          />
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Sales Resource</label>
+                          <input
+                            className="form-control"
+                            type="text"
+                            placeholder="Sales Resource"
+                            name="sales_resource"
+                            onChange={handleCompanyChange}
+                          />
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Application Engineer</label>
+                          <input
+                            className="form-control"
+                            type="text"
+                            placeholder="Application Engineer"
+                            name="application_engineer"
+                            onChange={handleCompanyChange}
+                          />
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Region</label>
+                          <input
+                            className="form-control"
+                            type="text"
+                            placeholder="Region"
+                            name="region"
+                            onChange={handleCompanyChange}
+                          />
                         </div>
                       </div>
-                      <h4>Description Information</h4>
+                      <h4>Memo</h4>
                       <div className="form-group row">
                         <div className="col-sm-12">
-                          <label className="col-form-label">Description </label>
+                          <label className="col-form-label">Memo</label>
                           <textarea
                             className="form-control"
                             rows={3}
-                            id="description"
-                            placeholder="Description"
+                            id="memo"
+                            placeholder="Memo"
                             defaultValue={""}
+                            onChange={handleCompanyChange}
                           />
-                        </div>
-                      </div>
-                      <h4>Tag Information</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-12">
-                          <label className="col-form-label">Tag List</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            name="tag-name"
-                            placeholder="Tag List"
-                          />
-                        </div>
-                      </div>
-                      <h4>Permissions</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Permission</label>
-                          <select className="form-control">
-                            <option>Task Visibility</option>
-                            <option>Private Task</option>
-                          </select>
                         </div>
                       </div>
                       <div className="text-center py-3">
                         <button
                           type="button"
                           className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                          onClick={handleAddNewCompany}
                         >
                           Save
                         </button>

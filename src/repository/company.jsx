@@ -14,14 +14,74 @@ export const CompanyRepo = selector({
                 const response = await fetch(`${BASE_PATH}/companies`);
                 const data = await response.json();
                 if(data.message){
-                    console.log('loadAllCompanies message:', data.message);
+                    console.log('\t[ loadAllCompanies ] message:', data.message);
                     set(atomAllCompanies, []);
                     return;
                 }
                 set(atomAllCompanies, data);
             }
             catch(err){
-                console.error(`loadAllCompanies / Error : ${err}`);
+                console.error(`\t[ loadAllCompanies ] Error : ${err}`);
+            };
+        });
+        const modifyCompany = getCallback(({set}) => async (newCompany) => {
+            const input_json = JSON.stringify(newCompany);
+            console.log(`[ modifyCompany ] input : ${input_json}`);
+            try{
+                const response = await fetch(`${BASE_PATH}/modifyCompany`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+                const data = await response.json();
+                if(data.message){
+                    console.log('\t[ modifyCompany ] message:', data.message);
+                    return false;
+                }
+                if(newCompany.action_type === 'ADD'){
+                    delete newCompany.action_type;
+                    const updatedNewCompany = {
+                        ...newCompany,
+                        company_code : data.out_company_code,
+                        create_user : data.out_create_user,
+                        create_date : data.out_create_date,
+                        modify_date: data.out_modify_date,
+                        recent_user: data.out_recent_user,
+                    };
+                    const updatedAllCompanies = [
+                        ...atomAllCompanies,
+                        updatedNewCompany
+                    ]
+                    set(atomAllCompanies, updatedAllCompanies);
+                    return true;
+                } else if(newCompany.action_type === 'UPDATE'){
+                    delete newCompany.action_type;
+                    const modifiedCompany = {
+                        ...newCompany,
+                        company_code : data.out_company_code,
+                        create_user : data.out_create_user,
+                        create_date : data.out_create_date,
+                        modify_date: data.out_modify_date,
+                        recent_user: data.out_recent_user,
+                    };
+                    const foundIdx = atomAllCompanies.foundIndex(company => company.company_code !== newCompany.company_code);
+                    if(foundIdx !== -1){
+                        const updatedAllCompanies = [
+                            ...atomAllCompanies.slice(0, foundIdx),
+                            updatedNewCompany,
+                            ...atomAllCompanies.slice(foundIdx + 1,),
+                        ];
+                        set(atomAllCompanies, updatedAllCompanies);
+                        return true;
+                    } else {
+                        console.log('\t[ modifyCompany ] no specified company is found');
+                        return false;
+                    }
+                }
+            }
+            catch(err){
+                console.error(`\t[ modifyCompany ] Error : ${err}`);
+                return false;
             };
         });
         const setCurrentCompany = getCallback(({set, snapshot}) => async (company_code) => {
@@ -31,11 +91,12 @@ export const CompanyRepo = selector({
                 set(atomCurrentCompany, selected);
             }
             catch(err){
-                console.error(`setCurrentCompany / Error : ${err}`);
+                console.error(`\t[ setCurrentCompany ] Error : ${err}`);
             };
         });
         return {
             loadAllCompanies,
+            modifyCompany,
             setCurrentCompany,
         };
     }
