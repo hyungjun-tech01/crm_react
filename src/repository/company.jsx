@@ -26,7 +26,7 @@ export const CompanyRepo = selector({
         });
         const modifyCompany = getCallback(({set}) => async (newCompany) => {
             const input_json = JSON.stringify(newCompany);
-            console.log(`[ modifyCompany ] input : ${input_json}`);
+            console.log(`[ modifyCompany ] input : `, input_json);
             try{
                 const response = await fetch(`${BASE_PATH}/modifyCompany`, {
                     method: "POST",
@@ -37,7 +37,7 @@ export const CompanyRepo = selector({
                 if(data.message){
                     console.log('\t[ modifyCompany ] message:', data.message);
                     return false;
-                }
+                };
                 if(newCompany.action_type === 'ADD'){
                     delete newCompany.action_type;
                     const updatedNewCompany = {
@@ -68,7 +68,7 @@ export const CompanyRepo = selector({
                     if(foundIdx !== -1){
                         const updatedAllCompanies = [
                             ...atomAllCompanies.slice(0, foundIdx),
-                            updatedNewCompany,
+                            modifiedCompany,
                             ...atomAllCompanies.slice(foundIdx + 1,),
                         ];
                         set(atomAllCompanies, updatedAllCompanies);

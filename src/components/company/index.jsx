@@ -56,10 +56,12 @@ const Company = () => {
     let input_data = null;
     if(e.target.name === 'establishment_date' || e.target.name === 'closure_date'){
       const date_value = new Date(e.target.value);
-      if(date_value.valueOf() !== NaN){
+      if(!isNaN(date_value.valueOf())){
+        const month = date_value.getMonth() + 1;
+        const date = date_value.getDate();
         input_data = date_value.getFullYear()
-          + "." + (date_value.getMonth() + 1)
-          + "." + date_value.getDay();
+          + "." + (month < 10 ? "0" + month.toString() : month.toString())
+          + "." + (date < 10 ? "0" + date.toString() : date.toString());
       };
     } else {
       input_data = e.target.value;
@@ -69,21 +71,22 @@ const Company = () => {
       [e.target.name]: input_data,
     };
     setCompanyChange(modifiedData);
-  }, [setCompanyChange]);
+  }, [companyChange]);
 
   const handleAddNewCompany = useCallback(()=>{
     const newComData = {
+      ...companyChange,
       action_type: 'ADD',
       company_number: '99999',
-      ...companyChange
+      counter: 0,
     };
-    console.log(`[ handleAddNewCompany ] ${[...newComData]}`);
+    console.log(`[ handleAddNewCompany ]`, newComData);
     const result = modifyCompany(newComData);
     if(result){
       initializeCompanyTemplate();
       //close modal
     }
-  },[]);
+  },[companyChange, initializeCompanyTemplate, modifyCompany]);
 
   const columns = [
     {
@@ -222,7 +225,7 @@ const Company = () => {
       application_engineer: data.application_engineer,
     }));
     setCompanyData(companyDataForTable);
-  }, [allCompanyData, loadAllCompanies]);
+  }, [allCompanyData, initializeCompanyTemplate, loadAllCompanies]);
 
   return (
     <HelmetProvider>
@@ -498,7 +501,7 @@ const Company = () => {
                             className="form-control"
                             type="text"
                             placeholder="Organization Name"
-                            name="org_name"
+                            name="company_name"
                             onChange={handleCompanyChange}
                           />
                         </div>
@@ -507,8 +510,8 @@ const Company = () => {
                           <input
                             type="text"
                             className="form-control"
-                            name="eng_org_name"
                             placeholder="English Name"
+                            name="company_name_eng"
                             onChange={handleCompanyChange}
                           />
                         </div>
@@ -550,7 +553,7 @@ const Company = () => {
                               className="form-control"
                               type="text"
                               placeholder="Bussiness Registration Code"
-                              name="bussiness_registration_code"
+                              name="business_registration_code"
                               onChange={handleCompanyChange}
                             />
                         </div>
@@ -805,9 +808,9 @@ const Company = () => {
                           <textarea
                             className="form-control"
                             rows={3}
-                            id="memo"
                             placeholder="Memo"
                             defaultValue={""}
+                            name="memo"
                             onChange={handleCompanyChange}
                           />
                         </div>
