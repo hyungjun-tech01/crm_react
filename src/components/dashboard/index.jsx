@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import { useCookies } from "react-cookie";
-import { useHistory } from "react-router-dom";
 
 import PieChart from "./piechart";
 import HorizontalBarChart from "./barchart/horizontalchart";
@@ -14,26 +12,6 @@ import Salesstatictschart from "./barchart/salesstatistics";
 import Completedtaskchart from "./barchart/completedtaks";
 
 const Dashboard = () => {
-  const [cookies, removeCookie] = useCookies([
-    "myLationCrmUserId",
-    "myLationCrmUserName",
-    "myLationCrmAuthToken",
-  ]);
-  const history = useHistory();
-
-  useEffect(() => {
-    console.log(`\nCheck cookies: ${cookies.myLationCrmAuthToken}`);
-    if(cookies.myLationCrmAuthToken === undefined
-      || cookies.myLationCrmAuthToken === null
-      || cookies.myLationCrmAuthToken === ""
-    ) {
-      removeCookie('myLationCrmUserId');
-      removeCookie('myLationCrmUserName');
-      removeCookie('myLationCrmAuthToken');
-      history.push("/login");
-    }
-  },[cookies.myLationCrmAuthToken, history, removeCookie]);
-
   return (
     <HelmetProvider>
       <div className="page-wrapper">
