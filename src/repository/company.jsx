@@ -24,7 +24,7 @@ export const CompanyRepo = selector({
                 console.error(`\t[ loadAllCompanies ] Error : ${err}`);
             };
         });
-        const modifyCompany = getCallback(({set}) => async (newCompany) => {
+        const modifyCompany = getCallback(({set, snapshot}) => async (newCompany) => {
             const input_json = JSON.stringify(newCompany);
             console.log(`[ modifyCompany ] input : `, input_json);
             try{
@@ -38,38 +38,36 @@ export const CompanyRepo = selector({
                     console.log('\t[ modifyCompany ] message:', data.message);
                     return false;
                 };
+
+                const allCompany = snapshot.getPromise(atomAllCompanies);
                 if(newCompany.action_type === 'ADD'){
                     delete newCompany.action_type;
                     const updatedNewCompany = {
                         ...newCompany,
-                        company_code : data.out_company_code,
+                        // company_code : data.out_company_code,
                         create_user : data.out_create_user,
                         create_date : data.out_create_date,
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    const updatedAllCompanies = [
-                        ...atomAllCompanies,
-                        updatedNewCompany
-                    ]
-                    set(atomAllCompanies, updatedAllCompanies);
+                    set(atomAllCompanies, (await allCompany).concat(newCompany));
                     return true;
                 } else if(newCompany.action_type === 'UPDATE'){
                     delete newCompany.action_type;
                     const modifiedCompany = {
                         ...newCompany,
-                        company_code : data.out_company_code,
+                        // company_code : data.out_company_code,
                         create_user : data.out_create_user,
                         create_date : data.out_create_date,
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    const foundIdx = atomAllCompanies.foundIndex(company => company.company_code !== newCompany.company_code);
+                    const foundIdx = allCompany.foundIndex(company => company.company_code !== newCompany.company_code);
                     if(foundIdx !== -1){
                         const updatedAllCompanies = [
-                            ...atomAllCompanies.slice(0, foundIdx),
+                            ...allCompany.slice(0, foundIdx),
                             modifiedCompany,
-                            ...atomAllCompanies.slice(foundIdx + 1,),
+                            ...allCompany.slice(foundIdx + 1,),
                         ];
                         set(atomAllCompanies, updatedAllCompanies);
                         return true;

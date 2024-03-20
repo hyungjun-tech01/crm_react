@@ -3,6 +3,7 @@ import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
+import { useCookies } from "react-cookie";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
 import CompanyDetailsModel from "./CompanyDetailsModel";
 import DatePicker from "react-datepicker";
@@ -12,6 +13,9 @@ import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies, defaultCompany } from "../../atoms/atoms";
 
 const Company = () => {
+  const [cookies] = useCookies([
+    "myLationCrmUserName",
+  ]);
   const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const [ companyData, setCompanyData ] = useState([]);
@@ -77,8 +81,9 @@ const Company = () => {
     const newComData = {
       ...companyChange,
       action_type: 'ADD',
-      company_number: '99999',
+      company_number: '99999',// Temporary
       counter: 0,
+      modify_user: cookies.myLationCrmUserName,
     };
     console.log(`[ handleAddNewCompany ]`, newComData);
     const result = modifyCompany(newComData);
