@@ -35,14 +35,16 @@ const Company = () => {
 
   // --- Functions used for Add New Company ------------------------------
   const initializeCompanyTemplate = useCallback(() => {
-    let initialCompany = {
-      ...defaultCompany
-    };
-    delete initialCompany.create_user;
-    delete initialCompany.create_date;
-    delete initialCompany.modify_date;
-    delete initialCompany.recent_user;
-    setCompanyChange(initialCompany);
+    // let initialCompany = {
+    //   ...defaultCompany
+    // };
+    // delete initialCompany.create_user;
+    // delete initialCompany.create_date;
+    // delete initialCompany.modify_date;
+    // delete initialCompany.recent_user;
+    // setCompanyChange(initialCompany);
+    setCompanyChange({...defaultCompany});
+    document.querySelector("#add_new_company_form").reset();
   }, []);
 
   const handleEstablishDateChange = useCallback((date) => {
@@ -78,6 +80,9 @@ const Company = () => {
   }, [companyChange]);
 
   const handleAddNewCompany = useCallback(()=>{
+    // Check data if they are available
+    if(companyChange.company_name === '') return;
+
     const newComData = {
       ...companyChange,
       action_type: 'ADD',
@@ -90,7 +95,10 @@ const Company = () => {
     if(result){
       initializeCompanyTemplate();
       //close modal
-    }
+      const add_company_modal = document.querySelector("#add_company");
+      add_company_modal.style.display = "none";
+
+    };
   },[companyChange, initializeCompanyTemplate, modifyCompany]);
 
   const columns = [
@@ -482,7 +490,7 @@ const Company = () => {
               <div className="modal-body">
                 <div className="row">
                   <div className="col-md-12">
-                    <form>
+                    <form id="add_new_company_form">
                       <h4>Organization Name</h4>
                       <div className="form-group row">
                         {/* <div className="col-md-12">
@@ -824,6 +832,7 @@ const Company = () => {
                         <button
                           type="button"
                           className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                          data-bs-dismiss="modal"
                           onClick={handleAddNewCompany}
                         >
                           Save
@@ -832,6 +841,7 @@ const Company = () => {
                         <button
                           type="button"
                           className="btn btn-secondary btn-rounded"
+                          data-bs-dismiss="modal"
                         >
                           Cancel
                         </button>
