@@ -189,14 +189,16 @@ const AppUniversal = (props) => {
     console.log(`\nCheck cookies: ${cookies.myLationCrmAuthToken}`);
     if(cookies.myLationCrmAuthToken === undefined
       || cookies.myLationCrmAuthToken === null
+      || cookies.myLationCrmAuthToken === "undefined"
       || cookies.myLationCrmAuthToken === ""
     ) {
+      console.log(`\nInitialize cookies`);
       removeCookie('myLationCrmUserId');
       removeCookie('myLationCrmUserName');
       removeCookie('myLationCrmAuthToken');
       history.push("/login");
     }
-  }, [cookies.myLationCrmAuthToken, history, removeCookie]);
+  }, [cookies.myLationCrmAuthToken]);
 
   const url = props.location.pathname.split("/")[1];
   const exclusionArray = [
@@ -206,6 +208,7 @@ const AppUniversal = (props) => {
     "error-404",
     "error-500",
   ];
+
   return (
     <Router basename={`${config.publicPath}`}>
       <div className="main-wrapper">
