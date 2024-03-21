@@ -39,7 +39,7 @@ export const CompanyRepo = selector({
                     return false;
                 };
 
-                const allCompany = snapshot.getPromise(atomAllCompanies);
+                const allCompany = await snapshot.getPromise(atomAllCompanies);
                 if(newCompany.action_type === 'ADD'){
                     delete newCompany.action_type;
                     const updatedNewCompany = {
@@ -50,19 +50,22 @@ export const CompanyRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomAllCompanies, (await allCompany).concat(newCompany));
+                    set(atomAllCompanies, allCompany.concat(updatedNewCompany));
                     return true;
                 } else if(newCompany.action_type === 'UPDATE'){
+                    const currentCompany = await snapshot.getPromise(atomCurrentCompany);
                     delete newCompany.action_type;
+                    delete newCompany.company_code;
+                    delete newCompany.modify_user;
                     const modifiedCompany = {
+                        ...currentCompany,
                         ...newCompany,
-                        // company_code : data.out_company_code,
-                        create_user : data.out_create_user,
-                        create_date : data.out_create_date,
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    const foundIdx = allCompany.foundIndex(company => company.company_code === newCompany.company_code);
+                    set(atomCurrentCompany, modifiedCompany);
+                    const foundIdx = allCompany.findIndex(company => 
+                        company.company_code === modifiedCompany.company_code);
                     if(foundIdx !== -1){
                         const updatedAllCompanies = [
                             ...allCompany.slice(0, foundIdx),
@@ -72,7 +75,7 @@ export const CompanyRepo = selector({
                         set(atomAllCompanies, updatedAllCompanies);
                         return true;
                     } else {
-                        console.log('\t[ modifyCompany ] no specified company is found');
+                        console.log('\t[ modifyCompany ] No specified company is found');
                         return false;
                     }
                 }
