@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { Route, BrowserRouter as Router, Switch, useHistory } from "react-router-dom";
 import { useCookies } from "react-cookie";
 
-
 import config from "config";
 
 import Header from "./components/header/index";
@@ -112,7 +111,6 @@ import Profile from "./components/profile";
 import UserInfo from "./components/userinfo";
 import Contacts from "./components/contact";
 import Company from "./components/company";
-import CompanyDetailInfo from "./components/company_detail/index.jsx";
 import Sidebarnav from "./components/sidebar";
 // Login & Register
 import Login from "./components/login";
@@ -225,7 +223,6 @@ const AppUniversal = (props) => {
           <Route path="/TaskDetailModel" exact component={TaskDetailModel} />
           <Route path="/contacts" exact component={Contacts} />
           <Route path="/companies" exact component={Company} />
-          <Route path="/CompanyDetailInfo" exact component={CompanyDetailInfo} />
           <Route path="/CompanyDetailsModel" exact component={CompanyDetailsModel} />
           <Route path="/leads" exact component={Lead} />
           <Route path="/LeadsDetailsModel" exact component={LeadsDetailsModel} />

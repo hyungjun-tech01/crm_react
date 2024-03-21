@@ -62,7 +62,7 @@ export const CompanyRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    const foundIdx = allCompany.foundIndex(company => company.company_code !== newCompany.company_code);
+                    const foundIdx = allCompany.foundIndex(company => company.company_code === newCompany.company_code);
                     if(foundIdx !== -1){
                         const updatedAllCompanies = [
                             ...allCompany.slice(0, foundIdx),

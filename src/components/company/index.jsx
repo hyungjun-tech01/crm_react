@@ -6,22 +6,20 @@ import { Link } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
 import CompanyDetailsModel from "./CompanyDetailsModel";
-import DatePicker from "react-datepicker";
+// import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { BiData } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies, defaultCompany } from "../../atoms/atoms";
 
 const Company = () => {
-  const [cookies] = useCookies([
-    "myLationCrmUserName",
-  ]);
   const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const [ companyData, setCompanyData ] = useState([]);
   const [ companyChange, setCompanyChange ] = useState(null);
-  const [ selectedEstablishDate, setSelectedEstablishDate ] = useState(null);
-  const [ selectedCloseDate, setSelectedCloseDate ] = useState(null);
+  const [ cookies ] = useCookies(["myLationCrmUserName"]);
+  // const [ selectedEstablishDate, setSelectedEstablishDate ] = useState(null);
+  // const [ selectedCloseDate, setSelectedCloseDate ] = useState(null);
 
   // --- Functions used for Table ------------------------------
   const handleClickCompanyName = useCallback((id)=>{
@@ -35,26 +33,20 @@ const Company = () => {
 
   // --- Functions used for Add New Company ------------------------------
   const initializeCompanyTemplate = useCallback(() => {
-    let initialCompany = {
-      ...defaultCompany
-    };
-    delete initialCompany.create_user;
-    delete initialCompany.create_date;
-    delete initialCompany.modify_date;
-    delete initialCompany.recent_user;
-    setCompanyChange(initialCompany);
+    setCompanyChange({...defaultCompany});
+    document.querySelector("#add_new_company_form").reset();
   }, []);
 
-  const handleEstablishDateChange = useCallback((date) => {
-    console.log(`[ handleEstablishDateChange ] ${date}`);
-    setSelectedEstablishDate(date);
-    companyChange.establishment_date = date;
-  },[]);
+  // const handleEstablishDateChange = useCallback((date) => {
+  //   console.log(`[ handleEstablishDateChange ] ${date}`);
+  //   setSelectedEstablishDate(date);
+  //   companyChange.establishment_date = date;
+  // },[]);
 
-  const handleCloseDateChange = useCallback((date) => {
-    console.log(`[ handleEstablishDateChange ] ${date}`);
-    setSelectedCloseDate(date);
-  },[]);
+  // const handleCloseDateChange = useCallback((date) => {
+  //   console.log(`[ handleEstablishDateChange ] ${date}`);
+  //   setSelectedCloseDate(date);
+  // },[]);
 
   const handleCompanyChange = useCallback((e)=>{
     let input_data = null;
@@ -78,6 +70,9 @@ const Company = () => {
   }, [companyChange]);
 
   const handleAddNewCompany = useCallback(()=>{
+    // Check data if they are available
+    if(companyChange.company_name === '') return;
+
     const newComData = {
       ...companyChange,
       action_type: 'ADD',
@@ -90,7 +85,10 @@ const Company = () => {
     if(result){
       initializeCompanyTemplate();
       //close modal
-    }
+      const add_company_modal = document.querySelector("#add_company");
+      add_company_modal.style.display = "none";
+
+    };
   },[companyChange, initializeCompanyTemplate, modifyCompany]);
 
   const columns = [
@@ -482,7 +480,7 @@ const Company = () => {
               <div className="modal-body">
                 <div className="row">
                   <div className="col-md-12">
-                    <form>
+                    <form id="add_new_company_form">
                       <h4>Organization Name</h4>
                       <div className="form-group row">
                         {/* <div className="col-md-12">
@@ -824,6 +822,7 @@ const Company = () => {
                         <button
                           type="button"
                           className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                          data-bs-dismiss="modal"
                           onClick={handleAddNewCompany}
                         >
                           Save
@@ -832,6 +831,7 @@ const Company = () => {
                         <button
                           type="button"
                           className="btn btn-secondary btn-rounded"
+                          data-bs-dismiss="modal"
                         >
                           Cancel
                         </button>
