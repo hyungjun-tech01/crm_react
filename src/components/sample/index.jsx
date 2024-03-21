@@ -12,7 +12,7 @@ const Sample = () => {
 
   useEffect(() => {
     const info ={
-      company_code: '',
+      company_code: '34E957F1FDD1814482BE3B073C61EB95',
       company_number: '99999',
       group_: 'etc',
       company_scale: '',
@@ -39,13 +39,13 @@ const Sample = () => {
       sales_resource: 'chs',
       application_engineer: 'chs',
       region: '',
-      action_type: 'ADD',
+      action_type: 'UPDATE',
       modify_user: 'crm 관리자'
     }
 //   const info = {
 //     action_type:'UPDATE'                ,   // 'ADD', 'UPDATE'
-// leads_code:"31F7C09C971245C9B26DD18AC5BD12C5"                 ,   // ADD일때는 들어오면 안되고, UPDATE일때는 반드시 들어와야
-// company_code :""               ,
+// lead_code: "959880CF13FC0D4F9FDFAECF41906B09"                 ,   // ADD일때는 들어오면 안되고, UPDATE일때는 반드시 들어와야
+// company_code :"AAAA"               ,
 // leads_index :            0    ,  // in integer
 // company_index:           0    ,  // in integer
 // lead_number  :           "1"    ,
