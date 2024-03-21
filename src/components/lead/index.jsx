@@ -3,6 +3,7 @@ import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
+import { useCookies } from "react-cookie";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
 import "../antdstyle.css";
 import LeadsDetailsModel from "./LeadsDetailsModel";
@@ -11,9 +12,11 @@ import { LeadRepo } from "../../repository/lead";
 import { atomAllLeads } from "../../atoms/atoms";
 
 const Lead = () => {
-  const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
+  const { loadAllLeads, modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
   const allLeadData = useRecoilValue(atomAllLeads);
   const [leadData, setLeadData] = useState([]);
+  const [ leadChange, setLeadChange ] = useState(null);
+  const [ cookies ] = useCookies(["myLationCrmUserName"]);
 
   const columns = [
     {
