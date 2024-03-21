@@ -6,22 +6,20 @@ import { Link } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
 import CompanyDetailsModel from "./CompanyDetailsModel";
-import DatePicker from "react-datepicker";
+// import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { BiData } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies, defaultCompany } from "../../atoms/atoms";
 
 const Company = () => {
-  const [cookies] = useCookies([
-    "myLationCrmUserName",
-  ]);
   const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const [ companyData, setCompanyData ] = useState([]);
   const [ companyChange, setCompanyChange ] = useState(null);
-  const [ selectedEstablishDate, setSelectedEstablishDate ] = useState(null);
-  const [ selectedCloseDate, setSelectedCloseDate ] = useState(null);
+  const [ cookies ] = useCookies(["myLationCrmUserName"]);
+  // const [ selectedEstablishDate, setSelectedEstablishDate ] = useState(null);
+  // const [ selectedCloseDate, setSelectedCloseDate ] = useState(null);
 
   // --- Functions used for Table ------------------------------
   const handleClickCompanyName = useCallback((id)=>{
@@ -35,28 +33,20 @@ const Company = () => {
 
   // --- Functions used for Add New Company ------------------------------
   const initializeCompanyTemplate = useCallback(() => {
-    // let initialCompany = {
-    //   ...defaultCompany
-    // };
-    // delete initialCompany.create_user;
-    // delete initialCompany.create_date;
-    // delete initialCompany.modify_date;
-    // delete initialCompany.recent_user;
-    // setCompanyChange(initialCompany);
     setCompanyChange({...defaultCompany});
     document.querySelector("#add_new_company_form").reset();
   }, []);
 
-  const handleEstablishDateChange = useCallback((date) => {
-    console.log(`[ handleEstablishDateChange ] ${date}`);
-    setSelectedEstablishDate(date);
-    companyChange.establishment_date = date;
-  },[]);
+  // const handleEstablishDateChange = useCallback((date) => {
+  //   console.log(`[ handleEstablishDateChange ] ${date}`);
+  //   setSelectedEstablishDate(date);
+  //   companyChange.establishment_date = date;
+  // },[]);
 
-  const handleCloseDateChange = useCallback((date) => {
-    console.log(`[ handleEstablishDateChange ] ${date}`);
-    setSelectedCloseDate(date);
-  },[]);
+  // const handleCloseDateChange = useCallback((date) => {
+  //   console.log(`[ handleEstablishDateChange ] ${date}`);
+  //   setSelectedCloseDate(date);
+  // },[]);
 
   const handleCompanyChange = useCallback((e)=>{
     let input_data = null;
