@@ -11,12 +11,17 @@ const BASE_PATH = Paths.BASE_PATH;
 const Sample = () => {
 
   useEffect(() => {
- const info ={
-       company_code: 'AE490436080B074BBAF5F3EE360A2434',
-       company_scale:'강소기업',
-       establishment_date:'1960.01.01',
-       action_type: 'UPDATE',
-       modify_user: 'crm 관리자3'
+
+  const info ={
+      lead_code: 'AE490436080B074BBAF5F3EE360A2434',
+      company_code:'AE490436080B074BBAF5F3EE360A2434',
+      consulting_code: '4B70907C2F57D74B85BC157CFB4527E7',
+      receipt_date:'2024.01.01',
+      receipt_time:'오전 10:21:51',
+      request_content:"문제 접수",
+      action_content:"해결 접수",
+      action_type: 'UPDATE',
+      modify_user: 'crm 관리자12'
      }    
    
   // const info = {
@@ -29,8 +34,9 @@ const Sample = () => {
   //   application_engineer :   "1"    ,
   //   modify_user: 'crm 관리자3',
   //   status               :   "1"    };
+
     try{
-      const response = fetch(`${BASE_PATH}/modifyCompany`,{
+      const response = fetch(`${BASE_PATH}/modifyConsult`,{
           method: "POST", 
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify(info)
