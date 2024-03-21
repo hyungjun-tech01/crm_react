@@ -11,68 +11,32 @@ const BASE_PATH = Paths.BASE_PATH;
 const Sample = () => {
 
   useEffect(() => {
-    const info ={
-      company_code: '',
-      company_number: '99999',
-      group_: 'etc',
-      company_scale: '',
-      deal_type: 'buyer',
-      company_name: '(주)신도리코',
-      company_name_eng: 'Sindoh Co., Ltd.',
-      business_registration_code: '',
-      establishment_date: '1997.08.29',
-      closure_date: null,
-      ceo_name: '',
-      business_type: '',
-      business_item: '',
-      industry_type: '',
-      company_zip_code: '',
-      company_address: '서울시 성동구 성수이로24길 3',
-      company_phone_number: '',
-      company_fax_number: '',
-      homepage: '',
-      memo: 'test',
-      counter: 0,
-      account_code: '',
-      bank_name: '',
-      account_owner: '',
-      sales_resource: 'chs',
-      application_engineer: 'chs',
-      region: '',
-      action_type: 'ADD',
-      modify_user: 'crm 관리자'
-    }
-//   const info = {
-//     action_type:'UPDATE'                ,   // 'ADD', 'UPDATE'
-// leads_code:"31F7C09C971245C9B26DD18AC5BD12C5"                 ,   // ADD일때는 들어오면 안되고, UPDATE일때는 반드시 들어와야
-// company_code :""               ,
-// leads_index :            0    ,  // in integer
-// company_index:           0    ,  // in integer
-// lead_number  :           "1"    ,
-// group_        :          "1"    ,
-// sales_resource :         "1"    ,
-// region          :        "1"    ,
-// company_name     :       "1"    ,
-// company_zip_code  :      "1"    ,
-// company_address    :     "1"    ,
-// company_phone_number:    "1"    ,
-// company_fax_number   :   "1"    ,
-// leads_name           :   "1"    ,
-// is_keyman            :   "1"    ,
-// department           :   "1"    ,
-// position             :   "1"    ,
-// mobile_number        :   "1"    ,
-// company_name_en      :   "1"    ,
-// email                :   "1"    ,
-// homepage             :   "1"    ,
-// modify_user          :   "1"    ,
-// counter              :   0   ,   // in integer 
-// application_engineer :   "1"    ,
-// status               :   "1"    ,
-    
-//   };
+
+  const info ={
+      lead_code: 'AE490436080B074BBAF5F3EE360A2434',
+      company_code:'AE490436080B074BBAF5F3EE360A2434',
+      consulting_code: '4B70907C2F57D74B85BC157CFB4527E7',
+      receipt_date:'2024.01.01',
+      receipt_time:'오전 10:21:51',
+      request_content:"문제 접수",
+      action_content:"해결 접수",
+      action_type: 'UPDATE',
+      modify_user: 'crm 관리자12'
+     }    
+   
+  // const info = {
+  //   action_type:'UPDATE'                ,   // 'ADD', 'UPDATE'
+  //   lead_code: '44A1DB07FD251E5088364163E54D5EAC'                 ,   // ADD일때는 들어오면 안되고, UPDATE일때는 반드시 들어와야
+  //   leads_name           :   '테스트리드---111'    ,
+  //   mobile_number        :   "1"    ,
+  //   email                :   "1"    ,
+  //   counter              :   1111   ,   // in integer 
+  //   application_engineer :   "1"    ,
+  //   modify_user: 'crm 관리자3',
+  //   status               :   "1"    };
+
     try{
-      const response = fetch(`${BASE_PATH}/modifyCompany`,{
+      const response = fetch(`${BASE_PATH}/modifyConsult`,{
           method: "POST", 
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify(info)
