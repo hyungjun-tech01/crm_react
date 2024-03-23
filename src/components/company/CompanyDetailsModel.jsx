@@ -193,7 +193,7 @@ const CompanyDetailsModel = () => {
                   </div>
                   <div className="col">
                     <span>Companies</span>
-                    <p>Acme Corp</p>
+                    <p>{selectedCompany.company_name}</p>
                   </div>
                   <div className="col">
                     <span>Phone</span>
@@ -296,18 +296,12 @@ const CompanyDetailsModel = () => {
                                           type="text"
                                           placeholder="Organization Name"
                                           name="company_name"
-                                          defaultValue={
-                                            selectedCompany.company_name
-                                          }
+                                          defaultValue={selectedCompany.company_name}
                                           onChange={handleEditing}
                                         />
                                       </td>
                                       <td className="border-0">
-                                        <div
-                                          onClick={() => {
-                                            handleEndEdit("company_name");
-                                          }}
-                                        >
+                                        <div onClick={() => {handleEndEdit("company_name");}}>
                                           <SaveAlt />
                                         </div>
                                       </td>
@@ -318,11 +312,7 @@ const CompanyDetailsModel = () => {
                                         {selectedCompany.company_name}
                                       </td>
                                       <td className="border-0">
-                                        <div
-                                          onClick={() => {
-                                            handleStartEdit("company_name");
-                                          }}
-                                        >
+                                        <div onClick={() => {handleStartEdit("company_name");}}>
                                           <Edit />
                                         </div>
                                       </td>
@@ -338,18 +328,12 @@ const CompanyDetailsModel = () => {
                                           type="text"
                                           placeholder="English Organization Name"
                                           name="company_name_eng"
-                                          defaultValue={
-                                            selectedCompany.company_name_eng
-                                          }
+                                          defaultValue={selectedCompany.company_name_eng}
                                           onChange={handleEditing}
                                         />
                                       </td>
                                       <td>
-                                        <div
-                                          onClick={() => {
-                                            handleEndEdit("company_name_eng");
-                                          }}
-                                        >
+                                        <div onClick={() => {handleEndEdit("company_name_eng");}}>
                                           <SaveAlt />
                                         </div>
                                       </td>
@@ -360,11 +344,7 @@ const CompanyDetailsModel = () => {
                                         {selectedCompany.company_name_eng}
                                       </td>
                                       <td>
-                                        <div
-                                          onClick={() => {
-                                            handleStartEdit("company_name_eng");
-                                          }}
-                                        >
+                                        <div onClick={() => {handleStartEdit("company_name_eng");}}>
                                           <Edit />
                                         </div>
                                       </td>

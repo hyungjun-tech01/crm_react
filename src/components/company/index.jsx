@@ -352,7 +352,7 @@ const Company = () => {
                       style={{ overflowX: "auto" }}
                       columns={columns}
                       dataSource={allCompanyData}
-                      rowKey={(record) => record.id}
+                      rowKey={(record) => record.company_number}
                     />
                   </div>
                 </div>

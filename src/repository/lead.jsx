@@ -88,11 +88,13 @@ export const LeadRepo = selector({
         const setCurrentLead = getCallback(({set, snapshot}) => async (lead_code) => {
             try{
                 const allLeads = await snapshot.getPromise(atomAllLeads);
-                const selected = allLeads.filter(lead => lead.lead_code === lead_code)[0];
-                set(atomCurrentLead, selected);
+                const selected_arrary = allLeads.filter(lead => lead.lead_code === lead_code);
+                if(selected_arrary.length > 0){
+                    set(atomCurrentLead, selected_arrary[0]);
+                }
             }
             catch(err){
-                console.error(`setCurrentCompany / Error : ${err}`);
+                console.error(`setCurrentLead / Error : ${err}`);
             };
         });
         return {

@@ -18,14 +18,13 @@ const Lead = () => {
   const allLeadData = useRecoilValue(atomAllLeads);
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
   const { loadAllLeads, modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
-  const [leadData, setLeadData] = useState([]);
   const [leadChange, setLeadChange] = useState(null);
   const [companyData, setCompanyData] = useState([]);
   const [cookies] = useCookies(["myLationCrmUserName"]);
 
   // --- Functions used for Table ------------------------------
   const handleClickLeadName = useCallback((id) => {
-      console.log("[Company] set current lead : ", id);
+      console.log("[Lead] set current lead : ", id);
       setCurrentLead(id);
   }, [setCurrentLead]);
 
@@ -88,7 +87,7 @@ const Lead = () => {
   const columns = [
     {
       title: "Full Name",
-      dataIndex: "name",
+      dataIndex: "leads_name",
       render: (text, record) => (
         <>
           <a href="#">
@@ -96,29 +95,34 @@ const Lead = () => {
               {text.charAt(0)}
             </span>
           </a>
-          <a href="#" data-bs-toggle="modal" data-bs-target="#leads-details" onClick={()=>{handleClickLeadName(record.company_code);}}>
+          <a href="#" data-bs-toggle="modal" data-bs-target="#leads-details" onClick={()=>{handleClickLeadName(record.lead_code);}}>
             {text}
           </a>
         </>
       ),
-      sorter: (a, b) => a.name.length - b.name.length,
+      sorter: (a, b) => a.leads_name.length - b.leads_name.length,
+    },
+    {
+      title: "Title",
+      dataIndex: "position",
+      sorter: (a, b) => a.position.length - b.position.length,
     },
     {
       title: "Department",
       dataIndex: "department",
-      sorter: (a, b) => a.title.length - b.title.length,
+      sorter: (a, b) => a.department.length - b.department.length,
     },
     {
       title: "Company",
-      dataIndex: "company",
+      dataIndex: "company_name",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.company.length - b.company.length,
+      sorter: (a, b) => a.company_name.length - b.company_name.length,
     },
     {
-      title: "Phone",
-      dataIndex: "phone",
+      title: "Mobile",
+      dataIndex: "mobile_number",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.phone.length - b.phone.length,
+      sorter: (a, b) => a.mobile_number.length - b.mobile_number.length,
     },
     {
       title: "Email Address",
@@ -133,14 +137,14 @@ const Lead = () => {
       sorter: (a, b) => a.status.length - b.status.length,
     },
     {
-      title: "Lead Created",
-      dataIndex: "created",
+      title: "Lead Modified",
+      dataIndex: "modify_date",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.created.length - b.created.length,
+      sorter: (a, b) => a.modify_date - b.modify_date,
     },
     {
-      title: "Lead Owner",
-      dataIndex: "owner",
+      title: "Lead Sales",
+      dataIndex: "sales_resource",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => a.owner.length - b.owner.length,
     },
@@ -155,7 +159,7 @@ const Lead = () => {
 
     {
       title: "Actions",
-      dataIndex: "status",
+      dataIndex: "status_",
       render: (text, record) => (
         <div className="dropdown dropdown-action">
           <a
@@ -247,20 +251,6 @@ const Lead = () => {
     };
     if (allLeadData.length === 0) {
       loadAllLeads();
-    } else {
-      const leadDataForTable = allLeadData.map((data, index) => ({
-        id: index.toString(),
-        code: data.lead_code,
-        name: data.leads_name,
-        department: data.department,
-        company: data.company_name,
-        phone: data.mobile_number,
-        email: data.email,
-        status: data.status,
-        created: data.create_date,
-        owner: data.create_user,
-      }));
-      setLeadData(leadDataForTable);
     };
     initializeLeadTemplate();
   }, [allCompnayData, allLeadData]);
@@ -430,7 +420,7 @@ const Lead = () => {
                       rowSelection={rowSelection}
                       className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
                       pagination={{
-                        total: leadData.length,
+                        total: allLeadData.length,
                         showTotal: (total, range) =>
                           `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                         showSizeChanger: true,
@@ -439,8 +429,8 @@ const Lead = () => {
                       }}
                       style={{ overflowX: "auto" }}
                       columns={columns}
-                      dataSource={leadData}
-                      rowKey={(record) => record.id}
+                      dataSource={allLeadData}
+                      rowKey={(record) => record.lead_number}
                     />
                   </div>
                 </div>

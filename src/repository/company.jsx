@@ -88,8 +88,10 @@ export const CompanyRepo = selector({
         const setCurrentCompany = getCallback(({set, snapshot}) => async (company_code) => {
             try{
                 const allCompanies = await snapshot.getPromise(atomAllCompanies);
-                const selected = allCompanies.filter(company => company.company_code === company_code)[0];
-                set(atomCurrentCompany, selected);
+                const selected_array = allCompanies.filter(company => company.company_code === company_code);
+                if(selected_array.length > 0){
+                    set(atomCurrentCompany, selected_array[0]);
+                }
             }
             catch(err){
                 console.error(`\t[ setCurrentCompany ] Error : ${err}`);

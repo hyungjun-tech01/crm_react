@@ -48,7 +48,7 @@ export const atomAllCompanies = atom({
 
 //----- Lead ----------------------
 export const defaultLead = {
-    leads_code: null,
+    lead_code: null,
     company_code: null,
     leads_index: 0,
     company_index: 0,
