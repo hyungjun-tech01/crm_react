@@ -15,7 +15,6 @@ import { atomAllCompanies, defaultCompany } from "../../atoms/atoms";
 const Company = () => {
   const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
-  const [ companyData, setCompanyData ] = useState([]);
   const [ companyChange, setCompanyChange ] = useState(null);
   const [ cookies ] = useCookies(["myLationCrmUserName"]);
   // const [ selectedEstablishDate, setSelectedEstablishDate ] = useState(null);
@@ -71,7 +70,7 @@ const Company = () => {
 
   const handleAddNewCompany = useCallback(()=>{
     // Check data if they are available
-    if(companyChange.company_name === '') return;
+    if(companyChange.company_name === null || companyChange.company_name === '') return;
 
     const newComData = {
       ...companyChange,
@@ -89,47 +88,47 @@ const Company = () => {
       add_company_modal.style.display = "none";
 
     };
-  },[companyChange, initializeCompanyTemplate, modifyCompany]);
+  },[companyChange, cookies.myLationCrmUserName, initializeCompanyTemplate, modifyCompany]);
 
   const columns = [
     {
       title: "Company Name",
-      dataIndex: "name",
+      dataIndex: "company_name",
       render: (text, record) => (
         <>
           <a href="#" className="avatar">
             <img alt="" src={record.image} />
           </a>
-          <a href="#" data-bs-toggle="modal" data-bs-target="#company-details" onClick={()=>{handleClickCompanyName(record.code);}}>
+          <a href="#" data-bs-toggle="modal" data-bs-target="#company-details" onClick={()=>{handleClickCompanyName(record.company_code);}}>
             {text}
           </a>
         </>
       ),
-      sorter: (a, b) => a.company.length - b.company.length,
+      sorter: (a, b) => a.company_number - b.company_number,
     },
     {
       title: "Phone",
-      dataIndex: "phone",
+      dataIndex: "company_phone_number",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.phone.length - b.phone.length,
+      sorter: (a, b) => a.company_phone_number - b.company_phone_number,
     },
     {
       title: "Address",
-      dataIndex: "address",
+      dataIndex: "company_address",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.billing.length - b.billing.length,
+      sorter: (a, b) => a.company_address.length - b.company_address.length,
     },
     {
       title: "Salesman",
       dataIndex: "sales_resource",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.state.length - b.state.length,
+      sorter: (a, b) => a.sales_resource.length - b.sales_resource.length,
     },
     {
       title: "Engineer",
       dataIndex: "application_engineer",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.country.length - b.country.length,
+      sorter: (a, b) => a.application_engineer.length - b.application_engineer.length,
     },
     // {
     //   title: "",
@@ -218,16 +217,6 @@ const Company = () => {
       loadAllCompanies();
     };
     initializeCompanyTemplate();
-    const companyDataForTable = allCompanyData.map((data, index) => ({
-      id: index.toString(),
-      code: data.company_code,
-      name: data.company_name,
-      phone: data.company_phone_number,
-      address: data.company_address,
-      sales_resource: data.sales_resource,
-      application_engineer: data.application_engineer,
-    }));
-    setCompanyData(companyDataForTable);
   }, [allCompanyData, initializeCompanyTemplate, loadAllCompanies]);
 
   return (
@@ -362,7 +351,7 @@ const Company = () => {
                       className="table"
                       style={{ overflowX: "auto" }}
                       columns={columns}
-                      dataSource={companyData}
+                      dataSource={allCompanyData}
                       rowKey={(record) => record.id}
                     />
                   </div>

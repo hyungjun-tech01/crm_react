@@ -1,22 +1,89 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
+import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
 import "../antdstyle.css";
 import LeadsDetailsModel from "./LeadsDetailsModel";
 import { BiUser } from "react-icons/bi";
+import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
-import { atomAllLeads } from "../../atoms/atoms";
+import { atomAllCompanies, atomAllLeads, defaultLead } from "../../atoms/atoms";
 
 const Lead = () => {
-  const { loadAllLeads, modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
+  const allCompnayData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
+  const { loadAllCompanies } = useRecoilValue(CompanyRepo);
+  const { loadAllLeads, modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
   const [leadData, setLeadData] = useState([]);
-  const [ leadChange, setLeadChange ] = useState(null);
-  const [ cookies ] = useCookies(["myLationCrmUserName"]);
+  const [leadChange, setLeadChange] = useState(null);
+  const [companyData, setCompanyData] = useState([]);
+  const [cookies] = useCookies(["myLationCrmUserName"]);
+
+  // --- Functions used for Table ------------------------------
+  const handleClickLeadName = useCallback((id) => {
+      console.log("[Company] set current lead : ", id);
+      setCurrentLead(id);
+  }, [setCurrentLead]);
+
+  const handleAddNewLeadClicked = useCallback(() => {
+    initializeLeadTemplate();
+  }, []);
+  // --- Functions used for Add New Company ------------------------------
+  const initializeLeadTemplate = useCallback(() => {
+    setLeadChange({ ...defaultLead });
+    document.querySelector("#add_new_lead_form").reset();
+  }, []);
+
+  const handleLeadChange = useCallback((e) => {
+    console.log('Change New value :', e.target.value);
+    const modifiedData = {
+      ...leadChange,
+      [e.target.name]: e.target.value,
+    };
+    setLeadChange(modifiedData);
+  }, [leadChange]);
+
+  const handleAddNewLead = useCallback(()=>{
+    // Check data if they are available
+    if(leadChange.leads_name === null || leadChange.leads_name === '') return;
+
+    const newLeadData = {
+      ...leadChange,
+      action_type: 'ADD',
+      lead_number: '99999',// Temporary
+      counter: 0,
+      modify_user: cookies.myLationCrmUserName,
+    };
+    console.log(`[ handleAddNewLead ]`, newLeadData);
+    const result = modifyLead(newLeadData);
+    if(result){
+      initializeLeadTemplate();
+      //close modal
+      const add_company_modal = document.querySelector("#add_lead");
+      add_company_modal.style.display = "none";
+    };
+  },[leadChange]);
+
+  const handleSelectCompany = useCallback((value)=>{
+    const selected = value.value;
+    // const selected_idx = allCompnayData.findIndex(company => company.company_code === event.target.value);
+    // if(selected_idx !== -1) {
+    //   const selected = allCompnayData.at(selected_idx);
+      const tempLeadChange = {
+        ...leadChange,
+        company_code: selected.company_code,
+        company_name: selected.company_name,
+        company_name_en: selected.company_name_en,
+        company_zip_code: selected.company_zip_code,
+        company_address: selected.company_address,
+      };
+      setLeadChange(tempLeadChange);
+    // };
+  }, [leadChange]);
 
   const columns = [
     {
@@ -29,7 +96,7 @@ const Lead = () => {
               {text.charAt(0)}
             </span>
           </a>
-          <a href="#" data-bs-toggle="modal" data-bs-target="#leads-details">
+          <a href="#" data-bs-toggle="modal" data-bs-target="#leads-details" onClick={()=>{handleClickLeadName(record.company_code);}}>
             {text}
           </a>
         </>
@@ -163,23 +230,40 @@ const Lead = () => {
   };
 
   useEffect(() => {
+    if (allCompnayData.length === 0) {
+      loadAllCompanies();
+    } else {
+      const companySubSet = allCompnayData.map((data) => ({
+        value: {
+          company_code: data.company_code,
+          company_name: data.company_name,
+          company_name_en: data.company_name_en,
+          company_zip_code: data.company_zip_code,
+          company_address: data.company_address,
+        },
+        label: data.company_name,
+      }));
+      setCompanyData(companySubSet);
+    };
     if (allLeadData.length === 0) {
       loadAllLeads();
-    }
-    const leadDataForTable = allLeadData.map((data, index) => ({
-      id: index.toString(),
-      code: data.lead_code,
-      name: data.leads_name,
-      department: data.department,
-      company: data.company_name,
-      phone: data.mobile_number,
-      email: data.email,
-      status: data.status,
-      created: data.create_date,
-      owner: data.create_user,
-    }));
-    setLeadData(leadDataForTable);
-  }, [allLeadData, loadAllLeads]);
+    } else {
+      const leadDataForTable = allLeadData.map((data, index) => ({
+        id: index.toString(),
+        code: data.lead_code,
+        name: data.leads_name,
+        department: data.department,
+        company: data.company_name,
+        phone: data.mobile_number,
+        email: data.email,
+        status: data.status,
+        created: data.create_date,
+        owner: data.create_user,
+      }));
+      setLeadData(leadDataForTable);
+    };
+    initializeLeadTemplate();
+  }, [allCompnayData, allLeadData]);
 
   return (
     <HelmetProvider>
@@ -326,6 +410,7 @@ const Lead = () => {
                       id="add-task"
                       data-bs-toggle="modal"
                       data-bs-target="#add_lead"
+                      onClick={handleAddNewLeadClicked}
                     >
                       New Lead
                     </button>
@@ -462,7 +547,9 @@ const Lead = () => {
             </button>
             <div className="modal-content">
               <div className="modal-header">
-                <h4 className="modal-title text-center">Add Lead</h4>
+                <h4 className="modal-title text-center">
+                  <b>Add Lead</b>
+                </h4>
                 <button
                   type="button"
                   className="btn-close"
@@ -472,7 +559,7 @@ const Lead = () => {
               <div className="modal-body">
                 <div className="row">
                   <div className="col-md-12">
-                    <form>
+                    <form id="add_new_lead_form">
                       <h4>Lead Information</h4>
                       <div className="form-group row">
                         <div className="col-md-12">
@@ -480,46 +567,22 @@ const Lead = () => {
                             Name <span className="text-danger">*</span>
                           </label>
                         </div>
-                        <div className="col-md-4">
+                        <div className="col-md-6">
                           <input
                             className="form-control"
                             type="text"
-                            placeholder="Prefix"
-                            name="prefix"
+                            placeholder="Name"
+                            name="leads_name"
+                            onChange={handleLeadChange}
                           />
                         </div>
-                        <div className="col-md-4">
+                        <div className="col-md-2">
                           <input
-                            className="form-control"
-                            type="text"
-                            placeholder="First name"
-                            name="prefix-name"
+                            type="checkbox"
+                            name="is_keyman"
+                            onChange={handleLeadChange}
                           />
-                        </div>
-                        <div className="col-md-4">
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder="Last name"
-                            name="last-name"
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Organization</label>
-                          <select className="form-control">
-                            <option>Select</option>
-                          </select>
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Title</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            name="title"
-                            placeholder="Title"
-                          />
+                          <label className="col-form-label">Key man</label>
                         </div>
                       </div>
                       <div className="form-group row">
@@ -541,7 +604,7 @@ const Lead = () => {
                           </select>
                         </div>
                       </div>
-                      <div className="form-group row">
+                      {/* <div className="form-group row">
                         <div className="col-sm-6">
                           <label className="col-form-label">Lead Rating</label>
                           <input
@@ -551,19 +614,82 @@ const Lead = () => {
                             placeholder="Rating"
                           />
                         </div>
-                      </div>
-                      <h4>Additional Information</h4>
+                      </div> */}
+                      <h4>Company Information</h4>
                       <div className="form-group row">
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Organization</label>
+                          <Select options={companyData} onChange={handleSelectCompany} />
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Title</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Title"
+                            name="position"
+                            onChange={handleLeadChange}
+                          />
+                        </div>
+                      </div>
+                      <div className="form-group row">
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Department</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Department"
+                            name="department"
+                            onChange={handleLeadChange}
+                          />
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Group</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Group"
+                            name="group_"
+                            onChange={handleLeadChange}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="form-group row">
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Region </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Region"
+                            name="region"
+                            onChange={handleLeadChange}
+                          />
+                        </div>
+                      </div>
+                      <h4>Contact Information</h4>
+                      <div className="form-group row">
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Mobile</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Mobile"
+                            name="mobile_number"
+                            onChange={handleLeadChange}
+                          />
+                        </div>
                         <div className="col-sm-6">
                           <label className="col-form-label">Email</label>
                           <input
                             type="text"
                             className="form-control"
-                            name="email"
                             placeholder="Email"
+                            name="email"
+                            onChange={handleLeadChange}
                           />
                         </div>
-                        <div className="col-sm-6">
+                        {/* <div className="col-sm-6">
                           <label className="col-form-label">
                             Email Opted out
                           </label>
@@ -573,7 +699,7 @@ const Lead = () => {
                               <span className="checkmark" />
                             </label>
                           </div>
-                        </div>
+                        </div> */}
                       </div>
                       <div className="form-group row">
                         <div className="col-sm-6">
@@ -581,65 +707,37 @@ const Lead = () => {
                           <input
                             type="text"
                             className="form-control"
-                            name="phone"
                             placeholder="Phone"
+                            name="company_phone_number"
+                            onChange={handleLeadChange}
                           />
                         </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Mobile Phone</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            name="m-phone"
-                            placeholder="Phone"
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
                         <div className="col-sm-6">
                           <label className="col-form-label">Fax</label>
                           <input
                             type="text"
                             className="form-control"
-                            name="fax"
                             placeholder="Fax"
+                            name="company_fax_number"
+                            onChange={handleLeadChange}
                           />
                         </div>
+                      </div>
+                      <div className="form-group row">
                         <div className="col-sm-6">
                           <label className="col-form-label">Website</label>
                           <input
                             type="text"
                             className="form-control"
-                            name="website"
                             placeholder="Website"
+                            name="homepage"
+                            onChange={handleLeadChange}
                           />
                         </div>
                       </div>
-                      <div className="form-group row">
+                      {/* <div className="form-group row">
                         <div className="col-sm-6">
-                          <label className="col-form-label">Industry</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            name="assistant-phone"
-                            placeholder="Industry"
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">
-                            Number of Employees
-                          </label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            name="employees"
-                            placeholder="Number of Employees"
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Lead Source</label>
+                          <label className="col-form-label">Sales Resource</label>
                           <select className="form-control">
                             <option>Web</option>
                             <option>Phone Enquiry</option>
@@ -648,8 +746,8 @@ const Lead = () => {
                             <option>Other</option>
                           </select>
                         </div>
-                      </div>
-                      <h4>Address Information</h4>
+                      </div> */}
+                      {/* <h4>Address Information</h4>
                       <div className="form-group row">
                         <div className="col-sm-12">
                           <label className="col-form-label">
@@ -698,21 +796,48 @@ const Lead = () => {
                             <option>Japan</option>
                           </select>
                         </div>
-                      </div>
-                      <h4>Description Information</h4>
+                      </div> */}
+                      <h4>Additional Information</h4>
                       <div className="form-group row">
-                        <div className="col-sm-12">
-                          <label className="col-form-label">Description </label>
-                          <textarea
+                        <div className="col-sm-6">
+                          <label className="col-form-label">
+                            Sales Resource{" "}
+                          </label>
+                          <input
+                            type="text"
                             className="form-control"
-                            rows={3}
-                            id="description"
-                            placeholder="Description"
-                            defaultValue={""}
+                            placeholder="Sales Resource"
+                            name="sales_resource"
+                            onChange={handleLeadChange}
+                          />
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">
+                            Application Engineer
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Application Engineer"
+                            name="application_engineer"
+                            onChange={handleLeadChange}
                           />
                         </div>
                       </div>
-                      <h4>Tag Information</h4>
+                      <div className="form-group row">
+                        <div className="col-sm-12">
+                          <label className="col-form-label">Status</label>
+                          <textarea
+                            className="form-control"
+                            rows={3}
+                            placeholder="Status"
+                            defaultValue={""}
+                            name="status"
+                            onChange={handleLeadChange}
+                          />
+                        </div>
+                      </div>
+                      {/* <h4>Tag Information</h4>
                       <div className="form-group row">
                         <div className="col-sm-12">
                           <label className="col-form-label">Tag List</label>
@@ -733,11 +858,13 @@ const Lead = () => {
                             <option>Private Task</option>
                           </select>
                         </div>
-                      </div>
+                      </div> */}
                       <div className="text-center py-3">
                         <button
                           type="button"
                           className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                          data-bs-dismiss="modal"
+                          onClick={handleAddNewLead}
                         >
                           Save
                         </button>
@@ -745,6 +872,7 @@ const Lead = () => {
                         <button
                           type="button"
                           className="btn btn-secondary btn-rounded"
+                          data-bs-dismiss="modal"
                         >
                           Cancel
                         </button>

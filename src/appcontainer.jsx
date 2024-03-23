@@ -196,7 +196,7 @@ const AppUniversal = (props) => {
       removeCookie('myLationCrmAuthToken');
       history.push("/login");
     }
-  }, [cookies.myLationCrmAuthToken]);
+  }, []);
 
   const url = props.location.pathname.split("/")[1];
   const exclusionArray = [
