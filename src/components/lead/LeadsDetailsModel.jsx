@@ -91,7 +91,7 @@ const LeadsDetailsModel = () => {
                   </div>
                   <div>
                     <p className="mb-0">System User</p>
-                    <span className="modal-title">{selectedLead.leads_name}</span>
+                    <span className="modal-title">{selectedLead.lead_name}</span>
                     <span className="rating-star">
                       <i className="fa fa-star" aria-hidden="true" />
                     </span>
@@ -315,19 +315,19 @@ const LeadsDetailsModel = () => {
                                     <tbody>
                                       <tr>
                                         <td className="border-0">Name</td>
-                                        { handleCheckEditState("leads_name") ? (
+                                        { handleCheckEditState("lead_name") ? (
                                           <>
                                             <td className="border-0">
                                               <input
                                                 type="text"
                                                 placeholder="Lead Name"
-                                                name="leads_name"
-                                                defaultValue={selectedLead.leads_name}
+                                                name="lead_name"
+                                                defaultValue={selectedLead.lead_name}
                                                 onChange={handleEditing}
                                               />
                                             </td>
                                             <td className="border-0">
-                                              <div onClick={() => {handleEndEdit("leads_name");}}>
+                                              <div onClick={() => {handleEndEdit("lead_name");}}>
                                                 <SaveAlt />
                                               </div>
                                             </td>
@@ -335,10 +335,10 @@ const LeadsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td className="border-0">
-                                              {selectedLead.leads_name}
+                                              {selectedLead.lead_name}
                                             </td>
                                             <td className="border-0">
-                                              <div onClick={() => {handleStartEdit("leads_name");}}>
+                                              <div onClick={() => {handleStartEdit("lead_name");}}>
                                                 <Edit />
                                               </div>
                                             </td>

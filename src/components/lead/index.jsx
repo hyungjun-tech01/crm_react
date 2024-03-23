@@ -48,7 +48,7 @@ const Lead = () => {
 
   const handleAddNewLead = useCallback(()=>{
     // Check data if they are available
-    if(leadChange.leads_name === null || leadChange.leads_name === '') return;
+    if(leadChange.lead_name === null || leadChange.lead_name === '') return;
 
     const newLeadData = {
       ...leadChange,
@@ -87,7 +87,7 @@ const Lead = () => {
   const columns = [
     {
       title: "Full Name",
-      dataIndex: "leads_name",
+      dataIndex: "lead_name",
       render: (text, record) => (
         <>
           <a href="#">
@@ -100,7 +100,7 @@ const Lead = () => {
           </a>
         </>
       ),
-      sorter: (a, b) => a.leads_name.length - b.leads_name.length,
+      sorter: (a, b) => a.lead_name.length - b.lead_name.length,
     },
     {
       title: "Title",
@@ -562,7 +562,7 @@ const Lead = () => {
                             className="form-control"
                             type="text"
                             placeholder="Name"
-                            name="leads_name"
+                            name="lead_name"
                             onChange={handleLeadChange}
                           />
                         </div>
