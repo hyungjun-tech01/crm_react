@@ -48,7 +48,7 @@ const Lead = () => {
 
   const handleAddNewLead = useCallback(()=>{
     // Check data if they are available
-    if(leadChange.leads_name === null || leadChange.leads_name === '') return;
+    if(leadChange.lead_name === null || leadChange.lead_name === '') return;
 
     const newLeadData = {
       ...leadChange,
@@ -77,8 +77,8 @@ const Lead = () => {
         company_code: selected.company_code,
         company_name: selected.company_name,
         company_name_en: selected.company_name_en,
-        company_zip_code: selected.company_zip_code,
-        company_address: selected.company_address,
+        company_zip_code: (leadChange.company_zip_code !== null ? leadChange.company_zip_code : selected.company_zip_code),
+        company_address: (leadChange.company_address !== null ? leadChange.company_address : selected.company_address),
       };
       setLeadChange(tempLeadChange);
     // };
@@ -87,7 +87,7 @@ const Lead = () => {
   const columns = [
     {
       title: "Full Name",
-      dataIndex: "leads_name",
+      dataIndex: "lead_name",
       render: (text, record) => (
         <>
           <a href="#">
@@ -100,7 +100,7 @@ const Lead = () => {
           </a>
         </>
       ),
-      sorter: (a, b) => a.leads_name.length - b.leads_name.length,
+      sorter: (a, b) => a.lead_name.length - b.lead_name.length,
     },
     {
       title: "Title",
@@ -552,27 +552,25 @@ const Lead = () => {
                     <form id="add_new_lead_form">
                       <h4>Lead Information</h4>
                       <div className="form-group row">
-                        <div className="col-md-12">
-                          <label className="col-form-label">
-                            Name <span className="text-danger">*</span>
-                          </label>
-                        </div>
-                        <div className="col-md-6">
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Name <span className="text-danger">*</span></label>
                           <input
-                            className="form-control"
                             type="text"
+                            className="form-control"
                             placeholder="Name"
-                            name="leads_name"
+                            name="lead_name"
                             onChange={handleLeadChange}
                           />
                         </div>
-                        <div className="col-md-2">
+                        <div className="col-sm-6">
+                          <label className="col-form-label">is Keyman</label>
                           <input
-                            type="checkbox"
+                            type="text"
+                            className="form-control"
+                            placeholder="Is Keyman"
                             name="is_keyman"
                             onChange={handleLeadChange}
                           />
-                          <label className="col-form-label">Key man</label>
                         </div>
                       </div>
                       <div className="form-group row">

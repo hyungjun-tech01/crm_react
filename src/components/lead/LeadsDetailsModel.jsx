@@ -91,7 +91,7 @@ const LeadsDetailsModel = () => {
                   </div>
                   <div>
                     <p className="mb-0">System User</p>
-                    <span className="modal-title">{selectedLead.leads_name}</span>
+                    <span className="modal-title">{selectedLead.lead_name}</span>
                     <span className="rating-star">
                       <i className="fa fa-star" aria-hidden="true" />
                     </span>
@@ -315,19 +315,19 @@ const LeadsDetailsModel = () => {
                                     <tbody>
                                       <tr>
                                         <td className="border-0">Name</td>
-                                        { handleCheckEditState("leads_name") ? (
+                                        { handleCheckEditState("lead_name") ? (
                                           <>
                                             <td className="border-0">
                                               <input
                                                 type="text"
                                                 placeholder="Lead Name"
-                                                name="leads_name"
-                                                defaultValue={selectedLead.leads_name}
+                                                name="lead_name"
+                                                defaultValue={selectedLead.lead_name}
                                                 onChange={handleEditing}
                                               />
                                             </td>
                                             <td className="border-0">
-                                              <div onClick={() => {handleEndEdit("leads_name");}}>
+                                              <div onClick={() => {handleEndEdit("lead_name");}}>
                                                 <SaveAlt />
                                               </div>
                                             </td>
@@ -335,10 +335,10 @@ const LeadsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td className="border-0">
-                                              {selectedLead.leads_name}
+                                              {selectedLead.lead_name}
                                             </td>
                                             <td className="border-0">
-                                              <div onClick={() => {handleStartEdit("leads_name");}}>
+                                              <div onClick={() => {handleStartEdit("lead_name");}}>
                                                 <Edit />
                                               </div>
                                             </td>
@@ -442,36 +442,196 @@ const LeadsDetailsModel = () => {
                                         )}
                                       </tr>
                                       <tr>
-                                        <td>Lead Status</td>
-                                        <td>OPEN - NotContacted</td>
+                                        <td>is KeyMan?</td>
+                                        { handleCheckEditState("is_keyman") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="is KeyMan"
+                                                name="is_keyman"
+                                                defaultValue={selectedLead.is_keyman}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("is_keyman");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                          ) : (
+                                          <>
+                                            <td>
+                                              {selectedLead.is_keyman}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("is_keyman");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
                                       </tr>
                                       <tr>
-                                        <td>User Responsible</td>
-                                        <td>Williams</td>
+                                        <td>Group</td>
+                                        { handleCheckEditState("group_") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Group"
+                                                name="group_"
+                                                defaultValue={selectedLead.group_}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td >
+                                              <div onClick={() => {handleEndEdit("group_");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedLead.group_}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("group_");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
                                       </tr>
                                       <tr>
-                                        <td>Link Email Address</td>
-                                        <td>abc@gmail.com</td>
+                                        <td>Region</td>
+                                        { handleCheckEditState("region") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Region"
+                                                name="region"
+                                                defaultValue={selectedLead.region}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td >
+                                              <div onClick={() => {handleEndEdit("region");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedLead.region}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("region");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
                                       </tr>
                                       <tr>
-                                        <td>Lead Owner</td>
-                                        <td>John Doe</td>
+                                        <td>Sales Resource</td>
+                                        { handleCheckEditState("sales_resource") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="date"
+                                                placeholder="Created Date"
+                                                name="sales_resource"
+                                                defaultValue={selectedLead.sales_resource}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td >
+                                              <div onClick={() => {handleEndEdit("sales_resource");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedLead.sales_resource}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("sales_resource");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Application Engineer</td>
+                                        { handleCheckEditState("application_engineer") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Application Engineer"
+                                                name="application_engineer"
+                                                defaultValue={selectedLead.application_engineer}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td >
+                                              <div onClick={() => {handleEndEdit("application_engineer");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedLead.application_engineer}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("application_engineer");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
                                       </tr>
                                       <tr>
                                         <td>Lead Created</td>
-                                        <td>03-Jun-20 1:14 AM</td>
-                                      </tr>
-                                      <tr>
-                                        <td>Date of Last Activity</td>
-                                        <td>09/01/2020</td>
-                                      </tr>
-                                      <tr>
-                                        <td>Date of Next Activity</td>
-                                        <td>09/01/2021</td>
-                                      </tr>
-                                      <tr>
-                                        <td>Lead Rating</td>
-                                        <td>0</td>
+                                        { handleCheckEditState("create_date") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="date"
+                                                placeholder="Created Date"
+                                                name="create_date"
+                                                defaultValue={selectedLead.create_date}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td >
+                                              <div onClick={() => {handleEndEdit("create_date");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedLead.create_date}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("create_date");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
                                       </tr>
                                     </tbody>
                                   </table>
@@ -480,7 +640,7 @@ const LeadsDetailsModel = () => {
                             </div>
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Additional Information" key="1">
+                                <Panel header="Contact Information" key="1">
                                   <table className="table">
                                     <tbody>
                                       <tr>
@@ -680,6 +840,38 @@ const LeadsDetailsModel = () => {
                                             </td>
                                             <td className="border-0">
                                               <div onClick={() => {handleStartEdit("company_address");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Postal Code</td>
+                                        { handleCheckEditState("company_zip_code") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Postal Code"
+                                                name="company_zip_code"
+                                                defaultValue={selectedLead.company_zip_code}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("company_zip_code");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedLead.company_zip_code}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("company_zip_code");}}>
                                                 <Edit />
                                               </div>
                                             </td>

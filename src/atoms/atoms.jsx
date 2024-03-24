@@ -50,7 +50,7 @@ export const atomAllCompanies = atom({
 export const defaultLead = {
     lead_code: null,
     company_code: null,
-    leads_index: 0,
+    lead_index: 0,
     company_index: 0,
     lead_number: null,
     group_: null,
@@ -61,7 +61,7 @@ export const defaultLead = {
     company_address: null,
     company_phone_number: null,
     company_fax_number: null,
-    leads_name: null,
+    lead_name: null,
     is_keyman: null,
     department: null,
     position: null,
