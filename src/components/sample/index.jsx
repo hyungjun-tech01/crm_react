@@ -24,20 +24,47 @@ const Sample = () => {
   //     modify_user: 'crm 관리자12'
   //    }    
    
-  const info = {
-    action_type:'ADD'                ,   // 'ADD', 'UPDATE'
-    lead_code: '44A1DB07FD251E5088364163E54D5EAC'                 ,   // ADD일때는 들어오면 안되고, UPDATE일때는 반드시 들어와야
-    company_code: '44A1DB07FD251E5088364163E54D5EAC'                 , 
-    lead_name           :   '테스트리드---111'    ,
-    mobile_number        :   "1"    ,
-    email                :   "1"    ,
-    counter              :   1111   ,   // in integer 
-    application_engineer :   "1"    ,
-    modify_user: 'crm 관리자3',
-    status               :   "1"    };
+  // const info = {
+  //   action_type:'ADD'                ,   // 'ADD', 'UPDATE'
+  //   lead_code: '44A1DB07FD251E5088364163E54D5EAC'                 ,   // ADD일때는 들어오면 안되고, UPDATE일때는 반드시 들어와야
+  //   company_code: '44A1DB07FD251E5088364163E54D5EAC'                 , 
+  //   lead_name           :   '테스트리드---111'    ,
+  //   mobile_number        :   "1"    ,
+  //   email                :   "1"    ,
+  //   counter              :   1111   ,   // in integer 
+  //   application_engineer :   "1"    ,
+  //   modify_user: 'crm 관리자3',
+  //   status               :   "1"    };
+
+    // const info = {
+    //   action_type:'UPDATE'                ,   // 'ADD', 'UPDATE'
+    //   purchase_code  : "BA030572AC0AD04AB428E9ECDBCA08C5"     , 
+    //   company_code   :"AAAA"     ,
+    //   product_code   : "AAAA"     ,
+    //   product_type   :"AAAA"     ,
+    //   product_name   :"BBBBBBB"     ,
+    //   serial_number  :"1234"     ,
+    //   delivery_date  :"2024.03.01"      ,
+    //   MA_finish_date : "2025.10.10"      , 
+    //   price : "1110000",
+    //   quantity: "100"};    
+      const info = {
+        action_type:'ADD'                ,   // 'ADD', 'UPDATE'
+        transaction_code : ''            ,         
+        lead_code        : 'BBB'            ,          
+        publish_type     : 'AAA'         , 
+        ceo_name         : '정낙준'       ,         
+        publish_date     : '2024.03.01'            ,         
+        supply_price     : '9999.99'     ,   
+        tax_price        : '99.99'        , 
+        total_price      : '10099.99'     ,                
+        modify_user      : 'admin'        ,
+        transaction_contents : [{transaction_code:'aaa', product_name:null}, {transaction_code:'aaa', product_name:null}]     ,
+        currency          : 'KRW'                 
+      };          
 
     try{
-      const response = fetch(`${BASE_PATH}/modifyLead`,{
+      const response = fetch(`${BASE_PATH}/modifyTransaction`,{
           method: "POST", 
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify(info)
