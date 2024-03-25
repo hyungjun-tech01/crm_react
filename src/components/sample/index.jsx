@@ -48,7 +48,9 @@ const Sample = () => {
     //   MA_finish_date : "2025.10.10"      , 
     //   price : "1110000",
     //   quantity: "100"};    
-      const info = {
+    const v_txn_contents = [{transaction_code:"aaa", product_name:null}, {transaction_code:"aaa", product_name:null}];
+    const b_txn_contents = JSON.stringify(v_txn_contents);
+    const info = {
         action_type:'ADD'                ,   // 'ADD', 'UPDATE'
         transaction_code : ''            ,         
         lead_code        : 'BBB'            ,          
@@ -59,7 +61,7 @@ const Sample = () => {
         tax_price        : '99.99'        , 
         total_price      : '10099.99'     ,                
         modify_user      : 'admin'        ,
-        transaction_contents : [{transaction_code:'aaa', product_name:null}, {transaction_code:'aaa', product_name:null}]     ,
+        transaction_contents : b_txn_contents  ,
         currency          : 'KRW'                 
       };          
 
