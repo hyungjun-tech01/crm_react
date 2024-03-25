@@ -2,11 +2,12 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
+import Select from "react-select";
 import { CircleImg, SystemUser } from "../imagepath";
 import { Collapse } from "antd";
 import { Edit, SaveAlt } from "@mui/icons-material";
 import { atomCurrentLead, defaultLead } from "../../atoms/atoms";
-import { LeadRepo } from "../../repository/lead";
+import { LeadKeyManItems, LeadRepo } from "../../repository/lead";
 
 const LeadsDetailsModel = () => {
   const { Panel } = Collapse;
@@ -14,7 +15,9 @@ const LeadsDetailsModel = () => {
   const { modifyLead } = useRecoilValue(LeadRepo);
   const [editedValues, setEditedValues] = useState(null);
   const [cookies] = useCookies(["myLationCrmUserName"]);
+  const [ keymanLabel, setKeymanLabel] = useState(null);
 
+  // --- Funtions for Editing ---------------------------------
   const handleCheckEditState = useCallback((name) => {
     return editedValues !== null && name in editedValues;
   }, [editedValues]);
@@ -55,7 +58,42 @@ const LeadsDetailsModel = () => {
     }
   }, [editedValues, selectedLead]);
 
+  // --- Funtions for Select ---------------------------------
+  const handleSelectKeyMan = useCallback((value) => {
+    console.log('handleSelectKeyMan called!');
+    const selected = value.value;
+    const current = selectedLead.is_keyman;
+
+    const tempEditedValue = {
+      ...editedValues,
+      is_keyman: selected,
+    };
+
+    if (selected !== current) {
+      if (modifyLead(tempEditedValue)) {
+        console.log(`Succeeded to modify: ${selected}`);
+        delete tempEditedValue['is_keyman'];
+        setEditedValues(tempEditedValue);
+      } else {
+        console.alert("Fail to change value");
+        delete tempEditedValue['is_keyman'];
+        setEditedValues(tempEditedValue);
+      }
+    } else {
+      delete tempEditedValue['is_keyman'];
+      setEditedValues(tempEditedValue);
+    }
+  }, [editedValues, selectedLead]);
+
+  const handleGetKeyManLabel = useCallback((value) => {
+    const found = LeadKeyManItems.filter(item => item.value === value)[0];
+    if(found.label === 'NULL') setKeymanLabel('');
+    else setKeymanLabel(found.label);
+  }, []);
+
+
   useEffect(() => {
+    console.log('useEffect called!');
     if (editedValues === null) {
       const tempValues = {
         action_type: "UPDATE",
@@ -69,6 +107,8 @@ const LeadsDetailsModel = () => {
         lead_code: selectedLead.lead_code,
       };
       setEditedValues(tempValues);
+      // get keyman label
+      handleGetKeyManLabel(selectedLead.is_keyman);
     }
   }, [cookies.myLationCrmUserName, selectedLead]);
 
@@ -442,28 +482,21 @@ const LeadsDetailsModel = () => {
                                         )}
                                       </tr>
                                       <tr>
-                                        <td>is KeyMan?</td>
+                                        <td>KeyMan</td>
                                         { handleCheckEditState("is_keyman") ? (
                                           <>
                                             <td>
-                                              <input
-                                                type="text"
-                                                placeholder="is KeyMan"
-                                                name="is_keyman"
-                                                defaultValue={selectedLead.is_keyman}
-                                                onChange={handleEditing}
+                                              <Select options={LeadKeyManItems}
+                                                onChange={handleSelectKeyMan}
+                                                selected={selectedLead.is_keyman ? selectedLead.is_keyman : 'NULL'}
                                               />
                                             </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("is_keyman");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
+                                            <td>{" "}</td>
                                           </>
                                           ) : (
                                           <>
                                             <td>
-                                              {selectedLead.is_keyman}
+                                              {keymanLabel}
                                             </td>
                                             <td>
                                               <div onClick={() => {handleStartEdit("is_keyman");}}>
@@ -622,9 +655,7 @@ const LeadsDetailsModel = () => {
                                           </>
                                         ) : (
                                           <>
-                                            <td>
-                                              {selectedLead.create_date}
-                                            </td>
+                                            <td>{ new Date(selectedLead.create_date).toDateString() }</td>
                                             <td>
                                               <div onClick={() => {handleStartEdit("create_date");}}>
                                                 <Edit />

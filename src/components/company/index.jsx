@@ -70,7 +70,12 @@ const Company = () => {
 
   const handleAddNewCompany = useCallback(()=>{
     // Check data if they are available
-    if(companyChange.company_name === null || companyChange.company_name === '') return;
+    if(companyChange.company_name === null
+      || companyChange.company_name === '')
+    {
+      console.log("Company Name must be available!");
+      return;
+    };
 
     const newComData = {
       ...companyChange,
@@ -811,7 +816,6 @@ const Company = () => {
                         <button
                           type="button"
                           className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                          data-bs-dismiss="modal"
                           onClick={handleAddNewCompany}
                         >
                           Save

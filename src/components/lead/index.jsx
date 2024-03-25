@@ -10,7 +10,7 @@ import "../antdstyle.css";
 import LeadsDetailsModel from "./LeadsDetailsModel";
 import { BiUser } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
-import { LeadRepo } from "../../repository/lead";
+import { LeadKeyManItems, LeadRepo } from "../../repository/lead";
 import { atomAllCompanies, atomAllLeads, defaultLead } from "../../atoms/atoms";
 
 const Lead = () => {
@@ -38,7 +38,6 @@ const Lead = () => {
   }, []);
 
   const handleLeadChange = useCallback((e) => {
-    console.log('Change New value :', e.target.value);
     const modifiedData = {
       ...leadChange,
       [e.target.name]: e.target.value,
@@ -48,7 +47,13 @@ const Lead = () => {
 
   const handleAddNewLead = useCallback(()=>{
     // Check data if they are available
-    if(leadChange.lead_name === null || leadChange.lead_name === '') return;
+    if(leadChange.lead_name === null
+      || leadChange.lead_name === ''
+      || leadChange.company_code === null)
+    {
+      console.log("Company Name must be available!");
+      return;
+    };
 
     const newLeadData = {
       ...leadChange,
@@ -67,22 +72,28 @@ const Lead = () => {
     };
   },[leadChange]);
 
+  // --- Funtions for Select ---------------------------------
   const handleSelectCompany = useCallback((value)=>{
     const selected = value.value;
-    // const selected_idx = allCompnayData.findIndex(company => company.company_code === event.target.value);
-    // if(selected_idx !== -1) {
-    //   const selected = allCompnayData.at(selected_idx);
-      const tempLeadChange = {
-        ...leadChange,
-        company_code: selected.company_code,
-        company_name: selected.company_name,
-        company_name_en: selected.company_name_en,
-        company_zip_code: (leadChange.company_zip_code !== null ? leadChange.company_zip_code : selected.company_zip_code),
-        company_address: (leadChange.company_address !== null ? leadChange.company_address : selected.company_address),
-      };
-      setLeadChange(tempLeadChange);
-    // };
+    const tempLeadChange = {
+      ...leadChange,
+      company_code: selected.company_code,
+      company_name: selected.company_name,
+      company_name_en: selected.company_name_en,
+      company_zip_code: (leadChange.company_zip_code !== null ? leadChange.company_zip_code : selected.company_zip_code),
+      company_address: (leadChange.company_address !== null ? leadChange.company_address : selected.company_address),
+    };
+    setLeadChange(tempLeadChange);
   }, [leadChange]);
+
+  const handleSelectKeyMan = useCallback((value) => {
+    const selected = value.value;
+    const tempLeadChange = {
+      ...leadChange,
+      is_keyman : selected
+    };
+    setLeadChange(tempLeadChange);
+  },[leadChange]);
 
   const columns = [
     {
@@ -564,13 +575,7 @@ const Lead = () => {
                         </div>
                         <div className="col-sm-6">
                           <label className="col-form-label">is Keyman</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Is Keyman"
-                            name="is_keyman"
-                            onChange={handleLeadChange}
-                          />
+                          <Select options={LeadKeyManItems} onChange={handleSelectKeyMan} />
                         </div>
                       </div>
                       <div className="form-group row">
@@ -851,7 +856,6 @@ const Lead = () => {
                         <button
                           type="button"
                           className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                          data-bs-dismiss="modal"
                           onClick={handleAddNewLead}
                         >
                           Save

@@ -15,54 +15,61 @@ const CompanyDetailsModel = () => {
   const [editedValues, setEditedValues] = useState(null);
   const [cookies] = useCookies(["myLationCrmUserName"]);
 
-  const handleCheckEditState = useCallback(
-    (name) => {
-      return editedValues !== null && name in editedValues;
-    },
-    [editedValues]
-  );
-  const handleStartEdit = useCallback(
-    (name) => {
-      const temp_value = {
-        ...editedValues,
-        [name]: null,
+  // --- Funtions for Editing ---------------------------------
+  const handleCheckEditState = useCallback((name) => {
+    return editedValues !== null && name in editedValues;
+  }, [editedValues]);
+
+  const handleStartEdit = useCallback((name) => {
+    const temp_value = {
+      ...editedValues,
+      [name]: null,
+    };
+    setEditedValues(temp_value);
+  }, [editedValues]);
+
+  const handleEditing = useCallback((e) => {
+    const temp_value = {
+      ...editedValues,
+      [e.target.name]: e.target.value,
+    };
+    setEditedValues(temp_value);
+  }, [editedValues]);
+
+  const handleEndEdit = useCallback((name) => {
+    if (editedValues[name]) {
+      if(editedValues[name] === selectedCompany[name]){
+        const tempValue = {
+          ...editedValues,
+        };
+        delete tempValue[name];
+        setEditedValues(tempValue);
+        return;
       };
-      setEditedValues(temp_value);
-    },
-    [editedValues]
-  );
-  const handleEditing = useCallback(
-    (e) => {
-      const temp_value = {
-        ...editedValues,
-        [e.target.name]: e.target.value,
-      };
-      setEditedValues(temp_value);
-    },
-    [editedValues]
-  );
-  const handleEndEdit = useCallback(
-    (name) => {
-      if (editedValues[name]) {
-        if (modifyCompany(editedValues)) {
-          console.log(`Succeeded to modify: ${name}`);
-          const tempValue = {
-            ...editedValues,
-          };
-          delete tempValue[name];
-          setEditedValues(tempValue);
-        } else {
-          console.alert("Fail to change value");
-          const tempValue = {
-            ...editedValues,
-          };
-          delete tempValue[name];
-          setEditedValues(tempValue);
-        }
+
+      if (modifyCompany(editedValues)) {
+        console.log(`Succeeded to modify: ${name}`);
+        const tempValue = {
+          ...editedValues,
+        };
+        delete tempValue[name];
+        setEditedValues(tempValue);
+      } else {
+        console.alert("Fail to change value");
+        const tempValue = {
+          ...editedValues,
+        };
+        delete tempValue[name];
+        setEditedValues(tempValue);
       }
-    },
-    [editedValues, selectedCompany]
-  );
+    } else {
+      const tempValue = {
+        ...editedValues,
+      };
+      delete tempValue[name];
+      setEditedValues(tempValue);
+    }
+  }, [editedValues, selectedCompany]);
 
   useEffect(() => {
     if (editedValues === null){
