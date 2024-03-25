@@ -48,16 +48,16 @@ const Sample = () => {
     //   MA_finish_date : "2025.10.10"      , 
     //   price : "1110000",
     //   quantity: "100"};    
-    const v_txn_contents = [{transaction_code:"aaa", product_name:null}, {transaction_code:"aaa", product_name:null}];
+    const v_txn_contents = [{transaction_code:"bbbb", product_name:null}, {transaction_code:"aaa", product_name:null}];
     const b_txn_contents = JSON.stringify(v_txn_contents);
     const info = {
-        action_type:'ADD'                ,   // 'ADD', 'UPDATE'
-        transaction_code : ''            ,         
-        lead_code        : 'BBB'            ,          
+        action_type:'UPDATE'                ,   // 'ADD', 'UPDATE'
+        transaction_code : '4B246E110DC5E1948A0AFD4D45AC5081'            ,         
+        lead_code        : 'BBB'         ,          
         publish_type     : 'AAA'         , 
-        ceo_name         : '정낙준'       ,         
-        publish_date     : '2024.03.01'            ,         
-        supply_price     : '9999.99'     ,   
+        ceo_name         : '최형성'       ,         
+        publish_date     : '2024.04.01'   ,         
+        supply_price     : '9999.99'      ,   
         tax_price        : '99.99'        , 
         total_price      : '10099.99'     ,                
         modify_user      : 'admin'        ,
