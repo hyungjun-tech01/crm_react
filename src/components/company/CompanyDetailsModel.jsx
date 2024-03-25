@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useCookies } from "react-cookie";
 import { useRecoilValue } from "recoil";
+import { useCookies } from "react-cookie";
 import { Collapse } from "antd";
 import { Edit, SaveAlt } from "@mui/icons-material";
 import { C_logo, C_logo2, CircleImg } from "../imagepath";
@@ -79,7 +79,7 @@ const CompanyDetailsModel = () => {
       };
       setEditedValues(tempValues);
     };
-    if(selectedCompany && selectedCompany !== defaultCompany){
+    if(selectedCompany && (selectedCompany !== defaultCompany)){
       const tempValues = {
         ...editedValues,
         company_code: selectedCompany.company_code,

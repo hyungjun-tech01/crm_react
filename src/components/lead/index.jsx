@@ -45,13 +45,14 @@ const Lead = () => {
     setLeadChange(modifiedData);
   }, [leadChange]);
 
-  const handleAddNewLead = useCallback(()=>{
+  const handleAddNewLead = useCallback((event)=>{
     // Check data if they are available
     if(leadChange.lead_name === null
       || leadChange.lead_name === ''
       || leadChange.company_code === null)
     {
       console.log("Company Name must be available!");
+      event.preventDefault();
       return;
     };
 
@@ -66,11 +67,9 @@ const Lead = () => {
     const result = modifyLead(newLeadData);
     if(result){
       initializeLeadTemplate();
-      //close modal
-      const add_company_modal = document.querySelector("#add_lead");
-      add_company_modal.style.display = "none";
+      //close modal ?
     };
-  },[leadChange]);
+  },[cookies.myLationCrmUserName, initializeLeadTemplate, leadChange, modifyLead]);
 
   // --- Funtions for Select ---------------------------------
   const handleSelectCompany = useCallback((value)=>{

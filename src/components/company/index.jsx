@@ -68,7 +68,7 @@ const Company = () => {
     setCompanyChange(modifiedData);
   }, [companyChange]);
 
-  const handleAddNewCompany = useCallback(()=>{
+  const handleAddNewCompany = useCallback((event)=>{
     // Check data if they are available
     if(companyChange.company_name === null
       || companyChange.company_name === '')
@@ -88,10 +88,7 @@ const Company = () => {
     const result = modifyCompany(newComData);
     if(result){
       initializeCompanyTemplate();
-      //close modal
-      const add_company_modal = document.querySelector("#add_company");
-      add_company_modal.style.display = "none";
-
+      //close modal ?
     };
   },[companyChange, cookies.myLationCrmUserName, initializeCompanyTemplate, modifyCompany]);
 

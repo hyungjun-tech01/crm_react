@@ -40,6 +40,15 @@ const LeadsDetailsModel = () => {
 
   const handleEndEdit = useCallback((name) => {
     if (editedValues[name]) {
+      if(editedValues[name] === selectedLead[name]){
+        const tempValue = {
+          ...editedValues,
+        };
+        delete tempValue[name];
+        setEditedValues(tempValue);
+        return;
+      };
+
       if (modifyLead(editedValues)) {
         console.log(`Succeeded to modify: ${name}`);
         const tempValue = {
@@ -55,6 +64,12 @@ const LeadsDetailsModel = () => {
         delete tempValue[name];
         setEditedValues(tempValue);
       }
+    } else {
+      const tempValue = {
+        ...editedValues,
+      };
+      delete tempValue[name];
+      setEditedValues(tempValue);
     }
   }, [editedValues, selectedLead]);
 
@@ -83,7 +98,7 @@ const LeadsDetailsModel = () => {
       delete tempEditedValue['is_keyman'];
       setEditedValues(tempEditedValue);
     }
-  }, [editedValues, selectedLead]);
+  }, [editedValues, modifyLead, selectedLead.is_keyman]);
 
   const handleGetKeyManLabel = useCallback((value) => {
     const found = LeadKeyManItems.filter(item => item.value === value)[0];
@@ -100,8 +115,8 @@ const LeadsDetailsModel = () => {
         modify_user: cookies.myLationCrmUserName,
       };
       setEditedValues(tempValues);
-    }
-    if (selectedLead && selectedLead !== defaultLead) {
+    };
+    if (selectedLead && (selectedLead !== defaultLead)) {
       const tempValues = {
         ...editedValues,
         lead_code: selectedLead.lead_code,
@@ -110,7 +125,7 @@ const LeadsDetailsModel = () => {
       // get keyman label
       handleGetKeyManLabel(selectedLead.is_keyman);
     }
-  }, [cookies.myLationCrmUserName, selectedLead]);
+  }, [cookies.myLationCrmUserName, handleGetKeyManLabel, selectedLead]);
 
   return (
     <>
