@@ -46,7 +46,7 @@ export const atomAllCompanies = atom({
     default: [],
 });
 
-//----- Lead ----------------------
+//----- Lead ------------------------
 export const defaultLead = {
     lead_code: null,
     company_code: null,
@@ -85,5 +85,44 @@ export const atomCurrentLead = atom({
 
 export const atomAllLeads = atom({
     key: "allLeads",
+    default: [],
+});
+
+//----- Consulting ------------------------
+export const defaultConsulting = {
+    consulting_code : null,    
+    lead_code : null,         
+    receipt_date : null,      
+    receipt_time : null,      
+    consulting_type : null,   
+    receiver : null,          
+    sales_representati : null,
+    company_name : null,      
+    company_code : null,      
+    lead_name : null,         
+    department : null,        
+    position : null,          
+    phone_number : null,      
+    mobile_number : null,     
+    email : null,             
+    request_content : null,    
+    status : null,             
+    lead_time : null,          
+    action_content : null,     
+    request_type : null,       
+    create_date : null,               
+    creater : null,            
+    recent_user : null,        
+    modify_date : null,         
+    product_type : null,      
+};
+
+export const atomCurrentConsulting = atom({
+    key: "currentConsulting",
+    default: defaultConsulting,
+});
+
+export const atomAllConsultings = atom({
+    key: "allConsultings",
     default: [],
 });

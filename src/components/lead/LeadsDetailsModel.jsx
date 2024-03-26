@@ -591,8 +591,8 @@ const LeadsDetailsModel = () => {
                                           <>
                                             <td>
                                               <input
-                                                type="date"
-                                                placeholder="Created Date"
+                                                type="text"
+                                                placeholder="Sales Resource"
                                                 name="sales_resource"
                                                 defaultValue={selectedLead.sales_resource}
                                                 onChange={handleEditing}

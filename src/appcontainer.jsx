@@ -33,6 +33,8 @@ import VerticalForm from "./components/forms/vertical-form";
 import FormMask from "./components/forms/form-mask";
 import Project from "./components/project";
 import Projectkanbanview from "./components/project/kanbanview";
+//consultings
+import Consultings from "./components/consulting/Consultings.jsx";
 //activities
 import Reports from "./components/report";
 import Activities from "./components/activites";
@@ -241,6 +243,7 @@ const AppUniversal = (props) => {
           <Route path="/add-blog" exact component={AddBlog} />
           <Route path="/edit-blog" exact component={EditBlog} />
           <Route path="/categories" exact component={Categories} />
+          <Route path="/consultings" exact component={Consultings} />
 
           {/* Invoices */}
           <Route path="/invoices" exact component={Invoiceslist} />
