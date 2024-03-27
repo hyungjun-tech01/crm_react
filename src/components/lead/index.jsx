@@ -18,9 +18,10 @@ const Lead = () => {
   const allLeadData = useRecoilValue(atomAllLeads);
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
   const { loadAllLeads, modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
-  const [leadChange, setLeadChange] = useState(null);
-  const [companyData, setCompanyData] = useState([]);
-  const [cookies] = useCookies(["myLationCrmUserName"]);
+  const [ cookies ] = useCookies(["myLationCrmUserName"]);
+
+  const [ leadChange, setLeadChange ] = useState(null);
+  const [ companyData, setCompanyData ] = useState([]);
 
   // --- Functions used for Table ------------------------------
   const handleClickLeadName = useCallback((id) => {
@@ -28,10 +29,11 @@ const Lead = () => {
       setCurrentLead(id);
   }, [setCurrentLead]);
 
+  // --- Functions used for Add New Lead ------------------------------
   const handleAddNewLeadClicked = useCallback(() => {
     initializeLeadTemplate();
   }, []);
-  // --- Functions used for Add New Company ------------------------------
+
   const initializeLeadTemplate = useCallback(() => {
     setLeadChange({ ...defaultLead });
     document.querySelector("#add_new_lead_form").reset();
@@ -52,7 +54,6 @@ const Lead = () => {
       || leadChange.company_code === null)
     {
       console.log("Company Name must be available!");
-      event.preventDefault();
       return;
     };
 

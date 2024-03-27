@@ -15,21 +15,80 @@ import DealDetailsModel from "../deals/DealDetailsModel";
 import ProjectDetailsModel from "../project/ProjectDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+
 import { BiClipboard } from "react-icons/bi";
+import { CompanyRepo } from "../../repository/company";
+import { LeadRepo } from "../../repository/lead";
 import { ConsultingRepo } from "../../repository/consulting";
-import { atomAllConsultings, defaultConsulting } from "../../atoms/atoms";
+import { atomAllCompanies, atomAllConsultings, atomAllLeads, defaultConsulting } from "../../atoms/atoms";
+import { compareCompanyName } from "../../constants/sortings";
 
 const Consultings = () => {
+  const allCompnayData = useRecoilValue(atomAllCompanies);
+  const allLeadData = useRecoilValue(atomAllLeads);
   const allConsultingData = useRecoilValue(atomAllConsultings);
+  const { loadAllCompanies } = useRecoilValue(CompanyRepo);
+  const { loadAllLeads } = useRecoilValue(LeadRepo);
   const { loadAllConsultings, modifyConsulting, setCurrentConsulting } = useRecoilValue(ConsultingRepo);
-  const [selectedDate1, setSelectedDate1] = useState(new Date());
-  const [selectedDate2, setSelectedDate2] = useState(new Date());
+  const [ cookies ] = useCookies(["myLationCrmUserName"]);
+
+  const [ companyData, setCompanyData ] = useState(null);
+  const [ leadData, setLeadData ] = useState(null);
+  const [ consultingChange, setConsultingChange ] = useState(null);
+  
+  const [ selectedDate1, setSelectedDate1 ] = useState(new Date());
+  const [ selectedDate2, setSelectedDate2 ] = useState(new Date());
+
   const handleDateChange1 = (date) => {
     setSelectedDate1(date);
   };
   const handleDateChange2 = (date) => {
     setSelectedDate2(date);
   };
+
+  // --- Functions used for Add Consulting ------------------------------
+  const handleAddNewConsultingClicked = useCallback(() => {
+    initializeConsultingTemplate();
+  }, []);
+
+  const initializeConsultingTemplate = useCallback(() => {
+    setConsultingChange({ ...defaultConsulting });
+    document.querySelector("#add_new_consulting_form").reset();
+  }, []);
+
+  const handleConsultingChange = useCallback((e) => {
+    const modifiedData = {
+      ...consultingChange,
+      [e.target.name]: e.target.value,
+    };
+    setConsultingChange(modifiedData);
+  }, [consultingChange]);
+
+  const handleAddNewConsulting = useCallback((event)=>{
+    // Check data if they are available
+    if(consultingChange.lead_name === null
+      || consultingChange.lead_name === ''
+      || consultingChange.company_code === null)
+    {
+      console.log("Company Name must be available!");
+      return;
+    };
+
+    const newConsultingData = {
+      ...consultingChange,
+      action_type: 'ADD',
+      lead_number: '99999',// Temporary
+      counter: 0,
+      modify_user: cookies.myLationCrmUserName,
+    };
+    console.log(`[ handleAddNewConsulting ]`, newConsultingData);
+    const result = modifyConsulting(newConsultingData);
+    if(result){
+      initializeConsultingTemplate();
+      //close modal ?
+    };
+  },[cookies.myLationCrmUserName, initializeConsultingTemplate, consultingChange, modifyConsulting]);
+
   const data = [
     {
       id: 1,
@@ -81,21 +140,8 @@ const Consultings = () => {
 
   const columns = [
     {
-      title: "Subject",
-      dataIndex: "subject",
-      render: (text, record) => (
-        <>
-          <a href="#" data-bs-toggle="modal" data-bs-target="#add_activity">
-            {text}
-          </a>
-        </>
-      ),
-      sorter: (a, b) => a.subject.length - b.subject.length,
-    },
-
-    {
-      title: "Deal",
-      dataIndex: "deal",
+      title: "Company",
+      dataIndex: "company_name",
       render: (text, record) => (
         <>
           <a href="#" data-bs-toggle="modal" data-bs-target="#company-details">
@@ -103,7 +149,19 @@ const Consultings = () => {
           </a>
         </>
       ),
-      sorter: (a, b) => a.deal.length - b.deal.length,
+      sorter: (a, b) => compareCompanyName(a, b),
+    },
+    {
+      title: "Subject",
+      dataIndex: "subject",
+      render: (text, record) => (
+        <>
+          <a href="#" data-bs-toggle="modal" data-bs-target="#add_consulting">
+            {text}
+          </a>
+        </>
+      ),
+      sorter: (a, b) => a.subject.length - b.subject.length,
     },
     {
       title: "Contact Person",
@@ -155,6 +213,7 @@ const Consultings = () => {
       ),
     },
   ];
+
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
       console.log(
@@ -169,6 +228,27 @@ const Consultings = () => {
       className: "checkbox-red",
     }),
   };
+
+  useEffect(() => {
+    if (allCompnayData.length === 0) {
+      loadAllCompanies();
+    } else {
+      let temp_company_data = {};
+      allCompnayData.forEach((data) => {
+        temp_company_data[data.company_name] = data.company_code;
+
+      });
+      setCompanyData(companySubSet);
+    }
+    if (allLeadData.length === 0) {
+      loadAllLeads();
+    };
+    if (allConsultingData.length === 0) {
+      loadAllConsultings();
+    };
+    initializeConsultingTemplate();
+  }, [allCompnayData, allLeadData, allConsultingData]);
+
   return (
     <HelmetProvider>
       <div className="page-wrapper">
@@ -229,7 +309,8 @@ const Consultings = () => {
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                       id="add-task"
                       data-bs-toggle="modal"
-                      data-bs-target="#add_activity"
+                      data-bs-target="#add_consulting"
+                      onClick={handleAddNewConsultingClicked}
                     >
                       Add Activity
                     </button>
@@ -278,7 +359,7 @@ const Consultings = () => {
 
         <div
           className="modal right fade"
-          id="add_activity"
+          id="add_consulting"
           tabIndex={-1}
           role="dialog"
           aria-modal="true"
@@ -305,7 +386,7 @@ const Consultings = () => {
                 ></button>
               </div>
               <div className="modal-body">
-                <form className="forms-sampme">
+                <form className="forms-sampme" id="add_new_consulting_form">
                   <div className="row">
                     <div className="col-sm-12">
                       <div className="form-group">
