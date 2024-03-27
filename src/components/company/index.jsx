@@ -11,6 +11,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { BiData } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies, defaultCompany } from "../../atoms/atoms";
+import { compareCompanyName } from "../../constants/sortings";
 
 const Company = () => {
   const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
@@ -106,7 +107,7 @@ const Company = () => {
           </a>
         </>
       ),
-      sorter: (a, b) => a.company_number - b.company_number,
+      sorter: (a, b) => compareCompanyName(a, b),
     },
     {
       title: "Phone",
@@ -354,7 +355,7 @@ const Company = () => {
                       style={{ overflowX: "auto" }}
                       columns={columns}
                       dataSource={allCompanyData}
-                      rowKey={(record) => record.company_number}
+                      rowKey={(record) => record.company_code}
                     />
                   </div>
                 </div>

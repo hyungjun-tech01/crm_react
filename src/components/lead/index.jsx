@@ -441,7 +441,7 @@ const Lead = () => {
                       style={{ overflowX: "auto" }}
                       columns={columns}
                       dataSource={allLeadData}
-                      rowKey={(record) => record.lead_number}
+                      rowKey={(record) => record.lead_code}
                     />
                   </div>
                 </div>

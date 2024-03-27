@@ -27,8 +27,8 @@ const Consultings = () => {
   const allCompnayData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
   const allConsultingData = useRecoilValue(atomAllConsultings);
-  const { loadAllCompanies } = useRecoilValue(CompanyRepo);
-  const { loadAllLeads } = useRecoilValue(LeadRepo);
+  const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
+  const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
   const { loadAllConsultings, modifyConsulting, setCurrentConsulting } = useRecoilValue(ConsultingRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName"]);
 
@@ -89,62 +89,16 @@ const Consultings = () => {
     };
   },[cookies.myLationCrmUserName, initializeConsultingTemplate, consultingChange, modifyConsulting]);
 
-  const data = [
-    {
-      id: 1,
-      subject: "Call",
-      deal: "Ansanio tech",
-      contact: "Cravo Ansanio",
-      email: "anson@gmail.com",
-      phone: "9874565464",
-      companies: "Soylent Corp",
-    },
-
-    {
-      id: 2,
-      subject: "Call",
-      deal: "Ansanio tech",
-      contact: "Cravo Ansanio",
-      email: "johndoe@gmail.com",
-      phone: "9874565464",
-      companies: "Soylent Corp",
-    },
-    {
-      id: 3,
-      subject: "Call",
-      deal: "Lunch",
-      contact: "John Doe",
-      email: "johndoe@gmail.com",
-      phone: "9874565464",
-      companies: "Acme Corporation",
-    },
-    {
-      id: 4,
-      subject: "Call",
-      deal: "Lunch",
-      contact: "John Doe",
-      email: "johndoe@gmail.com",
-      phone: "9874565464",
-      companies: "Acme Corporation",
-    },
-    {
-      id: 5,
-      subject: "Phone",
-      deal: "Lunch",
-      contact: "John Doe",
-      email: "johndoe@gmail.com",
-      phone: "9874565464",
-      companies: "Acme Corporation",
-    },
-  ];
-
   const columns = [
     {
       title: "Company",
       dataIndex: "company_name",
       render: (text, record) => (
         <>
-          <a href="#" data-bs-toggle="modal" data-bs-target="#company-details">
+          <a href="#" data-bs-toggle="modal"
+            data-bs-target="#company-details"
+            onClick={()=>setCurrentCompany(record.company_code)}
+          >
             {text}
           </a>
         </>
@@ -152,46 +106,48 @@ const Consultings = () => {
       sorter: (a, b) => compareCompanyName(a, b),
     },
     {
-      title: "Subject",
-      dataIndex: "subject",
+      title: "Type",
+      dataIndex: "consulting_type",
       render: (text, record) => (
         <>
-          <a href="#" data-bs-toggle="modal" data-bs-target="#add_consulting">
+          <a href="#"
+            data-bs-toggle="modal"
+            data-bs-target="#add_consulting"
+            onClick={()=>setCurrentConsulting(record.consulting_code)}
+          >
             {text}
           </a>
         </>
       ),
-      sorter: (a, b) => a.subject.length - b.subject.length,
+      sorter: (a, b) => a.consulting_type.length - b.consulting_type.length,
     },
     {
-      title: "Contact Person",
-      dataIndex: "contact",
-      render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.contact.length - b.contact.length,
+      title: "Lead",
+      dataIndex: "lead_name",
+      render: (text, record) => (
+        <>
+          <a href="#"
+            data-bs-toggle="modal"
+            data-bs-target="#leads-details"
+            onClick={()=>setCurrentLead(record.lead_code)}
+          >
+            {text}
+          </a>
+        </>
+      ),
+      sorter: (a, b) => a.lead_name.length - b.lead_name.length,
     },
     {
-      title: "Email",
-      dataIndex: "email",
+      title: "Mobile",
+      dataIndex: "mobile_number",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.email.length - b.email.length,
+      sorter: (a, b) => a.mobile_number.length - b.mobile_number.length,
     },
     {
       title: "Phone",
-      dataIndex: "phone",
+      dataIndex: "phone_number",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.phone.length - b.phone.length,
-    },
-    {
-      title: "Companies",
-      dataIndex: "companies",
-      render: (text, record) => (
-        <>
-          <a href="#" data-bs-toggle="modal" data-bs-target="#company-details">
-            {text}
-          </a>
-        </>
-      ),
-      sorter: (a, b) => a.companies.length - b.companies.length,
+      sorter: (a, b) => a.phone_number.length - b.phone_number.length,
     },
     {
       title: "Action",
@@ -233,12 +189,11 @@ const Consultings = () => {
     if (allCompnayData.length === 0) {
       loadAllCompanies();
     } else {
-      let temp_company_data = {};
+      let company_subset = {};
       allCompnayData.forEach((data) => {
-        temp_company_data[data.company_name] = data.company_code;
-
+        company_subset[data.company_name] = data.company_code;
       });
-      setCompanyData(companySubSet);
+      setCompanyData(company_subset);
     }
     if (allLeadData.length === 0) {
       loadAllLeads();
@@ -253,7 +208,7 @@ const Consultings = () => {
     <HelmetProvider>
       <div className="page-wrapper">
         <Helmet>
-          <title>Activities - CRMS admin Template</title>
+          <title>Consultings - CRMS admin Template</title>
           <meta name="description" content="Reactify Blank Page" />
         </Helmet>
         {/* Page Content */}
@@ -267,7 +222,7 @@ const Consultings = () => {
                     <BiClipboard />
                   </i>
                 </span>{" "}
-                Activities{" "}
+                Consultings{" "}
               </h3>
             </div>
             <div className="col p-0 text-end">
@@ -275,7 +230,7 @@ const Consultings = () => {
                 <li className="breadcrumb-item">
                   <Link to="/">Dashboard</Link>
                 </li>
-                <li className="breadcrumb-item active">Activities</li>
+                <li className="breadcrumb-item active">Consultings</li>
               </ul>
             </div>
           </div>
@@ -295,10 +250,10 @@ const Consultings = () => {
                   <div className="dropdown-menu">
                     <a className="dropdown-item">Recently Viewed</a>
                     <a className="dropdown-item">Items I'm following</a>
-                    <a className="dropdown-item">All Activity</a>
-                    <a className="dropdown-item">All Closed Activity</a>
-                    <a className="dropdown-item">All Open Activity</a>
-                    <a className="dropdown-item">My Activity</a>
+                    <a className="dropdown-item">All Consultings</a>
+                    <a className="dropdown-item">All Closed Consultings</a>
+                    <a className="dropdown-item">All Open Consultings</a>
+                    <a className="dropdown-item">My Consultings</a>
                   </div>
                 </div>
               </div>
@@ -312,7 +267,7 @@ const Consultings = () => {
                       data-bs-target="#add_consulting"
                       onClick={handleAddNewConsultingClicked}
                     >
-                      Add Activity
+                      Add Consulting
                     </button>
                   </li>
                 </ul>
@@ -330,7 +285,7 @@ const Consultings = () => {
                         ...rowSelection,
                       }}
                       pagination={{
-                        total: data.length,
+                        total: allConsultingData.length,
                         showTotal: (total, range) =>
                           `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                         showSizeChanger: true,
@@ -340,8 +295,8 @@ const Consultings = () => {
                       style={{ overflowX: "auto" }}
                       columns={columns}
                       bordered
-                      dataSource={data}
-                      rowKey={(record) => record.id}
+                      dataSource={allConsultingData}
+                      rowKey={(record) => record.consulting_code}
                       // onChange={handleTableChange}
                     />
                   </div>
