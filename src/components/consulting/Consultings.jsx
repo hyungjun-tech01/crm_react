@@ -2,13 +2,13 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { SystemUser, CircleImg, C_logo, C_logo2 } from "../imagepath";
 import { Table } from "antd";
 import "antd/dist/reset.css";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
 import "../antdstyle.css";
+import ConsultingsDetailsModel from "./ConsultingsDetailsModel";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import DealDetailsModel from "../deals/DealDetailsModel";
@@ -112,7 +112,7 @@ const Consultings = () => {
         <>
           <a href="#"
             data-bs-toggle="modal"
-            data-bs-target="#add_consulting"
+            data-bs-target="#consultings-details"
             onClick={()=>setCurrentConsulting(record.consulting_code)}
           >
             {text}
@@ -556,6 +556,7 @@ const Consultings = () => {
             </div>
           </div>
         </div>
+        <ConsultingsDetailsModel />
       </div>
     </HelmetProvider>
   );

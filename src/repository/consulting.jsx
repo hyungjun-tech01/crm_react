@@ -63,8 +63,8 @@ export const ConsultingRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCurrentConsulting, modifiedConsulting);
-                    const foundIdx = allConsultings.findIndex(lead => 
-                        lead.lead_code === modifiedConsulting.lead_code);
+                    const foundIdx = allConsultings.findIndex(consulting => 
+                        consulting.consulting_code === modifiedConsulting.consulting_code);
                     if(foundIdx !== -1){
                         const updatedAllConsultings = [
                             ...allConsultings.slice(0, foundIdx),
@@ -74,7 +74,7 @@ export const ConsultingRepo = selector({
                         set(atomAllConsultings, updatedAllConsultings);
                         return true;
                     } else {
-                        console.log('\t[ modifyConsulting ] No specified lead is found');
+                        console.log('\t[ modifyConsulting ] No specified consulting is found');
                         return false;
                     }
                 }
@@ -84,10 +84,10 @@ export const ConsultingRepo = selector({
                 return false;
             };
         });
-        const setCurrentConsulting = getCallback(({set, snapshot}) => async (lead_code) => {
+        const setCurrentConsulting = getCallback(({set, snapshot}) => async (consulting_code) => {
             try{
                 const allConsultings = await snapshot.getPromise(atomAllConsultings);
-                const selected_arrary = allConsultings.filter(lead => lead.lead_code === lead_code);
+                const selected_arrary = allConsultings.filter(consulting => consulting.consulting_code === consulting_code);
                 if(selected_arrary.length > 0){
                     set(atomCurrentConsulting, selected_arrary[0]);
                 }

@@ -1,8 +1,8 @@
-const delete_text = ['(주)'];
+const delete_text = ['㈜','(주)'];
 
 const compareText = (text1, text2) => {
     // Check if character is korean
-    const min_length = text1.length > text2.length ? text1.length : text2.length;
+    const min_length = text1.length < text2.length ? text1.length : text2.length;
     for(let i = 0; i < min_length; i++){
         const char1_code = text1.at(i).charCodeAt();
         const char2_code = text2.at(i).charCodeAt();
@@ -21,7 +21,7 @@ const compareText = (text1, text2) => {
     };
 
     // At this point, they are same as far minimum length of names
-    if(min_length > text2.length) return true;
+    if(text1.length > min_length ) return true;
     return false;
 }
 
@@ -29,12 +29,12 @@ export const compareCompanyName = (name1, name2) => {
     // At first, remove text not used to sort from input name.
     let text1 = name1;
     delete_text.forEach(text => {
-        text1.replaceAll(text, '');
+        text1 = text1.replaceAll(text, '');
     });
 
     let text2 = name2;
     delete_text.forEach(text => {
-        text2.replaceAll(text, '');
+        text2 = text2.replaceAll(text, '');
     });
 
     return compareText(text1, text2);
