@@ -50,23 +50,21 @@ const Sample = () => {
     //   quantity: "100"};    
     const v_txn_contents = [{transaction_code:"bbbb", product_name:null}, {transaction_code:"aaa", product_name:null}];
     const b_txn_contents = JSON.stringify(v_txn_contents);
+
     const info = {
         action_type:'UPDATE'                ,   // 'ADD', 'UPDATE'
-        transaction_code : '4B246E110DC5E1948A0AFD4D45AC5081'            ,         
+        quotation_code : '495D3F942621ED9C8D0063292EC0240C'            ,         
         lead_code        : 'BBB'         ,          
-        publish_type     : 'AAA'         , 
-        ceo_name         : '최형성'       ,         
-        publish_date     : '2024.04.01'   ,         
-        supply_price     : '9999.99'      ,   
-        tax_price        : '99.99'        , 
-        total_price      : '10099.99'     ,                
-        modify_user      : 'admin'        ,
-        transaction_contents : b_txn_contents  ,
-        currency          : 'KRW'                 
+        region     : '성동구'   ,         
+        company_name     : '어니언'      ,   
+        quotation_date        : '2024.03.28'    ,
+        modify_user : 'hjkim',
+        quotation_amount : '9999.99' ,
+        quotation_contents :    b_txn_contents            
       };          
 
     try{
-      const response = fetch(`${BASE_PATH}/modifyTransaction`,{
+      const response = fetch(`${BASE_PATH}/modifyQuotation`,{
           method: "POST", 
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify(info)
