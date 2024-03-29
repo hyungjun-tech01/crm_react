@@ -51,20 +51,25 @@ const Sample = () => {
     const v_txn_contents = [{transaction_code:"bbbb", product_name:null}, {transaction_code:"aaa", product_name:null}];
     const b_txn_contents = JSON.stringify(v_txn_contents);
 
-    const info = {
+    // const info = {
+    //     action_type:'UPDATE'                ,   // 'ADD', 'UPDATE'
+    //     quotation_code : '495D3F942621ED9C8D0063292EC0240C'            ,         
+    //     lead_code        : 'BBB'         ,          
+    //     region     : '성동구'   ,         
+    //     company_name     : '어니언'      ,   
+    //     quotation_date        : '2024.03.28'    ,
+    //     modify_user : 'hjkim',
+    //     quotation_amount : '9999.99' ,
+    //     quotation_contents :    b_txn_contents            
+    //   };          
+    const info ={
         action_type:'UPDATE'                ,   // 'ADD', 'UPDATE'
-        quotation_code : '495D3F942621ED9C8D0063292EC0240C'            ,         
-        lead_code        : 'BBB'         ,          
-        region     : '성동구'   ,         
-        company_name     : '어니언'      ,   
-        quotation_date        : '2024.03.28'    ,
-        modify_user : 'hjkim',
-        quotation_amount : '9999.99' ,
-        quotation_contents :    b_txn_contents            
-      };          
-
+        company_code : '4B554B54422FD42C9A153EABB0CEEFDE' , 
+        company_name : '테스트컴퍼니_변경테스트'            ,         
+        modify_user : 'admin'
+    }
     try{
-      const response = fetch(`${BASE_PATH}/modifyQuotation`,{
+      const response = fetch(`${BASE_PATH}/modifyCompany`,{
           method: "POST", 
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify(info)
