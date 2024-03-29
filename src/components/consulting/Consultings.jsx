@@ -46,7 +46,7 @@ const Consultings = () => {
     setSelectedDate2(date);
   };
 
-  // --- Functions used for Add Consulting ------------------------------
+  // --- Functions used for Add New Consulting ------------------------------
   const handleAddNewConsultingClicked = useCallback(() => {
     initializeConsultingTemplate();
   }, []);
@@ -89,6 +89,7 @@ const Consultings = () => {
     };
   },[cookies.myLationCrmUserName, initializeConsultingTemplate, consultingChange, modifyConsulting]);
 
+  // --- Section for Table ------------------------------
   const columns = [
     {
       title: "Company",
@@ -103,7 +104,7 @@ const Consultings = () => {
           </a>
         </>
       ),
-      sorter: (a, b) => compareCompanyName(a, b),
+      sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
     {
       title: "Type",
