@@ -81,6 +81,7 @@ const ConsultingsDetailsModel = () => {
   }, []);
 
   useEffect(() => {
+    console.log('[ConsultingsDetailsModel] called!');
     if (editedValues === null) {
       const tempValues = {
         action_type: "UPDATE",

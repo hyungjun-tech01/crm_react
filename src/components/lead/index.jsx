@@ -12,7 +12,7 @@ import { BiUser } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { LeadKeyManItems, LeadRepo } from "../../repository/lead";
 import { atomAllCompanies, atomAllLeads, defaultLead } from "../../atoms/atoms";
-import { compareCompanyName } from "../../constants/functions";
+import { compareCompanyName, compareText } from "../../constants/functions";
 
 const Lead = () => {
   const allCompnayData = useRecoilValue(atomAllCompanies);
@@ -107,22 +107,28 @@ const Lead = () => {
               {text.charAt(0)}
             </span>
           </a>
-          <a href="#" data-bs-toggle="modal" data-bs-target="#leads-details" onClick={()=>{handleClickLeadName(record.lead_code);}}>
+          <a href="#"
+            data-bs-toggle="modal"
+            data-bs-target="#leads-details"
+            onClick={()=>{
+              console.log("[Lead] set current lead : ", record.lead_code);
+              setCurrentLead(record.lead_code);
+          }}>
             {text}
           </a>
         </>
       ),
-      sorter: (a, b) => a.lead_name - b.lead_name,
+      sorter: (a, b) => compareText(a.lead_name, b.lead_name),
     },
     {
       title: "Title",
       dataIndex: "position",
-      sorter: (a, b) => a.position - b.position,
+      sorter: (a, b) => compareText(a.position, b.position),
     },
     {
       title: "Department",
       dataIndex: "department",
-      sorter: (a, b) => a.department - b.department,
+      sorter: (a, b) => compareText(a.department, b.department),
     },
     {
       title: "Company",
@@ -134,19 +140,19 @@ const Lead = () => {
       title: "Mobile",
       dataIndex: "mobile_number",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.mobile_number - b.mobile_number,
+      sorter: (a, b) => compareText(a.mobile_number, b.mobile_number),
     },
     {
       title: "Email Address",
       dataIndex: "email",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.email - b.email,
+      sorter: (a, b) => compareText(a.email, b.email),
     },
     {
       title: "Lead Status",
       dataIndex: "status",
       render: (text, record) => <label>{text}</label>,
-      sorter: (a, b) => a.status.length - b.status.length,
+      sorter: (a, b) => compareText(a.status, b.status.length),
     },
     {
       title: "Lead Modified",
@@ -158,7 +164,7 @@ const Lead = () => {
       title: "Lead Sales",
       dataIndex: "sales_resource",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.owner - b.owner,
+      sorter: (a, b) => compareText(a.sales_resource, b.sales_resource),
     },
     // {
     //   title: "",

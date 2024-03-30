@@ -11,7 +11,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { BiData } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies, defaultCompany } from "../../atoms/atoms";
-import { compareCompanyName, formateDate } from "../../constants/functions";
+import { compareCompanyName, compareText, formateDate } from "../../constants/functions";
 
 const Company = () => {
   const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
@@ -109,7 +109,7 @@ const Company = () => {
       title: "Phone",
       dataIndex: "company_phone_number",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.company_phone_number - b.company_phone_number,
+      sorter: (a, b) => compareText(a.company_phone_number, b.company_phone_number),
     },
     {
       title: "Address",
@@ -121,13 +121,13 @@ const Company = () => {
       title: "Salesman",
       dataIndex: "sales_resource",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.sales_resource - b.sales_resource,
+      sorter: (a, b) => compareText(a.sales_resource, b.sales_resource),
     },
     {
       title: "Engineer",
       dataIndex: "application_engineer",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.application_engineer - b.application_engineer,
+      sorter: (a, b) => compareText(a.application_engineer, b.application_engineer),
     },
     // {
     //   title: "",

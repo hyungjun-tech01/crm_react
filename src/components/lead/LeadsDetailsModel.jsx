@@ -113,7 +113,7 @@ const LeadsDetailsModel = () => {
 
 
   useEffect(() => {
-    console.log('useEffect called!');
+    console.log('[LeadsDetailsModel] called!');
     if (editedValues === null) {
       const tempValues = {
         action_type: "UPDATE",
@@ -130,7 +130,7 @@ const LeadsDetailsModel = () => {
       // get keyman label
       handleGetKeyManLabel(selectedLead.is_keyman);
     }
-  }, [cookies.myLationCrmUserName, handleGetKeyManLabel, selectedLead]);
+  }, [cookies.myLationCrmUserName, selectedLead]);
 
   return (
     <>

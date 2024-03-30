@@ -47,6 +47,17 @@ export const compareCompanyName = (name1, name2) => {
     return 0;
 };
 
+export const compareText = (text1, text2) => {
+    if (text1 > text2) {
+        return 1;
+    }
+    if (text1 < text2) {
+    return -1;
+    }
+    // a must be equal to b
+    return 0;
+};
+
 export const formateDate = (date_value) => {
     const month = date_value.getMonth() + 1;
     const date = date_value.getDate();

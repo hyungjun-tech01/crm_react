@@ -14,6 +14,7 @@ import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import DealDetailsModel from "../deals/DealDetailsModel";
 import ProjectDetailsModel from "../project/ProjectDetailsModel";
+import LeadsDetailsModel from "../lead/LeadsDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -21,22 +22,24 @@ import { BiClipboard } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { ConsultingRepo, ConsultingTypes } from "../../repository/consulting";
-import { atomAllCompanies, atomAllConsultings, atomAllLeads, defaultConsulting } from "../../atoms/atoms";
-import { compareCompanyName, formateDate } from "../../constants/functions";
+import { atomAllCompanies, atomAllConsultings, atomAllLeads, atomCurrentCompany, atomCurrentLead, defaultConsulting } from "../../atoms/atoms";
+import { compareCompanyName, compareText, formateDate } from "../../constants/functions";
 
 const Consultings = () => {
   const allCompnayData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
   const allConsultingData = useRecoilValue(atomAllConsultings);
+  const currentCompany = useRecoilValue(atomCurrentCompany);
+  const currentLead = useRecoilValue(atomCurrentLead);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
   const { loadAllConsultings, modifyConsulting, setCurrentConsulting } = useRecoilValue(ConsultingRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName"]);
 
-  const [ companyData, setCompanyData ] = useState(null);
-  const [ leadData, setLeadData ] = useState([]);
-  const [ selectedLead, setSelectedLead] = useState(null);
+  const [ companiesForSelection, setCompaniesForSelection ] = useState([]);
+  const [ leadsForSelection, setLeadsForSelection] = useState([]);
   const [ consultingChange, setConsultingChange ] = useState(null);
+  const [ selectedLead, setSelectedLead ] = useState(null);
   
   const [ receiptDate, setReceiptDate ] = useState(new Date());
 
@@ -82,10 +85,10 @@ const Consultings = () => {
       phone_number: value.phone,
       email: value.email,
       company_name: value.company,
-      company_code: companyData[value.company],
+      company_code: companiesForSelection[value.company],
     };
     setConsultingChange(tempChanges);
-  }, [companyData, consultingChange]);
+  }, [companiesForSelection, consultingChange]);
 
   const handleSelectConsultingType = useCallback((value) => {
     const tempChanges = {
@@ -129,8 +132,10 @@ const Consultings = () => {
         <>
           <a href="#" data-bs-toggle="modal"
             data-bs-target="#company-details"
-            onClick={()=>setCurrentCompany(record.company_code)}
-          >
+            onClick={()=>{
+              console.log("[Consulting] set current company : ", record.company_code);
+              setCurrentCompany(record.company_code);
+          }}>
             {text}
           </a>
         </>
@@ -145,13 +150,15 @@ const Consultings = () => {
           <a href="#"
             data-bs-toggle="modal"
             data-bs-target="#consultings-details"
-            onClick={()=>setCurrentConsulting(record.consulting_code)}
-          >
+            onClick={()=>{
+              console.log("[Consulting] set current consulting : ", record.consulting_code);
+              setCurrentConsulting(record.consulting_code);
+          }}>
             {text}
           </a>
         </>
       ),
-      sorter: (a, b) => a.consulting_type.length - b.consulting_type.length,
+      sorter: (a, b) => compareText(a.consulting_type, b.consulting_type),
     },
     {
       title: "Lead",
@@ -161,25 +168,27 @@ const Consultings = () => {
           <a href="#"
             data-bs-toggle="modal"
             data-bs-target="#leads-details"
-            onClick={()=>setCurrentLead(record.lead_code)}
-          >
+            onClick={()=>{
+              console.log("[Consulting] set current lead : ", record.lead_code);
+              setCurrentLead(record.lead_code);
+          }}>
             {text}
           </a>
         </>
       ),
-      sorter: (a, b) => a.lead_name.length - b.lead_name.length,
+      sorter: (a, b) => compareText(a.lead_name, b.lead_name),
     },
     {
       title: "Mobile",
       dataIndex: "mobile_number",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.mobile_number.length - b.mobile_number.length,
+      sorter: (a, b) => compareText(a.mobile_number, b.mobile_number),
     },
     {
       title: "Phone",
       dataIndex: "phone_number",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.phone_number.length - b.phone_number.length,
+      sorter: (a, b) => compareText(a.phone_number, b.phone_number),
     },
     {
       title: "Action",
@@ -225,7 +234,7 @@ const Consultings = () => {
       allCompnayData.forEach((data) => {
         company_subset[data.company_name] = data.company_code;
       });
-      setCompanyData(company_subset);
+      setCompaniesForSelection(company_subset);
     }
     if (allLeadData.length === 0) {
       loadAllLeads();
@@ -255,13 +264,13 @@ const Consultings = () => {
         // a must be equal to b
         return 0;
       });
-      setLeadData(temp_data);
+      setLeadsForSelection(temp_data);
     };
     if (allConsultingData.length === 0) {
       loadAllConsultings();
     };
     initializeConsultingTemplate();
-  }, [allCompnayData, allLeadData, allConsultingData]);
+  }, [allCompnayData, allLeadData, allConsultingData, currentCompany, currentLead]);
 
   return (
     <HelmetProvider>
@@ -365,10 +374,6 @@ const Consultings = () => {
           </div>
           {/* /Content End */}
         </div>
-        <SystemUserModel />
-        <CompanyDetailsModel />
-        <DealDetailsModel />
-        <ProjectDetailsModel />
         {/* /Page Content */}
 
 {/*---- Start : Add New Consulting Modal-------------------------------------------------------------*/}
@@ -408,7 +413,7 @@ const Consultings = () => {
                       <label>Name</label>
                     </div>
                     <div className="col-sm-8">
-                      <Select options={leadData} onChange={(value) => { 
+                      <Select options={leadsForSelection} onChange={(value) => { 
                         handleSelectLead(value.value);
                         setSelectedLead({...value.value}); }}/>
                     </div>
@@ -626,6 +631,11 @@ const Consultings = () => {
             </div>
           </div>
         </div>
+        <SystemUserModel />
+        <CompanyDetailsModel />
+        <DealDetailsModel />
+        <ProjectDetailsModel />
+        <LeadsDetailsModel />
         <ConsultingsDetailsModel />
       </div>
     </HelmetProvider>
