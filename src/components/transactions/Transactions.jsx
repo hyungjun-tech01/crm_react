@@ -2,14 +2,13 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { SystemUser, CircleImg, C_logo, C_logo2 } from "../imagepath";
 import { Table } from "antd";
 import "antd/dist/reset.css";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
 import "../antdstyle.css";
-import ConsultingsDetailsModel from "./ConsultingsDetailsModel";
+import TransactionsDetailsModel from "./TransactionsDetailsModel";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import DealDetailsModel from "../deals/DealDetailsModel";
@@ -20,105 +19,75 @@ import "react-datepicker/dist/react-datepicker.css";
 import { BiClipboard } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
-import { ConsultingRepo, ConsultingTypes } from "../../repository/consulting";
-import { atomAllCompanies, atomAllConsultings, atomAllLeads, defaultConsulting } from "../../atoms/atoms";
-import { compareCompanyName, formateDate } from "../../constants/functions";
+import { TransactionRepo } from "../../repository/transaction";
+import { atomAllCompanies, atomAllTransactions, atomAllLeads, defaultTransaction } from "../../atoms/atoms";
+import { compareCompanyName } from "../../constants/sortings";
 
-const Consultings = () => {
+const Transactions = () => {
   const allCompnayData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
-  const allConsultingData = useRecoilValue(atomAllConsultings);
+  const allTransactionData = useRecoilValue(atomAllTransactions);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
-  const { loadAllConsultings, modifyConsulting, setCurrentConsulting } = useRecoilValue(ConsultingRepo);
+  const { loadAllTransactions, modifyTransaction, setCurrentTransaction } = useRecoilValue(TransactionRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName"]);
 
   const [ companyData, setCompanyData ] = useState(null);
-  const [ leadData, setLeadData ] = useState([]);
-  const [ selectedLead, setSelectedLead] = useState(null);
-  const [ consultingChange, setConsultingChange ] = useState(null);
+  const [ leadData, setLeadData ] = useState(null);
+  const [ transactionChange, setTransactionChange ] = useState(null);
   
-  const [ receiptDate, setReceiptDate ] = useState(new Date());
+  const [ selectedDate1, setSelectedDate1 ] = useState(new Date());
+  const [ selectedDate2, setSelectedDate2 ] = useState(new Date());
 
-  const handleReceiptDateChange = (date) => {
-    setReceiptDate(date);
-    const localDate = formateDate(date);
-    const localTime = date.toLocaleTimeString('ko-KR');
-    const tempChanges = {
-      ...consultingChange,
-      receipt_date: localDate,
-      receipt_time: localTime,
-    };
-    setConsultingChange(tempChanges);
+  const handleDateChange1 = (date) => {
+    setSelectedDate1(date);
+  };
+  const handleDateChange2 = (date) => {
+    setSelectedDate2(date);
   };
 
-  // --- Functions used for Add New Consulting ------------------------------
-  const handleAddNewConsultingClicked = useCallback(() => {
-    initializeConsultingTemplate();
+  // --- Functions used for Add New Transaction ------------------------------
+  const handleAddNewTransactionClicked = useCallback(() => {
+    initializeTransactionTemplate();
   }, []);
 
-  const initializeConsultingTemplate = useCallback(() => {
-    setConsultingChange({ ...defaultConsulting });
-    setSelectedLead(null);
-    document.querySelector("#add_new_consulting_form").reset();
+  const initializeTransactionTemplate = useCallback(() => {
+    setTransactionChange({ ...defaultTransaction });
+    document.querySelector("#add_new_transaction_form").reset();
   }, []);
 
-  const handleConsultingChange = useCallback((e) => {
+  const handleTransactionChange = useCallback((e) => {
     const modifiedData = {
-      ...consultingChange,
+      ...transactionChange,
       [e.target.name]: e.target.value,
     };
-    setConsultingChange(modifiedData);
-  }, [consultingChange]);
+    setTransactionChange(modifiedData);
+  }, [transactionChange]);
 
-  const handleSelectLead = useCallback((value) => {
-    const tempChanges = {
-      ...consultingChange,
-      lead_code: value.code,
-      lead_name: value.name,
-      department: value.department,
-      position: value.position,
-      mobile_number: value.mobile,
-      phone_number: value.phone,
-      email: value.email,
-      company_name: value.company,
-      company_code: companyData[value.company],
-    };
-    setConsultingChange(tempChanges);
-  }, [companyData, consultingChange]);
-
-  const handleSelectConsultingType = useCallback((value) => {
-    const tempChanges = {
-      ...consultingChange,
-      consulting_type: value.value,
-    };
-    setConsultingChange(tempChanges);
-  }, [consultingChange]);
-
-  const handleAddNewConsulting = useCallback((event)=>{
+  const handleAddNewTransaction = useCallback((event)=>{
     // Check data if they are available
-    if(consultingChange.lead_name === null
-      || consultingChange.lead_name === ''
-      || consultingChange.consulting_type === null
-    ) {
-      console.log("Necessary information isn't submitted!");
+    if(transactionChange.lead_name === null
+      || transactionChange.lead_name === ''
+      || transactionChange.company_code === null)
+    {
+      console.log("Company Name must be available!");
       return;
     };
 
-    const newConsultingData = {
-      ...consultingChange,
+    const newTransactionData = {
+      ...transactionChange,
       action_type: 'ADD',
       lead_number: '99999',// Temporary
       counter: 0,
       modify_user: cookies.myLationCrmUserName,
     };
-    console.log(`[ handleAddNewConsulting ]`, newConsultingData);
-    const result = modifyConsulting(newConsultingData);
+    console.log(`[ handleAddNewTransaction ]`, newTransactionData);
+    const result = modifyTransaction(newTransactionData);
     if(result){
-      initializeConsultingTemplate();
+      initializeTransactionTemplate();
       //close modal ?
     };
-  }, [cookies.myLationCrmUserName, initializeConsultingTemplate, consultingChange, modifyConsulting]);
+  },[cookies.myLationCrmUserName, initializeTransactionTemplate, transactionChange, modifyTransaction]);
 
   // --- Section for Table ------------------------------
   const columns = [
@@ -139,19 +108,19 @@ const Consultings = () => {
     },
     {
       title: "Type",
-      dataIndex: "consulting_type",
+      dataIndex: "transaction_type",
       render: (text, record) => (
         <>
           <a href="#"
             data-bs-toggle="modal"
-            data-bs-target="#consultings-details"
-            onClick={()=>setCurrentConsulting(record.consulting_code)}
+            data-bs-target="#transactions-details"
+            onClick={()=>setCurrentTransaction(record.transaction_code)}
           >
             {text}
           </a>
         </>
       ),
-      sorter: (a, b) => a.consulting_type.length - b.consulting_type.length,
+      sorter: (a, b) => a.transaction_type.length - b.transaction_type.length,
     },
     {
       title: "Lead",
@@ -229,45 +198,18 @@ const Consultings = () => {
     }
     if (allLeadData.length === 0) {
       loadAllLeads();
-    } else {
-      const temp_data = allLeadData.map(lead => {
-        return {
-          label : lead.lead_name,
-          value : {
-            code: lead.lead_code,
-            name: lead.lead_name,
-            department: lead.department,
-            position: lead.position,
-            mobile: lead.mobile_number,
-            phone: lead.phone_number,
-            email: lead.email,
-            company: lead.company_name,
-          }
-        }
-      });
-      temp_data.sort((a, b) => {
-        if (a.label > b.label) {
-          return 1;
-        }
-        if (a.label < b.label) {
-          return -1;
-        }
-        // a must be equal to b
-        return 0;
-      });
-      setLeadData(temp_data);
     };
-    if (allConsultingData.length === 0) {
-      loadAllConsultings();
+    if (allTransactionData.length === 0) {
+      loadAllTransactions();
     };
-    initializeConsultingTemplate();
-  }, [allCompnayData, allLeadData, allConsultingData]);
+    initializeTransactionTemplate();
+  }, [allCompnayData, allLeadData, allTransactionData]);
 
   return (
     <HelmetProvider>
       <div className="page-wrapper">
         <Helmet>
-          <title>Consultings - CRMS admin Template</title>
+          <title>Transactions - CRMS admin Template</title>
           <meta name="description" content="Reactify Blank Page" />
         </Helmet>
         {/* Page Content */}
@@ -281,7 +223,7 @@ const Consultings = () => {
                     <BiClipboard />
                   </i>
                 </span>{" "}
-                Consultings{" "}
+                Transactions{" "}
               </h3>
             </div>
             <div className="col p-0 text-end">
@@ -289,7 +231,7 @@ const Consultings = () => {
                 <li className="breadcrumb-item">
                   <Link to="/">Dashboard</Link>
                 </li>
-                <li className="breadcrumb-item active">Consultings</li>
+                <li className="breadcrumb-item active">Transactions</li>
               </ul>
             </div>
           </div>
@@ -309,10 +251,10 @@ const Consultings = () => {
                   <div className="dropdown-menu">
                     <a className="dropdown-item">Recently Viewed</a>
                     <a className="dropdown-item">Items I'm following</a>
-                    <a className="dropdown-item">All Consultings</a>
-                    <a className="dropdown-item">All Closed Consultings</a>
-                    <a className="dropdown-item">All Open Consultings</a>
-                    <a className="dropdown-item">My Consultings</a>
+                    <a className="dropdown-item">All Transactions</a>
+                    <a className="dropdown-item">All Closed Transactions</a>
+                    <a className="dropdown-item">All Open Transactions</a>
+                    <a className="dropdown-item">My Transactions</a>
                   </div>
                 </div>
               </div>
@@ -323,10 +265,10 @@ const Consultings = () => {
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                       id="add-task"
                       data-bs-toggle="modal"
-                      data-bs-target="#add_consulting"
-                      onClick={handleAddNewConsultingClicked}
+                      data-bs-target="#add_transaction"
+                      onClick={handleAddNewTransactionClicked}
                     >
-                      Add Consulting
+                      Add Transaction
                     </button>
                   </li>
                 </ul>
@@ -344,7 +286,7 @@ const Consultings = () => {
                         ...rowSelection,
                       }}
                       pagination={{
-                        total: allConsultingData.length,
+                        total: allTransactionData.length,
                         showTotal: (total, range) =>
                           `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                         showSizeChanger: true,
@@ -354,8 +296,8 @@ const Consultings = () => {
                       style={{ overflowX: "auto" }}
                       columns={columns}
                       bordered
-                      dataSource={allConsultingData}
-                      rowKey={(record) => record.consulting_code}
+                      dataSource={allTransactionData}
+                      rowKey={(record) => record.transaction_code}
                       // onChange={handleTableChange}
                     />
                   </div>
@@ -371,10 +313,9 @@ const Consultings = () => {
         <ProjectDetailsModel />
         {/* /Page Content */}
 
-{/*---- Start : Add New Consulting Modal-------------------------------------------------------------*/}
         <div
           className="modal right fade"
-          id="add_consulting"
+          id="add_transaction"
           tabIndex={-1}
           role="dialog"
           aria-modal="true"
@@ -393,7 +334,7 @@ const Consultings = () => {
             </button>
             <div className="modal-content">
               <div className="modal-header">
-                <h4 className="modal-title"><b>Add New Consulting</b></h4>
+                <h4 className="modal-title">Schedule an Activity</h4>
                 <button
                   type="button"
                   className="btn-close"
@@ -401,168 +342,160 @@ const Consultings = () => {
                 ></button>
               </div>
               <div className="modal-body">
-                <form className="forms-sampme" id="add_new_consulting_form">
-                  <h4>Lead Information</h4>
-                  <div className="form-group row">
-                    <div className="col-sm-4">
-                      <label>Name</label>
-                    </div>
-                    <div className="col-sm-8">
-                      <Select options={leadData} onChange={(value) => { 
-                        handleSelectLead(value.value);
-                        setSelectedLead({...value.value}); }}/>
-                    </div>
-                  </div>
-                  { (selectedLead !== null) &&
-                    <>
-                      <div className="form-group row">
-                        <div className="col-sm-12">
-                            <table className="table">
-                              <tbody>
-                                <tr>
-                                  <td>Department</td>
-                                  <td>{selectedLead.department}</td>
-                                </tr>
-                                <tr>
-                                  <td>Position</td>
-                                  <td>{selectedLead.position}</td>
-                                </tr>
-                                <tr>
-                                  <td>Mobile</td>
-                                  <td>{selectedLead.mobile}</td>
-                                </tr>
-                                <tr>
-                                  <td>Phone</td>
-                                  <td>{selectedLead.phone}</td>
-                                </tr>
-                                <tr>
-                                  <td>Email</td>
-                                  <td>{selectedLead.email}</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                        </div>
+                <form className="forms-sampme" id="add_new_transaction_form">
+                  <div className="row">
+                    <div className="col-sm-12">
+                      <div className="form-group">
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="deal-name"
+                          id="deal-name"
+                          defaultValue="Call"
+                        />
                       </div>
-                      <h4>Company Information</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label>Company Name</label>
-                        </div>
-                        <div className="col-sm-6">
-                          <label>{selectedLead.company}</label>
-                        </div>
-                      </div>
-                    </>}
-                  <h4>Consulting Information</h4>
-                  <div className="form-group row">
-                    <div className="col-sm-4">
-                      <label className="col-form-label">Type</label>
-                      <Select options={ConsultingTypes} onChange={handleSelectConsultingType} />
-                    </div>
-                    <div className="col-sm-4">
-                      <label className="col-form-label">Receipt</label>
-                        <div className="cal-icon">
-                          <DatePicker
-                            className="form-control"
-                            selected={receiptDate}
-                            onChange={handleReceiptDateChange}
-                            dateFormat="yyyy.MM.dd hh:mm:ss"
-                            showTimeSelect
+                      <div className="btn-group mb-3">
+                        <button type="button" className="btn btn-light">
+                          <i className="fa fa-phone" aria-hidden="true" />
+                        </button>
+                        <button type="button" className="btn btn-light">
+                          <i className="fa fa-users" aria-hidden="true" />
+                        </button>
+                        <button type="button" className="btn btn-light">
+                          <i className="fa fa-clock-o" aria-hidden="true" />
+                        </button>
+                        <button type="button" className="btn btn-light">
+                          <i className="fa fa-flag" aria-hidden="true" />
+                        </button>
+                        <button type="button" className="btn btn-light">
+                          <i
+                            className="fa fa-paper-plane-o"
+                            aria-hidden="true"
                           />
+                        </button>
+                        <button type="button" className="btn btn-light">
+                          <i className="fa fa-cutlery" aria-hidden="true" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="col-sm-12">
+                      <div className="form-group">
+                        <div className="row">
+                          <div className="col-md-3">
+                            <div className="cal-icon">
+                              <DatePicker
+                                className="form-control"
+                                selected={selectedDate1}
+                                onChange={handleDateChange1}
+                                dateFormat="dd/MM/yyyy"
+                                showDayMonthYearPicker
+                              />
+                            </div>
+                          </div>
+                          <div className="col-md-3">
+                            <select className="form-control">
+                              <option>02:00</option>
+                              <option>03:00</option>
+                            </select>
+                          </div>
+                          <div className="col-md-3">
+                            <select className="form-control">
+                              <option>02:00</option>
+                              <option>03:00</option>
+                            </select>
+                          </div>
+                          <div className="col-md-3">
+                            <div className="cal-icon">
+                              <DatePicker
+                                className="form-control"
+                                selected={selectedDate2}
+                                onChange={handleDateChange2}
+                                dateFormat="dd/MM/yyyy"
+                                showDayMonthYearPicker
+                              />
+                            </div>
+                          </div>
                         </div>
+                      </div>
                     </div>
-                    <div className="col-sm-4">
-                      <label className="col-form-label">Receiver</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Receiver"
-                        name="receiver"
-                        onChange={handleConsultingChange}
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group row">
-                    <div className="col-sm-6">
-                      <label className="col-form-label">Lead Time</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Lead Time"
-                        name="lead_time"
-                        onChange={handleConsultingChange}
-                      />
-                    </div>
-                    <div className="col-sm-6">
-                      <label className="col-form-label">Request Type</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Request Type"
-                        name="request_type"
-                        onChange={handleConsultingChange}
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group row">
                     <div className="col-sm-12">
-                      <label className="col-form-label">Request Content</label>
-                      <textarea
-                        className="form-control"
-                        rows={2}
-                        placeholder="Request Content"
-                        name="request_content"
-                        defaultValue={""}
-                        onChange={handleConsultingChange}
-                      />
+                      <div className="form-group">
+                        <div className="row m-0">
+                          <p>
+                            Add <a>Guests</a>, <a>Location</a>,{" "}
+                            <a>Description</a>
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="form-group row">
                     <div className="col-sm-12">
-                      <label className="col-form-label">Action Content</label>
-                      <textarea
-                        className="form-control"
-                        rows={2}
-                        placeholder="Action Content"
-                        name="action_content"
-                        defaultValue={""}
-                        onChange={handleConsultingChange}
-                      />
+                      <div className="form-group">
+                        <select className="form-control">
+                          <option>Busy</option>
+                          <option>Free</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="col-sm-12">
+                      <div className="form-group">
+                        <textarea
+                          className="form-control mb-2"
+                          rows={3}
+                          placeholder="Notes"
+                          defaultValue={""}
+                        />
+                        <span className="pt-2">
+                          Notes are private and visible only within your
+                          Pipedrive account
+                        </span>
+                      </div>
+                    </div>
+                    <div className="col-sm-12">
+                      <div className="form-group">
+                        <select className="form-control">
+                          <option>John Doe</option>
+                          <option>John Smith</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="col-sm-12">
+                      <div className="form-group">
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Deal or Transaction"
+                        />
+                      </div>
+                    </div>
+                    <div className="col-sm-12">
+                      <div className="form-group">
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="People"
+                        />
+                      </div>
+                    </div>
+                    <div className="col-sm-12">
+                      <div className="form-group">
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Organization"
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div className="form-group row">
-                    <div className="col-sm-6">
-                      <label className="col-form-label">Sales Representative</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Sales Representative"
-                        name="sales_representati"
-                        onChange={handleConsultingChange}
-                      />
-                    </div>
-                    <div className="col-sm-6">
-                      <label className="col-form-label">Status</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Status"
-                        name="status"
-                        onChange={handleConsultingChange}
-                      />
-                    </div>
-                  </div>
-                  {/* <div className="submit-section mt-0">
+                  <div className="submit-section mt-0">
                     <div className="custom-check mb-4">
                       <input type="checkbox" id="mark-as-done" />
                       <label htmlFor="mark-as-done">Mark as Done</label>
                     </div>
-                  </div> */}
+                  </div>
                   <div className="text-center">
                     <button
                       type="button"
                       className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                      onClick={handleAddNewConsulting}
                     >
                       Save
                     </button>
@@ -570,7 +503,6 @@ const Consultings = () => {
                     <button
                       type="button"
                       className="btn btn-secondary btn-rounded"
-                      data-bs-dismiss="modal"
                     >
                       Cancel
                     </button>
@@ -580,7 +512,6 @@ const Consultings = () => {
             </div>
           </div>
         </div>
-{/*---- End : Add New Consulting Modal-------------------------------------------------------*/}
         {/* modal */}
         {/* cchange pipeline stage Modal */}
         <div className="modal" id="pipeline-stage">
@@ -626,10 +557,10 @@ const Consultings = () => {
             </div>
           </div>
         </div>
-        <ConsultingsDetailsModel />
+        <TransactionsDetailsModel />
       </div>
     </HelmetProvider>
   );
 };
 
-export default Consultings;
+export default Transactions;

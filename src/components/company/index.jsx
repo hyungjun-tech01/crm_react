@@ -11,7 +11,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { BiData } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies, defaultCompany } from "../../atoms/atoms";
-import { compareCompanyName } from "../../constants/sortings";
+import { compareCompanyName, formateDate } from "../../constants/functions";
 
 const Company = () => {
   const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
@@ -53,11 +53,7 @@ const Company = () => {
     if(e.target.name === 'establishment_date' || e.target.name === 'closure_date'){
       const date_value = new Date(e.target.value);
       if(!isNaN(date_value.valueOf())){
-        const month = date_value.getMonth() + 1;
-        const date = date_value.getDate();
-        input_data = date_value.getFullYear()
-          + "." + (month < 10 ? "0" + month.toString() : month.toString())
-          + "." + (date < 10 ? "0" + date.toString() : date.toString());
+        input_data = formateDate(date_value);
       };
     } else {
       input_data = e.target.value;
@@ -107,7 +103,7 @@ const Company = () => {
           </a>
         </>
       ),
-      sorter: (a, b) => compareCompanyName(a, b),
+      sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
     {
       title: "Phone",
@@ -125,13 +121,13 @@ const Company = () => {
       title: "Salesman",
       dataIndex: "sales_resource",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.sales_resource.length - b.sales_resource.length,
+      sorter: (a, b) => a.sales_resource - b.sales_resource,
     },
     {
       title: "Engineer",
       dataIndex: "application_engineer",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.application_engineer.length - b.application_engineer.length,
+      sorter: (a, b) => a.application_engineer - b.application_engineer,
     },
     // {
     //   title: "",

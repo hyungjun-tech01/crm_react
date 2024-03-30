@@ -48,34 +48,37 @@ export const atomAllCompanies = atom({
 
 //----- Lead ------------------------
 export const defaultLead = {
+    //-----Lead info --------------
     lead_code: null,
-    company_code: null,
     lead_index: 0,
-    company_index: 0,
     lead_number: null,
-    group_: null,
-    sales_resource: null,
-    region: null,
-    company_name: null,
-    company_zip_code: null,
-    company_address: null,
-    company_phone_number: null,
-    company_fax_number: null,
     lead_name: null,
     is_keyman: null,
     department: null,
     position: null,
     mobile_number: null,
-    company_name_en: null,
     email: null,
     homepage: null,
+    group_: null,
+    region: null,
+    sales_resource: null,
+    application_engineer: null,
+    status: null,
+    //-----Company info --------------
+    company_code: null,
+    company_index: 0,
+    company_name: null,
+    company_name_en: null,
+    company_zip_code: null,
+    company_address: null,
+    company_phone_number: null,
+    company_fax_number: null,
+    //-----Etc info --------------
+    counter: 0,
     create_user: null,
     create_date: null,
     modify_date: null,
     recent_user: null,
-    counter: 0,
-    application_engineer: null,
-    status: null,
 };
 
 export const atomCurrentLead = atom({
@@ -128,5 +131,81 @@ export const atomCurrentConsulting = atom({
 
 export const atomAllConsultings = atom({
     key: "allConsultings",
+    default: [],
+});
+
+//----- Transaction ------------------------
+export const defaultTransaction = {
+    //-----Transaction info --------------
+    transaction_code: null,
+    transaction_title: null,
+    transaction_type: null,
+    transaction_contents: null,
+    publish_date: null,
+    publish_type: null,
+    supply_price: null,
+    tax_price: null,
+    total_price: null,
+    currency: null,
+    payment_type: null,
+    //-----Lead info --------------
+    lead_code: null,
+    //-----Company info --------------
+    company_name: null,
+    ceo_name: null,
+    company_address: null,
+    business_type: null,
+    business_item: null,
+    business_registration_code: null,
+    //-----Etc info --------------
+    creater: null,
+    modify_date: null,
+    recent_user: null,
+};
+
+export const atomCurrentTransaction = atom({
+    key: "currentTransaction",
+    default: defaultTransaction,
+});
+
+export const atomAllTransactions = atom({
+    key: "allTransactions",
+    default: [],
+});
+
+//----- Purchase ------------------------
+export const defaultPurchase = {
+    //-----Purchase info --------------
+    purchase_code: null,
+    //----- Company info --------------
+    company_code: null,
+    //----- Product info --------------
+    product_code: null,
+    product_type: null,
+    product_name: null,
+    serial_number: null,
+    delivery_date: null,
+    MA_contact_date: null,
+    MA_finish_date: null,
+    quantity: null,
+    price: null,
+    currency: null,
+    register: null,
+    registration_date: null,
+    regcode: null,
+    purchase_memo: null,
+    //----- Etc info --------------
+    recent_user: null,
+    modify_date: null,
+    status: null,
+};
+
+export const atomCurrentPurchase = atom({
+    key: "currentPurchase",
+    default: defaultPurchase,
+});
+
+export const atomAllPurchases = atom({
+    key: "allPurchases",
     default: [],
 });

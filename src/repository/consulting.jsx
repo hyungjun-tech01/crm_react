@@ -5,6 +5,17 @@ import { atomCurrentConsulting, atomAllConsultings } from '../atoms/atoms';
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
+export const ConsultingTypes = [
+    { value: '전화지원', label: 'Call'},
+    { value: '원격지원', label: 'Remote'},
+    { value: '교육지원', label: 'Education'},
+    { value: '방문', label: 'Visit'},
+    { value: '상담', label: 'Consult'},
+    { value: '내근', label: 'InDoor'},
+    { value: '기타', label: 'Etc'},
+    { value: 'NULL', label: 'NULL'},
+];
+
 export const ConsultingRepo = selector({
     key: "ConsultingRepository",
     get: ({getCallback}) => {
@@ -27,7 +38,7 @@ export const ConsultingRepo = selector({
             const input_json = JSON.stringify(newConsulting);
             console.log(`[ modifyConsulting ] input : `, input_json);
             try{
-                const response = await fetch(`${BASE_PATH}/modifyConsulting`, {
+                const response = await fetch(`${BASE_PATH}/modifyConsult`, {
                     method: "POST",
                     headers:{'Content-Type':'application/json'},
                     body: input_json,

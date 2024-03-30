@@ -12,6 +12,7 @@ import { BiUser } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { LeadKeyManItems, LeadRepo } from "../../repository/lead";
 import { atomAllCompanies, atomAllLeads, defaultLead } from "../../atoms/atoms";
+import { compareCompanyName } from "../../constants/functions";
 
 const Lead = () => {
   const allCompnayData = useRecoilValue(atomAllCompanies);
@@ -111,35 +112,35 @@ const Lead = () => {
           </a>
         </>
       ),
-      sorter: (a, b) => a.lead_name.length - b.lead_name.length,
+      sorter: (a, b) => a.lead_name - b.lead_name,
     },
     {
       title: "Title",
       dataIndex: "position",
-      sorter: (a, b) => a.position.length - b.position.length,
+      sorter: (a, b) => a.position - b.position,
     },
     {
       title: "Department",
       dataIndex: "department",
-      sorter: (a, b) => a.department.length - b.department.length,
+      sorter: (a, b) => a.department - b.department,
     },
     {
       title: "Company",
       dataIndex: "company_name",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.company_name.length - b.company_name.length,
+      sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
     {
       title: "Mobile",
       dataIndex: "mobile_number",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.mobile_number.length - b.mobile_number.length,
+      sorter: (a, b) => a.mobile_number - b.mobile_number,
     },
     {
       title: "Email Address",
       dataIndex: "email",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.email.length - b.email.length,
+      sorter: (a, b) => a.email - b.email,
     },
     {
       title: "Lead Status",
@@ -157,7 +158,7 @@ const Lead = () => {
       title: "Lead Sales",
       dataIndex: "sales_resource",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.owner.length - b.owner.length,
+      sorter: (a, b) => a.owner - b.owner,
     },
     // {
     //   title: "",
