@@ -22,15 +22,13 @@ import { BiClipboard } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { ConsultingRepo, ConsultingTypes } from "../../repository/consulting";
-import { atomAllCompanies, atomAllConsultings, atomAllLeads, atomCurrentCompany, atomCurrentLead, defaultConsulting } from "../../atoms/atoms";
+import { atomAllCompanies, atomAllConsultings, atomAllLeads, defaultConsulting } from "../../atoms/atoms";
 import { compareCompanyName, compareText, formateDate } from "../../constants/functions";
 
 const Consultings = () => {
   const allCompnayData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
   const allConsultingData = useRecoilValue(atomAllConsultings);
-  const currentCompany = useRecoilValue(atomCurrentCompany);
-  const currentLead = useRecoilValue(atomCurrentLead);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
   const { loadAllConsultings, modifyConsulting, setCurrentConsulting } = useRecoilValue(ConsultingRepo);
@@ -40,7 +38,6 @@ const Consultings = () => {
   const [ leadsForSelection, setLeadsForSelection] = useState([]);
   const [ consultingChange, setConsultingChange ] = useState(null);
   const [ selectedLead, setSelectedLead ] = useState(null);
-  
   const [ receiptDate, setReceiptDate ] = useState(new Date());
 
   const handleReceiptDateChange = (date) => {
@@ -132,10 +129,15 @@ const Consultings = () => {
         <>
           <a href="#" data-bs-toggle="modal"
             data-bs-target="#company-details"
-            onClick={()=>{
+            onClick={(event)=>{
               console.log("[Consulting] set current company : ", record.company_code);
-              setCurrentCompany(record.company_code);
-          }}>
+              if(record.company_code === null) {
+                event.preventDefault();
+              } else {
+                setCurrentCompany(record.company_code);
+              };
+            }}
+          >
             {text}
           </a>
         </>
@@ -170,8 +172,8 @@ const Consultings = () => {
             data-bs-target="#leads-details"
             onClick={()=>{
               console.log("[Consulting] set current lead : ", record.lead_code);
-              setCurrentLead(record.lead_code);
-          }}>
+              setCurrentLead(record.lead_code);}}
+          >
             {text}
           </a>
         </>
@@ -270,7 +272,7 @@ const Consultings = () => {
       loadAllConsultings();
     };
     initializeConsultingTemplate();
-  }, [allCompnayData, allLeadData, allConsultingData, currentCompany, currentLead]);
+  }, [allCompnayData, allLeadData, allConsultingData]);
 
   return (
     <HelmetProvider>

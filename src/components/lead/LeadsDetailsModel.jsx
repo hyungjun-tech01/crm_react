@@ -12,7 +12,7 @@ import { LeadKeyManItems, LeadRepo } from "../../repository/lead";
 const LeadsDetailsModel = () => {
   const { Panel } = Collapse;
   const selectedLead = useRecoilValue(atomCurrentLead);
-  const { modifyLead } = useRecoilValue(LeadRepo);
+  const { modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
   const [editedValues, setEditedValues] = useState(null);
   const [cookies] = useCookies(["myLationCrmUserName"]);
   const [ keymanLabel, setKeymanLabel] = useState(null);
@@ -110,7 +110,6 @@ const LeadsDetailsModel = () => {
     if(found.label === 'NULL') setKeymanLabel('');
     else setKeymanLabel(found.label);
   }, []);
-
 
   useEffect(() => {
     console.log('[LeadsDetailsModel] called!');
@@ -226,6 +225,7 @@ const LeadsDetailsModel = () => {
                 type="button"
                 className="btn-close xs-close"
                 data-bs-dismiss="modal"
+                onClick={()=>setCurrentLead()}
               />
             </div>
             <div className="card due-dates">

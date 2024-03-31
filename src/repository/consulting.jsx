@@ -1,6 +1,6 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentConsulting, atomAllConsultings } from '../atoms/atoms';
+import { atomCurrentConsulting, atomAllConsultings, defaultConsulting } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
@@ -97,6 +97,10 @@ export const ConsultingRepo = selector({
         });
         const setCurrentConsulting = getCallback(({set, snapshot}) => async (consulting_code) => {
             try{
+                if(consulting_code === undefined || consulting_code === null) {
+                    set(atomCurrentConsulting, defaultConsulting);
+                    return;
+                };
                 const allConsultings = await snapshot.getPromise(atomAllConsultings);
                 const selected_arrary = allConsultings.filter(consulting => consulting.consulting_code === consulting_code);
                 if(selected_arrary.length > 0){
