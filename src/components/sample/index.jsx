@@ -63,13 +63,13 @@ const Sample = () => {
     //     quotation_contents :    b_txn_contents            
     //   };          
     const info ={
-        action_type:'UPDATE'                ,   // 'ADD', 'UPDATE'
+        action_type:'ADD'                ,   // 'ADD', 'UPDATE'
         company_code : '4B554B54422FD42C9A153EABB0CEEFDE' , 
-        company_name : '테스트컴퍼니_변경테스트'            ,         
+        lead_name : '테스트리드',
         modify_user : 'admin'
     }
     try{
-      const response = fetch(`${BASE_PATH}/modifyCompany`,{
+      const response = fetch(`${BASE_PATH}/modifyLead`,{
           method: "POST", 
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify(info)
