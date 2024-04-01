@@ -100,10 +100,10 @@ export const LeadRepo = selector({
                 };
                 const allLeads = await snapshot.getPromise(atomAllLeads);
                 const selected_arrary = allLeads.filter(lead => lead.lead_code === lead_code);
-                console.log('\t-Check : ', selected_arrary);
                 if(selected_arrary.length > 0){
-                    console.log('\t[ setCurrentLead ] set the specified lead to the current');
                     set(atomCurrentLead, selected_arrary[0]);
+                } else {
+                    console.log('\t[ setCurrentLead ] No lead data matched the specified id');
                 }
             }
             catch(err){

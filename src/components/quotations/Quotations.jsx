@@ -9,7 +9,7 @@ import { Table } from "antd";
 import "antd/dist/reset.css";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
 import "../antdstyle.css";
-import ConsultingsDetailsModel from "./ConsultingsDetailsModel";
+import QuotationsDetailsModel from "./QuotationsDetailsModel";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import DealDetailsModel from "../deals/DealDetailsModel";
@@ -21,22 +21,22 @@ import "react-datepicker/dist/react-datepicker.css";
 import { BiClipboard } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
-import { ConsultingRepo, ConsultingTypes } from "../../repository/consulting";
-import { atomAllCompanies, atomAllConsultings, atomAllLeads, defaultConsulting } from "../../atoms/atoms";
+import { QuotationRepo, QuotationSendTypes } from "../../repository/quotation";
+import { atomAllCompanies, atomAllQuotations, atomAllLeads, defaultQuotation } from "../../atoms/atoms";
 import { compareCompanyName, compareText, formateDate } from "../../constants/functions";
 
-const Consultings = () => {
+const Quotations = () => {
   const allCompnayData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
-  const allConsultingData = useRecoilValue(atomAllConsultings);
+  const allQuotationData = useRecoilValue(atomAllQuotations);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
-  const { loadAllConsultings, modifyConsulting, setCurrentConsulting } = useRecoilValue(ConsultingRepo);
+  const { loadAllQuotations, modifyQuotation, setCurrentQuotation } = useRecoilValue(QuotationRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName"]);
 
   const [ companiesForSelection, setCompaniesForSelection ] = useState([]);
   const [ leadsForSelection, setLeadsForSelection] = useState([]);
-  const [ consultingChange, setConsultingChange ] = useState(null);
+  const [ quotationChange, setQuotationChange ] = useState(null);
   const [ selectedLead, setSelectedLead ] = useState(null);
   const [ receiptDate, setReceiptDate ] = useState(new Date());
 
@@ -45,35 +45,35 @@ const Consultings = () => {
     const localDate = formateDate(date);
     const localTime = date.toLocaleTimeString('ko-KR');
     const tempChanges = {
-      ...consultingChange,
+      ...quotationChange,
       receipt_date: localDate,
       receipt_time: localTime,
     };
-    setConsultingChange(tempChanges);
+    setQuotationChange(tempChanges);
   };
 
-  // --- Functions used for Add New Consulting ------------------------------
-  const handleAddNewConsultingClicked = useCallback(() => {
-    initializeConsultingTemplate();
+  // --- Functions used for Add New Quotation ------------------------------
+  const handleAddNewQuotationClicked = useCallback(() => {
+    initializeQuotationTemplate();
   }, []);
 
-  const initializeConsultingTemplate = useCallback(() => {
-    setConsultingChange({ ...defaultConsulting });
+  const initializeQuotationTemplate = useCallback(() => {
+    setQuotationChange({ ...defaultQuotation });
     setSelectedLead(null);
-    document.querySelector("#add_new_consulting_form").reset();
+    document.querySelector("#add_new_quotation_form").reset();
   }, []);
 
-  const handleConsultingChange = useCallback((e) => {
+  const handleQuotationChange = useCallback((e) => {
     const modifiedData = {
-      ...consultingChange,
+      ...quotationChange,
       [e.target.name]: e.target.value,
     };
-    setConsultingChange(modifiedData);
-  }, [consultingChange]);
+    setQuotationChange(modifiedData);
+  }, [quotationChange]);
 
   const handleSelectLead = useCallback((value) => {
     const tempChanges = {
-      ...consultingChange,
+      ...quotationChange,
       lead_code: value.code,
       lead_name: value.name,
       department: value.department,
@@ -84,41 +84,41 @@ const Consultings = () => {
       company_name: value.company,
       company_code: companiesForSelection[value.company],
     };
-    setConsultingChange(tempChanges);
-  }, [companiesForSelection, consultingChange]);
+    setQuotationChange(tempChanges);
+  }, [companiesForSelection, quotationChange]);
 
-  const handleSelectConsultingType = useCallback((value) => {
+  const handleSelectQuotationType = useCallback((value) => {
     const tempChanges = {
-      ...consultingChange,
-      consulting_type: value.value,
+      ...quotationChange,
+      quotation_type: value.value,
     };
-    setConsultingChange(tempChanges);
-  }, [consultingChange]);
+    setQuotationChange(tempChanges);
+  }, [quotationChange]);
 
-  const handleAddNewConsulting = useCallback((event)=>{
+  const handleAddNewQuotation = useCallback((event)=>{
     // Check data if they are available
-    if(consultingChange.lead_name === null
-      || consultingChange.lead_name === ''
-      || consultingChange.consulting_type === null
+    if(quotationChange.lead_name === null
+      || quotationChange.lead_name === ''
+      || quotationChange.quotation_type === null
     ) {
       console.log("Necessary information isn't submitted!");
       return;
     };
 
-    const newConsultingData = {
-      ...consultingChange,
+    const newQuotationData = {
+      ...quotationChange,
       action_type: 'ADD',
       lead_number: '99999',// Temporary
       counter: 0,
       modify_user: cookies.myLationCrmUserName,
     };
-    console.log(`[ handleAddNewConsulting ]`, newConsultingData);
-    const result = modifyConsulting(newConsultingData);
+    console.log(`[ handleAddNewQuotation ]`, newQuotationData);
+    const result = modifyQuotation(newQuotationData);
     if(result){
-      initializeConsultingTemplate();
+      initializeQuotationTemplate();
       //close modal ?
     };
-  }, [cookies.myLationCrmUserName, initializeConsultingTemplate, consultingChange, modifyConsulting]);
+  }, [cookies.myLationCrmUserName, initializeQuotationTemplate, quotationChange, modifyQuotation]);
 
   // --- Section for Table ------------------------------
   const columns = [
@@ -130,7 +130,7 @@ const Consultings = () => {
           <a href="#" data-bs-toggle="modal"
             data-bs-target="#company-details"
             onClick={(event)=>{
-              console.log("[Consulting] set current company : ", record.company_code);
+              console.log("[Quotation] set current company : ", record.company_code);
               setCurrentCompany(record.company_code);
             }}
           >
@@ -142,21 +142,57 @@ const Consultings = () => {
     },
     {
       title: "Type",
-      dataIndex: "consulting_type",
+      dataIndex: "quotation_type",
       render: (text, record) => (
         <>
           <a href="#"
             data-bs-toggle="modal"
-            data-bs-target="#consultings-details"
+            data-bs-target="#quotations-details"
             onClick={()=>{
-              console.log("[Consulting] set current consulting : ", record.consulting_code);
-              setCurrentConsulting(record.consulting_code);
+              console.log("[Quotation] set current quotation : ", record.quotation_code);
+              setCurrentQuotation(record.quotation_code);
           }}>
             {text}
           </a>
         </>
       ),
-      sorter: (a, b) => compareText(a.consulting_type, b.consulting_type),
+      sorter: (a, b) => compareText(a.quotation_type, b.quotation_type),
+    },
+    {
+      title: "Title",
+      dataIndex: "quotation_title",
+      render: (text, record) => (
+        <>
+          <a href="#"
+            data-bs-toggle="modal"
+            data-bs-target="#quotations-details"
+            onClick={()=>{
+              console.log("[Quotation] set current quotation : ", record.quotation_code);
+              setCurrentQuotation(record.quotation_code);
+          }}>
+            {text}
+          </a>
+        </>
+      ),
+      sorter: (a, b) => compareText(a.quotation_title, b.quotation_title),
+    },
+    {
+      title: "Date",
+      dataIndex: "quotation_date",
+      render: (text, record) => (
+        <>
+          <a href="#"
+            data-bs-toggle="modal"
+            data-bs-target="#quotations-details"
+            onClick={()=>{
+              console.log("[Quotation] set current quotation : ", record.quotation_code);
+              setCurrentQuotation(record.quotation_code);
+          }}>
+            {new Date(text).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day: 'numeric'})}
+          </a>
+        </>
+      ),
+      sorter: (a, b) => compareText(a.quotation_date, b.quotation_date),
     },
     {
       title: "Lead",
@@ -167,7 +203,7 @@ const Consultings = () => {
             data-bs-toggle="modal"
             data-bs-target="#leads-details"
             onClick={()=>{
-              console.log("[Consulting] set current lead : ", record.lead_code);
+              console.log("[Quotation] set current lead : ", record.lead_code);
               setCurrentLead(record.lead_code);}}
           >
             {text}
@@ -187,6 +223,12 @@ const Consultings = () => {
       dataIndex: "phone_number",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.phone_number, b.phone_number),
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      render: (text, record) => <>{text}</>,
+      sorter: (a, b) => compareText(a.email, b.email),
     },
     {
       title: "Action",
@@ -264,17 +306,17 @@ const Consultings = () => {
       });
       setLeadsForSelection(temp_data);
     };
-    if (allConsultingData.length === 0) {
-      loadAllConsultings();
+    if (allQuotationData.length === 0) {
+      loadAllQuotations();
     };
-    initializeConsultingTemplate();
-  }, [allCompnayData, allLeadData, allConsultingData]);
+    initializeQuotationTemplate();
+  }, [allCompnayData, allLeadData, allQuotationData]);
 
   return (
     <HelmetProvider>
       <div className="page-wrapper">
         <Helmet>
-          <title>Consultings - CRMS admin Template</title>
+          <title>Quotations - CRMS admin Template</title>
           <meta name="description" content="Reactify Blank Page" />
         </Helmet>
         {/* Page Content */}
@@ -288,7 +330,7 @@ const Consultings = () => {
                     <BiClipboard />
                   </i>
                 </span>{" "}
-                Consultings{" "}
+                Quotations{" "}
               </h3>
             </div>
             <div className="col p-0 text-end">
@@ -296,7 +338,7 @@ const Consultings = () => {
                 <li className="breadcrumb-item">
                   <Link to="/">Dashboard</Link>
                 </li>
-                <li className="breadcrumb-item active">Consultings</li>
+                <li className="breadcrumb-item active">Quotations</li>
               </ul>
             </div>
           </div>
@@ -316,10 +358,10 @@ const Consultings = () => {
                   <div className="dropdown-menu">
                     <a className="dropdown-item">Recently Viewed</a>
                     <a className="dropdown-item">Items I'm following</a>
-                    <a className="dropdown-item">All Consultings</a>
-                    <a className="dropdown-item">All Closed Consultings</a>
-                    <a className="dropdown-item">All Open Consultings</a>
-                    <a className="dropdown-item">My Consultings</a>
+                    <a className="dropdown-item">All Quotations</a>
+                    <a className="dropdown-item">All Closed Quotations</a>
+                    <a className="dropdown-item">All Open Quotations</a>
+                    <a className="dropdown-item">My Quotations</a>
                   </div>
                 </div>
               </div>
@@ -330,10 +372,10 @@ const Consultings = () => {
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                       id="add-task"
                       data-bs-toggle="modal"
-                      data-bs-target="#add_consulting"
-                      onClick={handleAddNewConsultingClicked}
+                      data-bs-target="#add_quotation"
+                      onClick={handleAddNewQuotationClicked}
                     >
-                      Add Consulting
+                      Add Quotation
                     </button>
                   </li>
                 </ul>
@@ -351,7 +393,7 @@ const Consultings = () => {
                         ...rowSelection,
                       }}
                       pagination={{
-                        total: allConsultingData.length,
+                        total: allQuotationData.length,
                         showTotal: (total, range) =>
                           `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                         showSizeChanger: true,
@@ -361,8 +403,8 @@ const Consultings = () => {
                       style={{ overflowX: "auto" }}
                       columns={columns}
                       bordered
-                      dataSource={allConsultingData}
-                      rowKey={(record) => record.consulting_code}
+                      dataSource={allQuotationData}
+                      rowKey={(record) => record.quotation_code}
                       // onChange={handleTableChange}
                     />
                   </div>
@@ -374,10 +416,10 @@ const Consultings = () => {
         </div>
         {/* /Page Content */}
 
-{/*---- Start : Add New Consulting Modal-------------------------------------------------------------*/}
+{/*---- Start : Add New Quotation Modal-------------------------------------------------------------*/}
         <div
           className="modal right fade"
-          id="add_consulting"
+          id="add_quotation"
           tabIndex={-1}
           role="dialog"
           aria-modal="true"
@@ -396,7 +438,7 @@ const Consultings = () => {
             </button>
             <div className="modal-content">
               <div className="modal-header">
-                <h4 className="modal-title"><b>Add New Consulting</b></h4>
+                <h4 className="modal-title"><b>Add New Quotation</b></h4>
                 <button
                   type="button"
                   className="btn-close"
@@ -404,7 +446,7 @@ const Consultings = () => {
                 ></button>
               </div>
               <div className="modal-body">
-                <form className="forms-sampme" id="add_new_consulting_form">
+                <form className="forms-sampme" id="add_new_quotation_form">
                   <h4>Lead Information</h4>
                   <div className="form-group row">
                     <div className="col-sm-4">
@@ -456,11 +498,11 @@ const Consultings = () => {
                         </div>
                       </div>
                     </>}
-                  <h4>Consulting Information</h4>
+                  <h4>Quotation Information</h4>
                   <div className="form-group row">
                     <div className="col-sm-4">
                       <label className="col-form-label">Type</label>
-                      <Select options={ConsultingTypes} onChange={handleSelectConsultingType} />
+                      <Select options={QuotationSendTypes} onChange={handleSelectQuotationType} />
                     </div>
                     <div className="col-sm-4">
                       <label className="col-form-label">Receipt</label>
@@ -481,7 +523,7 @@ const Consultings = () => {
                         className="form-control"
                         placeholder="Receiver"
                         name="receiver"
-                        onChange={handleConsultingChange}
+                        onChange={handleQuotationChange}
                       />
                     </div>
                   </div>
@@ -493,7 +535,7 @@ const Consultings = () => {
                         className="form-control"
                         placeholder="Lead Time"
                         name="lead_time"
-                        onChange={handleConsultingChange}
+                        onChange={handleQuotationChange}
                       />
                     </div>
                     <div className="col-sm-6">
@@ -503,7 +545,7 @@ const Consultings = () => {
                         className="form-control"
                         placeholder="Request Type"
                         name="request_type"
-                        onChange={handleConsultingChange}
+                        onChange={handleQuotationChange}
                       />
                     </div>
                   </div>
@@ -516,7 +558,7 @@ const Consultings = () => {
                         placeholder="Request Content"
                         name="request_content"
                         defaultValue={""}
-                        onChange={handleConsultingChange}
+                        onChange={handleQuotationChange}
                       />
                     </div>
                   </div>
@@ -529,7 +571,7 @@ const Consultings = () => {
                         placeholder="Action Content"
                         name="action_content"
                         defaultValue={""}
-                        onChange={handleConsultingChange}
+                        onChange={handleQuotationChange}
                       />
                     </div>
                   </div>
@@ -541,7 +583,7 @@ const Consultings = () => {
                         className="form-control"
                         placeholder="Sales Representative"
                         name="sales_representati"
-                        onChange={handleConsultingChange}
+                        onChange={handleQuotationChange}
                       />
                     </div>
                     <div className="col-sm-6">
@@ -551,7 +593,7 @@ const Consultings = () => {
                         className="form-control"
                         placeholder="Status"
                         name="status"
-                        onChange={handleConsultingChange}
+                        onChange={handleQuotationChange}
                       />
                     </div>
                   </div>
@@ -565,7 +607,7 @@ const Consultings = () => {
                     <button
                       type="button"
                       className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                      onClick={handleAddNewConsulting}
+                      onClick={handleAddNewQuotation}
                     >
                       Save
                     </button>
@@ -583,7 +625,7 @@ const Consultings = () => {
             </div>
           </div>
         </div>
-{/*---- End : Add New Consulting Modal-------------------------------------------------------*/}
+{/*---- End : Add New Quotation Modal-------------------------------------------------------*/}
         {/* modal */}
         {/* cchange pipeline stage Modal */}
         <div className="modal" id="pipeline-stage">
@@ -634,10 +676,10 @@ const Consultings = () => {
         <DealDetailsModel />
         <ProjectDetailsModel />
         <LeadsDetailsModel />
-        <ConsultingsDetailsModel />
+        <QuotationsDetailsModel />
       </div>
     </HelmetProvider>
   );
 };
 
-export default Consultings;
+export default Quotations;

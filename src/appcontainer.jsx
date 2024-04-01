@@ -60,6 +60,8 @@ import ViewInvoices from "./components/invoices/invocesdetails/index";
 import Invoicesettings from "./components/invoices/invoicesettings/index";
 import Taxsettings from "./components/invoices/invoicesettings/taxsettings";
 import Banksettings from "./components/invoices/invoicesettings/banksettings";
+//Quotations
+import Quotations from "./components/quotations/Quotations.jsx";
 // Elements
 import Sweetalerts from "./components/elements/sweetalerts/index";
 import Tooltip from "./components/elements/tooltip/index";
@@ -260,6 +262,10 @@ const AppUniversal = (props) => {
           <Route path="/invoices-settings" exact component={Invoicesettings} />
           <Route path="/tax-settings" exact component={Taxsettings} />
           <Route path="/bank-settings" exact component={Banksettings} />
+
+          {/* Quotations */}
+          <Route path="/quotations" exact component={Quotations} />
+
           {/* Settings */}
           <Route path="/userinfo" exact component={UserInfo} />
           <Route path="/email-settings" exact component={Emailsettings} />
