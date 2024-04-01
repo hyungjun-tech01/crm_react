@@ -1,6 +1,6 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentCompany, atomAllCompanies } from '../atoms/atoms';
+import { atomCurrentCompany, atomAllCompanies, defaultCompany } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
@@ -87,6 +87,10 @@ export const CompanyRepo = selector({
         });
         const setCurrentCompany = getCallback(({set, snapshot}) => async (company_code) => {
             try{
+                if(company_code === undefined || company_code === null) {
+                    set(atomCurrentCompany, defaultCompany);
+                    return;
+                };
                 const allCompanies = await snapshot.getPromise(atomAllCompanies);
                 const selected_array = allCompanies.filter(company => company.company_code === company_code);
                 if(selected_array.length > 0){

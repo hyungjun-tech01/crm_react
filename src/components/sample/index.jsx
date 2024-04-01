@@ -64,10 +64,10 @@ const Sample = () => {
     //   };          
     // --4B554B54422FD42C9A153EABB0CEEFDE
     const info ={
-        action_type:'ADD'                ,   // 'ADD', 'UPDATE'
-        company_code : '12345' ,   
-        lead_name : '테스트리드'            ,         
-        modify_user : 'admin11'
+        action_type:'UPDATE'                ,   // 'ADD', 'UPDATE'
+         // company_code : '4B554B54422FD42C9A153EABB0CEEFDE' ,   // 4B554B54422FD42C9A153EABB0CEEFDE
+        lead_name : '테스트리드 변경',
+        modify_user : 'admin'
     }
     try{
       const response = fetch(`${BASE_PATH}/modifyLead`,{

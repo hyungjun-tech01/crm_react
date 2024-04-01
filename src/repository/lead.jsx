@@ -1,6 +1,6 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentLead, atomAllLeads } from '../atoms/atoms';
+import { atomCurrentLead, atomAllLeads, defaultLead } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
@@ -94,10 +94,16 @@ export const LeadRepo = selector({
         });
         const setCurrentLead = getCallback(({set, snapshot}) => async (lead_code) => {
             try{
+                if(lead_code === undefined || lead_code === null) {
+                    set(atomCurrentLead, defaultLead);
+                    return;
+                };
                 const allLeads = await snapshot.getPromise(atomAllLeads);
                 const selected_arrary = allLeads.filter(lead => lead.lead_code === lead_code);
                 if(selected_arrary.length > 0){
                     set(atomCurrentLead, selected_arrary[0]);
+                } else {
+                    console.log('\t[ setCurrentLead ] No lead data matched the specified id');
                 }
             }
             catch(err){

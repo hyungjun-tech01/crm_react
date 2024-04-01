@@ -12,7 +12,7 @@ import { LeadKeyManItems, LeadRepo } from "../../repository/lead";
 const LeadsDetailsModel = () => {
   const { Panel } = Collapse;
   const selectedLead = useRecoilValue(atomCurrentLead);
-  const { modifyLead } = useRecoilValue(LeadRepo);
+  const { modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
   const [editedValues, setEditedValues] = useState(null);
   const [cookies] = useCookies(["myLationCrmUserName"]);
   const [ keymanLabel, setKeymanLabel] = useState(null);
@@ -101,14 +101,18 @@ const LeadsDetailsModel = () => {
   }, [editedValues, modifyLead, selectedLead.is_keyman]);
 
   const handleGetKeyManLabel = useCallback((value) => {
+    if(value === undefined || value === null)
+    {
+      setKeymanLabel('');
+      return;
+    }
     const found = LeadKeyManItems.filter(item => item.value === value)[0];
     if(found.label === 'NULL') setKeymanLabel('');
     else setKeymanLabel(found.label);
   }, []);
 
-
   useEffect(() => {
-    console.log('useEffect called!');
+    console.log('[LeadsDetailsModel] called!');
     if (editedValues === null) {
       const tempValues = {
         action_type: "UPDATE",
@@ -125,7 +129,7 @@ const LeadsDetailsModel = () => {
       // get keyman label
       handleGetKeyManLabel(selectedLead.is_keyman);
     }
-  }, [cookies.myLationCrmUserName, handleGetKeyManLabel, selectedLead]);
+  }, [cookies.myLationCrmUserName, selectedLead]);
 
   return (
     <>
@@ -221,6 +225,7 @@ const LeadsDetailsModel = () => {
                 type="button"
                 className="btn-close xs-close"
                 data-bs-dismiss="modal"
+                onClick={()=>setCurrentLead()}
               />
             </div>
             <div className="card due-dates">
