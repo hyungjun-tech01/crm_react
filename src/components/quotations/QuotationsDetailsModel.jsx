@@ -17,7 +17,8 @@ const QuotationsDetailsModel = () => {
   const [editedValues, setEditedValues] = useState(null);
   const [cookies] = useCookies(["myLationCrmUserName"]);
 
-  const [ receiptTime, setReceiptTime ] = useState(new Date());
+  const [ quotationDate, setQuotationDate ] = useState(new Date());
+  const [ confirmDate, setConfirmDate ] = useState(null);
 
   // --- Funtions for Editing ---------------------------------
   const handleCheckEditState = useCallback((name) => {
@@ -76,8 +77,12 @@ const QuotationsDetailsModel = () => {
   }, [editedValues, selectedQuotation]);
 
   // --- Funtions for Editing ---------------------------------
-  const handleReceiptTimeChange = useCallback((time) => {
-    setReceiptTime(time);
+  const handleQuotationDateChange = useCallback((date) => {
+    setQuotationDate(date);
+  }, []);
+
+  const handleConfirmDateChange = useCallback((date) => {
+    setConfirmDate(date);
   }, []);
 
   useEffect(() => {
@@ -97,33 +102,13 @@ const QuotationsDetailsModel = () => {
       setEditedValues(tempValues);
 
       // Set time from selected quotation data
-      let input_time = new Date();
-      if(selectedQuotation.receipt_date !== null)
+      if(selectedQuotation.quotation_date !== null)
       {
-        input_time.setTime(Date.parse(selectedQuotation.receipt_date));
-
-        if(selectedQuotation.receipt_time !== null
-          && selectedQuotation.receipt_time !== '')
-        {
-          let converted_time = '';
-          const splitted = selectedQuotation.receipt_time.split(' ');
-          if(splitted.length === 2) {
-            if(splitted[0] === '오전'){
-              converted_time = splitted[1] + ' AM';
-            } else if(splitted[0] === '오후'){
-              converted_time = splitted[1] + ' PM';
-            }
-          };
-
-          if(converted_time !==''){
-            const str_ymd = input_time.toLocaleDateString('ko-KR', {year: 'numeric', month: 'numeric', day: 'numeric'})
-              + ' ' + converted_time;
-            if(str_ymd !== NaN){
-              input_time.setTime(Date.parse(str_ymd));
-            }
-          }
-        }
-        setReceiptTime(input_time);
+        setQuotationDate(new Date(selectedQuotation.quotation_date));
+      };
+      if(selectedQuotation.comfirm_date !== null)
+      {
+        setConfirmDate(new Date(selectedQuotation.comfirm_date));
       };
     }
   }, [cookies.myLationCrmUserName, selectedQuotation]);
@@ -251,76 +236,6 @@ const QuotationsDetailsModel = () => {
               </div>
             </div>
             <div className="modal-body">
-              {/* <div className="row">
-                <div className="col-md-12">
-                  <ul
-                    className="cd-breadcrumb triangle nav nav-tabs w-100 crms-steps"
-                    role="tablist"
-                  >
-                    <li role="presentation">
-                      <Link
-                        to="#not-contacted"
-                        className="active"
-                        aria-controls="not-contacted"
-                        role="tab"
-                        data-bs-toggle="tab"
-                        aria-expanded="true"
-                      >
-                        <span className="octicon octicon-light-bulb" />
-                        Not Contacted
-                      </Link>
-                    </li>
-                    <li role="presentation" className="">
-                      <Link
-                        to="#attempted-contact"
-                        aria-controls="attempted-contact"
-                        role="tab"
-                        data-bs-toggle="tab"
-                        aria-expanded="false"
-                      >
-                        <span className="octicon octicon-diff-added" />
-                        Attempted Contact
-                      </Link>
-                    </li>
-                    <li role="presentation" className="">
-                      <Link
-                        to="#contact"
-                        aria-controls="contact"
-                        role="tab"
-                        data-bs-toggle="tab"
-                        aria-expanded="false"
-                      >
-                        <span className="octicon octicon-comment-discussion" />
-                        Contact
-                      </Link>
-                    </li>
-                    <li role="presentation" className="">
-                      <Link
-                        to="#converted"
-                        aria-controls="contact"
-                        role="tab"
-                        data-bs-toggle="tab"
-                        aria-expanded="false"
-                      >
-                        <span className="octicon octicon-comment-discussion" />
-                        Converted
-                      </Link>
-                    </li>
-                    <li role="presentation" className="d-none">
-                      <Link
-                        to="#converted"
-                        aria-controls="converted"
-                        role="tab"
-                        data-bs-toggle="tab"
-                        aria-expanded="false"
-                      >
-                        <span className="octicon octicon-verified" />
-                        Converted
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div> */}
               <div className="tab-content pipeline-tabs border-0">
                 <div
                   role="tabpanel"
@@ -366,7 +281,7 @@ const QuotationsDetailsModel = () => {
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Quotation Information" key="1">
+                                <Panel header="Quotation Main Information" key="1">
                                   <table className="table">
                                     <tbody>
                                       <tr>
@@ -402,20 +317,116 @@ const QuotationsDetailsModel = () => {
                                         )}
                                       </tr>
                                       <tr>
-                                        <td>Receipt Time</td>
-                                        { handleCheckEditState("receipt_date") ? (
+                                        <td>Title</td>
+                                        { handleCheckEditState("quotation_title") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Title"
+                                                name="quotation_title"
+                                                defaultValue={selectedQuotation.quotation_title}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("quotation_title");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedQuotation.quotation_title}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("quotation_title");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Manager</td>
+                                        { handleCheckEditState("quotation_manager") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Manager"
+                                                name="quotation_manager"
+                                                defaultValue={selectedQuotation.quotation_manager}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("quotation_manager");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedQuotation.quotation_manager}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("quotation_manager");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Send Type</td>
+                                        { handleCheckEditState("quotation_send_type") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Send Type"
+                                                name="quotation_send_type"
+                                                defaultValue={selectedQuotation.quotation_send_type}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("quotation_send_type");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedQuotation.quotation_send_type}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("quotation_send_type");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Quotation Date</td>
+                                        { handleCheckEditState("quotation_date") ? (
                                           <>
                                             <td>
                                               <DatePicker
                                                 className="form-control"
-                                                selected={ receiptTime }
-                                                onChange={ handleReceiptTimeChange }
+                                                selected={ quotationDate }
+                                                onChange={ handleQuotationDateChange }
                                                 dateFormat="yyyy-MM-dd"
                                                 showTimeSelect
                                               />
                                             </td>
                                             <td>
-                                              <div onClick={() => {handleEndEdit("receipt_date");}}>
+                                              <div onClick={() => {handleEndEdit("quotation_date");}}>
                                                 <SaveAlt />
                                               </div>
                                             </td>
@@ -423,12 +434,12 @@ const QuotationsDetailsModel = () => {
                                           ) : (
                                           <>
                                             <td>
-                                              {receiptTime.toLocaleDateString('ko-KR', {
-                                                year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric'
+                                              {quotationDate.toLocaleDateString('ko-KR', {
+                                                year: 'numeric', month: 'long', day: 'numeric'
                                               })}
                                             </td>
                                             <td>
-                                              <div onClick={() => {handleStartEdit("receipt_date");}}>
+                                              <div onClick={() => {handleStartEdit("quotation_date");}}>
                                                 <Edit />
                                               </div>
                                             </td>
@@ -436,20 +447,20 @@ const QuotationsDetailsModel = () => {
                                         )}
                                       </tr>
                                       <tr>
-                                        <td>Receiver</td>
-                                        { handleCheckEditState("receiver") ? (
+                                        <td>Expiry Date</td>
+                                        { handleCheckEditState("quotation_expiration_date") ? (
                                           <>
                                             <td>
                                               <input
                                                 type="text"
-                                                placeholder="Receiver"
-                                                name="receiver"
-                                                defaultValue={selectedQuotation.receiver}
+                                                placeholder="Expriy Date"
+                                                name="quotation_expiration_date"
+                                                defaultValue={selectedQuotation.quotation_expiration_date}
                                                 onChange={handleEditing}
                                               />
                                             </td>
                                             <td>
-                                              <div onClick={() => {handleEndEdit("receiver");}}>
+                                              <div onClick={() => {handleEndEdit("quotation_expiration_date");}}>
                                                 <SaveAlt />
                                               </div>
                                             </td>
@@ -457,10 +468,10 @@ const QuotationsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td>
-                                              {selectedQuotation.receiver}
+                                              {selectedQuotation.quotation_expiration_date}
                                             </td>
                                             <td>
-                                              <div onClick={() => {handleStartEdit("receiver");}}>
+                                              <div onClick={() => {handleStartEdit("quotation_expiration_date");}}>
                                                 <Edit />
                                               </div>
                                             </td>
@@ -468,20 +479,54 @@ const QuotationsDetailsModel = () => {
                                         )}
                                       </tr>
                                       <tr>
-                                        <td>Product Type</td>
-                                        { handleCheckEditState("product_type") ? (
+                                        <td>Confirm Date</td>
+                                        { handleCheckEditState("comfirm_date") ? (
+                                          <>
+                                            <td>
+                                              <DatePicker
+                                                className="form-control"
+                                                selected={ confirmDate === null? new Date() : confirmDate }
+                                                onChange={ handleConfirmDateChange }
+                                                dateFormat="yyyy-MM-dd"
+                                                showTimeSelect
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("comfirm_date");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                          ) : (
+                                          <>
+                                            <td>
+                                              {confirmDate === null ? '' : confirmDate.toLocaleDateString('ko-KR', {
+                                                year: 'numeric', month: 'long', day: 'numeric'
+                                              })}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("comfirm_date");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Delivery Location</td>
+                                        { handleCheckEditState("delivery_location") ? (
                                           <>
                                             <td>
                                               <input
                                                 type="text"
                                                 placeholder="Product Type"
-                                                name="product_type"
-                                                defaultValue={selectedQuotation.product_type}
+                                                name="delivery_location"
+                                                defaultValue={selectedQuotation.delivery_location}
                                                 onChange={handleEditing}
                                               />
                                             </td>
                                             <td>
-                                              <div onClick={() => {handleEndEdit("product_type");}}>
+                                              <div onClick={() => {handleEndEdit("delivery_location");}}>
                                                 <SaveAlt />
                                               </div>
                                             </td>
@@ -489,10 +534,10 @@ const QuotationsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td>
-                                              {selectedQuotation.product_type}
+                                              {selectedQuotation.delivery_location}
                                             </td>
                                             <td>
-                                              <div onClick={() => {handleStartEdit("product_type");}}>
+                                              <div onClick={() => {handleStartEdit("delivery_location");}}>
                                                 <Edit />
                                               </div>
                                             </td>
@@ -500,20 +545,20 @@ const QuotationsDetailsModel = () => {
                                         )}
                                       </tr>
                                       <tr>
-                                        <td>Lead Time</td>
-                                        { handleCheckEditState("lead_time") ? (
+                                        <td>Delivery Period</td>
+                                        { handleCheckEditState("delivery_location") ? (
                                           <>
                                             <td>
                                               <input
                                                 type="text"
-                                                placeholder="Lead Time"
-                                                name="lead_time"
-                                                defaultValue={selectedQuotation.lead_time}
+                                                placeholder="Delivery Period"
+                                                name="delivery_period"
+                                                defaultValue={selectedQuotation.delivery_period}
                                                 onChange={handleEditing}
                                               />
                                             </td>
                                             <td>
-                                              <div onClick={() => {handleEndEdit("lead_time");}}>
+                                              <div onClick={() => {handleEndEdit("delivery_period");}}>
                                                 <SaveAlt />
                                               </div>
                                             </td>
@@ -521,10 +566,10 @@ const QuotationsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td>
-                                              {selectedQuotation.lead_time}
+                                              {selectedQuotation.delivery_period}
                                             </td>
                                             <td>
-                                              <div onClick={() => {handleStartEdit("lead_time");}}>
+                                              <div onClick={() => {handleStartEdit("delivery_period");}}>
                                                 <Edit />
                                               </div>
                                             </td>
@@ -532,20 +577,20 @@ const QuotationsDetailsModel = () => {
                                         )}
                                       </tr>
                                       <tr>
-                                        <td>Request Type</td>
-                                        { handleCheckEditState("request_type") ? (
+                                        <td>Warranty Period</td>
+                                        { handleCheckEditState("warranty_period") ? (
                                           <>
                                             <td>
                                               <input
                                                 type="text"
-                                                placeholder="Request Type"
-                                                name="request_type"
-                                                defaultValue={selectedQuotation.request_type}
+                                                placeholder="Warranty Period"
+                                                name="warranty_period"
+                                                defaultValue={selectedQuotation.warranty_period}
                                                 onChange={handleEditing}
                                               />
                                             </td>
                                             <td>
-                                              <div onClick={() => {handleEndEdit("request_type");}}>
+                                              <div onClick={() => {handleEndEdit("warranty_period");}}>
                                                 <SaveAlt />
                                               </div>
                                             </td>
@@ -553,76 +598,10 @@ const QuotationsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td>
-                                              {selectedQuotation.request_type}
+                                              {selectedQuotation.delivery_pewarranty_periodriod}
                                             </td>
                                             <td>
-                                              <div onClick={() => {handleStartEdit("request_type");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Request Content</td>
-                                        {handleCheckEditState("request_content") ? (
-                                          <>
-                                            <td className="border-0">
-                                              <textarea
-                                                className="form-control"
-                                                rows={3}
-                                                placeholder="Request Content"
-                                                defaultValue={selectedQuotation.request_content}
-                                                name="request_content"
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("request_content");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedQuotation.request_content}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("request_content");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Action Content</td>
-                                        {handleCheckEditState("action_content") ? (
-                                          <>
-                                            <td>
-                                              <textarea
-                                                className="form-control"
-                                                rows={3}
-                                                placeholder="Action Content"
-                                                defaultValue={selectedQuotation.action_content}
-                                                name="action_content"
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("action_content");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedQuotation.action_content}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("action_content");}}>
+                                              <div onClick={() => {handleStartEdit("warranty_period");}}>
                                                 <Edit />
                                               </div>
                                             </td>
@@ -661,21 +640,63 @@ const QuotationsDetailsModel = () => {
                                           </>
                                         )}
                                       </tr>
-                                      {/* <tr>
-                                        <td>Status</td>
-                                        {handleCheckEditState("status") ? (
+                                    </tbody>
+                                  </table>
+                                </Panel>
+                              </Collapse>
+                            </div>
+                            <div className="tasks__item crms-task-item">
+                              <Collapse accordion expandIconPosition="end">
+                                <Panel header="Quotation Cost Information" key="1">
+                                  <table className="table">
+                                    <tbody>
+                                      <tr>
+                                        <td className="border-0">Payment Type</td>
+                                        { handleCheckEditState("payment_type") ? (
+                                          <>
+                                            <td className="border-0">
+                                              <input
+                                                type="text"
+                                                placeholder="Payment Type"
+                                                name="payment_type"
+                                                defaultValue={selectedQuotation.payment_type}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td className="border-0">
+                                              <div onClick={() => {handleEndEdit("payment_type");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td className="border-0">
+                                              {selectedQuotation.payment_type}
+                                            </td>
+                                            <td className="border-0">
+                                              <div onClick={() => {handleStartEdit("payment_type");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Currency</td>
+                                        { handleCheckEditState("currency") ? (
                                           <>
                                             <td>
                                               <input
                                                 type="text"
-                                                placeholder="Status"
-                                                name="status"
-                                                defaultValue={selectedQuotation.status}
+                                                placeholder="Currency"
+                                                name="currency"
+                                                defaultValue={selectedQuotation.currency}
                                                 onChange={handleEditing}
                                               />
                                             </td>
                                             <td>
-                                              <div onClick={() => {handleEndEdit("status");}}>
+                                              <div onClick={() => {handleEndEdit("currency");}}>
                                                 <SaveAlt />
                                               </div>
                                             </td>
@@ -683,16 +704,432 @@ const QuotationsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td>
-                                              {selectedQuotation.status}
+                                              {selectedQuotation.quotation_title}
                                             </td>
                                             <td>
-                                              <div onClick={() => {handleStartEdit("status");}}>
+                                              <div onClick={() => {handleStartEdit("currency");}}>
                                                 <Edit />
                                               </div>
                                             </td>
                                           </>
                                         )}
-                                      </tr> */}
+                                      </tr>
+                                      <tr>
+                                        <td>List Price</td>
+                                        { handleCheckEditState("list_price") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="List Price"
+                                                name="list_price"
+                                                defaultValue={selectedQuotation.list_price}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("list_price");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedQuotation.list_price}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("list_price");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>List Price DC</td>
+                                        { handleCheckEditState("list_price_dc") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="List Price DC"
+                                                name="list_price_dc"
+                                                defaultValue={selectedQuotation.list_price_dc}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("list_price_dc");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedQuotation.list_price_dc}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("list_price_dc");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Sub Total Amount</td>
+                                        { handleCheckEditState("list_price_dc") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Sub Total Amount"
+                                                name="sub_total_amount"
+                                                defaultValue={selectedQuotation.sub_total_amount}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("sub_total_amount");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedQuotation.sub_total_amount}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("sub_total_amount");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>DC Rate</td>
+                                        { handleCheckEditState("dc_rate") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="DC Rate"
+                                                name="dc_rate"
+                                                defaultValue={selectedQuotation.dc_rate}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("dc_rate");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedQuotation.dc_rate}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("dc_rate");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Quotation Amount</td>
+                                        { handleCheckEditState("quotation_amount") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Quotation Amount"
+                                                name="quotation_amount"
+                                                defaultValue={selectedQuotation.quotation_amount}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("quotation_amount");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedQuotation.quotation_amount}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("quotation_amount");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Tax Amount</td>
+                                        { handleCheckEditState("tax_amount") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Tax Amount"
+                                                name="tax_amount"
+                                                defaultValue={selectedQuotation.tax_amount}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("tax_amount");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedQuotation.tax_amount}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("tax_amount");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Cut-Off Amount</td>
+                                        { handleCheckEditState("cutoff_amount") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Cut-Off Amount"
+                                                name="cutoff_amount"
+                                                defaultValue={selectedQuotation.cutoff_amount}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("cutoff_amount");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedQuotation.cutoff_amount}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("cutoff_amount");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Total Quotation Amount</td>
+                                        { handleCheckEditState("total_quotation_amount") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Total Quotation Amount"
+                                                name="total_quotation_amount"
+                                                defaultValue={selectedQuotation.total_quotation_amount}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("total_quotation_amount");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedQuotation.total_quotation_amount}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("total_quotation_amount");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Total Cost Amount</td>
+                                        { handleCheckEditState("total_cost_price") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Total Cost Amount"
+                                                name="total_cost_price"
+                                                defaultValue={selectedQuotation.total_cost_price}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("total_cost_price");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedQuotation.total_cost_price}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("total_cost_price");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Profit</td>
+                                        { handleCheckEditState("profit") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Profit"
+                                                name="profit"
+                                                defaultValue={selectedQuotation.profit}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("profit");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedQuotation.profit}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("profit");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Profit Rate</td>
+                                        { handleCheckEditState("profit_rate") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Profit Rate"
+                                                name="profit_rate"
+                                                defaultValue={selectedQuotation.profit_rate}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("profit_rate");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedQuotation.profit_rate}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("profit_rate");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Upper Memo</td>
+                                        { handleCheckEditState("upper_memo") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Upper Memo"
+                                                name="upper_memo"
+                                                defaultValue={selectedQuotation.upper_memo}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("upper_memo");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedQuotation.upper_memo}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("upper_memo");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Lower Memo</td>
+                                        { handleCheckEditState("lower_memo") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Lower Memo"
+                                                name="lower_memo"
+                                                defaultValue={selectedQuotation.lower_memo}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("lower_memo");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedQuotation.lower_memo}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("lower_memo");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
                                     </tbody>
                                   </table>
                                 </Panel>
@@ -857,6 +1294,38 @@ const QuotationsDetailsModel = () => {
                                             </td>
                                             <td>
                                               <div onClick={() => {handleStartEdit("phone_number");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Fax</td>
+                                        { handleCheckEditState("fax_number") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Fax"
+                                                name="fax_number"
+                                                defaultValue={selectedQuotation.fax_number}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("fax_number");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedQuotation.fax_number}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("fax_number");}}>
                                                 <Edit />
                                               </div>
                                             </td>
