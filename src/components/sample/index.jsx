@@ -62,14 +62,15 @@ const Sample = () => {
     //     quotation_amount : '9999.99' ,
     //     quotation_contents :    b_txn_contents            
     //   };          
+    // --4B554B54422FD42C9A153EABB0CEEFDE
     const info ={
-        action_type:'UPDATE'                ,   // 'ADD', 'UPDATE'
-        company_code : '4B554B54422FD42C9A153EABB0CEEFDE' , 
-        company_name : '테스트컴퍼니_변경테스트'            ,         
-        modify_user : 'admin'
+        action_type:'ADD'                ,   // 'ADD', 'UPDATE'
+        company_code : '12345' ,   
+        lead_name : '테스트리드'            ,         
+        modify_user : 'admin11'
     }
     try{
-      const response = fetch(`${BASE_PATH}/modifyCompany`,{
+      const response = fetch(`${BASE_PATH}/modifyLead`,{
           method: "POST", 
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify(info)
