@@ -2,31 +2,13 @@ import React from "react";
 import { Link, withRouter } from "react-router-dom";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import { avatar17 } from "../imagepath";
-import {
-  BiAward,
-  BiBarChartAlt2,
-  BiCalendarAlt,
-  BiClipboard,
-  BiCog,
-  BiCoinStack,
-  BiCommand,
-  BiCube,
-  BiData,
-  BiDockLeft,
-  BiDockTop,
-  BiEdit,
-  BiEnvelope,
-  BiError,
-  BiGridAlt,
-  BiHomeAlt,
-  BiMenu,
-  BiMobileAlt,
-  BiPodcast,
-  BiSearchAlt2,
-  BiStation,
-  BiTask,
-  BiUser,
-} from "react-icons/bi";
+import { BiEdit, BiSearchAlt2, BiStation } from "react-icons/bi";
+import { Business
+  , CalculateOutlined
+  , EditCalendarOutlined
+  , PersonOutlineOutlined
+  , SpaceDashboardOutlined
+} from "@mui/icons-material";
 
 const SidebarNav = (props) => {
 
@@ -80,22 +62,27 @@ const SidebarNav = (props) => {
               </ul>
               </li> */}
               <li>
-                <Link to="/" className={`${pathname === "/" || pathname === "/projects-dashboard" || pathname === "/index" ||
-                  pathname === "/leads-dashboard" ? "active subdrop" : ""}`}><BiHomeAlt /> <span> Dashboard</span> <span className="menu-arrow" /></Link>
+                <Link to="/" className={`${pathname === "/" || pathname === "/projects-dashboard" || pathname === "/index" || pathname === "/leads-dashboard" ? "active subdrop" : ""}`}>
+                  <SpaceDashboardOutlined /> <span> Dashboard</span> <span className="menu-arrow" /></Link>
                 </li>
               <li>
                 <Link className={`${pathname.includes("companies") ? "active" : "" }`} to="/companies">
-                  <BiData /> <span>Companies</span>
+                  <Business /> <span>Companies</span>
                 </Link>
               </li>
               <li>
                 <Link className={`${pathname.includes("leads") ? "active" : ""}`} to="/leads">
-                  <BiUser /> <span>Leads</span>
+                  <PersonOutlineOutlined /> <span>Leads</span>
                 </Link>
               </li>
               <li>
                 <Link className={`${pathname.includes("consultings") ? "active" : ""}`} to="/consultings">
-                  <BiClipboard/> <span>Consultings</span>
+                  <EditCalendarOutlined/> <span>Consultings</span>
+                </Link>
+              </li>
+              <li>
+                <Link className={`${pathname.includes("quotations") ? "active" : ""}`} to="/quotations">
+                  <CalculateOutlined /> <span>Quotations</span>
                 </Link>
               </li>
               <li>

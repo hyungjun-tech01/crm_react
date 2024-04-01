@@ -1,9 +1,20 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentConsulting, atomAllConsultings } from '../atoms/atoms';
+import { atomCurrentConsulting, atomAllConsultings, defaultConsulting } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
+
+export const ConsultingTypes = [
+    { value: '전화지원', label: 'Call'},
+    { value: '원격지원', label: 'Remote'},
+    { value: '교육지원', label: 'Education'},
+    { value: '방문', label: 'Visit'},
+    { value: '상담', label: 'Consult'},
+    { value: '내근', label: 'InDoor'},
+    { value: '기타', label: 'Etc'},
+    { value: 'NULL', label: 'NULL'},
+];
 
 export const ConsultingRepo = selector({
     key: "ConsultingRepository",
@@ -27,7 +38,7 @@ export const ConsultingRepo = selector({
             const input_json = JSON.stringify(newConsulting);
             console.log(`[ modifyConsulting ] input : `, input_json);
             try{
-                const response = await fetch(`${BASE_PATH}/modifyConsulting`, {
+                const response = await fetch(`${BASE_PATH}/modifyConsult`, {
                     method: "POST",
                     headers:{'Content-Type':'application/json'},
                     body: input_json,
@@ -86,6 +97,10 @@ export const ConsultingRepo = selector({
         });
         const setCurrentConsulting = getCallback(({set, snapshot}) => async (consulting_code) => {
             try{
+                if(consulting_code === undefined || consulting_code === null) {
+                    set(atomCurrentConsulting, defaultConsulting);
+                    return;
+                };
                 const allConsultings = await snapshot.getPromise(atomAllConsultings);
                 const selected_arrary = allConsultings.filter(consulting => consulting.consulting_code === consulting_code);
                 if(selected_arrary.length > 0){

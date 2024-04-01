@@ -5,15 +5,15 @@ import { useCookies } from "react-cookie";
 import { CircleImg, SystemUser } from "../imagepath";
 import { Collapse } from "antd";
 import { Edit, SaveAlt } from "@mui/icons-material";
-import { atomCurrentConsulting, defaultConsulting } from "../../atoms/atoms";
-import { ConsultingRepo } from "../../repository/consulting";
+import { atomCurrentQuotation, defaultQuotation } from "../../atoms/atoms";
+import { QuotationRepo } from "../../repository/quotation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const ConsultingsDetailsModel = () => {
+const QuotationsDetailsModel = () => {
   const { Panel } = Collapse;
-  const selectedConsulting = useRecoilValue(atomCurrentConsulting);
-  const { modifyConsulting } = useRecoilValue(ConsultingRepo);
+  const selectedQuotation = useRecoilValue(atomCurrentQuotation);
+  const { modifyQuotation } = useRecoilValue(QuotationRepo);
   const [editedValues, setEditedValues] = useState(null);
   const [cookies] = useCookies(["myLationCrmUserName"]);
 
@@ -42,7 +42,7 @@ const ConsultingsDetailsModel = () => {
 
   const handleEndEdit = useCallback((name) => {
     if (editedValues[name]) {
-      if(editedValues[name] === selectedConsulting[name]){
+      if(editedValues[name] === selectedQuotation[name]){
         const tempValue = {
           ...editedValues,
         };
@@ -51,7 +51,7 @@ const ConsultingsDetailsModel = () => {
         return;
       };
 
-      if (modifyConsulting(editedValues)) {
+      if (modifyQuotation(editedValues)) {
         console.log(`Succeeded to modify: ${name}`);
         const tempValue = {
           ...editedValues,
@@ -73,7 +73,7 @@ const ConsultingsDetailsModel = () => {
       delete tempValue[name];
       setEditedValues(tempValue);
     }
-  }, [editedValues, selectedConsulting]);
+  }, [editedValues, selectedQuotation]);
 
   // --- Funtions for Editing ---------------------------------
   const handleReceiptTimeChange = useCallback((time) => {
@@ -81,7 +81,7 @@ const ConsultingsDetailsModel = () => {
   }, []);
 
   useEffect(() => {
-    console.log('[ConsultingsDetailsModel] called!');
+    console.log('[QuotationsDetailsModel] called!');
     if (editedValues === null) {
       const tempValues = {
         action_type: "UPDATE",
@@ -89,24 +89,24 @@ const ConsultingsDetailsModel = () => {
       };
       setEditedValues(tempValues);
     };
-    if (selectedConsulting && (selectedConsulting !== defaultConsulting)) {
+    if (selectedQuotation && (selectedQuotation !== defaultQuotation)) {
       const tempValues = {
         ...editedValues,
-        consulting_code: selectedConsulting.consulting_code,
+        quotation_code: selectedQuotation.quotation_code,
       };
       setEditedValues(tempValues);
 
-      // Set time from selected consulting data
+      // Set time from selected quotation data
       let input_time = new Date();
-      if(selectedConsulting.receipt_date !== null)
+      if(selectedQuotation.receipt_date !== null)
       {
-        input_time.setTime(Date.parse(selectedConsulting.receipt_date));
+        input_time.setTime(Date.parse(selectedQuotation.receipt_date));
 
-        if(selectedConsulting.receipt_time !== null
-          && selectedConsulting.receipt_time !== '')
+        if(selectedQuotation.receipt_time !== null
+          && selectedQuotation.receipt_time !== '')
         {
           let converted_time = '';
-          const splitted = selectedConsulting.receipt_time.split(' ');
+          const splitted = selectedQuotation.receipt_time.split(' ');
           if(splitted.length === 2) {
             if(splitted[0] === '오전'){
               converted_time = splitted[1] + ' AM';
@@ -126,13 +126,13 @@ const ConsultingsDetailsModel = () => {
         setReceiptTime(input_time);
       };
     }
-  }, [cookies.myLationCrmUserName, selectedConsulting]);
+  }, [cookies.myLationCrmUserName, selectedQuotation]);
 
   return (
     <>
       <div
         className="modal right fade"
-        id="consultings-details"
+        id="quotations-details"
         tabIndex={-1}
         role="dialog"
         aria-modal="true"
@@ -172,19 +172,19 @@ const ConsultingsDetailsModel = () => {
                       </Link>
                       <div className="dropdown-menu">
                         <Link className="dropdown-item" to="#">
-                          Edit This Consulting
+                          Edit This Quotation
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Change Consulting Image
+                          Change Quotation Image
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Delete This Consulting
+                          Delete This Quotation
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Email This Consulting
+                          Email This Quotation
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Clone This Consulting
+                          Clone This Quotation
                         </Link>
                         <Link className="dropdown-item" to="#">
                           Change Record Owner
@@ -193,25 +193,25 @@ const ConsultingsDetailsModel = () => {
                           Generate Merge Document
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Change Consulting to Contact
+                          Change Quotation to Contact
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Convert Consulting
+                          Convert Quotation
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Print This Consulting
+                          Print This Quotation
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Merge Into Consulting
+                          Merge Into Quotation
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          SmartMerge Consulting
+                          SmartMerge Quotation
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Add Activity Set To Consulting
+                          Add Activity Set To Quotation
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Add New Event For Consulting
+                          Add New Event For Quotation
                         </Link>
                       </div>
                     </li>
@@ -228,7 +228,7 @@ const ConsultingsDetailsModel = () => {
               <div className="card-body">
                 <div className="row">
                   <div className="col">
-                    <span>Consulting Status</span>
+                    <span>Quotation Status</span>
                     <p>Not Contacted</p>
                   </div>
                   <div className="col">
@@ -236,15 +236,15 @@ const ConsultingsDetailsModel = () => {
                     <p>Anne Lynch</p>
                   </div>
                   <div className="col">
-                    <span>Consulting Source</span>
+                    <span>Quotation Source</span>
                     <p>Phone Enquiry</p>
                   </div>
                   <div className="col">
-                    <span>Consulting Rating</span>
+                    <span>Quotation Rating</span>
                     <p>0</p>
                   </div>
                   <div className="col">
-                    <span>Consulting owner</span>
+                    <span>Quotation owner</span>
                     <p>John Doe</p>
                   </div>
                 </div>
@@ -366,24 +366,24 @@ const ConsultingsDetailsModel = () => {
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Consulting Information" key="1">
+                                <Panel header="Quotation Information" key="1">
                                   <table className="table">
                                     <tbody>
                                       <tr>
                                         <td className="border-0">Type</td>
-                                        { handleCheckEditState("consulting_type") ? (
+                                        { handleCheckEditState("quotation_type") ? (
                                           <>
                                             <td className="border-0">
                                               <input
                                                 type="text"
-                                                placeholder="Consulting Type"
-                                                name="consulting_type"
-                                                defaultValue={selectedConsulting.consulting_type}
+                                                placeholder="Quotation Type"
+                                                name="quotation_type"
+                                                defaultValue={selectedQuotation.quotation_type}
                                                 onChange={handleEditing}
                                               />
                                             </td>
                                             <td className="border-0">
-                                              <div onClick={() => {handleEndEdit("consulting_type");}}>
+                                              <div onClick={() => {handleEndEdit("quotation_type");}}>
                                                 <SaveAlt />
                                               </div>
                                             </td>
@@ -391,10 +391,10 @@ const ConsultingsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td className="border-0">
-                                              {selectedConsulting.consulting_type}
+                                              {selectedQuotation.quotation_type}
                                             </td>
                                             <td className="border-0">
-                                              <div onClick={() => {handleStartEdit("consulting_type");}}>
+                                              <div onClick={() => {handleStartEdit("quotation_type");}}>
                                                 <Edit />
                                               </div>
                                             </td>
@@ -444,7 +444,7 @@ const ConsultingsDetailsModel = () => {
                                                 type="text"
                                                 placeholder="Receiver"
                                                 name="receiver"
-                                                defaultValue={selectedConsulting.receiver}
+                                                defaultValue={selectedQuotation.receiver}
                                                 onChange={handleEditing}
                                               />
                                             </td>
@@ -457,7 +457,7 @@ const ConsultingsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td>
-                                              {selectedConsulting.receiver}
+                                              {selectedQuotation.receiver}
                                             </td>
                                             <td>
                                               <div onClick={() => {handleStartEdit("receiver");}}>
@@ -476,7 +476,7 @@ const ConsultingsDetailsModel = () => {
                                                 type="text"
                                                 placeholder="Product Type"
                                                 name="product_type"
-                                                defaultValue={selectedConsulting.product_type}
+                                                defaultValue={selectedQuotation.product_type}
                                                 onChange={handleEditing}
                                               />
                                             </td>
@@ -489,7 +489,7 @@ const ConsultingsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td>
-                                              {selectedConsulting.product_type}
+                                              {selectedQuotation.product_type}
                                             </td>
                                             <td>
                                               <div onClick={() => {handleStartEdit("product_type");}}>
@@ -508,7 +508,7 @@ const ConsultingsDetailsModel = () => {
                                                 type="text"
                                                 placeholder="Lead Time"
                                                 name="lead_time"
-                                                defaultValue={selectedConsulting.lead_time}
+                                                defaultValue={selectedQuotation.lead_time}
                                                 onChange={handleEditing}
                                               />
                                             </td>
@@ -521,7 +521,7 @@ const ConsultingsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td>
-                                              {selectedConsulting.lead_time}
+                                              {selectedQuotation.lead_time}
                                             </td>
                                             <td>
                                               <div onClick={() => {handleStartEdit("lead_time");}}>
@@ -540,7 +540,7 @@ const ConsultingsDetailsModel = () => {
                                                 type="text"
                                                 placeholder="Request Type"
                                                 name="request_type"
-                                                defaultValue={selectedConsulting.request_type}
+                                                defaultValue={selectedQuotation.request_type}
                                                 onChange={handleEditing}
                                               />
                                             </td>
@@ -553,7 +553,7 @@ const ConsultingsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td>
-                                              {selectedConsulting.request_type}
+                                              {selectedQuotation.request_type}
                                             </td>
                                             <td>
                                               <div onClick={() => {handleStartEdit("request_type");}}>
@@ -572,7 +572,7 @@ const ConsultingsDetailsModel = () => {
                                                 className="form-control"
                                                 rows={3}
                                                 placeholder="Request Content"
-                                                defaultValue={selectedConsulting.request_content}
+                                                defaultValue={selectedQuotation.request_content}
                                                 name="request_content"
                                                 onChange={handleEditing}
                                               />
@@ -586,7 +586,7 @@ const ConsultingsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td>
-                                              {selectedConsulting.request_content}
+                                              {selectedQuotation.request_content}
                                             </td>
                                             <td>
                                               <div onClick={() => {handleStartEdit("request_content");}}>
@@ -605,7 +605,7 @@ const ConsultingsDetailsModel = () => {
                                                 className="form-control"
                                                 rows={3}
                                                 placeholder="Action Content"
-                                                defaultValue={selectedConsulting.action_content}
+                                                defaultValue={selectedQuotation.action_content}
                                                 name="action_content"
                                                 onChange={handleEditing}
                                               />
@@ -619,7 +619,7 @@ const ConsultingsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td>
-                                              {selectedConsulting.action_content}
+                                              {selectedQuotation.action_content}
                                             </td>
                                             <td>
                                               <div onClick={() => {handleStartEdit("action_content");}}>
@@ -638,7 +638,7 @@ const ConsultingsDetailsModel = () => {
                                                 type="text"
                                                 placeholder="Request Type"
                                                 name="Sales Representative"
-                                                defaultValue={selectedConsulting.sales_representati}
+                                                defaultValue={selectedQuotation.sales_representati}
                                                 onChange={handleEditing}
                                               />
                                             </td>
@@ -651,7 +651,7 @@ const ConsultingsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td>
-                                              {selectedConsulting.sales_representati}
+                                              {selectedQuotation.sales_representati}
                                             </td>
                                             <td>
                                               <div onClick={() => {handleStartEdit("sales_representati");}}>
@@ -670,7 +670,7 @@ const ConsultingsDetailsModel = () => {
                                                 type="text"
                                                 placeholder="Status"
                                                 name="status"
-                                                defaultValue={selectedConsulting.status}
+                                                defaultValue={selectedQuotation.status}
                                                 onChange={handleEditing}
                                               />
                                             </td>
@@ -683,7 +683,7 @@ const ConsultingsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td>
-                                              {selectedConsulting.status}
+                                              {selectedQuotation.status}
                                             </td>
                                             <td>
                                               <div onClick={() => {handleStartEdit("status");}}>
@@ -712,7 +712,7 @@ const ConsultingsDetailsModel = () => {
                                                 type="text"
                                                 placeholder="Lead Name"
                                                 name="lead_name"
-                                                defaultValue={selectedConsulting.lead_name}
+                                                defaultValue={selectedQuotation.lead_name}
                                                 onChange={handleEditing}
                                               />
                                             </td>
@@ -725,7 +725,7 @@ const ConsultingsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td className="border-0">
-                                              {selectedConsulting.lead_name}
+                                              {selectedQuotation.lead_name}
                                             </td>
                                             <td className="border-0">
                                               <div onClick={() => {handleStartEdit("lead_name");}}>
@@ -744,7 +744,7 @@ const ConsultingsDetailsModel = () => {
                                                 type="text"
                                                 placeholder="Department"
                                                 name="department"
-                                                defaultValue={selectedConsulting.department}
+                                                defaultValue={selectedQuotation.department}
                                                 onChange={handleEditing}
                                               />
                                             </td>
@@ -757,7 +757,7 @@ const ConsultingsDetailsModel = () => {
                                           ) : (
                                           <>
                                             <td>
-                                              {selectedConsulting.department}
+                                              {selectedQuotation.department}
                                             </td>
                                             <td>
                                               <div onClick={() => {handleStartEdit("department");}}>
@@ -776,7 +776,7 @@ const ConsultingsDetailsModel = () => {
                                                 type="text"
                                                 placeholder="Position"
                                                 name="position"
-                                                defaultValue={selectedConsulting.position}
+                                                defaultValue={selectedQuotation.position}
                                                 onChange={handleEditing}
                                               />
                                             </td>
@@ -789,7 +789,7 @@ const ConsultingsDetailsModel = () => {
                                           ) : (
                                           <>
                                             <td>
-                                              {selectedConsulting.position}
+                                              {selectedQuotation.position}
                                             </td>
                                             <td>
                                               <div onClick={() => {handleStartEdit("position");}}>
@@ -808,7 +808,7 @@ const ConsultingsDetailsModel = () => {
                                                 type="text"
                                                 placeholder="Mobile"
                                                 name="mobile_number"
-                                                defaultValue={selectedConsulting.mobile_number}
+                                                defaultValue={selectedQuotation.mobile_number}
                                                 onChange={handleEditing}
                                               />
                                             </td>
@@ -821,7 +821,7 @@ const ConsultingsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td>
-                                              {selectedConsulting.mobile_number}
+                                              {selectedQuotation.mobile_number}
                                             </td>
                                             <td>
                                               <div onClick={() => {handleStartEdit("mobile_number");}}>
@@ -840,7 +840,7 @@ const ConsultingsDetailsModel = () => {
                                                 type="text"
                                                 placeholder="Phone"
                                                 name="phone_number"
-                                                defaultValue={selectedConsulting.phone_number}
+                                                defaultValue={selectedQuotation.phone_number}
                                                 onChange={handleEditing}
                                               />
                                             </td>
@@ -853,7 +853,7 @@ const ConsultingsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td>
-                                              {selectedConsulting.phone_number}
+                                              {selectedQuotation.phone_number}
                                             </td>
                                             <td>
                                               <div onClick={() => {handleStartEdit("phone_number");}}>
@@ -872,7 +872,7 @@ const ConsultingsDetailsModel = () => {
                                                 type="text"
                                                 placeholder="Email"
                                                 name="email"
-                                                defaultValue={selectedConsulting.email}
+                                                defaultValue={selectedQuotation.email}
                                                 onChange={handleEditing}
                                               />
                                             </td>
@@ -885,7 +885,7 @@ const ConsultingsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td>
-                                              {selectedConsulting.email}
+                                              {selectedQuotation.email}
                                             </td>
                                             <td>
                                               <div onClick={() => {handleStartEdit("email");}}>
@@ -914,7 +914,7 @@ const ConsultingsDetailsModel = () => {
                                                 type="text"
                                                 placeholder="Organization"
                                                 name="company_name"
-                                                defaultValue={selectedConsulting.company_name}
+                                                defaultValue={selectedQuotation.company_name}
                                                 onChange={handleEditing}
                                               />
                                             </td>
@@ -927,7 +927,7 @@ const ConsultingsDetailsModel = () => {
                                           ) : (
                                           <>
                                             <td className="border-0">
-                                              {selectedConsulting.company_name}
+                                              {selectedQuotation.company_name}
                                             </td>
                                             <td className="border-0">
                                               <div onClick={() => {handleStartEdit("company_name");}}>
@@ -955,7 +955,7 @@ const ConsultingsDetailsModel = () => {
                                               <input
                                                 type="text"
                                                 placeholder="Status"
-                                                defaultValue={selectedConsulting.status}
+                                                defaultValue={selectedQuotation.status}
                                                 name="status"
                                                 onChange={handleEditing}
                                               />
@@ -969,7 +969,7 @@ const ConsultingsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td className="border-0">
-                                              {selectedConsulting.status}
+                                              {selectedQuotation.status}
                                             </td>
                                             <td className="border-0">
                                               <div onClick={() => {handleStartEdit("status");}}>
@@ -1465,7 +1465,7 @@ const ConsultingsDetailsModel = () => {
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Consulting Information" key="1">
+                                <Panel header="Quotation Information" key="1">
                                   <table className="table">
                                     <tbody>
                                       <tr>
@@ -1485,7 +1485,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>Howe-Blanda LLC</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Status</td>
+                                        <td>Quotation Status</td>
                                         <td>OPEN - NotContacted</td>
                                       </tr>
                                       <tr>
@@ -1497,11 +1497,11 @@ const ConsultingsDetailsModel = () => {
                                         <td>abc@gmail.com</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Owner</td>
+                                        <td>Quotation Owner</td>
                                         <td>John Doe</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Created</td>
+                                        <td>Quotation Created</td>
                                         <td>03-Jun-20 1:14 AM</td>
                                       </tr>
                                       <tr>
@@ -1513,7 +1513,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>10/03/2000</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Rating</td>
+                                        <td>Quotation Rating</td>
                                         <td>0</td>
                                       </tr>
                                     </tbody>
@@ -1559,7 +1559,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>2</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Source</td>
+                                        <td>Quotation Source</td>
                                         <td>Phone Enquiry</td>
                                       </tr>
                                     </tbody>
@@ -1619,7 +1619,7 @@ const ConsultingsDetailsModel = () => {
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
                                 <Panel
-                                  header="Consulting Conversion Information"
+                                  header="Quotation Conversion Information"
                                   key="1"
                                 >
                                   <table className="table">
@@ -2118,7 +2118,7 @@ const ConsultingsDetailsModel = () => {
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Consulting Information" key="1">
+                                <Panel header="Quotation Information" key="1">
                                   <table className="table">
                                     <tbody>
                                       <tr>
@@ -2138,7 +2138,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>Howe-Blanda LLC</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Status</td>
+                                        <td>Quotation Status</td>
                                         <td>OPEN - NotContacted</td>
                                       </tr>
                                       <tr>
@@ -2150,11 +2150,11 @@ const ConsultingsDetailsModel = () => {
                                         <td>abc@gmail.com</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Owner</td>
+                                        <td>Quotation Owner</td>
                                         <td>John Doe</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Created</td>
+                                        <td>Quotation Created</td>
                                         <td>03-Jun-20 1:14 AM</td>
                                       </tr>
                                       <tr>
@@ -2166,7 +2166,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>07/02/2010</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Rating</td>
+                                        <td>Quotation Rating</td>
                                         <td>0</td>
                                       </tr>
                                     </tbody>
@@ -2212,7 +2212,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>2</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Source</td>
+                                        <td>Quotation Source</td>
                                         <td>Phone Enquiry</td>
                                       </tr>
                                     </tbody>
@@ -2272,7 +2272,7 @@ const ConsultingsDetailsModel = () => {
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
                                 <Panel
-                                  header="Consulting Conversion Information"
+                                  header="Quotation Conversion Information"
                                   key="1"
                                 >
                                   <table className="table">
@@ -2778,7 +2778,7 @@ const ConsultingsDetailsModel = () => {
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Consulting Information" key="1">
+                                <Panel header="Quotation Information" key="1">
                                   <table className="table">
                                     <tbody>
                                       <tr>
@@ -2798,7 +2798,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>Howe-Blanda LLC</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Status</td>
+                                        <td>Quotation Status</td>
                                         <td>OPEN - NotContacted</td>
                                       </tr>
                                       <tr>
@@ -2810,11 +2810,11 @@ const ConsultingsDetailsModel = () => {
                                         <td>abc@gmail.com</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Owner</td>
+                                        <td>Quotation Owner</td>
                                         <td>John Doe</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Created</td>
+                                        <td>Quotation Created</td>
                                         <td>03-Jun-20 1:14 AM</td>
                                       </tr>
                                       <tr>
@@ -2826,7 +2826,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>10/03/2000</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Rating</td>
+                                        <td>Quotation Rating</td>
                                         <td>0</td>
                                       </tr>
                                     </tbody>
@@ -2872,7 +2872,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>2</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Source</td>
+                                        <td>Quotation Source</td>
                                         <td>Phone Enquiry</td>
                                       </tr>
                                     </tbody>
@@ -2935,7 +2935,7 @@ const ConsultingsDetailsModel = () => {
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
                                 <Panel
-                                  header="Consulting Conversion Information"
+                                  header="Quotation Conversion Information"
                                   key="1"
                                 >
                                   <table className="table">
@@ -3405,4 +3405,4 @@ const ConsultingsDetailsModel = () => {
   );
 };
 
-export default ConsultingsDetailsModel;
+export default QuotationsDetailsModel;

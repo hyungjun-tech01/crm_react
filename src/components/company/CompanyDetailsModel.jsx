@@ -72,6 +72,7 @@ const CompanyDetailsModel = () => {
   }, [editedValues, selectedCompany]);
 
   useEffect(() => {
+    console.log('[CompanyDetailsModel] called!');
     if (editedValues === null){
       const tempValues = {
         action_type: "UPDATE",
