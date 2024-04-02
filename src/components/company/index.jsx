@@ -17,7 +17,7 @@ const Company = () => {
   const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const [ companyChange, setCompanyChange ] = useState(null);
-  const [ cookies ] = useCookies(["myLationCrmUserName"]);
+  const [ cookies ] = useCookies(["myLationCrmUserName",  "myLationCrmUserId"]);
   // const [ selectedEstablishDate, setSelectedEstablishDate ] = useState(null);
   // const [ selectedCloseDate, setSelectedCloseDate ] = useState(null);
 
@@ -79,7 +79,7 @@ const Company = () => {
       action_type: 'ADD',
       company_number: '99999',// Temporary
       counter: 0,
-      modify_user: cookies.myLationCrmUserName,
+      modify_user: cookies.myLationCrmUserId,
     };
     console.log(`[ handleAddNewCompany ]`, newComData);
     const result = modifyCompany(newComData);

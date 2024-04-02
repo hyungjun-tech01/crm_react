@@ -14,7 +14,7 @@ const LeadsDetailsModel = () => {
   const selectedLead = useRecoilValue(atomCurrentLead);
   const { modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
   const [editedValues, setEditedValues] = useState(null);
-  const [cookies] = useCookies(["myLationCrmUserName"]);
+  const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
   const [ keymanLabel, setKeymanLabel] = useState(null);
 
   // --- Funtions for Editing ---------------------------------
@@ -116,7 +116,7 @@ const LeadsDetailsModel = () => {
     if (editedValues === null) {
       const tempValues = {
         action_type: "UPDATE",
-        modify_user: cookies.myLationCrmUserName,
+        modify_user: cookies.myLationCrmUserId,
       };
       setEditedValues(tempValues);
     };

@@ -19,7 +19,7 @@ const Leads = () => {
   const allLeadData = useRecoilValue(atomAllLeads);
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
   const { loadAllLeads, modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
-  const [ cookies ] = useCookies(["myLationCrmUserName"]);
+  const [ cookies ] = useCookies(["myLationCrmUserName",  "myLationCrmUserId",]);
 
   const [ leadChange, setLeadChange ] = useState(null);
   const [ companyData, setCompanyData ] = useState([]);
@@ -57,7 +57,7 @@ const Leads = () => {
       action_type: 'ADD',
       lead_number: '99999',// Temporary
       counter: 0,
-      modify_user: cookies.myLationCrmUserName,
+      modify_user: cookies.myLationCrmUserId,
     };
     console.log(`[ handleAddNewLead ]`, newLeadData);
     const result = modifyLead(newLeadData);

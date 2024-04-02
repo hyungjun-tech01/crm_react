@@ -64,13 +64,14 @@ const Sample = () => {
     //   };          
     // --4B554B54422FD42C9A153EABB0CEEFDE
     const info ={
-        action_type:'UPDATE'                ,   // 'ADD', 'UPDATE'
-         // company_code : '4B554B54422FD42C9A153EABB0CEEFDE' ,   // 4B554B54422FD42C9A153EABB0CEEFDE
+        action_type:'ADD'                ,   // 'ADD', 'UPDATE'
+        lead_code : '271D70FE7C4C8744A78149F255FD7C72',
+         company_code : '4B554B54422FD42C9A153EABB0CEEFDE' ,   // 4B554B54422FD42C9A153EABB0CEEFDE
         lead_name : '테스트리드 변경',
         modify_user : 'admin'
     }
     try{
-      const response = fetch(`${BASE_PATH}/modifyLead`,{
+      const response = fetch(`${BASE_PATH}/modifyConsult`,{
           method: "POST", 
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify(info)

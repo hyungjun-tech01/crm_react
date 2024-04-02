@@ -13,7 +13,7 @@ const CompanyDetailsModel = () => {
   const selectedCompany = useRecoilValue(atomCurrentCompany);
   const { modifyCompany } = useRecoilValue(CompanyRepo);
   const [editedValues, setEditedValues] = useState(null);
-  const [cookies] = useCookies(["myLationCrmUserName"]);
+  const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
   // --- Funtions for Editing ---------------------------------
   const handleCheckEditState = useCallback((name) => {
@@ -76,7 +76,7 @@ const CompanyDetailsModel = () => {
     if (editedValues === null){
       const tempValues = {
         action_type: "UPDATE",
-        modify_user: cookies.myLationCrmUserName,
+        modify_user: cookies.myLationCrmUserId,
       };
       setEditedValues(tempValues);
     };
