@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
+import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { SystemUser, CircleImg, C_logo, C_logo2 } from "../imagepath";
 import { Table } from "antd";
@@ -11,8 +12,6 @@ import "../antdstyle.css";
 import TransactionsDetailsModel from "./TransactionsDetailsModel";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
-import DealDetailsModel from "../deals/DealDetailsModel";
-import ProjectDetailsModel from "../project/ProjectDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -20,8 +19,8 @@ import { BiClipboard } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { TransactionRepo } from "../../repository/transaction";
-import { atomAllCompanies, atomAllTransactions, atomAllLeads, defaultTransaction } from "../../atoms/atoms";
-import { compareCompanyName } from "../../constants/sortings";
+import { atomAllCompanies, atomAllLeads, atomAllTransactions, defaultTransaction } from "../../atoms/atoms";
+import { compareCompanyName , compareText} from "../../constants/functions";
 
 const Transactions = () => {
   const allCompnayData = useRecoilValue(atomAllCompanies);
@@ -32,20 +31,40 @@ const Transactions = () => {
   const { loadAllTransactions, modifyTransaction, setCurrentTransaction } = useRecoilValue(TransactionRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName"]);
 
-  const [ companyData, setCompanyData ] = useState(null);
-  const [ leadData, setLeadData ] = useState(null);
+  const [ leadsForSelection, setLeadsForSelection ] = useState(null);
   const [ transactionChange, setTransactionChange ] = useState(null);
+  const [ publishDate, setPublishDate ] = useState(new Date());
+
+  const handlePublishDateChange = useCallback((date) => {
+    setPublishDate(date);
+    const localDate = formateDate(date);
+    const tempChanges = {
+      ...transactionChange,
+      publish_date: localDate,
+    };
+    setTransactionChange(tempChanges);
+  }, [transactionChange]);
+
+  const handleSelectLead = useCallback((selected) => {
+    const found_idx = allCompnayData.findIndex(com => com.company_code === selected.value.company_code);
+    if(found_idx !== -1){
+      const tempChanges = {
+        ...transactionChange,
+        lead_code: selected.value.lead_code,
+        company_name: allCompnayData[found_idx].company_name,
+        ceo_name: allCompnayData[found_idx].ceo_name,
+        company_address: allCompnayData[found_idx].company_address,
+        business_type: allCompnayData[found_idx].business_type,
+        business_item: allCompnayData[found_idx].business_item,
+        business_registration_code: allCompnayData[found_idx].business_registration_code,
+      };
+      setTransactionChange(tempChanges);
+    } else {
+      console.error('[ Transaction ] No matched Company!');
+    }
+    
+  }, [])
   
-  const [ selectedDate1, setSelectedDate1 ] = useState(new Date());
-  const [ selectedDate2, setSelectedDate2 ] = useState(new Date());
-
-  const handleDateChange1 = (date) => {
-    setSelectedDate1(date);
-  };
-  const handleDateChange2 = (date) => {
-    setSelectedDate2(date);
-  };
-
   // --- Functions used for Add New Transaction ------------------------------
   const handleAddNewTransactionClicked = useCallback(() => {
     initializeTransactionTemplate();
@@ -66,9 +85,7 @@ const Transactions = () => {
 
   const handleAddNewTransaction = useCallback((event)=>{
     // Check data if they are available
-    if(transactionChange.lead_name === null
-      || transactionChange.lead_name === ''
-      || transactionChange.company_code === null)
+    if(transactionChange.company_code === null)
     {
       console.log("Company Name must be available!");
       return;
@@ -77,9 +94,7 @@ const Transactions = () => {
     const newTransactionData = {
       ...transactionChange,
       action_type: 'ADD',
-      lead_number: '99999',// Temporary
-      counter: 0,
-      modify_user: cookies.myLationCrmUserName,
+      recent_user: cookies.myLationCrmUserName,
     };
     console.log(`[ handleAddNewTransaction ]`, newTransactionData);
     const result = modifyTransaction(newTransactionData);
@@ -92,7 +107,7 @@ const Transactions = () => {
   // --- Section for Table ------------------------------
   const columns = [
     {
-      title: "Company",
+      title: "Compay",
       dataIndex: "company_name",
       render: (text, record) => (
         <>
@@ -105,6 +120,22 @@ const Transactions = () => {
         </>
       ),
       sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
+    },
+    {
+      title: "Title",
+      dataIndex: "transaction_title",
+      render: (text, record) => (
+        <>
+          <a href="#"
+            data-bs-toggle="modal"
+            data-bs-target="#transactions-details"
+            onClick={()=>setCurrentTransaction(record.transaction_code)}
+          >
+            {text}
+          </a>
+        </>
+      ),
+      sorter: (a, b) => compareText(a.transaction_title, b.transaction_title),
     },
     {
       title: "Type",
@@ -120,35 +151,28 @@ const Transactions = () => {
           </a>
         </>
       ),
-      sorter: (a, b) => a.transaction_type.length - b.transaction_type.length,
+      sorter: (a, b) => compareText(a.transaction_type, b.transaction_type),
     },
     {
-      title: "Lead",
-      dataIndex: "lead_name",
-      render: (text, record) => (
+      title: "Publish Date",
+      dataIndex: "publish_date",
+      render: (text, record) => 
         <>
-          <a href="#"
-            data-bs-toggle="modal"
-            data-bs-target="#leads-details"
-            onClick={()=>setCurrentLead(record.lead_code)}
-          >
-            {text}
-          </a>
-        </>
-      ),
-      sorter: (a, b) => a.lead_name.length - b.lead_name.length,
+          {new Date(text).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day: 'numeric'})}
+        </>,
+      sorter: (a, b) => a.publish_date - b.publish_date,
     },
     {
-      title: "Mobile",
-      dataIndex: "mobile_number",
+      title: "Publish Type",
+      dataIndex: "publish_type",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.mobile_number.length - b.mobile_number.length,
+      sorter: (a, b) => compareText(a.publish_type, b.publish_type),
     },
     {
-      title: "Phone",
-      dataIndex: "phone_number",
+      title: "Payment Type",
+      dataIndex: "payment_type",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.phone_number.length - b.phone_number.length,
+      sorter: (a, b) => compareText(a.payment_type, b.payment_type),
     },
     {
       title: "Action",
@@ -189,21 +213,36 @@ const Transactions = () => {
   useEffect(() => {
     if (allCompnayData.length === 0) {
       loadAllCompanies();
-    } else {
-      let company_subset = {};
-      allCompnayData.forEach((data) => {
-        company_subset[data.company_name] = data.company_code;
-      });
-      setCompanyData(company_subset);
-    }
+    };
     if (allLeadData.length === 0) {
       loadAllLeads();
+    } else {
+      const lead_subset = allLeadData.map((data) => {
+        return {
+          label: data.lead_name,
+          value: {
+            lead_code: data.lead_code,
+            company_code: data.company_code,
+          },
+        }
+      });
+      lead_subset.sort((a, b) => {
+        if (a.label > b.label) {
+          return 1;
+        }
+        if (a.label < b.label) {
+          return -1;
+        }
+        // a must be equal to b
+        return 0;
+      });
+      setLeadsForSelection(lead_subset);
     };
     if (allTransactionData.length === 0) {
       loadAllTransactions();
     };
     initializeTransactionTemplate();
-  }, [allCompnayData, allLeadData, allTransactionData]);
+  }, [allCompnayData, allTransactionData, allTransactionData]);
 
   return (
     <HelmetProvider>
@@ -265,7 +304,7 @@ const Transactions = () => {
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                       id="add-task"
                       data-bs-toggle="modal"
-                      data-bs-target="#add_transaction"
+                      data-bs-target="#add_new_transaction"
                       onClick={handleAddNewTransactionClicked}
                     >
                       Add Transaction
@@ -309,13 +348,12 @@ const Transactions = () => {
         </div>
         <SystemUserModel />
         <CompanyDetailsModel />
-        <DealDetailsModel />
-        <ProjectDetailsModel />
+        <TransactionsDetailsModel />
         {/* /Page Content */}
 
         <div
           className="modal right fade"
-          id="add_transaction"
+          id="add_new_transaction"
           tabIndex={-1}
           role="dialog"
           aria-modal="true"
@@ -334,7 +372,7 @@ const Transactions = () => {
             </button>
             <div className="modal-content">
               <div className="modal-header">
-                <h4 className="modal-title">Schedule an Activity</h4>
+                <h4 className="modal-title">Transaction</h4>
                 <button
                   type="button"
                   className="btn-close"
@@ -342,172 +380,174 @@ const Transactions = () => {
                 ></button>
               </div>
               <div className="modal-body">
-                <form className="forms-sampme" id="add_new_transaction_form">
-                  <div className="row">
-                    <div className="col-sm-12">
-                      <div className="form-group">
-                        <input
-                          className="form-control"
-                          type="text"
-                          name="deal-name"
-                          id="deal-name"
-                          defaultValue="Call"
-                        />
-                      </div>
-                      <div className="btn-group mb-3">
-                        <button type="button" className="btn btn-light">
-                          <i className="fa fa-phone" aria-hidden="true" />
-                        </button>
-                        <button type="button" className="btn btn-light">
-                          <i className="fa fa-users" aria-hidden="true" />
-                        </button>
-                        <button type="button" className="btn btn-light">
-                          <i className="fa fa-clock-o" aria-hidden="true" />
-                        </button>
-                        <button type="button" className="btn btn-light">
-                          <i className="fa fa-flag" aria-hidden="true" />
-                        </button>
-                        <button type="button" className="btn btn-light">
-                          <i
-                            className="fa fa-paper-plane-o"
-                            aria-hidden="true"
+              <div className="row">
+                  <div className="col-md-12">
+                    <form id="add_new_transaction_form">
+                      <h4>Transaction Information</h4>
+                      <div className="form-group row">
+                        <div className="col-sm-9">
+                          <label className="col-form-label">Name <span className="text-danger">*</span></label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Name"
+                            name="transaction_title"
+                            onChange={handleTransactionChange}
                           />
-                        </button>
-                        <button type="button" className="btn btn-light">
-                          <i className="fa fa-cutlery" aria-hidden="true" />
-                        </button>
-                      </div>
-                    </div>
-                    <div className="col-sm-12">
-                      <div className="form-group">
-                        <div className="row">
-                          <div className="col-md-3">
-                            <div className="cal-icon">
-                              <DatePicker
-                                className="form-control"
-                                selected={selectedDate1}
-                                onChange={handleDateChange1}
-                                dateFormat="dd/MM/yyyy"
-                                showDayMonthYearPicker
-                              />
-                            </div>
-                          </div>
-                          <div className="col-md-3">
-                            <select className="form-control">
-                              <option>02:00</option>
-                              <option>03:00</option>
-                            </select>
-                          </div>
-                          <div className="col-md-3">
-                            <select className="form-control">
-                              <option>02:00</option>
-                              <option>03:00</option>
-                            </select>
-                          </div>
-                          <div className="col-md-3">
-                            <div className="cal-icon">
-                              <DatePicker
-                                className="form-control"
-                                selected={selectedDate2}
-                                onChange={handleDateChange2}
-                                dateFormat="dd/MM/yyyy"
-                                showDayMonthYearPicker
-                              />
-                            </div>
-                          </div>
+                        </div>
+                        <div className="col-sm-3">
+                          <label className="col-form-label">Type</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Type"
+                            name="transaction_type"
+                            onChange={handleTransactionChange}
+                          />
                         </div>
                       </div>
-                    </div>
-                    <div className="col-sm-12">
-                      <div className="form-group">
-                        <div className="row m-0">
-                          <p>
-                            Add <a>Guests</a>, <a>Location</a>,{" "}
-                            <a>Description</a>
-                          </p>
+                      <div className="form-group row">
+                        <div className="col-sm-8">
+                          <label className="col-form-label">Publish Date</label>
+                          <DatePicker
+                            className="form-control"
+                            selected={publishDate}
+                            onChange={handlePublishDateChange}
+                            dateFormat="yyyy.MM.dd"
+                          />
+                        </div>
+                        <div className="col-sm-4">
+                          <label className="col-form-label">Publish Type</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Publish Type"
+                            name="publish_type"
+                            onChange={handleTransactionChange}
+                          />
                         </div>
                       </div>
-                    </div>
-                    <div className="col-sm-12">
-                      <div className="form-group">
-                        <select className="form-control">
-                          <option>Busy</option>
-                          <option>Free</option>
-                        </select>
+                      <h4>Lead Information</h4>
+                      <div className="form-group row">
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Lead Name</label>
+                          <Select options={leadsForSelection} onChange={handleSelectLead} />
+                        </div>
                       </div>
-                    </div>
-                    <div className="col-sm-12">
-                      <div className="form-group">
-                        <textarea
-                          className="form-control mb-2"
-                          rows={3}
-                          placeholder="Notes"
-                          defaultValue={""}
-                        />
-                        <span className="pt-2">
-                          Notes are private and visible only within your
-                          Pipedrive account
-                        </span>
+                      { (transactionChange && transactionChange.lead_code) && 
+                        <>
+                          <h4>Company Information</h4>
+                          <div className="form-group row">
+                            <div className="col-sm-6">
+                              <label className="col-form-label">Organization</label>
+                              <label className="col-form-label">{transactionChange.company_name}</label>
+                            </div>
+                            <div className="col-sm-6">
+                              <label className="col-form-label">CEO Name</label>
+                              <label className="col-form-label">{transactionChange.ceo_name}</label>
+                            </div>
+                          </div>
+                          <div className="form-group row">
+                            <div className="col-sm-12">
+                              <label className="col-form-label">Address</label>
+                              <label className="col-form-label">{transactionChange.company_address}</label>
+                            </div>
+                          </div>
+                          <div className="form-group row">
+                            <div className="col-sm-6">
+                              <label className="col-form-label">Business Type </label>
+                              <label className="col-form-label">{transactionChange.business_type}</label>
+                            </div>
+                            <div className="col-sm-6">
+                              <label className="col-form-label">Business Item </label>
+                              <label className="col-form-label">{transactionChange.business_item}</label>
+                            </div>
+                          </div>
+                          <div className="form-group row">
+                            <div className="col-sm-12">
+                              <label className="col-form-label">Registration No.</label>
+                              <label className="col-form-label">{transactionChange.business_registration_code}</label>
+                            </div>
+                          </div>
+                        </>
+                      }
+                      <h4>Price Information</h4>
+                      <div className="form-group row">
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Supply Price</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Supply Price"
+                            name="supply_price"
+                            onChange={handleTransactionChange}
+                          />
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Tax</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Tax"
+                            name="tax_price"
+                            onChange={handleTransactionChange}
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <div className="col-sm-12">
-                      <div className="form-group">
-                        <select className="form-control">
-                          <option>John Doe</option>
-                          <option>John Smith</option>
-                        </select>
+                      <div className="form-group row">
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Total Price</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Total Price"
+                            name="total_price"
+                            onChange={handleTransactionChange}
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <div className="col-sm-12">
-                      <div className="form-group">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Deal or Transaction"
-                        />
+                      <div className="form-group row">
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Currency</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Currency"
+                            name="currency"
+                            onChange={handleTransactionChange}
+                          />
+                        </div>
+                        <div className="col-sm-6">
+                          <label className="col-form-label">Payment Type</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Payment Type"
+                            name="payment_type"
+                            onChange={handleTransactionChange}
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <div className="col-sm-12">
-                      <div className="form-group">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="People"
-                        />
+                      <div className="text-center py-3">
+                        <button
+                          type="button"
+                          className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                          onClick={handleAddNewTransaction}
+                        >
+                          Save
+                        </button>
+                        &nbsp;&nbsp;
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-rounded"
+                          data-bs-dismiss="modal"
+                        >
+                          Cancel
+                        </button>
                       </div>
-                    </div>
-                    <div className="col-sm-12">
-                      <div className="form-group">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Organization"
-                        />
-                      </div>
-                    </div>
+                    </form>
                   </div>
-                  <div className="submit-section mt-0">
-                    <div className="custom-check mb-4">
-                      <input type="checkbox" id="mark-as-done" />
-                      <label htmlFor="mark-as-done">Mark as Done</label>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <button
-                      type="button"
-                      className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                    >
-                      Save
-                    </button>
-                    &nbsp;&nbsp;
-                    <button
-                      type="button"
-                      className="btn btn-secondary btn-rounded"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
+                </div>
               </div>
             </div>
           </div>
@@ -557,7 +597,6 @@ const Transactions = () => {
             </div>
           </div>
         </div>
-        <TransactionsDetailsModel />
       </div>
     </HelmetProvider>
   );

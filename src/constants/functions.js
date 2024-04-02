@@ -1,4 +1,4 @@
-const delete_text = [' ','㈜','(주)','(유)','(의)'];
+const delete_text = [' ','㈜','(주)','(유)','(의)','(학)'];
 
 // const compareText = (text1, text2) => {
 //     // Check if character is korean

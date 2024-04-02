@@ -7,6 +7,7 @@ import { Business
   , CalculateOutlined
   , EditCalendarOutlined
   , PersonOutlineOutlined
+  , ReceiptLongOutlined
   , SpaceDashboardOutlined
 } from "@mui/icons-material";
 
@@ -83,6 +84,11 @@ const SidebarNav = (props) => {
               <li>
                 <Link className={`${pathname.includes("quotations") ? "active" : ""}`} to="/quotations">
                   <CalculateOutlined /> <span>Quotations</span>
+                </Link>
+              </li>
+              <li>
+                <Link className={`${pathname.includes("transactions") ? "active" : ""}`} to="/transactions">
+                  <ReceiptLongOutlined /> <span>Transactions</span>
                 </Link>
               </li>
               <li>

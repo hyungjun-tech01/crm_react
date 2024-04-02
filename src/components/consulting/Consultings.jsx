@@ -14,7 +14,7 @@ import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import DealDetailsModel from "../deals/DealDetailsModel";
 import ProjectDetailsModel from "../project/ProjectDetailsModel";
-import LeadsDetailsModel from "../lead/LeadsDetailsModel";
+import LeadsDetailsModel from "../leads/LeadsDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 

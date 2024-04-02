@@ -5,19 +5,19 @@ import { useCookies } from "react-cookie";
 import { CircleImg, SystemUser } from "../imagepath";
 import { Collapse } from "antd";
 import { Edit, SaveAlt } from "@mui/icons-material";
-import { atomCurrentConsulting, defaultConsulting } from "../../atoms/atoms";
-import { ConsultingRepo } from "../../repository/consulting";
+import { atomCurrentTransaction, defaultTransaction } from "../../atoms/atoms";
+import { TransactionRepo } from "../../repository/transaction";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const ConsultingsDetailsModel = () => {
+const TransactionsDetailsModel = () => {
   const { Panel } = Collapse;
-  const selectedConsulting = useRecoilValue(atomCurrentConsulting);
-  const { modifyConsulting } = useRecoilValue(ConsultingRepo);
+  const selectedTransaction = useRecoilValue(atomCurrentTransaction);
+  const { modifyTransaction } = useRecoilValue(TransactionRepo);
   const [editedValues, setEditedValues] = useState(null);
   const [cookies] = useCookies(["myLationCrmUserName"]);
 
-  const [ receiptTime, setReceiptTime ] = useState(new Date());
+  const [ publishDate, setPublishDate ] = useState(new Date());
 
   // --- Funtions for Editing ---------------------------------
   const handleCheckEditState = useCallback((name) => {
@@ -42,7 +42,7 @@ const ConsultingsDetailsModel = () => {
 
   const handleEndEdit = useCallback((name) => {
     if (editedValues[name]) {
-      if(editedValues[name] === selectedConsulting[name]){
+      if(editedValues[name] === selectedTransaction[name]){
         const tempValue = {
           ...editedValues,
         };
@@ -51,7 +51,7 @@ const ConsultingsDetailsModel = () => {
         return;
       };
 
-      if (modifyConsulting(editedValues)) {
+      if (modifyTransaction(editedValues)) {
         console.log(`Succeeded to modify: ${name}`);
         const tempValue = {
           ...editedValues,
@@ -73,11 +73,11 @@ const ConsultingsDetailsModel = () => {
       delete tempValue[name];
       setEditedValues(tempValue);
     }
-  }, [editedValues, selectedConsulting]);
+  }, [editedValues, selectedTransaction]);
 
   // --- Funtions for Editing ---------------------------------
-  const handleReceiptTimeChange = useCallback((time) => {
-    setReceiptTime(time);
+  const handlePublishDateChange = useCallback((time) => {
+    setPublishDate(time);
   }, []);
 
   useEffect(() => {
@@ -88,50 +88,26 @@ const ConsultingsDetailsModel = () => {
       };
       setEditedValues(tempValues);
     };
-    if (selectedConsulting && (selectedConsulting !== defaultConsulting)) {
+    if (selectedTransaction && (selectedTransaction !== defaultTransaction)) {
       const tempValues = {
         ...editedValues,
-        consulting_code: selectedConsulting.consulting_code,
+        transaction_code: selectedTransaction.transaction_code,
       };
       setEditedValues(tempValues);
 
-      // Set time from selected consulting data
-      let input_time = new Date();
-      if(selectedConsulting.receipt_date !== null)
+      // Set time from selected transaction data
+      if(selectedTransaction.publish_date !== null)
       {
-        input_time.setTime(Date.parse(selectedConsulting.receipt_date));
-
-        if(selectedConsulting.receipt_time !== null
-          && selectedConsulting.receipt_time !== '')
-        {
-          let converted_time = '';
-          const splitted = selectedConsulting.receipt_time.split(' ');
-          if(splitted.length === 2) {
-            if(splitted[0] === '오전'){
-              converted_time = splitted[1] + ' AM';
-            } else if(splitted[0] === '오후'){
-              converted_time = splitted[1] + ' PM';
-            }
-          };
-
-          if(converted_time !==''){
-            const str_ymd = input_time.toLocaleDateString('ko-KR', {year: 'numeric', month: 'numeric', day: 'numeric'})
-              + ' ' + converted_time;
-            if(str_ymd !== NaN){
-              input_time.setTime(Date.parse(str_ymd));
-            }
-          }
-        }
-        setReceiptTime(input_time);
+        setPublishDate(new Date(selectedTransaction.publish_date));
       };
     }
-  }, [cookies.myLationCrmUserName, selectedConsulting]);
+  }, [cookies.myLationCrmUserName, selectedTransaction]);
 
   return (
     <>
       <div
         className="modal right fade"
-        id="consultings-details"
+        id="transactions-details"
         tabIndex={-1}
         role="dialog"
         aria-modal="true"
@@ -171,19 +147,19 @@ const ConsultingsDetailsModel = () => {
                       </Link>
                       <div className="dropdown-menu">
                         <Link className="dropdown-item" to="#">
-                          Edit This Consulting
+                          Edit This Transaction
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Change Consulting Image
+                          Change Transaction Image
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Delete This Consulting
+                          Delete This Transaction
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Email This Consulting
+                          Email This Transaction
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Clone This Consulting
+                          Clone This Transaction
                         </Link>
                         <Link className="dropdown-item" to="#">
                           Change Record Owner
@@ -192,25 +168,25 @@ const ConsultingsDetailsModel = () => {
                           Generate Merge Document
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Change Consulting to Contact
+                          Change Transaction to Contact
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Convert Consulting
+                          Convert Transaction
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Print This Consulting
+                          Print This Transaction
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Merge Into Consulting
+                          Merge Into Transaction
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          SmartMerge Consulting
+                          SmartMerge Transaction
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Add Activity Set To Consulting
+                          Add Activity Set To Transaction
                         </Link>
                         <Link className="dropdown-item" to="#">
-                          Add New Event For Consulting
+                          Add New Event For Transaction
                         </Link>
                       </div>
                     </li>
@@ -227,7 +203,7 @@ const ConsultingsDetailsModel = () => {
               <div className="card-body">
                 <div className="row">
                   <div className="col">
-                    <span>Consulting Status</span>
+                    <span>Transaction Status</span>
                     <p>Not Contacted</p>
                   </div>
                   <div className="col">
@@ -235,91 +211,21 @@ const ConsultingsDetailsModel = () => {
                     <p>Anne Lynch</p>
                   </div>
                   <div className="col">
-                    <span>Consulting Source</span>
+                    <span>Transaction Source</span>
                     <p>Phone Enquiry</p>
                   </div>
                   <div className="col">
-                    <span>Consulting Rating</span>
+                    <span>Transaction Rating</span>
                     <p>0</p>
                   </div>
                   <div className="col">
-                    <span>Consulting owner</span>
+                    <span>Transaction owner</span>
                     <p>John Doe</p>
                   </div>
                 </div>
               </div>
             </div>
             <div className="modal-body">
-              {/* <div className="row">
-                <div className="col-md-12">
-                  <ul
-                    className="cd-breadcrumb triangle nav nav-tabs w-100 crms-steps"
-                    role="tablist"
-                  >
-                    <li role="presentation">
-                      <Link
-                        to="#not-contacted"
-                        className="active"
-                        aria-controls="not-contacted"
-                        role="tab"
-                        data-bs-toggle="tab"
-                        aria-expanded="true"
-                      >
-                        <span className="octicon octicon-light-bulb" />
-                        Not Contacted
-                      </Link>
-                    </li>
-                    <li role="presentation" className="">
-                      <Link
-                        to="#attempted-contact"
-                        aria-controls="attempted-contact"
-                        role="tab"
-                        data-bs-toggle="tab"
-                        aria-expanded="false"
-                      >
-                        <span className="octicon octicon-diff-added" />
-                        Attempted Contact
-                      </Link>
-                    </li>
-                    <li role="presentation" className="">
-                      <Link
-                        to="#contact"
-                        aria-controls="contact"
-                        role="tab"
-                        data-bs-toggle="tab"
-                        aria-expanded="false"
-                      >
-                        <span className="octicon octicon-comment-discussion" />
-                        Contact
-                      </Link>
-                    </li>
-                    <li role="presentation" className="">
-                      <Link
-                        to="#converted"
-                        aria-controls="contact"
-                        role="tab"
-                        data-bs-toggle="tab"
-                        aria-expanded="false"
-                      >
-                        <span className="octicon octicon-comment-discussion" />
-                        Converted
-                      </Link>
-                    </li>
-                    <li role="presentation" className="d-none">
-                      <Link
-                        to="#converted"
-                        aria-controls="converted"
-                        role="tab"
-                        data-bs-toggle="tab"
-                        aria-expanded="false"
-                      >
-                        <span className="octicon octicon-verified" />
-                        Converted
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div> */}
               <div className="tab-content pipeline-tabs border-0">
                 <div
                   role="tabpanel"
@@ -365,24 +271,24 @@ const ConsultingsDetailsModel = () => {
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Consulting Information" key="1">
+                                <Panel header="Transaction Information" key="1">
                                   <table className="table">
                                     <tbody>
                                       <tr>
-                                        <td className="border-0">Type</td>
-                                        { handleCheckEditState("consulting_type") ? (
+                                        <td className="border-0">Title</td>
+                                        { handleCheckEditState("transaction_title") ? (
                                           <>
                                             <td className="border-0">
                                               <input
                                                 type="text"
-                                                placeholder="Consulting Type"
-                                                name="consulting_type"
-                                                defaultValue={selectedConsulting.consulting_type}
+                                                placeholder="Transaction Title"
+                                                name="transaction_type"
+                                                defaultValue={selectedTransaction.transaction_title}
                                                 onChange={handleEditing}
                                               />
                                             </td>
                                             <td className="border-0">
-                                              <div onClick={() => {handleEndEdit("consulting_type");}}>
+                                              <div onClick={() => {handleEndEdit("transaction_title");}}>
                                                 <SaveAlt />
                                               </div>
                                             </td>
@@ -390,10 +296,10 @@ const ConsultingsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td className="border-0">
-                                              {selectedConsulting.consulting_type}
+                                              {selectedTransaction.transaction_title}
                                             </td>
                                             <td className="border-0">
-                                              <div onClick={() => {handleStartEdit("consulting_type");}}>
+                                              <div onClick={() => {handleStartEdit("transaction_title");}}>
                                                 <Edit />
                                               </div>
                                             </td>
@@ -401,20 +307,51 @@ const ConsultingsDetailsModel = () => {
                                         )}
                                       </tr>
                                       <tr>
-                                        <td>Receipt Time</td>
-                                        { handleCheckEditState("receipt_date") ? (
+                                        <td>Type</td>
+                                        { handleCheckEditState("transaction_type") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Type"
+                                                name="transaction_type"
+                                                defaultValue={selectedTransaction.transaction_type}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("transaction_type");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedTransaction.transaction_type}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("transaction_type");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Publish Date</td>
+                                        { handleCheckEditState("publish_date") ? (
                                           <>
                                             <td>
                                               <DatePicker
                                                 className="form-control"
-                                                selected={ receiptTime }
-                                                onChange={ handleReceiptTimeChange }
+                                                selected={ publishDate }
+                                                onChange={ handlePublishDateChange }
                                                 dateFormat="yyyy-MM-dd"
-                                                showTimeSelect
                                               />
                                             </td>
                                             <td>
-                                              <div onClick={() => {handleEndEdit("receipt_date");}}>
+                                              <div onClick={() => {handleEndEdit("publish_date");}}>
                                                 <SaveAlt />
                                               </div>
                                             </td>
@@ -422,12 +359,12 @@ const ConsultingsDetailsModel = () => {
                                           ) : (
                                           <>
                                             <td>
-                                              {receiptTime.toLocaleDateString('ko-KR', {
+                                              {publishDate.toLocaleDateString('ko-KR', {
                                                 year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric'
                                               })}
                                             </td>
                                             <td>
-                                              <div onClick={() => {handleStartEdit("receipt_date");}}>
+                                              <div onClick={() => {handleStartEdit("publish_date");}}>
                                                 <Edit />
                                               </div>
                                             </td>
@@ -435,20 +372,20 @@ const ConsultingsDetailsModel = () => {
                                         )}
                                       </tr>
                                       <tr>
-                                        <td>Receiver</td>
-                                        { handleCheckEditState("receiver") ? (
+                                        <td>Publish Type</td>
+                                        { handleCheckEditState("publish_type") ? (
                                           <>
                                             <td>
                                               <input
                                                 type="text"
-                                                placeholder="Receiver"
-                                                name="receiver"
-                                                defaultValue={selectedConsulting.receiver}
+                                                placeholder="Publish Type"
+                                                name="publish_type"
+                                                defaultValue={selectedTransaction.publish_type}
                                                 onChange={handleEditing}
                                               />
                                             </td>
                                             <td>
-                                              <div onClick={() => {handleEndEdit("receiver");}}>
+                                              <div onClick={() => {handleEndEdit("publish_type");}}>
                                                 <SaveAlt />
                                               </div>
                                             </td>
@@ -456,438 +393,10 @@ const ConsultingsDetailsModel = () => {
                                         ) : (
                                           <>
                                             <td>
-                                              {selectedConsulting.receiver}
+                                              {selectedTransaction.publish_type}
                                             </td>
                                             <td>
-                                              <div onClick={() => {handleStartEdit("receiver");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Product Type</td>
-                                        { handleCheckEditState("product_type") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Product Type"
-                                                name="product_type"
-                                                defaultValue={selectedConsulting.product_type}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("product_type");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedConsulting.product_type}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("product_type");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Lead Time</td>
-                                        { handleCheckEditState("lead_time") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Lead Time"
-                                                name="lead_time"
-                                                defaultValue={selectedConsulting.lead_time}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("lead_time");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedConsulting.lead_time}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("lead_time");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Request Type</td>
-                                        { handleCheckEditState("request_type") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Request Type"
-                                                name="request_type"
-                                                defaultValue={selectedConsulting.request_type}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("request_type");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedConsulting.request_type}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("request_type");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Request Content</td>
-                                        {handleCheckEditState("request_content") ? (
-                                          <>
-                                            <td className="border-0">
-                                              <textarea
-                                                className="form-control"
-                                                rows={3}
-                                                placeholder="Request Content"
-                                                defaultValue={selectedConsulting.request_content}
-                                                name="request_content"
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("request_content");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedConsulting.request_content}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("request_content");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Action Content</td>
-                                        {handleCheckEditState("action_content") ? (
-                                          <>
-                                            <td>
-                                              <textarea
-                                                className="form-control"
-                                                rows={3}
-                                                placeholder="Action Content"
-                                                defaultValue={selectedConsulting.action_content}
-                                                name="action_content"
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("action_content");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedConsulting.action_content}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("action_content");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Sales Representative</td>
-                                        {handleCheckEditState("sales_representati") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Request Type"
-                                                name="Sales Representative"
-                                                defaultValue={selectedConsulting.sales_representati}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("sales_representati");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedConsulting.sales_representati}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("sales_representati");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      {/* <tr>
-                                        <td>Status</td>
-                                        {handleCheckEditState("status") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Status"
-                                                name="status"
-                                                defaultValue={selectedConsulting.status}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("status");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedConsulting.status}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("status");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr> */}
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
-                            </div>
-                            <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
-                                <Panel header="Lead Information" key="1">
-                                  <table className="table">
-                                    <tbody>
-                                      <tr>
-                                        <td className="border-0">Lead Name</td>
-                                        { handleCheckEditState("lead_name") ? (
-                                          <>
-                                            <td className="border-0">
-                                              <input
-                                                type="text"
-                                                placeholder="Lead Name"
-                                                name="lead_name"
-                                                defaultValue={selectedConsulting.lead_name}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td className="border-0">
-                                              <div onClick={() => {handleEndEdit("lead_name");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td className="border-0">
-                                              {selectedConsulting.lead_name}
-                                            </td>
-                                            <td className="border-0">
-                                              <div onClick={() => {handleStartEdit("lead_name");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Department</td>
-                                        { handleCheckEditState("department") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Department"
-                                                name="department"
-                                                defaultValue={selectedConsulting.department}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("department");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                          ) : (
-                                          <>
-                                            <td>
-                                              {selectedConsulting.department}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("department");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Position</td>
-                                        { handleCheckEditState("position") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Position"
-                                                name="position"
-                                                defaultValue={selectedConsulting.position}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("position");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                          ) : (
-                                          <>
-                                            <td>
-                                              {selectedConsulting.position}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("position");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Mobile</td>
-                                        { handleCheckEditState("mobile_number") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Mobile"
-                                                name="mobile_number"
-                                                defaultValue={selectedConsulting.mobile_number}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("mobile_number");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedConsulting.mobile_number}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("mobile_number");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Phone</td>
-                                        { handleCheckEditState("phone_number") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Phone"
-                                                name="phone_number"
-                                                defaultValue={selectedConsulting.phone_number}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("phone_number");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedConsulting.phone_number}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("phone_number");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Email</td>
-                                        { handleCheckEditState("email") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Email"
-                                                name="email"
-                                                defaultValue={selectedConsulting.email}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("email");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedConsulting.email}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("email");}}>
+                                              <div onClick={() => {handleStartEdit("publish_type");}}>
                                                 <Edit />
                                               </div>
                                             </td>
@@ -901,19 +410,19 @@ const ConsultingsDetailsModel = () => {
                             </div>
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Company Information" key="1">
+                                <Panel header="Organization Information" key="1">
                                   <table className="table">
                                     <tbody>
                                       <tr>
-                                        <td className="border-0">Organization</td>
+                                        <td className="border-0">Organization Name</td>
                                         { handleCheckEditState("company_name") ? (
                                           <>
                                             <td className="border-0">
                                               <input
                                                 type="text"
-                                                placeholder="Organization"
+                                                placeholder="Company Name"
                                                 name="company_name"
-                                                defaultValue={selectedConsulting.company_name}
+                                                defaultValue={selectedTransaction.company_name}
                                                 onChange={handleEditing}
                                               />
                                             </td>
@@ -923,13 +432,174 @@ const ConsultingsDetailsModel = () => {
                                               </div>
                                             </td>
                                           </>
-                                          ) : (
+                                        ) : (
                                           <>
                                             <td className="border-0">
-                                              {selectedConsulting.company_name}
+                                              {selectedTransaction.company_name}
                                             </td>
                                             <td className="border-0">
                                               <div onClick={() => {handleStartEdit("company_name");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Ceo Name</td>
+                                        { handleCheckEditState("ceo_name") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Department"
+                                                name="ceo_name"
+                                                defaultValue={selectedTransaction.ceo_name}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("ceo_name");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                          ) : (
+                                          <>
+                                            <td>
+                                              {selectedTransaction.ceo_name}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("ceo_name");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Organization Address</td>
+                                        { handleCheckEditState("company_address") ? (
+                                          <>
+                                            <td>
+                                              <textarea
+                                                className="form-control"
+                                                rows={2}
+                                                placeholder="Address"
+                                                defaultValue={selectedTransaction.email}
+                                                name="company_address"
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("company_address");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedTransaction.company_address}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("company_address");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Business Type</td>
+                                        { handleCheckEditState("business_type") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Business Type"
+                                                name="business_type"
+                                                defaultValue={selectedTransaction.business_type}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("business_type");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedTransaction.business_type}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("business_type");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Business Item</td>
+                                        { handleCheckEditState("business_item") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Business Item"
+                                                name="business_item"
+                                                defaultValue={selectedTransaction.business_item}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("business_item");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedTransaction.business_item}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("business_item");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Business Registration Code</td>
+                                        { handleCheckEditState("business_registration_code") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Business Registration Code"
+                                                name="business_registration_code"
+                                                defaultValue={selectedTransaction.business_registration_code}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("business_registration_code");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedTransaction.business_registration_code}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("business_registration_code");}}>
                                                 <Edit />
                                               </div>
                                             </td>
@@ -943,35 +613,163 @@ const ConsultingsDetailsModel = () => {
                             </div>
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Status Information" key="1">
+                                <Panel header="Price Information" key="1">
                                   <table className="table">
                                     <tbody>
                                       <tr>
-                                        <td className="border-0">Status</td>
-                                        {handleCheckEditState("status") ? (
+                                        <td className="border-0">Supply Price</td>
+                                        { handleCheckEditState("supply_price") ? (
                                           <>
                                             <td className="border-0">
                                               <input
                                                 type="text"
-                                                placeholder="Status"
-                                                defaultValue={selectedConsulting.status}
-                                                name="status"
+                                                placeholder="Supply Price"
+                                                name="supply_price"
+                                                defaultValue={selectedTransaction.supply_price}
                                                 onChange={handleEditing}
                                               />
                                             </td>
                                             <td className="border-0">
-                                              <div onClick={() => {handleEndEdit("status");}}>
+                                              <div onClick={() => {handleEndEdit("supply_price");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                          ) : (
+                                          <>
+                                            <td className="border-0">
+                                              {selectedTransaction.supply_price}
+                                            </td>
+                                            <td className="border-0">
+                                              <div onClick={() => {handleStartEdit("supply_price");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Tax Price</td>
+                                        { handleCheckEditState("tax_price") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Tax Price"
+                                                name="tax_price"
+                                                defaultValue={selectedTransaction.tax_price}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("tax_price");}}>
                                                 <SaveAlt />
                                               </div>
                                             </td>
                                           </>
                                         ) : (
                                           <>
-                                            <td className="border-0">
-                                              {selectedConsulting.status}
+                                            <td>
+                                              {selectedTransaction.tax_price}
                                             </td>
-                                            <td className="border-0">
-                                              <div onClick={() => {handleStartEdit("status");}}>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("tax_price");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Total Price</td>
+                                        { handleCheckEditState("total_price") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Total Price"
+                                                name="total_price"
+                                                defaultValue={selectedTransaction.total_price}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("total_price");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedTransaction.total_price}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("total_price");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Currency</td>
+                                        { handleCheckEditState("currency") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Currency"
+                                                name="currency"
+                                                defaultValue={selectedTransaction.currency}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("currency");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedTransaction.currency}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("currency");}}>
+                                                <Edit />
+                                              </div>
+                                            </td>
+                                          </>
+                                        )}
+                                      </tr>
+                                      <tr>
+                                        <td>Payment Type</td>
+                                        { handleCheckEditState("payment_type") ? (
+                                          <>
+                                            <td>
+                                              <input
+                                                type="text"
+                                                placeholder="Payment Type"
+                                                name="payment_type"
+                                                defaultValue={selectedTransaction.payment_type}
+                                                onChange={handleEditing}
+                                              />
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleEndEdit("payment_type");}}>
+                                                <SaveAlt />
+                                              </div>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <td>
+                                              {selectedTransaction.payment_type}
+                                            </td>
+                                            <td>
+                                              <div onClick={() => {handleStartEdit("payment_type");}}>
                                                 <Edit />
                                               </div>
                                             </td>
@@ -1464,7 +1262,7 @@ const ConsultingsDetailsModel = () => {
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Consulting Information" key="1">
+                                <Panel header="Transaction Information" key="1">
                                   <table className="table">
                                     <tbody>
                                       <tr>
@@ -1484,7 +1282,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>Howe-Blanda LLC</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Status</td>
+                                        <td>Transaction Status</td>
                                         <td>OPEN - NotContacted</td>
                                       </tr>
                                       <tr>
@@ -1496,11 +1294,11 @@ const ConsultingsDetailsModel = () => {
                                         <td>abc@gmail.com</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Owner</td>
+                                        <td>Transaction Owner</td>
                                         <td>John Doe</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Created</td>
+                                        <td>Transaction Created</td>
                                         <td>03-Jun-20 1:14 AM</td>
                                       </tr>
                                       <tr>
@@ -1512,7 +1310,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>10/03/2000</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Rating</td>
+                                        <td>Transaction Rating</td>
                                         <td>0</td>
                                       </tr>
                                     </tbody>
@@ -1558,7 +1356,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>2</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Source</td>
+                                        <td>Transaction Source</td>
                                         <td>Phone Enquiry</td>
                                       </tr>
                                     </tbody>
@@ -1618,7 +1416,7 @@ const ConsultingsDetailsModel = () => {
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
                                 <Panel
-                                  header="Consulting Conversion Information"
+                                  header="Transaction Conversion Information"
                                   key="1"
                                 >
                                   <table className="table">
@@ -2117,7 +1915,7 @@ const ConsultingsDetailsModel = () => {
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Consulting Information" key="1">
+                                <Panel header="Transaction Information" key="1">
                                   <table className="table">
                                     <tbody>
                                       <tr>
@@ -2137,7 +1935,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>Howe-Blanda LLC</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Status</td>
+                                        <td>Transaction Status</td>
                                         <td>OPEN - NotContacted</td>
                                       </tr>
                                       <tr>
@@ -2149,11 +1947,11 @@ const ConsultingsDetailsModel = () => {
                                         <td>abc@gmail.com</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Owner</td>
+                                        <td>Transaction Owner</td>
                                         <td>John Doe</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Created</td>
+                                        <td>Transaction Created</td>
                                         <td>03-Jun-20 1:14 AM</td>
                                       </tr>
                                       <tr>
@@ -2165,7 +1963,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>07/02/2010</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Rating</td>
+                                        <td>Transaction Rating</td>
                                         <td>0</td>
                                       </tr>
                                     </tbody>
@@ -2211,7 +2009,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>2</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Source</td>
+                                        <td>Transaction Source</td>
                                         <td>Phone Enquiry</td>
                                       </tr>
                                     </tbody>
@@ -2271,7 +2069,7 @@ const ConsultingsDetailsModel = () => {
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
                                 <Panel
-                                  header="Consulting Conversion Information"
+                                  header="Transaction Conversion Information"
                                   key="1"
                                 >
                                   <table className="table">
@@ -2777,7 +2575,7 @@ const ConsultingsDetailsModel = () => {
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Consulting Information" key="1">
+                                <Panel header="Transaction Information" key="1">
                                   <table className="table">
                                     <tbody>
                                       <tr>
@@ -2797,7 +2595,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>Howe-Blanda LLC</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Status</td>
+                                        <td>Transaction Status</td>
                                         <td>OPEN - NotContacted</td>
                                       </tr>
                                       <tr>
@@ -2809,11 +2607,11 @@ const ConsultingsDetailsModel = () => {
                                         <td>abc@gmail.com</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Owner</td>
+                                        <td>Transaction Owner</td>
                                         <td>John Doe</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Created</td>
+                                        <td>Transaction Created</td>
                                         <td>03-Jun-20 1:14 AM</td>
                                       </tr>
                                       <tr>
@@ -2825,7 +2623,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>10/03/2000</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Rating</td>
+                                        <td>Transaction Rating</td>
                                         <td>0</td>
                                       </tr>
                                     </tbody>
@@ -2871,7 +2669,7 @@ const ConsultingsDetailsModel = () => {
                                         <td>2</td>
                                       </tr>
                                       <tr>
-                                        <td>Consulting Source</td>
+                                        <td>Transaction Source</td>
                                         <td>Phone Enquiry</td>
                                       </tr>
                                     </tbody>
@@ -2934,7 +2732,7 @@ const ConsultingsDetailsModel = () => {
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
                                 <Panel
-                                  header="Consulting Conversion Information"
+                                  header="Transaction Conversion Information"
                                   key="1"
                                 >
                                   <table className="table">
@@ -3404,4 +3202,4 @@ const ConsultingsDetailsModel = () => {
   );
 };
 
-export default ConsultingsDetailsModel;
+export default TransactionsDetailsModel;

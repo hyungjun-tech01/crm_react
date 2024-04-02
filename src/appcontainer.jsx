@@ -22,7 +22,7 @@ import Components from "./components/components";
 //component
 import Email from "./components/email";
 import Mailview from "./components/email/mail-view";
-import Lead from "./components/lead";
+import Leads from "./components/leads/index.jsx";
 import Task from "./components/task";
 import BasicTable from "./components/table/basictable";
 import DataTable from "./components/table/datatable";
@@ -35,6 +35,7 @@ import Project from "./components/project";
 import Projectkanbanview from "./components/project/kanbanview";
 //consultings
 import Consultings from "./components/consulting/Consultings.jsx";
+import Transactions from "./components/transactions/Transactions.jsx";
 //activities
 import Reports from "./components/report";
 import Activities from "./components/activites";
@@ -141,8 +142,8 @@ import "./assets/js/app.js";
 import SystemUserModel from "./components/task/SystemUserModel";
 import TaskDetailModel from "./components/task/TaskDetailModel";
 import CompanyDetailsModel from "./components/company/CompanyDetailsModel";
-import LeadsDetailsModel from "./components/lead/LeadsDetailsModel";
-import Leadskanbanview from "./components/lead/kanbanview";
+import LeadsDetailsModel from "./components/leads/LeadsDetailsModel.jsx";
+import Leadskanbanview from "./components/leads/kanbanview.jsx";
 import DealDetailsModel from "./components/deals/DealDetailsModel";
 import CompanyDetails from "./components/deals/CompanyDetails";
 import ProjectDetailsModel from "./components/project/ProjectDetailsModel";
@@ -228,7 +229,7 @@ const AppUniversal = (props) => {
           <Route path="/contacts" exact component={Contacts} />
           <Route path="/companies" exact component={Company} />
           <Route path="/CompanyDetailsModel" exact component={CompanyDetailsModel} />
-          <Route path="/leads" exact component={Lead} />
+          <Route path="/leads" exact component={Leads} />
           <Route path="/LeadsDetailsModel" exact component={LeadsDetailsModel} />
           <Route path="/leads-kanban-view" exact component={Leadskanbanview} />
           <Route path="/deals" exact component={Deals} />
@@ -245,7 +246,6 @@ const AppUniversal = (props) => {
           <Route path="/add-blog" exact component={AddBlog} />
           <Route path="/edit-blog" exact component={EditBlog} />
           <Route path="/categories" exact component={Categories} />
-          <Route path="/consultings" exact component={Consultings} />
 
           {/* Invoices */}
           <Route path="/invoices" exact component={Invoiceslist} />
@@ -263,8 +263,14 @@ const AppUniversal = (props) => {
           <Route path="/tax-settings" exact component={Taxsettings} />
           <Route path="/bank-settings" exact component={Banksettings} />
 
+          {/* Consultings */}
+          <Route path="/consultings" exact component={Consultings} />
+
           {/* Quotations */}
           <Route path="/quotations" exact component={Quotations} />
+
+          {/* Transactions */}
+          <Route path="/transactions" exact component={Transactions} />
 
           {/* Settings */}
           <Route path="/userinfo" exact component={UserInfo} />

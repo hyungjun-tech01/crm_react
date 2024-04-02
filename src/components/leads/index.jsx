@@ -14,7 +14,7 @@ import { LeadKeyManItems, LeadRepo } from "../../repository/lead";
 import { atomAllCompanies, atomAllLeads, defaultLead } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 
-const Lead = () => {
+const Leads = () => {
   const allCompnayData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
@@ -23,12 +23,6 @@ const Lead = () => {
 
   const [ leadChange, setLeadChange ] = useState(null);
   const [ companyData, setCompanyData ] = useState([]);
-
-  // --- Functions used for Table ------------------------------
-  const handleClickLeadName = useCallback((id) => {
-      console.log("[Lead] set current lead : ", id);
-      setCurrentLead(id);
-  }, [setCurrentLead]);
 
   // --- Functions used for Add New Lead ------------------------------
   const handleAddNewLeadClicked = useCallback(() => {
@@ -891,4 +885,4 @@ const Lead = () => {
     </HelmetProvider>
   );
 };
-export default Lead;
+export default Leads;
