@@ -9,6 +9,13 @@ import Header from "./components/header/index";
 import Dashboard from "./components/dashboard";
 import ProjectDashboard from "./components/dashboard/projectdashboard";
 import LeadDashboard from "./components/dashboard/leaddashboard";
+//main
+import Company from "./components/company";
+import Leads from "./components/leads/index.jsx";
+import Consultings from "./components/consulting/Consultings.jsx";
+import Transactions from "./components/transactions/Transactions.jsx";
+import Quotations from "./components/quotations/Quotations.jsx";
+import Purchase from "./components/purchase/Purchase.jsx";
 //pages
 import FAQ from "./components/pages/faq";
 import Privacypolicy from "./components/pages/privacy";
@@ -22,7 +29,6 @@ import Components from "./components/components";
 //component
 import Email from "./components/email";
 import Mailview from "./components/email/mail-view";
-import Leads from "./components/leads/index.jsx";
 import Task from "./components/task";
 import BasicTable from "./components/table/basictable";
 import DataTable from "./components/table/datatable";
@@ -33,9 +39,6 @@ import VerticalForm from "./components/forms/vertical-form";
 import FormMask from "./components/forms/form-mask";
 import Project from "./components/project";
 import Projectkanbanview from "./components/project/kanbanview";
-//consultings
-import Consultings from "./components/consulting/Consultings.jsx";
-import Transactions from "./components/transactions/Transactions.jsx";
 //activities
 import Reports from "./components/report";
 import Activities from "./components/activites";
@@ -61,8 +64,6 @@ import ViewInvoices from "./components/invoices/invocesdetails/index";
 import Invoicesettings from "./components/invoices/invoicesettings/index";
 import Taxsettings from "./components/invoices/invoicesettings/taxsettings";
 import Banksettings from "./components/invoices/invoicesettings/banksettings";
-//Quotations
-import Quotations from "./components/quotations/Quotations.jsx";
 // Elements
 import Sweetalerts from "./components/elements/sweetalerts/index";
 import Tooltip from "./components/elements/tooltip/index";
@@ -115,7 +116,6 @@ import FormValidation from "./components/forms/form-validation";
 import Profile from "./components/profile";
 import UserInfo from "./components/userinfo";
 import Contacts from "./components/contact";
-import Company from "./components/company";
 import Sidebarnav from "./components/sidebar";
 // Login & Register
 import Login from "./components/login";
@@ -271,6 +271,9 @@ const AppUniversal = (props) => {
 
           {/* Transactions */}
           <Route path="/transactions" exact component={Transactions} />
+
+          {/* Purchase */}
+          <Route path="/purchases" exact component={Purchase} />
 
           {/* Settings */}
           <Route path="/userinfo" exact component={UserInfo} />

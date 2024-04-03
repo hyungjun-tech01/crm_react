@@ -4,16 +4,16 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { Collapse } from "antd";
 import { C_logo, C_logo2, CircleImg } from "../imagepath";
-import { atomCurrentCompany, defaultCompany } from "../../atoms/atoms";
-import { CompanyRepo } from "../../repository/company";
+import { atomCurrentPurchase, defaultPurchase } from "../../atoms/atoms";
+import { PurchaseRepo } from "../../repository/purchase";
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailDateItem from "../../constants/DetailDateItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
 
-const CompanyDetailsModel = () => {
+const PurchaseDetailsModel = () => {
   const { Panel } = Collapse;
-  const selectedCompany = useRecoilValue(atomCurrentCompany);
-  const { modifyCompany } = useRecoilValue(CompanyRepo);
+  const selectedPurchase = useRecoilValue(atomCurrentPurchase);
+  const { modifyPurchase } = useRecoilValue(PurchaseRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
   const [ editedValues, setEditedValues ] = useState(null);
@@ -29,10 +29,10 @@ const CompanyDetailsModel = () => {
   const handleStartEdit = useCallback((name) => {
     const tempEdited = {
       ...editedValues,
-      [name]: selectedCompany[name],
+      [name]: selectedPurchase[name],
     };
     setEditedValues(tempEdited);
-  }, [editedValues, selectedCompany]);
+  }, [editedValues, selectedPurchase]);
 
   const handleEditing = useCallback((e) => {
     const tempEdited = {
@@ -43,7 +43,7 @@ const CompanyDetailsModel = () => {
   }, [editedValues]);
 
   const handleEndEdit = useCallback((name) => {
-    if(editedValues[name] === selectedCompany[name]){
+    if(editedValues[name] === selectedPurchase[name]){
       const tempEdited = {
         ...editedValues,
       };
@@ -63,7 +63,7 @@ const CompanyDetailsModel = () => {
     };
     delete tempEdited[name];
     setEditedValues(tempEdited);
-  }, [editedValues, selectedCompany]);
+  }, [editedValues, selectedPurchase]);
 
   // --- Funtions for Saving ---------------------------------
   const handleCheckSaved = useCallback((name) => {
@@ -80,26 +80,26 @@ const CompanyDetailsModel = () => {
 
   const handleSaveAll = useCallback(() => {
     if(savedValues !== null
-      && selectedCompany
-      && selectedCompany !== defaultCompany)
+      && selectedPurchase
+      && selectedPurchase !== defaultPurchase)
     {
       const temp_all_saved = {
         ...savedValues,
         action_type: "UPDATE",
         modify_user: cookies.myLationCrmUserId,
-        company_code: selectedCompany.company_code,
+        purchase_code: selectedPurchase.purchase_code,
       };
-      if (modifyCompany(temp_all_saved)) {
-        console.log(`Succeeded to modify company`);
+      if (modifyPurchase(temp_all_saved)) {
+        console.log(`Succeeded to modify purchase`);
       } else {
-        console.error('Failed to modify company')
+        console.error('Failed to modify purchase')
       }
     } else {
-      console.log("[ CompanyDetailModel ] No saved data");
+      console.log("[ PurchaseDetailModel ] No saved data");
     };
     setEditedValues(null);
     setSavedValues(null);
-  }, [savedValues, selectedCompany]);
+  }, [savedValues, selectedPurchase]);
 
   const handleCancelAll = useCallback(() => {
     setEditedValues(null);
@@ -112,7 +112,7 @@ const CompanyDetailsModel = () => {
   });
 
   const handleEndEditEstablishDate = useCallback(() => {
-    if(establishDate !== selectedCompany.establishment_date) {
+    if(establishDate !== selectedPurchase.establishment_date) {
       const tempSaved = {
         ...savedValues,
         establishment_date : establishDate,
@@ -131,7 +131,7 @@ const CompanyDetailsModel = () => {
   });
 
   const handleEndEditCloseDate = useCallback(() => {
-    if(closeDate !== selectedCompany.closure_date) {
+    if(closeDate !== selectedPurchase.closure_date) {
       const tempSaved = {
         ...savedValues,
         closure_date : closeDate,
@@ -146,14 +146,14 @@ const CompanyDetailsModel = () => {
   });
 
   useEffect(() => {
-    console.log('[CompanyDetailsModel] called!');
-  }, [selectedCompany, savedValues]);
+    console.log('[PurchaseDetailsModel] called!');
+  }, [selectedPurchase, savedValues]);
 
   return (
     <>
       <div
         className="modal right fade"
-        id="company-details"
+        id="purchase-details"
         tabIndex={-1}
         role="dialog"
         aria-modal="true"
@@ -171,13 +171,13 @@ const CompanyDetailsModel = () => {
             <div className="modal-header">
               <div className="row w-100">
                 <div className="col-md-7 account d-flex">
-                  <div className="company_img">
+                  <div className="purchase_img">
                     <img src={C_logo} alt="User" className="user-image" />
                   </div>
                   <div>
-                    <p className="mb-0">Company</p>
+                    <p className="mb-0">Purchase</p>
                     <span className="modal-title">
-                      {selectedCompany.company_name}
+                      {selectedPurchase.purchase_name}
                     </span>
                     <span className="rating-star">
                       <i className="fa fa-star" aria-hidden="true" />
@@ -203,7 +203,7 @@ const CompanyDetailsModel = () => {
                       </Link>
                       <div className="dropdown-menu">
                         <Link className="dropdown-item" to="#">
-                          Edit This Company
+                          Edit This Purchase
                         </Link>
                         <Link className="dropdown-item" to="#">
                           Change Organization Image
@@ -261,19 +261,19 @@ const CompanyDetailsModel = () => {
                   </div>
                   <div className="col">
                     <span>Companies</span>
-                    <p>{selectedCompany.company_name}</p>
+                    <p>{selectedPurchase.purchase_name}</p>
                   </div>
                   <div className="col">
                     <span>Phone</span>
-                    <p>{selectedCompany.company_phone_number}</p>
+                    <p>{selectedPurchase.purchase_phone_number}</p>
                   </div>
                   <div className="col">
                     <span>Fax</span>
-                    <p>{selectedCompany.company_fax_number}</p>
+                    <p>{selectedPurchase.purchase_fax_number}</p>
                   </div>
                   <div className="col">
                     <span>Contact owner</span>
-                    <p>{selectedCompany.ceo_name}</p>
+                    <p>{selectedPurchase.ceo_name}</p>
                   </div>
                 </div>
               </div>
@@ -354,9 +354,9 @@ const CompanyDetailsModel = () => {
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
-                                  name="company_name"
+                                  name="purchase_name"
                                   title="Name"
                                   is_top={true}
                                   checkEdit={handleCheckEditState}
@@ -367,9 +367,9 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
-                                  name="company_name_eng"
+                                  name="purchase_name_eng"
                                   title="English Name"
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
@@ -389,7 +389,7 @@ const CompanyDetailsModel = () => {
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
                                   name="group_"
                                   title="Group"
@@ -402,10 +402,10 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
-                                  name="company_scale"
-                                  title="Company Scale"
+                                  name="purchase_scale"
+                                  title="Purchase Scale"
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -414,7 +414,7 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
                                   name="deal_type"
                                   title="Deal Type"
@@ -426,7 +426,7 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
                                   name="business_registration_code"
                                   title="Business Registration Code"
@@ -438,7 +438,7 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailDateItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
                                   name="establishment_date"
                                   title="Establishment Date"
@@ -451,7 +451,7 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailDateItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
                                   name="closure_date"
                                   title="Closure Date"
@@ -465,7 +465,7 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
                                   name="ceo_name"
                                   title="Ceo Name"
@@ -477,7 +477,7 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
                                   name="business_type"
                                   title="Business Type"
@@ -489,7 +489,7 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
                                   name="business_item"
                                   title="Business Item"
@@ -501,7 +501,7 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
                                   name="industry_type"
                                   title="Industry Type"
@@ -523,9 +523,9 @@ const CompanyDetailsModel = () => {
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
-                                  name="company_phone_number"
+                                  name="purchase_phone_number"
                                   title="Phone"
                                   is_top={true}
                                   checkEdit={handleCheckEditState}
@@ -536,9 +536,9 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
-                                  name="company_fax_number"
+                                  name="purchase_fax_number"
                                   title="Fax"
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
@@ -548,7 +548,7 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
                                   name="homepage"
                                   title="Website"
@@ -570,9 +570,9 @@ const CompanyDetailsModel = () => {
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
-                                  name="company_address"
+                                  name="purchase_address"
                                   title="Address"
                                   is_top={true}
                                   checkEdit={handleCheckEditState}
@@ -583,9 +583,9 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
-                                  name="company_zip_code"
+                                  name="purchase_zip_code"
                                   title="Postal code"
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
@@ -605,7 +605,7 @@ const CompanyDetailsModel = () => {
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
                                   name="account_code"
                                   title="Account Code"
@@ -618,7 +618,7 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
                                   name="bank_name"
                                   title="Bank Name"
@@ -630,7 +630,7 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
                                   name="account_owner"
                                   title="Account Owner"
@@ -642,7 +642,7 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
                                   name="sales_resource"
                                   title="Sales Resource"
@@ -654,7 +654,7 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
                                   name="application_engineer"
                                   title="Application Engineer"
@@ -666,7 +666,7 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
                                   name="region"
                                   title="Region"
@@ -688,7 +688,7 @@ const CompanyDetailsModel = () => {
                             <table className="table">
                               <tbody>
                                 <DetailTextareaItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedPurchase}
                                   saved={savedValues}
                                   name="memo"
                                   title="Memo"
@@ -805,7 +805,7 @@ const CompanyDetailsModel = () => {
                               <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                 <thead>
                                   <tr>
-                                    <th>Company Name</th>
+                                    <th>Purchase Name</th>
                                     <th>Phone</th>
                                     <th>Billing Country</th>
                                     <th className="text-end">Actions</th>
@@ -820,7 +820,7 @@ const CompanyDetailsModel = () => {
                                       <Link
                                         to="#"
                                         data-bs-toggle="modal"
-                                        data-bs-target="#company-details"
+                                        data-bs-target="#purchase-details"
                                       >
                                         Clampett Oil and Gas Corp.
                                       </Link>
@@ -864,7 +864,7 @@ const CompanyDetailsModel = () => {
                                       <Link
                                         to="#"
                                         data-bs-toggle="modal"
-                                        data-bs-target="#company-details"
+                                        data-bs-target="#purchase-details"
                                       >
                                         Acme Corporation
                                       </Link>
@@ -912,7 +912,7 @@ const CompanyDetailsModel = () => {
                                 <thead>
                                   <tr>
                                     <th>Deal Name</th>
-                                    <th>Company</th>
+                                    <th>Purchase</th>
                                     <th>User Responsible</th>
                                     <th>Deal Value</th>
                                     <th />
@@ -1577,4 +1577,4 @@ const CompanyDetailsModel = () => {
   );
 };
 
-export default CompanyDetailsModel;
+export default PurchaseDetailsModel;
