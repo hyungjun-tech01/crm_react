@@ -4,9 +4,13 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const DetailDateItem = (props) => {
-    const { data_set, saved, name, title, no_border,
-        timeData, timeDataChange, selectTime,
+    const { saved, name, title, no_border,
+        orgTimeData, timeData, timeDataChange, selectTime,
         checkEdit, startEdit, endEdit, checkSaved, cancelSaved } = props;
+
+    const options = selectTime ?
+        {year: 'numeric', month: 'short', day: 'numeric', hour:'numeric', minute:'numeric', second:'numeric'} :
+        {year: 'numeric', month: 'short', day: 'numeric'};
 
     if(checkEdit(name)) {
         return (
@@ -18,7 +22,7 @@ const DetailDateItem = (props) => {
                             className="form-control"
                             selected={ timeData }
                             onChange={ timeDataChange }
-                            dateFormat="yyyy-MM-dd"
+                            dateFormat="yyyy-MM-dd hh:mm:ss"
                             showTimeSelect
                         />
                         :
@@ -43,7 +47,7 @@ const DetailDateItem = (props) => {
             <tr>
                 <td className={no_border && "border-0"}>{title}</td>
                 <td className={no_border && "border-0"}>
-                    {saved[name] && new Date(saved[name]).toLocaleDateString('ko-KR', {year: 'numeric', month: 'short', day: 'numeric'})}
+                    { saved[name] && (new Date(saved[name])).toLocaleDateString('ko-KR', options) }
                 </td>
                 <td className={no_border && "border-0"}>
                     <div onClick={() => { cancelSaved(name); }}>
@@ -58,7 +62,7 @@ const DetailDateItem = (props) => {
         <tr>
             <td className={no_border && "border-0"}>{title}</td>
             <td className={no_border && "border-0"}>
-                {data_set[name] && new Date(data_set[name]).toLocaleDateString('ko-KR', {year: 'numeric', month: 'short', day: 'numeric'})}
+                {(new Date(orgTimeData)).toLocaleDateString('ko-KR', options)}
             </td>
             <td className={no_border && "border-0"}>
                 <div onClick={() => { startEdit(name); }}>

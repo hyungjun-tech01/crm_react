@@ -18,7 +18,9 @@ const CompanyDetailsModel = () => {
 
   const [ editedValues, setEditedValues ] = useState(null);
   const [ savedValues, setSavedValues ] = useState(null);
+  const [ orgEstablishDate, setOrgEstablishDate ] = useState(null);
   const [ establishDate, setEstablishDate ] = useState(new Date());
+  const [ orgCloseDate, setOrgCloseDate ] = useState(null);
   const [ closeDate, setCloseDate ] = useState(new Date());
 
   // --- Funtions for Editing ---------------------------------
@@ -63,7 +65,7 @@ const CompanyDetailsModel = () => {
     };
     delete tempEdited[name];
     setEditedValues(tempEdited);
-  }, [editedValues, selectedCompany]);
+  }, [editedValues, savedValues, selectedCompany]);
 
   // --- Funtions for Saving ---------------------------------
   const handleCheckSaved = useCallback((name) => {
@@ -99,54 +101,69 @@ const CompanyDetailsModel = () => {
     };
     setEditedValues(null);
     setSavedValues(null);
-  }, [savedValues, selectedCompany]);
+  }, [cookies.myLationCrmUserId, modifyCompany, savedValues, selectedCompany]);
 
   const handleCancelAll = useCallback(() => {
     setEditedValues(null);
     setSavedValues(null);
   }, []);
 
-  // --- Funtions for Editing data ---------------------------------
+  // --- Funtions for Establishment Date ---------------------------------
+  const handleStartEstablishDateEdit = useCallback(() => {
+    const tempEdited = {
+      ...editedValues,
+      establishment_date: orgEstablishDate,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues, orgEstablishDate]);
   const handleEstablishDateChange = useCallback((date) => {
     setEstablishDate(date);
-  });
-
-  const handleEndEditEstablishDate = useCallback(() => {
-    if(establishDate !== selectedCompany.establishment_date) {
+  }, []);
+  const handleEndEstablishDateEdit = useCallback(() => {
+    if(establishDate !== orgEstablishDate) {
       const tempSaved = {
         ...savedValues,
         establishment_date : establishDate,
-      }
-      setSavedValues(tempSaved);  
+      };
+      setSavedValues(tempSaved);
     }
     const tempEdited = {
       ...editedValues,
     };
-    delete tempEdited.establishment_date;
+    delete tempEdited.establishDate;
     setEditedValues(tempEdited);
-  });
+  }, [editedValues, savedValues, orgEstablishDate, establishDate]);
 
+  // --- Funtions for Closure Date ---------------------------------
+  const handleStartCloseDateEdit = useCallback(() => {
+    const tempEdited = {
+      ...editedValues,
+      closure_date: orgCloseDate,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues, orgCloseDate]);
   const handleCloseDateChange = useCallback((date) => {
     setCloseDate(date);
-  });
-
-  const handleEndEditCloseDate = useCallback(() => {
-    if(closeDate !== selectedCompany.closure_date) {
+  }, []);
+  const handleEndCloseDateEdit = useCallback(() => {
+    if(closeDate !== orgCloseDate) {
       const tempSaved = {
         ...savedValues,
         closure_date : closeDate,
-      }
-      setSavedValues(tempSaved);  
+      };
+      setSavedValues(tempSaved);
     }
     const tempEdited = {
       ...editedValues,
     };
     delete tempEdited.closure_date;
     setEditedValues(tempEdited);
-  });
+  }, [editedValues, savedValues, orgCloseDate, closeDate]);
 
   useEffect(() => {
     console.log('[CompanyDetailsModel] called!');
+    setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
+    setOrgCloseDate(selectedCompany.closure_date ? new Date(selectedCompany.closure_date) : null);
   }, [selectedCompany, savedValues]);
 
   return (
@@ -438,29 +455,29 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailDateItem
-                                  data_set={selectedCompany}
                                   saved={savedValues}
                                   name="establishment_date"
                                   title="Establishment Date"
+                                  orgTimeData={orgEstablishDate}
                                   timeData={establishDate}
                                   timeDataChange={handleEstablishDateChange}
                                   checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  endEdit={handleEndEditEstablishDate}
+                                  startEdit={handleStartEstablishDateEdit}
+                                  endEdit={handleEndEstablishDateEdit}
                                   checkSaved={handleCheckSaved}
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailDateItem
-                                  data_set={selectedCompany}
                                   saved={savedValues}
                                   name="closure_date"
                                   title="Closure Date"
+                                  orgTimeData={orgCloseDate}
                                   timeData={closeDate}
                                   timeDataChange={handleCloseDateChange}
                                   checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
+                                  startEdit={handleStartCloseDateEdit}
                                   editing={handleEditing}
-                                  endEdit={handleEndEditCloseDate}
+                                  endEdit={handleEndCloseDateEdit}
                                   checkSaved={handleCheckSaved}
                                   cancelSaved={handleCancelSaved}
                                 />
