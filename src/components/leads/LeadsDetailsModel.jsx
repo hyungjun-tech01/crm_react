@@ -4,11 +4,9 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { CircleImg, SystemUser } from "../imagepath";
 import { Collapse } from "antd";
-import { Edit, SaveAlt } from "@mui/icons-material";
 import { atomCurrentLead, defaultLead } from "../../atoms/atoms";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import DetailLabelItem from "../../constants/DetailLabelItem";
-import DetailDateItem from "../../constants/DetailDateItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
 import DetailSelectItem from "../../constants/DetailSelectItem";
 
@@ -20,7 +18,6 @@ const LeadsDetailsModel = () => {
 
   const [ editedValues, setEditedValues ] = useState(null);
   const [ savedValues, setSavedValues ] = useState(null);
-  const [ keymanLabel, setKeymanLabel] = useState(null);
 
   // --- Funtions for Editing ---------------------------------
   const handleCheckEditState = useCallback((name) => {
@@ -109,9 +106,8 @@ const LeadsDetailsModel = () => {
 
   // --- Funtions for Select ---------------------------------
   const handleEndEditKeyMan = useCallback((value) => {
-    console.log('handleEndEditKeyMan called!');
+    console.log('handleEndEditKeyMan called! : ', value);
     const selected = value.value;
-    const current = selectedLead.is_keyman;
 
     if(editedValues.is_keyman === selected){
       const tempEdited = {
@@ -122,9 +118,10 @@ const LeadsDetailsModel = () => {
       return;
     };
 
+    console.log('handleEndEditKeyMan edited : ', editedValues.is_keyman);
     const tempSaved = {
       ...savedValues,
-      is_keyman : editedValues.is_keyman,
+      is_keyman : selected,
     }
     setSavedValues(tempSaved); 
 
@@ -133,38 +130,11 @@ const LeadsDetailsModel = () => {
     };
     delete tempEdited.is_keyman;
     setEditedValues(tempEdited);
-  }, [editedValues, modifyLead, selectedLead.is_keyman]);
-
-  const handleGetKeyManLabel = useCallback((value) => {
-    if(value === undefined || value === null)
-    {
-      setKeymanLabel('');
-      return;
-    }
-    const found = KeyManForSelection.filter(item => item.value === value)[0];
-    if(found.label === 'NULL') setKeymanLabel('');
-    else setKeymanLabel(found.label);
-  }, []);
+  }, [editedValues, savedValues, selectedLead.is_keyman]);
 
   useEffect(() => {
     console.log('[LeadsDetailsModel] called!');
-    if (editedValues === null) {
-      const tempValues = {
-        action_type: "UPDATE",
-        modify_user: cookies.myLationCrmUserId,
-      };
-      setEditedValues(tempValues);
-    };
-    if (selectedLead && (selectedLead !== defaultLead)) {
-      const tempValues = {
-        ...editedValues,
-        lead_code: selectedLead.lead_code,
-      };
-      setEditedValues(tempValues);
-      // get keyman label
-      handleGetKeyManLabel(selectedLead.is_keyman);
-    }
-  }, [cookies.myLationCrmUserName, selectedLead]);
+  }, [selectedLead, savedValues]);
 
   return (
     <>

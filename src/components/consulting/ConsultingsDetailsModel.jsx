@@ -9,6 +9,9 @@ import { atomCurrentConsulting, defaultConsulting } from "../../atoms/atoms";
 import { ConsultingRepo } from "../../repository/consulting";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import DetailLabelItem from "../../constants/DetailLabelItem";
+import DetailDateItem from "../../constants/DetailDateItem";
+import DetailTextareaItem from "../../constants/DetailTextareaItem";
 
 const ConsultingsDetailsModel = () => {
   const { Panel } = Collapse;
