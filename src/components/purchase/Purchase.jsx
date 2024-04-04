@@ -95,9 +95,7 @@ const Purchase = () => {
       dataIndex: "product_type",
       render: (text, record) => (
         <>
-          <a href="#" data-bs-toggle="modal" data-bs-target="#purchase-details" onClick={()=>{handleClickPurchase(record.purchase_code);}}>
-            {text}
-          </a>
+          {text}
         </>
       ),
       sorter: (a, b) => compareText(a.purchase_type, b.purchase_type),
@@ -111,25 +109,39 @@ const Purchase = () => {
     {
       title: "Serial Number",
       dataIndex: "serial_number",
-      render: (text, record) => <>{text}</>,
+      render: (text, record) =>
+        <>
+          <a href="#" data-bs-toggle="modal" data-bs-target="#purchase-details" onClick={()=>{handleClickPurchase(record.purchase_code);}}>
+            {text}
+          </a>
+        </>,
       sorter: (a, b) => compareText(a.serial_number, b.serial_number),
     },
     {
       title: "Delivery Date",
       dataIndex: "delivery_date",
-      render: (text, record) => <>{text}</>,
+      render: (text, record) =>
+        <>
+          { (text && text !=="") && new Date(text).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day: 'numeric'}) }
+        </>,
       sorter: (a, b) => a.delivery_date - b.delivery_date,
     },
     {
       title: "MA Contact Date",
       dataIndex: "MA_contact_date",
-      render: (text, record) => <>{text}</>,
+      render: (text, record) =>
+        <>
+          { (text && text !=="") && new Date(text).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day: 'numeric'}) }
+        </>,
       sorter: (a, b) => a.MA_contact_date - b.MA_contact_date,
     },
     {
       title: "MA Finish Date",
       dataIndex: "MA_finish_date",
-      render: (text, record) => <>{text}</>,
+      render: (text, record) =>
+        <>
+          { (text && text !=="") && new Date(text).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day: 'numeric'}) }
+        </>,
       sorter: (a, b) => a.MA_finish_date - b.MA_finish_date,
     },
     {
@@ -159,7 +171,10 @@ const Purchase = () => {
     {
       title: "Registration Date",
       dataIndex: "registration_date",
-      render: (text, record) => <>{text}</>,
+      render: (text, record) => 
+      <>
+        { (text && text !=="") && new Date(text).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day: 'numeric'}) }
+      </>,
       sorter: (a, b) => a.registration_date - b.registration_date,
     },
     {
