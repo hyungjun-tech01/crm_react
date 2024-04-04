@@ -365,6 +365,11 @@ const Header = (props) => {
             <span>Admin</span>
           </Link>
           <div id="dropdown_menu" className="dropdown-menu">
+            {/* <Link className="dropdown-item" to="/Profile" 
+                  onClick={ ()=>{document.querySelector('#dropdown_menu').classList.remove('show');}}>
+              My Profile
+            </Link> */}
+
             <Link className="dropdown-item" to="/UserInfo" 
                   onClick={ ()=>{document.querySelector('#dropdown_menu').classList.remove('show');}}>
               My Profile
