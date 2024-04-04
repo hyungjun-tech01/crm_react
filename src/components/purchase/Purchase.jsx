@@ -3,23 +3,32 @@ import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
+import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
 import PurchaseDetailsModel from "./PurchaseDetailsModel";
-// import DatePicker from "react-datepicker";
+import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ShoppingBagOutlined } from "@mui/icons-material";
 import { PurchaseRepo } from "../../repository/purchase";
-import { atomAllPurchases, defaultPurchase } from "../../atoms/atoms";
-import { compareText, formateDate } from "../../constants/functions";
+import { atomAllLeads, atomAllPurchases, defaultPurchase } from "../../atoms/atoms";
+import { compareText } from "../../constants/functions";
+import { LeadRepo } from "../../repository/lead";
 
 const Purchase = () => {
+  const { loadAllLeads } = useRecoilValue(LeadRepo);
   const { loadAllPurchases, modifyPurchase, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
+  const allLeadData = useRecoilValue(atomAllLeads);
   const allPurchaseData = useRecoilValue(atomAllPurchases);
-  const [ purchaseChange, setPurchaseChange ] = useState(null);
   const [ cookies ] = useCookies(["myLationCrmUserName",  "myLationCrmUserId"]);
-  // const [ selectedEstablishDate, setSelectedEstablishDate ] = useState(null);
-  // const [ selectedCloseDate, setSelectedCloseDate ] = useState(null);
+
+  const [ purchaseChange, setPurchaseChange ] = useState(null);
+  const [ leadForSelection, setLeadForSelection ] = useState(null);
+
+  const [ deliveryDate, setDeliveryDate ] = useState(new Date());
+  const [ contactDate, setContactDate ] = useState(new Date());
+  const [ finishDate, setFinishDate ] = useState(new Date());
+  const [ registerDate, setRegisterDate ] = useState(new Date());
 
   // --- Functions used for Table ------------------------------
   const handleClickPurchase = useCallback((id)=>{
@@ -35,54 +44,61 @@ const Purchase = () => {
   const initializePurchaseTemplate = useCallback(() => {
     setPurchaseChange({...defaultPurchase});
     document.querySelector("#add_new_purchase_form").reset();
-  }, []);
+  }, [defaultPurchase]);
 
-  // const handleEstablishDateChange = useCallback((date) => {
-  //   console.log(`[ handleEstablishDateChange ] ${date}`);
-  //   setSelectedEstablishDate(date);
-  //   purchaseChange.establishment_date = date;
-  // },[]);
+  const handleLeadSelectionChange = useCallback((value) => {
+    purchaseChange.lead_code = value.value.lead_code;
+    purchaseChange.company_code = value.value.company_code;
+  });
 
-  // const handleCloseDateChange = useCallback((date) => {
-  //   console.log(`[ handleEstablishDateChange ] ${date}`);
-  //   setSelectedCloseDate(date);
-  // },[]);
+  const handleDeliveryDateChange = useCallback((date) => {
+    console.log(`[ handleDeliveryDateChange ] ${date}`);
+    setDeliveryDate(date);
+    purchaseChange.delivery_date = date;
+  },[purchaseChange, setDeliveryDate]);
+
+  const handleContactDateChange = useCallback((date) => {
+    console.log(`[ handleContactDateChange ] ${date}`);
+    setContactDate(date);
+    purchaseChange.MA_contact_date = date;
+  },[purchaseChange, setContactDate]);
+
+  const handleFinishDateChange = useCallback((date) => {
+    console.log(`[ handleContactDateChange ] ${date}`);
+    setFinishDate(date);
+    purchaseChange.MA_finish_date = date;
+  },[purchaseChange, setFinishDate]);
+
+  const handleRegisterDateChange = useCallback((date) => {
+    console.log(`[ handleContactDateChange ] ${date}`);
+    setRegisterDate(date);
+    purchaseChange.registration_date = date;
+  },[purchaseChange, setFinishDate]);
 
   const handlePurchaseChange = useCallback((e)=>{
-    let input_data = null;
-    if(e.target.name === 'establishment_date' || e.target.name === 'closure_date'){
-      const date_value = new Date(e.target.value);
-      if(!isNaN(date_value.valueOf())){
-        input_data = formateDate(date_value);
-      };
-    } else {
-      input_data = e.target.value;
-    }
     const modifiedData = {
       ...purchaseChange,
-      [e.target.name]: input_data,
+      [e.target.name]: e.target.value,
     };
     setPurchaseChange(modifiedData);
   }, [purchaseChange]);
 
   const handleAddNewPurchase = useCallback((event)=>{
     // Check data if they are available
-    if(purchaseChange.purchase_name === null
-      || purchaseChange.purchase_name === '')
+    if(purchaseChange.company_code === null
+      || purchaseChange.product_code === null)
     {
-      console.log("Purchase Name must be available!");
+      console.log("Necessary inputs must be available!");
       return;
     };
 
-    const newComData = {
+    const newPurchaseData = {
       ...purchaseChange,
       action_type: 'ADD',
-      purchase_number: '99999',// Temporary
-      counter: 0,
       modify_user: cookies.myLationCrmUserId,
     };
-    console.log(`[ handleAddNewPurchase ]`, newComData);
-    const result = modifyPurchase(newComData);
+    console.log(`[ handleAddNewPurchase ]`, newPurchaseData);
+    const result = modifyPurchase(newPurchaseData);
     if(result){
       initializePurchaseTemplate();
       //close modal ?
@@ -265,12 +281,24 @@ const Purchase = () => {
     }),
   };
 
-  useEffect(() => {    
+  useEffect(() => {
+    if(allLeadData.length === 0) {
+      loadAllLeads();
+    } else {
+      const temp_lead_selection = allLeadData.map(lead => {return {
+        label : lead.lead_name,
+        value : {
+          lead_code: lead.lead_code,
+          company_code: lead.company_code,
+        }
+      }});
+      setLeadForSelection(temp_lead_selection);
+    };
     if (allPurchaseData.length === 0) {
       loadAllPurchases();
     };
     initializePurchaseTemplate();
-  }, [allPurchaseData, initializePurchaseTemplate, loadAllPurchases]);
+  }, [allLeadData, allPurchaseData, initializePurchaseTemplate, loadAllPurchases]);
 
   return (
     <HelmetProvider>
@@ -523,339 +551,130 @@ const Purchase = () => {
                 <div className="row">
                   <div className="col-md-12">
                     <form id="add_new_purchase_form">
-                      <h4>Organization Name</h4>
+                      <h4>Lead</h4>
                       <div className="form-group row">
-                        {/* <div className="col-md-12">
+                        <div className="col-sm-6">
                           <label className="col-form-label">
-                            Organization Name{" "}
+                            Lead Name
                             <span className="text-danger">*</span>
                           </label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder="Organization Name"
-                            name="organization"
-                          />
-                        </div> */}
-                        <div className="col-sm-6">
-                          <label className="col-form-label">
-                            Organization Name
-                            <span className="text-danger">*</span>
-                          </label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder="Organization Name"
-                            name="purchase_name"
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">English Name</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="English Name"
-                            name="purchase_name_eng"
-                            onChange={handlePurchaseChange}
-                          />
+                          <Select options={leadForSelection} onChange={handleLeadSelectionChange}/>
                         </div>
                       </div>
-                      <h4>Organization Information Details</h4>
+                      <h4>Product</h4>
+                      <h4>Deal</h4>
                       <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Group</label>
-                          <select className="form-control"  name="group_" onChange={handlePurchaseChange}>
-                            <option value="">choose proper group</option>
-                            <optgroup label="Shared Group">
-                              <option value="prospective">Prospective Customer</option>
-                              <option value="current">Current Customer</option>
-                              <option value="etc">Etc</option>
-                            </optgroup>
-                          </select>
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Purchase Scale</label>
-                            <input
-                              className="form-control"
-                              type="text"
-                              placeholder="Purchase Scale"
-                              name="purchase_scale"
-                              onChange={handlePurchaseChange}
-                            />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Deal Type</label>
-                          <select className="form-control" name="deal_type" onChange={handlePurchaseChange}>
-                            <option value="">choose proper deal type</option>
-                            <option value="buyer">Buyer</option>
-                            <option value="seller">Seller</option>
-                          </select>
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Bussiness Registration Code</label>
-                            <input
-                              className="form-control"
-                              type="text"
-                              placeholder="Bussiness Registration Code"
-                              name="business_registration_code"
-                              onChange={handlePurchaseChange}
-                            />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Establishment Date</label>
-                          <input
-                            className="form-control"
-                            type="date"
-                            placeholder="Establishment Date"
-                            name="establishment_date"
-                            onChange={handlePurchaseChange}
-                          />
-                          {/* <div className="cal-icon">
-                            <DatePicker
-                              className="form-control"
-                              selected={selectedEstablishDate}
-                              onChange={handleEstablishDateChange}
-                              dateFormat="yyyy.MM.dd"
-                              showDayMonthYearPicker
-                            />
-                          </div> */}
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Closure Date</label>
-                          <input
-                            className="form-control"
-                            type="date"
-                            placeholder="Closure Date"
-                            name="closure_date"
-                            onChange={handlePurchaseChange}
-                          />
-                          {/* <div className="cal-icon">
-                            <DatePicker
-                              className="form-control"
-                              selected={selectedCloseDate}
-                              onChange={handleCloseDateChange}
-                              dateFormat="yyyy.MM.dd"
-                              showDayMonthYearPicker
-                            />
-                          </div> */}
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">CEO Name</label>
-                            <input
-                              className="form-control"
-                              type="text"
-                              placeholder="CEO Name"
-                              name="ceo_name"
-                              onChange={handlePurchaseChange}
-                            />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Business Type</label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder="Business Type"
-                            name="business_type"
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Business Item</label>
+                        <div className="col-sm-3">
+                          <label className="col-form-label">Quantity</label>
                           <input
                             type="text"
                             className="form-control"
-                            placeholder="Business Item"
-                            name="business_item"
+                            placeholder="Quantity"
+                            name="quantity"
                             onChange={handlePurchaseChange}
                           />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Industry Type</label>
+                          <label className="col-form-label">Price</label>
                           <input
-                            className="form-control"
                             type="text"
-                            placeholder="Industry Type"
-                            name="industry_type"
+                            className="form-control"
+                            placeholder="Price"
+                            name="price"
                             onChange={handlePurchaseChange}
                           />
                         </div>
-                      </div>
-                      <h4>Organization Contact Details</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Phone</label>
+                        <div className="col-sm-3">
+                          <label className="col-form-label">Currency</label>
                           <input
                             type="text"
                             className="form-control"
-                            placeholder="Phone"
-                            name="purchase_phone_number"
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Fax</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Fax"
-                            name="purchase_fax_number"
+                            placeholder="Currency"
+                            name="currency"
                             onChange={handlePurchaseChange}
                           />
                         </div>
                       </div>
                       <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Website</label>
-                          <input
-                            type="text"
+                        <div className="col-sm-4">
+                          <label className="col-form-label">Delivery Date</label>
+                          <DatePicker
                             className="form-control"
-                            placeholder="Website"
-                            name="homepage"
-                            onChange={handlePurchaseChange}
+                            selected={deliveryDate}
+                            dateFormat="yyyy.MM.dd"
+                            onChange={handleDeliveryDateChange}
                           />
                         </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Linkedin</label>
-                          <input
-                            type="text"
+                        <div className="col-sm-4">
+                          <label className="col-form-label">MA Contact Date</label>
+                          <DatePicker
                             className="form-control"
-                            name="linkedin"
-                            placeholder="Linkedin"
+                            selected={contactDate}
+                            dateFormat="yyyy.MM.dd"
+                            onChange={handleContactDateChange}
                           />
                         </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Facebook</label>
-                          <input
-                            type="text"
+                        <div className="col-sm-4">
+                          <label className="col-form-label">MA Finish Date</label>
+                          <DatePicker
                             className="form-control"
-                            name="fb"
-                            placeholder="Facebook"
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Twitter</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            name="twitter"
-                            placeholder="Twitter"
+                            selected={finishDate}
+                            dateFormat="yyyy.MM.dd"
+                            onChange={handleFinishDateChange}
                           />
                         </div>
                       </div>
                       <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">
-                            Email Domains
-                          </label>
+                        <div className="col-sm-4">
+                          <label className="col-form-label">Register</label>
                           <input
                             type="text"
                             className="form-control"
-                            name="domains"
-                            placeholder="Email Domains"
+                            placeholder="Register"
+                            name="register"
+                            onChange={handlePurchaseChange}
+                          />
+                        </div>
+                        <div className="col-sm-4">
+                          <label className="col-form-label">Register Code</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Register Code"
+                            name="regcode"
+                            onChange={handlePurchaseChange}
+                          />
+                        </div>
+                        <div className="col-sm-4">
+                          <label className="col-form-label">Registration Date</label>
+                          <DatePicker
+                            className="form-control"
+                            selected={registerDate}
+                            dateFormat="yyyy.MM.dd"
+                            onChange={handleRegisterDateChange}
                           />
                         </div>
                       </div>
-                      <h4>Address Information</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Address</label>
-                          <textarea
-                            className="form-control"
-                            rows={3}
-                            placeholder="Address"
-                            defaultValue={""}
-                            name="purchase_address"
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                        <div className="col-sm-6 mt-3">
-                          <label className="col-form-label" />
-                          <br />
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Postal code"
-                            name="purchase_zip_code"
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                      </div>
-                      <h4>Additional Information</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Bank Account</label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder="Bank Account"
-                            name="acount_code"
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Bank Name</label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder="Bank Name"
-                            name="bank_name"
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Account Owner</label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder="Account Owner"
-                            name="account_owner"
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Sales Resource</label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder="Sales Resource"
-                            name="sales_resource"
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Application Engineer</label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder="Application Engineer"
-                            name="application_engineer"
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Region</label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder="Region"
-                            name="region"
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                      </div>
-                      <h4>Memo</h4>
                       <div className="form-group row">
                         <div className="col-sm-12">
-                          <label className="col-form-label">Memo</label>
+                          <label className="col-form-label">Momo</label>
                           <textarea
                             className="form-control"
-                            rows={3}
+                            rows={2}
+                            name="purchase_memo"
                             placeholder="Memo"
-                            defaultValue={""}
-                            name="memo"
+                            onChange={handlePurchaseChange}
+                          />
+                        </div>
+                      </div>
+                      <h4>Status Information</h4>
+                      <div className="form-group row">
+                        <div className="col-sm-12">
+                          <textarea
+                            className="form-control"
+                            rows={2}
+                            name="status"
+                            placeholder="Status"
                             onChange={handlePurchaseChange}
                           />
                         </div>
