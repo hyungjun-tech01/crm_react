@@ -285,14 +285,24 @@ const Purchase = () => {
     if(allLeadData.length === 0) {
       loadAllLeads();
     } else {
-      const temp_lead_selection = allLeadData.map(lead => {return {
+      const temp_data = allLeadData.map(lead => {return {
         label : lead.lead_name,
         value : {
           lead_code: lead.lead_code,
           company_code: lead.company_code,
         }
       }});
-      setLeadForSelection(temp_lead_selection);
+      temp_data.sort((a, b) => {
+        if (a.label > b.label) {
+          return 1;
+        }
+        if (a.label < b.label) {
+          return -1;
+        }
+        // a must be equal to b
+        return 0;
+      });
+      setLeadForSelection(temp_data);
     };
     if (allPurchaseData.length === 0) {
       loadAllPurchases();

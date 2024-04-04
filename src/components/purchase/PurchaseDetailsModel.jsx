@@ -18,8 +18,11 @@ const PurchaseDetailsModel = () => {
 
   const [ editedValues, setEditedValues ] = useState(null);
   const [ savedValues, setSavedValues ] = useState(null);
-  const [ establishDate, setEstablishDate ] = useState(new Date());
-  const [ closeDate, setCloseDate ] = useState(new Date());
+
+  const [ deliveryDate, setDeliveryDate ] = useState(new Date());
+  const [ contactDate, setContactDate ] = useState(new Date());
+  const [ finishDate, setFinishDate ] = useState(new Date());
+  const [ registerDate, setRegisterDate ] = useState(new Date());
 
   // --- Funtions for Editing ---------------------------------
   const handleCheckEditState = useCallback((name) => {
@@ -107,46 +110,81 @@ const PurchaseDetailsModel = () => {
   }, []);
 
   // --- Funtions for Editing data ---------------------------------
-  const handleEstablishDateChange = useCallback((date) => {
-    setEstablishDate(date);
+  const handleDeliveryDateChange = useCallback((date) => {
+    setDeliveryDate(date);
   });
-
-  const handleEndEditEstablishDate = useCallback(() => {
-    if(establishDate !== selectedPurchase.establishment_date) {
+  const handleEndEditDelieveryDate = useCallback(() => {
+    if(deliveryDate !== selectedPurchase.delivery_date) {
       const tempSaved = {
         ...savedValues,
-        establishment_date : establishDate,
+        delivery_date : deliveryDate,
       }
       setSavedValues(tempSaved);  
     }
     const tempEdited = {
       ...editedValues,
     };
-    delete tempEdited.establishment_date;
+    delete tempEdited.delivery_date;
     setEditedValues(tempEdited);
   });
 
-  const handleCloseDate = useCallback((date) => {
-    setCloseDate(date);
+  const handleContactDateChange = useCallback((date) => {
+    setContactDate(date);
   });
-
-  const handleEndEditCloseDate = useCallback(() => {
-    if(closeDate !== selectedPurchase.closure_date) {
+  const handleEndEditContactDate = useCallback(() => {
+    if(contactDate !== selectedPurchase.MA_contact_date) {
       const tempSaved = {
         ...savedValues,
-        closure_date : closeDate,
+        MA_contact_date : contactDate,
       }
       setSavedValues(tempSaved);  
     }
     const tempEdited = {
       ...editedValues,
     };
-    delete tempEdited.closure_date;
+    delete tempEdited.MA_contact_date;
+    setEditedValues(tempEdited);
+  });
+
+  const handleFinishDateChange = useCallback((date) => {
+    setFinishDate(date);
+  });
+  const handleEndEditFinishDate = useCallback(() => {
+    if(finishDate !== selectedPurchase.MA_finish_date) {
+      const tempSaved = {
+        ...savedValues,
+        MA_finish_date : finishDate,
+      }
+      setSavedValues(tempSaved);  
+    }
+    const tempEdited = {
+      ...editedValues,
+    };
+    delete tempEdited.MA_finish_date;
+    setEditedValues(tempEdited);
+  });
+
+  const handleRegisterDateChange = useCallback((date) => {
+    setRegisterDate(date);
+  });
+  const handleEndEditRegisterDate = useCallback(() => {
+    if(registerDate !== selectedPurchase.registration_date) {
+      const tempSaved = {
+        ...savedValues,
+        registration_date : registerDate,
+      }
+      setSavedValues(tempSaved);  
+    }
+    const tempEdited = {
+      ...editedValues,
+    };
+    delete tempEdited.registration_date;
     setEditedValues(tempEdited);
   });
 
   useEffect(() => {
     console.log('[PurchaseDetailsModel] called!');
+
   }, [selectedPurchase, savedValues]);
 
   return (
@@ -177,7 +215,7 @@ const PurchaseDetailsModel = () => {
                   <div>
                     <p className="mb-0">Purchase</p>
                     <span className="modal-title">
-                      {selectedPurchase.purchase_name}
+                      Detail Information
                     </span>
                     <span className="rating-star">
                       <i className="fa fa-star" aria-hidden="true" />
@@ -350,34 +388,10 @@ const PurchaseDetailsModel = () => {
                     <div className="crms-tasks">
                       <div className="tasks__item crms-task-item active">
                         <Collapse accordion expandIconPosition="end">
-                          <Panel header="Organization Name" key="1">
+                          <Panel header="Product" key="1">
                             <table className="table">
                               <tbody>
-                                <DetailLabelItem
-                                  data_set={selectedPurchase}
-                                  saved={savedValues}
-                                  name="purchase_name"
-                                  title="Name"
-                                  is_top={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedPurchase}
-                                  saved={savedValues}
-                                  name="purchase_name_eng"
-                                  title="English Name"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
+                                {}
                               </tbody>
                             </table>
                           </Panel>
@@ -385,15 +399,15 @@ const PurchaseDetailsModel = () => {
                       </div>
                       <div className="tasks__item crms-task-item active">
                         <Collapse accordion expandIconPosition="end">
-                          <Panel header="Organization Details" key="1">
+                          <Panel header="Deal" key="1">
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
                                   data_set={selectedPurchase}
                                   saved={savedValues}
-                                  name="group_"
-                                  title="Group"
-                                  is_top={true}
+                                  name="quantity"
+                                  title="Quantity"
+                                  no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -404,8 +418,8 @@ const PurchaseDetailsModel = () => {
                                 <DetailLabelItem
                                   data_set={selectedPurchase}
                                   saved={savedValues}
-                                  name="purchase_scale"
-                                  title="Purchase Scale"
+                                  name="price"
+                                  title="Price"
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -416,20 +430,8 @@ const PurchaseDetailsModel = () => {
                                 <DetailLabelItem
                                   data_set={selectedPurchase}
                                   saved={savedValues}
-                                  name="deal_type"
-                                  title="Deal Type"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedPurchase}
-                                  saved={savedValues}
-                                  name="business_registration_code"
-                                  title="Business Registration Code"
+                                  name="currency"
+                                  title="Currency"
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -440,59 +442,49 @@ const PurchaseDetailsModel = () => {
                                 <DetailDateItem
                                   data_set={selectedPurchase}
                                   saved={savedValues}
-                                  name="establishment_date"
-                                  title="Establishment Date"
-                                  timeData={establishDate}
-                                  timeDataChange={handleEstablishDateChange}
+                                  name="delivery_date"
+                                  title="Delivery Date"
+                                  timeData={deliveryDate}
+                                  timeDataChange={handleDeliveryDateChange}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
-                                  endEdit={handleEndEditEstablishDate}
+                                  endEdit={handleEndEditDelieveryDate}
                                   checkSaved={handleCheckSaved}
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailDateItem
                                   data_set={selectedPurchase}
                                   saved={savedValues}
-                                  name="closure_date"
-                                  title="Closure Date"
-                                  timeData={closeDate}
-                                  timeDataChange={handleCloseDate}
+                                  name="MA_contact_date"
+                                  title="MA Contact Date"
+                                  timeData={contactDate}
+                                  timeDataChange={handleContactDateChange}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
-                                  endEdit={handleEndEditCloseDate}
+                                  endEdit={handleEndEditContactDate}
+                                  checkSaved={handleCheckSaved}
+                                  cancelSaved={handleCancelSaved}
+                                />
+                                <DetailDateItem
+                                  data_set={selectedPurchase}
+                                  saved={savedValues}
+                                  name="MA_finish_date"
+                                  title="MA Finish Date"
+                                  timeData={finishDate}
+                                  timeDataChange={handleFinishDateChange}
+                                  checkEdit={handleCheckEditState}
+                                  startEdit={handleStartEdit}
+                                  editing={handleEditing}
+                                  endEdit={handleEndEditFinishDate}
                                   checkSaved={handleCheckSaved}
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
                                   data_set={selectedPurchase}
                                   saved={savedValues}
-                                  name="ceo_name"
-                                  title="Ceo Name"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedPurchase}
-                                  saved={savedValues}
-                                  name="business_type"
-                                  title="Business Type"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedPurchase}
-                                  saved={savedValues}
-                                  name="business_item"
-                                  title="Business Item"
+                                  name="register"
+                                  title="Register"
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -500,11 +492,25 @@ const PurchaseDetailsModel = () => {
                                   checkSaved={handleCheckSaved}
                                   cancelSaved={handleCancelSaved}
                                 />
+                                <DetailDateItem
+                                  data_set={selectedPurchase}
+                                  saved={savedValues}
+                                  name="registration_date"
+                                  title="Registration Date"
+                                  timeData={finishDate}
+                                  timeDataChange={handleRegisterDateChange}
+                                  checkEdit={handleCheckEditState}
+                                  startEdit={handleStartEdit}
+                                  editing={handleEditing}
+                                  endEdit={handleEndEditRegisterDate}
+                                  checkSaved={handleCheckSaved}
+                                  cancelSaved={handleCancelSaved}
+                                />
                                 <DetailLabelItem
                                   data_set={selectedPurchase}
                                   saved={savedValues}
-                                  name="industry_type"
-                                  title="Industry Type"
+                                  name="regcode"
+                                  title="Registration Code"
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -512,46 +518,13 @@ const PurchaseDetailsModel = () => {
                                   checkSaved={handleCheckSaved}
                                   cancelSaved={handleCancelSaved}
                                 />
-                              </tbody>
-                            </table>
-                          </Panel>
-                        </Collapse>
-                      </div>
-                      <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition="end">
-                          <Panel header="Organization Contact Details" key="1">
-                            <table className="table">
-                              <tbody>
-                                <DetailLabelItem
+                                <DetailTextareaItem
                                   data_set={selectedPurchase}
                                   saved={savedValues}
-                                  name="purchase_phone_number"
-                                  title="Phone"
-                                  is_top={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedPurchase}
-                                  saved={savedValues}
-                                  name="purchase_fax_number"
-                                  title="Fax"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedPurchase}
-                                  saved={savedValues}
-                                  name="homepage"
-                                  title="Website"
+                                  name="purchase_memo"
+                                  title="Memo"
+                                  row_no={3}
+                                  no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -566,134 +539,16 @@ const PurchaseDetailsModel = () => {
                       </div>
                       <div className="tasks__item crms-task-item">
                         <Collapse accordion expandIconPosition="end">
-                          <Panel header="Address Information" key="1">
-                            <table className="table">
-                              <tbody>
-                                <DetailLabelItem
-                                  data_set={selectedPurchase}
-                                  saved={savedValues}
-                                  name="purchase_address"
-                                  title="Address"
-                                  is_top={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedPurchase}
-                                  saved={savedValues}
-                                  name="purchase_zip_code"
-                                  title="Postal code"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                              </tbody>
-                            </table>
-                          </Panel>
-                        </Collapse>
-                      </div>
-                      <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition="end">
-                          <Panel header="Additional Information" key="1">
-                            <table className="table">
-                              <tbody>
-                                <DetailLabelItem
-                                  data_set={selectedPurchase}
-                                  saved={savedValues}
-                                  name="account_code"
-                                  title="Account Code"
-                                  is_top={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedPurchase}
-                                  saved={savedValues}
-                                  name="bank_name"
-                                  title="Bank Name"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedPurchase}
-                                  saved={savedValues}
-                                  name="account_owner"
-                                  title="Account Owner"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedPurchase}
-                                  saved={savedValues}
-                                  name="sales_resource"
-                                  title="Sales Resource"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedPurchase}
-                                  saved={savedValues}
-                                  name="application_engineer"
-                                  title="Application Engineer"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedPurchase}
-                                  saved={savedValues}
-                                  name="region"
-                                  title="Region"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                              </tbody>
-                            </table>
-                          </Panel>
-                        </Collapse>
-                      </div>
-                      <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition="end">
-                          <Panel header="Memo" key="1">
+                          <Panel header="Status" key="1">
                             <table className="table">
                               <tbody>
                                 <DetailTextareaItem
                                   data_set={selectedPurchase}
                                   saved={savedValues}
-                                  name="memo"
-                                  title="Memo"
+                                  name="status"
+                                  title="Status"
                                   row_no={3}
-                                  is_top={true}
+                                  no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}

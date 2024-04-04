@@ -97,7 +97,7 @@ const SidebarNav = (props) => {
                   <ShoppingBagOutlined /> <span>Purchases</span>
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link className={`${pathname.includes("invoices") ? "active" : ""}`} to="/invoices">
                   <BiEdit /> <span>Invoices</span>
                 </Link>
@@ -106,7 +106,7 @@ const SidebarNav = (props) => {
                 <Link className={`${pathname.includes("deals") ? "active" : ""}`} to="/deals">
                   <BiStation /> <span>Deals</span>
                 </Link>
-              </li>
+              </li> */}
               {/* <li className="menu-title">
                 <span>Settings</span>
               </li>

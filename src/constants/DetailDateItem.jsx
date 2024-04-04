@@ -4,15 +4,15 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const DetailDateItem = (props) => {
-    const { data_set, saved, name, title, is_top,
+    const { data_set, saved, name, title, no_border,
         timeData, timeDataChange, selectTime,
         checkEdit, startEdit, endEdit, checkSaved, cancelSaved } = props;
 
     if(checkEdit(name)) {
         return (
             <tr>
-                <td className={is_top && "border-0"}>{title}</td>
-                <td className={is_top && "border-0"} >
+                <td className={no_border && "border-0"}>{title}</td>
+                <td className={no_border && "border-0"} >
                     { selectTime ? 
                         <DatePicker
                             className="form-control"
@@ -30,7 +30,7 @@ const DetailDateItem = (props) => {
                         />
                     }
                 </td>
-                <td className={is_top && "border-0"}>
+                <td className={no_border && "border-0"}>
                     <div onClick={() => { endEdit(); }}>
                         <SaveAlt />
                     </div>
@@ -41,11 +41,11 @@ const DetailDateItem = (props) => {
     if(checkSaved(name)) {
         return (
             <tr>
-                <td className={is_top && "border-0"}>{title}</td>
-                <td className={is_top && "border-0"}>
+                <td className={no_border && "border-0"}>{title}</td>
+                <td className={no_border && "border-0"}>
                     {saved[name] && new Date(saved[name]).toLocaleDateString('ko-KR', {year: 'numeric', month: 'short', day: 'numeric'})}
                 </td>
-                <td className={is_top && "border-0"}>
+                <td className={no_border && "border-0"}>
                     <div onClick={() => { cancelSaved(name); }}>
                         <Cancel />
                     </div>
@@ -56,11 +56,11 @@ const DetailDateItem = (props) => {
 
     return (
         <tr>
-            <td className={is_top && "border-0"}>{title}</td>
-            <td className={is_top && "border-0"}>
+            <td className={no_border && "border-0"}>{title}</td>
+            <td className={no_border && "border-0"}>
                 {data_set[name] && new Date(data_set[name]).toLocaleDateString('ko-KR', {year: 'numeric', month: 'short', day: 'numeric'})}
             </td>
-            <td className={is_top && "border-0"}>
+            <td className={no_border && "border-0"}>
                 <div onClick={() => { startEdit(name); }}>
                     <Edit />
                 </div>

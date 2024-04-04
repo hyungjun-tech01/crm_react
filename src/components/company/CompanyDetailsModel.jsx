@@ -126,7 +126,7 @@ const CompanyDetailsModel = () => {
     setEditedValues(tempEdited);
   });
 
-  const handleCloseDate = useCallback((date) => {
+  const handleCloseDateChange = useCallback((date) => {
     setCloseDate(date);
   });
 
@@ -358,7 +358,7 @@ const CompanyDetailsModel = () => {
                                   saved={savedValues}
                                   name="company_name"
                                   title="Name"
-                                  is_top={true}
+                                  no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -393,7 +393,7 @@ const CompanyDetailsModel = () => {
                                   saved={savedValues}
                                   name="group_"
                                   title="Group"
-                                  is_top={true}
+                                  no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -456,7 +456,7 @@ const CompanyDetailsModel = () => {
                                   name="closure_date"
                                   title="Closure Date"
                                   timeData={closeDate}
-                                  timeDataChange={handleCloseDate}
+                                  timeDataChange={handleCloseDateChange}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -527,7 +527,7 @@ const CompanyDetailsModel = () => {
                                   saved={savedValues}
                                   name="company_phone_number"
                                   title="Phone"
-                                  is_top={true}
+                                  no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -574,7 +574,7 @@ const CompanyDetailsModel = () => {
                                   saved={savedValues}
                                   name="company_address"
                                   title="Address"
-                                  is_top={true}
+                                  no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -609,7 +609,7 @@ const CompanyDetailsModel = () => {
                                   saved={savedValues}
                                   name="account_code"
                                   title="Account Code"
-                                  is_top={true}
+                                  no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -693,7 +693,7 @@ const CompanyDetailsModel = () => {
                                   name="memo"
                                   title="Memo"
                                   row_no={3}
-                                  is_top={true}
+                                  no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}

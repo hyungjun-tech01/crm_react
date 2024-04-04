@@ -1,26 +1,21 @@
 import React from 'react';
+import Select from 'react-select';
 import { Cancel, Edit, SaveAlt } from '@mui/icons-material';
 
-const DetailLabelItem = (props) => {
-    const { data_set, saved, name, title, type, no_border,
-        checkEdit, startEdit, endEdit, editing, checkSaved, cancelSaved } = props;
+const DetailSelectItem = (props) => {
+    const { data_set, saved, name, title, options, no_border,
+        checkEdit, startEdit, endEdit, checkSaved, cancelSaved } = props;
 
     if(checkEdit && checkEdit(name)) {
         return (
             <tr>
                 <td className={no_border && "border-0"}>{title}</td>
                 <td className={no_border && "border-0"} >
-                    <input
-                        type={type ? type : "text"}
-                        placeholder={title}
-                        name={name}
-                        defaultValue={data_set[name]}
-                        onChange={editing}
-                    />
+                    <Select options={options} onChange={endEdit}/>
                 </td>
                 <td className={no_border && "border-0"}>
-                    <div onClick={() => { endEdit(name); }}>
-                        <SaveAlt />
+                    <div>
+                        {" "}
                     </div>
                 </td>
             </tr>
@@ -57,4 +52,4 @@ const DetailLabelItem = (props) => {
     );
 };
 
-export default DetailLabelItem;
+export default DetailSelectItem;

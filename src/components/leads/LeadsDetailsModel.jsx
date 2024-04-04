@@ -2,19 +2,24 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
-import Select from "react-select";
 import { CircleImg, SystemUser } from "../imagepath";
 import { Collapse } from "antd";
 import { Edit, SaveAlt } from "@mui/icons-material";
 import { atomCurrentLead, defaultLead } from "../../atoms/atoms";
-import { LeadKeyManItems, LeadRepo } from "../../repository/lead";
+import { KeyManForSelection, LeadRepo } from "../../repository/lead";
+import DetailLabelItem from "../../constants/DetailLabelItem";
+import DetailDateItem from "../../constants/DetailDateItem";
+import DetailTextareaItem from "../../constants/DetailTextareaItem";
+import DetailSelectItem from "../../constants/DetailSelectItem";
 
 const LeadsDetailsModel = () => {
   const { Panel } = Collapse;
   const selectedLead = useRecoilValue(atomCurrentLead);
   const { modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
-  const [editedValues, setEditedValues] = useState(null);
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+
+  const [ editedValues, setEditedValues ] = useState(null);
+  const [ savedValues, setSavedValues ] = useState(null);
   const [ keymanLabel, setKeymanLabel] = useState(null);
 
   // --- Funtions for Editing ---------------------------------
@@ -23,81 +28,111 @@ const LeadsDetailsModel = () => {
   }, [editedValues]);
 
   const handleStartEdit = useCallback((name) => {
-    const temp_value = {
+    const tempEdited = {
       ...editedValues,
-      [name]: null,
+      [name]: selectedLead[name],
     };
-    setEditedValues(temp_value);
-  }, [editedValues]);
+    setEditedValues(tempEdited);
+  }, [editedValues, selectedLead]);
 
   const handleEditing = useCallback((e) => {
-    const temp_value = {
+    const tempEdited = {
       ...editedValues,
       [e.target.name]: e.target.value,
     };
-    setEditedValues(temp_value);
+    setEditedValues(tempEdited);
   }, [editedValues]);
 
   const handleEndEdit = useCallback((name) => {
-    if (editedValues[name]) {
-      if(editedValues[name] === selectedLead[name]){
-        const tempValue = {
-          ...editedValues,
-        };
-        delete tempValue[name];
-        setEditedValues(tempValue);
-        return;
-      };
-
-      if (modifyLead(editedValues)) {
-        console.log(`Succeeded to modify: ${name}`);
-        const tempValue = {
-          ...editedValues,
-        };
-        delete tempValue[name];
-        setEditedValues(tempValue);
-      } else {
-        console.alert("Fail to change value");
-        const tempValue = {
-          ...editedValues,
-        };
-        delete tempValue[name];
-        setEditedValues(tempValue);
-      }
-    } else {
-      const tempValue = {
+    if(editedValues[name] === selectedLead[name]){
+      const tempEdited = {
         ...editedValues,
       };
-      delete tempValue[name];
-      setEditedValues(tempValue);
+      delete tempEdited[name];
+      setEditedValues(tempEdited);
+      return;
+    };
+
+    const tempSaved = {
+      ...savedValues,
+      [name] : editedValues[name],
     }
+    setSavedValues(tempSaved);  
+
+    const tempEdited = {
+      ...editedValues,
+    };
+    delete tempEdited[name];
+    setEditedValues(tempEdited);
   }, [editedValues, selectedLead]);
 
+  // --- Funtions for Saving ---------------------------------
+  const handleCheckSaved = useCallback((name) => {
+    return savedValues !== null && name in savedValues;
+  }, [savedValues]);
+
+  const handleCancelSaved = useCallback((name) => {
+    const tempSaved = {
+      ...savedValues,
+    };
+    delete tempSaved[name];
+    setSavedValues(tempSaved);
+  }, [savedValues]);
+
+  const handleSaveAll = useCallback(() => {
+    if(savedValues !== null
+      && selectedLead
+      && selectedLead !== defaultLead)
+    {
+      const temp_all_saved = {
+        ...savedValues,
+        action_type: "UPDATE",
+        modify_user: cookies.myLationCrmUserId,
+        lead_code: selectedLead.lead_code,
+      };
+      if (modifyLead(temp_all_saved)) {
+        console.log(`Succeeded to modify lead`);
+      } else {
+        console.error('Failed to modify lead')
+      }
+    } else {
+      console.log("[ LeadDetailModel ] No saved data");
+    };
+    setEditedValues(null);
+    setSavedValues(null);
+  }, [savedValues, selectedLead]);
+
+  const handleCancelAll = useCallback(() => {
+    setEditedValues(null);
+    setSavedValues(null);
+  }, []);
+
   // --- Funtions for Select ---------------------------------
-  const handleSelectKeyMan = useCallback((value) => {
-    console.log('handleSelectKeyMan called!');
+  const handleEndEditKeyMan = useCallback((value) => {
+    console.log('handleEndEditKeyMan called!');
     const selected = value.value;
     const current = selectedLead.is_keyman;
 
-    const tempEditedValue = {
-      ...editedValues,
-      is_keyman: selected,
+    if(editedValues.is_keyman === selected){
+      const tempEdited = {
+        ...editedValues,
+      };
+      delete tempEdited.is_keyman;
+      setEditedValues(tempEdited);
+      return;
     };
 
-    if (selected !== current) {
-      if (modifyLead(tempEditedValue)) {
-        console.log(`Succeeded to modify: ${selected}`);
-        delete tempEditedValue['is_keyman'];
-        setEditedValues(tempEditedValue);
-      } else {
-        console.alert("Fail to change value");
-        delete tempEditedValue['is_keyman'];
-        setEditedValues(tempEditedValue);
-      }
-    } else {
-      delete tempEditedValue['is_keyman'];
-      setEditedValues(tempEditedValue);
+    const tempSaved = {
+      ...savedValues,
+      is_keyman : editedValues.is_keyman,
     }
+    setSavedValues(tempSaved); 
+
+    const tempEdited = {
+      ...editedValues,
+    };
+    delete tempEdited.is_keyman;
+    setEditedValues(tempEdited);
   }, [editedValues, modifyLead, selectedLead.is_keyman]);
 
   const handleGetKeyManLabel = useCallback((value) => {
@@ -106,7 +141,7 @@ const LeadsDetailsModel = () => {
       setKeymanLabel('');
       return;
     }
-    const found = LeadKeyManItems.filter(item => item.value === value)[0];
+    const found = KeyManForSelection.filter(item => item.value === value)[0];
     if(found.label === 'NULL') setKeymanLabel('');
     else setKeymanLabel(found.label);
   }, []);
@@ -373,316 +408,120 @@ const LeadsDetailsModel = () => {
                                 <Panel header="Lead Information" key="1">
                                   <table className="table">
                                     <tbody>
+                                      <DetailLabelItem
+                                        data_set={selectedLead}
+                                        saved={savedValues}
+                                        name="lead_name"
+                                        title="Name"
+                                        no_border={true}
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedLead}
+                                        saved={savedValues}
+                                        name="position"
+                                        title="Title"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedLead}
+                                        saved={savedValues}
+                                        name="department"
+                                        title="Department"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedLead}
+                                        saved={savedValues}
+                                        name="company_name"
+                                        title="Organization"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailSelectItem
+                                        data_set={selectedLead}
+                                        saved={savedValues}
+                                        name="is_keyman"
+                                        title="Key Man"
+                                        options={KeyManForSelection}
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        endEdit={handleEndEditKeyMan}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedLead}
+                                        saved={savedValues}
+                                        name="group_"
+                                        title="Group"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedLead}
+                                        saved={savedValues}
+                                        name="region"
+                                        title="Region"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedLead}
+                                        saved={savedValues}
+                                        name="sales_resource"
+                                        title="Sales Resource"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedLead}
+                                        saved={savedValues}
+                                        name="application_engineer"
+                                        title="Application Engineer"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
                                       <tr>
-                                        <td className="border-0">Name</td>
-                                        { handleCheckEditState("lead_name") ? (
-                                          <>
-                                            <td className="border-0">
-                                              <input
-                                                type="text"
-                                                placeholder="Lead Name"
-                                                name="lead_name"
-                                                defaultValue={selectedLead.lead_name}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td className="border-0">
-                                              <div onClick={() => {handleEndEdit("lead_name");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td className="border-0">
-                                              {selectedLead.lead_name}
-                                            </td>
-                                            <td className="border-0">
-                                              <div onClick={() => {handleStartEdit("lead_name");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Title</td>
-                                        { handleCheckEditState("position") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Title"
-                                                name="position"
-                                                defaultValue={selectedLead.position}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("position");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                          ) : (
-                                          <>
-                                            <td>
-                                              {selectedLead.position}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("position");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Department</td>
-                                        { handleCheckEditState("department") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Department"
-                                                name="department"
-                                                defaultValue={selectedLead.department}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("department");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                          ) : (
-                                          <>
-                                            <td>
-                                              {selectedLead.department}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("department");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Organization</td>
-                                        { handleCheckEditState("company_name") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Organization"
-                                                name="company_name"
-                                                defaultValue={selectedLead.company_name}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("company_name");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                          ) : (
-                                          <>
-                                            <td>
-                                              {selectedLead.company_name}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("company_name");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>KeyMan</td>
-                                        { handleCheckEditState("is_keyman") ? (
-                                          <>
-                                            <td>
-                                              <Select options={LeadKeyManItems}
-                                                onChange={handleSelectKeyMan}
-                                                selected={selectedLead.is_keyman ? selectedLead.is_keyman : 'NULL'}
-                                              />
-                                            </td>
-                                            <td>{" "}</td>
-                                          </>
-                                          ) : (
-                                          <>
-                                            <td>
-                                              {keymanLabel}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("is_keyman");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Group</td>
-                                        { handleCheckEditState("group_") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Group"
-                                                name="group_"
-                                                defaultValue={selectedLead.group_}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td >
-                                              <div onClick={() => {handleEndEdit("group_");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedLead.group_}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("group_");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Region</td>
-                                        { handleCheckEditState("region") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Region"
-                                                name="region"
-                                                defaultValue={selectedLead.region}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td >
-                                              <div onClick={() => {handleEndEdit("region");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedLead.region}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("region");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Sales Resource</td>
-                                        { handleCheckEditState("sales_resource") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Sales Resource"
-                                                name="sales_resource"
-                                                defaultValue={selectedLead.sales_resource}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td >
-                                              <div onClick={() => {handleEndEdit("sales_resource");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedLead.sales_resource}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("sales_resource");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Application Engineer</td>
-                                        { handleCheckEditState("application_engineer") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Application Engineer"
-                                                name="application_engineer"
-                                                defaultValue={selectedLead.application_engineer}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td >
-                                              <div onClick={() => {handleEndEdit("application_engineer");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedLead.application_engineer}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("application_engineer");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Lead Created</td>
-                                        { handleCheckEditState("create_date") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="date"
-                                                placeholder="Created Date"
-                                                name="create_date"
-                                                defaultValue={selectedLead.create_date}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td >
-                                              <div onClick={() => {handleEndEdit("create_date");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>{ new Date(selectedLead.create_date).toDateString() }</td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("create_date");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
+                                        <td className="border-0">Lead Created</td>
+                                        <td className="border-0">
+                                          {new Date(selectedLead.create_date).toLocaleDateString('ko-KR', {year:"numeric", month: 'short', day:'numeric'})}
+                                        </td>
                                       </tr>
                                     </tbody>
                                   </table>
@@ -694,166 +533,68 @@ const LeadsDetailsModel = () => {
                                 <Panel header="Contact Information" key="1">
                                   <table className="table">
                                     <tbody>
-                                      <tr>
-                                        <td className="border-0">Email Address</td>
-                                        { handleCheckEditState("email") ? (
-                                          <>
-                                            <td className="border-0">
-                                              <input
-                                                type="text"
-                                                placeholder="Email"
-                                                name="email"
-                                                defaultValue={selectedLead.email}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td className="border-0">
-                                              <div onClick={() => {handleEndEdit("email");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td className="border-0">
-                                              {selectedLead.email}
-                                            </td>
-                                            <td className="border-0">
-                                              <div onClick={() => {handleStartEdit("email");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Mobile</td>
-                                        { handleCheckEditState("mobile_number") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Mobile"
-                                                name="mobile_number"
-                                                defaultValue={selectedLead.mobile_number}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("mobile_number");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedLead.mobile_number}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("mobile_number");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Phone</td>
-                                        { handleCheckEditState("company_phone_number") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Phone"
-                                                name="company_phone_number"
-                                                defaultValue={selectedLead.company_phone_number}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("company_phone_number");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedLead.company_phone_number}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("company_phone_number");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Fax</td>
-                                        { handleCheckEditState("company_fax_number") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Fax"
-                                                name="company_fax_number"
-                                                defaultValue={selectedLead.company_fax_number}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("company_fax_number");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedLead.company_fax_number}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("company_fax_number");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Website</td>
-                                        { handleCheckEditState("homepage") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Website"
-                                                name="homepage"
-                                                defaultValue={selectedLead.homepage}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("homepage");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedLead.homepage}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("homepage");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
+                                      <DetailLabelItem
+                                        data_set={selectedLead}
+                                        saved={savedValues}
+                                        name="email"
+                                        title="Email"
+                                        no_border={true}
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedLead}
+                                        saved={savedValues}
+                                        name="mobile_number"
+                                        title="Mobile"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedLead}
+                                        saved={savedValues}
+                                        name="company_phone_number"
+                                        title="Phone"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedLead}
+                                        saved={savedValues}
+                                        name="company_fax_number"
+                                        title="Fax"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedLead}
+                                        saved={savedValues}
+                                        name="homepage"
+                                        title="Website"
+                                        no_border={true}
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
                                     </tbody>
                                   </table>
                                 </Panel>
@@ -864,71 +605,32 @@ const LeadsDetailsModel = () => {
                                 <Panel header="Address Information" key="1">
                                   <table className="table">
                                     <tbody>
-                                      <tr>
-                                        <td className="border-0"> Address</td>
-                                        {handleCheckEditState("company_address") ? (
-                                          <>
-                                            <td className="border-0">
-                                              <textarea
-                                                className="form-control"
-                                                rows={3}
-                                                placeholder="Address"
-                                                defaultValue={selectedLead.company_address}
-                                                name="company_address"
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td className="border-0">
-                                              <div onClick={() => {handleEndEdit("company_address");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td className="border-0">
-                                              {selectedLead.company_address}
-                                            </td>
-                                            <td className="border-0">
-                                              <div onClick={() => {handleStartEdit("company_address");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Postal Code</td>
-                                        { handleCheckEditState("company_zip_code") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Postal Code"
-                                                name="company_zip_code"
-                                                defaultValue={selectedLead.company_zip_code}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("company_zip_code");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedLead.company_zip_code}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("company_zip_code");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
+                                      <DetailLabelItem
+                                        data_set={selectedLead}
+                                        saved={savedValues}
+                                        name="company_address"
+                                        title="Address"
+                                        no_border={true}
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedLead}
+                                        saved={savedValues}
+                                        name="company_zip_code"
+                                        title="Postal Code"
+                                        no_border={true}
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
                                     </tbody>
                                   </table>
                                 </Panel>
@@ -939,39 +641,20 @@ const LeadsDetailsModel = () => {
                                 <Panel header="Status Information" key="1">
                                   <table className="table">
                                     <tbody>
-                                      <tr>
-                                        <td className="border-0">Status</td>
-                                        {handleCheckEditState("status") ? (
-                                          <>
-                                            <td className="border-0">
-                                              <textarea
-                                                className="form-control"
-                                                rows={3}
-                                                placeholder="Status"
-                                                defaultValue={selectedLead.status}
-                                                name="status"
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td className="border-0">
-                                              <div onClick={() => {handleEndEdit("status");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td className="border-0">
-                                              {selectedLead.status}
-                                            </td>
-                                            <td className="border-0">
-                                              <div onClick={() => {handleStartEdit("status");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
+                                      <DetailTextareaItem
+                                        data_set={selectedLead}
+                                        saved={savedValues}
+                                        name="status"
+                                        title="Status"
+                                        row_no={2}
+                                        no_border={true}
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
                                     </tbody>
                                   </table>
                                 </Panel>
@@ -3388,6 +3071,25 @@ const LeadsDetailsModel = () => {
                   </div>
                 </div>
               </div>
+              { savedValues !== null && Object.keys(savedValues).length !== 0 &&
+                  <div className="text-center py-3">
+                    <button
+                      type="button"
+                      className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                      onClick={handleSaveAll}
+                    >
+                      Save
+                    </button>
+                    &nbsp;&nbsp;
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-rounded"
+                      onClick={handleCancelAll}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                }
             </div>
           </div>
           {/* modal-content */}

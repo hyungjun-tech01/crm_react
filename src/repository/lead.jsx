@@ -5,7 +5,7 @@ import { atomCurrentLead, atomAllLeads, defaultLead } from '../atoms/atoms';
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
-export const LeadKeyManItems = [
+export const KeyManForSelection = [
     { value: 'M', label: 'Manager'},
     { value: '결제', label: 'Payer'},
     { value: 'User', label: 'User'},

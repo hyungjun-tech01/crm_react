@@ -10,7 +10,7 @@ import "../antdstyle.css";
 import LeadsDetailsModel from "./LeadsDetailsModel";
 import { BiUser } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
-import { LeadKeyManItems, LeadRepo } from "../../repository/lead";
+import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { atomAllCompanies, atomAllLeads, defaultLead } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 
@@ -576,7 +576,7 @@ const Leads = () => {
                         </div>
                         <div className="col-sm-6">
                           <label className="col-form-label">is Keyman</label>
-                          <Select options={LeadKeyManItems} onChange={handleSelectKeyMan} />
+                          <Select options={KeyManForSelection} onChange={handleSelectKeyMan} />
                         </div>
                       </div>
                       <div className="form-group row">
