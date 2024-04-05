@@ -370,7 +370,7 @@ const Header = (props) => {
               My Profile
             </Link> */}
 
-            <Link className="dropdown-item" to="/UserInfo" 
+            <Link className="dropdown-item" to="/userinfo" 
                   onClick={ ()=>{document.querySelector('#dropdown_menu').classList.remove('show');}}>
               My Profile
             </Link>

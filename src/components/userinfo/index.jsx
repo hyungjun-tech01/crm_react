@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState, useCallback } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { useCookies } from "react-cookie";
@@ -6,6 +6,11 @@ import { avatar02, avatar16 } from "../imagepath";
 import {atomCurrentUser} from "../../atoms/atomsUser.jsx";
 import {useRecoilValue} from "recoil";
 import { UserRepo } from "../../repository/user";
+
+import UserDetailModel from "./UserDetailModel.jsx";
+// import DatePicker from "react-datepicker";
+import { CompanyRepo } from "../../repository/company";
+import { atomAllCompanies, defaultCompany } from "../../atoms/atoms";
 
 const UserInfo = () => {
   const currentUser = useRecoilValue(atomCurrentUser);
@@ -16,6 +21,18 @@ const UserInfo = () => {
     "myLationCrmAuthToken",
   ]);
   console.log("currentUser", currentUser.userId);
+
+  const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
+  const allCompanyData = useRecoilValue(atomAllCompanies);
+  const [ companyChange, setCompanyChange ] = useState(null);
+  // const [ selectedEstablishDate, setSelectedEstablishDate ] = useState(null);
+  // const [ selectedCloseDate, setSelectedCloseDate ] = useState(null);
+
+  // --- Functions used for Table ------------------------------
+  const handleClickUserEdit = useCallback((id)=>{
+    console.log('[Company] set current User : ', id);  // setCurrentUser로 변경할 것 .
+    setCurrentCompany(id);
+  },[setCurrentCompany]);  
 
   useEffect(() => {
     if (currentUser.userId === "") {
@@ -115,10 +132,11 @@ const UserInfo = () => {
                       </div>
                       <div className="pro-edit">
                         <a
-                          data-bs-target="#profile_info"
+                          data-bs-target="#user-detail"
                           data-bs-toggle="modal"
                           className="edit-icon"
                           href="#"
+                          onClick={()=>{handleClickUserEdit('A85FB3956E1DE540B9D6F0EA493DE94F');}}
                         >
                           <i className="fa fa-pencil" />
                         </a>
@@ -364,6 +382,7 @@ const UserInfo = () => {
           {/* /Page Header */}
         </div>
         {/* /Page Content */}
+        <UserDetailModel />        
       </div>
     </HelmetProvider>
   );
