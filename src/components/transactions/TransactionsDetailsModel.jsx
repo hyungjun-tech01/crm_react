@@ -4,19 +4,22 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { CircleImg, SystemUser } from "../imagepath";
 import { Collapse } from "antd";
-import { Edit, SaveAlt } from "@mui/icons-material";
 import { atomCurrentTransaction, defaultTransaction } from "../../atoms/atoms";
 import { TransactionRepo } from "../../repository/transaction";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import DetailLabelItem from "../../constants/DetailLabelItem";
+import DetailDateItem from "../../constants/DetailDateItem";
+import DetailTextareaItem from "../../constants/DetailTextareaItem";
 
 const TransactionsDetailsModel = () => {
   const { Panel } = Collapse;
   const selectedTransaction = useRecoilValue(atomCurrentTransaction);
   const { modifyTransaction } = useRecoilValue(TransactionRepo);
-  const [editedValues, setEditedValues] = useState(null);
-  const [cookies] = useCookies(["myLationCrmUserName"]);
+  const [cookies] = useCookies(["myLationCrmUserId"]);
 
+  const [editedValues, setEditedValues] = useState(null);
+  const [savedValues, setSavedValues] = useState(null);
+  
+  const [ orgPublishDate, setOrgPublishDate ] = useState(null);
   const [ publishDate, setPublishDate ] = useState(new Date());
 
   // --- Funtions for Editing ---------------------------------
@@ -25,83 +28,125 @@ const TransactionsDetailsModel = () => {
   }, [editedValues]);
 
   const handleStartEdit = useCallback((name) => {
-    const temp_value = {
+    const tempEdited = {
       ...editedValues,
-      [name]: null,
+      [name]: selectedTransaction[name],
     };
-    setEditedValues(temp_value);
-  }, [editedValues]);
+    setEditedValues(tempEdited);
+  }, [editedValues, selectedTransaction]);
 
   const handleEditing = useCallback((e) => {
-    const temp_value = {
+    const tempEdited = {
       ...editedValues,
       [e.target.name]: e.target.value,
     };
-    setEditedValues(temp_value);
+    setEditedValues(tempEdited);
   }, [editedValues]);
 
   const handleEndEdit = useCallback((name) => {
-    if (editedValues[name]) {
-      if(editedValues[name] === selectedTransaction[name]){
-        const tempValue = {
-          ...editedValues,
-        };
-        delete tempValue[name];
-        setEditedValues(tempValue);
-        return;
-      };
-
-      if (modifyTransaction(editedValues)) {
-        console.log(`Succeeded to modify: ${name}`);
-        const tempValue = {
-          ...editedValues,
-        };
-        delete tempValue[name];
-        setEditedValues(tempValue);
-      } else {
-        console.alert("Fail to change value");
-        const tempValue = {
-          ...editedValues,
-        };
-        delete tempValue[name];
-        setEditedValues(tempValue);
-      }
-    } else {
-      const tempValue = {
+    if (editedValues[name] === selectedTransaction[name]) {
+      const tempEdited = {
         ...editedValues,
       };
-      delete tempValue[name];
-      setEditedValues(tempValue);
+      delete tempEdited[name];
+      setEditedValues(tempEdited);
+      return;
     }
-  }, [editedValues, selectedTransaction]);
 
-  // --- Funtions for Editing ---------------------------------
+    const tempSaved = {
+      ...savedValues,
+      [name]: editedValues[name],
+    };
+    setSavedValues(tempSaved);
+
+    const tempEdited = {
+      ...editedValues,
+    };
+    delete tempEdited[name];
+    setEditedValues(tempEdited);
+  }, [editedValues, savedValues, selectedTransaction]);
+
+  // --- Funtions for Saving ---------------------------------
+  const handleCheckSaved = useCallback((name) => {
+    return savedValues !== null && name in savedValues;
+  }, [savedValues]);
+
+  const handleCancelSaved = useCallback((name) => {
+    const tempSaved = {
+      ...savedValues,
+    };
+    delete tempSaved[name];
+    setSavedValues(tempSaved);
+  }, [savedValues]);
+
+  const handleSaveAll = useCallback(() => {
+    if (
+      savedValues !== null &&
+      selectedTransaction &&
+      selectedTransaction !== defaultTransaction
+    ) {
+      const temp_all_saved = {
+        ...savedValues,
+        action_type: "UPDATE",
+        modify_user: cookies.myLationCrmUserId,
+        transaction_code: selectedTransaction.transaction_code,
+      };
+      if (modifyTransaction(temp_all_saved)) {
+        console.log(`Succeeded to modify transaction`);
+      } else {
+        console.error("Failed to modify transaction");
+      }
+    } else {
+      console.log("[ TransactionDetailModel ] No saved data");
+    }
+    setEditedValues(null);
+    setSavedValues(null);
+  }, [
+    cookies.myLationCrmUserId,
+    modifyTransaction,
+    savedValues,
+    selectedTransaction,
+  ]);
+
+  const handleCancelAll = useCallback(() => {
+    setEditedValues(null);
+    setSavedValues(null);
+  }, []);
+
+  // --- Funtions for Publish Date ---------------------------------
+  const handleStartPublishDateEdit = useCallback(() => {
+    const tempEdited = {
+      ...editedValues,
+      publish_date: orgPublishDate,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues, orgPublishDate]);
   const handlePublishDateChange = useCallback((time) => {
     setPublishDate(time);
   }, []);
+  const handleEndPublishDateEdit = useCallback(() => {
+    if (publishDate !== orgPublishDate) {
+      const tempSaved = {
+        ...savedValues,
+        publish_date: publishDate,
+      };
+      setSavedValues(tempSaved);
+    }
+    const tempEdited = {
+      ...editedValues,
+    };
+    delete tempEdited.publish_date;
+    setEditedValues(tempEdited);
+  }, [editedValues, savedValues, orgPublishDate, publishDate]);
 
   useEffect(() => {
-    if (editedValues === null) {
-      const tempValues = {
-        action_type: "UPDATE",
-        modify_user: cookies.myLationCrmUserName,
-      };
-      setEditedValues(tempValues);
-    };
-    if (selectedTransaction && (selectedTransaction !== defaultTransaction)) {
-      const tempValues = {
-        ...editedValues,
-        transaction_code: selectedTransaction.transaction_code,
-      };
-      setEditedValues(tempValues);
-
-      // Set time from selected transaction data
-      if(selectedTransaction.publish_date !== null)
-      {
-        setPublishDate(new Date(selectedTransaction.publish_date));
-      };
-    }
-  }, [cookies.myLationCrmUserName, selectedTransaction]);
+    console.log("[TransactionDetailsModel] called!");
+    setOrgPublishDate(
+      selectedTransaction.publish_date
+      ? new Date(selectedTransaction.publish_date)
+      : null
+    );
+  }, [selectedTransaction, savedValues]);
 
   return (
     <>
@@ -274,135 +319,58 @@ const TransactionsDetailsModel = () => {
                                 <Panel header="Transaction Information" key="1">
                                   <table className="table">
                                     <tbody>
-                                      <tr>
-                                        <td className="border-0">Title</td>
-                                        { handleCheckEditState("transaction_title") ? (
-                                          <>
-                                            <td className="border-0">
-                                              <input
-                                                type="text"
-                                                placeholder="Transaction Title"
-                                                name="transaction_type"
-                                                defaultValue={selectedTransaction.transaction_title}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td className="border-0">
-                                              <div onClick={() => {handleEndEdit("transaction_title");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td className="border-0">
-                                              {selectedTransaction.transaction_title}
-                                            </td>
-                                            <td className="border-0">
-                                              <div onClick={() => {handleStartEdit("transaction_title");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Type</td>
-                                        { handleCheckEditState("transaction_type") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Type"
-                                                name="transaction_type"
-                                                defaultValue={selectedTransaction.transaction_type}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("transaction_type");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedTransaction.transaction_type}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("transaction_type");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Publish Date</td>
-                                        { handleCheckEditState("publish_date") ? (
-                                          <>
-                                            <td>
-                                              <DatePicker
-                                                className="form-control"
-                                                selected={ publishDate }
-                                                onChange={ handlePublishDateChange }
-                                                dateFormat="yyyy-MM-dd"
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("publish_date");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                          ) : (
-                                          <>
-                                            <td>
-                                              {publishDate.toLocaleDateString('ko-KR', {
-                                                year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric'
-                                              })}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("publish_date");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Publish Type</td>
-                                        { handleCheckEditState("publish_type") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Publish Type"
-                                                name="publish_type"
-                                                defaultValue={selectedTransaction.publish_type}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("publish_type");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedTransaction.publish_type}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("publish_type");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
+                                      <DetailLabelItem
+                                        data_set={selectedTransaction}
+                                        saved={savedValues}
+                                        name="transaction_title"
+                                        title="Title"
+                                        no_border={true}
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedTransaction}
+                                        saved={savedValues}
+                                        name="transaction_type"
+                                        title="Type"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailDateItem
+                                        saved={savedValues}
+                                        name="publish_date"
+                                        title="MA Contact Date"
+                                        orgTimeData={orgPublishDate}
+                                        timeData={publishDate}
+                                        timeDataChange={handlePublishDateChange}
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartPublishDateEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndPublishDateEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedTransaction}
+                                        saved={savedValues}
+                                        name="publish_type"
+                                        title="Publish Type"
+                                        no_border={true}
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
                                     </tbody>
                                   </table>
                                 </Panel>
@@ -413,199 +381,81 @@ const TransactionsDetailsModel = () => {
                                 <Panel header="Organization Information" key="1">
                                   <table className="table">
                                     <tbody>
-                                      <tr>
-                                        <td className="border-0">Organization Name</td>
-                                        { handleCheckEditState("company_name") ? (
-                                          <>
-                                            <td className="border-0">
-                                              <input
-                                                type="text"
-                                                placeholder="Company Name"
-                                                name="company_name"
-                                                defaultValue={selectedTransaction.company_name}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td className="border-0">
-                                              <div onClick={() => {handleEndEdit("company_name");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td className="border-0">
-                                              {selectedTransaction.company_name}
-                                            </td>
-                                            <td className="border-0">
-                                              <div onClick={() => {handleStartEdit("company_name");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Ceo Name</td>
-                                        { handleCheckEditState("ceo_name") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Department"
-                                                name="ceo_name"
-                                                defaultValue={selectedTransaction.ceo_name}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("ceo_name");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                          ) : (
-                                          <>
-                                            <td>
-                                              {selectedTransaction.ceo_name}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("ceo_name");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Organization Address</td>
-                                        { handleCheckEditState("company_address") ? (
-                                          <>
-                                            <td>
-                                              <textarea
-                                                className="form-control"
-                                                rows={2}
-                                                placeholder="Address"
-                                                defaultValue={selectedTransaction.email}
-                                                name="company_address"
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("company_address");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedTransaction.company_address}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("company_address");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Business Type</td>
-                                        { handleCheckEditState("business_type") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Business Type"
-                                                name="business_type"
-                                                defaultValue={selectedTransaction.business_type}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("business_type");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedTransaction.business_type}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("business_type");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Business Item</td>
-                                        { handleCheckEditState("business_item") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Business Item"
-                                                name="business_item"
-                                                defaultValue={selectedTransaction.business_item}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("business_item");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedTransaction.business_item}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("business_item");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Business Registration Code</td>
-                                        { handleCheckEditState("business_registration_code") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Business Registration Code"
-                                                name="business_registration_code"
-                                                defaultValue={selectedTransaction.business_registration_code}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("business_registration_code");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedTransaction.business_registration_code}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("business_registration_code");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
+                                      <DetailLabelItem
+                                        data_set={selectedTransaction}
+                                        saved={savedValues}
+                                        name="company_name"
+                                        title="Organization"
+                                        no_border={true}
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedTransaction}
+                                        saved={savedValues}
+                                        name="ceo_name"
+                                        title="Ceo Name"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailTextareaItem
+                                        data_set={selectedTransaction}
+                                        saved={savedValues}
+                                        name="company_address"
+                                        title="Address"
+                                        row_no={2}
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedTransaction}
+                                        saved={savedValues}
+                                        name="business_type"
+                                        title="Business Type"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedTransaction}
+                                        saved={savedValues}
+                                        name="business_item"
+                                        title="Business Item"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedTransaction}
+                                        saved={savedValues}
+                                        name="business_registration_code"
+                                        title="Business Registration Code"
+                                        no_border={true}
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
                                     </tbody>
                                   </table>
                                 </Panel>
@@ -616,166 +466,68 @@ const TransactionsDetailsModel = () => {
                                 <Panel header="Price Information" key="1">
                                   <table className="table">
                                     <tbody>
-                                      <tr>
-                                        <td className="border-0">Supply Price</td>
-                                        { handleCheckEditState("supply_price") ? (
-                                          <>
-                                            <td className="border-0">
-                                              <input
-                                                type="text"
-                                                placeholder="Supply Price"
-                                                name="supply_price"
-                                                defaultValue={selectedTransaction.supply_price}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td className="border-0">
-                                              <div onClick={() => {handleEndEdit("supply_price");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                          ) : (
-                                          <>
-                                            <td className="border-0">
-                                              {selectedTransaction.supply_price}
-                                            </td>
-                                            <td className="border-0">
-                                              <div onClick={() => {handleStartEdit("supply_price");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Tax Price</td>
-                                        { handleCheckEditState("tax_price") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Tax Price"
-                                                name="tax_price"
-                                                defaultValue={selectedTransaction.tax_price}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("tax_price");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedTransaction.tax_price}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("tax_price");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Total Price</td>
-                                        { handleCheckEditState("total_price") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Total Price"
-                                                name="total_price"
-                                                defaultValue={selectedTransaction.total_price}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("total_price");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedTransaction.total_price}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("total_price");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Currency</td>
-                                        { handleCheckEditState("currency") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Currency"
-                                                name="currency"
-                                                defaultValue={selectedTransaction.currency}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("currency");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedTransaction.currency}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("currency");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
-                                      <tr>
-                                        <td>Payment Type</td>
-                                        { handleCheckEditState("payment_type") ? (
-                                          <>
-                                            <td>
-                                              <input
-                                                type="text"
-                                                placeholder="Payment Type"
-                                                name="payment_type"
-                                                defaultValue={selectedTransaction.payment_type}
-                                                onChange={handleEditing}
-                                              />
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleEndEdit("payment_type");}}>
-                                                <SaveAlt />
-                                              </div>
-                                            </td>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <td>
-                                              {selectedTransaction.payment_type}
-                                            </td>
-                                            <td>
-                                              <div onClick={() => {handleStartEdit("payment_type");}}>
-                                                <Edit />
-                                              </div>
-                                            </td>
-                                          </>
-                                        )}
-                                      </tr>
+                                      <DetailLabelItem
+                                        data_set={selectedTransaction}
+                                        saved={savedValues}
+                                        name="supply_price"
+                                        title="Supply Price"
+                                        no_border={true}
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedTransaction}
+                                        saved={savedValues}
+                                        name="tax_price"
+                                        title="Tax Price"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedTransaction}
+                                        saved={savedValues}
+                                        name="total_price"
+                                        title="Total Price"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedTransaction}
+                                        saved={savedValues}
+                                        name="currency"
+                                        title="Currency"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
+                                        data_set={selectedTransaction}
+                                        saved={savedValues}
+                                        name="payment_type"
+                                        title="Payment Type"
+                                        no_border={true}
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
                                     </tbody>
                                   </table>
                                 </Panel>
@@ -1215,6 +967,25 @@ const TransactionsDetailsModel = () => {
                           </div>
                         </div>
                       </div>
+                      { savedValues !== null && Object.keys(savedValues).length !== 0 &&
+                        <div className="text-center py-3">
+                          <button
+                            type="button"
+                            className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                            onClick={handleSaveAll}
+                          >
+                            Save
+                          </button>
+                          &nbsp;&nbsp;
+                          <button
+                            type="button"
+                            className="btn btn-secondary btn-rounded"
+                            onClick={handleCancelAll}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      }
                     </div>
                   </div>
                 </div>

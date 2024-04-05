@@ -14,7 +14,7 @@ const PurchaseDetailsModel = () => {
   const { Panel } = Collapse;
   const selectedPurchase = useRecoilValue(atomCurrentPurchase);
   const { modifyPurchase } = useRecoilValue(PurchaseRepo);
-  const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+  const [cookies] = useCookies(["myLationCrmUserId"]);
 
   const [editedValues, setEditedValues] = useState(null);
   const [savedValues, setSavedValues] = useState(null);
@@ -29,79 +29,61 @@ const PurchaseDetailsModel = () => {
   const [registerDate, setRegisterDate] = useState(new Date());
 
   // --- Funtions for Editing ---------------------------------
-  const handleCheckEditState = useCallback(
-    (name) => {
-      return editedValues !== null && name in editedValues;
-    },
-    [editedValues]
-  );
+  const handleCheckEditState = useCallback((name) => {
+    return editedValues !== null && name in editedValues;
+  }, [editedValues]);
 
-  const handleStartEdit = useCallback(
-    (name) => {
-      const tempEdited = {
-        ...editedValues,
-        [name]: selectedPurchase[name],
-      };
-      setEditedValues(tempEdited);
-    },
-    [editedValues, selectedPurchase]
-  );
+  const handleStartEdit = useCallback((name) => {
+    const tempEdited = {
+      ...editedValues,
+      [name]: selectedPurchase[name],
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues, selectedPurchase]);
 
-  const handleEditing = useCallback(
-    (e) => {
-      const tempEdited = {
-        ...editedValues,
-        [e.target.name]: e.target.value,
-      };
-      setEditedValues(tempEdited);
-    },
-    [editedValues]
-  );
+  const handleEditing = useCallback((e) => {
+    const tempEdited = {
+      ...editedValues,
+      [e.target.name]: e.target.value,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues]);
 
-  const handleEndEdit = useCallback(
-    (name) => {
-      if (editedValues[name] === selectedPurchase[name]) {
-        const tempEdited = {
-          ...editedValues,
-        };
-        delete tempEdited[name];
-        setEditedValues(tempEdited);
-        return;
-      }
-
-      const tempSaved = {
-        ...savedValues,
-        [name]: editedValues[name],
-      };
-      setSavedValues(tempSaved);
-
+  const handleEndEdit = useCallback((name) => {
+    if (editedValues[name] === selectedPurchase[name]) {
       const tempEdited = {
         ...editedValues,
       };
       delete tempEdited[name];
       setEditedValues(tempEdited);
-    },
-    [editedValues, savedValues, selectedPurchase]
-  );
+      return;
+    }
+
+    const tempSaved = {
+      ...savedValues,
+      [name]: editedValues[name],
+    };
+    setSavedValues(tempSaved);
+
+    const tempEdited = {
+      ...editedValues,
+    };
+    delete tempEdited[name];
+    setEditedValues(tempEdited);
+  }, [editedValues, savedValues, selectedPurchase]);
 
   // --- Funtions for Saving ---------------------------------
-  const handleCheckSaved = useCallback(
-    (name) => {
-      return savedValues !== null && name in savedValues;
-    },
-    [savedValues]
-  );
+  const handleCheckSaved = useCallback((name) => {
+    return savedValues !== null && name in savedValues;
+  }, [savedValues]);
 
-  const handleCancelSaved = useCallback(
-    (name) => {
-      const tempSaved = {
-        ...savedValues,
-      };
-      delete tempSaved[name];
-      setSavedValues(tempSaved);
-    },
-    [savedValues]
-  );
+  const handleCancelSaved = useCallback((name) => {
+    const tempSaved = {
+      ...savedValues,
+    };
+    delete tempSaved[name];
+    setSavedValues(tempSaved);
+  }, [savedValues]);
 
   const handleSaveAll = useCallback(() => {
     if (
@@ -159,7 +141,7 @@ const PurchaseDetailsModel = () => {
     const tempEdited = {
       ...editedValues,
     };
-    delete tempEdited.deliveryDate;
+    delete tempEdited.deliveryment_date;
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, orgDeliveryDate, deliveryDate]);
 

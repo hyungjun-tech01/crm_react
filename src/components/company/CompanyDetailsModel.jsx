@@ -130,7 +130,7 @@ const CompanyDetailsModel = () => {
     const tempEdited = {
       ...editedValues,
     };
-    delete tempEdited.establishDate;
+    delete tempEdited.establishment_date;
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, orgEstablishDate, establishDate]);
 
