@@ -4,7 +4,7 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { Collapse } from "antd";
 import { C_logo, C_logo2, CircleImg } from "../imagepath";
-import { atomCurrentCompany, defaultCompany } from "../../atoms/atoms";
+import { atomCurrentUser, defaultUser } from "../../atoms/atomsUser";
 import { CompanyRepo } from "../../repository/company";
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailDateItem from "../../constants/DetailDateItem";
@@ -12,7 +12,7 @@ import DetailTextareaItem from "../../constants/DetailTextareaItem";
 
 const UserDetailModel = () => {
   const { Panel } = Collapse;
-  const selectedCompany = useRecoilValue(atomCurrentCompany);
+  const selectedUser = useRecoilValue(atomCurrentUser);
   const { modifyCompany } = useRecoilValue(CompanyRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
@@ -31,10 +31,10 @@ const UserDetailModel = () => {
   const handleStartEdit = useCallback((name) => {
     const tempEdited = {
       ...editedValues,
-      [name]: selectedCompany[name],
+      [name]: selectedUser[name],
     };
     setEditedValues(tempEdited);
-  }, [editedValues, selectedCompany]);
+  }, [editedValues, selectedUser]);
 
   const handleEditing = useCallback((e) => {
     const tempEdited = {
@@ -45,7 +45,7 @@ const UserDetailModel = () => {
   }, [editedValues]);
 
   const handleEndEdit = useCallback((name) => {
-    if(editedValues[name] === selectedCompany[name]){
+    if(editedValues[name] === selectedUser[name]){
       const tempEdited = {
         ...editedValues,
       };
@@ -65,7 +65,7 @@ const UserDetailModel = () => {
     };
     delete tempEdited[name];
     setEditedValues(tempEdited);
-  }, [editedValues, savedValues, selectedCompany]);
+  }, [editedValues, savedValues, selectedUser]);
 
   // --- Funtions for Saving ---------------------------------
   const handleCheckSaved = useCallback((name) => {
@@ -82,14 +82,14 @@ const UserDetailModel = () => {
 
   const handleSaveAll = useCallback(() => {
     if(savedValues !== null
-      && selectedCompany
-      && selectedCompany !== defaultCompany)
+      && selectedUser
+      && selectedUser !== defaultUser)
     {
       const temp_all_saved = {
         ...savedValues,
         action_type: "UPDATE",
         modify_user: cookies.myLationCrmUserId,
-        company_code: selectedCompany.company_code,
+        user_id: selectedUser.userId,
       };
       if (modifyCompany(temp_all_saved)) {
         console.log(`Succeeded to modify company`);
@@ -101,7 +101,7 @@ const UserDetailModel = () => {
     };
     setEditedValues(null);
     setSavedValues(null);
-  }, [cookies.myLationCrmUserId, modifyCompany, savedValues, selectedCompany]);
+  }, [cookies.myLationCrmUserId, modifyCompany, savedValues, selectedUser]);
 
   const handleCancelAll = useCallback(() => {
     setEditedValues(null);
@@ -161,7 +161,7 @@ const UserDetailModel = () => {
   }, [editedValues, savedValues, orgCloseDate, closeDate]);
 
   // useEffect(() => {
-  //   console.log('[UserDetailModel] called!');
+     console.log('[UserDetailModel] called!', selectedUser);
   //   setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
   //   setOrgCloseDate(selectedCompany.closure_date ? new Date(selectedCompany.closure_date) : null);
   // }, [selectedCompany, savedValues]);
@@ -192,15 +192,9 @@ const UserDetailModel = () => {
                     <img src={C_logo} alt="User" className="user-image" />
                   </div>
                   <div>
-                    <p className="mb-0">Company</p>
+                    <p className="mb-0">UserInfo</p>
                     <span className="modal-title">
-                      {selectedCompany.company_name}
-                    </span>
-                    <span className="rating-star">
-                      <i className="fa fa-star" aria-hidden="true" />
-                    </span>
-                    <span className="lock">
-                      <i className="fa fa-lock" aria-hidden="true" />
+                      {selectedUser.userName}
                     </span>
                   </div>
                 </div>
@@ -269,111 +263,20 @@ const UserDetailModel = () => {
                 data-bs-dismiss="modal"
               />
             </div>
-            <div className="card due-dates">
-              <div className="card-body">
-                <div className="row">
-                  <div className="col">
-                    <span>Title</span>
-                    <p>Enquiry</p>
-                  </div>
-                  <div className="col">
-                    <span>Companies</span>
-                    <p>{selectedCompany.company_name}</p>
-                  </div>
-                  <div className="col">
-                    <span>Phone</span>
-                    <p>{selectedCompany.company_phone_number}</p>
-                  </div>
-                  <div className="col">
-                    <span>Fax</span>
-                    <p>{selectedCompany.company_fax_number}</p>
-                  </div>
-                  <div className="col">
-                    <span>Contact owner</span>
-                    <p>{selectedCompany.ceo_name}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
             <div className="modal-body">
               <div className="task-infos">
-                <ul className="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified">
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link active"
-                      to="#task-details"
-                      data-bs-toggle="tab"
-                    >
-                      Details
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#task-related"
-                      data-bs-toggle="tab"
-                    >
-                      Lead
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#task-related"
-                      data-bs-toggle="tab"
-                    >
-                      Purchase
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#task-related"
-                      data-bs-toggle="tab"
-                    >
-                      Quatation
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#task-related"
-                      data-bs-toggle="tab"
-                    >
-                      Transaction
-                    </Link>
-                  </li>
-                  {/* <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#task-activity"
-                      data-bs-toggle="tab"
-                    >
-                      Activity
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#task-news"
-                      data-bs-toggle="tab"
-                    >
-                      News
-                    </Link>
-                  </li> */}
-                </ul>
                 <div className="tab-content">
                   <div className="tab-pane show active" id="task-details">
                     <div className="crms-tasks">
                       <div className="tasks__item crms-task-item active">
-                        <Collapse accordion expandIconPosition="end">
-                          <Panel header="Organization Name" key="1">
+                        {/* <Collapse accordion expandIconPosition="end">
+                          <Panel header="Organization Name" key="1"> */}
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedUser}
                                   saved={savedValues}
-                                  name="company_name"
+                                  name="userName"
                                   title="Name"
                                   no_border={true}
                                   checkEdit={handleCheckEditState}
@@ -384,10 +287,10 @@ const UserDetailModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedUser}
                                   saved={savedValues}
-                                  name="company_name_eng"
-                                  title="English Name"
+                                  name="mobileNumber"
+                                  title="Mobile Number"
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -395,1174 +298,74 @@ const UserDetailModel = () => {
                                   checkSaved={handleCheckSaved}
                                   cancelSaved={handleCancelSaved}
                                 />
-                              </tbody>
-                            </table>
-                          </Panel>
-                        </Collapse>
-                      </div>
-                      <div className="tasks__item crms-task-item active">
-                        <Collapse accordion expandIconPosition="end">
-                          <Panel header="Organization Details" key="1">
-                            <table className="table">
-                              <tbody>
                                 <DetailLabelItem
-                                  data_set={selectedCompany}
+                                  data_set={selectedUser}
+                                  saved={savedValues}
+                                  name="phoneNumber"
+                                  title="Phone Number"
+                                  checkEdit={handleCheckEditState}
+                                  startEdit={handleStartEdit}
+                                  editing={handleEditing}
+                                  endEdit={handleEndEdit}
+                                  checkSaved={handleCheckSaved}
+                                  cancelSaved={handleCancelSaved}
+                                />   
+                               <DetailLabelItem
+                                  data_set={selectedUser}
+                                  saved={savedValues}
+                                  name="department"
+                                  title="Department"
+                                  checkEdit={handleCheckEditState}
+                                  startEdit={handleStartEdit}
+                                  editing={handleEditing}
+                                  endEdit={handleEndEdit}
+                                  checkSaved={handleCheckSaved}
+                                  cancelSaved={handleCancelSaved}
+                                />
+                               <DetailLabelItem
+                                  data_set={selectedUser}
+                                  saved={savedValues}
+                                  name="position"
+                                  title="Position"
+                                  checkEdit={handleCheckEditState}
+                                  startEdit={handleStartEdit}
+                                  editing={handleEditing}
+                                  endEdit={handleEndEdit}
+                                  checkSaved={handleCheckSaved}
+                                  cancelSaved={handleCancelSaved}
+                                />         
+                               <DetailLabelItem
+                                  data_set={selectedUser}
+                                  saved={savedValues}
+                                  name="email"
+                                  title="Mobile Number"
+                                  checkEdit={handleCheckEditState}
+                                  startEdit={handleStartEdit}
+                                  editing={handleEditing}
+                                  endEdit={handleEndEdit}
+                                  checkSaved={handleCheckSaved}
+                                  cancelSaved={handleCancelSaved}
+                                />          
+                                <DetailLabelItem
+                                  data_set={selectedUser}
                                   saved={savedValues}
                                   name="group_"
-                                  title="Group"
-                                  no_border={true}
+                                  title="Mobile Number"
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
                                   endEdit={handleEndEdit}
                                   checkSaved={handleCheckSaved}
                                   cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="company_scale"
-                                  title="Company Scale"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="deal_type"
-                                  title="Deal Type"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="business_registration_code"
-                                  title="Business Registration Code"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailDateItem
-                                  saved={savedValues}
-                                  name="establishment_date"
-                                  title="Establishment Date"
-                                  orgTimeData={orgEstablishDate}
-                                  timeData={establishDate}
-                                  timeDataChange={handleEstablishDateChange}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEstablishDateEdit}
-                                  endEdit={handleEndEstablishDateEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailDateItem
-                                  saved={savedValues}
-                                  name="closure_date"
-                                  title="Closure Date"
-                                  orgTimeData={orgCloseDate}
-                                  timeData={closeDate}
-                                  timeDataChange={handleCloseDateChange}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartCloseDateEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndCloseDateEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="ceo_name"
-                                  title="Ceo Name"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="business_type"
-                                  title="Business Type"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="business_item"
-                                  title="Business Item"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="industry_type"
-                                  title="Industry Type"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
+                                />                                                                                       
                               </tbody>
                             </table>
-                          </Panel>
-                        </Collapse>
-                      </div>
-                      <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition="end">
-                          <Panel header="Organization Contact Details" key="1">
-                            <table className="table">
-                              <tbody>
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="company_phone_number"
-                                  title="Phone"
-                                  no_border={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="company_fax_number"
-                                  title="Fax"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="homepage"
-                                  title="Website"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                              </tbody>
-                            </table>
-                          </Panel>
-                        </Collapse>
-                      </div>
-                      <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition="end">
-                          <Panel header="Address Information" key="1">
-                            <table className="table">
-                              <tbody>
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="company_address"
-                                  title="Address"
-                                  no_border={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="company_zip_code"
-                                  title="Postal code"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                              </tbody>
-                            </table>
-                          </Panel>
-                        </Collapse>
-                      </div>
-                      <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition="end">
-                          <Panel header="Additional Information" key="1">
-                            <table className="table">
-                              <tbody>
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="account_code"
-                                  title="Account Code"
-                                  no_border={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="bank_name"
-                                  title="Bank Name"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="account_owner"
-                                  title="Account Owner"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="sales_resource"
-                                  title="Sales Resource"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="application_engineer"
-                                  title="Application Engineer"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="region"
-                                  title="Region"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                              </tbody>
-                            </table>
-                          </Panel>
-                        </Collapse>
-                      </div>
-                      <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition="end">
-                          <Panel header="Memo" key="1">
-                            <table className="table">
-                              <tbody>
-                                <DetailTextareaItem
-                                  data_set={selectedCompany}
-                                  saved={savedValues}
-                                  name="memo"
-                                  title="Memo"
-                                  row_no={3}
-                                  no_border={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                              </tbody>
-                            </table>
-                          </Panel>
-                        </Collapse>
+                          {/* </Panel>
+                        </Collapse> */}
                       </div>
                     </div>
                   </div>
-                  <div className="tab-pane task-related" id="task-related">
-                    <div className="row">
-                      <div className="col-md-4">
-                        <div className="card bg-gradient-danger card-img-holder text-white h-100">
-                          <div className="card-body">
-                            <img
-                              src={CircleImg}
-                              className="card-img-absolute"
-                              alt="circle"
-                            />
-                            <h4 className="font-weight-normal mb-3">
-                              Companies
-                            </h4>
-                            <span>2</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-4">
-                        <div className="card bg-gradient-info card-img-holder text-white h-100">
-                          <div className="card-body">
-                            <img
-                              src={CircleImg}
-                              className="card-img-absolute"
-                              alt="circle"
-                            />
-                            <h4 className="font-weight-normal mb-3">Deals</h4>
-                            <span>2</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-4">
-                        <div className="card bg-gradient-success card-img-holder text-white h-100">
-                          <div className="card-body">
-                            <img
-                              src={CircleImg}
-                              className="card-img-absolute"
-                              alt="circle"
-                            />
-                            <h4 className="font-weight-normal mb-3">
-                              Projects
-                            </h4>
-                            <span>1</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="row pt-3">
-                      <div className="col-md-4">
-                        <div className="card bg-gradient-success card-img-holder text-white h-100">
-                          <div className="card-body">
-                            <img
-                              src={CircleImg}
-                              className="card-img-absolute"
-                              alt="circle"
-                            />
-                            <h4 className="font-weight-normal mb-3">
-                              Contacts
-                            </h4>
-                            <span>2</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-4">
-                        <div className="card bg-gradient-danger card-img-holder text-white h-100">
-                          <div className="card-body">
-                            <img
-                              src={CircleImg}
-                              className="card-img-absolute"
-                              alt="circle"
-                            />
-                            <h4 className="font-weight-normal mb-3">Notes</h4>
-                            <span>2</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-4">
-                        <div className="card bg-gradient-info card-img-holder text-white h-100">
-                          <div className="card-body">
-                            <img
-                              src={CircleImg}
-                              className="card-img-absolute"
-                              alt="circle"
-                            />
-                            <h4 className="font-weight-normal mb-3">Files</h4>
-                            <span>2</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="row">
-                      <div className="crms-tasks p-2">
-                        <div className="tasks__item crms-task-item active">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Companies" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Company Name</th>
-                                    <th>Phone</th>
-                                    <th>Billing Country</th>
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    <td>
-                                      <Link to="#" className="avatar">
-                                        <img alt="" src={C_logo2} />
-                                      </Link>
-                                      <Link
-                                        to="#"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#company-details"
-                                      >
-                                        Clampett Oil and Gas Corp.
-                                      </Link>
-                                    </td>
-                                    <td>8754554531</td>
-                                    <td>United States</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>
-                                      <Link to="#" className="avatar">
-                                        <img alt="" src={C_logo} />
-                                      </Link>
-                                      <Link
-                                        to="#"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#company-details"
-                                      >
-                                        Acme Corporation
-                                      </Link>
-                                    </td>
-                                    <td>8754554531</td>
-                                    <td>United States</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                        <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Deals" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Deal Name</th>
-                                    <th>Company</th>
-                                    <th>User Responsible</th>
-                                    <th>Deal Value</th>
-                                    <th />
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    <td>Bensolet</td>
-                                    <td>Globex</td>
-                                    <td>John Doe</td>
-                                    <td>USD $‎180</td>
-                                    <td>
-                                      <i
-                                        className="fa fa-star"
-                                        aria-hidden="true"
-                                      />
-                                    </td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>Ansanio tech</td>
-                                    <td>Lecto</td>
-                                    <td>John Smith</td>
-                                    <td>USD $‎180</td>
-                                    <td>
-                                      <i
-                                        className="fa fa-star"
-                                        aria-hidden="true"
-                                      />
-                                    </td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                        <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Projects" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Project Name</th>
-                                    <th>Status</th>
-                                    <th>User Responsible</th>
-                                    <th>Date Created</th>
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    <td>Wilmer Deluna</td>
-                                    <td>Completed</td>
-                                    <td>Williams</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                        <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Contacts" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Name</th>
-                                    <th>Title</th>
-                                    <th>phone</th>
-                                    <th>Email</th>
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    <td>Wilmer Deluna</td>
-                                    <td>Call Enquiry</td>
-                                    <td>987675656</td>
-                                    <td>william@gmail.com</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>John Doe</td>
-                                    <td>Enquiry</td>
-                                    <td>987675656</td>
-                                    <td>john@gmail.com</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                        <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Notes" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Name</th>
-                                    <th>Size</th>
-                                    <th>Category</th>
-                                    <th>Date Added</th>
-                                    <th>Added by</th>
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    <td>Document</td>
-                                    <td>50KB</td>
-                                    <td>Email</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td>John Doe</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>Finance</td>
-                                    <td>100KB</td>
-                                    <td>Phone call</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td>Smith</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                        <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Files" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Name</th>
-                                    <th>Size</th>
-                                    <th>Category</th>
-                                    <th>Date Added</th>
-                                    <th>Added by</th>
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    <td>Document</td>
-                                    <td>50KB</td>
-                                    <td>Phone Enquiry</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td>John Doe</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>Finance</td>
-                                    <td>100KB</td>
-                                    <td>Email</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td>Smith</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="tab-pane" id="task-activity">
-                    <div className="row">
-                      <div className="col-md-4">
-                        <div className="card bg-gradient-danger card-img-holder text-white h-100">
-                          <div className="card-body">
-                            <img
-                              src={CircleImg}
-                              className="card-img-absolute"
-                              alt="circle"
-                            />
-                            <h4 className="font-weight-normal mb-3">
-                              Total Activities
-                            </h4>
-                            <span>2</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-4">
-                        <div className="card bg-gradient-info card-img-holder text-white h-100">
-                          <div className="card-body">
-                            <img
-                              src={CircleImg}
-                              className="card-img-absolute"
-                              alt="circle"
-                            />
-                            <h4 className="font-weight-normal mb-3">
-                              Last Activity
-                            </h4>
-                            <span>1</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="row">
-                      <div className="crms-tasks  p-2">
-                        <div className="tasks__item crms-task-item active">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Upcoming Activity" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Type</th>
-                                    <th>Activity Name</th>
-                                    <th>Assigned To</th>
-                                    <th>Due Date</th>
-                                    <th>Status</th>
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    <td>Meeting</td>
-                                    <td>Call Enquiry</td>
-                                    <td>John Doe</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td>
-                                      <label className="container-checkbox">
-                                        <input
-                                          type="checkbox"
-                                          defaultChecked=""
-                                        />
-                                        <span className="checkmark" />
-                                      </label>
-                                    </td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Add New Task
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Add New Event
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>Meeting</td>
-                                    <td>Phone Enquiry</td>
-                                    <td>David</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td>
-                                      <label className="container-checkbox">
-                                        <input
-                                          type="checkbox"
-                                          defaultChecked=""
-                                        />
-                                        <span className="checkmark" />
-                                      </label>
-                                    </td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Add New Task
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Add New Event
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                        <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Past Activity" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Type</th>
-                                    <th>Activity Name</th>
-                                    <th>Assigned To</th>
-                                    <th>Due Date</th>
-                                    <th>Status</th>
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    <td>Meeting</td>
-                                    <td>Call Enquiry</td>
-                                    <td>John Doe</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td>
-                                      <label className="container-checkbox">
-                                        <input
-                                          type="checkbox"
-                                          defaultChecked=""
-                                        />
-                                        <span className="checkmark" />
-                                      </label>
-                                    </td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Add New Task
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Add New Event
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="tab-pane" id="task-news">
-                    <div className="row">
-                      <div className="col-md-12">
-                        <h4>News Items</h4>
-                        <p>
-                          Current news items about this Organization are sourced
-                          from Google News
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+
                 </div>
                 { savedValues !== null && Object.keys(savedValues).length !== 0 &&
                   <div className="text-center py-3">
