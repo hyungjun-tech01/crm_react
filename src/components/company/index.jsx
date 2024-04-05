@@ -6,9 +6,9 @@ import { Link } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
 import CompanyDetailsModel from "./CompanyDetailsModel";
-// import DatePicker from "react-datepicker";
+import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { BiData } from "react-icons/bi";
+import { BiBuildings } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies, defaultCompany } from "../../atoms/atoms";
 import { compareCompanyName, compareText, formateDate } from "../../constants/functions";
@@ -18,8 +18,8 @@ const Company = () => {
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const [ companyChange, setCompanyChange ] = useState(null);
   const [ cookies ] = useCookies(["myLationCrmUserName",  "myLationCrmUserId"]);
-  // const [ selectedEstablishDate, setSelectedEstablishDate ] = useState(null);
-  // const [ selectedCloseDate, setSelectedCloseDate ] = useState(null);
+  const [ establishDate, setEstablishDate ] = useState(null);
+  const [ closeDate, setCloseDate ] = useState(null);
 
   // --- Functions used for Table ------------------------------
   const handleClickCompanyName = useCallback((id)=>{
@@ -37,16 +37,15 @@ const Company = () => {
     document.querySelector("#add_new_company_form").reset();
   }, []);
 
-  // const handleEstablishDateChange = useCallback((date) => {
-  //   console.log(`[ handleEstablishDateChange ] ${date}`);
-  //   setSelectedEstablishDate(date);
-  //   companyChange.establishment_date = date;
-  // },[]);
+  const handleEstablishDateChange = useCallback((date) => {
+    setEstablishDate(date);
+    companyChange.establishment_date = date;
+  },[companyChange]);
 
-  // const handleCloseDateChange = useCallback((date) => {
-  //   console.log(`[ handleEstablishDateChange ] ${date}`);
-  //   setSelectedCloseDate(date);
-  // },[]);
+  const handleCloseDateChange = useCallback((date) => {
+    setCloseDate(date);
+    companyChange.closure_date = date;
+  },[companyChange]);
 
   const handleCompanyChange = useCallback((e)=>{
     let input_data = null;
@@ -232,7 +231,7 @@ const Company = () => {
                 <span className="page-title-icon bg-gradient-primary text-white me-2">
                   {/* <i className="feather-database" /> */}
                   <i>
-                    <BiData />
+                    <BiBuildings />
                   </i>
                 </span>{" "}
                 Companies{" "}
@@ -550,41 +549,27 @@ const Company = () => {
                         </div>
                         <div className="col-sm-6">
                           <label className="col-form-label">Establishment Date</label>
-                          <input
-                            className="form-control"
-                            type="date"
-                            placeholder="Establishment Date"
-                            name="establishment_date"
-                            onChange={handleCompanyChange}
-                          />
-                          {/* <div className="cal-icon">
+                          <div className="cal-icon">
                             <DatePicker
                               className="form-control"
-                              selected={selectedEstablishDate}
+                              selected={establishDate}
                               onChange={handleEstablishDateChange}
                               dateFormat="yyyy.MM.dd"
                               showDayMonthYearPicker
                             />
-                          </div> */}
+                          </div>
                         </div>
                         <div className="col-sm-6">
                           <label className="col-form-label">Closure Date</label>
-                          <input
-                            className="form-control"
-                            type="date"
-                            placeholder="Closure Date"
-                            name="closure_date"
-                            onChange={handleCompanyChange}
-                          />
-                          {/* <div className="cal-icon">
+                          <div className="cal-icon">
                             <DatePicker
                               className="form-control"
-                              selected={selectedCloseDate}
+                              selected={closeDate}
                               onChange={handleCloseDateChange}
                               dateFormat="yyyy.MM.dd"
                               showDayMonthYearPicker
                             />
-                          </div> */}
+                          </div>
                         </div>
                         <div className="col-sm-6">
                           <label className="col-form-label">CEO Name</label>

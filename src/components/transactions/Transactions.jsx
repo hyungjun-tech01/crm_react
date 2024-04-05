@@ -15,7 +15,7 @@ import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-import { BiClipboard } from "react-icons/bi";
+import { BiReceipt } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { TransactionRepo } from "../../repository/transaction";
@@ -259,7 +259,7 @@ const Transactions = () => {
                 <span className="page-title-icon bg-gradient-primary text-white me-2">
                   {/* <i className="feather-calendar" /> */}
                   <i>
-                    <BiClipboard />
+                    <BiReceipt />
                   </i>
                 </span>{" "}
                 Transactions{" "}

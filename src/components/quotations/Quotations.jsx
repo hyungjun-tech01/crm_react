@@ -4,7 +4,6 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
-import { SystemUser, CircleImg, C_logo, C_logo2 } from "../imagepath";
 import { Table } from "antd";
 import "antd/dist/reset.css";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
@@ -18,7 +17,7 @@ import LeadsDetailsModel from "../leads/LeadsDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-import { BiClipboard } from "react-icons/bi";
+import { BiCalculator } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { QuotationRepo, QuotationSendTypes } from "../../repository/quotation";
@@ -327,7 +326,7 @@ const Quotations = () => {
                 <span className="page-title-icon bg-gradient-primary text-white me-2">
                   {/* <i className="feather-calendar" /> */}
                   <i>
-                    <BiClipboard />
+                    <BiCalculator />
                   </i>
                 </span>{" "}
                 Quotations{" "}

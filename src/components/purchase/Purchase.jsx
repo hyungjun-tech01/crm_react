@@ -9,7 +9,7 @@ import { itemRender, onShowSizeChange } from "../paginationfunction";
 import PurchaseDetailsModel from "./PurchaseDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { ShoppingBagOutlined } from "@mui/icons-material";
+import { BiShoppingBag } from "react-icons/bi";
 import { PurchaseRepo } from "../../repository/purchase";
 import { atomAllLeads, atomAllPurchases, defaultPurchase } from "../../atoms/atoms";
 import { compareText } from "../../constants/functions";
@@ -324,7 +324,7 @@ const Purchase = () => {
                 <span className="page-title-icon bg-gradient-primary text-white me-2">
                   {/* <i className="feather-database" /> */}
                   <i>
-                    <ShoppingBagOutlined />
+                    <BiShoppingBag />
                   </i>
                 </span>{" "}
                 Purchase{" "}
