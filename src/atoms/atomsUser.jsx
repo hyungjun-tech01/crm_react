@@ -10,12 +10,12 @@ export const defaultUser = {
     position: "", 
     email: "", 
     group_: "", 
-    memo: "",
+    memo: ""
 }
 
 export const atomCurrentUser= atom({
     key: "currentUser",
-    default: defaultUser,
+    default: defaultUser
 });
 
 

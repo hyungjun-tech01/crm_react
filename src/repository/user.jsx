@@ -7,10 +7,10 @@ import { data_user } from './test_data';
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
-export async function  apiLoginValidate(email, password) {
+export async function  apiLoginValidate(userId, password) {
     try{
         const input_data = {
-            email: email,
+            userId: userId,
             password: password,
         };
         const response = await fetch(`${BASE_PATH}/login`,{

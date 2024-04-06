@@ -15,7 +15,7 @@ const Login = () => {
   ]);
   const [currentUser, setCurrentUser] = useRecoilState(atomCurrentUser);
   const history = useHistory();
-  const [loginEmail, setLoginEmail] = useState("");
+  const [loginUserId, setLoginUserId] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
 
@@ -35,8 +35,8 @@ const Login = () => {
 
   const handleCheckLogin = useCallback((event) => {
     event.preventDefault();
-    console.log("Login index", loginEmail, loginPassword);
-    const response = apiLoginValidate(loginEmail, loginPassword);
+    console.log("Login index", loginUserId, loginPassword);
+    const response = apiLoginValidate(loginUserId, loginPassword);
     response.then((res) => {
       console.log("res", res);
       if (res.message === "success") {  
@@ -48,13 +48,13 @@ const Login = () => {
         history.push("/");
       }
     });
-  },[loginEmail, loginPassword]);
+  },[loginUserId, loginPassword]);
 
   return (
     <>
       {/* Main Wrapper */}
       <HelmetProvider>
-        <div className="page-wrapper">
+        {/* <div className="page-wrapper"> */}
           <Helmet>
             <title>Login - CRMS admin template</title>
             <meta name="description" content="Reactify Blank Page" />
@@ -76,11 +76,11 @@ const Login = () => {
                     {/* Account Form */}
                     <form>
                       <div className="form-group">
-                        <label>Email Address</label>
+                        <label>User Id</label>
                         <input
                           type="text"
                           className="form-control"
-                          onChange={(e) => setLoginEmail(e.target.value)}
+                          onChange={(e) => setLoginUserId(e.target.value)}
                         />
                       </div>
                       <div className="form-group">
@@ -125,7 +125,7 @@ const Login = () => {
               </div>
             </div>
           </div>
-        </div>
+        {/* </div> */}
       </HelmetProvider>
       {/* /Main Wrapper */}
     </>
