@@ -5,7 +5,7 @@ import { useCookies } from "react-cookie";
 import { Collapse } from "antd";
 import { C_logo, C_logo2, CircleImg } from "../imagepath";
 import { atomCurrentUser, defaultUser } from "../../atoms/atomsUser";
-import { CompanyRepo } from "../../repository/company";
+import { UserRepo } from "../../repository/user";
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailDateItem from "../../constants/DetailDateItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
@@ -13,7 +13,7 @@ import DetailTextareaItem from "../../constants/DetailTextareaItem";
 const UserDetailModel = () => {
   const { Panel } = Collapse;
   const selectedUser = useRecoilValue(atomCurrentUser);
-  const { modifyCompany } = useRecoilValue(CompanyRepo);
+  const { modifyUser } = useRecoilValue(UserRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
   const [ editedValues, setEditedValues ] = useState(null);
@@ -89,9 +89,10 @@ const UserDetailModel = () => {
         ...savedValues,
         action_type: "UPDATE",
         modify_user: cookies.myLationCrmUserId,
-        user_id: selectedUser.userId,
+        userId: selectedUser.userId,
       };
-      if (modifyCompany(temp_all_saved)) {
+      console.log('temp_all_saved', temp_all_saved);
+      if (modifyUser(temp_all_saved)) {
         console.log(`Succeeded to modify company`);
       } else {
         console.error('Failed to modify company')
@@ -101,7 +102,7 @@ const UserDetailModel = () => {
     };
     setEditedValues(null);
     setSavedValues(null);
-  }, [cookies.myLationCrmUserId, modifyCompany, savedValues, selectedUser]);
+  }, [cookies.myLationCrmUserId, modifyUser, savedValues, selectedUser]);
 
   const handleCancelAll = useCallback(() => {
     setEditedValues(null);
@@ -161,7 +162,7 @@ const UserDetailModel = () => {
   }, [editedValues, savedValues, orgCloseDate, closeDate]);
 
   // useEffect(() => {
-     console.log('[UserDetailModel] called!', selectedUser);
+  //   console.log('[UserDetailModel] called!', selectedUser);
   //   setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
   //   setOrgCloseDate(selectedCompany.closure_date ? new Date(selectedCompany.closure_date) : null);
   // }, [selectedCompany, savedValues]);
@@ -289,30 +290,6 @@ const UserDetailModel = () => {
                                 <DetailLabelItem
                                   data_set={selectedUser}
                                   saved={savedValues}
-                                  name="mobileNumber"
-                                  title="Mobile Number"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  data_set={selectedUser}
-                                  saved={savedValues}
-                                  name="phoneNumber"
-                                  title="Phone Number"
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />   
-                               <DetailLabelItem
-                                  data_set={selectedUser}
-                                  saved={savedValues}
                                   name="department"
                                   title="Department"
                                   checkEdit={handleCheckEditState}
@@ -333,12 +310,36 @@ const UserDetailModel = () => {
                                   endEdit={handleEndEdit}
                                   checkSaved={handleCheckSaved}
                                   cancelSaved={handleCancelSaved}
-                                />         
+                                />     
+                                <DetailLabelItem
+                                  data_set={selectedUser}
+                                  saved={savedValues}
+                                  name="phoneNumber"
+                                  title="Phone Number"
+                                  checkEdit={handleCheckEditState}
+                                  startEdit={handleStartEdit}
+                                  editing={handleEditing}
+                                  endEdit={handleEndEdit}
+                                  checkSaved={handleCheckSaved}
+                                  cancelSaved={handleCancelSaved}
+                                />                                                                 
+                                <DetailLabelItem
+                                  data_set={selectedUser}
+                                  saved={savedValues}
+                                  name="mobileNumber"
+                                  title="Mobile Number"
+                                  checkEdit={handleCheckEditState}
+                                  startEdit={handleStartEdit}
+                                  editing={handleEditing}
+                                  endEdit={handleEndEdit}
+                                  checkSaved={handleCheckSaved}
+                                  cancelSaved={handleCancelSaved}
+                                />
                                <DetailLabelItem
                                   data_set={selectedUser}
                                   saved={savedValues}
                                   name="email"
-                                  title="Mobile Number"
+                                  title="EMail"
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -350,14 +351,26 @@ const UserDetailModel = () => {
                                   data_set={selectedUser}
                                   saved={savedValues}
                                   name="group_"
-                                  title="Mobile Number"
+                                  title="Group"
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
                                   endEdit={handleEndEdit}
                                   checkSaved={handleCheckSaved}
                                   cancelSaved={handleCancelSaved}
-                                />                                                                                       
+                                />
+                                <DetailLabelItem
+                                  data_set={selectedUser}
+                                  saved={savedValues}
+                                  name="memo"
+                                  title="Memo"
+                                  checkEdit={handleCheckEditState}
+                                  startEdit={handleStartEdit}
+                                  editing={handleEditing}
+                                  endEdit={handleEndEdit}
+                                  checkSaved={handleCheckSaved}
+                                  cancelSaved={handleCancelSaved}
+                                />        
                               </tbody>
                             </table>
                           {/* </Panel>

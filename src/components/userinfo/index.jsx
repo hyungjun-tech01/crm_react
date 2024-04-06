@@ -14,7 +14,7 @@ import { atomAllCompanies, defaultCompany } from "../../atoms/atoms";
 
 const UserInfo = () => {
   const currentUser = useRecoilValue(atomCurrentUser);
-  const { loadUsers } = useRecoilValue(UserRepo);
+  const { loadUsers, setCurrentUser } = useRecoilValue(UserRepo);
   const [cookies] = useCookies([
     "myLationCrmUserId",
     "myLationCrmUserName",
@@ -22,7 +22,7 @@ const UserInfo = () => {
   ]);
   console.log("currentUser", currentUser.userId);
 
-  const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
+
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const [ companyChange, setCompanyChange ] = useState(null);
   // const [ selectedEstablishDate, setSelectedEstablishDate ] = useState(null);
@@ -31,8 +31,8 @@ const UserInfo = () => {
   // --- Functions used for Table ------------------------------
   const handleClickUserEdit = useCallback((id)=>{
     console.log('[Company] set current User : ', id);  // setCurrentUser로 변경할 것 .
-    setCurrentCompany(id);
-  },[setCurrentCompany]);  
+    setCurrentUser(id);
+  },[setCurrentUser]);  
 
   useEffect(() => {
     if (currentUser.userId === "") {
@@ -85,41 +85,38 @@ const UserInfo = () => {
                           <div className="col-md-5">
                             <div className="profile-info-left">
                               <h3 className="user-name m-t-0 mb-0">{currentUser.userName}</h3>
+                              <h6 className="text-muted">{currentUser.userId}</h6>
                               <h6 className="text-muted">{currentUser.department}</h6>
                               <small className="text-muted">{currentUser.position}</small>
-                              <div className="staff-id">
-                                Employee ID : 
+                              <div>
+                                <div className="title">Phone:</div>
+                                <div className="text">
+                                  <a> {currentUser.phoneNumber}</a>
+                                </div>
                               </div>
-                              <div className="small doj text-muted">
-                                Date of Join : 
+                              <div>
+                                <div className="title">M.P:</div>
+                                <div className="text">
+                                  <a>{currentUser.mobileNumber}</a>
+                                </div>
                               </div>
-                              <div className="staff-msg">
-                                <a className="btn btn-custom" href="#">
-                                  Send Message
-                                </a>
+                              <div>
+                                <div className="title">E-mail:</div>
+                                <div className="text">
+                                  <a>{currentUser.email}</a>
+                                </div>
                               </div>
                             </div>
                           </div>
                           <div className="col-md-7">
                             <ul className="personal-info">
+                              
                               <li>
-                                <div className="title">Phone:</div>
+                                <div className="title">Group:</div>
                                 <div className="text">
-                                  <a> &nbsp;{currentUser.phoneNumber}</a>
+                                  <a>&nbsp;{currentUser.group_}</a>
                                 </div>
-                              </li>
-                              <li>
-                                <div className="title">Mobile Phone:</div>
-                                <div className="text">
-                                  <a>&nbsp;{currentUser.mobileNumber}</a>
-                                </div>
-                              </li>
-                              <li>
-                                <div className="title">Email:</div>
-                                <div className="text">
-                                  <a>&nbsp;{currentUser.email}</a>
-                                </div>
-                              </li>
+                              </li>                              
                               <li>
                                 <div className="title">Memo:</div>
                                 <div className="text">
@@ -136,7 +133,7 @@ const UserInfo = () => {
                           data-bs-toggle="modal"
                           className="edit-icon"
                           href="#"
-                          onClick={()=>{handleClickUserEdit('A85FB3956E1DE540B9D6F0EA493DE94F');}}
+                          onClick={()=>{handleClickUserEdit(cookies.myLationCrmUserId)}}
                         >
                           <i className="fa fa-pencil" />
                         </a>
