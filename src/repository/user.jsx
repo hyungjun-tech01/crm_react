@@ -27,7 +27,33 @@ export async function  apiLoginValidate(userId, password) {
         return(err);
     }
  }
+ export async function  apiRegister(userId, Email, password) {
+    try{
+        const input_data = {
+            action_type:'ADD',
+            userId: userId,
+            password: password,
+            Email:Email
+        };
+        const response = await fetch(`${BASE_PATH}/modifyUser`,{
+            method: "POST", 
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify(input_data)
+           }); 
+        
+           const responseData = await response.json();
+           if (responseData.message) {
+            console.log('responseMessage', responseData.message);
+            return responseData;
+        }
 
+        
+    }catch(err){
+        console.error(err);
+        return(err);
+    }
+ }
+ 
 
  export const UserRepo = selector({
     key: "UserRepository",
