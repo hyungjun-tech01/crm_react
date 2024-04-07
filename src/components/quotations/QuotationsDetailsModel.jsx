@@ -316,7 +316,7 @@ const QuotationsDetailsModel = () => {
                         <li className="nav-item">
                           <Link
                             className="nav-link active"
-                            to="#not-contact-task-details"
+                            to="#quotation-details"
                             data-bs-toggle="tab"
                           >
                             Details
@@ -325,27 +325,15 @@ const QuotationsDetailsModel = () => {
                         <li className="nav-item">
                           <Link
                             className="nav-link"
-                            to="#not-contact-task-related"
+                            to="#quotation-pdf-view"
                             data-bs-toggle="tab"
                           >
-                            Related
-                          </Link>
-                        </li>
-                        <li className="nav-item">
-                          <Link
-                            className="nav-link"
-                            to="#not-contact-task-activity"
-                            data-bs-toggle="tab"
-                          >
-                            Activity
+                            PDF View
                           </Link>
                         </li>
                       </ul>
                       <div className="tab-content">
-                        <div
-                          className="tab-pane show active p-0"
-                          id="not-contact-task-details"
-                        >
+                        <div className="tab-pane show active p-0" id="quotation-details">
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
                               <Collapse accordion expandIconPosition="end">
@@ -829,10 +817,7 @@ const QuotationsDetailsModel = () => {
                             </div>
                           </div>
                         </div>
-                        <div
-                          className="tab-pane task-related p-0"
-                          id="not-contact-task-related"
-                        >
+                        <div className="tab-pane task-related p-0" id="quotation-pdf-view">
                           <div className="row">
                             <div className="col-md-4">
                               <div className="card bg-gradient-danger card-img-holder text-white h-100">
@@ -1037,216 +1022,6 @@ const QuotationsDetailsModel = () => {
                                                   to="#"
                                                 >
                                                   Delete Link
-                                                </Link>
-                                              </div>
-                                            </div>
-                                          </td>
-                                        </tr>
-                                      </tbody>
-                                    </table>
-                                  </Panel>
-                                </Collapse>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          className="tab-pane p-0"
-                          id="not-contact-task-activity"
-                        >
-                          <div className="row">
-                            <div className="col-md-4">
-                              <div className="card bg-gradient-danger card-img-holder text-white h-100">
-                                <div className="card-body">
-                                  <img
-                                    src={CircleImg}
-                                    className="card-img-absolute"
-                                    alt="circle-image"
-                                  />
-                                  <h4 className="font-weight-normal mb-3">
-                                    Total Activities
-                                  </h4>
-                                  <span>2</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="col-md-4">
-                              <div className="card bg-gradient-success card-img-holder text-white h-100">
-                                <div className="card-body">
-                                  <img
-                                    src={CircleImg}
-                                    className="card-img-absolute"
-                                    alt="circle-image"
-                                  />
-                                  <h4 className="font-weight-normal mb-3">
-                                    Last Activity
-                                  </h4>
-                                  <span>1</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="row">
-                            <div className="crms-tasks  p-2">
-                              <div className="tasks__item crms-task-item active">
-                                <Collapse accordion expandIconPosition="end">
-                                  <Panel header="Upcoming Activity" key="1">
-                                    <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                      <thead>
-                                        <tr>
-                                          <th>Type</th>
-                                          <th>Activity Name</th>
-                                          <th>Assigned To</th>
-                                          <th>Due Date</th>
-                                          <th>Status</th>
-                                          <th className="text-end">Actions</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        <tr>
-                                          <td>Meeting</td>
-                                          <td>Call Enquiry</td>
-                                          <td>John Doe</td>
-                                          <td>13-Jul-20 11:37 PM</td>
-                                          <td>
-                                            <label className="container-checkbox">
-                                              <input
-                                                type="checkbox"
-                                                defaultChecked=""
-                                              />
-                                              <span className="checkmark" />
-                                            </label>
-                                          </td>
-                                          <td className="text-center">
-                                            <div className="dropdown dropdown-action">
-                                              <Link
-                                                to="#"
-                                                className="action-icon dropdown-toggle"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false"
-                                              >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
-                                              </Link>
-                                              <div className="dropdown-menu dropdown-menu-right">
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Add New Task
-                                                </Link>
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Add New Event
-                                                </Link>
-                                              </div>
-                                            </div>
-                                          </td>
-                                        </tr>
-                                        <tr>
-                                          <td>Meeting</td>
-                                          <td>Phone Enquiry</td>
-                                          <td>David</td>
-                                          <td>13-Jul-20 11:37 PM</td>
-                                          <td>
-                                            <label className="container-checkbox">
-                                              <input
-                                                type="checkbox"
-                                                defaultChecked=""
-                                              />
-                                              <span className="checkmark" />
-                                            </label>
-                                          </td>
-                                          <td className="text-center">
-                                            <div className="dropdown dropdown-action">
-                                              <Link
-                                                to="#"
-                                                className="action-icon dropdown-toggle"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false"
-                                              >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
-                                              </Link>
-                                              <div className="dropdown-menu dropdown-menu-right">
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Add New Task
-                                                </Link>
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Add New Event
-                                                </Link>
-                                              </div>
-                                            </div>
-                                          </td>
-                                        </tr>
-                                      </tbody>
-                                    </table>
-                                  </Panel>
-                                </Collapse>
-                              </div>
-                              <div className="tasks__item crms-task-item">
-                                <Collapse accordion expandIconPosition="end">
-                                  <Panel header="Past Activity" key="1">
-                                    <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                      <thead>
-                                        <tr>
-                                          <th>Type</th>
-                                          <th>Activity Name</th>
-                                          <th>Assigned To</th>
-                                          <th>Due Date</th>
-                                          <th>Status</th>
-                                          <th className="text-end">Actions</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        <tr>
-                                          <td>Meeting</td>
-                                          <td>Call Enquiry</td>
-                                          <td>John Doe</td>
-                                          <td>13-Jul-20 11:37 PM</td>
-                                          <td>
-                                            <label className="container-checkbox">
-                                              <input
-                                                type="checkbox"
-                                                defaultChecked=""
-                                              />
-                                              <span className="checkmark" />
-                                            </label>
-                                          </td>
-                                          <td className="text-center">
-                                            <div className="dropdown dropdown-action">
-                                              <Link
-                                                to="#"
-                                                className="action-icon dropdown-toggle"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false"
-                                              >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
-                                              </Link>
-                                              <div className="dropdown-menu dropdown-menu-right">
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Add New Task
-                                                </Link>
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Add New Event
                                                 </Link>
                                               </div>
                                             </div>
