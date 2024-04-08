@@ -5,9 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
-//const publicPath = '/template/';
 const publicPath = '';
-// const publicPath = '/';
 const opn = require('opn'); // Import the 'opn' package
 
 module.exports = {
@@ -15,7 +13,6 @@ module.exports = {
   entry: path.join(__dirname, "src", "index.js"),
   output: {
     path: path.resolve(__dirname, "dist"),
-    // publicPath: publicPath, // base path where referenced files will be look for
   },
   devServer: {
     static: {
@@ -26,9 +23,7 @@ module.exports = {
     open: true, // Automatically open the browser
     onAfterSetupMiddleware() {
       // Open the browser after the dev server is up and running
-      // const open = require('open');
       opn(`http://localhost:${this.port}`);
-      // opn(`http://localhost:${this.port}/template3/`);
     },  
   },
 
@@ -37,11 +32,9 @@ module.exports = {
     config: JSON.stringify({
       apiUrl: '',
       publicPath: '/'
-      //publicPath: '/template/'
-      // publicPath: '/react/template/'
-
     })
   },
+
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.jsx'],
     alias: {
@@ -50,7 +43,6 @@ module.exports = {
     fallback: {
       "process": require.resolve("process/browser")
     }
-
   },
 
   module: {
@@ -83,24 +75,6 @@ module.exports = {
           }
         ]
       },
-      //  {
-      //    test: /\.(png|jpg|gif)$/i,
-      //    use: [
-      //      {
-      //        loader: 'url-loader',
-      //        options: {
-      //          limit: 8192,
-      //        },
-      //      },
-      //    ],
-      //  },
-
-      /////--------------------------------------
-
-      //  {
-      //      test: /\.(woff|woff2|eot|ttf|svg)$/,
-      //      loader: 'url-loader?limit=100000'
-      //   },
       {
         test: /\.(jpe?g|png|gif|woff|woff2|otf|eot|ttf|svg)(\?[a-z0-9=.]+)?$/,
         use: [
@@ -112,20 +86,14 @@ module.exports = {
             }
           }
         ]
-      }
-      //  { // config for fonts
-      //    test: /\.(woff|woff2|eot|ttf|otf)$/,
-      //   use: [
-      //      {
-      //        loader: 'file-loader',
-      //        options: {
-      //          outputPath: 'fonts',
-      //       }
-      //     }
-      //    ],
-      //  }
+      },
+      {
+        test: /\.(ts|tsx)$/,
+        use: 'ts-loader',
+      },
     ]
   },
+
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
@@ -145,5 +113,4 @@ module.exports = {
       'window.jQuery': 'jquery'
     })
   ],
-
 }

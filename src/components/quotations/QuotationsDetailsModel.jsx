@@ -8,7 +8,8 @@ import { atomCurrentQuotation, defaultQuotation } from "../../atoms/atoms";
 import { QuotationRepo } from "../../repository/quotation";
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailDateItem from "../../constants/DetailDateItem";
-import DetailTextareaItem from "../../constants/DetailTextareaItem";
+
+import QuotationView from "./QuotationtView";
 
 const QuotationsDetailsModel = () => {
   const { Panel } = Collapse;
@@ -333,6 +334,7 @@ const QuotationsDetailsModel = () => {
                         </li>
                       </ul>
                       <div className="tab-content">
+{/*---- Start -- Tab : Detail Quotation-------------------------------------------------------------*/}
                         <div className="tab-pane show active p-0" id="quotation-details">
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
@@ -817,224 +819,14 @@ const QuotationsDetailsModel = () => {
                             </div>
                           </div>
                         </div>
+{/*---- End   -- Tab : Detail Quotation-------------------------------------------------------------*/}
+{/*---- Start -- Tab : PDF View - Quotation---------------------------------------------------------*/}
                         <div className="tab-pane task-related p-0" id="quotation-pdf-view">
-                          <div className="row">
-                            <div className="col-md-4">
-                              <div className="card bg-gradient-danger card-img-holder text-white h-100">
-                                <div className="card-body">
-                                  <img
-                                    src={CircleImg}
-                                    className="card-img-absolute"
-                                    alt="circle-image"
-                                  />
-                                  <h4 className="font-weight-normal mb-3">
-                                    Notes
-                                  </h4>
-                                  <span>2</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="col-md-4">
-                              <div className="card bg-gradient-info card-img-holder text-white h-100">
-                                <div className="card-body">
-                                  <img
-                                    src={CircleImg}
-                                    className="card-img-absolute"
-                                    alt="circle-image"
-                                  />
-                                  <h4 className="font-weight-normal mb-3">
-                                    Files
-                                  </h4>
-                                  <span>2</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="row">
-                            <div className="crms-tasks  p-2">
-                              <div className="tasks__item crms-task-item">
-                                <Collapse accordion expandIconPosition="end">
-                                  <Panel header="Notes" key="1">
-                                    <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                      <thead>
-                                        <tr>
-                                          <th>Name</th>
-                                          <th>Size</th>
-                                          <th>Category</th>
-                                          <th>Date Added</th>
-                                          <th>Added by</th>
-                                          <th className="text-end">Actions</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        <tr>
-                                          <td>Document</td>
-                                          <td>50KB</td>
-                                          <td>phone Call</td>
-                                          <td>13-Jul-20 11:37 PM</td>
-                                          <td>John Doe</td>
-                                          <td className="text-center">
-                                            <div className="dropdown dropdown-action">
-                                              <Link
-                                                to="#"
-                                                className="action-icon dropdown-toggle"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false"
-                                              >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
-                                              </Link>
-                                              <div className="dropdown-menu dropdown-menu-right">
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Edit Link
-                                                </Link>
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Delete Link
-                                                </Link>
-                                              </div>
-                                            </div>
-                                          </td>
-                                        </tr>
-                                        <tr>
-                                          <td>Finance</td>
-                                          <td>100KB</td>
-                                          <td>Enquiry</td>
-                                          <td>13-Jul-20 11:37 PM</td>
-                                          <td>Smith</td>
-                                          <td className="text-center">
-                                            <div className="dropdown dropdown-action">
-                                              <Link
-                                                to="#"
-                                                className="action-icon dropdown-toggle"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false"
-                                              >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
-                                              </Link>
-                                              <div className="dropdown-menu dropdown-menu-right">
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Edit Link
-                                                </Link>
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Delete Link
-                                                </Link>
-                                              </div>
-                                            </div>
-                                          </td>
-                                        </tr>
-                                      </tbody>
-                                    </table>
-                                  </Panel>
-                                </Collapse>
-                              </div>
-                              <div className="tasks__item crms-task-item">
-                                <Collapse accordion expandIconPosition="end">
-                                  <Panel header="Files" key="1">
-                                    <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                      <thead>
-                                        <tr>
-                                          <th>Name</th>
-                                          <th>Size</th>
-                                          <th>Category</th>
-                                          <th>Date Added</th>
-                                          <th>Added by</th>
-                                          <th className="text-end">Actions</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        <tr>
-                                          <td>Document</td>
-                                          <td>50KB</td>
-                                          <td>Email</td>
-                                          <td>13-Jul-20 11:37 PM</td>
-                                          <td>John Doe</td>
-                                          <td className="text-center">
-                                            <div className="dropdown dropdown-action">
-                                              <Link
-                                                to="#"
-                                                className="action-icon dropdown-toggle"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false"
-                                              >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
-                                              </Link>
-                                              <div className="dropdown-menu dropdown-menu-right">
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Edit Link
-                                                </Link>
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Delete Link
-                                                </Link>
-                                              </div>
-                                            </div>
-                                          </td>
-                                        </tr>
-                                        <tr>
-                                          <td>Finance</td>
-                                          <td>100KB</td>
-                                          <td>Phone Enquiry</td>
-                                          <td>13-Jul-20 11:37 PM</td>
-                                          <td>Smith</td>
-                                          <td className="text-center">
-                                            <div className="dropdown dropdown-action">
-                                              <Link
-                                                to="#"
-                                                className="action-icon dropdown-toggle"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false"
-                                              >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
-                                              </Link>
-                                              <div className="dropdown-menu dropdown-menu-right">
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Edit Link
-                                                </Link>
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Delete Link
-                                                </Link>
-                                              </div>
-                                            </div>
-                                          </td>
-                                        </tr>
-                                      </tbody>
-                                    </table>
-                                  </Panel>
-                                </Collapse>
-                              </div>
-                            </div>
-                          </div>
+                          { selectedQuotation !== defaultQuotation &&
+                            <QuotationView/>
+                          }
                         </div>
+{/*---- End   -- Tab : PDF View - Quotation---------------------------------------------------------*/}
                       </div>
                       {savedValues !== null &&
                         Object.keys(savedValues).length !== 0 && (
