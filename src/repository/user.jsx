@@ -27,11 +27,12 @@ export async function  apiLoginValidate(userId, password) {
         return(err);
     }
  }
- export async function  apiRegister(userId, Email, password) {
+ export async function  apiRegister(userId, userName, Email, password) {
     try{
         const input_data = {
             action_type:'ADD',
             userId: userId,
+            userName: userName,
             password: password,
             Email:Email
         };
@@ -43,7 +44,7 @@ export async function  apiLoginValidate(userId, password) {
         
            const responseData = await response.json();
            if (responseData.message) {
-            console.log('responseMessage', responseData.message);
+            console.log('responseMessage', responseData.message );
             return responseData;
         }
 

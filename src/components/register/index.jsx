@@ -17,6 +17,7 @@ const Register = () => {
   const history = useHistory();
   const [currentUser, setCurrentUser] = useRecoilState(atomCurrentUser);
   const [userId, setUserId] = useState("");
+  const [userName, setUserName] = useState("");
   const [Email, setEmail] = useState("")
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
@@ -37,7 +38,7 @@ const Register = () => {
     console.log("Login index", userId, Email, password);
 
     // register  성공한다면 . 후에 login 
-    const registerResponse = apiRegister(userId, Email, password); 
+    const registerResponse = apiRegister(userId, userName, Email, password); 
     registerResponse.then((res) => {
       console.log("res", res);
       if(res.message){
@@ -55,6 +56,7 @@ const Register = () => {
           });
         }else{
           setRegisterErrMsg(res.message);
+          setOpen(true);
         }
       }
     });  
@@ -105,6 +107,16 @@ const Register = () => {
                            style={{ flex: 1 , marginRight: '10px'}} />
                       </div>
                     </div>
+                    <div className="form-group">
+                    <label>User Name</label>
+                      <div style={{display: 'flex'}}>
+                        <input className="form-control" 
+                           value={userName}
+                           onChange={(e) => setUserName(e.target.value)}
+                           type="text"  
+                           style={{ flex: 1 , marginRight: '10px'}} />
+                      </div>
+                    </div>                    
                     <div className="form-group">
                       <label>Email</label>
                       <input className="form-control" 
