@@ -720,8 +720,8 @@ const QuotationsDetailsModel = () => {
                                       <DetailLabelItem
                                         data_set={selectedQuotation}
                                         saved={savedValues}
-                                        name="Mobile"
-                                        title="mobile_number"
+                                        name="mobile_number"
+                                        title="Mobile"
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -732,8 +732,8 @@ const QuotationsDetailsModel = () => {
                                       <DetailLabelItem
                                         data_set={selectedQuotation}
                                         saved={savedValues}
-                                        name="Phone"
-                                        title="phone_number"
+                                        name="phone_number"
+                                        title="Phone"
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -744,8 +744,8 @@ const QuotationsDetailsModel = () => {
                                       <DetailLabelItem
                                         data_set={selectedQuotation}
                                         saved={savedValues}
-                                        name="Fax"
-                                        title="fax_number"
+                                        name="fax_number"
+                                        title="Fax"
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -756,8 +756,8 @@ const QuotationsDetailsModel = () => {
                                       <DetailLabelItem
                                         data_set={selectedQuotation}
                                         saved={savedValues}
-                                        name="Email"
-                                        title="email"
+                                        name="email"
+                                        title="Email"
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -779,8 +779,8 @@ const QuotationsDetailsModel = () => {
                                       <DetailLabelItem
                                         data_set={selectedQuotation}
                                         saved={savedValues}
-                                        name="Organization"
-                                        title="company_name"
+                                        name="company_name"
+                                        title="Organization"
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -802,8 +802,8 @@ const QuotationsDetailsModel = () => {
                                       <DetailLabelItem
                                         data_set={selectedQuotation}
                                         saved={savedValues}
-                                        name="Status"
-                                        title="status"
+                                        name="status"
+                                        title="Status"
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
