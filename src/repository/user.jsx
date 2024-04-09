@@ -34,7 +34,7 @@ export async function  apiLoginValidate(userId, password) {
             userId: userId,
             userName: userName,
             password: password,
-            Email:Email
+            email:Email
         };
         const response = await fetch(`${BASE_PATH}/modifyUser`,{
             method: "POST", 
@@ -94,25 +94,11 @@ export async function  apiLoginValidate(userId, password) {
                     body: input_json,
                 });
                 const data = await response.json();
-                if(data.message){
+                if(data.message !== "success"){
                     console.log('\t[ modifyUser ] message:', data.message);
                     return false;
                 };
 
-               // const allCompany = await snapshot.getPromise(atomAllCompanies);
-                //if(newUser.action_type === 'ADD'){
-                //     delete newUser.action_type;
-                //     const updatedNewCompany = {
-                //         ...newCompany,
-                //         // company_code : data.out_company_code,
-                //         create_user : data.out_create_user,
-                //         create_date : data.out_create_date,
-                //         modify_date: data.out_modify_date,
-                //         recent_user: data.out_recent_user,
-                //     };
-                //     set(atomAllCompanies, allCompany.concat(updatedNewCompany));
-                //     return true;
-                // } else 
                 if(newUser.action_type === 'UPDATE'){
                     const currentUser = await snapshot.getPromise(atomCurrentUser);
                     delete newUser.action_type;
@@ -122,6 +108,10 @@ export async function  apiLoginValidate(userId, password) {
                         ...newUser
                     };
                     set(atomCurrentUser, modifiedUser);
+
+                    console.log('modifiedUser', atomCurrentUser, modifiedUser);
+
+                    return(true);
 
                     // const foundIdx = allCompany.findIndex(company => 
                     //     company.company_code === modifiedCompany.company_code);

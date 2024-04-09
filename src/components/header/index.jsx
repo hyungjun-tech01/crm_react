@@ -362,7 +362,7 @@ const Header = (props) => {
           >
             <span className="user-img"><img src={avatar21} alt="" />
               <span className="status online" /></span>
-            <span>Admin</span>
+            <span>{cookies.myLationCrmUserName}</span>
           </Link>
           <div id="dropdown_menu" className="dropdown-menu">
             {/* <Link className="dropdown-item" to="/Profile" 

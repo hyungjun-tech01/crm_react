@@ -359,18 +359,20 @@ const UserDetailModel = () => {
                                   checkSaved={handleCheckSaved}
                                   cancelSaved={handleCancelSaved}
                                 />
-                                <DetailLabelItem
+                                 <DetailTextareaItem
                                   data_set={selectedUser}
                                   saved={savedValues}
                                   name="memo"
                                   title="Memo"
+                                  row_no={3}
+                                  no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
                                   endEdit={handleEndEdit}
                                   checkSaved={handleCheckSaved}
                                   cancelSaved={handleCancelSaved}
-                                />        
+                                />       
                               </tbody>
                             </table>
                           {/* </Panel>
