@@ -3616,7 +3616,6 @@
 
     // Public
     toggle() {
-      console.log('Dropdown / toggle : ', this);
       return this._isShown() ? this.hide() : this.show();
     }
     show() {
@@ -3812,12 +3811,10 @@
       });
     }
     static clearMenus(event) {
-      console.log('This event is activated - 1', event);
       if (event.button === RIGHT_MOUSE_BUTTON || event.type === 'keyup' && event.key !== TAB_KEY$1) {
         return;
       }
       const openToggles = SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN);
-      console.log('clearMenus : openToggles', openToggles);
       for (const toggle of openToggles) {
         const context = Dropdown.getInstance(toggle);
         if (!context || context._config.autoClose === false) {
@@ -3884,7 +3881,6 @@
   EventHandler.on(document, EVENT_CLICK_DATA_API$3, Dropdown.clearMenus);
   EventHandler.on(document, EVENT_KEYUP_DATA_API, Dropdown.clearMenus);
   EventHandler.on(document, EVENT_CLICK_DATA_API$3, SELECTOR_DATA_TOGGLE$3, function (event) {
-    console.log('This event is activated - 0');
     event.preventDefault();
     Dropdown.getOrCreateInstance(this).toggle();
   });
