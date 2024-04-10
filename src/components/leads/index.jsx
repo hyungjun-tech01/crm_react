@@ -11,18 +11,27 @@ import LeadsDetailsModel from "./LeadsDetailsModel";
 import { BiUser } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
-import { atomAllCompanies, atomAllLeads, defaultLead } from "../../atoms/atoms";
+import { atomAllCompanies, atomAllLeads, atomFilteredLead, defaultLead } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
+
 
 const Leads = () => {
   const allCompnayData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
+  const filteredLead = useRecoilValue(atomFilteredLead);
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
-  const { loadAllLeads, modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
+  const { loadAllLeads, modifyLead, setCurrentLead, filterLeads } = useRecoilValue(LeadRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName",  "myLationCrmUserId",]);
 
   const [ leadChange, setLeadChange ] = useState(null);
   const [ companyData, setCompanyData ] = useState([]);
+
+  const [searchCondition, setSearchCondition] = useState("");
+
+  const handleSearchCondition =  (newValue)=> {
+    setSearchCondition(newValue);
+    filterLeads(newValue);
+  };
 
   // --- Functions used for Add New Lead ------------------------------
   const handleAddNewLeadClicked = useCallback(() => {
@@ -339,6 +348,18 @@ const Leads = () => {
                   </div>
                 </div>
               </div>
+              <div className="col">
+                <input
+                      id = "searchCondition"
+                      className="form-control" 
+                      type="text"
+                      placeholder="이름,Company, Lead Sales"
+                      style={{width:'300px'}}
+                      value={searchCondition}
+                      onChange ={(e) => handleSearchCondition(e.target.value)}
+                />  
+              </div>
+
               <div className="col text-end">
                 <ul className="list-inline-item pl-0">
                   <li className="dropdown list-inline-item add-lists">
@@ -432,7 +453,7 @@ const Leads = () => {
                       rowSelection={rowSelection}
                       className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
                       pagination={{
-                        total: allLeadData.length,
+                        total: filteredLead.length > 0 ? filteredLead.length:allLeadData.length,
                         showTotal: (total, range) =>
                           `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                         showSizeChanger: true,
@@ -441,7 +462,7 @@ const Leads = () => {
                       }}
                       style={{ overflowX: "auto" }}
                       columns={columns}
-                      dataSource={allLeadData}
+                      dataSource={filteredLead.length > 0 ? filteredLead:allLeadData}
                       rowKey={(record) => record.lead_code}
                     />
                   </div>

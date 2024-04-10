@@ -5,11 +5,15 @@ import { Logo, S_Logo, avatar02, avatar03, avatar05, avatar06, avatar08, avatar0
 import { FiBell, FiSearch } from "react-icons/fi";
 import { BiMessageRounded } from "react-icons/bi";
 import { Avatar } from "@mui/material";
+import {atomCurrentUser} from "../../atoms/atomsUser.jsx";
+import {useRecoilValue} from "recoil";
 
 const Header = (props) => {
   const exclusionArray = [ "login", "register", "forgot-password", "error-404", "error-500", ];
   const [cookies, removeCookie ] = useCookies(["myLationCrmUserId", "myLationCrmUserName", "myLationCrmAuthToken"]);
   const history = useHistory();
+  const currentUser = useRecoilValue(atomCurrentUser);
+
   const handleLogout = (event) => {
     event.preventDefault();
     console.log("handleLogout", cookies);
@@ -363,9 +367,9 @@ const Header = (props) => {
           >
             <span className="user-img">
               {/* <img src={avatar21} alt="" /> */}
-              <Avatar>{(cookies.myLationCrmUserName).substring(0,2)}</Avatar>
+              <Avatar>{currentUser.userName === undefined ? "":(currentUser.userName).substring(0,2)}</Avatar>
               <span className="status online" /></span>
-            <span>{cookies.myLationCrmUserName}</span>
+            <span>{currentUser.userName}</span>
           </Link>
           <div id="dropdown_menu" className="dropdown-menu">
             {/* <Link className="dropdown-item" to="/Profile" 

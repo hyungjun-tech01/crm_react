@@ -91,6 +91,10 @@ export const atomAllLeads = atom({
     default: [],
 });
 
+export const atomFilteredLead  = atom({
+    key: "filteredLeads",
+    default: [],
+});
 //----- Consulting ------------------------
 export const defaultConsulting = {
     //-----Consulting info --------------
