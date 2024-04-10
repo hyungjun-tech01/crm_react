@@ -37,6 +37,50 @@ const Register = () => {
     event.preventDefault();
     console.log("Login index", userId, Email, password);
 
+    // 미리 check 
+    if(userId === null || userId === "") {
+      setRegisterErrMsg('User Id 를 넣어주세요.');
+      setOpen(true);
+      return;
+    }
+    if(userName === null || userName === "") {
+      setRegisterErrMsg('User Name 를 넣어주세요.');
+      setOpen(true);
+      return;
+    }
+    if(Email === null || Email === ""){
+      setRegisterErrMsg('이메일 주소를 넣어주세요.');
+      setOpen(true);
+		  return;
+	 }
+    var valid_txt = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i; 
+    //(알파벳,숫자)@(알파벳,숫자).(알파벳,숫자)
+  
+    if(valid_txt.test(Email) === false){ 
+      setRegisterErrMsg('이메일 주소가 올바르지 않습니다.');
+      setOpen(true);
+      return;
+    }
+
+    if(password === null || password === "" || password.length < 5){
+      setRegisterErrMsg('패스워드는 5자 이상입니다.');
+      setOpen(true);
+		  return;
+	  }
+
+    console.log('repeatPassword', repeatPassword);
+    if(repeatPassword === null || repeatPassword === "" || repeatPassword.length < 5){
+      setRegisterErrMsg('패스워드 확인은 5자 이상입니다.');
+      setOpen(true);
+		  return;
+	  }    
+
+    if(password !== repeatPassword ){
+      setRegisterErrMsg('패스워드가 맞지 않습니다. 확인을 다시 해주세요.');
+      setOpen(true);
+		  return;
+	  }    
+
     // register  성공한다면 . 후에 login 
     const registerResponse = apiRegister(userId, userName, Email, password); 
     registerResponse.then((res) => {
@@ -62,7 +106,7 @@ const Register = () => {
     });  
 
     
-  },[userId, Email, password]);
+  },[userId, userName, Email, password, repeatPassword]);
 
   return (
     <>
@@ -119,7 +163,7 @@ const Register = () => {
                     </div>                    
                     <div className="form-group">
                       <label>Email</label>
-                      <input className="form-control" 
+                      <input id="Email" className="form-control" 
                         value={Email}
                         onChange={(e) => setEmail(e.target.value)}
                         type="text" />
