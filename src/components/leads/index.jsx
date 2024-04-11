@@ -308,7 +308,7 @@ const Leads = () => {
           {/* Page Header */}
           <div className="page-header pt-3 mb-0 ">
             <div className="row">
-              <div className="col">
+              <div className=".row-cols-6 text-start" style={{width:'100px'}}>
                 <div className="dropdown">
                   <a
                     className="dropdown-toggle recently-viewed"
@@ -348,13 +348,14 @@ const Leads = () => {
                   </div>
                 </div>
               </div>
-              <div className="col">
+              <div className="col text-start">
+                <label style={{ display: 'inline', marginRight:'10px' }}>결과내 검색</label>
                 <input
                       id = "searchCondition"
                       className="form-control" 
                       type="text"
-                      placeholder="이름,Company, Lead Sales"
-                      style={{width:'300px'}}
+                      placeholder="이름,Company,Lead Sales" 
+                      style={{width:'300px', display: 'inline'}}
                       value={searchCondition}
                       onChange ={(e) => handleSearchCondition(e.target.value)}
                 />  
