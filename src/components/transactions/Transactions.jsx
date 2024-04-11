@@ -4,7 +4,6 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
-import { SystemUser, CircleImg, C_logo, C_logo2 } from "../imagepath";
 import { Table } from "antd";
 import "antd/dist/reset.css";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
@@ -20,7 +19,7 @@ import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { TransactionRepo } from "../../repository/transaction";
 import { atomAllCompanies, atomAllLeads, atomAllTransactions, defaultTransaction } from "../../atoms/atoms";
-import { compareCompanyName , compareText} from "../../constants/functions";
+import { compareCompanyName , compareText, formateDate} from "../../constants/functions";
 
 const Transactions = () => {
   const allCompnayData = useRecoilValue(atomAllCompanies);
