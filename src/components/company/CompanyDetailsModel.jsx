@@ -838,8 +838,8 @@ const CompanyDetailsModel = () => {
                                 </thead>
                                 { leadsByCompany.length > 0 &&
                                   <tbody>
-                                    { leadsByCompany.map(lead => 
-                                        <tr>
+                                    { leadsByCompany.map((lead, index) => 
+                                        <tr key={index}>
                                           <td>
                                             <Link to="#" className="avatar">
                                               <img alt="" src={C_logo2} />
@@ -907,8 +907,8 @@ const CompanyDetailsModel = () => {
                                 </thead>
                                 { consultingByCompany.length > 0 &&
                                   <tbody>
-                                    { consultingByCompany.map(consulting =>
-                                      <tr>
+                                    { consultingByCompany.map((consulting, index) =>
+                                      <tr key={index}>
                                         <td>{consulting.consulting_type}</td>
                                         <td>{consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
                                         {consulting.receipt_time && new Date(consulting.receipt_time).toLocaleDateString('ko-KR', {hour:'numeric',minute:'numeric',second:'numeric'})}
@@ -964,8 +964,8 @@ const CompanyDetailsModel = () => {
                                 </thead>
                                 { quotationByCompany.length > 0 && 
                                   <tbody>
-                                    { quotationByCompany.map(quotation =>
-                                      <tr>
+                                    { quotationByCompany.map((quotation, index) =>
+                                      <tr key={index}>
                                         <td>{quotation.quotation_title}</td>
                                         <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}</td>
                                         <td className="text-center">
@@ -1019,8 +1019,8 @@ const CompanyDetailsModel = () => {
                                 </thead>
                                 { transactionByCompany.length > 0 &&
                                   <tbody>
-                                    { transactionByCompany.map(trans =>
-                                      <tr>
+                                    { transactionByCompany.map((trans, index) =>
+                                      <tr key={index}>
                                         <td>{trans.transaction_title}</td>
                                         <td>{trans.publish_date && new Date(trans.publish_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
                                         <td>{trans.publish_type}</td>
@@ -1077,8 +1077,8 @@ const CompanyDetailsModel = () => {
                                 </thead>
                                 { purchaseByCompany.length > 0 && 
                                   <tbody>
-                                  { purchaseByCompany.map(purchase =>
-                                    <tr>
+                                  { purchaseByCompany.map((purchase, index) =>
+                                    <tr key={index}>
                                       <td>{purchase.product_name}</td>
                                       <td>{purchase.quantity}</td>
                                       <td>{purchase.price}</td>
