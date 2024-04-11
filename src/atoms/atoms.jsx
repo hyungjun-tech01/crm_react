@@ -45,7 +45,10 @@ export const atomAllCompanies = atom({
     key: "allCompanies",
     default: [],
 });
-
+export const atomFilteredCompany = atom({
+    key: "filteredCompanies",
+    default: [],
+});
 //----- Lead ------------------------
 export const defaultLead = {
     //-----Lead info --------------

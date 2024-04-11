@@ -307,8 +307,8 @@ const Leads = () => {
           </div>
           {/* Page Header */}
           <div className="page-header pt-3 mb-0 ">
-            <div className="row">
-              <div className=".row-cols-6 text-start" style={{width:'100px'}}>
+            <div className="row ">
+              <div className="text-start" style={{width:'120px'}}>
                 <div className="dropdown">
                   <a
                     className="dropdown-toggle recently-viewed"
@@ -348,8 +348,8 @@ const Leads = () => {
                   </div>
                 </div>
               </div>
-              <div className="col text-start">
-                <label style={{ display: 'inline', marginRight:'10px' }}>결과내 검색</label>
+              <div className="col text-start" style={{width:'400px'}}>
+                <label style={{ display: 'inline', width:'100px',marginRight:'10px' }}>결과내 검색</label>
                 <input
                       id = "searchCondition"
                       className="form-control" 

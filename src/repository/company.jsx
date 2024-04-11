@@ -1,6 +1,6 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentCompany, atomAllCompanies, defaultCompany } from '../atoms/atoms';
+import { atomCurrentCompany, atomAllCompanies,atomFilteredCompany, defaultCompany } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
@@ -23,6 +23,15 @@ export const CompanyRepo = selector({
             catch(err){
                 console.error(`\t[ loadAllCompanies ] Error : ${err}`);
             };
+        });
+        const filterCompanies = getCallback(({set, snapshot }) => async (filterText) => {
+            const allCompanyList = await snapshot.getPromise(atomAllCompanies);
+            const allCompanies = 
+            allCompanyList.filter(item => (item.company_name &&item.company_name.includes(filterText))||
+                                           (item.sales_resource && item.sales_resource.includes(filterText))  
+            );
+            set(atomFilteredCompany, allCompanies);
+            return true;
         });
         const modifyCompany = getCallback(({set, snapshot}) => async (newCompany) => {
             const input_json = JSON.stringify(newCompany);
@@ -103,6 +112,7 @@ export const CompanyRepo = selector({
         });
         return {
             loadAllCompanies,
+            filterCompanies,
             modifyCompany,
             setCurrentCompany,
         };

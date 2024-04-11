@@ -10,16 +10,25 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { BiBuildings } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
-import { atomAllCompanies, defaultCompany } from "../../atoms/atoms";
+import { atomAllCompanies, atomFilteredCompany, defaultCompany } from "../../atoms/atoms";
 import { compareCompanyName, compareText, formateDate } from "../../constants/functions";
 
 const Company = () => {
-  const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
+  const { loadAllCompanies, filterCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
+  const filteredCompany = useRecoilValue(atomFilteredCompany);
   const [ companyChange, setCompanyChange ] = useState(null);
   const [ cookies ] = useCookies(["myLationCrmUserName",  "myLationCrmUserId"]);
   const [ establishDate, setEstablishDate ] = useState(null);
   const [ closeDate, setCloseDate ] = useState(null);
+
+  const [searchCondition, setSearchCondition] = useState("");
+
+  const handleSearchCondition =  (newValue)=> {
+    setSearchCondition(newValue);
+    console.log('handle search', newValue);
+    filterCompanies(newValue);
+  };
 
   // --- Functions used for Table ------------------------------
   const handleClickCompanyName = useCallback((id)=>{
@@ -249,7 +258,7 @@ const Company = () => {
           {/* Page Header */}
           <div className="page-header pt-3 mb-0 ">
             <div className="row">
-              <div className="col">
+              <div className="text-start"  style={{width:'120px'}}>
                 <div className="dropdown">
                   <a
                     className="dropdown-toggle recently-viewed"
@@ -259,7 +268,7 @@ const Company = () => {
                     aria-expanded="false"
                   >
                     {" "}
-                    Recently Viewed
+                    Recently
                   </a>
                   <div className="dropdown-menu">
                     <a className="dropdown-item" href="#">
@@ -285,6 +294,18 @@ const Company = () => {
                     </a>
                   </div>
                 </div>
+              </div>
+              <div className="col text-start" style={{width:'400px'}}>
+                <label style={{ display: 'inline', width:'100px', marginRight:'10px' }}>결과내 검색</label>
+                <input
+                      id = "searchCondition"
+                      className="form-control" 
+                      type="text"
+                      placeholder="이름,Lead Sales" 
+                      style={{width:'300px', display: 'inline'}}
+                      value={searchCondition}
+                      onChange ={(e) => handleSearchCondition(e.target.value)}
+                />  
               </div>
               <div className="col text-end">
                 <ul className="list-inline-item pl-0">
@@ -339,7 +360,7 @@ const Company = () => {
                     <Table
                       rowSelection={rowSelection}
                       pagination={{
-                        total: allCompanyData.length,
+                        total:  filteredCompany.length > 0 ? filteredCompany.length:allCompanyData.length,
                         showTotal: (total, range) =>
                           `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                         showSizeChanger: true,
@@ -349,7 +370,7 @@ const Company = () => {
                       className="table"
                       style={{ overflowX: "auto" }}
                       columns={columns}
-                      dataSource={allCompanyData}
+                      dataSource={filteredCompany.length > 0 ? filteredCompany:allCompanyData}
                       rowKey={(record) => record.company_code}
                     />
                   </div>
