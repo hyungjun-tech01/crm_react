@@ -9,8 +9,7 @@ import { UserRepo } from "../../repository/user";
 
 import UserDetailModel from "./UserDetailModel.jsx";
 // import DatePicker from "react-datepicker";
-import { CompanyRepo } from "../../repository/company";
-import { atomAllCompanies, defaultCompany } from "../../atoms/atoms";
+
 
 const UserInfo = () => {
   const currentUser = useRecoilValue(atomCurrentUser);
@@ -23,8 +22,7 @@ const UserInfo = () => {
   console.log("currentUser", currentUser.userId);
 
 
-  const allCompanyData = useRecoilValue(atomAllCompanies);
-  const [ companyChange, setCompanyChange ] = useState(null);
+  
   // const [ selectedEstablishDate, setSelectedEstablishDate ] = useState(null);
   // const [ selectedCloseDate, setSelectedCloseDate ] = useState(null);
 

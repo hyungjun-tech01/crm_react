@@ -1,6 +1,6 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentLead, atomAllLeads, defaultLead } from '../atoms/atoms';
+import { atomCurrentLead, atomAllLeads, atomFilteredLead, defaultLead } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
@@ -26,10 +26,21 @@ export const LeadRepo = selector({
                     return;
                 }
                 set(atomAllLeads, data);
+                set(atomFilteredLead, atomAllLeads);
             }
             catch(err){
                 console.error(`loadAllCompanies / Error : ${err}`);
             };
+        });
+        const filterLeads = getCallback(({set, snapshot }) => async (filterText) => {
+            const allLeadList = await snapshot.getPromise(atomAllLeads);
+            const allLeads = 
+                allLeadList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))||
+                                           (item.company_name && item.company_name.includes(filterText))||
+                                           (item.sales_resource && item.sales_resource.includes(filterText))  
+            );
+            set(atomFilteredLead, allLeads);
+            return true;
         });
         const modifyLead = getCallback(({set, snapshot}) => async (newLead) => {
             const input_json = JSON.stringify(newLead);
@@ -114,6 +125,7 @@ export const LeadRepo = selector({
             loadAllLeads,
             modifyLead,
             setCurrentLead,
+            filterLeads,
         };
     }
 });

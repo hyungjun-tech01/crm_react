@@ -825,7 +825,7 @@ const QuotationsDetailsModel = () => {
                           { selectedQuotation !== defaultQuotation &&
                             <QuotationView/>
                           }
-                        </div>
+                                </div>
 {/*---- End   -- Tab : PDF View - Quotation---------------------------------------------------------*/}
                       </div>
                       {savedValues !== null &&
