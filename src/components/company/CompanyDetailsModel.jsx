@@ -4,8 +4,13 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { Collapse } from "antd";
 import { C_logo, C_logo2, CircleImg } from "../imagepath";
-import { atomCurrentCompany, defaultCompany } from "../../atoms/atoms";
+import { atomAllConsultings, atomAllLeads, atomAllPurchases, atomAllQuotations, atomAllTransactions, atomCurrentCompany, defaultCompany } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
+import { LeadRepo } from "../../repository/lead";
+import { ConsultingRepo } from "../../repository/consulting";
+import { QuotationRepo } from "../../repository/quotation";
+import { TransactionRepo } from "../../repository/transaction";
+import { PurchaseRepo } from "../../repository/purchase";
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailDateItem from "../../constants/DetailDateItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
@@ -14,6 +19,16 @@ const CompanyDetailsModel = () => {
   const { Panel } = Collapse;
   const selectedCompany = useRecoilValue(atomCurrentCompany);
   const { modifyCompany } = useRecoilValue(CompanyRepo);
+  const allLeads = useRecoilValue(atomAllLeads);
+  const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
+  const allConsultings = useRecoilValue(atomAllConsultings);
+  const { loadAllConsultings } = useRecoilValue(ConsultingRepo);
+  const allQuotations = useRecoilValue(atomAllQuotations);
+  const { loadAllQuotations } = useRecoilValue(QuotationRepo);
+  const allTransactions = useRecoilValue(atomAllTransactions);
+  const { loadAllTransactions } = useRecoilValue(TransactionRepo);
+  const allPurchases = useRecoilValue(atomAllPurchases);
+  const { loadAllPurchases } = useRecoilValue(PurchaseRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
   const [ editedValues, setEditedValues ] = useState(null);
@@ -22,6 +37,12 @@ const CompanyDetailsModel = () => {
   const [ establishDate, setEstablishDate ] = useState(new Date());
   const [ orgCloseDate, setOrgCloseDate ] = useState(null);
   const [ closeDate, setCloseDate ] = useState(new Date());
+
+  const [ leadsByCompany, setLeadsByCompany] = useState([]);
+  const [ consultingByCompany, setConsultingByCompany] = useState([]);
+  const [ quotationByCompany, setQuotationByCompany] = useState([]);
+  const [ transactionByCompany, setTransactionByCompany] = useState([]);
+  const [ purchaseByCompany, setPurchaseByCompany] = useState([]);
 
   // --- Funtions for Editing ---------------------------------
   const handleCheckEditState = useCallback((name) => {
@@ -164,7 +185,38 @@ const CompanyDetailsModel = () => {
     console.log('[CompanyDetailsModel] called!');
     setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
     setOrgCloseDate(selectedCompany.closure_date ? new Date(selectedCompany.closure_date) : null);
-  }, [selectedCompany, savedValues]);
+
+    if(allLeads.length === 0){
+      loadAllLeads();
+    } else {
+      const companyleads = allLeads.filter(lead => lead.company_code === selectedCompany.company_code);
+      setLeadsByCompany(companyleads);
+    };
+    if(allConsultings.length === 0){
+      loadAllConsultings();
+    } else {
+      const companyConsultings = allConsultings.filter(consult => consult.company_code === selectedCompany.company_code);
+      setConsultingByCompany(companyConsultings);
+    };
+    if(allQuotations.length === 0){
+      loadAllQuotations();
+    } else {
+      const companyQuotations = allQuotations.filter(quotation => quotation.company_code === selectedCompany.company_code);
+      setQuotationByCompany(companyQuotations);
+    };
+    if(allTransactions.length === 0){
+      loadAllTransactions();
+    } else {
+      const companyTransactions = allTransactions.filter(transaction => transaction.company_name === selectedCompany.company_name);
+      setTransactionByCompany(companyTransactions);
+    };
+    if(allPurchases.length === 0){
+      loadAllPurchases();
+    } else {
+      const companyPurchases = allPurchases.filter(purchase => purchase.company_code === selectedCompany.company_code);
+      setPurchaseByCompany(companyPurchases);
+    };
+  }, [selectedCompany, savedValues, allLeads, allConsultings, allQuotations, allTransactions, allPurchases, loadAllLeads, loadAllConsultings, loadAllQuotations, loadAllTransactions, loadAllPurchases]);
 
   return (
     <>
@@ -313,34 +365,7 @@ const CompanyDetailsModel = () => {
                       to="#task-related"
                       data-bs-toggle="tab"
                     >
-                      Lead
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#task-related"
-                      data-bs-toggle="tab"
-                    >
-                      Purchase
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#task-related"
-                      data-bs-toggle="tab"
-                    >
-                      Quatation
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#task-related"
-                      data-bs-toggle="tab"
-                    >
-                      Transaction
+                      Related
                     </Link>
                   </li>
                   {/* <li className="nav-item">
@@ -736,9 +761,9 @@ const CompanyDetailsModel = () => {
                               alt="circle"
                             />
                             <h4 className="font-weight-normal mb-3">
-                              Companies
+                              Leads
                             </h4>
-                            <span>2</span>
+                            <span>{leadsByCompany.length}</span>
                           </div>
                         </div>
                       </div>
@@ -750,8 +775,8 @@ const CompanyDetailsModel = () => {
                               className="card-img-absolute"
                               alt="circle"
                             />
-                            <h4 className="font-weight-normal mb-3">Deals</h4>
-                            <span>2</span>
+                            <h4 className="font-weight-normal mb-3">Consulting</h4>
+                            <span>{consultingByCompany.length}</span>
                           </div>
                         </div>
                       </div>
@@ -763,10 +788,8 @@ const CompanyDetailsModel = () => {
                               className="card-img-absolute"
                               alt="circle"
                             />
-                            <h4 className="font-weight-normal mb-3">
-                              Projects
-                            </h4>
-                            <span>1</span>
+                            <h4 className="font-weight-normal mb-3">Quotation</h4>
+                            <span>{quotationByCompany.length}</span>
                           </div>
                         </div>
                       </div>
@@ -780,10 +803,8 @@ const CompanyDetailsModel = () => {
                               className="card-img-absolute"
                               alt="circle"
                             />
-                            <h4 className="font-weight-normal mb-3">
-                              Contacts
-                            </h4>
-                            <span>2</span>
+                            <h4 className="font-weight-normal mb-3">Transaction</h4>
+                            <span>{transactionByCompany.length}</span>
                           </div>
                         </div>
                       </div>
@@ -795,21 +816,8 @@ const CompanyDetailsModel = () => {
                               className="card-img-absolute"
                               alt="circle"
                             />
-                            <h4 className="font-weight-normal mb-3">Notes</h4>
-                            <span>2</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-4">
-                        <div className="card bg-gradient-info card-img-holder text-white h-100">
-                          <div className="card-body">
-                            <img
-                              src={CircleImg}
-                              className="card-img-absolute"
-                              alt="circle"
-                            />
-                            <h4 className="font-weight-normal mb-3">Files</h4>
-                            <span>2</span>
+                            <h4 className="font-weight-normal mb-3">Purchase</h4>
+                            <span>{purchaseByCompany.length}</span>
                           </div>
                         </div>
                       </div>
@@ -818,526 +826,296 @@ const CompanyDetailsModel = () => {
                       <div className="crms-tasks p-2">
                         <div className="tasks__item crms-task-item active">
                           <Collapse accordion expandIconPosition="end">
-                            <Panel header="Companies" key="1">
+                            <Panel header="Lead" key="1">
                               <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                 <thead>
                                   <tr>
-                                    <th>Company Name</th>
-                                    <th>Phone</th>
-                                    <th>Billing Country</th>
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    <td>
-                                      <Link to="#" className="avatar">
-                                        <img alt="" src={C_logo2} />
-                                      </Link>
-                                      <Link
-                                        to="#"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#company-details"
-                                      >
-                                        Clampett Oil and Gas Corp.
-                                      </Link>
-                                    </td>
-                                    <td>8754554531</td>
-                                    <td>United States</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>
-                                      <Link to="#" className="avatar">
-                                        <img alt="" src={C_logo} />
-                                      </Link>
-                                      <Link
-                                        to="#"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#company-details"
-                                      >
-                                        Acme Corporation
-                                      </Link>
-                                    </td>
-                                    <td>8754554531</td>
-                                    <td>United States</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                        <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Deals" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Deal Name</th>
-                                    <th>Company</th>
-                                    <th>User Responsible</th>
-                                    <th>Deal Value</th>
-                                    <th />
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    <td>Bensolet</td>
-                                    <td>Globex</td>
-                                    <td>John Doe</td>
-                                    <td>USD $‎180</td>
-                                    <td>
-                                      <i
-                                        className="fa fa-star"
-                                        aria-hidden="true"
-                                      />
-                                    </td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>Ansanio tech</td>
-                                    <td>Lecto</td>
-                                    <td>John Smith</td>
-                                    <td>USD $‎180</td>
-                                    <td>
-                                      <i
-                                        className="fa fa-star"
-                                        aria-hidden="true"
-                                      />
-                                    </td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                        <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Projects" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Project Name</th>
-                                    <th>Status</th>
-                                    <th>User Responsible</th>
-                                    <th>Date Created</th>
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    <td>Wilmer Deluna</td>
-                                    <td>Completed</td>
-                                    <td>Williams</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                        <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Contacts" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Name</th>
-                                    <th>Title</th>
-                                    <th>phone</th>
+                                    <th>Lead Name</th>
+                                    <th>Mobile</th>
                                     <th>Email</th>
                                     <th className="text-end">Actions</th>
                                   </tr>
                                 </thead>
-                                <tbody>
-                                  <tr>
-                                    <td>Wilmer Deluna</td>
-                                    <td>Call Enquiry</td>
-                                    <td>987675656</td>
-                                    <td>william@gmail.com</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>John Doe</td>
-                                    <td>Enquiry</td>
-                                    <td>987675656</td>
-                                    <td>john@gmail.com</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
+                                { leadsByCompany.length > 0 &&
+                                  <tbody>
+                                    { leadsByCompany.map(lead => 
+                                        <tr>
+                                          <td>
+                                            <Link to="#" className="avatar">
+                                              <img alt="" src={C_logo2} />
+                                            </Link>
+                                            <Link
+                                              to="#"
+                                              data-bs-toggle="modal"
+                                              data-bs-target="#lead-details"
+                                              onClick={()=> setCurrentLead(lead.lead_code)}
+                                            >
+                                              {lead.lead_name}
+                                            </Link>
+                                          </td>
+                                          <td>{lead.mobile_number}</td>
+                                          <td>{lead.email}</td>
+                                          <td className="text-center">
+                                            <div className="dropdown dropdown-action">
+                                              <Link
+                                                to="#"
+                                                className="action-icon dropdown-toggle"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false"
+                                              >
+                                                <i className="material-icons">
+                                                  more_vert
+                                                </i>
+                                              </Link>
+                                              <div className="dropdown-menu dropdown-menu-right">
+                                                <Link
+                                                  className="dropdown-item"
+                                                  to="#"
+                                                >
+                                                  Edit Link
+                                                </Link>
+                                                <Link
+                                                  className="dropdown-item"
+                                                  to="#"
+                                                >
+                                                  Delete Link
+                                                </Link>
+                                              </div>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      )
+                                    }
+                                  </tbody>
+                                }
                               </table>
                             </Panel>
                           </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
                           <Collapse accordion expandIconPosition="end">
-                            <Panel header="Notes" key="1">
+                            <Panel header="Consultings" key="1">
                               <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                 <thead>
                                   <tr>
-                                    <th>Name</th>
-                                    <th>Size</th>
-                                    <th>Category</th>
-                                    <th>Date Added</th>
-                                    <th>Added by</th>
+                                    <th>Type</th>
+                                    <th>Date/Time</th>
+                                    <th>Receiver</th>
+                                    <th>Request</th>
                                     <th className="text-end">Actions</th>
                                   </tr>
                                 </thead>
-                                <tbody>
-                                  <tr>
-                                    <td>Document</td>
-                                    <td>50KB</td>
-                                    <td>Email</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td>John Doe</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>Finance</td>
-                                    <td>100KB</td>
-                                    <td>Phone call</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td>Smith</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
+                                { consultingByCompany.length > 0 &&
+                                  <tbody>
+                                    { consultingByCompany.map(consulting =>
+                                      <tr>
+                                        <td>{consulting.consulting_type}</td>
+                                        <td>{consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
+                                        {consulting.receipt_time && new Date(consulting.receipt_time).toLocaleDateString('ko-KR', {hour:'numeric',minute:'numeric',second:'numeric'})}
+                                        </td>
+                                        <td>{consulting.receiver}</td>
+                                        <td>{consulting.request_type}</td>
+                                        <td className="text-center">
+                                          <div className="dropdown dropdown-action">
+                                            <Link
+                                              to="#"
+                                              className="action-icon dropdown-toggle"
+                                              data-bs-toggle="dropdown"
+                                              aria-expanded="false"
+                                            >
+                                              <i className="material-icons">
+                                                more_vert
+                                              </i>
+                                            </Link>
+                                            <div className="dropdown-menu dropdown-menu-right">
+                                              <Link
+                                                className="dropdown-item"
+                                                to="#"
+                                              >
+                                                Edit Link
+                                              </Link>
+                                              <Link
+                                                className="dropdown-item"
+                                                to="#"
+                                              >
+                                                Delete Link
+                                              </Link>
+                                            </div>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </tbody>
+                                }
                               </table>
                             </Panel>
                           </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
                           <Collapse accordion expandIconPosition="end">
-                            <Panel header="Files" key="1">
+                            <Panel header="Quotations" key="1">
                               <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                 <thead>
                                   <tr>
-                                    <th>Name</th>
-                                    <th>Size</th>
-                                    <th>Category</th>
-                                    <th>Date Added</th>
-                                    <th>Added by</th>
+                                    <th>Title</th>
+                                    <th>Date</th>
                                     <th className="text-end">Actions</th>
                                   </tr>
                                 </thead>
-                                <tbody>
+                                { quotationByCompany.length > 0 && 
+                                  <tbody>
+                                    { quotationByCompany.map(quotation =>
+                                      <tr>
+                                        <td>{quotation.quotation_title}</td>
+                                        <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}</td>
+                                        <td className="text-center">
+                                          <div className="dropdown dropdown-action">
+                                            <Link
+                                              to="#"
+                                              className="action-icon dropdown-toggle"
+                                              data-bs-toggle="dropdown"
+                                              aria-expanded="false"
+                                            >
+                                              <i className="material-icons">
+                                                more_vert
+                                              </i>
+                                            </Link>
+                                            <div className="dropdown-menu dropdown-menu-right">
+                                              <Link
+                                                className="dropdown-item"
+                                                to="#"
+                                              >
+                                                Edit Link
+                                              </Link>
+                                              <Link
+                                                className="dropdown-item"
+                                                to="#"
+                                              >
+                                                Delete Link
+                                              </Link>
+                                            </div>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </tbody>
+                                }
+                              </table>
+                            </Panel>
+                          </Collapse>
+                        </div>
+                        <div className="tasks__item crms-task-item">
+                          <Collapse accordion expandIconPosition="end">
+                            <Panel header="Transaction" key="1">
+                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
+                                <thead>
                                   <tr>
-                                    <td>Document</td>
-                                    <td>50KB</td>
-                                    <td>Phone Enquiry</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td>John Doe</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
+                                    <th>Title</th>
+                                    <th>Publish Date</th>
+                                    <th>Publish Type</th>
+                                    <th>Supply Price</th>
+                                    <th className="text-end">Actions</th>
                                   </tr>
+                                </thead>
+                                { transactionByCompany.length > 0 &&
+                                  <tbody>
+                                    { transactionByCompany.map(trans =>
+                                      <tr>
+                                        <td>{trans.transaction_title}</td>
+                                        <td>{trans.publish_date && new Date(trans.publish_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
+                                        <td>{trans.publish_type}</td>
+                                        <td>{trans.supply_price}</td>
+                                        <td className="text-center">
+                                          <div className="dropdown dropdown-action">
+                                            <Link
+                                              to="#"
+                                              className="action-icon dropdown-toggle"
+                                              data-bs-toggle="dropdown"
+                                              aria-expanded="false"
+                                            >
+                                              <i className="material-icons">
+                                                more_vert
+                                              </i>
+                                            </Link>
+                                            <div className="dropdown-menu dropdown-menu-right">
+                                              <Link
+                                                className="dropdown-item"
+                                                to="#"
+                                              >
+                                                Edit Link
+                                              </Link>
+                                              <Link
+                                                className="dropdown-item"
+                                                to="#"
+                                              >
+                                                Delete Link
+                                              </Link>
+                                            </div>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </tbody>
+                                }
+                              </table>
+                            </Panel>
+                          </Collapse>
+                        </div>
+                        <div className="tasks__item crms-task-item">
+                          <Collapse accordion expandIconPosition="end">
+                            <Panel header="Purchase" key="1">
+                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
+                                <thead>
                                   <tr>
-                                    <td>Finance</td>
-                                    <td>100KB</td>
-                                    <td>Email</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td>Smith</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
+                                    <th>Product Name</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Delivery Date</th>
+                                    <th>Registration Date</th>
+                                    <th className="text-end">Actions</th>
                                   </tr>
-                                </tbody>
+                                </thead>
+                                { purchaseByCompany.length > 0 && 
+                                  <tbody>
+                                  { purchaseByCompany.map(purchase =>
+                                    <tr>
+                                      <td>{purchase.product_name}</td>
+                                      <td>{purchase.quantity}</td>
+                                      <td>{purchase.price}</td>
+                                      <td>{purchase.delivery_date && new Date(purchase.delivery_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
+                                      <td>{purchase.registration_date && new Date(purchase.registration_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
+                                      <td className="text-center">
+                                        <div className="dropdown dropdown-action">
+                                          <Link
+                                            to="#"
+                                            className="action-icon dropdown-toggle"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false"
+                                          >
+                                            <i className="material-icons">
+                                              more_vert
+                                            </i>
+                                          </Link>
+                                          <div className="dropdown-menu dropdown-menu-right">
+                                            <Link
+                                              className="dropdown-item"
+                                              to="#"
+                                            >
+                                              Edit Link
+                                            </Link>
+                                            <Link
+                                              className="dropdown-item"
+                                              to="#"
+                                            >
+                                              Delete Link
+                                            </Link>
+                                          </div>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  )}
+                                  </tbody>
+                                }
                               </table>
                             </Panel>
                           </Collapse>
@@ -1595,3 +1373,4 @@ const CompanyDetailsModel = () => {
 };
 
 export default CompanyDetailsModel;
+
