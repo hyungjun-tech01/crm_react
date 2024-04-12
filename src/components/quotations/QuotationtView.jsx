@@ -205,7 +205,7 @@ const pdfStyles = StyleSheet.create({
         textAlign: 'center',
         color: 'grey',
     },
-    supplierCell:{
+    supplierRow:{
         minHeight: 20,
         margin: 0,
         padding: 0,
@@ -214,21 +214,18 @@ const pdfStyles = StyleSheet.create({
     supplierSubject: {
         width: 75,
         margin: 0,
-        paddingHorizontal: 5,
-        paddingVertical: 0,
+        paddingLeft: 5,
         borderRight: 1,
         flexGrow: 0,
     },
     supplierContent: {
         margin:0,
-        paddingHorizontal: 5,
-        paddingVertical: 0,
+        paddingLeft: 5,
         border: 0,
         flexGrow: 1,
     },
     supplierText: {
-        marginHorizontal: 2,
-        marginVertical: 0,
+        margin: 0,
         fontSize: 10,
         textAlign: 'start',
         textWrap: 'wrap',
@@ -277,22 +274,22 @@ const QuotationView = () => {
                     <Text style={{fontSize: 16,textAlign: 'left',textDecoration: 'underline',marginLeft: 20,marginBottom: 10,fontFamily: 'Noto Sans'}}>
                         {currentQuotation.company_name} 귀중
                     </Text>
-                    <View style={{marginBottom: 20, padding: 0, flexDirection: 'row'}}>
-                        <View style={{margin: 0, padding: 5, width:'50%', flewGrow: 1}}>
+                    <View style={{marginBottom: 20, padding: 0, flexDirection: 'row', alignItems:'stretch'}}>
+                        <View style={{margin: 0, padding: 5, width:'50%'}}>
                             <Text style={pdfStyles.text}>받으실 분:  {currentQuotation.department} {currentQuotation.lead_name} {currentQuotation.position}</Text>
                             <Text style={pdfStyles.text}>견적 일자:  {new Date(currentQuotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day:'numeric'})}</Text>
                             <Text style={pdfStyles.text}>지불 조건:  {currentQuotation.payment_type}</Text>
                             <Text style={pdfStyles.text}>납품 기간:  {currentQuotation.delivery_period}</Text>
                             <Text style={pdfStyles.text}>유효 기간:  {currentQuotation.quotation_expiration_date}</Text>
                         </View>
-                        <View style={{margin: 0, padding: 0, width:'50%', border: 1,flexGrow:1,alignContent:'center',alignItems:'stretch',flexDirection: 'row'}}>
-                            <View style={{width:20,margin:0,backgroundColor:'#cccccc',borderRight:1,flexGrow:0,flexDirection:'column',justifyContent:'space-around'}}>
+                        <View style={{margin: 0, padding: 0, width:'50%', border:1,alignContent:'center',flexDirection: 'row'}}>
+                            <View style={{width:20,margin:0,backgroundColor:'#cccccc',borderRight:1,flexGrow:0,flexDirection:'column',alignItems:'center',justifyContent:'space-around'}}>
                                 <Text style={pdfStyles.text}>공</Text>
                                 <Text style={pdfStyles.text}>급</Text>
                                 <Text style={pdfStyles.text}>자</Text>
                             </View>
                             <View style={{margin: 0, border: 0,flexGrow:1, flexDirection: 'column'}}>
-                                <View style={[pdfStyles.supplierCell,{flexGrow:0,borderBottom:1}]}>
+                                <View style={[pdfStyles.supplierRow,{flexGrow:0,borderBottom:1}]}>
                                     <View style={pdfStyles.supplierSubject}>
                                         <Text style={pdfStyles.supplierText}>등록번호</Text>
                                     </View>
@@ -300,7 +297,7 @@ const QuotationView = () => {
                                         <Text style={pdfStyles.supplierText}>106-86-26016</Text>
                                     </View>
                                 </View>
-                                <View style={[pdfStyles.supplierCell,{flexGrow:0,borderBottom:1}]}>
+                                <View style={[pdfStyles.supplierRow,{flexGrow:0,borderBottom:1}]}>
                                     <View style={pdfStyles.supplierSubject}>
                                         <Text style={pdfStyles.supplierText}>상호</Text>
                                     </View>
@@ -308,7 +305,7 @@ const QuotationView = () => {
                                         <Text style={pdfStyles.supplierText}>노드데이타</Text>
                                     </View>
                                 </View>
-                                <View style={[pdfStyles.supplierCell,{flexGrow:0,borderBottom:1}]}>
+                                <View style={[pdfStyles.supplierRow,{flexGrow:0,borderBottom:1}]}>
                                     <View style={pdfStyles.supplierSubject}>
                                         <Text style={pdfStyles.supplierText}>대표자명</Text>
                                     </View>
@@ -316,7 +313,7 @@ const QuotationView = () => {
                                         <Text style={pdfStyles.supplierText}>김신일</Text>
                                     </View>
                                 </View>
-                                <View style={[pdfStyles.supplierCell,{flexGrow:1,borderBottom:1}]}>
+                                <View style={[pdfStyles.supplierRow,{flexGrow:1,borderBottom:1}]}>
                                     <View style={pdfStyles.supplierSubject}>
                                         <Text style={pdfStyles.supplierText}>주소</Text>
                                     </View>
@@ -324,7 +321,7 @@ const QuotationView = () => {
                                         <Text style={pdfStyles.supplierText}>서울특별시 금천구 가산디지털 1로 128 1811 (STX V-Tower)</Text>
                                     </View>
                                 </View>
-                                <View style={[pdfStyles.supplierCell,{flexGrow:1,borderBottom:1}]}>
+                                <View style={[pdfStyles.supplierRow,{flexGrow:1,borderBottom:1}]}>
                                     <View style={pdfStyles.supplierSubject}>
                                         <Text style={pdfStyles.supplierText}>업태/종목</Text>
                                     </View>
@@ -332,7 +329,7 @@ const QuotationView = () => {
                                         <Text style={pdfStyles.supplierText}>도소매서비스/컴퓨터및주변기기,S/W개발,공급,자문</Text>
                                     </View>
                                 </View>
-                                <View style={[pdfStyles.supplierCell,{flexGrow:0,borderBottom:1}]}>
+                                <View style={[pdfStyles.supplierRow,{flexGrow:0,borderBottom:1}]}>
                                     <View style={pdfStyles.supplierSubject}>
                                         <Text style={pdfStyles.supplierText}>회사전화</Text>
                                     </View>
@@ -340,7 +337,7 @@ const QuotationView = () => {
                                         <Text style={pdfStyles.supplierText}>02-595-4450 / 051-517-4450</Text>
                                     </View>
                                 </View>
-                                <View style={[pdfStyles.supplierCell,{flexGrow:0,border:0}]}>
+                                <View style={[pdfStyles.supplierRow,{flexGrow:0,border:0}]}>
                                     <View style={pdfStyles.supplierSubject}>
                                         <Text style={pdfStyles.supplierText}>회사팩스</Text>
                                     </View>
@@ -413,7 +410,7 @@ const QuotationView = () => {
                                             <Text style={{marginHorizontal:2,marginVertical:0,fontSize:10,fontWeight:'bold',textAlign:'justify',textWrap:'wrap',fontFamily:'Noto Sans'}}>
                                                 +++ 상기 공통 사항 +++
                                             </Text>
-                                            {common_items.map(item => <Text style={pdfStyles.textComment}>{item}</Text>)}
+                                            {common_items.map((item, index) => <Text key={index} style={pdfStyles.textComment}>{item}</Text>)}
                                         </View>
                                         <View style={{width: 40, height:'100%',margin:0,padding:0,borderRight:1,flexGrow:0}}>
                                             <Text style={pdfStyles.text}>{}</Text>
