@@ -65,3 +65,27 @@ export const formateDate = (date_value) => {
           + "." + (month < 10 ? "0" + month.toString() : month.toString())
           + "." + (date < 10 ? "0" + date.toString() : date.toString());
 };
+
+export const ConverTextAmount = (amount) => {
+    if(!amount) return "";
+
+    let input = null;
+    if(typeof amount === 'number'){
+        input = amount;
+    } else if(typeof amount === 'string')
+    {
+        input = amount.toString();
+    };
+    
+    let ret = "";
+    for(let i = input.length - 1, m = 0; i >= 0; i--, m++)
+    {
+        let temp_ret = input.at(i);
+        if(m !==0 && m % 3 === 0 && !isNaN(Number(temp_ret))){
+            temp_ret += ",";
+        };
+        ret = temp_ret + ret;
+    };
+    // console.log('\t[ ConverTextAmount ] output : ', ret);
+    return ret;
+};

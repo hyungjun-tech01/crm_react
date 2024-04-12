@@ -6,6 +6,7 @@ import { atomCurrentQuotation, defaultQuotation } from "../../atoms/atoms";
 import NotoSansRegular from "../../fonts/NotoSansKR-Regular.ttf";
 import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";
+import { ConverTextAmount } from '../../constants/functions';
 
 const ConvStrNumToKor = (digit) => {
     switch(digit)
@@ -76,28 +77,6 @@ const ConvertKoreanAmount = (amount) => {
         ret = temp_ret + ret;
     };
     // console.log('\t[ ConvertKoreanAmount ] output : ', ret);
-    return ret;
-};
-
-const ConverTextAmount = (amount) => {
-    let input = null;
-    if(typeof amount === 'number'){
-        input = amount;
-    } else if(typeof amount === 'string')
-    {
-        input = amount.toString();
-    };
-    
-    let ret = "";
-    for(let i = input.length - 1, m = 0; i >= 0; i--, m++)
-    {
-        let temp_ret = input.at(i);
-        if(m !==0 && m % 3 === 0){
-            temp_ret += ",";
-        };
-        ret = temp_ret + ret;
-    };
-    // console.log('\t[ ConverTextAmount ] output : ', ret);
     return ret;
 };
 
