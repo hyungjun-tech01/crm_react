@@ -19,7 +19,7 @@ const Leads = () => {
   const allCompnayData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
   const filteredLead = useRecoilValue(atomFilteredLead);
-  const { loadAllCompanies } = useRecoilValue(CompanyRepo);
+  const { loadAllCompanies , setCurrentCompany} = useRecoilValue(CompanyRepo);
   const { loadAllLeads, modifyLead, setCurrentLead, filterLeads } = useRecoilValue(LeadRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName",  "myLationCrmUserId",]);
 
@@ -116,6 +116,7 @@ const Leads = () => {
             onClick={()=>{
               console.log("[Lead] set current lead : ", record.lead_code);
               setCurrentLead(record.lead_code);
+              setCurrentCompany(record.company_code);
           }}>
             {text}
           </a>
