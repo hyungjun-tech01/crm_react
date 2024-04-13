@@ -329,7 +329,7 @@ const QuotationsDetailsModel = () => {
                             to="#quotation-pdf-view"
                             data-bs-toggle="tab"
                           >
-                            PDF View
+                            View
                           </Link>
                         </li>
                       </ul>
