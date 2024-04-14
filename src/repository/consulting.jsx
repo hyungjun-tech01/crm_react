@@ -1,6 +1,6 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentConsulting, atomAllConsultings, defaultConsulting } from '../atoms/atoms';
+import { atomCurrentConsulting, atomAllConsultings, defaultConsulting, atomCompanyConsultings } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
@@ -29,6 +29,28 @@ export const ConsultingRepo = selector({
                     return;
                 }
                 set(atomAllConsultings, data);
+            }
+            catch(err){
+                console.error(`loadAllCompanies / Error : ${err}`);
+            };
+        });
+        const loadCompanyConsultings = getCallback(({set}) => async (company_code) => {
+            const input_json = {company_code:company_code};
+            //JSON.stringify(company_code);
+            try{
+                const response = await fetch(`${BASE_PATH}/companyConsultings`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify(input_json),
+                });
+
+                const data = await response.json();
+                if(data.message){
+                    console.log('loadCompanyConsultings message:', data.message);
+                    set(atomCompanyConsultings, input_json);
+                    return;
+                }
+                set(atomCompanyConsultings, data);
             }
             catch(err){
                 console.error(`loadAllCompanies / Error : ${err}`);
@@ -115,6 +137,7 @@ export const ConsultingRepo = selector({
             loadAllConsultings,
             modifyConsulting,
             setCurrentConsulting,
+            loadCompanyConsultings,
         };
     }
 });

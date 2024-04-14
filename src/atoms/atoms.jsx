@@ -141,6 +141,11 @@ export const atomAllConsultings = atom({
     default: [],
 });
 
+export const atomCompanyConsultings = atom({
+    key: "companyConsultings",
+    default: [],
+});
+
 //----- Quotations ------------------------
 export const defaultQuotation = {
     //-----Quotation Main info -----------------

@@ -10,6 +10,7 @@ import "../antdstyle.css";
 import LeadsDetailsModel from "./LeadsDetailsModel";
 import { BiUser } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
+import {ConsultingRepo} from "../../repository/consulting"
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { atomAllCompanies, atomAllLeads, atomFilteredLead, defaultLead } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
@@ -20,6 +21,7 @@ const Leads = () => {
   const allLeadData = useRecoilValue(atomAllLeads);
   const filteredLead = useRecoilValue(atomFilteredLead);
   const { loadAllCompanies , setCurrentCompany} = useRecoilValue(CompanyRepo);
+  const { loadCompanyConsultings} = useRecoilValue(ConsultingRepo);
   const { loadAllLeads, modifyLead, setCurrentLead, filterLeads } = useRecoilValue(LeadRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName",  "myLationCrmUserId",]);
 
@@ -116,7 +118,8 @@ const Leads = () => {
             onClick={()=>{
               console.log("[Lead] set current lead : ", record.lead_code);
               setCurrentLead(record.lead_code);
-              setCurrentCompany(record.company_code);
+              setCurrentCompany(record.company_code);   // 현재 company 세팅 
+              loadCompanyConsultings(record.company_code);  // 현재 company에 해당하는 consulting 조회 
           }}>
             {text}
           </a>

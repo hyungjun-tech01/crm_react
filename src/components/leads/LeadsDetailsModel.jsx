@@ -4,7 +4,7 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { CircleImg, SystemUser } from "../imagepath";
 import { Collapse } from "antd";
-import { atomCurrentLead, defaultLead, atomCurrentCompany, defaultCompany } from "../../atoms/atoms";
+import { atomCurrentLead, defaultLead, atomCurrentCompany, defaultCompany, atomCompanyConsultings } from "../../atoms/atoms";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { CompanyRepo} from "../../repository/company";
 import DetailLabelItem from "../../constants/DetailLabelItem";
@@ -19,6 +19,8 @@ const LeadsDetailsModel = () => {
   const { Panel } = Collapse;
   const selectedLead = useRecoilValue(atomCurrentLead);
   const selectedCompany = useRecoilValue(atomCurrentCompany);
+  const companyConsultings = useRecoilValue(atomCompanyConsultings);
+
   const { modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
   const { modifyCompany } = useRecoilValue(CompanyRepo);
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
@@ -28,6 +30,7 @@ const LeadsDetailsModel = () => {
 
   const [ editedValuesCompany, setEditedValuesCompany ] = useState(null);
   const [ savedValuesCompany, setSavedValuesCompany ] = useState(null);
+  const [activeTab, setActiveTab] = useState(""); // 상태 관리를 위한 useState
 
 
   // --- Funtions for Editing ---------------------------------
@@ -289,7 +292,8 @@ const LeadsDetailsModel = () => {
     console.log('[LeadsDetailsModel] called!');
     setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
     setOrgCloseDate(selectedCompany.closure_date ? new Date(selectedCompany.closure_date) : null);
-    console.log('[Company] set current company : ', selectedLead.company_code);
+
+
     }, [selectedLead, savedValues, selectedCompany.establishment_date, selectedCompany.closure_date]);
 
   return (
@@ -1167,6 +1171,36 @@ const LeadsDetailsModel = () => {
                             </div>
                           </div>
                         </div>
+                        <div className="tab-pane task-related p-0"
+                          id="not-contact-task-consult" >
+                          <table className="table table-striped table-nowrap custom-table mb-0 datatable">
+                            <thead>
+                              <tr>
+                                <th>Type</th>
+                                <th>Date/Time</th>
+                                <th>Status</th>
+                                <th>Receiver</th>
+                                <th className="text-end">Lead Name</th>
+                              </tr>
+                            </thead>
+                            {  companyConsultings.length > 0 &&
+                              <tbody>
+                                { companyConsultings.map(consulting =>
+                                  <tr key={consulting.consulting_code}>
+                                    <td>{consulting.consulting_type}</td>
+                                    <td>{consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
+                                    {consulting.receipt_time === null ? "":consulting.receipt_time }
+                                    </td>
+                                    <td>{consulting.satatus}</td>
+                                    <td>{consulting.receiver}</td>
+                                    <td className="text-end">{consulting.lead_name}</td>
+                                  </tr>
+                                )}
+                              </tbody> 
+                            }
+                          </table>
+                        </div>
+
                         <div
                           className="tab-pane p-0"
                           id="not-contact-task-activity"

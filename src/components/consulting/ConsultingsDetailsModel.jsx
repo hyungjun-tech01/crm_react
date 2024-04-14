@@ -11,6 +11,7 @@ import DetailDateItem from "../../constants/DetailDateItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
 
 
+
 const ConsultingsDetailsModel = () => {
   const { Panel } = Collapse;
   const selectedConsulting = useRecoilValue(atomCurrentConsulting);
@@ -21,6 +22,8 @@ const ConsultingsDetailsModel = () => {
   const [ savedValues, setSavedValues ] = useState(null);
   const [ orgReceiptTime, setOrgReceiptTime ] = useState(new Date());
   const [ receiptTime, setReceiptTime ] = useState(new Date());
+
+
 
   // --- Funtions for Editing ---------------------------------
   const handleCheckEditState = useCallback((name) => {
