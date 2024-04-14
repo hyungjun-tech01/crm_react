@@ -7,6 +7,7 @@ import NotoSansRegular from "../../fonts/NotoSansKR-Regular.ttf";
 import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";
 import { ConverTextAmount } from '../../constants/functions';
+import { TabTwoTone } from '@mui/icons-material';
 
 const ConvStrNumToKor = (digit) => {
     switch(digit)
@@ -96,33 +97,29 @@ const ConvCurrencyMark = (currency) => {
         default:
             return '';
     }
-}
+};
 
-const sw_pro_items = [
-    "Professional",
-    "- SOLIDWORKS Design Software (Part, Assembly, Drawing)",
-    "- Sheetmetal Design Module (판금)",
-    "- Surface Design Module (곡면 모델링)",
-    "- Simulation XPress (단품 구조해석)",
-    "- Flow XPress (유동의 흐름 Viewing)",
-    "- DFM XPress (가공 시 에러 발생 부분 분석)",
-    "- DriveWorks XPress (유사한 제품 시리즈 생성)",
-    "- SOLIDWORKS eDrawings",
-    "- SOLIDWORKS Utilities (데이타 비교)",
-    "- FeatureWorks (작업 이력 생성)",
-    "- 3D 파단도",
-    "- SOLIDWORKS eDrawings Professional",
-    "- SOLIDWORKS Toolbox (라이브러리)",
-    "- PhotoView360 (실사 이미지 제작)",
-    "- Task Scheduler (작업 스케줄러)",
-    "- Design Checker (도면 비교 분석)",
-    "- SOLIDWORKS PDM Standard (설계 데이터 관리 프로그램)",
-    "- TolAnalyst (공차해석)",
-    "- SOLIDWORKS ScadTo3D (3D 스캔data를 3D 파일로 변환)",
-    "- SOLIDWORKS Visualize Standard (Rendering_이미지)",
-    "- CircuitWorks (ECAD 데이타 호환)",
-    "- Costing (제품 원가 계산)",
-];
+const quotation_tables = {
+    '1': 'No',          //|420|,
+    '2': '분류',        //|0|,
+    '3': '제조회사',    //|0|,
+    '4': '모델명',      //|0|,
+    '5': '품목',        //|4215|,
+    '6': '재질',        //|0|,
+    '7': '타입',        //|0|,
+    '8': '색상',        //|0|,
+    '9': '규격',        //|0|,
+    '10': '세부사양',   //|1005|,
+    '11': '단위',       //|0|,
+    '12': '수량',       //|1005|,
+    '13': '소비자가',   //|1020|,
+    '14': '할인%',      //|0|,
+    '15': '견적단가',   //|1305|,
+    '16': '견적금액',   //|1305|,
+    '17': '원가',       //|0|,
+    '18': '이익금액',   //|0|,
+    '19': '비고',       //|0,
+};
 
 const common_items = [
     "#. DX TOOL 제공 : 노드데이타 개발 솔리드웍스 속성편집기(\\2,000,000)",
@@ -232,6 +229,8 @@ Font.register({
 const QuotationView = () => {
     const currentQuotation = useRecoilValue(atomCurrentQuotation);
     const [ quotationContents, setQuotationContents ] = useState([]);
+    const [ quotationTables, setQuotationTables ] = useState([]);
+    const [ showTableHeaders, setShowTableHeaders ] = useState([]);
 
     useEffect(() => {
         console.log('Load QuotationView');
@@ -241,6 +240,35 @@ const QuotationView = () => {
                 console.log('- Contents : ', tempContents);
                 setQuotationContents(tempContents);
             };
+
+            let tableHeaderInfos = [];
+            let tempTableWidths =[];
+            let tempTotalTableWidth = 0;
+            const tempTables = currentQuotation.quotation_table.split('|');
+            const temp_count = Math.floor(tempTables.length / 3);
+            const temp_remain = tempTables.length - temp_count * 3;
+            console.log('- Check : This must be zero : ', temp_remain);
+
+            for(let i=0; i<temp_count; i++)
+            {
+                const tempWidth = Number(tempTables[3*i+2]);
+                if(!isNaN(tempWidth) && tempWidth !== 0 && i !== 10){
+                    tempTableWidths.push(tempWidth);
+                    tempTotalTableWidth += tempWidth;
+                    tableHeaderInfos.push([tempTables.at(3*i), tempTables.at(3*i + 1),'' ]);
+                };
+            };
+            console.log('- Table Widths : ', tempTableWidths);
+            console.log('- Total Table Widths : ', tempTotalTableWidth);
+            console.log('- Total Table Headers : ', tableHeaderInfos);
+            for(let i=0; i<tempTableWidths.length; i++)
+            {
+                const tableWidthPercent = Math.round(tempTableWidths.at(i) / tempTotalTableWidth * 100);
+                const tableInfos = tableHeaderInfos.at(i);
+                tableHeaderInfos[i] = [tableInfos.at(0), tableInfos.at(1), tableWidthPercent.toString()+'%'];
+            };
+            console.log('- Final Table Header : ', tableHeaderInfos);
+            setQuotationTables(tableHeaderInfos);
         }
     }, [currentQuotation]);
 
@@ -343,49 +371,32 @@ const QuotationView = () => {
                                      ({ConvCurrencyMark(currentQuotation.currency)}{ConverTextAmount(currentQuotation.total_quotation_amount)})(VAT별도)
                                 </Text>
                             </View>
-                            <View style={{width:'100%',height:20,margin:0,padding:0,borderBottom:1,borderTop:1,backgroundColor:"#cccccc",flexDirection:'row',flexGrow:0}} fixed>
-                                <View style={{width: 30, margin:0,padding:0,borderRight:1,flexGrow:0}} fixed>
-                                    <Text style={Styles.text} fixed>No</Text>
-                                </View>
-                                <View style={{margin:0,padding:0,borderRight:1,flexGrow:1}} fixed>
-                                    <Text style={Styles.text} fixed>품목</Text>
-                                </View>
-                                <View style={{width: 40, margin:0,padding:0,borderRight:1,flexGrow:0}} fixed>
-                                    <Text style={Styles.text} fixed>수량</Text>
-                                </View>
-                                <View style={{width: 60, margin:0,padding:0,borderRight:1,flexGrow:0}} fixed>
-                                    <Text style={Styles.text} fixed>소비자가</Text>
-                                </View>
-                                <View style={{width: 60, margin:0,padding:0,borderRight:1,flexGrow:0}} fixed>
-                                    <Text style={Styles.text} fixed>견적단가</Text>
-                                </View>
-                                <View style={{width: 60, margin:0,padding:0,flexGrow:0}} fixed>
-                                    <Text style={Styles.text} fixed>견적금액</Text>
-                                </View>
+                            <View break style={{width:'100%',height:20,margin:0,padding:0,borderBottom:1,borderTop:1,backgroundColor:"#cccccc",flexDirection:'row',flexGrow:0}} fixed>
+                                { quotationTables && quotationTables.map((item, index) => 
+                                    index !== (quotationTables.length - 1) ? (
+                                        <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,borderRight:1}} fixed>
+                                            <Text style={Styles.text} fixed>{item.at(1)}</Text>
+                                        </View>
+                                        ) : (
+                                        <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,border:0}} fixed>
+                                            <Text style={Styles.text} fixed>{item.at(1)}</Text>
+                                        </View>)
+                                )}
                             </View>
-                            <View style={{width:'100%',margin:0,padding:0,border:0,justifyContent:'space-between',flexDirection:'column',flexGrow:1}}>
+                            <View style={{width:'100%',margin:0,padding:0,border:0,justifyContent:'flex-start',flexDirection:'column',flexGrow:1}}>
                                 { quotationContents.map((content, index) => 
                                     <View key={index} style={{width:'100%',margin:0,padding:0,border:0,flexDirection:'row',flexGrow: 1}}>
-                                        <View style={{width: 30, margin:0,padding:0,borderRight:1,flexGrow:0}}>
-                                            <Text style={Styles.text}>{index + 1}</Text>
-                                        </View>
-                                        <View style={{margin:0,padding:0,borderRight:1,flexGrow:1}}>
-                                            <Text style={Styles.text}>{content["5"]}</Text>
-                                            { content["5"] && content["5"].includes("Professional") &&
-                                                sw_pro_items.map((item, index) => <Text key={index} style={Styles.textComment}>{item}</Text>)}
-                                        </View>
-                                        <View style={{width: 40,margin:0,padding:0,borderRight:1,flexGrow:0}}>
-                                            <Text style={Styles.text}>{}</Text>
-                                        </View>
-                                        <View style={{width: 60,margin:0,padding:0,borderRight:1,flexGrow:0}}>
-                                            <Text style={Styles.text}>{}</Text>
-                                        </View>
-                                        <View style={{width: 60,margin:0,padding:0,borderRight:1,flexGrow:0}}>
-                                            <Text style={Styles.textBold}>{content["18"]}</Text>
-                                        </View>
-                                        <View style={{width: 60,margin:0,padding:0,flexGrow:0}}>
-                                            <Text style={Styles.textBold}>{content["18"]}</Text>
-                                        </View>
+                                        { quotationTables && quotationTables.map((item, index) => 
+                                            index !== (quotationTables.length - 1) ? (
+                                                <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,borderRight:1}} fixed>
+                                                    { content[item.at(0)] && <Text style={Styles.text} fixed>{content[item.at(0)]}</Text>}
+                                                    { item.at(0) === '5' && content['998'] && <Text style={Styles.textComment} >{content["998"]}</Text>}
+                                                </View>
+                                                ) : (
+                                                <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,border:0}} fixed>
+                                                    { content[item.at(0)] && <Text style={Styles.text} fixed>{content[item.at(0)]}</Text>}
+                                                </View>)
+                                        )}
                                     </View>
                                 )}
                                 {false && <View style={{width:'100%',margin:0,padding:0,borderBottom:1,flexDirection:'row',alignItems:'stretch',alignContent:'start'}}>
