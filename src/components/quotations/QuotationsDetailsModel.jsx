@@ -346,6 +346,15 @@ const QuotationsDetailsModel = () => {
                         <li className="nav-item">
                           <Link
                             className="nav-link"
+                            to="#quotation-products"
+                            data-bs-toggle="tab"
+                          >
+                            Product Lists
+                          </Link>
+                        </li>
+                        <li className="nav-item">
+                          <Link
+                            className="nav-link"
                             to="#quotation-pdf-view"
                             data-bs-toggle="tab"
                           >
@@ -488,8 +497,32 @@ const QuotationsDetailsModel = () => {
                                       <DetailLabelItem
                                         data_set={selectedQuotation}
                                         saved={savedValues}
+                                        name="sales_representati"
+                                        title="Sales Representative"
+                                        no_border={true}
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                    </tbody>
+                                  </table>
+                                </Panel>
+                              </Collapse>
+                            </div>
+                            <div className="tasks__item crms-task-item">
+                              <Collapse accordion expandIconPosition="end">
+                                <Panel header="Quotation Price Information" key="1">
+                                  <table className="table">
+                                    <tbody>
+                                      <DetailLabelItem
+                                        data_set={selectedQuotation}
+                                        saved={savedValues}
                                         name="payment_type"
                                         title="Payment Type"
+                                        no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -509,58 +542,6 @@ const QuotationsDetailsModel = () => {
                                         checkSaved={handleCheckSaved}
                                         cancelSaved={handleCancelSaved}
                                       />
-                                      <DetailLabelItem
-                                        data_set={selectedQuotation}
-                                        saved={savedValues}
-                                        name="sales_representati"
-                                        title="Sales Representative"
-                                        no_border={true}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
-                            </div>
-                            <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
-                                <Panel header="Quotation Table Information" key="1">
-                                  { quotationContents.map((content, index1) => 
-                                    <Collapse accordion expandIconPosition="end">
-                                      <Panel header={"No." + content["1"]} key={index1}>
-                                        <table className="table">
-                                          <tbody>
-                                            { content['2'] && 
-                                              <tr key={1}>
-                                                <td className="border-0">분류</td>
-                                                <td className="border-0">{content['2']}</td>
-                                              </tr>
-                                            }
-                                            { quotationHeaders.map((value, index2) => (
-                                              value.at(0) !== "1" && value.at(0) !== "2" && 
-                                                <tr key={index2}>
-                                                  <td>{value.at(1)}</td>
-                                                  <td>{content[value.at(0)]}</td>
-                                                </tr>
-                                            ))}
-                                            { content['998'] && 
-                                              <tr key={998}>
-                                                <td className="border-0">Comment</td>
-                                                <td className="border-0">{content['998']}</td>
-                                              </tr>
-                                            }
-                                          </tbody>
-                                        </table>
-                                      </Panel>
-                                    </Collapse>
-                                  )}
-                                  <table className="table">
-                                    <tbody>
                                       <DetailLabelItem
                                         data_set={selectedQuotation}
                                         saved={savedValues}
@@ -867,13 +848,52 @@ const QuotationsDetailsModel = () => {
                             </div>
                           </div>
                         </div>
-{/*---- End   -- Tab : Detail Quotation-------------------------------------------------------------*/}
-{/*---- Start -- Tab : PDF View - Quotation---------------------------------------------------------*/}
+{/*---- End   -- Tab : Detail Quotation ------------------------------------------------------------*/}
+{/*---- Start -- Tab : Product Lists - Quotation ---------------------------------------------------*/}
+                        <div className="tab-pane task-related p-0" id="quotation-products">
+                          <div className="crms-tasks">
+                            <div className="tasks__item crms-task-item active">
+                            { quotationContents && quotationContents.length > 0 && 
+                                quotationContents.map((content, index1) => 
+                                  <Collapse accordion expandIconPosition="end">
+                                    <Panel header={"No." + content["1"]} key={index1}>
+                                      <table className="table">
+                                        <tbody>
+                                          { content['2'] && 
+                                            <tr key={1}>
+                                              <td className="border-0">분류</td>
+                                              <td className="border-0">{content['2']}</td>
+                                            </tr>
+                                          }
+                                          { quotationHeaders.map((value, index2) => (
+                                            value.at(0) !== "1" && value.at(0) !== "2" && 
+                                              <tr key={index2}>
+                                                <td>{value.at(1)}</td>
+                                                <td>{content[value.at(0)]}</td>
+                                              </tr>
+                                          ))}
+                                          { content['998'] && 
+                                            <tr key={998}>
+                                              <td className="border-0">Comment</td>
+                                              <td className="border-0">{content['998']}</td>
+                                            </tr>
+                                          }
+                                        </tbody>
+                                      </table>
+                                    </Panel>
+                                  </Collapse>
+                                )
+                            }
+                            </div>
+                          </div>
+                        </div>
+{/*---- End   -- Tab : Product Lists - Quotation ---------------------------------------------------*/}
+{/*---- Start -- Tab : PDF View - Quotation --------------------------------------------------------*/}
                         <div className="tab-pane task-related p-0" id="quotation-pdf-view">
                           { selectedQuotation !== defaultQuotation &&
                             <QuotationView/>
                           }
-                                </div>
+                        </div>
 {/*---- End   -- Tab : PDF View - Quotation---------------------------------------------------------*/}
                       </div>
                       {savedValues !== null &&
