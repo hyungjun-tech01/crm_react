@@ -1176,6 +1176,34 @@ const LeadsDetailsModel = () => {
                           <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                             <thead>
                               <tr>
+                              <div className="text-start" style={{width:'120px'}}>
+                                <div className="dropdown">
+                                  <a
+                                    className="dropdown-toggle recently-viewed"
+                                    href="#"
+                                    role="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                  >
+                                    Status
+                                  </a>
+                                </div>
+                              </div>
+                                <div className="col text-start" style={{width:'400px'}}>
+                                  <input
+                                        id = "searchCondition"
+                                        className="form-control" 
+                                        type="text"
+                                        placeholder="Lead Name, Receiver" 
+                                        style={{width:'300px', display: 'inline'}}
+
+                                  />  
+                                  {/*  value={searchCondition}
+                                  onChange ={(e) => handleSearchCondition(e.target.value)}
+                                  */}
+                                </div>
+                              </tr>
+                              <tr>
                                 <th>Type</th>
                                 <th>Date/Time</th>
                                 <th>Status</th>
