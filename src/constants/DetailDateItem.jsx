@@ -62,7 +62,7 @@ const DetailDateItem = (props) => {
         <tr>
             <td className={no_border && "border-0"}>{title}</td>
             <td className={no_border && "border-0"}>
-                {(new Date(orgTimeData)).toLocaleDateString('ko-KR', options)}
+                {orgTimeData && orgTimeData !=='' && (new Date(orgTimeData)).toLocaleDateString('ko-KR', options)}
             </td>
             <td className={no_border && "border-0"}>
                 <div onClick={() => { startEdit(name); }}>
