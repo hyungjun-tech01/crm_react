@@ -25,6 +25,9 @@ const QuotationsDetailsModel = () => {
   const [ orgConfirmDate, setOrgConfirmDate ] = useState(null);
   const [ confirmDate, setConfirmDate ] = useState(new Date());
 
+  const [ quotationContents, setQuotationContents ] = useState([]);
+  const [ quotationHeaders, setQuotationHeaders ] = useState([]);
+
   // --- Funtions for Editing ---------------------------------
   const handleCheckEditState = useCallback((name) => {
     return editedValues !== null && name in editedValues;
@@ -180,6 +183,23 @@ const QuotationsDetailsModel = () => {
         ? new Date(selectedQuotation.comfirm_date)
         : null
     );
+    if(selectedQuotation && selectedQuotation !== defaultQuotation)
+    {
+      console.log('- Check :', selectedQuotation.quotation_table);
+      const headerValues = selectedQuotation.quotation_table.split('|');
+      if(headerValues && Array.isArray(headerValues)){
+        let tableHeaders = [];
+        const headerCount = headerValues.length / 3;
+        for(let i=0; i < headerCount; i++){
+          tableHeaders.push([ headerValues.at(3*i), headerValues.at(3*i + 1),headerValues.at(3*i + 2)]);
+        };
+        setQuotationHeaders(tableHeaders);
+      };
+      const tempContents = JSON.parse(selectedQuotation.quotation_contents);
+      if(tempContents && Array.isArray(tempContents)){
+          setQuotationContents(tempContents);
+      };
+    }
   }, [ selectedQuotation, savedValues ]);
 
   return (
@@ -468,32 +488,8 @@ const QuotationsDetailsModel = () => {
                                       <DetailLabelItem
                                         data_set={selectedQuotation}
                                         saved={savedValues}
-                                        name="sales_representati"
-                                        title="Sales Representative"
-                                        no_border={true}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
-                            </div>
-                            <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
-                                <Panel header="Quotation Cost Information" key="1">
-                                  <table className="table">
-                                    <tbody>
-                                      <DetailLabelItem
-                                        data_set={selectedQuotation}
-                                        saved={savedValues}
                                         name="payment_type"
                                         title="Payment Type"
-                                        no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -513,6 +509,58 @@ const QuotationsDetailsModel = () => {
                                         checkSaved={handleCheckSaved}
                                         cancelSaved={handleCancelSaved}
                                       />
+                                      <DetailLabelItem
+                                        data_set={selectedQuotation}
+                                        saved={savedValues}
+                                        name="sales_representati"
+                                        title="Sales Representative"
+                                        no_border={true}
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                    </tbody>
+                                  </table>
+                                </Panel>
+                              </Collapse>
+                            </div>
+                            <div className="tasks__item crms-task-item">
+                              <Collapse accordion expandIconPosition="end">
+                                <Panel header="Quotation Table Information" key="1">
+                                  { quotationContents.map((content, index1) => 
+                                    <Collapse accordion expandIconPosition="end">
+                                      <Panel header={"No." + content["1"]} key={index1}>
+                                        <table className="table">
+                                          <tbody>
+                                            { content['2'] && 
+                                              <tr key={1}>
+                                                <td className="border-0">분류</td>
+                                                <td className="border-0">{content['2']}</td>
+                                              </tr>
+                                            }
+                                            { quotationHeaders.map((value, index2) => (
+                                              value.at(0) !== "1" && value.at(0) !== "2" && 
+                                                <tr key={index2}>
+                                                  <td>{value.at(1)}</td>
+                                                  <td>{content[value.at(0)]}</td>
+                                                </tr>
+                                            ))}
+                                            { content['998'] && 
+                                              <tr key={998}>
+                                                <td className="border-0">Comment</td>
+                                                <td className="border-0">{content['998']}</td>
+                                              </tr>
+                                            }
+                                          </tbody>
+                                        </table>
+                                      </Panel>
+                                    </Collapse>
+                                  )}
+                                  <table className="table">
+                                    <tbody>
                                       <DetailLabelItem
                                         data_set={selectedQuotation}
                                         saved={savedValues}
