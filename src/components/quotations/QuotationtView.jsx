@@ -7,7 +7,6 @@ import NotoSansRegular from "../../fonts/NotoSansKR-Regular.ttf";
 import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";
 import { ConverTextAmount } from '../../constants/functions';
-import { TabTwoTone } from '@mui/icons-material';
 
 const ConvStrNumToKor = (digit) => {
     switch(digit)
@@ -99,6 +98,17 @@ const ConvCurrencyMark = (currency) => {
     }
 };
 
+const ConvertComment = (comment) => {
+    const splitted = comment.split('\r\n');
+    return (
+        <>
+            { splitted.map((value, index) => 
+                <Text key={index} style={Styles.textComment} >{value}</Text>
+            )}
+        </>
+    );
+};
+
 const quotation_tables = {
     '1': 'No',          //|420|,
     '2': '분류',        //|0|,
@@ -184,34 +194,27 @@ const Styles = StyleSheet.create({
     },
     supplierRow:{
         margin: 0,
-        paddingVertical: 3,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'start',
-    },
-    supplierRow2:{
-        height: 50,
-        margin: 0,
-        paddingVertical: 3,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'start',
     },
     supplierSubject:{
         width: 75,
+        height: '100%',
         margin: 0,
         paddingLeft: 5,
         borderRight: 1,
     },
     supplierContent:{
         width: '100%',
+        height: '100%',
         margin:0,
         paddingLeft: 5,
         border: 0,
     },
     supplierText:{
         margin: 0,
-        padding: 0,
+        paddingTop: 2,
         fontSize: 10,
         fontFamily: 'Noto Sans',
     },
@@ -230,44 +233,46 @@ const QuotationView = () => {
     const currentQuotation = useRecoilValue(atomCurrentQuotation);
     const [ quotationContents, setQuotationContents ] = useState([]);
     const [ quotationTables, setQuotationTables ] = useState([]);
-    const [ showTableHeaders, setShowTableHeaders ] = useState([]);
 
     useEffect(() => {
         console.log('Load QuotationView');
         if(currentQuotation && currentQuotation !== defaultQuotation){
             const tempContents = JSON.parse(currentQuotation.quotation_contents);
             if(tempContents && Array.isArray(tempContents)){
-                console.log('- Contents : ', tempContents);
                 setQuotationContents(tempContents);
             };
 
             let tableHeaderInfos = [];
-            let tempTableWidths =[];
+            let tempHeaderIndices = [];
+            let tempTableWidthObject = {};
             let tempTotalTableWidth = 0;
             const tempTables = currentQuotation.quotation_table.split('|');
             const temp_count = Math.floor(tempTables.length / 3);
-            const temp_remain = tempTables.length - temp_count * 3;
-            console.log('- Check : This must be zero : ', temp_remain);
-
             for(let i=0; i<temp_count; i++)
             {
                 const tempWidth = Number(tempTables[3*i+2]);
-                if(!isNaN(tempWidth) && tempWidth !== 0 && i !== 10){
-                    tempTableWidths.push(tempWidth);
+                if(!isNaN(tempWidth) && tempWidth !== 0){
                     tempTotalTableWidth += tempWidth;
-                    tableHeaderInfos.push([tempTables.at(3*i), tempTables.at(3*i + 1),'' ]);
+                    tempHeaderIndices.push(tempTables[3*i]);
+                    tempTableWidthObject[tempTables[3*i]] = [tempTables[3*i+1], tempWidth];
                 };
             };
-            console.log('- Table Widths : ', tempTableWidths);
-            console.log('- Total Table Widths : ', tempTotalTableWidth);
-            console.log('- Total Table Headers : ', tableHeaderInfos);
-            for(let i=0; i<tempTableWidths.length; i++)
-            {
-                const tableWidthPercent = Math.round(tempTableWidths.at(i) / tempTotalTableWidth * 100);
-                const tableInfos = tableHeaderInfos.at(i);
-                tableHeaderInfos[i] = [tableInfos.at(0), tableInfos.at(1), tableWidthPercent.toString()+'%'];
-            };
-            console.log('- Final Table Header : ', tableHeaderInfos);
+            tempHeaderIndices.forEach(index => {
+                if(index === '10') return;
+
+                const tempObject = tempTableWidthObject[index];
+                let tableWidthPercent = 0;
+                if(index === '5') {
+                    const tempObject10 = tempTableWidthObject['10'];
+                    if(tempObject10) {
+                        tableWidthPercent = Math.round((
+                            tempObject.at(1) + tempObject10.at(1)) / tempTotalTableWidth * 100);
+                    };
+                } else {
+                    tableWidthPercent = Math.round(tempObject.at(1) / tempTotalTableWidth * 100);
+                }
+                tableHeaderInfos.push([index, tempObject.at(0), tableWidthPercent.toString()+'%']);
+            });
             setQuotationTables(tableHeaderInfos);
         }
     }, [currentQuotation]);
@@ -288,22 +293,22 @@ const QuotationView = () => {
                     <Text style={{fontSize: 16,textAlign: 'left',textDecoration: 'underline',marginLeft: 20,marginBottom: 10,fontFamily: 'Noto Sans'}}>
                         {currentQuotation.company_name} 귀중
                     </Text>
-                    <View style={{marginBottom: 20, padding: 0, flexDirection: 'row'}}>
-                        <View style={{margin: 0, padding: 5, width:'50%'}}>
+                    <View style={{marginBottom: 20,padding:0,flexDirection:'row',flexGrow:0}}>
+                        <View style={{width:'50%',margin:0,padding:5}}>
                             <Text style={Styles.text}>받으실 분:  {currentQuotation.department} {currentQuotation.lead_name} {currentQuotation.position}</Text>
                             <Text style={Styles.text}>견적 일자:  {new Date(currentQuotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day:'numeric'})}</Text>
                             <Text style={Styles.text}>지불 조건:  {currentQuotation.payment_type}</Text>
                             <Text style={Styles.text}>납품 기간:  {currentQuotation.delivery_period}</Text>
                             <Text style={Styles.text}>유효 기간:  {currentQuotation.quotation_expiration_date}</Text>
                         </View>
-                        <View style={{width:'50%',margin:0,padding:0, border:1,flexDirection: 'row'}}>
+                        <View style={{width:'50%',margin:0,padding:0,border:1,flexDirection: 'row'}}>
                             <View style={{width:20,margin:0,backgroundColor:'#cccccc',borderRight:1,flexDirection:'column',alignItems:'center',justifyContent:'space-around'}}>
                                 <Text style={Styles.text}>공</Text>
                                 <Text style={Styles.text}>급</Text>
                                 <Text style={Styles.text}>자</Text>
                             </View>
                             <View style={{margin:0,border:0,flexDirection:'column'}}>
-                                <View style={[Styles.supplierRow,{height:25,borderBottom:1}]}>
+                                <View style={[Styles.supplierRow,{height:20,borderBottom:1}]}>
                                     <View style={Styles.supplierSubject}>
                                         <Text style={Styles.supplierText}>등록번호</Text>
                                     </View>
@@ -311,7 +316,7 @@ const QuotationView = () => {
                                         <Text style={Styles.supplierText}>106-86-26016</Text>
                                     </View>
                                 </View>
-                                <View style={[Styles.supplierRow,{height:25,borderBottom:1}]}>
+                                <View style={[Styles.supplierRow,{height:20,borderBottom:1}]}>
                                     <View style={Styles.supplierSubject}>
                                         <Text style={Styles.supplierText}>상호</Text>
                                     </View>
@@ -319,7 +324,7 @@ const QuotationView = () => {
                                         <Text style={Styles.supplierText}>노드데이타</Text>
                                     </View>
                                 </View>
-                                <View style={[Styles.supplierRow,{height:25,borderBottom:1}]}>
+                                <View style={[Styles.supplierRow,{height:20,borderBottom:1}]}>
                                     <View style={Styles.supplierSubject}>
                                         <Text style={Styles.supplierText}>대표자명</Text>
                                     </View>
@@ -327,23 +332,23 @@ const QuotationView = () => {
                                         <Text style={Styles.supplierText}>김신일</Text>
                                     </View>
                                 </View>
-                                <View style={[Styles.supplierRow,{height:50,borderBottom:1}]}>
-                                    <View style={[Styles.supplierSubject,{height:'100%'}]}>
+                                <View style={[Styles.supplierRow,{height:36,borderBottom:1}]}>
+                                    <View style={Styles.supplierSubject}>
                                         <Text style={Styles.supplierText}>주소</Text>
                                     </View>
                                     <View style={Styles.supplierContent}>
                                         <Text style={Styles.supplierText}>서울특별시 금천구 가산디지털 1로 128 1811 (STX V-Tower)</Text>
                                     </View>
                                 </View>
-                                <View style={[Styles.supplierRow,{height:50,borderBottom:1}]}>
-                                    <View style={[Styles.supplierSubject,{height:'100%'}]}>
+                                <View style={[Styles.supplierRow,{height:36,borderBottom:1}]}>
+                                    <View style={Styles.supplierSubject}>
                                         <Text style={Styles.supplierText}>업태/종목</Text>
                                     </View>
                                     <View style={Styles.supplierContent}>
                                         <Text style={Styles.supplierText}>도소매서비스/컴퓨터및주변기기,S/W개발,공급,자문</Text>
                                     </View>
                                 </View>
-                                <View style={[Styles.supplierRow,{borderBottom:1}]}>
+                                <View style={[Styles.supplierRow,{height:20,borderBottom:1}]}>
                                     <View style={Styles.supplierSubject}>
                                         <Text style={Styles.supplierText}>회사전화</Text>
                                     </View>
@@ -351,7 +356,7 @@ const QuotationView = () => {
                                         <Text style={Styles.supplierText}>02-595-4450 / 051-517-4450</Text>
                                     </View>
                                 </View>
-                                <View style={[Styles.supplierRow,{border:0}]}>
+                                <View style={[Styles.supplierRow,{height:20,border:0}]}>
                                     <View style={Styles.supplierSubject}>
                                         <Text style={Styles.supplierText}>회사팩스</Text>
                                     </View>
@@ -362,44 +367,44 @@ const QuotationView = () => {
                             </View>
                         </View>
                     </View>
-                    <View style={{margin: 0, padding: 0}}>
+                    <View style={{margin: 0,padding: 0,flexDirection:'column',flexGrow:1}}>
                         <Text style={Styles.text}>{currentQuotation.upper_memo}</Text>
-                        <View style={{width: '100%',height: '100%',margin: 0,padding: 0,border: 1, flexDirection: 'column'}}>
-                            <View style={{width:'100%',height:20,margin:0,padding:1, border: 0,flexGrow:0}}>
-                                <Text style={Styles.textBold}>
-                                     견적합계: 일금{ConvertKoreanAmount(currentQuotation.total_quotation_amount)}원정
-                                     ({ConvCurrencyMark(currentQuotation.currency)}{ConverTextAmount(currentQuotation.total_quotation_amount)})(VAT별도)
-                                </Text>
-                            </View>
-                            <View break style={{width:'100%',height:20,margin:0,padding:0,borderBottom:1,borderTop:1,backgroundColor:"#cccccc",flexDirection:'row',flexGrow:0}} fixed>
+                        <View style={{width:'100%',height:20,margin:0,padding:1,borderTop:1,borderLeft:1,borderRight:1,flexGrow:0}}>
+                            <Text style={Styles.textBold}>
+                                    견적합계: 일금{ConvertKoreanAmount(currentQuotation.total_quotation_amount)}원정
+                                    ({ConvCurrencyMark(currentQuotation.currency)}{ConverTextAmount(currentQuotation.total_quotation_amount)})(VAT별도)
+                            </Text>
+                        </View>
+                        <View style={{width:'100%',margin:0,padding:0,borderLeft:1,borderRight:1,borderBottom:1,flexDirection:'column'}}>
+                            <View style={{width:'100%',height:20,margin:0,padding:0,borderBottom:1,borderTop:1,backgroundColor:"#cccccc",flexDirection:'row',flexGrow:0}} fixed>
                                 { quotationTables && quotationTables.map((item, index) => 
                                     index !== (quotationTables.length - 1) ? (
                                         <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,borderRight:1}} fixed>
-                                            <Text style={Styles.text} fixed>{item.at(1)}</Text>
+                                            <Text style={Styles.text}>{item.at(1)}</Text>
                                         </View>
                                         ) : (
                                         <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,border:0}} fixed>
-                                            <Text style={Styles.text} fixed>{item.at(1)}</Text>
+                                            <Text style={Styles.text}>{item.at(1)}</Text>
                                         </View>)
                                 )}
                             </View>
                             <View style={{width:'100%',margin:0,padding:0,border:0,justifyContent:'flex-start',flexDirection:'column',flexGrow:1}}>
                                 { quotationContents.map((content, index) => 
-                                    <View key={index} style={{width:'100%',margin:0,padding:0,border:0,flexDirection:'row',flexGrow: 1}}>
+                                    <View key={index} wrap={false} style={{width:'100%',margin:0,padding:0,border:0,flexDirection:'row',flexGrow: 1}}>
                                         { quotationTables && quotationTables.map((item, index) => 
                                             index !== (quotationTables.length - 1) ? (
-                                                <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,borderRight:1}} fixed>
-                                                    { content[item.at(0)] && <Text style={Styles.text} fixed>{content[item.at(0)]}</Text>}
-                                                    { item.at(0) === '5' && content['998'] && <Text style={Styles.textComment} >{content["998"]}</Text>}
+                                                <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,borderRight:1}}>
+                                                    { content[item.at(0)] && <Text style={Styles.text}>{content[item.at(0)]}</Text>}
+                                                    { item.at(0) === '5' && content['998'] && ConvertComment(content['998'])}
                                                 </View>
                                                 ) : (
-                                                <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,border:0}} fixed>
-                                                    { content[item.at(0)] && <Text style={Styles.text} fixed>{content[item.at(0)]}</Text>}
+                                                <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,border:0}}>
+                                                    { content[item.at(0)] && <Text style={Styles.text}>{content[item.at(0)]}</Text>}
                                                 </View>)
                                         )}
                                     </View>
                                 )}
-                                {false && <View style={{width:'100%',margin:0,padding:0,borderBottom:1,flexDirection:'row',alignItems:'stretch',alignContent:'start'}}>
+                                { false && <View style={{width:'100%',margin:0,padding:0,borderBottom:1,flexDirection:'row',alignItems:'stretch',alignContent:'start'}}>
                                         <View style={{width: 30, height:'100%',margin:0,padding:0,borderRight:1,flexGrow:0}}>
                                             <Text style={Styles.text}>{}</Text>
                                         </View>
@@ -447,14 +452,23 @@ const QuotationView = () => {
                             </View>
                             <View style={{width:'100%',height:40,margin:0,padding:0,borderTop:1,flexDirection:'row',flexGrow:0}}>
                                 <View style={{height:'100%',margin:0,padding:0,borderRight:1,flexGrow:1}}>
-                                <Text style={Styles.text}>{}</Text>
+                                    <Text style={Styles.text}>{}</Text>
                                 </View>
-                                <View style={{width: 120, height:'100%',margin:0,padding:0,borderRight:1,flexGrow:0, backgroundColor: '#aaaaaa'}}>
-                                    <Text style={Styles.text}>견적합계</Text>
-                                </View>
-                                <View style={{width: 60, height:'100%',margin:0,padding:0,flexGrow:0}}>
-                                    <Text style={Styles.text}>{ConverTextAmount(currentQuotation.total_quotation_amount)}</Text>
-                                </View>
+                                { quotationTables && quotationTables.map((item, index) => 
+                                    { if(index === (quotationTables.length - 2))
+                                        return (
+                                            <View key={item.at(0)} style={{width: item.at(2),height:'100%',margin:0,padding:0,borderRight:1,flexGrow:0, backgroundColor: '#aaaaaa'}} >
+                                                <Text style={Styles.text}>견적합계</Text>
+                                            </View>
+                                        );
+                                     if(index === (quotationTables.length - 1))
+                                        return (
+                                            <View key={item.at(0)} style={{width: item.at(2),height:'100%',margin:0,padding:0,flexGrow:0}} >
+                                                <Text style={Styles.text}>{ConverTextAmount(currentQuotation.total_quotation_amount)}</Text>
+                                            </View>
+                                        )
+                                    }
+                                )}
                             </View>
                         </View>
                     </View>
