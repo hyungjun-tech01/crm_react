@@ -882,8 +882,7 @@ const QuotationsDetailsModel = () => {
                                       </table>
                                     </Panel>
                                   </Collapse>
-                                )
-                            }
+                            )}
                             </div>
                           </div>
                         </div>
@@ -896,7 +895,7 @@ const QuotationsDetailsModel = () => {
                         </div>
 {/*---- End   -- Tab : PDF View - Quotation---------------------------------------------------------*/}
                       </div>
-                      {savedValues !== null &&
+                      { savedValues !== null &&
                         Object.keys(savedValues).length !== 0 && (
                           <div className="text-center py-3">
                             <button
