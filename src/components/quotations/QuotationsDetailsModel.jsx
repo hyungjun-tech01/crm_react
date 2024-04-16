@@ -367,7 +367,7 @@ const QuotationsDetailsModel = () => {
                         <div className="tab-pane show active p-0" id="quotation-details">
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header="Quotation Main Information" key="1">
                                   <table className="table">
                                     <tbody>
