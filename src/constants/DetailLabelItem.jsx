@@ -2,7 +2,7 @@ import React from 'react';
 import { Cancel, Edit, SaveAlt } from '@mui/icons-material';
 
 const DetailLabelItem = (props) => {
-    const { data_set, saved, name, title, type, no_border,
+    const { defaultText, saved, name, title, type, no_border,
         checkEdit, startEdit, endEdit, editing, checkSaved, cancelSaved } = props;
 
     if(checkEdit && checkEdit(name)) {
@@ -14,7 +14,7 @@ const DetailLabelItem = (props) => {
                         type={type ? type : "text"}
                         placeholder={title}
                         name={name}
-                        defaultValue={data_set[name]}
+                        defaultValue={defaultText}
                         onChange={editing}
                     />
                 </td>
@@ -46,7 +46,7 @@ const DetailLabelItem = (props) => {
         <tr>
             <td className={no_border && "border-0"}>{title}</td>
             <td className={no_border && "border-0"}>
-                {data_set[name]}
+                {defaultText}
             </td>
             <td className={no_border && "border-0"}>
                 <div onClick={() => { startEdit(name); }}>

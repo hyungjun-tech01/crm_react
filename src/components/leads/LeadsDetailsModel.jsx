@@ -554,7 +554,7 @@ const LeadsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedLead}
+                                        defaultText={selectedLead.lead_name}
                                         saved={savedValues}
                                         name="lead_name"
                                         title="Name"
@@ -567,7 +567,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedLead}
+                                        defaultText={selectedLead.position}
                                         saved={savedValues}
                                         name="position"
                                         title="Title"
@@ -579,7 +579,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedLead}
+                                        defaultText={selectedLead.department}
                                         saved={savedValues}
                                         name="department"
                                         title="Department"
@@ -591,7 +591,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedLead}
+                                        defaultText={selectedLead.company_name}
                                         saved={savedValues}
                                         name="company_name"
                                         title="Organization"
@@ -603,7 +603,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailSelectItem
-                                        data_set={selectedLead}
+                                        defaultText={selectedLead.is_keyman}
                                         saved={savedValues}
                                         name="is_keyman"
                                         title="Key Man"
@@ -615,7 +615,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedLead}
+                                        defaultText={selectedLead.group_}
                                         saved={savedValues}
                                         name="group_"
                                         title="Group"
@@ -627,7 +627,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedLead}
+                                        defaultText={selectedLead.region}
                                         saved={savedValues}
                                         name="region"
                                         title="Region"
@@ -639,7 +639,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedLead}
+                                        defaultText={selectedLead.sales_resource}
                                         saved={savedValues}
                                         name="sales_resource"
                                         title="Sales Resource"
@@ -651,7 +651,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedLead}
+                                        defaultText={selectedLead.application_engineer}
                                         saved={savedValues}
                                         name="application_engineer"
                                         title="Application Engineer"
@@ -679,7 +679,7 @@ const LeadsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedLead}
+                                        defaultText={selectedLead.email}
                                         saved={savedValues}
                                         name="email"
                                         title="Email"
@@ -692,7 +692,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedLead}
+                                        defaultText={selectedLead.mobile_number}
                                         saved={savedValues}
                                         name="mobile_number"
                                         title="Mobile"
@@ -704,7 +704,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedLead}
+                                        defaultText={selectedLead.company_phone_number}
                                         saved={savedValues}
                                         name="company_phone_number"
                                         title="Phone"
@@ -716,7 +716,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedLead}
+                                        defaultText={selectedLead.company_fax_number}
                                         saved={savedValues}
                                         name="company_fax_number"
                                         title="Fax"
@@ -728,7 +728,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedLead}
+                                        defaultText={selectedLead.homepage}
                                         saved={savedValues}
                                         name="homepage"
                                         title="Website"
@@ -751,7 +751,7 @@ const LeadsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedLead}
+                                        defaultText={selectedLead.company_address}
                                         saved={savedValues}
                                         name="company_address"
                                         title="Address"
@@ -764,7 +764,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedLead}
+                                        defaultText={selectedLead.company_zip_code}
                                         saved={savedValues}
                                         name="company_zip_code"
                                         title="Postal Code"
@@ -787,7 +787,7 @@ const LeadsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailTextareaItem
-                                        data_set={selectedLead}
+                                        defaultText={selectedLead.status}
                                         saved={savedValues}
                                         name="status"
                                         title="Status"
@@ -817,7 +817,7 @@ const LeadsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.company_name}
                                         saved={savedValuesCompany}
                                         name="company_name"
                                         title="Name"
@@ -830,7 +830,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.company_name_eng}
                                         saved={savedValuesCompany}
                                         name="company_name_eng"
                                         title="English Name"
@@ -852,7 +852,7 @@ const LeadsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.group_}
                                         saved={savedValuesCompany}
                                         name="group_"
                                         title="Group"
@@ -865,7 +865,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.company_scale}
                                         saved={savedValuesCompany}
                                         name="company_scale"
                                         title="Company Scale"
@@ -877,7 +877,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.deal_type}
                                         saved={savedValuesCompany}
                                         name="deal_type"
                                         title="Deal Type"
@@ -889,7 +889,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.business_registration_code}
                                         saved={savedValuesCompany}
                                         name="business_registration_code"
                                         title="Business Registration Code"
@@ -928,7 +928,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.ceo_name}
                                         saved={savedValuesCompany}
                                         name="ceo_name"
                                         title="Ceo Name"
@@ -940,7 +940,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.business_type}
                                         saved={savedValuesCompany}
                                         name="business_type"
                                         title="Business Type"
@@ -952,7 +952,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.business_item}
                                         saved={savedValuesCompany}
                                         name="business_item"
                                         title="Business Item"
@@ -964,7 +964,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.industry_type}
                                         saved={savedValuesCompany}
                                         name="industry_type"
                                         title="Industry Type"
@@ -986,7 +986,7 @@ const LeadsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.company_phone_number}
                                         saved={savedValuesCompany}
                                         name="company_phone_number"
                                         title="Phone"
@@ -999,7 +999,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.company_fax_number}
                                         saved={savedValuesCompany}
                                         name="company_fax_number"
                                         title="Fax"
@@ -1011,7 +1011,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.homepage}
                                         saved={savedValuesCompany}
                                         name="homepage"
                                         title="Website"
@@ -1033,7 +1033,7 @@ const LeadsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.company_address}
                                         saved={savedValuesCompany}
                                         name="company_address"
                                         title="Address"
@@ -1046,7 +1046,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.company_zip_code}
                                         saved={savedValuesCompany}
                                         name="company_zip_code"
                                         title="Postal code"
@@ -1068,7 +1068,7 @@ const LeadsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.account_code}
                                         saved={savedValuesCompany}
                                         name="account_code"
                                         title="Account Code"
@@ -1081,7 +1081,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.bank_name}
                                         saved={savedValuesCompany}
                                         name="bank_name"
                                         title="Bank Name"
@@ -1093,7 +1093,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.account_owner}
                                         saved={savedValuesCompany}
                                         name="account_owner"
                                         title="Account Owner"
@@ -1105,7 +1105,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.sales_resource}
                                         saved={savedValuesCompany}
                                         name="sales_resource"
                                         title="Sales Resource"
@@ -1117,7 +1117,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.application_engineer}
                                         saved={savedValuesCompany}
                                         name="application_engineer"
                                         title="Application Engineer"
@@ -1129,7 +1129,7 @@ const LeadsDetailsModel = () => {
                                         cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.region}
                                         saved={savedValuesCompany}
                                         name="region"
                                         title="Region"
@@ -1151,7 +1151,7 @@ const LeadsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailTextareaItem
-                                        data_set={selectedCompany}
+                                        defaultText={selectedCompany.memo}
                                         saved={savedValuesCompany}
                                         name="memo"
                                         title="Memo"

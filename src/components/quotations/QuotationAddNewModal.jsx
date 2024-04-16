@@ -7,6 +7,7 @@ import "antd/dist/reset.css";
 import "../antdstyle.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { AddCircle, RemoveCircle } from '@mui/icons-material';
 
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
@@ -14,27 +15,47 @@ import { QuotationRepo, QuotationSendTypes } from "../../repository/quotation";
 import { atomAllCompanies, atomAllQuotations, atomAllLeads, defaultQuotation } from "../../atoms/atoms";
 import { formateDate } from "../../constants/functions";
 
-const quotation_type = ["FAX", "EMAIL"];
+const quotation_type = ["견적서", "발주서"];
+const quotation_send_type = ["FAX", "EMAIL"];
 const default_quotation_headers = [
-  ['1', 'No', 0],
-  ['2', '분류', 0],
-  ['3', '제조회사', 0],
-  ['4', '모델명', 0],
-  ['5', '품목', 0],
-  ['6', '재질', 0],
-  ['7', '타입', 0],
-  ['8', '색상', 0],
-  ['9', '규격', 0],
-  ['10', '세부사양', 0],
-  ['11', '단위', 0],
-  ['12', '수량', 0],
-  ['13', '소비자가', 0],
-  ['14', '할인%', 0],
-  ['15', '견적단가', 0],
-  ['16', '견적금액', 0],
-  ['17', '원가', 0],
-  ['18', '이익금액', 0],
-  ['19', '비고', 0],
+  [['1', 'No', 0], ['2', '분류', 0]],
+  [['3', '제조회사', 0], ['4', '모델명', 0]],
+  [['5', '품목', 0], ['6', '재질', 0]],
+  [['7', '타입', 0], ['8', '색상', 0]],
+  [['9', '규격', 0], ['10', '세부사양', 0]],
+  [['11', '단위', 0], ['12', '수량', 0]],
+  [['13', '소비자가', 0], ['14', '할인%', 0]],
+  [['15', '견적단가', 0], ['16', '견적금액', 0]],
+  [['17', '원가', 0], ['18', '이익금액', 0]],
+  [['19', '비고', 0], []],
+];
+const default_quotation_content = {
+  '1': null,'2': null,'3': null,'4': null,'5': null,
+  '6': null,'7': null,'8': null,'9': null,'10': null,
+  '11': null,'12': null,'13': null,'14': null,'15': null,
+  '16': null,'17': null,'18': null,'19': null,'998': null,
+};
+const default_content_array = [
+  ['1', 'No', null],
+  ['2', '분류', null],
+  ['3', '제조회사', null],
+  ['4', '모델명', null],
+  ['5', '품목', null],
+  ['6', '재질', null],
+  ['7', '타입', null],
+  ['8', '색상', null],
+  ['9', '규격', null],
+  ['10', '세부사양', null],
+  ['11', '단위', null],
+  ['12', '수량', null],
+  ['13', '소비자가', null],
+  ['14', '할인%', null],
+  ['15', '견적단가', null],
+  ['16', '견적금액', null],
+  ['17', '원가', null],
+  ['18', '이익금액', null],
+  ['19', '비고', null],
+  ['998', 'Comment', null],
 ];
 
 const common_items = [
@@ -145,6 +166,77 @@ const QuotationAddNewModal = () => {
       //close modal ?
     };
   }, [cookies.myLationCrmUserId, initializeQuotationTemplate, quotationChange, modifyQuotation]);
+
+  const handleAddNewContent = useCallback(() => {
+    const tempContent = {
+      ...default_quotation_content,
+      No: quotationContents.length, 
+    };
+    const tempContents = [
+      ...quotationContents,
+      tempContent,
+    ];
+    setQuotationContents(tempContents);
+  }, [quotationContents]);
+
+  const handleDeleteContent = useCallback((index) => {
+    const tempContents = [
+      ...quotationContents,
+    ];
+    delete tempContents[index];
+    setQuotationContents(tempContents);
+  }, [quotationContents]);
+
+  const CovertContentToCollapseItem = useCallback((contents) => {
+    const tempItems = contents.map((content, index) =>
+      {
+        const indexStr = (index + 1).toString();
+        return {
+          key: indexStr,
+          label: 'Product ' + indexStr,
+          extra: <RemoveCircle onClick={() => handleDeleteContent(index)} />,
+          children: <table className="table">
+                      <tbody>
+                      { default_content_array.map((item, index2) => {
+                        content['1'] = indexStr;
+                        if(index2 === 0 || index2 === default_content_array.length)
+                        {
+                          return (
+                            <tr key={index2}>
+                              <td className="border-0">{item.at(1)}</td>
+                              <td className="border-0" >
+                                  <input
+                                      type="text"
+                                      placeholder={item.at(1)}
+                                      name={content[item.at(0)]}
+                                      onChange={() => {console.log('check')}}
+                                  />
+                              </td>
+                            </tr>
+                          );
+                        };
+                        return (
+                          <tr key={index2}>
+                            <td>{item.at(1)}</td>
+                            <td>
+                                <input
+                                    type="text"
+                                    placeholder={item.at(1)}
+                                    name={content[item.at(0)]}
+                                    onChange={() => {console.log('check')}}
+                                />
+                            </td>
+                          </tr>
+                        );
+                      })
+                    }
+                    </tbody>
+                  </table>
+        }
+      }
+    );
+    return tempItems;
+  }, []);
 
   useEffect(() => {
     // ----- Load companies and set up the relation between lead and company by company code ---
@@ -341,19 +433,30 @@ const QuotationAddNewModal = () => {
                   </div>
                   <h4>Price Table</h4>
                   <div className="tasks__item active">
-                    <Collapse size="small" accordion expandIconPosition="end">
-                      <Panel header="Header Setting" key="1">
+                    <Collapse size="small"  ghost={true} accordion defaultActiveKey="1" expandIconPosition="end">
+                      <Panel header={<b>Header Setting</b>} key="1">
                         <table className="table">
                           <tbody>
                           { quotationHeaders.map((header, index) =>
-                            <tr key={index}>
-                              <td><input key={index} type="checkbox"/></td>
-                              <td>{header.at(1)}</td>
-                              <td>{header.at(2)}</td>
-                            </tr>
+                            (index === 0 || index === quotationHeaders.length-1) ?
+                              <tr key={index}>
+                                <td className="border-0"><input type="checkbox"/> {header[0][1]}</td>
+                                <td className="border-0">{header[0][2]}</td>
+                                <td className="border-0"><input type="checkbox"/> {header[1][1]}</td>
+                                <td className="border-0">{header[1][2]}</td>
+                              </tr> : 
+                              <tr key={index}>
+                                <td><input type="checkbox"/> {header[0][1]}</td>
+                                <td>{header[0][2]}</td>
+                                <td><input type="checkbox"/> {header[1][1]}</td>
+                                <td>{header[1][2]}</td>
+                              </tr>
                           )}
                           </tbody>
                         </table>
+                      </Panel>
+                      <Panel header={<b>Contents</b>} key="2" extra={<AddCircle onClick={handleAddNewContent} />}>
+                        <Collapse size="small" items={CovertContentToCollapseItem(quotationContents)} accordion expandIconPosition="end" />
                       </Panel>
                     </Collapse>
                   </div>

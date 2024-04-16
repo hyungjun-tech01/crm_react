@@ -2,7 +2,7 @@ import React from 'react';
 import { Cancel, Edit, SaveAlt } from '@mui/icons-material';
 
 const DetailTextareaItem = (props) => {
-    const { data_set, saved, name, title, row_no, no_border,
+    const { defaultText, saved, name, title, row_no, no_border,
         checkEdit, startEdit, endEdit, editing, checkSaved, cancelSaved } = props;
 
     if(checkEdit(name)) {
@@ -14,7 +14,7 @@ const DetailTextareaItem = (props) => {
                         className="form-control"
                         rows={row_no}
                         placeholder={title}
-                        defaultValue={data_set[name]}
+                        defaultValue={defaultText}
                         name={name}
                         onChange={editing}
                     />
@@ -47,7 +47,7 @@ const DetailTextareaItem = (props) => {
         <tr>
             <td className={no_border && "border-0"}>{title}</td>
             <td className={no_border && "border-0"}>
-                {data_set[name]}
+                {defaultText}
             </td>
             <td className={no_border && "border-0"}>
                 <div onClick={() => { startEdit(name); }}>

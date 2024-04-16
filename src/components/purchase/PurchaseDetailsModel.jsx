@@ -459,7 +459,7 @@ const PurchaseDetailsModel = () => {
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
-                                  data_set={selectedPurchase}
+                                  defaultText={selectedPurchase.quantity}
                                   saved={savedValues}
                                   name="quantity"
                                   title="Quantity"
@@ -472,7 +472,7 @@ const PurchaseDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedPurchase}
+                                  defaultText={selectedPurchase.price}
                                   saved={savedValues}
                                   name="price"
                                   title="Price"
@@ -484,7 +484,7 @@ const PurchaseDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedPurchase}
+                                  defaultText={selectedPurchase.currency}
                                   saved={savedValues}
                                   name="currency"
                                   title="Currency"
@@ -537,7 +537,7 @@ const PurchaseDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedPurchase}
+                                  defaultText={selectedPurchase.register}
                                   saved={savedValues}
                                   name="register"
                                   title="Register"
@@ -563,7 +563,7 @@ const PurchaseDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedPurchase}
+                                  defaultText={selectedPurchase.regcode}
                                   saved={savedValues}
                                   name="regcode"
                                   title="Registration Code"
@@ -575,7 +575,7 @@ const PurchaseDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailTextareaItem
-                                  data_set={selectedPurchase}
+                                  defaultText={selectedPurchase.purchase_memo}
                                   saved={savedValues}
                                   name="purchase_memo"
                                   title="Memo"
@@ -599,7 +599,7 @@ const PurchaseDetailsModel = () => {
                             <table className="table">
                               <tbody>
                                 <DetailTextareaItem
-                                  data_set={selectedPurchase}
+                                  defaultText={selectedPurchase.status}
                                   saved={savedValues}
                                   name="status"
                                   title="Status"

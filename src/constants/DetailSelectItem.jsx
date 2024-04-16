@@ -1,9 +1,9 @@
 import React from 'react';
 import Select from 'react-select';
-import { Cancel, Edit, SaveAlt } from '@mui/icons-material';
+import { Cancel, Edit } from '@mui/icons-material';
 
 const DetailSelectItem = (props) => {
-    const { data_set, saved, name, title, options, no_border,
+    const { defaultText, saved, name, title, options, no_border,
         checkEdit, startEdit, endEdit, checkSaved, cancelSaved } = props;
 
     if(checkEdit && checkEdit(name)) {
@@ -41,7 +41,7 @@ const DetailSelectItem = (props) => {
         <tr>
             <td className={no_border && "border-0"}>{title}</td>
             <td className={no_border && "border-0"}>
-                {data_set[name]}
+                {defaultText}
             </td>
             <td className={no_border && "border-0"}>
                 <div onClick={() => { startEdit(name); }}>
