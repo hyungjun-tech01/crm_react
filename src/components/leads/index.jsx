@@ -101,6 +101,8 @@ const Leads = () => {
     setLeadChange(tempLeadChange);
   },[leadChange]);
 
+  const [expanded, setExpaned] = useState(false);
+
   const columns = [
     {
       title: "Full Name",
@@ -313,42 +315,17 @@ const Leads = () => {
           <div className="page-header pt-3 mb-0 ">
             <div className="row ">
               <div className="text-start" style={{width:'120px'}}>
-                <div className="dropdown">
-                  <a
-                    className="dropdown-toggle recently-viewed"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    {" "}
-                    All Leads
-                  </a>
-                  <div className="dropdown-menu">
-                    <a className="dropdown-item" href="#">
-                      Recently Viewed
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Items I'm following
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      All Leads
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      All Closed Leads
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      All Open Leads
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Converted Leads
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      My Open Leads
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Todays Leads
-                    </a>
+              <div className="dropdown">
+                <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> All Leads</button>
+                  <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
+                    <button className="dropdown-item" type="button">Recently Viewed</button>
+                    <button className="dropdown-item" type="button">Items I'm following</button>
+                    <button className="dropdown-item" type="button">All Leads</button>
+                    <button className="dropdown-item" type="button">All Closed Leads</button>
+                    <button className="dropdown-item" type="button">All Open Leads</button>
+                    <button className="dropdown-item" type="button">Converted Leads</button>
+                    <button className="dropdown-item" type="button">My Open Leads</button>
+                    <button className="dropdown-item" type="button">Todays Leads</button>
                   </div>
                 </div>
               </div>
