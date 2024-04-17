@@ -2,33 +2,20 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
-import { Collapse } from "antd";
 import "antd/dist/reset.css";
+import { Table } from 'antd';
+import { itemRender, onShowSizeChange } from "../paginationfunction";
 import "../antdstyle.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { AddCircle, RemoveCircle } from '@mui/icons-material';
+import { MoreVert } from '@mui/icons-material';
 
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
-import { QuotationRepo, QuotationSendTypes } from "../../repository/quotation";
+import { QuotationRepo, QuotationTypes, QuotationSendTypes } from "../../repository/quotation";
 import { atomAllCompanies, atomAllQuotations, atomAllLeads, defaultQuotation } from "../../atoms/atoms";
 import { formateDate } from "../../constants/functions";
 
-const quotation_type = ["견적서", "발주서"];
-const quotation_send_type = ["FAX", "EMAIL"];
-const default_quotation_headers = [
-  [['1', 'No', 0], ['2', '분류', 0]],
-  [['3', '제조회사', 0], ['4', '모델명', 0]],
-  [['5', '품목', 0], ['6', '재질', 0]],
-  [['7', '타입', 0], ['8', '색상', 0]],
-  [['9', '규격', 0], ['10', '세부사양', 0]],
-  [['11', '단위', 0], ['12', '수량', 0]],
-  [['13', '소비자가', 0], ['14', '할인%', 0]],
-  [['15', '견적단가', 0], ['16', '견적금액', 0]],
-  [['17', '원가', 0], ['18', '이익금액', 0]],
-  [['19', '비고', 0], []],
-];
 const default_quotation_content = {
   '1': null,'2': null,'3': null,'4': null,'5': null,
   '6': null,'7': null,'8': null,'9': null,'10': null,
@@ -71,8 +58,80 @@ const common_items = [
   "   (SOLIDWORKS Pro 이상 구매시)",
 ];
 
+const ConvertHeaderInfosToString = (data) => {
+  let ret = '';
+  default_content_array.forEach(item => {
+    ret += item.at(0) + '|';
+    ret += item.at(1) + '|';
+    if(data[item.at(0)]){
+      
+    }
+  })
+}
+
+const default_columns = [
+  {
+    title: "No",
+    dataIndex: '1',
+    render: (text, record) => <>{text}</>,
+  },
+  {
+    title: "Product",
+    dataIndex: '5',
+    render: (text, record) => <>{text}</>,
+  },
+  {
+    title: "Detail Info.",
+    dataIndex: '10',
+    render: (text, record) => <>{text}</>,
+  },
+  {
+    title: "Quantity",
+    dataIndex: '12',
+    render: (text, record) => <>{text}</>,
+  },
+  {
+    title: "Unit Price",
+    dataIndex: '15',
+    render: (text, record) => <>{text}</>,
+  },
+  {
+    title: "Total Price",
+    dataIndex: '16',
+    render: (text, record) => <>{text}</>,
+  },
+  {
+    title: "Action",
+    render: (text, record) => (
+      <div className="dropdown dropdown-action text-center">
+        <a
+          className="action-icon dropdown-toggle"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          <MoreVert onClick={()=>{
+            const tarElem = document.querySelector("#content_table_" + record['1']);
+            if(tarElem){
+              tarElem.style.display = "block";
+            }
+          }}/>
+        </a>
+        <div className="dropdown-menu dropdown-menu-right h-100" id={"content_table_" + record['1']}>
+          <a style={{ display: "initial" }} className="dropdown-item">
+            {default_content_array.map((item, index) => {
+              if(index === 0) return;
+              return (
+                <div key={index}>{item.at(1)} <input type="text" /></div>
+              )
+            })}
+          </a>
+        </div>
+      </div>
+    ),
+  },
+]
+
 const QuotationAddNewModal = () => {
-  const { Panel } = Collapse;
   const allCompnayData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
   const allQuotationData = useRecoilValue(atomAllQuotations);
@@ -83,29 +142,21 @@ const QuotationAddNewModal = () => {
 
   const [ companiesForSelection, setCompaniesForSelection ] = useState([]);
   const [ leadsForSelection, setLeadsForSelection] = useState([]);
-  const [ quotationChange, setQuotationChange ] = useState(null);
   const [ selectedLead, setSelectedLead ] = useState(null);
-  const [ receiptDate, setReceiptDate ] = useState(new Date());
+  const [ quotationDate, setQuotationDate ] = useState(new Date());
+  const [ confirmDate, setConfirmDate ] = useState(new Date());
+  
+  const [ contentColumns, setContentColumns ] = useState([]);
   const [ quotationHeaders, setQuotationHeaders ] = useState([]);
   const [ quotationContents, setQuotationContents ] = useState([]);
+  const [ quotationChange, setQuotationChange ] = useState(null);
 
-  const handleReceiptDateChange = (date) => {
-    setReceiptDate(date);
-    const localDate = formateDate(date);
-    const localTime = date.toLocaleTimeString('ko-KR');
-    const tempChanges = {
-      ...quotationChange,
-      receipt_date: localDate,
-      receipt_time: localTime,
-    };
-    setQuotationChange(tempChanges);
-  };
 
-  // --- Functions used for Add New Quotation ------------------------------
+  // --- Functions used for adding new quotation ------------------------------
   const initializeQuotationTemplate = useCallback(() => {
     setQuotationChange({ ...defaultQuotation });
     setSelectedLead(null);
-    setQuotationHeaders(default_quotation_headers);
+    setQuotationHeaders([]);
     setQuotationContents([]);
     document.querySelector("#add_new_quotation_form").reset();
   }, []);
@@ -134,10 +185,38 @@ const QuotationAddNewModal = () => {
     setQuotationChange(tempChanges);
   }, [companiesForSelection, quotationChange]);
 
+  const handleQuotationDateChange = (date) => {
+    setQuotationDate(date);
+    const localDate = formateDate(date);
+    const tempChanges = {
+      ...quotationChange,
+      quotation_date: localDate,
+    };
+    setQuotationChange(tempChanges);
+  };
+
+  const handleConfirmDateChange = (date) => {
+    setConfirmDate(date);
+    const localDate = formateDate(date);
+    const tempChanges = {
+      ...quotationChange,
+      comfirm_date: localDate,
+    };
+    setQuotationChange(tempChanges);
+  };
+
   const handleSelectQuotationType = useCallback((value) => {
     const tempChanges = {
       ...quotationChange,
       quotation_type: value.value,
+    };
+    setQuotationChange(tempChanges);
+  }, [quotationChange]);
+
+  const handleSelectQuotationSendType = useCallback((value) => {
+    const tempChanges = {
+      ...quotationChange,
+      quotation_send_type: value.value,
     };
     setQuotationChange(tempChanges);
   }, [quotationChange]);
@@ -147,13 +226,15 @@ const QuotationAddNewModal = () => {
     if(quotationChange.lead_name === null
       || quotationChange.lead_name === ''
       || quotationChange.quotation_type === null
+      || quotationHeaders.length === 0
+      || quotationContents.length === 0
     ) {
       console.log("Necessary information isn't submitted!");
       return;
     };
-
     const newQuotationData = {
       ...quotationChange,
+      quotation_contents: JSON.stringify(quotationContents),
       action_type: 'ADD',
       lead_number: '99999',// Temporary
       counter: 0,
@@ -167,14 +248,45 @@ const QuotationAddNewModal = () => {
     };
   }, [cookies.myLationCrmUserId, initializeQuotationTemplate, quotationChange, modifyQuotation]);
 
+  // --- Functions dealing with contents table -------------------------------
+  const rowSelection = {
+    onChange: (selectedRowKeys, selectedRows) => {
+      console.log(
+        `selectedRowKeys: ${selectedRowKeys}`,
+        "selectedRows: ",
+        selectedRows
+      );
+    },
+    getCheckboxProps: (record) => ({
+      disabled: record.name === "Disabled User", // Column configuration not to be checked
+      name: record.name,
+      className: "checkbox-red",
+    }),
+  };
+  
+  // --- Functions used for adding new content ------------------------------
   const handleAddNewContent = useCallback(() => {
     const tempContent = {
       ...default_quotation_content,
-      No: quotationContents.length, 
+      ['1']: quotationContents.length + 1,
     };
     const tempContents = [
       ...quotationContents,
       tempContent,
+    ];
+    setQuotationContents(tempContents);
+  }, [quotationContents]);
+
+  const handleModifyContent = useCallback((index, item, data)=>{
+    if(quotationContents.length <= index) return;
+    const tempContent = {
+      ...quotationContents.at(index),
+      [item]: data,
+    };
+    const tempContents = [
+      ...quotationContents.slice(0, index),
+      tempContent,
+      ...quotationContents.slice(index + 1, ),
     ];
     setQuotationContents(tempContents);
   }, [quotationContents]);
@@ -187,56 +299,6 @@ const QuotationAddNewModal = () => {
     setQuotationContents(tempContents);
   }, [quotationContents]);
 
-  const CovertContentToCollapseItem = useCallback((contents) => {
-    const tempItems = contents.map((content, index) =>
-      {
-        const indexStr = (index + 1).toString();
-        return {
-          key: indexStr,
-          label: 'Product ' + indexStr,
-          extra: <RemoveCircle onClick={() => handleDeleteContent(index)} />,
-          children: <table className="table">
-                      <tbody>
-                      { default_content_array.map((item, index2) => {
-                        content['1'] = indexStr;
-                        if(index2 === 0 || index2 === default_content_array.length)
-                        {
-                          return (
-                            <tr key={index2}>
-                              <td className="border-0">{item.at(1)}</td>
-                              <td className="border-0" >
-                                  <input
-                                      type="text"
-                                      placeholder={item.at(1)}
-                                      name={content[item.at(0)]}
-                                      onChange={() => {console.log('check')}}
-                                  />
-                              </td>
-                            </tr>
-                          );
-                        };
-                        return (
-                          <tr key={index2}>
-                            <td>{item.at(1)}</td>
-                            <td>
-                                <input
-                                    type="text"
-                                    placeholder={item.at(1)}
-                                    name={content[item.at(0)]}
-                                    onChange={() => {console.log('check')}}
-                                />
-                            </td>
-                          </tr>
-                        );
-                      })
-                    }
-                    </tbody>
-                  </table>
-        }
-      }
-    );
-    return tempItems;
-  }, []);
 
   useEffect(() => {
     // ----- Load companies and set up the relation between lead and company by company code ---
@@ -283,7 +345,10 @@ const QuotationAddNewModal = () => {
 
     // ----- Initialize template to store values -----
     initializeQuotationTemplate();
-  }, [allCompnayData, allLeadData, allQuotationData]);
+    if(contentColumns.length === 0) {
+      setContentColumns(default_columns);
+    }
+  }, [allCompnayData, allLeadData, allQuotationData, contentColumns]);
 
   return (
         <div
@@ -330,7 +395,7 @@ const QuotationAddNewModal = () => {
                   { (selectedLead !== null) &&
                     <>
                       <div className="form-group row">
-                        <div className="col-sm-12">
+                        <div className="col-sm-6">
                             <table className="table">
                               <tbody>
                                 <tr>
@@ -338,16 +403,8 @@ const QuotationAddNewModal = () => {
                                   <td>{selectedLead.department}</td>
                                 </tr>
                                 <tr>
-                                  <td>Position</td>
-                                  <td>{selectedLead.position}</td>
-                                </tr>
-                                <tr>
                                   <td>Mobile</td>
                                   <td>{selectedLead.mobile}</td>
-                                </tr>
-                                <tr>
-                                  <td>Phone</td>
-                                  <td>{selectedLead.phone}</td>
                                 </tr>
                                 <tr>
                                   <td>Email</td>
@@ -356,110 +413,224 @@ const QuotationAddNewModal = () => {
                               </tbody>
                             </table>
                         </div>
+                        <div className="col-sm-6">
+                            <table className="table">
+                              <tbody>
+                                <tr>
+                                  <td>Position</td>
+                                  <td>{selectedLead.position}</td>
+                                </tr>
+                                <tr>
+                                  <td>Phone</td>
+                                  <td>{selectedLead.phone}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                        </div>
                       </div>
                     </>}
                   <h4>Quotation Information</h4>
                   <div className="form-group row">
-                    <div className="col-sm-4">
-                      <label className="col-form-label">Type</label>
-                      <Select options={QuotationSendTypes} onChange={handleSelectQuotationType} />
+                    <div className="col-sm-9">
+                      <label className="col-form-label">Title</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Title"
+                        name="quotation_title"
+                        onChange={handleQuotationChange}
+                      />
                     </div>
-                    <div className="col-sm-4">
-                      <label className="col-form-label">Receipt</label>
-                        <div className="cal-icon">
-                          <DatePicker
+                    <div className="col-sm-3">
+                      <label className="col-form-label">Type</label>
+                      <Select options={QuotationTypes} onChange={handleSelectQuotationType} />  
+                    </div>
+                  </div>
+                  <div className="form-group row">
+                    <div className="col-sm-6">
+                      <div className="form-group row">
+                        <div className="col-sm-4">Document No</div>
+                        <div className="col-sm-7">
+                          <input
+                            type="text"
                             className="form-control"
-                            selected={receiptDate}
-                            onChange={handleReceiptDateChange}
-                            dateFormat="yyyy.MM.dd hh:mm:ss"
-                            showTimeSelect
+                            placeholder="Document No"
+                            name="quotation_number"
+                            onChange={handleQuotationChange}
                           />
                         </div>
+                      </div>
+                      <div className="form-group row">
+                        <div className="col-sm-4">Send Type</div>
+                        <div className="col-sm-7">
+                          <Select options={QuotationSendTypes} onChange={handleSelectQuotationSendType} />
+                        </div>
+                      </div>
+                      <div className="form-group row">
+                        <div className="col-sm-4">
+                          <label className="col-form-label">Quotation Date</label>
+                        </div>
+                        <div className="col-sm-7">
+                          <div className="cal-icon">
+                            <DatePicker
+                              className="form-control"
+                              selected={quotationDate}
+                              onChange={handleQuotationDateChange}
+                              dateFormat="yyyy.MM.dd"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="form-group row">
+                        <div className="col-sm-4">
+                          <label className="col-form-label">Location</label>
+                        </div>
+                        <div className="col-sm-7">
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Location"
+                            name="delivery_location"
+                            onChange={handleQuotationChange}
+                          />
+                        </div>
+                      </div>
+                      <div className="form-group row">
+                        <div className="col-sm-4">
+                          <label className="col-form-label">Payment Type</label>
+                        </div>
+                        <div className="col-sm-7">
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Payment Type"
+                            name="payment_type"
+                            onChange={handleQuotationChange}
+                          />
+                        </div>
+                      </div>
+                      <div className="form-group row">
+                        <div className="col-sm-4">
+                          <label className="col-form-label">Warranty</label>
+                        </div>
+                        <div className="col-sm-7">
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Warranty Period"
+                            name="warranty_period"
+                            onChange={handleQuotationChange}
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <div className="col-sm-4">
-                      <label className="col-form-label">Receiver</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Receiver"
-                        name="receiver"
-                        onChange={handleQuotationChange}
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group row">
                     <div className="col-sm-6">
-                      <label className="col-form-label">Lead Time</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Lead Time"
-                        name="lead_time"
-                        onChange={handleQuotationChange}
-                      />
-                    </div>
-                    <div className="col-sm-6">
-                      <label className="col-form-label">Request Type</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Request Type"
-                        name="request_type"
-                        onChange={handleQuotationChange}
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group row">
-                    <div className="col-sm-6">
-                      <label className="col-form-label">Sales Representative</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Sales Representative"
-                        name="sales_representati"
-                        onChange={handleQuotationChange}
-                      />
-                    </div>
-                    <div className="col-sm-6">
-                      <label className="col-form-label">Status</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Status"
-                        name="status"
-                        onChange={handleQuotationChange}
-                      />
+                      <div className="form-group row">
+                        <div className="col-sm-4">Delivery Period</div>
+                        <div className="col-sm-7">
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Delivery Period"
+                            name="delivery_period"
+                            onChange={handleQuotationChange}
+                          />
+                        </div>
+                      </div>
+                      <div className="form-group row">
+                        <div className="col-sm-4">Expiry Date</div>
+                        <div className="col-sm-7">
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Expiry Date"
+                            name="quotation_expiration_date"
+                            onChange={handleQuotationChange}
+                          />
+                        </div>
+                      </div>
+                      <div className="form-group row">
+                        <div className="col-sm-4">Status</div>
+                        <div className="col-sm-7">
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Status"
+                            name="status"
+                            onChange={handleQuotationChange}
+                          />
+                        </div>
+                      </div>
+                      <div className="form-group row">
+                        <div className="col-sm-4">
+                          <label className="col-form-label">Confirm Date</label>
+                        </div>
+                        <div className="col-sm-7">
+                          <div className="cal-icon">
+                            <DatePicker
+                              className="form-control"
+                              selected={confirmDate}
+                              onChange={handleConfirmDateChange}
+                              dateFormat="yyyy.MM.dd"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="form-group row">
+                        <div className="col-sm-4">Representative</div>
+                        <div className="col-sm-7">
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Representative"
+                            name="sales_representative"
+                            onChange={handleQuotationChange}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <h4>Price Table</h4>
-                  <div className="tasks__item active">
-                    <Collapse size="small"  ghost={true} accordion defaultActiveKey="1" expandIconPosition="end">
-                      <Panel header={<b>Header Setting</b>} key="1">
-                        <table className="table">
-                          <tbody>
-                          { quotationHeaders.map((header, index) =>
-                            (index === 0 || index === quotationHeaders.length-1) ?
-                              <tr key={index}>
-                                <td className="border-0"><input type="checkbox"/> {header[0][1]}</td>
-                                <td className="border-0">{header[0][2]}</td>
-                                <td className="border-0"><input type="checkbox"/> {header[1][1]}</td>
-                                <td className="border-0">{header[1][2]}</td>
-                              </tr> : 
-                              <tr key={index}>
-                                <td><input type="checkbox"/> {header[0][1]}</td>
-                                <td>{header[0][2]}</td>
-                                <td><input type="checkbox"/> {header[1][1]}</td>
-                                <td>{header[1][2]}</td>
-                              </tr>
-                          )}
-                          </tbody>
-                        </table>
-                      </Panel>
-                      <Panel header={<b>Contents</b>} key="2" extra={<AddCircle onClick={handleAddNewContent} />}>
-                        <Collapse size="small" items={CovertContentToCollapseItem(quotationContents)} accordion expandIconPosition="end" />
-                      </Panel>
-                    </Collapse>
+                  <div className="form-group row">
+                    <div className="text-end">
+                      <button
+                        type="button"
+                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                        onClick={handleAddNewContent}
+                      >
+                        Add New Item
+                      </button>
+                      &nbsp;&nbsp;
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-rounded"
+                        onClick={handleDeleteContent}
+                      >
+                        Delete Selected Item
+                      </button>
+                    </div>
                   </div>
+                  <div className="form-group row">
+                    <Table
+                        rowSelection={{
+                          ...rowSelection,
+                        }}
+                        pagination={{
+                          total: quotationContents.length,
+                          showTotal: (total, range) =>
+                            `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+                          showSizeChanger: true,
+                          onShowSizeChange: onShowSizeChange,
+                          itemRender: itemRender,
+                        }}
+                        style={{ overflowX: "auto" }}
+                        columns={contentColumns}
+                        bordered
+                        dataSource={quotationContents}
+                        rowKey={(record) => record['1']}
+                        // onChange={handleTableChange}
+                      />
+                    </div>
                   <div className="text-center">
                     <button
                       type="button"

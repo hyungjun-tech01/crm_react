@@ -164,9 +164,7 @@ const Quotations = () => {
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
       console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
+        `selectedRowKeys: ${selectedRowKeys}`, "selectedRows: ", selectedRows
       );
     },
     getCheckboxProps: (record) => ({
