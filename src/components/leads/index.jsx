@@ -315,7 +315,7 @@ const Leads = () => {
               <div className="text-start" style={{width:'120px'}}>
                 <div className="dropdown">
                   <a
-                    className="dropdown-toggle recently-viewed"
+                    className="dropdown-toggle"
                     href="#"
                     role="button"
                     data-bs-toggle="dropdown"

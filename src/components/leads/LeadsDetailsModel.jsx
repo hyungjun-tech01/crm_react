@@ -1176,10 +1176,10 @@ const LeadsDetailsModel = () => {
                           <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                             <thead>
                               <tr>
-                              <div className="text-start" style={{width:'120px'}}>
+
                                 <div className="dropdown">
                                   <a
-                                    className="dropdown-toggle recently-viewed"
+                                    className="dropdown-toggle"
                                     href="#"
                                     role="button"
                                     data-bs-toggle="dropdown"
@@ -1187,8 +1187,16 @@ const LeadsDetailsModel = () => {
                                   >
                                     Status
                                   </a>
+                                  <div className="dropdown-menu">
+                                    <Link className="dropdown-item" to="#">
+                                      진행중
+                                    </Link>
+                                    <Link className="dropdown-item" to="#">
+                                      완료
+                                    </Link>
+                                  </div>                                     
                                 </div>
-                              </div>
+
                                 <div className="col text-start" style={{width:'400px'}}>
                                   <input
                                         id = "searchCondition"
