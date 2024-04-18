@@ -12,6 +12,7 @@ import DetailTextareaItem from "../../constants/DetailTextareaItem";
 import DetailSelectItem from "../../constants/DetailSelectItem";
 import { Avatar } from "@mui/material";
 import DetailDateItem from "../../constants/DetailDateItem";
+import {ConsultingRepo} from "../../repository/consulting"
 
 
 
@@ -31,9 +32,30 @@ const LeadsDetailsModel = () => {
   const [ editedValuesCompany, setEditedValuesCompany ] = useState(null);
   const [ savedValuesCompany, setSavedValuesCompany ] = useState(null);
   const [activeTab, setActiveTab] = useState(""); // 상태 관리를 위한 useState
+  const [expanded, setExpaned] = useState(false);
+  const [statusSearch, setStatusSearch] = useState("");
+  const [searchCondition, setSearchCondition] = useState("")
+  const { loadCompanyConsultings} = useRecoilValue(ConsultingRepo);
 
 
   // --- Funtions for Editing ---------------------------------
+
+  const handleSearchCondition =  (newValue)=> {
+    setSearchCondition(newValue);
+   //filterConsulting  filterLeads(newValue);
+  };
+
+  const handleStatusSearch = (newValue) => {
+    setStatusSearch(newValue);
+    if(newValue === "All"){
+      loadCompanyConsultings(selectedLead.company_code); 
+    }else{
+      loadCompanyConsultings(selectedLead.company_code); 
+    }
+    setExpaned(false);
+    setSearchCondition("");
+  }
+
   const handleCheckEditState = useCallback((name) => {
     return editedValues !== null && name in editedValues;
   }, [editedValues]);
@@ -1176,32 +1198,32 @@ const LeadsDetailsModel = () => {
                           <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                             <thead>
                               <tr>
-                              <div className="text-start" style={{width:'120px'}}>
-                                <div className="dropdown">
-                                  <a
-                                    className="dropdown-toggle recently-viewed"
-                                    href="#"
-                                    role="button"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false"
-                                  >
-                                    Status
-                                  </a>
-                                </div>
-                              </div>
-                                <div className="col text-start" style={{width:'400px'}}>
-                                  <input
-                                        id = "searchCondition"
-                                        className="form-control" 
-                                        type="text"
-                                        placeholder="Lead Name, Receiver" 
-                                        style={{width:'300px', display: 'inline'}}
+                                <div className="row">
+                                  <div className="text-start" style={{width:'80px'}}>
+                                    <div className="dropdown">
+                                      <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> Status</button>
+                                        <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
+                                          <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('All')}>All</button>
+                                          <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('접수')}>접수</button>
+                                          <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('진행중')}>진행</button>
+                                          <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('완료')}>완료</button>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <div className="col text-start" style={{width:'200px'}}>
+                                    <input
+                                          id = "searchCondition"
+                                          className="form-control" 
+                                          type="text"
+                                          value={searchCondition}
+                                          onChange ={(e) => handleSearchCondition(e.target.value)}
+                                          placeholder="Lead Name, Receiver" 
+                                          style={{width:'300px', display: 'inline'}}
 
-                                  />  
-                                  {/*  value={searchCondition}
-                                  onChange ={(e) => handleSearchCondition(e.target.value)}
-                                  */}
+                                    />  
+                                  </div>
                                 </div>
+                                
                               </tr>
                               <tr>
                                 <th>Type</th>
