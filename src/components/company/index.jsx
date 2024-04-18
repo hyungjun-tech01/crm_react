@@ -9,6 +9,7 @@ import CompanyDetailsModel from "./CompanyDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { BiBuildings } from "react-icons/bi";
+// import { MoreVert } from '@mui/icons-material';
 import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies, atomFilteredCompany, defaultCompany } from "../../atoms/atoms";
 import { compareCompanyName, compareText, formateDate } from "../../constants/functions";
@@ -156,7 +157,7 @@ const Company = () => {
     //         data-bs-toggle="dropdown"
     //         aria-expanded="false"
     //       >
-    //         <i className="material-icons">more_vert</i>
+    //         <MoreVert />
     //       </a>
     //       <div className="dropdown-menu dropdown-menu-right">
     //         <a className="dropdown-item" href="#">

@@ -8,6 +8,7 @@ import { useCookies } from "react-cookie";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
 import "../antdstyle.css";
 import LeadsDetailsModel from "./LeadsDetailsModel";
+import { MoreVert } from '@mui/icons-material';
 import { BiUser } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import {ConsultingRepo} from "../../repository/consulting"
@@ -195,7 +196,7 @@ const Leads = () => {
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            <i className="material-icons">more_vert</i>
+            <MoreVert />
           </a>
           <div className="dropdown-menu dropdown-menu-right">
             <a className="dropdown-item" href="#">
