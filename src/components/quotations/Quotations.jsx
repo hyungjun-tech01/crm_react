@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
@@ -15,6 +15,7 @@ import ProjectDetailsModel from "../project/ProjectDetailsModel";
 import LeadsDetailsModel from "../leads/LeadsDetailsModel";
 import "react-datepicker/dist/react-datepicker.css";
 
+import { MoreVert } from '@mui/icons-material';
 import { BiCalculator } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
@@ -149,7 +150,7 @@ const Quotations = () => {
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            <i className="material-icons">more_vert</i>
+            <MoreVert />
           </a>
           <div className="dropdown-menu dropdown-menu-right h-100">
             <a style={{ display: "initial" }} className="dropdown-item">

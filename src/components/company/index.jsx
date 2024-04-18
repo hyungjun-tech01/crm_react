@@ -39,7 +39,8 @@ const Company = () => {
 
   const handleAddNewCompanyClicked = useCallback(() => {
     initializeCompanyTemplate();
-  }, []);
+  // eslint-disable-next-line no-use-before-define
+  }, [initializeCompanyTemplate]);
 
   // --- Functions used for Add New Company ------------------------------
   const initializeCompanyTemplate = useCallback(() => {
@@ -96,7 +97,7 @@ const Company = () => {
       initializeCompanyTemplate();
       //close modal ?
     };
-  },[companyChange, cookies.myLationCrmUserName, initializeCompanyTemplate, modifyCompany]);
+  },[companyChange, cookies.myLationCrmUserId, initializeCompanyTemplate, modifyCompany]);
 
   const columns = [
     {
