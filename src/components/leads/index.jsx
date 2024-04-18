@@ -29,12 +29,23 @@ const Leads = () => {
   const [ companyData, setCompanyData ] = useState([]);
 
   const [searchCondition, setSearchCondition] = useState("");
+  const [statusSearch, setStatusSearch] = useState("");
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
     filterLeads(newValue);
   };
 
+  const handleStatusSearch = (newValue) => {
+    setStatusSearch(newValue);
+    if(newValue === "All Leads"){
+      loadAllLeads();
+    }else{
+      loadAllLeads();
+    }
+    setExpaned(false);
+    setSearchCondition("");
+  }
   // --- Functions used for Add New Lead ------------------------------
   const handleAddNewLeadClicked = useCallback(() => {
     initializeLeadTemplate();
@@ -315,22 +326,18 @@ const Leads = () => {
           <div className="page-header pt-3 mb-0 ">
             <div className="row ">
               <div className="text-start" style={{width:'120px'}}>
-              <div className="dropdown">
-                <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> All Leads</button>
-                  <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
-                    <button className="dropdown-item" type="button">Recently Viewed</button>
-                    <button className="dropdown-item" type="button">Items I'm following</button>
-                    <button className="dropdown-item" type="button">All Leads</button>
-                    <button className="dropdown-item" type="button">All Closed Leads</button>
-                    <button className="dropdown-item" type="button">All Open Leads</button>
-                    <button className="dropdown-item" type="button">Converted Leads</button>
-                    <button className="dropdown-item" type="button">My Open Leads</button>
-                    <button className="dropdown-item" type="button">Todays Leads</button>
+                <div className="dropdown">
+                  <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> Status</button>
+                    <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('All Leads')}>All Leads</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('Not Contacted')}>Not Contacted</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('Attempted Contact')}>Attempted Contact</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('Contact')}>Contact</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('Converted')}>Converted</button>
+                    </div>
                   </div>
                 </div>
-              </div>
               <div className="col text-start" style={{width:'400px'}}>
-                <label style={{ display: 'inline', width:'100px',marginRight:'10px' }}>결과내 검색</label>
                 <input
                       id = "searchCondition"
                       className="form-control" 
