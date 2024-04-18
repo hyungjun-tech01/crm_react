@@ -15,6 +15,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import { BiReceipt } from "react-icons/bi";
+import { MoreVert } from '@mui/icons-material';
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { TransactionRepo } from "../../repository/transaction";
@@ -182,7 +183,7 @@ const Transactions = () => {
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            <i className="material-icons">more_vert</i>
+            <MoreVert />
           </a>
           <div className="dropdown-menu dropdown-menu-right h-100">
             <a style={{ display: "initial" }} className="dropdown-item">
