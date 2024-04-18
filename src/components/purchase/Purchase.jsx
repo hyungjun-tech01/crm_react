@@ -9,6 +9,7 @@ import { itemRender, onShowSizeChange } from "../paginationfunction";
 import PurchaseDetailsModel from "./PurchaseDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+// import { MoreVert } from '@mui/icons-material';
 import { BiShoppingBag } from "react-icons/bi";
 import { PurchaseRepo } from "../../repository/purchase";
 import { atomAllLeads, atomAllPurchases, defaultPurchase } from "../../atoms/atoms";
@@ -218,7 +219,7 @@ const Purchase = () => {
     //         data-bs-toggle="dropdown"
     //         aria-expanded="false"
     //       >
-    //         <i className="material-icons">more_vert</i>
+    //         <MoreVert />
     //       </a>
     //       <div className="dropdown-menu dropdown-menu-right">
     //         <a className="dropdown-item" href="#">
