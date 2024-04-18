@@ -8,7 +8,8 @@ import { itemRender, onShowSizeChange } from "../paginationfunction";
 import "../antdstyle.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { MoreVert } from '@mui/icons-material';
+import { Button, Popover } from "@mui/material";
+import { AddBoxOutlined, MoreVert, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
 
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
@@ -17,10 +18,10 @@ import { atomAllCompanies, atomAllQuotations, atomAllLeads, defaultQuotation } f
 import { formateDate } from "../../constants/functions";
 
 const default_quotation_content = {
-  '1': null,'2': null,'3': null,'4': null,'5': null,
-  '6': null,'7': null,'8': null,'9': null,'10': null,
-  '11': null,'12': null,'13': null,'14': null,'15': null,
-  '16': null,'17': null,'18': null,'19': null,'998': null,
+  '1': null, '2': null, '3': null, '4': null, '5': null,
+  '6': null, '7': null, '8': null, '9': null, '10': null,
+  '11': null, '12': null, '13': null, '14': null, '15': null,
+  '16': null, '17': null, '18': null, '19': null, '998': null,
 };
 const default_content_array = [
   ['1', 'No', null],
@@ -63,8 +64,8 @@ const ConvertHeaderInfosToString = (data) => {
   default_content_array.forEach(item => {
     ret += item.at(0) + '|';
     ret += item.at(1) + '|';
-    if(data[item.at(0)]){
-      
+    if (data[item.at(0)]) {
+
     }
   })
 }
@@ -109,23 +110,13 @@ const default_columns = [
           data-bs-toggle="dropdown"
           aria-expanded="false"
         >
-          <MoreVert onClick={()=>{
+          <MoreVert onClick={() => {
             const tarElem = document.querySelector("#content_table_" + record['1']);
-            if(tarElem){
+            if (tarElem) {
               tarElem.style.display = "block";
             }
-          }}/>
+          }} />
         </a>
-        <div className="dropdown-menu dropdown-menu-right h-100" id={"content_table_" + record['1']}>
-          <a style={{ display: "initial" }} className="dropdown-item">
-            {default_content_array.map((item, index) => {
-              if(index === 0) return;
-              return (
-                <div key={index}>{item.at(1)} <input type="text" /></div>
-              )
-            })}
-          </a>
-        </div>
       </div>
     ),
   },
@@ -138,19 +129,20 @@ const QuotationAddNewModal = () => {
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
   const { loadAllLeads } = useRecoilValue(LeadRepo);
   const { modifyQuotation } = useRecoilValue(QuotationRepo);
-  const [ cookies ] = useCookies(["myLationCrmUserId"]);
+  const [ cookies] = useCookies(["myLationCrmUserId"]);
 
   const [ companiesForSelection, setCompaniesForSelection ] = useState([]);
-  const [ leadsForSelection, setLeadsForSelection] = useState([]);
+  const [ leadsForSelection, setLeadsForSelection ] = useState([]);
   const [ selectedLead, setSelectedLead ] = useState(null);
   const [ quotationDate, setQuotationDate ] = useState(new Date());
   const [ confirmDate, setConfirmDate ] = useState(new Date());
-  
-  const [ contentColumns, setContentColumns ] = useState([]);
+
   const [ quotationHeaders, setQuotationHeaders ] = useState([]);
   const [ quotationContents, setQuotationContents ] = useState([]);
   const [ quotationChange, setQuotationChange ] = useState(null);
 
+  const [ contentColumns, setContentColumns ] = useState([]);
+  const [ temporaryContent, setTemporaryContent ] = useState([]);
 
   // --- Functions used for adding new quotation ------------------------------
   const initializeQuotationTemplate = useCallback(() => {
@@ -221,9 +213,9 @@ const QuotationAddNewModal = () => {
     setQuotationChange(tempChanges);
   }, [quotationChange]);
 
-  const handleAddNewQuotation = useCallback((event)=>{
+  const handleAddNewQuotation = useCallback((event) => {
     // Check data if they are available
-    if(quotationChange.lead_name === null
+    if (quotationChange.lead_name === null
       || quotationChange.lead_name === ''
       || quotationChange.quotation_type === null
       || quotationHeaders.length === 0
@@ -242,7 +234,7 @@ const QuotationAddNewModal = () => {
     };
     console.log(`[ handleAddNewQuotation ]`, newQuotationData);
     const result = modifyQuotation(newQuotationData);
-    if(result){
+    if (result) {
       initializeQuotationTemplate();
       //close modal ?
     };
@@ -263,8 +255,73 @@ const QuotationAddNewModal = () => {
       className: "checkbox-red",
     }),
   };
-  
+
   // --- Functions used for adding new content ------------------------------
+  const handleLoadNewTemporaryContent = useCallback(() => {
+    const tarElem = document.querySelector("#modify_content");
+    if (tarElem) {
+      const tempContentArray = [
+        ['1', 'No', quotationContents.length + 1],
+        ...default_content_array.slice(1,)
+      ];
+      setTemporaryContent(tempContentArray);
+      tarElem.style.display = "block";
+    };
+  }, [quotationContents]);
+
+  const handleLoadSelectedContent = useCallback((index) => {
+    const tarElem = document.querySelector("#modify_content");
+    if (tarElem) {
+      const foundContent = {
+        ...quotationContents.at(index)
+      };
+      const tempContentArray = [
+        ...default_content_array
+      ];
+      tempContentArray.forEach(item => {
+        item[2] = foundContent[item[0]];
+      });
+      setTemporaryContent(tempContentArray);
+      tarElem.style.display = "block";
+    };
+  }, [quotationContents]);
+
+  const handleSaveTemporaryEdit = useCallback(() => {
+    const tarElem = document.querySelector("#modify_content");
+    if (tarElem) {
+      const contentToSave = {
+        ...default_quotation_content
+      };
+      temporaryContent.forEach(item => {
+        contentToSave[item.at(0)] = item.at(2);
+      });
+      let tempContents = [];
+      if (contentToSave['1'] === quotationContents.length) {
+        tempContents = [
+          ...quotationContents,
+          contentToSave
+        ];
+      } else {
+        const temp_index = tempContents['1'] - 1;
+        tempContents = [
+          ...quotationContents.slice(0, temp_index),
+          contentToSave,
+          ...quotationContents.slice(temp_index + 1,)
+        ];
+      }
+      setQuotationContents(tempContents);
+      tarElem.style.display = "none";
+    };
+  }, []);
+
+  const handleCloseTemporaryEdit = useCallback(() => {
+    const tarElem = document.querySelector("#modify_content");
+    if (tarElem) {
+      setTemporaryContent(null);
+      tarElem.style.display = "none";
+    };
+  }, []);
+
   const handleAddNewContent = useCallback(() => {
     const tempContent = {
       ...default_quotation_content,
@@ -277,8 +334,8 @@ const QuotationAddNewModal = () => {
     setQuotationContents(tempContents);
   }, [quotationContents]);
 
-  const handleModifyContent = useCallback((index, item, data)=>{
-    if(quotationContents.length <= index) return;
+  const handleModifyContent = useCallback((index, item, data) => {
+    if (quotationContents.length <= index) return;
     const tempContent = {
       ...quotationContents.at(index),
       [item]: data,
@@ -286,7 +343,7 @@ const QuotationAddNewModal = () => {
     const tempContents = [
       ...quotationContents.slice(0, index),
       tempContent,
-      ...quotationContents.slice(index + 1, ),
+      ...quotationContents.slice(index + 1,),
     ];
     setQuotationContents(tempContents);
   }, [quotationContents]);
@@ -318,8 +375,8 @@ const QuotationAddNewModal = () => {
     } else {
       const temp_data = allLeadData.map(lead => {
         return {
-          label : lead.lead_name + " / " + lead.company_name,
-          value : {
+          label: lead.lead_name + " / " + lead.company_name,
+          value: {
             code: lead.lead_code,
             name: lead.lead_name,
             department: lead.department,
@@ -345,314 +402,364 @@ const QuotationAddNewModal = () => {
 
     // ----- Initialize template to store values -----
     initializeQuotationTemplate();
-    if(contentColumns.length === 0) {
+    if (contentColumns.length === 0) {
       setContentColumns(default_columns);
     }
   }, [allCompnayData, allLeadData, allQuotationData, contentColumns]);
 
   return (
-        <div
-          className="modal right fade"
-          id="add_quotation"
-          tabIndex={-1}
-          role="dialog"
-          aria-modal="true"
+    <div
+      className="modal right fade"
+      id="add_quotation"
+      tabIndex={-1}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        className="modal-dialog modal-dialog-centered modal-lg"
+        role="document"
+      >
+        <button
+          type="button"
+          className="close md-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
         >
-          <div
-            className="modal-dialog modal-dialog-centered modal-lg"
-            role="document"
-          >
+          <span aria-hidden="true">×</span>
+        </button>
+        <div className="modal-content">
+          <div className="modal-header">
+            <h4 className="modal-title"><b>Add New Quotation</b></h4>
             <button
               type="button"
-              className="close md-close"
+              className="btn-close"
               data-bs-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
-            <div className="modal-content">
-              <div className="modal-header">
-                <h4 className="modal-title"><b>Add New Quotation</b></h4>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                ></button>
+            ></button>
+          </div>
+          <div className="modal-body">
+            <form className="forms-sampme" id="add_new_quotation_form">
+              <h4>Lead Information</h4>
+              <div className="form-group row">
+                <div className="col-sm-4">
+                  <label>Name</label>
+                </div>
+                <div className="col-sm-8">
+                  <Select options={leadsForSelection} onChange={(value) => {
+                    handleSelectLead(value.value);
+                    setSelectedLead({ ...value.value });
+                  }} />
+                </div>
               </div>
-              <div className="modal-body">
-                <form className="forms-sampme" id="add_new_quotation_form">
-                  <h4>Lead Information</h4>
+              {(selectedLead !== null) &&
+                <>
                   <div className="form-group row">
-                    <div className="col-sm-4">
-                      <label>Name</label>
+                    <div className="col-sm-6">
+                      <table className="table">
+                        <tbody>
+                          <tr>
+                            <td>Department</td>
+                            <td>{selectedLead.department}</td>
+                          </tr>
+                          <tr>
+                            <td>Mobile</td>
+                            <td>{selectedLead.mobile}</td>
+                          </tr>
+                          <tr>
+                            <td>Email</td>
+                            <td>{selectedLead.email}</td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
-                    <div className="col-sm-8">
-                      <Select options={leadsForSelection} onChange={(value) => { 
-                        handleSelectLead(value.value);
-                        setSelectedLead({...value.value}); }}/>
+                    <div className="col-sm-6">
+                      <table className="table">
+                        <tbody>
+                          <tr>
+                            <td>Position</td>
+                            <td>{selectedLead.position}</td>
+                          </tr>
+                          <tr>
+                            <td>Phone</td>
+                            <td>{selectedLead.phone}</td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
-                  { (selectedLead !== null) &&
-                    <>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                            <table className="table">
-                              <tbody>
-                                <tr>
-                                  <td>Department</td>
-                                  <td>{selectedLead.department}</td>
-                                </tr>
-                                <tr>
-                                  <td>Mobile</td>
-                                  <td>{selectedLead.mobile}</td>
-                                </tr>
-                                <tr>
-                                  <td>Email</td>
-                                  <td>{selectedLead.email}</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                        </div>
-                        <div className="col-sm-6">
-                            <table className="table">
-                              <tbody>
-                                <tr>
-                                  <td>Position</td>
-                                  <td>{selectedLead.position}</td>
-                                </tr>
-                                <tr>
-                                  <td>Phone</td>
-                                  <td>{selectedLead.phone}</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                        </div>
-                      </div>
-                    </>}
-                  <h4>Quotation Information</h4>
+                </>}
+              <h4>Quotation Information</h4>
+              <div className="form-group row">
+                <div className="col-sm-9">
+                  <label className="col-form-label">Title</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Title"
+                    name="quotation_title"
+                    onChange={handleQuotationChange}
+                  />
+                </div>
+                <div className="col-sm-3">
+                  <label className="col-form-label">Type</label>
+                  <Select options={QuotationTypes} onChange={handleSelectQuotationType} />
+                </div>
+              </div>
+              <div className="form-group row">
+                <div className="col-sm-6">
                   <div className="form-group row">
-                    <div className="col-sm-9">
-                      <label className="col-form-label">Title</label>
+                    <div className="col-sm-4">Document No</div>
+                    <div className="col-sm-7">
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Title"
-                        name="quotation_title"
+                        placeholder="Document No"
+                        name="quotation_number"
                         onChange={handleQuotationChange}
                       />
                     </div>
-                    <div className="col-sm-3">
-                      <label className="col-form-label">Type</label>
-                      <Select options={QuotationTypes} onChange={handleSelectQuotationType} />  
+                  </div>
+                  <div className="form-group row">
+                    <div className="col-sm-4">Send Type</div>
+                    <div className="col-sm-7">
+                      <Select options={QuotationSendTypes} onChange={handleSelectQuotationSendType} />
                     </div>
                   </div>
                   <div className="form-group row">
-                    <div className="col-sm-6">
-                      <div className="form-group row">
-                        <div className="col-sm-4">Document No</div>
-                        <div className="col-sm-7">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Document No"
-                            name="quotation_number"
-                            onChange={handleQuotationChange}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-4">Send Type</div>
-                        <div className="col-sm-7">
-                          <Select options={QuotationSendTypes} onChange={handleSelectQuotationSendType} />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-4">
-                          <label className="col-form-label">Quotation Date</label>
-                        </div>
-                        <div className="col-sm-7">
-                          <div className="cal-icon">
-                            <DatePicker
-                              className="form-control"
-                              selected={quotationDate}
-                              onChange={handleQuotationDateChange}
-                              dateFormat="yyyy.MM.dd"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-4">
-                          <label className="col-form-label">Location</label>
-                        </div>
-                        <div className="col-sm-7">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Location"
-                            name="delivery_location"
-                            onChange={handleQuotationChange}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-4">
-                          <label className="col-form-label">Payment Type</label>
-                        </div>
-                        <div className="col-sm-7">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Payment Type"
-                            name="payment_type"
-                            onChange={handleQuotationChange}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-4">
-                          <label className="col-form-label">Warranty</label>
-                        </div>
-                        <div className="col-sm-7">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Warranty Period"
-                            name="warranty_period"
-                            onChange={handleQuotationChange}
-                          />
-                        </div>
-                      </div>
+                    <div className="col-sm-4">
+                      <label className="col-form-label">Quotation Date</label>
                     </div>
-                    <div className="col-sm-6">
-                      <div className="form-group row">
-                        <div className="col-sm-4">Delivery Period</div>
-                        <div className="col-sm-7">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Delivery Period"
-                            name="delivery_period"
-                            onChange={handleQuotationChange}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-4">Expiry Date</div>
-                        <div className="col-sm-7">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Expiry Date"
-                            name="quotation_expiration_date"
-                            onChange={handleQuotationChange}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-4">Status</div>
-                        <div className="col-sm-7">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Status"
-                            name="status"
-                            onChange={handleQuotationChange}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-4">
-                          <label className="col-form-label">Confirm Date</label>
-                        </div>
-                        <div className="col-sm-7">
-                          <div className="cal-icon">
-                            <DatePicker
-                              className="form-control"
-                              selected={confirmDate}
-                              onChange={handleConfirmDateChange}
-                              dateFormat="yyyy.MM.dd"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-4">Representative</div>
-                        <div className="col-sm-7">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Representative"
-                            name="sales_representative"
-                            onChange={handleQuotationChange}
-                          />
-                        </div>
+                    <div className="col-sm-7">
+                      <div className="cal-icon">
+                        <DatePicker
+                          className="form-control"
+                          selected={quotationDate}
+                          onChange={handleQuotationDateChange}
+                          dateFormat="yyyy.MM.dd"
+                        />
                       </div>
                     </div>
                   </div>
-                  <h4>Price Table</h4>
                   <div className="form-group row">
-                    <div className="text-end">
-                      <button
-                        type="button"
-                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                        onClick={handleAddNewContent}
-                      >
-                        Add New Item
-                      </button>
-                      &nbsp;&nbsp;
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-rounded"
-                        onClick={handleDeleteContent}
-                      >
-                        Delete Selected Item
-                      </button>
+                    <div className="col-sm-4">
+                      <label className="col-form-label">Location</label>
                     </div>
-                  </div>
-                  <div className="form-group row">
-                    <Table
-                        rowSelection={{
-                          ...rowSelection,
-                        }}
-                        pagination={{
-                          total: quotationContents.length,
-                          showTotal: (total, range) =>
-                            `Showing ${range[0]} to ${range[1]} of ${total} entries`,
-                          showSizeChanger: true,
-                          onShowSizeChange: onShowSizeChange,
-                          itemRender: itemRender,
-                        }}
-                        style={{ overflowX: "auto" }}
-                        columns={contentColumns}
-                        bordered
-                        dataSource={quotationContents}
-                        rowKey={(record) => record['1']}
-                        // onChange={handleTableChange}
+                    <div className="col-sm-7">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Location"
+                        name="delivery_location"
+                        onChange={handleQuotationChange}
                       />
                     </div>
-                  <div className="text-center">
-                    <button
-                      type="button"
-                      className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                      onClick={handleAddNewQuotation}
-                    >
-                      Save
-                    </button>
-                    &nbsp;&nbsp;
-                    <button
-                      type="button"
-                      className="btn btn-secondary btn-rounded"
-                      data-bs-dismiss="modal"
-                    >
-                      Cancel
-                    </button>
                   </div>
-                </form>
+                  <div className="form-group row">
+                    <div className="col-sm-4">
+                      <label className="col-form-label">Payment Type</label>
+                    </div>
+                    <div className="col-sm-7">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Payment Type"
+                        name="payment_type"
+                        onChange={handleQuotationChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group row">
+                    <div className="col-sm-4">
+                      <label className="col-form-label">Warranty</label>
+                    </div>
+                    <div className="col-sm-7">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Warranty Period"
+                        name="warranty_period"
+                        onChange={handleQuotationChange}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="col-sm-6">
+                  <div className="form-group row">
+                    <div className="col-sm-4">Delivery Period</div>
+                    <div className="col-sm-7">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Delivery Period"
+                        name="delivery_period"
+                        onChange={handleQuotationChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group row">
+                    <div className="col-sm-4">Expiry Date</div>
+                    <div className="col-sm-7">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Expiry Date"
+                        name="quotation_expiration_date"
+                        onChange={handleQuotationChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group row">
+                    <div className="col-sm-4">Status</div>
+                    <div className="col-sm-7">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Status"
+                        name="status"
+                        onChange={handleQuotationChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group row">
+                    <div className="col-sm-4">
+                      <label className="col-form-label">Confirm Date</label>
+                    </div>
+                    <div className="col-sm-7">
+                      <div className="cal-icon">
+                        <DatePicker
+                          className="form-control"
+                          selected={confirmDate}
+                          onChange={handleConfirmDateChange}
+                          dateFormat="yyyy.MM.dd"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="form-group row">
+                    <div className="col-sm-4">Representative</div>
+                    <div className="col-sm-7">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Representative"
+                        name="sales_representative"
+                        onChange={handleQuotationChange}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+              <h4>Price Table</h4>
+              <div className="form-group row">
+                <div className="text-end flex-row">
+                  <div
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    <AddBoxOutlined style={{ height: 32, width: 32, color: 'gray' }} onClick={handleLoadNewTemporaryContent} />
+                    <IndeterminateCheckBoxOutlined style={{ height: 32, width: 32, color: 'gray' }} onClick={() => {
+                      console.log('Nothing yet');
+                    }} />
+                    <SettingsOutlined style={{ height: 32, width: 32, color: 'gray' }} onClick={() => {
+                      console.log('Nothing yet');
+                    }} />
+                  </div>
+                  <div className="dropdown-menu dropdown-menu-left" id="modify_content">
+                    <div>
+                      <h4>Edit Content</h4>
+                      {temporaryContent &&
+                        <>
+                          <table className="table">
+                            {temporaryContent.map((item, index) => {
+                              if (index === 0 || index === temporaryContent.length - 1) return;
+                              if (index % 2 === 1) {
+                                if (index !== temporaryContent.length - 2) return;
+                                return (
+                                  <tr key={index}>
+                                    <td>
+                                      {item.at(1)}
+                                    </td>
+                                    <td>
+                                      <input className="input-group-text-sm" type="text" />
+                                    </td>
+                                  </tr>
+                                )
+                              };
+                              return (
+                                <tr key={index}>
+                                  <td>
+                                    {temporaryContent[index - 1].at(1)}
+                                  </td>
+                                  <td>
+                                    <input className="input-group-text-sm" type="text" />
+                                  </td>
+                                  <td>
+                                    {item.at(1)}
+                                  </td>
+                                  <td>
+                                    <input className="input-group-text-sm" type="text" />
+                                  </td>
+                                </tr>
+                              )
+                            })}
+                          </table>
+                          <div>
+                            <textarea
+                              className="form-control"
+                              rows={3}
+                              placeholder='Comment'
+                              defaultValue=''
+                              name='comment'
+                            />
+                          </div>
+                        </>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="form-group row">
+                <Table
+                  rowSelection={{
+                    ...rowSelection,
+                  }}
+                  pagination={{
+                    total: quotationContents.length,
+                    showTotal: (total, range) =>
+                      `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+                    showSizeChanger: true,
+                    onShowSizeChange: onShowSizeChange,
+                    itemRender: itemRender,
+                  }}
+                  style={{ overflowX: "auto" }}
+                  columns={contentColumns}
+                  bordered
+                  dataSource={quotationContents}
+                  rowKey={(record) => record['1']}
+                // onChange={handleTableChange}
+                />
+              </div>
+              <div className="text-center">
+                <button
+                  type="button"
+                  className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                  onClick={handleAddNewQuotation}
+                >
+                  Save
+                </button>
+                &nbsp;&nbsp;
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-rounded"
+                  data-bs-dismiss="modal"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
+      </div>
+    </div>
   );
 };
 
