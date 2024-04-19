@@ -8,7 +8,7 @@ import { itemRender, onShowSizeChange } from "../paginationfunction";
 import "../antdstyle.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { AddBoxOutlined, MoreVert, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
+import { AddBoxOutlined, ModeEdit, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
 
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
@@ -131,11 +131,11 @@ const QuotationAddNewModal = () => {
       render: (text, record) => <>{text}</>,
     },
     {
-      title: "Action",
+      title: "Edit",
       render: (text, record) => (
         <div className="dropdown dropdown-action text-center">
-          <MoreVert onClick={() => {
-            handleLoadSelectedContent(record['1'] - 1);
+          <ModeEdit onClick={() => {
+            handleLoadSelectedContent(record);
           }} />
         </div>
       ),
@@ -237,7 +237,7 @@ const QuotationAddNewModal = () => {
       initializeQuotationTemplate();
       //close modal ?
     };
-  }, [cookies.myLationCrmUserId, initializeQuotationTemplate, quotationChange, modifyQuotation]);
+  }, [quotationChange, quotationHeaders.length, quotationContents, contentColumns, cookies.myLationCrmUserId, modifyQuotation, initializeQuotationTemplate]);
 
   // --- Functions dealing with contents table -------------------------------
   const rowSelection = {
@@ -270,17 +270,14 @@ const QuotationAddNewModal = () => {
     };
   }, [quotationContents]);
 
-  const handleLoadSelectedContent = useCallback((index) => {
-    console.log('\thandleLoadSelectedContent : ', index);
-    const foundContent = {
-      ...quotationContents.at(index)
-    };
-    setTemporaryContent(foundContent);
+  const handleLoadSelectedContent = useCallback((data) => {
+    console.log('\thandleLoadSelectedContent : ', data);
+    setTemporaryContent(data);
 
     const tarElem = document.querySelector("#modify_content");
     tarElem.style.display = "block";
     tarElem.focus();
-  }, [quotationContents, setTemporaryContent]);
+  }, [setTemporaryContent]);
 
   const handleEditTemporaryContent = useCallback((event) => {
     const tempContent = {
@@ -298,15 +295,15 @@ const QuotationAddNewModal = () => {
       console.log('[ Quotation / handleSaveTemporaryEdit ] Necessary Input is ommited!');
       return;
     };
-      
+    console.log('handleSaveTemporaryEdit : ', contentToSave);
+    const temp_index = contentToSave['1'] - 1;
     let tempContents = [];
-    if (contentToSave['1'] === quotationContents.length) {
+    if (temp_index === quotationContents.length) {
       tempContents = [
         ...quotationContents,
         contentToSave
       ];
     } else {
-      const temp_index = tempContents['1'] - 1;
       tempContents = [
         ...quotationContents.slice(0, temp_index),
         contentToSave,
@@ -328,20 +325,21 @@ const QuotationAddNewModal = () => {
   }, [setTemporaryContent]);
 
   // --- Functions used for remove selected contents ------------------------------
-  const handleDeleteContent = useCallback((index) => {
-    const tempContents = [
-      ...quotationContents.slice(0, index),
-      ...quotationContents.slice(index+1,)
-    ];
-    setQuotationContents(tempContents);
-  }, [quotationContents, setQuotationContents]);
-
   const handleDeleteSelectedConetents = useCallback(()=>{
     console.log('handleDeleteSelectedConetents : ', selectedRows);
-    // selectedRows.map(item => {
-    //   handleDeleteContent(item)
-    // })
-  }, [selectedRows, ])
+    let tempContents=[
+      ...quotationContents
+    ];
+    selectedRows.forEach(row => {
+      const filteredContents = tempContents.filter(item => item['1'] !== row['1']);
+      tempContents = filteredContents;
+    });
+    const finalContents = tempContents.map((item, index) => {
+      return { ...item, '1': index + 1};
+    })
+    console.log('handleDeleteSelectedConetents / final : ', finalContents);
+    setQuotationContents(finalContents);
+  }, [selectedRows, quotationContents, setQuotationContents])
 
   useEffect(() => {
     // ----- Load companies and set up the relation between lead and company by company code ---
@@ -391,7 +389,7 @@ const QuotationAddNewModal = () => {
     if (contentColumns.length === 0) {
       setContentColumns(default_columns);
     }
-  }, [allCompnayData, allLeadData, allQuotationData, contentColumns]);
+  }, [allCompnayData, allLeadData, allQuotationData, initializeQuotationTemplate, loadAllCompanies, loadAllLeads]);
 
   return (
     <div
