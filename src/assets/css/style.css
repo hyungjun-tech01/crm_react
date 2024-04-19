@@ -2071,6 +2071,10 @@ table.dataTable thead>tr>td.sorting {
 	top: 15px;
 }
 
+.cal-icon.cal-icon-sm:after {
+	top: 6px;
+}
+
 
 /*-----------------
   11. Login

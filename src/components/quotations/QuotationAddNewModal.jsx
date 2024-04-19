@@ -8,7 +8,6 @@ import { itemRender, onShowSizeChange } from "../paginationfunction";
 import "../antdstyle.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { Button, Popover } from "@mui/material";
 import { AddBoxOutlined, MoreVert, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
 
 import { CompanyRepo } from "../../repository/company";
@@ -24,26 +23,24 @@ const default_quotation_content = {
   '16': null, '17': null, '18': null, '19': null, '998': null,
 };
 const default_content_array = [
-  ['1', 'No', null],
-  ['2', '분류', null],
-  ['3', '제조회사', null],
-  ['4', '모델명', null],
-  ['5', '품목', null],
-  ['6', '재질', null],
-  ['7', '타입', null],
-  ['8', '색상', null],
-  ['9', '규격', null],
-  ['10', '세부사양', null],
-  ['11', '단위', null],
-  ['12', '수량', null],
-  ['13', '소비자가', null],
-  ['14', '할인%', null],
-  ['15', '견적단가', null],
-  ['16', '견적금액', null],
-  ['17', '원가', null],
-  ['18', '이익금액', null],
-  ['19', '비고', null],
-  ['998', 'Comment', null],
+  ['2', '분류'],
+  ['3', '제조회사'],
+  ['4', '모델명'],
+  ['5', '품목'],
+  ['6', '재질'],
+  ['7', '타입'],
+  ['8', '색상'],
+  ['9', '규격'],
+  ['10', '세부사양'],
+  ['11', '단위'],
+  ['12', '수량'],
+  ['13', '소비자가'],
+  ['14', '할인%'],
+  ['15', '견적단가'],
+  ['16', '견적금액'],
+  ['17', '원가'],
+  ['18', '이익금액'],
+  ['19', '비고'],
 ];
 
 const common_items = [
@@ -60,67 +57,18 @@ const common_items = [
 ];
 
 const ConvertHeaderInfosToString = (data) => {
-  let ret = '';
+  let ret = 'No|1|';
+  
+  if(data[0]['title'] === 'No') ret += data[0]['size']
+  else ret += '0';
+
   default_content_array.forEach(item => {
-    ret += item.at(0) + '|';
-    ret += item.at(1) + '|';
-    if (data[item.at(0)]) {
+    ret += '|' + item.at(0) + '|' + item.at(1) + '|' + data[item.at(0)];
+  });
 
-    }
-  })
+  console.log('\t[ ConvertHeaderInfosToString ] Result : ', ret);
+  return ret;
 }
-
-const default_columns = [
-  {
-    title: "No",
-    dataIndex: '1',
-    render: (text, record) => <>{text}</>,
-  },
-  {
-    title: "Product",
-    dataIndex: '5',
-    render: (text, record) => <>{text}</>,
-  },
-  {
-    title: "Detail Info.",
-    dataIndex: '10',
-    render: (text, record) => <>{text}</>,
-  },
-  {
-    title: "Quantity",
-    dataIndex: '12',
-    render: (text, record) => <>{text}</>,
-  },
-  {
-    title: "Unit Price",
-    dataIndex: '15',
-    render: (text, record) => <>{text}</>,
-  },
-  {
-    title: "Total Price",
-    dataIndex: '16',
-    render: (text, record) => <>{text}</>,
-  },
-  {
-    title: "Action",
-    render: (text, record) => (
-      <div className="dropdown dropdown-action text-center">
-        <a
-          className="action-icon dropdown-toggle"
-          data-bs-toggle="dropdown"
-          aria-expanded="false"
-        >
-          <MoreVert onClick={() => {
-            const tarElem = document.querySelector("#content_table_" + record['1']);
-            if (tarElem) {
-              tarElem.style.display = "block";
-            }
-          }} />
-        </a>
-      </div>
-    ),
-  },
-]
 
 const QuotationAddNewModal = () => {
   const allCompnayData = useRecoilValue(atomAllCompanies);
@@ -142,7 +90,57 @@ const QuotationAddNewModal = () => {
   const [ quotationChange, setQuotationChange ] = useState(null);
 
   const [ contentColumns, setContentColumns ] = useState([]);
-  const [ temporaryContent, setTemporaryContent ] = useState([]);
+  const [ temporaryContent, setTemporaryContent ] = useState(null);
+  const [ selectedRows, setSelectedRows ] = useState([]);
+
+  const default_columns = [
+    {
+      title: "No",
+      dataIndex: '1',
+      size: 5,
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: "Product",
+      dataIndex: '5',
+      size: 50,
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: "Detail Info.",
+      dataIndex: '10',
+      size: 10,
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: "Quantity",
+      dataIndex: '12',
+      size: 10,
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: "Unit Price",
+      dataIndex: '15',
+      size: 15,
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: "Total Price",
+      dataIndex: '16',
+      size: 15,
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: "Action",
+      render: (text, record) => (
+        <div className="dropdown dropdown-action text-center">
+          <MoreVert onClick={() => {
+            handleLoadSelectedContent(record['1'] - 1);
+          }} />
+        </div>
+      ),
+    },
+  ];
 
   // --- Functions used for adding new quotation ------------------------------
   const initializeQuotationTemplate = useCallback(() => {
@@ -226,6 +224,7 @@ const QuotationAddNewModal = () => {
     };
     const newQuotationData = {
       ...quotationChange,
+      quotation_table: ConvertHeaderInfosToString(contentColumns),
       quotation_contents: JSON.stringify(quotationContents),
       action_type: 'ADD',
       lead_number: '99999',// Temporary
@@ -248,6 +247,7 @@ const QuotationAddNewModal = () => {
         "selectedRows: ",
         selectedRows
       );
+      setSelectedRows(selectedRows);
     },
     getCheckboxProps: (record) => ({
       disabled: record.name === "Disabled User", // Column configuration not to be checked
@@ -260,59 +260,64 @@ const QuotationAddNewModal = () => {
   const handleLoadNewTemporaryContent = useCallback(() => {
     const tarElem = document.querySelector("#modify_content");
     if (tarElem) {
-      const tempContentArray = [
-        ['1', 'No', quotationContents.length + 1],
-        ...default_content_array.slice(1,)
-      ];
-      setTemporaryContent(tempContentArray);
+      const tempContent = {
+        ...default_quotation_content,
+        '1': quotationContents.length + 1,
+      };
+      setTemporaryContent(tempContent);
       tarElem.style.display = "block";
+      tarElem.focus();
     };
   }, [quotationContents]);
 
   const handleLoadSelectedContent = useCallback((index) => {
-    const tarElem = document.querySelector("#modify_content");
-    if (tarElem) {
-      const foundContent = {
-        ...quotationContents.at(index)
-      };
-      const tempContentArray = [
-        ...default_content_array
-      ];
-      tempContentArray.forEach(item => {
-        item[2] = foundContent[item[0]];
-      });
-      setTemporaryContent(tempContentArray);
-      tarElem.style.display = "block";
+    console.log('\thandleLoadSelectedContent : ', index);
+    const foundContent = {
+      ...quotationContents.at(index)
     };
-  }, [quotationContents]);
+    setTemporaryContent(foundContent);
+
+    const tarElem = document.querySelector("#modify_content");
+    tarElem.style.display = "block";
+    tarElem.focus();
+  }, [quotationContents, setTemporaryContent]);
+
+  const handleEditTemporaryContent = useCallback((event) => {
+    const tempContent = {
+      ...temporaryContent,
+      [event.target.name]: event.target.value,
+    };
+    setTemporaryContent(tempContent);
+  }, [temporaryContent, setTemporaryContent]);
 
   const handleSaveTemporaryEdit = useCallback(() => {
-    const tarElem = document.querySelector("#modify_content");
-    if (tarElem) {
-      const contentToSave = {
-        ...default_quotation_content
-      };
-      temporaryContent.forEach(item => {
-        contentToSave[item.at(0)] = item.at(2);
-      });
-      let tempContents = [];
-      if (contentToSave['1'] === quotationContents.length) {
-        tempContents = [
-          ...quotationContents,
-          contentToSave
-        ];
-      } else {
-        const temp_index = tempContents['1'] - 1;
-        tempContents = [
-          ...quotationContents.slice(0, temp_index),
-          contentToSave,
-          ...quotationContents.slice(temp_index + 1,)
-        ];
-      }
-      setQuotationContents(tempContents);
-      tarElem.style.display = "none";
+    const contentToSave = {
+      ...temporaryContent
     };
-  }, []);
+    if(!contentToSave['1'] || !contentToSave['5'] || !contentToSave['16']){
+      console.log('[ Quotation / handleSaveTemporaryEdit ] Necessary Input is ommited!');
+      return;
+    };
+      
+    let tempContents = [];
+    if (contentToSave['1'] === quotationContents.length) {
+      tempContents = [
+        ...quotationContents,
+        contentToSave
+      ];
+    } else {
+      const temp_index = tempContents['1'] - 1;
+      tempContents = [
+        ...quotationContents.slice(0, temp_index),
+        contentToSave,
+        ...quotationContents.slice(temp_index + 1,)
+      ];
+    }
+    setQuotationContents(tempContents);
+    setTemporaryContent(null);
+    const tarElem = document.querySelector("#modify_content");
+    tarElem.style.display = "none";
+  }, [temporaryContent, quotationContents, setQuotationContents, setTemporaryContent]);
 
   const handleCloseTemporaryEdit = useCallback(() => {
     const tarElem = document.querySelector("#modify_content");
@@ -320,42 +325,23 @@ const QuotationAddNewModal = () => {
       setTemporaryContent(null);
       tarElem.style.display = "none";
     };
-  }, []);
+  }, [setTemporaryContent]);
 
-  const handleAddNewContent = useCallback(() => {
-    const tempContent = {
-      ...default_quotation_content,
-      ['1']: quotationContents.length + 1,
-    };
-    const tempContents = [
-      ...quotationContents,
-      tempContent,
-    ];
-    setQuotationContents(tempContents);
-  }, [quotationContents]);
-
-  const handleModifyContent = useCallback((index, item, data) => {
-    if (quotationContents.length <= index) return;
-    const tempContent = {
-      ...quotationContents.at(index),
-      [item]: data,
-    };
-    const tempContents = [
-      ...quotationContents.slice(0, index),
-      tempContent,
-      ...quotationContents.slice(index + 1,),
-    ];
-    setQuotationContents(tempContents);
-  }, [quotationContents]);
-
+  // --- Functions used for remove selected contents ------------------------------
   const handleDeleteContent = useCallback((index) => {
     const tempContents = [
-      ...quotationContents,
+      ...quotationContents.slice(0, index),
+      ...quotationContents.slice(index+1,)
     ];
-    delete tempContents[index];
     setQuotationContents(tempContents);
-  }, [quotationContents]);
+  }, [quotationContents, setQuotationContents]);
 
+  const handleDeleteSelectedConetents = useCallback(()=>{
+    console.log('handleDeleteSelectedConetents : ', selectedRows);
+    // selectedRows.map(item => {
+    //   handleDeleteContent(item)
+    // })
+  }, [selectedRows, ])
 
   useEffect(() => {
     // ----- Load companies and set up the relation between lead and company by company code ---
@@ -444,9 +430,16 @@ const QuotationAddNewModal = () => {
                   <label>Name</label>
                 </div>
                 <div className="col-sm-8">
-                  <Select options={leadsForSelection} onChange={(value) => {
-                    handleSelectLead(value.value);
-                    setSelectedLead({ ...value.value });
+                  <Select 
+                    options={leadsForSelection}
+                    styles={{
+                      borderColor: '#e3e3e3',
+                      boxShadow: 'none',
+                      fontSize: '15px',
+                      height: '20px'}}
+                    onChange={(value) => {
+                      handleSelectLead(value.value);
+                      setSelectedLead({ ...value.value });
                   }} />
                 </div>
               </div>
@@ -493,7 +486,7 @@ const QuotationAddNewModal = () => {
                   <label className="col-form-label">Title</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control form-control-sm"
                     placeholder="Title"
                     name="quotation_title"
                     onChange={handleQuotationChange}
@@ -511,7 +504,7 @@ const QuotationAddNewModal = () => {
                     <div className="col-sm-7">
                       <input
                         type="text"
-                        className="form-control"
+                        className="form-control form-control-sm"
                         placeholder="Document No"
                         name="quotation_number"
                         onChange={handleQuotationChange}
@@ -529,9 +522,9 @@ const QuotationAddNewModal = () => {
                       <label className="col-form-label">Quotation Date</label>
                     </div>
                     <div className="col-sm-7">
-                      <div className="cal-icon">
+                      <div className="cal-icon cal-icon-sm">
                         <DatePicker
-                          className="form-control"
+                          className="form-control form-control-sm"
                           selected={quotationDate}
                           onChange={handleQuotationDateChange}
                           dateFormat="yyyy.MM.dd"
@@ -546,7 +539,7 @@ const QuotationAddNewModal = () => {
                     <div className="col-sm-7">
                       <input
                         type="text"
-                        className="form-control"
+                        className="form-control form-control-sm"
                         placeholder="Location"
                         name="delivery_location"
                         onChange={handleQuotationChange}
@@ -560,7 +553,7 @@ const QuotationAddNewModal = () => {
                     <div className="col-sm-7">
                       <input
                         type="text"
-                        className="form-control"
+                        className="form-control form-control-sm"
                         placeholder="Payment Type"
                         name="payment_type"
                         onChange={handleQuotationChange}
@@ -574,7 +567,7 @@ const QuotationAddNewModal = () => {
                     <div className="col-sm-7">
                       <input
                         type="text"
-                        className="form-control"
+                        className="form-control form-control-sm"
                         placeholder="Warranty Period"
                         name="warranty_period"
                         onChange={handleQuotationChange}
@@ -588,7 +581,7 @@ const QuotationAddNewModal = () => {
                     <div className="col-sm-7">
                       <input
                         type="text"
-                        className="form-control"
+                        className="form-control form-control-sm"
                         placeholder="Delivery Period"
                         name="delivery_period"
                         onChange={handleQuotationChange}
@@ -600,7 +593,7 @@ const QuotationAddNewModal = () => {
                     <div className="col-sm-7">
                       <input
                         type="text"
-                        className="form-control"
+                        className="form-control form-control-sm"
                         placeholder="Expiry Date"
                         name="quotation_expiration_date"
                         onChange={handleQuotationChange}
@@ -612,7 +605,7 @@ const QuotationAddNewModal = () => {
                     <div className="col-sm-7">
                       <input
                         type="text"
-                        className="form-control"
+                        className="form-control form-control-sm"
                         placeholder="Status"
                         name="status"
                         onChange={handleQuotationChange}
@@ -624,9 +617,9 @@ const QuotationAddNewModal = () => {
                       <label className="col-form-label">Confirm Date</label>
                     </div>
                     <div className="col-sm-7">
-                      <div className="cal-icon">
+                      <div className="cal-icon cal-icon-sm">
                         <DatePicker
-                          className="form-control"
+                          className="form-control form-control-sm"
                           selected={confirmDate}
                           onChange={handleConfirmDateChange}
                           dateFormat="yyyy.MM.dd"
@@ -639,7 +632,7 @@ const QuotationAddNewModal = () => {
                     <div className="col-sm-7">
                       <input
                         type="text"
-                        className="form-control"
+                        className="form-control form-control-sm"
                         placeholder="Representative"
                         name="sales_representative"
                         onChange={handleQuotationChange}
@@ -655,13 +648,21 @@ const QuotationAddNewModal = () => {
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    <AddBoxOutlined style={{ height: 32, width: 32, color: 'gray' }} onClick={handleLoadNewTemporaryContent} />
-                    <IndeterminateCheckBoxOutlined style={{ height: 32, width: 32, color: 'gray' }} onClick={() => {
-                      console.log('Nothing yet');
-                    }} />
-                    <SettingsOutlined style={{ height: 32, width: 32, color: 'gray' }} onClick={() => {
-                      console.log('Nothing yet');
-                    }} />
+                    <AddBoxOutlined
+                      style={{ height: 32, width: 32, color: 'gray' }}
+                      onClick={handleLoadNewTemporaryContent}
+                    />
+                    <IndeterminateCheckBoxOutlined 
+                      style={{ height: 32, width: 32, color: 'gray' }}
+                      onClick={handleDeleteSelectedConetents}
+                      disabled={!selectedRows}
+                    />
+                    <SettingsOutlined
+                      style={{ height: 32, width: 32, color: 'gray' }}
+                      onClick={() => {
+                        console.log('Nothing yet');
+                      }} 
+                    />
                   </div>
                   <div className="dropdown-menu dropdown-menu-left" id="modify_content">
                     <div>
@@ -669,17 +670,22 @@ const QuotationAddNewModal = () => {
                       {temporaryContent &&
                         <>
                           <table className="table">
-                            {temporaryContent.map((item, index) => {
-                              if (index === 0 || index === temporaryContent.length - 1) return;
-                              if (index % 2 === 1) {
-                                if (index !== temporaryContent.length - 2) return;
+                            {default_content_array.map((item, index) => {
+                              if (index % 2 === 0) {
+                                if (index !== default_content_array.length - 1) return;
                                 return (
                                   <tr key={index}>
                                     <td>
                                       {item.at(1)}
                                     </td>
                                     <td>
-                                      <input className="input-group-text-sm" type="text" />
+                                      <input 
+                                        name={item.at(0)} 
+                                        className="input-group-text input-group-text-sm"
+                                        type="text"
+                                        defaultValue={temporaryContent[item.at(0)]}
+                                        onChange={handleEditTemporaryContent}
+                                      />
                                     </td>
                                   </tr>
                                 )
@@ -687,32 +693,62 @@ const QuotationAddNewModal = () => {
                               return (
                                 <tr key={index}>
                                   <td>
-                                    {temporaryContent[index - 1].at(1)}
+                                    {default_content_array[index - 1][1]}
                                   </td>
                                   <td>
-                                    <input className="input-group-text-sm" type="text" />
+                                    <input
+                                      name={default_content_array[index - 1][0]}
+                                      className="input-group-text input-group-text-sm"
+                                      type="text"
+                                      defaultValue={temporaryContent[default_content_array[index - 1][0]]}
+                                      onChange={handleEditTemporaryContent}
+                                    />
                                   </td>
                                   <td>
                                     {item.at(1)}
                                   </td>
                                   <td>
-                                    <input className="input-group-text-sm" type="text" />
+                                    <input
+                                      name={item.at(0)}
+                                      className="input-group-text input-group-text-sm"
+                                      type="text"
+                                      defaultValue={temporaryContent[item.at(0)]}
+                                      onChange={handleEditTemporaryContent}
+                                    />
                                   </td>
                                 </tr>
                               )
                             })}
                           </table>
-                          <div>
+                          { !!temporaryContent['10'] && <div>
                             <textarea
                               className="form-control"
                               rows={3}
                               placeholder='Comment'
-                              defaultValue=''
-                              name='comment'
+                              defaultValue={temporaryContent['998']}
+                              name='998'
+                              onChange={handleEditTemporaryContent}
                             />
-                          </div>
+                          </div>}
                         </>
                       }
+                    </div>
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                        onClick={handleSaveTemporaryEdit}
+                      >
+                        Save
+                      </button>
+                      &nbsp;&nbsp;
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-rounded"
+                        onClick={handleCloseTemporaryEdit}
+                      >
+                        Cancel
+                      </button>
                     </div>
                   </div>
                 </div>
