@@ -326,9 +326,9 @@ const Leads = () => {
           {/* Page Header */}
           <div className="page-header pt-3 mb-0 ">
             <div className="row ">
-              <div className="text-start" style={{width:'120px'}}>
+              <div className="text-start" style={{width:'150px'}}>
                 <div className="dropdown">
-                  <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> Status</button>
+                  <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ?"All Leads":statusSearch}</button>
                     <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('All Leads')}>All Leads</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('Not Contacted')}>Not Contacted</button>
