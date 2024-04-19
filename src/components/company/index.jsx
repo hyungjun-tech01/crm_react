@@ -37,16 +37,16 @@ const Company = () => {
     setCurrentCompany(id);
   },[setCurrentCompany]);
 
-  const handleAddNewCompanyClicked = useCallback(() => {
-    initializeCompanyTemplate();
-  // eslint-disable-next-line no-use-before-define
-  }, [initializeCompanyTemplate]);
-
   // --- Functions used for Add New Company ------------------------------
   const initializeCompanyTemplate = useCallback(() => {
     setCompanyChange({...defaultCompany});
     document.querySelector("#add_new_company_form").reset();
   }, []);
+
+  const handleAddNewCompanyClicked = useCallback(() => {
+    initializeCompanyTemplate();
+  // eslint-disable-next-line no-use-before-define
+  }, [initializeCompanyTemplate]);
 
   const handleEstablishDateChange = useCallback((date) => {
     setEstablishDate(date);
