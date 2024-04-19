@@ -4,7 +4,7 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
-import { SystemUser, CircleImg, C_logo, C_logo2 } from "../imagepath";
+import { MoreVert } from '@mui/icons-material';
 import { Table } from "antd";
 import "antd/dist/reset.css";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
@@ -197,7 +197,7 @@ const Consultings = () => {
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            <i className="material-icons">more_vert</i>
+            <MoreVert />
           </a>
           <div className="dropdown-menu dropdown-menu-right h-100">
             <a style={{ display: "initial" }} className="dropdown-item">

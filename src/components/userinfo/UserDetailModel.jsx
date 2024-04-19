@@ -275,7 +275,7 @@ const UserDetailModel = () => {
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
-                                  data_set={selectedUser}
+                                  defaultText={selectedUser.userName}
                                   saved={savedValues}
                                   name="userName"
                                   title="Name"
@@ -288,7 +288,7 @@ const UserDetailModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  data_set={selectedUser}
+                                  defaultText={selectedUser.department}
                                   saved={savedValues}
                                   name="department"
                                   title="Department"
@@ -300,7 +300,7 @@ const UserDetailModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                <DetailLabelItem
-                                  data_set={selectedUser}
+                                  defaultText={selectedUser.position}
                                   saved={savedValues}
                                   name="position"
                                   title="Position"
@@ -312,7 +312,7 @@ const UserDetailModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />     
                                 <DetailLabelItem
-                                  data_set={selectedUser}
+                                  defaultText={selectedUser.phoneNumber}
                                   saved={savedValues}
                                   name="phoneNumber"
                                   title="Phone Number"
@@ -324,7 +324,7 @@ const UserDetailModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />                                                                 
                                 <DetailLabelItem
-                                  data_set={selectedUser}
+                                  defaultText={selectedUser.mobileNumber}
                                   saved={savedValues}
                                   name="mobileNumber"
                                   title="Mobile Number"
@@ -336,7 +336,7 @@ const UserDetailModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                <DetailLabelItem
-                                  data_set={selectedUser}
+                                  defaultText={selectedUser.email}
                                   saved={savedValues}
                                   name="email"
                                   title="EMail"
@@ -348,7 +348,7 @@ const UserDetailModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />          
                                 <DetailLabelItem
-                                  data_set={selectedUser}
+                                  defaultText={selectedUser.group_}
                                   saved={savedValues}
                                   name="group_"
                                   title="Group"
@@ -360,7 +360,7 @@ const UserDetailModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                  <DetailTextareaItem
-                                  data_set={selectedUser}
+                                  defaultText={selectedUser.memo}
                                   saved={savedValues}
                                   name="memo"
                                   title="Memo"

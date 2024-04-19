@@ -150,9 +150,9 @@ export const atomCompanyConsultings = atom({
 export const defaultQuotation = {
     //-----Quotation Main info -----------------
     quotation_code: null,
+    quotation_title: null,
     quotation_number: null,
     quotation_type: null,
-    quotation_title: null,
     quotation_manager: null,
     quotation_send_type: null,
     quotation_date: null,

@@ -367,12 +367,12 @@ const QuotationsDetailsModel = () => {
                         <div className="tab-pane show active p-0" id="quotation-details">
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header="Quotation Main Information" key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.quotation_type}
                                         saved={savedValues}
                                         name="quotation_type"
                                         title="Quotation Type"
@@ -385,7 +385,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.quotation_title}
                                         saved={savedValues}
                                         name="quotation_title"
                                         title="Quotation Title"
@@ -397,7 +397,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.quotation_manager}
                                         saved={savedValues}
                                         name="quotation_manager"
                                         title="Manager"
@@ -409,7 +409,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.quotation_send_type}
                                         saved={savedValues}
                                         name="quotation_send_type"
                                         title="Send Type"
@@ -434,7 +434,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.quotation_expiration_date}
                                         saved={savedValues}
                                         name="quotation_expiration_date"
                                         title="Expriy Date"
@@ -459,7 +459,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.delivery_location}
                                         saved={savedValues}
                                         name="delivery_location"
                                         title="Delivery Location"
@@ -471,7 +471,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.delivery_period}
                                         saved={savedValues}
                                         name="delivery_period"
                                         title="Delivery Period"
@@ -483,7 +483,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.warranty_period}
                                         saved={savedValues}
                                         name="warranty_period"
                                         title="Warranty Period"
@@ -495,7 +495,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.sales_representati}
                                         saved={savedValues}
                                         name="sales_representati"
                                         title="Sales Representative"
@@ -518,7 +518,7 @@ const QuotationsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.payment_type}
                                         saved={savedValues}
                                         name="payment_type"
                                         title="Payment Type"
@@ -531,7 +531,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.currency}
                                         saved={savedValues}
                                         name="currency"
                                         title="Currency"
@@ -543,7 +543,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.list_price}
                                         saved={savedValues}
                                         name="list_price"
                                         title="List Price"
@@ -555,7 +555,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.list_price_dc}
                                         saved={savedValues}
                                         name="list_price_dc"
                                         title="List Price DC"
@@ -567,7 +567,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.sub_total_amount}
                                         saved={savedValues}
                                         name="sub_total_amount"
                                         title="Sub Total Amount"
@@ -579,7 +579,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.dc_rate}
                                         saved={savedValues}
                                         name="dc_rate"
                                         title="DC Rate"
@@ -591,7 +591,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.quotation_amount}
                                         saved={savedValues}
                                         name="quotation_amount"
                                         title="Quotation Amount"
@@ -603,7 +603,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.tax_amount}
                                         saved={savedValues}
                                         name="tax_amount"
                                         title="Tax Amount"
@@ -615,7 +615,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.cutoff_amount}
                                         saved={savedValues}
                                         name="cutoff_amount"
                                         title="Cut-Off Amount"
@@ -627,7 +627,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.total_quotation_amount}
                                         saved={savedValues}
                                         name="total_quotation_amount"
                                         title="Total Quotation Amount"
@@ -639,7 +639,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.total_cost_price}
                                         saved={savedValues}
                                         name="total_cost_price"
                                         title="Total Cost Amount"
@@ -651,7 +651,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.profit}
                                         saved={savedValues}
                                         name="profit"
                                         title="Profit"
@@ -663,7 +663,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.profit_rate}
                                         saved={savedValues}
                                         name="profit_rate"
                                         title="Profit Rate"
@@ -675,7 +675,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.upper_memo}
                                         saved={savedValues}
                                         name="upper_memo"
                                         title="Upper Memo"
@@ -687,7 +687,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.lower_memo}
                                         saved={savedValues}
                                         name="lower_memo"
                                         title="Lower Memo"
@@ -710,7 +710,7 @@ const QuotationsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.lead_name}
                                         saved={savedValues}
                                         name="lead_name"
                                         title="Lead Name"
@@ -723,7 +723,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.department}
                                         saved={savedValues}
                                         name="department"
                                         title="Department"
@@ -735,7 +735,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.position}
                                         saved={savedValues}
                                         name="position"
                                         title="Position"
@@ -747,7 +747,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.mobile_number}
                                         saved={savedValues}
                                         name="mobile_number"
                                         title="Mobile"
@@ -759,7 +759,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.phone_number}
                                         saved={savedValues}
                                         name="phone_number"
                                         title="Phone"
@@ -771,7 +771,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.fax_number}
                                         saved={savedValues}
                                         name="fax_number"
                                         title="Fax"
@@ -783,7 +783,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.email}
                                         saved={savedValues}
                                         name="email"
                                         title="Email"
@@ -806,7 +806,7 @@ const QuotationsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.company_name}
                                         saved={savedValues}
                                         name="company_name"
                                         title="Organization"
@@ -829,7 +829,7 @@ const QuotationsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedQuotation}
+                                        defaultText={selectedQuotation.status}
                                         saved={savedValues}
                                         name="status"
                                         title="Status"

@@ -8,6 +8,7 @@ import { useCookies } from "react-cookie";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
 import "../antdstyle.css";
 import LeadsDetailsModel from "./LeadsDetailsModel";
+import { MoreVert } from '@mui/icons-material';
 import { BiUser } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import {ConsultingRepo} from "../../repository/consulting"
@@ -29,12 +30,23 @@ const Leads = () => {
   const [ companyData, setCompanyData ] = useState([]);
 
   const [searchCondition, setSearchCondition] = useState("");
+  const [statusSearch, setStatusSearch] = useState("");
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
     filterLeads(newValue);
   };
 
+  const handleStatusSearch = (newValue) => {
+    setStatusSearch(newValue);
+    if(newValue === "All Leads"){
+      loadAllLeads();
+    }else{
+      loadAllLeads();
+    }
+    setExpaned(false);
+    setSearchCondition("");
+  }
   // --- Functions used for Add New Lead ------------------------------
   const handleAddNewLeadClicked = useCallback(() => {
     initializeLeadTemplate();
@@ -100,6 +112,8 @@ const Leads = () => {
     };
     setLeadChange(tempLeadChange);
   },[leadChange]);
+
+  const [expanded, setExpaned] = useState(false);
 
   const columns = [
     {
@@ -193,7 +207,7 @@ const Leads = () => {
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            <i className="material-icons">more_vert</i>
+            <MoreVert />
           </a>
           <div className="dropdown-menu dropdown-menu-right">
             <a className="dropdown-item" href="#">
@@ -314,46 +328,17 @@ const Leads = () => {
             <div className="row ">
               <div className="text-start" style={{width:'120px'}}>
                 <div className="dropdown">
-                  <a
-                    className="dropdown-toggle"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    {" "}
-                    All Leads
-                  </a>
-                  <div className="dropdown-menu">
-                    <a className="dropdown-item" href="#">
-                      Recently Viewed
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Items I'm following
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      All Leads
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      All Closed Leads
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      All Open Leads
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Converted Leads
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      My Open Leads
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Todays Leads
-                    </a>
+                  <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> Status</button>
+                    <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('All Leads')}>All Leads</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('Not Contacted')}>Not Contacted</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('Attempted Contact')}>Attempted Contact</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('Contact')}>Contact</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('Converted')}>Converted</button>
+                    </div>
                   </div>
                 </div>
-              </div>
               <div className="col text-start" style={{width:'400px'}}>
-                <label style={{ display: 'inline', width:'100px',marginRight:'10px' }}>결과내 검색</label>
                 <input
                       id = "searchCondition"
                       className="form-control" 

@@ -350,7 +350,7 @@ const ConsultingsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedConsulting}
+                                        defaultText={selectedConsulting.consulting_type}
                                         saved={savedValues}
                                         name="consulting_type"
                                         title="Consulting Type"
@@ -377,7 +377,7 @@ const ConsultingsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedConsulting}
+                                        defaultText={selectedConsulting.receiver}
                                         saved={savedValues}
                                         name="receiver"
                                         title="Receiver"
@@ -389,7 +389,7 @@ const ConsultingsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedConsulting}
+                                        defaultText={selectedConsulting.product_type}
                                         saved={savedValues}
                                         name="product_type"
                                         title="Product Type"
@@ -401,7 +401,7 @@ const ConsultingsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedConsulting}
+                                        defaultText={selectedConsulting.lead_time}
                                         saved={savedValues}
                                         name="lead_time"
                                         title="Lead Time"
@@ -413,7 +413,7 @@ const ConsultingsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedConsulting}
+                                        defaultText={selectedConsulting.request_type}
                                         saved={savedValues}
                                         name="request_type"
                                         title="Request Type"
@@ -425,7 +425,7 @@ const ConsultingsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailTextareaItem
-                                        data_set={selectedConsulting}
+                                        defaultText={selectedConsulting.request_content}
                                         saved={savedValues}
                                         name="request_content"
                                         title="Request Content"
@@ -439,7 +439,7 @@ const ConsultingsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailTextareaItem
-                                        data_set={selectedConsulting}
+                                        defaultText={selectedConsulting.action_content}
                                         saved={savedValues}
                                         name="action_content"
                                         title="Action Content"
@@ -453,7 +453,7 @@ const ConsultingsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedConsulting}
+                                        defaultText={selectedConsulting.sales_representati}
                                         saved={savedValues}
                                         name="sales_representati"
                                         title="Sales Representative"
@@ -476,7 +476,7 @@ const ConsultingsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedConsulting}
+                                        defaultText={selectedConsulting.lead_name}
                                         saved={savedValues}
                                         name="lead_name"
                                         title="Lead Name"
@@ -489,7 +489,7 @@ const ConsultingsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedConsulting}
+                                        defaultText={selectedConsulting.department}
                                         saved={savedValues}
                                         name="department"
                                         title="Department"
@@ -501,7 +501,7 @@ const ConsultingsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedConsulting}
+                                        defaultText={selectedConsulting.position}
                                         saved={savedValues}
                                         name="position"
                                         title="Position"
@@ -513,7 +513,7 @@ const ConsultingsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedConsulting}
+                                        defaultText={selectedConsulting.mobile_number}
                                         saved={savedValues}
                                         name="mobile_number"
                                         title="Mobile"
@@ -525,7 +525,7 @@ const ConsultingsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedConsulting}
+                                        defaultText={selectedConsulting.phone_number}
                                         saved={savedValues}
                                         name="phone_number"
                                         title="Phone"
@@ -537,7 +537,7 @@ const ConsultingsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedConsulting}
+                                        defaultText={selectedConsulting.email}
                                         saved={savedValues}
                                         name="email"
                                         title="Email"
@@ -560,7 +560,7 @@ const ConsultingsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedConsulting}
+                                        defaultText={selectedConsulting.company_name}
                                         saved={savedValues}
                                         name="company_name"
                                         title="Organization"
@@ -583,7 +583,7 @@ const ConsultingsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedConsulting}
+                                        defaultText={selectedConsulting.status}
                                         saved={savedValues}
                                         name="status"
                                         title="Status"

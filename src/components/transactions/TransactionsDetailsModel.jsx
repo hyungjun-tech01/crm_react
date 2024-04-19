@@ -321,7 +321,7 @@ const TransactionsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedTransaction}
+                                        defaultText={selectedTransaction.transaction_title}
                                         saved={savedValues}
                                         name="transaction_title"
                                         title="Title"
@@ -334,7 +334,7 @@ const TransactionsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedTransaction}
+                                        defaultText={selectedTransaction.transaction_type}
                                         saved={savedValues}
                                         name="transaction_type"
                                         title="Type"
@@ -360,7 +360,7 @@ const TransactionsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedTransaction}
+                                        defaultText={selectedTransaction.publish_type}
                                         saved={savedValues}
                                         name="publish_type"
                                         title="Publish Type"
@@ -383,7 +383,7 @@ const TransactionsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedTransaction}
+                                        defaultText={selectedTransaction.company_name}
                                         saved={savedValues}
                                         name="company_name"
                                         title="Organization"
@@ -396,7 +396,7 @@ const TransactionsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedTransaction}
+                                        defaultText={selectedTransaction.ceo_name}
                                         saved={savedValues}
                                         name="ceo_name"
                                         title="Ceo Name"
@@ -408,7 +408,7 @@ const TransactionsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailTextareaItem
-                                        data_set={selectedTransaction}
+                                        defaultText={selectedTransaction.company_address}
                                         saved={savedValues}
                                         name="company_address"
                                         title="Address"
@@ -421,7 +421,7 @@ const TransactionsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedTransaction}
+                                        defaultText={selectedTransaction.business_type}
                                         saved={savedValues}
                                         name="business_type"
                                         title="Business Type"
@@ -433,7 +433,7 @@ const TransactionsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedTransaction}
+                                        defaultText={selectedTransaction.business_item}
                                         saved={savedValues}
                                         name="business_item"
                                         title="Business Item"
@@ -445,7 +445,7 @@ const TransactionsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedTransaction}
+                                        defaultText={selectedTransaction.business_registration_code}
                                         saved={savedValues}
                                         name="business_registration_code"
                                         title="Business Registration Code"
@@ -468,7 +468,7 @@ const TransactionsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        data_set={selectedTransaction}
+                                        defaultText={selectedTransaction.supply_price}
                                         saved={savedValues}
                                         name="supply_price"
                                         title="Supply Price"
@@ -481,7 +481,7 @@ const TransactionsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedTransaction}
+                                        defaultText={selectedTransaction.tax_price}
                                         saved={savedValues}
                                         name="tax_price"
                                         title="Tax Price"
@@ -493,7 +493,7 @@ const TransactionsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedTransaction}
+                                        defaultText={selectedTransaction.total_price}
                                         saved={savedValues}
                                         name="total_price"
                                         title="Total Price"
@@ -505,7 +505,7 @@ const TransactionsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedTransaction}
+                                        defaultText={selectedTransaction.currency}
                                         saved={savedValues}
                                         name="currency"
                                         title="Currency"
@@ -517,7 +517,7 @@ const TransactionsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        data_set={selectedTransaction}
+                                        defaultText={selectedTransaction.payment_type}
                                         saved={savedValues}
                                         name="payment_type"
                                         title="Payment Type"

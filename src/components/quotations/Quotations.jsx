@@ -1,28 +1,27 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import Select from "react-select";
-import { useCookies } from "react-cookie";
 import { Table } from "antd";
 import "antd/dist/reset.css";
 import { itemRender, onShowSizeChange } from "../paginationfunction";
 import "../antdstyle.css";
 import QuotationsDetailsModel from "./QuotationsDetailsModel";
+import QuotationAddNewModal from "./QuotationAddNewModal";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import DealDetailsModel from "../deals/DealDetailsModel";
 import ProjectDetailsModel from "../project/ProjectDetailsModel";
 import LeadsDetailsModel from "../leads/LeadsDetailsModel";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+import { MoreVert } from '@mui/icons-material';
 import { BiCalculator } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
-import { QuotationRepo, QuotationSendTypes } from "../../repository/quotation";
-import { atomAllCompanies, atomAllQuotations, atomAllLeads, defaultQuotation } from "../../atoms/atoms";
-import { compareCompanyName, compareText, formateDate } from "../../constants/functions";
+import { QuotationRepo } from "../../repository/quotation";
+import { atomAllCompanies, atomAllQuotations, atomAllLeads } from "../../atoms/atoms";
+import { compareCompanyName, compareText } from "../../constants/functions";
 
 const Quotations = () => {
   const allCompnayData = useRecoilValue(atomAllCompanies);
@@ -30,94 +29,7 @@ const Quotations = () => {
   const allQuotationData = useRecoilValue(atomAllQuotations);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
-  const { loadAllQuotations, modifyQuotation, setCurrentQuotation } = useRecoilValue(QuotationRepo);
-  const [ cookies ] = useCookies(["myLationCrmUserName"]);
-
-  const [ companiesForSelection, setCompaniesForSelection ] = useState([]);
-  const [ leadsForSelection, setLeadsForSelection] = useState([]);
-  const [ quotationChange, setQuotationChange ] = useState(null);
-  const [ selectedLead, setSelectedLead ] = useState(null);
-  const [ receiptDate, setReceiptDate ] = useState(new Date());
-
-  const handleReceiptDateChange = (date) => {
-    setReceiptDate(date);
-    const localDate = formateDate(date);
-    const localTime = date.toLocaleTimeString('ko-KR');
-    const tempChanges = {
-      ...quotationChange,
-      receipt_date: localDate,
-      receipt_time: localTime,
-    };
-    setQuotationChange(tempChanges);
-  };
-
-  // --- Functions used for Add New Quotation ------------------------------
-  const handleAddNewQuotationClicked = useCallback(() => {
-    initializeQuotationTemplate();
-  }, []);
-
-  const initializeQuotationTemplate = useCallback(() => {
-    setQuotationChange({ ...defaultQuotation });
-    setSelectedLead(null);
-    document.querySelector("#add_new_quotation_form").reset();
-  }, []);
-
-  const handleQuotationChange = useCallback((e) => {
-    const modifiedData = {
-      ...quotationChange,
-      [e.target.name]: e.target.value,
-    };
-    setQuotationChange(modifiedData);
-  }, [quotationChange]);
-
-  const handleSelectLead = useCallback((value) => {
-    const tempChanges = {
-      ...quotationChange,
-      lead_code: value.code,
-      lead_name: value.name,
-      department: value.department,
-      position: value.position,
-      mobile_number: value.mobile,
-      phone_number: value.phone,
-      email: value.email,
-      company_name: value.company,
-      company_code: companiesForSelection[value.company],
-    };
-    setQuotationChange(tempChanges);
-  }, [companiesForSelection, quotationChange]);
-
-  const handleSelectQuotationType = useCallback((value) => {
-    const tempChanges = {
-      ...quotationChange,
-      quotation_type: value.value,
-    };
-    setQuotationChange(tempChanges);
-  }, [quotationChange]);
-
-  const handleAddNewQuotation = useCallback((event)=>{
-    // Check data if they are available
-    if(quotationChange.lead_name === null
-      || quotationChange.lead_name === ''
-      || quotationChange.quotation_type === null
-    ) {
-      console.log("Necessary information isn't submitted!");
-      return;
-    };
-
-    const newQuotationData = {
-      ...quotationChange,
-      action_type: 'ADD',
-      lead_number: '99999',// Temporary
-      counter: 0,
-      modify_user: cookies.myLationCrmUserName,
-    };
-    console.log(`[ handleAddNewQuotation ]`, newQuotationData);
-    const result = modifyQuotation(newQuotationData);
-    if(result){
-      initializeQuotationTemplate();
-      //close modal ?
-    };
-  }, [cookies.myLationCrmUserName, initializeQuotationTemplate, quotationChange, modifyQuotation]);
+  const { loadAllQuotations, setCurrentQuotation } = useRecoilValue(QuotationRepo);
 
   // --- Section for Table ------------------------------
   const columns = [
@@ -238,7 +150,7 @@ const Quotations = () => {
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            <i className="material-icons">more_vert</i>
+            <MoreVert />
           </a>
           <div className="dropdown-menu dropdown-menu-right h-100">
             <a style={{ display: "initial" }} className="dropdown-item">
@@ -253,9 +165,7 @@ const Quotations = () => {
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
       console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
+        `selectedRowKeys: ${selectedRowKeys}`, "selectedRows: ", selectedRows
       );
     },
     getCheckboxProps: (record) => ({
@@ -268,47 +178,13 @@ const Quotations = () => {
   useEffect(() => {
     if (allCompnayData.length === 0) {
       loadAllCompanies();
-    } else {
-      let company_subset = {};
-      allCompnayData.forEach((data) => {
-        company_subset[data.company_name] = data.company_code;
-      });
-      setCompaniesForSelection(company_subset);
-    }
+    };
     if (allLeadData.length === 0) {
       loadAllLeads();
-    } else {
-      const temp_data = allLeadData.map(lead => {
-        return {
-          label : lead.lead_name,
-          value : {
-            code: lead.lead_code,
-            name: lead.lead_name,
-            department: lead.department,
-            position: lead.position,
-            mobile: lead.mobile_number,
-            phone: lead.phone_number,
-            email: lead.email,
-            company: lead.company_name,
-          }
-        }
-      });
-      temp_data.sort((a, b) => {
-        if (a.label > b.label) {
-          return 1;
-        }
-        if (a.label < b.label) {
-          return -1;
-        }
-        // a must be equal to b
-        return 0;
-      });
-      setLeadsForSelection(temp_data);
     };
     if (allQuotationData.length === 0) {
       loadAllQuotations();
     };
-    initializeQuotationTemplate();
   }, [allCompnayData, allLeadData, allQuotationData]);
 
   return (
@@ -372,7 +248,6 @@ const Quotations = () => {
                       id="add-task"
                       data-bs-toggle="modal"
                       data-bs-target="#add_quotation"
-                      onClick={handleAddNewQuotationClicked}
                     >
                       Add Quotation
                     </button>
@@ -414,217 +289,7 @@ const Quotations = () => {
           {/* /Content End */}
         </div>
         {/* /Page Content */}
-
-{/*---- Start : Add New Quotation Modal-------------------------------------------------------------*/}
-        <div
-          className="modal right fade"
-          id="add_quotation"
-          tabIndex={-1}
-          role="dialog"
-          aria-modal="true"
-        >
-          <div
-            className="modal-dialog modal-dialog-centered modal-lg"
-            role="document"
-          >
-            <button
-              type="button"
-              className="close md-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
-            <div className="modal-content">
-              <div className="modal-header">
-                <h4 className="modal-title"><b>Add New Quotation</b></h4>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                ></button>
-              </div>
-              <div className="modal-body">
-                <form className="forms-sampme" id="add_new_quotation_form">
-                  <h4>Lead Information</h4>
-                  <div className="form-group row">
-                    <div className="col-sm-4">
-                      <label>Name</label>
-                    </div>
-                    <div className="col-sm-8">
-                      <Select options={leadsForSelection} onChange={(value) => { 
-                        handleSelectLead(value.value);
-                        setSelectedLead({...value.value}); }}/>
-                    </div>
-                  </div>
-                  { (selectedLead !== null) &&
-                    <>
-                      <div className="form-group row">
-                        <div className="col-sm-12">
-                            <table className="table">
-                              <tbody>
-                                <tr>
-                                  <td>Department</td>
-                                  <td>{selectedLead.department}</td>
-                                </tr>
-                                <tr>
-                                  <td>Position</td>
-                                  <td>{selectedLead.position}</td>
-                                </tr>
-                                <tr>
-                                  <td>Mobile</td>
-                                  <td>{selectedLead.mobile}</td>
-                                </tr>
-                                <tr>
-                                  <td>Phone</td>
-                                  <td>{selectedLead.phone}</td>
-                                </tr>
-                                <tr>
-                                  <td>Email</td>
-                                  <td>{selectedLead.email}</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                        </div>
-                      </div>
-                      <h4>Company Information</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label>Company Name</label>
-                        </div>
-                        <div className="col-sm-6">
-                          <label>{selectedLead.company}</label>
-                        </div>
-                      </div>
-                    </>}
-                  <h4>Quotation Information</h4>
-                  <div className="form-group row">
-                    <div className="col-sm-4">
-                      <label className="col-form-label">Type</label>
-                      <Select options={QuotationSendTypes} onChange={handleSelectQuotationType} />
-                    </div>
-                    <div className="col-sm-4">
-                      <label className="col-form-label">Receipt</label>
-                        <div className="cal-icon">
-                          <DatePicker
-                            className="form-control"
-                            selected={receiptDate}
-                            onChange={handleReceiptDateChange}
-                            dateFormat="yyyy.MM.dd hh:mm:ss"
-                            showTimeSelect
-                          />
-                        </div>
-                    </div>
-                    <div className="col-sm-4">
-                      <label className="col-form-label">Receiver</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Receiver"
-                        name="receiver"
-                        onChange={handleQuotationChange}
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group row">
-                    <div className="col-sm-6">
-                      <label className="col-form-label">Lead Time</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Lead Time"
-                        name="lead_time"
-                        onChange={handleQuotationChange}
-                      />
-                    </div>
-                    <div className="col-sm-6">
-                      <label className="col-form-label">Request Type</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Request Type"
-                        name="request_type"
-                        onChange={handleQuotationChange}
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group row">
-                    <div className="col-sm-12">
-                      <label className="col-form-label">Request Content</label>
-                      <textarea
-                        className="form-control"
-                        rows={2}
-                        placeholder="Request Content"
-                        name="request_content"
-                        defaultValue={""}
-                        onChange={handleQuotationChange}
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group row">
-                    <div className="col-sm-12">
-                      <label className="col-form-label">Action Content</label>
-                      <textarea
-                        className="form-control"
-                        rows={2}
-                        placeholder="Action Content"
-                        name="action_content"
-                        defaultValue={""}
-                        onChange={handleQuotationChange}
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group row">
-                    <div className="col-sm-6">
-                      <label className="col-form-label">Sales Representative</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Sales Representative"
-                        name="sales_representati"
-                        onChange={handleQuotationChange}
-                      />
-                    </div>
-                    <div className="col-sm-6">
-                      <label className="col-form-label">Status</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Status"
-                        name="status"
-                        onChange={handleQuotationChange}
-                      />
-                    </div>
-                  </div>
-                  {/* <div className="submit-section mt-0">
-                    <div className="custom-check mb-4">
-                      <input type="checkbox" id="mark-as-done" />
-                      <label htmlFor="mark-as-done">Mark as Done</label>
-                    </div>
-                  </div> */}
-                  <div className="text-center">
-                    <button
-                      type="button"
-                      className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                      onClick={handleAddNewQuotation}
-                    >
-                      Save
-                    </button>
-                    &nbsp;&nbsp;
-                    <button
-                      type="button"
-                      className="btn btn-secondary btn-rounded"
-                      data-bs-dismiss="modal"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-{/*---- End : Add New Quotation Modal-------------------------------------------------------*/}
+        <QuotationAddNewModal />
         {/* modal */}
         {/* cchange pipeline stage Modal */}
         <div className="modal" id="pipeline-stage">
