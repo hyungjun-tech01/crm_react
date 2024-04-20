@@ -145,6 +145,10 @@ export const atomCompanyConsultings = atom({
     key: "companyConsultings",
     default: [],
 });
+export const atomFilteredConsulting = atom({
+    key: "filteredConsultings",
+    default: [],
+});
 
 //----- Quotations ------------------------
 export const defaultQuotation = {
