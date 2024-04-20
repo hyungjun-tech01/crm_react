@@ -439,11 +439,12 @@ const Leads = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive">
+                    {searchCondition === "" ? 
                     <Table
                       rowSelection={rowSelection}
                       className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
                       pagination={{
-                        total: filteredLead.length > 0 ? filteredLead.length:allLeadData.length,
+                        total: allLeadData.length,
                         showTotal: (total, range) =>
                           `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                         showSizeChanger: true,
@@ -452,9 +453,27 @@ const Leads = () => {
                       }}
                       style={{ overflowX: "auto" }}
                       columns={columns}
-                      dataSource={filteredLead.length > 0 ? filteredLead:allLeadData}
+                      dataSource={allLeadData}
                       rowKey={(record) => record.lead_code}
-                    />
+                    /> 
+                    :
+                    <Table
+                      rowSelection={rowSelection}
+                      className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
+                      pagination={{
+                        total: filteredLead.length >0 ? filteredLead.length:0,
+                        showTotal: (total, range) =>
+                          `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+                        showSizeChanger: true,
+                        onShowSizeChange: onShowSizeChange,
+                        itemRender: itemRender,
+                      }}
+                      style={{ overflowX: "auto" }}
+                      columns={columns}
+                      dataSource={filteredLead.length >0 ?  filteredLead:null}
+                      rowKey={(record) => record.lead_code}
+                    /> 
+                    }
                   </div>
                 </div>
               </div>

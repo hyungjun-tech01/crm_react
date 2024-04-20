@@ -1267,12 +1267,12 @@ const handleRowClick = (row) => {
                                   {selectedRow === consulting && (
                                   <tr>
                                       <td colSpan="5" >
-                                        <tr>{consulting.request_content && 
+                                        <tr>Request: {consulting.request_content && 
                                                         consulting.request_content.split('\n').map((line, index) => (
                                                         <div key={index}>{line}</div>))
                                                       }
                                         </tr>
-                                        <tr>{consulting.action_content && 
+                                        <tr>Actions: {consulting.action_content && 
                                                       consulting.action_content.split('\n').map((line, index) => (
                                                       <div key={index}>{line}</div>))
                                                     }
