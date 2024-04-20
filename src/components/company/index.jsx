@@ -298,12 +298,11 @@ const Company = () => {
                 </div>
               </div>
               <div className="col text-start" style={{width:'400px'}}>
-                <label style={{ display: 'inline', width:'100px', marginRight:'10px' }}>결과내 검색</label>
                 <input
                       id = "searchCondition"
                       className="form-control" 
                       type="text"
-                      placeholder="이름,Lead Sales" 
+                      placeholder="Company Name,Sales Man" 
                       style={{width:'300px', display: 'inline'}}
                       value={searchCondition}
                       onChange ={(e) => handleSearchCondition(e.target.value)}
@@ -359,10 +358,11 @@ const Company = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive">
+                    { searchCondition === "" ? 
                     <Table
                       rowSelection={rowSelection}
                       pagination={{
-                        total:  filteredCompany.length > 0 ? filteredCompany.length:allCompanyData.length,
+                        total:  allCompanyData.length,
                         showTotal: (total, range) =>
                           `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                         showSizeChanger: true,
@@ -372,9 +372,27 @@ const Company = () => {
                       className="table"
                       style={{ overflowX: "auto" }}
                       columns={columns}
-                      dataSource={filteredCompany.length > 0 ? filteredCompany:allCompanyData}
+                      dataSource={allCompanyData}
                       rowKey={(record) => record.company_code}
                     />
+                    :
+                    <Table
+                      rowSelection={rowSelection}
+                      pagination={{
+                        total:  filteredCompany.length > 0 ? filteredCompany.length:0,
+                        showTotal: (total, range) =>
+                          `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+                        showSizeChanger: true,
+                        onShowSizeChange: onShowSizeChange,
+                        itemRender: itemRender,
+                      }}
+                      className="table"
+                      style={{ overflowX: "auto" }}
+                      columns={columns}
+                      dataSource={filteredCompany.length > 0 ? filteredCompany:null}
+                      rowKey={(record) => record.company_code}
+                    />
+                    }
                   </div>
                 </div>
               </div>
