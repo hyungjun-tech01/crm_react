@@ -37,7 +37,7 @@ export const QuotationRepo = selector({
             const input_json = JSON.stringify(newQuotation);
             console.log(`[ modifyQuotation ] input : `, input_json);
             try{
-                const response = await fetch(`${BASE_PATH}/modifyConsult`, {
+                const response = await fetch(`${BASE_PATH}/modifyQuotation`, {
                     method: "POST",
                     headers:{'Content-Type':'application/json'},
                     body: input_json,
@@ -59,6 +59,7 @@ export const QuotationRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
+                    console.log('\t[ modifyQuotation ] new quotation : ', updatedNewQuotation);
                     set(atomAllQuotations, allQuotations.concat(updatedNewQuotation));
                     return true;
                 } else if(newQuotation.action_type === 'UPDATE'){

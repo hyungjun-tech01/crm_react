@@ -58,7 +58,7 @@ const common_items = [
 ];
 
 const ConvertHeaderInfosToString = (data) => {
-  let ret = 'No|1|';
+  let ret = '1|No|';
   
   if(data[0]['title'] === 'No') ret += data[0]['size']
   else ret += '0';
@@ -66,8 +66,12 @@ const ConvertHeaderInfosToString = (data) => {
   default_content_array.forEach(item => {
     ret += '|' + item.at(0) + '|' + item.at(1) + '|';
 
-    if(data[item.at(0)]) ret += data[item.at(0)]['size'];
-    else ret += '0';
+    const foundIdx = data.findIndex(col => col.title === item.at(1));
+    if(foundIdx === -1) {
+      ret += '0';
+    } else {
+      ret += data[foundIdx]['size'];
+    }
   });
 
   console.log('\t[ ConvertHeaderInfosToString ] Result : ', ret);
@@ -313,12 +317,19 @@ const QuotationAddNewModal = () => {
       const filteredContents = tempContents.filter(item => item['1'] !== row['1']);
       tempContents = filteredContents;
     });
+    let temp_total_amount = 0;
     const finalContents = tempContents.map((item, index) => {
+      temp_total_amount += item['16'];
       return { ...item, '1': index + 1};
-    })
+    });
+    const tempQuotation = {
+      ...quotationChange,
+      total_quotation_amount : temp_total_amount,
+    };
+    setQuotationChange(tempQuotation);
     console.log('handleDeleteSelectedConetents / final : ', finalContents);
     setQuotationContents(finalContents);
-  }, [selectedRows, quotationContents, setQuotationContents])
+  }, [selectedRows, quotationContents, quotationChange, setQuotationContents, setQuotationChange])
   const handleEditTemporaryContent = useCallback((event) => {
     const tempContent = {
       ...temporaryContent,
@@ -336,6 +347,10 @@ const QuotationAddNewModal = () => {
     };
     const temp_index = contentToSave['1'] - 1;
     let tempContents = [];
+    let temp_total_amount = contentToSave['16'];
+    if(quotationChange['total_quotation_amount']) {
+      temp_total_amount = quotationChange['total_quotation_amount'];
+    };
     if (temp_index === quotationContents.length) {
       tempContents = [
         ...quotationContents,
@@ -349,6 +364,11 @@ const QuotationAddNewModal = () => {
       ];
     }
     setQuotationContents(tempContents);
+    const tempQuotationChange = {
+      ...quotationChange,
+      total_quotation_amount: temp_total_amount,
+    };
+    setQuotationChange(tempQuotationChange);
     setTemporaryContent(null);
   }, [temporaryContent, quotationContents, setQuotationContents, setTemporaryContent]);
   const handleCloseTemporaryEdit = useCallback(() => {
@@ -718,50 +738,22 @@ const QuotationAddNewModal = () => {
       </div>
       {temporaryContent &&
         <div className="edit-content">
-          <div>
+          <div className="edit-content-header">
             <h4>&nbsp;&nbsp;<b>Edit Content</b></h4>
-            <table className="table">
-              <tbody>
-              {default_content_array.map((item, index) => {
-                if (index % 2 === 0) {
-                  if (index !== default_content_array.length - 1) return;
-                  return (
-                    <tr key={index}>
-                      <td>
-                        {item.at(1)}
-                      </td>
-                      <td>
-                        <input 
-                          name={item.at(0)} 
-                          className="input-group-text input-group-text-sm"
-                          type="text"
-                          defaultValue={temporaryContent[item.at(0)]}
-                          onChange={handleEditTemporaryContent}
-                        />
-                      </td>
-                    </tr>
-                  )
-                };
+          </div>
+          <table className="table">
+            <tbody>
+            {default_content_array.map((item, index) => {
+              if (index % 2 === 0) {
+                if (index !== default_content_array.length - 1) return;
                 return (
                   <tr key={index}>
-                    <td>
-                      {default_content_array[index - 1][1]}
-                    </td>
-                    <td>
-                      <input
-                        name={default_content_array[index - 1][0]}
-                        className="input-group-text input-group-text-sm"
-                        type="text"
-                        defaultValue={temporaryContent[default_content_array[index - 1][0]]}
-                        onChange={handleEditTemporaryContent}
-                      />
-                    </td>
                     <td>
                       {item.at(1)}
                     </td>
                     <td>
-                      <input
-                        name={item.at(0)}
+                      <input 
+                        name={item.at(0)} 
                         className="input-group-text input-group-text-sm"
                         type="text"
                         defaultValue={temporaryContent[item.at(0)]}
@@ -770,22 +762,50 @@ const QuotationAddNewModal = () => {
                     </td>
                   </tr>
                 )
-              })}
-              </tbody>
-            </table>
-            { !!temporaryContent['10'] &&
-              <div>
-                <textarea
-                  className="form-control"
-                  rows={3}
-                  placeholder='Comment'
-                  defaultValue={temporaryContent['998']}
-                  name='998'
-                  onChange={handleEditTemporaryContent}
-                />
-              </div>
-            }
-          </div>
+              };
+              return (
+                <tr key={index}>
+                  <td>
+                    {default_content_array[index - 1][1]}
+                  </td>
+                  <td>
+                    <input
+                      name={default_content_array[index - 1][0]}
+                      className="input-group-text input-group-text-sm"
+                      type="text"
+                      defaultValue={temporaryContent[default_content_array[index - 1][0]]}
+                      onChange={handleEditTemporaryContent}
+                    />
+                  </td>
+                  <td>
+                    {item.at(1)}
+                  </td>
+                  <td>
+                    <input
+                      name={item.at(0)}
+                      className="input-group-text input-group-text-sm"
+                      type="text"
+                      defaultValue={temporaryContent[item.at(0)]}
+                      onChange={handleEditTemporaryContent}
+                    />
+                  </td>
+                </tr>
+              )
+            })}
+            </tbody>
+          </table>
+          { !!temporaryContent['10'] &&
+            <div>
+              <textarea
+                className="form-control"
+                rows={3}
+                placeholder='Comment'
+                defaultValue={temporaryContent['998']}
+                name='998'
+                onChange={handleEditTemporaryContent}
+              />
+            </div>
+          }
           <div className="edit-content-footer" >
             <button
               type="button"

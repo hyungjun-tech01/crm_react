@@ -28,6 +28,7 @@
 .edit-content-footer{
     padding: 0.5rem 0;
     justify-content: center;
+    text-align: center !important;
 }
 .edit-content-close {
 	color: #000;
