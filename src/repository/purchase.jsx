@@ -43,7 +43,7 @@ export const PurchaseRepo = selector({
                     delete newPurchase.action_type;
                     const updatedNewPurchase = {
                         ...newPurchase,
-                        // company_code : data.out_company_code,
+                        purchase_code : data.out_purchase_code,
                         create_user : data.out_create_user,
                         create_date : data.out_create_date,
                         modify_date: data.out_modify_date,

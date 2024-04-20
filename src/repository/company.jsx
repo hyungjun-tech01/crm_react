@@ -53,7 +53,7 @@ export const CompanyRepo = selector({
                     delete newCompany.action_type;
                     const updatedNewCompany = {
                         ...newCompany,
-                        // company_code : data.out_company_code,
+                        company_code : data.out_company_code,
                         create_user : data.out_create_user,
                         create_date : data.out_create_date,
                         modify_date: data.out_modify_date,

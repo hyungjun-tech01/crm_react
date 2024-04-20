@@ -43,7 +43,7 @@ export const TransactionRepo = selector({
                     delete newTransaction.action_type;
                     const updatedNewTransaction = {
                         ...newTransaction,
-                        // company_code : data.out_company_code,
+                        transaction_code : data.out_transaction_code,
                         create_user : data.out_create_user,
                         create_date : data.out_create_date,
                         modify_date: data.out_modify_date,

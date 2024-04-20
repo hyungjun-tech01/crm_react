@@ -53,7 +53,7 @@ export const QuotationRepo = selector({
                     delete newQuotation.action_type;
                     const updatedNewQuotation = {
                         ...newQuotation,
-                        // company_code : data.out_company_code,
+                        quotation_code : data.out_quotation_code,
                         create_user : data.out_create_user,
                         create_date : data.out_create_date,
                         modify_date: data.out_modify_date,

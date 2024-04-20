@@ -62,7 +62,7 @@ export const LeadRepo = selector({
                     delete newLead.action_type;
                     const updatedNewLead = {
                         ...newLead,
-                        // company_code : data.out_company_code,
+                        lead_code : data.out_lead_code,
                         create_user : data.out_create_user,
                         create_date : data.out_create_date,
                         modify_date: data.out_modify_date,
