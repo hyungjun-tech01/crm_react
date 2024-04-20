@@ -4,7 +4,7 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { CircleImg, SystemUser } from "../imagepath";
 import { Collapse } from "antd";
-import { atomCurrentLead, defaultLead, atomCurrentCompany, defaultCompany, atomCompanyConsultings } from "../../atoms/atoms";
+import { atomCurrentLead, defaultLead, atomCurrentCompany, defaultCompany, atomCompanyConsultings,atomFilteredConsulting } from "../../atoms/atoms";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { CompanyRepo} from "../../repository/company";
 import DetailLabelItem from "../../constants/DetailLabelItem";
@@ -13,7 +13,7 @@ import DetailSelectItem from "../../constants/DetailSelectItem";
 import { Avatar } from "@mui/material";
 import DetailDateItem from "../../constants/DetailDateItem";
 import {ConsultingRepo} from "../../repository/consulting"
-
+import {ExpandMore} from "@mui/icons-material";
 
 
 const LeadsDetailsModel = () => {
@@ -21,6 +21,8 @@ const LeadsDetailsModel = () => {
   const selectedLead = useRecoilValue(atomCurrentLead);
   const selectedCompany = useRecoilValue(atomCurrentCompany);
   const companyConsultings = useRecoilValue(atomCompanyConsultings);
+  const filteredConsultings = useRecoilValue(atomFilteredConsulting);
+
 
   const { modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
   const { modifyCompany } = useRecoilValue(CompanyRepo);
@@ -35,14 +37,18 @@ const LeadsDetailsModel = () => {
   const [expanded, setExpaned] = useState(false);
   const [statusSearch, setStatusSearch] = useState("");
   const [searchCondition, setSearchCondition] = useState("")
-  const { loadCompanyConsultings} = useRecoilValue(ConsultingRepo);
+  const { loadCompanyConsultings, filterConsulting} = useRecoilValue(ConsultingRepo);
+  
+  // 상태(state) 정의
+const [selectedRow, setSelectedRow] = useState(null);
+
 
 
   // --- Funtions for Editing ---------------------------------
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
-   //filterConsulting  filterLeads(newValue);
+    filterConsulting(newValue);  // filterLeads(newValue);
   };
 
   const handleStatusSearch = (newValue) => {
@@ -309,6 +315,16 @@ const LeadsDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, orgCloseDate, closeDate]);
 
+// 각 행 클릭 시 호출되는 함수
+const handleRowClick = (row) => {
+  if (selectedRow === row) {
+    // 이미 선택된 행을 다시 클릭하면 선택 취소
+    setSelectedRow(null);
+  } else {
+    // 새로운 행을 클릭하면 해당 행을 선택
+    setSelectedRow(row);
+  }
+};
 
   useEffect(() => {
     console.log('[LeadsDetailsModel] called!');
@@ -1233,9 +1249,43 @@ const LeadsDetailsModel = () => {
                                 <th className="text-end">Lead Name</th>
                               </tr>
                             </thead>
-                            {  companyConsultings.length > 0 &&
+                            {
+                              searchCondition === "" ? 
+                              companyConsultings.length > 0 &&
                               <tbody>
                                 { companyConsultings.map(consulting =>
+                                <React.Fragment key={consulting.consulting_code}>
+                                  <tr key={consulting.consulting_code}>
+                                      <td>{consulting.consulting_type}<ExpandMore  onClick={() => handleRowClick(consulting)}/></td>
+                                      <td>{consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
+                                      {consulting.receipt_time === null ? "":consulting.receipt_time }
+                                      </td>
+                                      <td>{consulting.satatus}</td>
+                                      <td>{consulting.receiver}</td>
+                                      <td className="text-end">{consulting.lead_name}</td>
+                                  </tr>
+                                  {selectedRow === consulting && (
+                                  <tr>
+                                      <td colSpan="5" >
+                                        <tr>{consulting.request_content && 
+                                                        consulting.request_content.split('\n').map((line, index) => (
+                                                        <div key={index}>{line}</div>))
+                                                      }
+                                        </tr>
+                                        <tr>{consulting.action_content && 
+                                                      consulting.action_content.split('\n').map((line, index) => (
+                                                      <div key={index}>{line}</div>))
+                                                    }
+                                        </tr>
+                                      </td>
+                                  </tr>)}
+                                  </React.Fragment>
+                                )}
+                              </tbody> 
+                              : 
+                              filteredConsultings.length > 0 &&
+                              <tbody>
+                                { filteredConsultings.map(consulting =>
                                   <tr key={consulting.consulting_code}>
                                     <td>{consulting.consulting_type}</td>
                                     <td>{consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}

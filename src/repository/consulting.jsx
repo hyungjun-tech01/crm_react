@@ -1,6 +1,6 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentConsulting, atomAllConsultings, defaultConsulting, atomCompanyConsultings } from '../atoms/atoms';
+import { atomCurrentConsulting, atomAllConsultings, defaultConsulting, atomCompanyConsultings, atomFilteredConsulting } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
@@ -55,6 +55,15 @@ export const ConsultingRepo = selector({
             catch(err){
                 console.error(`loadAllCompanies / Error : ${err}`);
             };
+        });
+        const filterConsulting = getCallback(({set, snapshot }) => async (filterText) => {
+            const allConsultingList = await snapshot.getPromise(atomCompanyConsultings);
+            const allConsulting = 
+            allConsultingList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))||
+                                           (item.receiver && item.receiver.includes(filterText))
+            );
+            set(atomFilteredConsulting, allConsulting);
+            return true;
         });
         const modifyConsulting = getCallback(({set, snapshot}) => async (newConsulting) => {
             const input_json = JSON.stringify(newConsulting);
@@ -138,6 +147,7 @@ export const ConsultingRepo = selector({
             modifyConsulting,
             setCurrentConsulting,
             loadCompanyConsultings,
+            filterConsulting,
         };
     }
 });
