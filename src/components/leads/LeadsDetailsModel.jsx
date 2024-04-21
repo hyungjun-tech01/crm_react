@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { CircleImg, SystemUser } from "../imagepath";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Collapse } from "antd";
 import { atomCurrentLead, defaultLead, atomCurrentCompany, defaultCompany, atomCompanyConsultings,atomFilteredConsulting } from "../../atoms/atoms";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
@@ -14,6 +15,7 @@ import { Avatar } from "@mui/material";
 import DetailDateItem from "../../constants/DetailDateItem";
 import {ConsultingRepo} from "../../repository/consulting"
 import {ExpandMore} from "@mui/icons-material";
+import ConsultingsDetailsModel from "../consulting/ConsultingsDetailsModel";
 
 
 const LeadsDetailsModel = () => {
@@ -37,12 +39,10 @@ const LeadsDetailsModel = () => {
   const [expanded, setExpaned] = useState(false);
   const [statusSearch, setStatusSearch] = useState("");
   const [searchCondition, setSearchCondition] = useState("")
-  const { loadCompanyConsultings, filterConsulting} = useRecoilValue(ConsultingRepo);
+  const { loadCompanyConsultings, filterConsulting, setCurrentConsulting} = useRecoilValue(ConsultingRepo);
   
   // 상태(state) 정의
 const [selectedRow, setSelectedRow] = useState(null);
-
-
 
   // --- Funtions for Editing ---------------------------------
 
@@ -1256,7 +1256,18 @@ const handleRowClick = (row) => {
                                 { companyConsultings.map(consulting =>
                                 <React.Fragment key={consulting.consulting_code}>
                                   <tr key={consulting.consulting_code}>
-                                      <td>{consulting.consulting_type}<ExpandMore  onClick={() => handleRowClick(consulting)}/></td>
+                                      <td>{consulting.consulting_type}
+                                        <ExpandMore  onClick={() => handleRowClick(consulting)}/>
+                                        <a href="#"
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#consultings-details"
+                                          onClick={()=>{
+                                            console.log('showConsultingDetail', consulting.consulting_code);
+                                            setCurrentConsulting(consulting.consulting_code);
+                                        }}>
+                                          Edit
+                                        </a>
+                                      </td>
                                       <td>{consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
                                       {consulting.receipt_time === null ? "":consulting.receipt_time }
                                       </td>
@@ -1560,6 +1571,7 @@ const handleRowClick = (row) => {
         </div>
         {/* modal-dialog */}
       </div>
+      <ConsultingsDetailsModel />
     </>
   );
 };
