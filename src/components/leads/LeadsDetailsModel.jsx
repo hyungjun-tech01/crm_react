@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { CircleImg, SystemUser } from "../imagepath";
-import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Collapse } from "antd";
 import { atomCurrentLead, defaultLead, atomCurrentCompany, defaultCompany, atomCompanyConsultings,atomFilteredConsulting } from "../../atoms/atoms";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
@@ -16,6 +15,7 @@ import DetailDateItem from "../../constants/DetailDateItem";
 import {ConsultingRepo} from "../../repository/consulting"
 import {ExpandMore} from "@mui/icons-material";
 import ConsultingsDetailsModel from "../consulting/ConsultingsDetailsModel";
+import {  Edit } from '@mui/icons-material';
 
 
 const LeadsDetailsModel = () => {
@@ -1265,7 +1265,7 @@ const handleRowClick = (row) => {
                                             console.log('showConsultingDetail', consulting.consulting_code);
                                             setCurrentConsulting(consulting.consulting_code);
                                         }}>
-                                          Edit
+                                          <Edit fontSize="small"/>
                                         </a>
                                       </td>
                                       <td>{consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
