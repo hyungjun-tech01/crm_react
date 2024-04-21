@@ -153,7 +153,7 @@ const ConsultingsDetailsModel = () => {
         input_time.setTime(Date.parse(selectedConsulting.receipt_date));
 
         if(selectedConsulting.receipt_time !== null
-          && selectedConsulting.receipt_time !== '')
+          && selectedConsulting.receipt_time !== '' && selectedConsulting.receipt_time !== undefined)
         {
           let converted_time = '';
           const splitted = selectedConsulting.receipt_time.split(' ');
