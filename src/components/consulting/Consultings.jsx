@@ -22,16 +22,17 @@ import { BiClipboard } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { ConsultingRepo, ConsultingTypes } from "../../repository/consulting";
-import { atomAllCompanies, atomAllConsultings, atomAllLeads, defaultConsulting } from "../../atoms/atoms";
+import { atomAllCompanies, atomAllConsultings, atomAllLeads, defaultConsulting, atomFilteredConsulting } from "../../atoms/atoms";
 import { compareCompanyName, compareText, formateDate } from "../../constants/functions";
 
 const Consultings = () => {
   const allCompnayData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
   const allConsultingData = useRecoilValue(atomAllConsultings);
+  const filteredConsulting = useRecoilValue(atomFilteredConsulting);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
-  const { loadAllConsultings, modifyConsulting, setCurrentConsulting } = useRecoilValue(ConsultingRepo);
+  const { loadAllConsultings, modifyConsulting, setCurrentConsulting, filterConsultingOri } = useRecoilValue(ConsultingRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName"]);
 
   const [ companiesForSelection, setCompaniesForSelection ] = useState([]);
@@ -39,6 +40,24 @@ const Consultings = () => {
   const [ consultingChange, setConsultingChange ] = useState(null);
   const [ selectedLead, setSelectedLead ] = useState(null);
   const [ receiptDate, setReceiptDate ] = useState(new Date());
+  const [searchCondition, setSearchCondition] = useState("");
+  const [statusSearch, setStatusSearch] = useState("");
+
+
+  const handleSearchCondition =  (newValue)=> {
+    setSearchCondition(newValue);
+    filterConsultingOri(newValue);
+  };
+
+  const handleStatusSearch = (newValue) => {
+    setStatusSearch(newValue);
+    if(newValue === "All Consulting"){
+      loadAllConsultings();
+    }else{
+      loadAllConsultings();
+    }
+    setSearchCondition("");
+  }
 
   const handleReceiptDateChange = (date) => {
     setReceiptDate(date);
@@ -302,7 +321,7 @@ const Consultings = () => {
           </div>
           <div className="page-header pt-3 mb-0 ">
             <div className="row">
-              <div className="col">
+              <div className="text-start" style={{width:'150px'}}>
                 <div className="dropdown">
                   <a
                     className="dropdown-toggle recently-viewed"
@@ -310,18 +329,29 @@ const Consultings = () => {
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    {" "}
-                    Propose Times{" "}
+                   {statusSearch === "" ?"All Consulting":statusSearch}
                   </a>
                   <div className="dropdown-menu">
-                    <a className="dropdown-item">Recently Viewed</a>
-                    <a className="dropdown-item">Items I'm following</a>
-                    <a className="dropdown-item">All Consultings</a>
-                    <a className="dropdown-item">All Closed Consultings</a>
-                    <a className="dropdown-item">All Open Consultings</a>
-                    <a className="dropdown-item">My Consultings</a>
+                    <a className="dropdown-item" onClick={()=>handleStatusSearch('All Consulting')}>All</a>
+                    <a className="dropdown-item" onClick={()=>handleStatusSearch('초기')}>초기</a>
+                    <a className="dropdown-item" onClick={()=>handleStatusSearch('진행중')}>진행중</a>
+                    <a className="dropdown-item" onClick={()=>handleStatusSearch('보류')}>보류</a>
+                    <a className="dropdown-item" onClick={()=>handleStatusSearch('취소')}>취소</a>
+                    <a className="dropdown-item" onClick={()=>handleStatusSearch('완료')}>완료</a>
+                    <a className="dropdown-item" onClick={()=>handleStatusSearch('기타')}>기타</a>
                   </div>
                 </div>
+              </div>
+              <div className="col text-start" style={{width:'400px'}}>
+                <input
+                      id = "searchCondition"
+                      className="form-control" 
+                      type="text"
+                      placeholder="Company,Lead" 
+                      style={{width:'300px', display: 'inline'}}
+                      value={searchCondition}
+                      onChange ={(e) => handleSearchCondition(e.target.value)}
+                />  
               </div>
               <div className="col text-end">
                 <ul className="list-inline-item pl-0">
@@ -346,6 +376,7 @@ const Consultings = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive activity-tables">
+                    {searchCondition=== "" ? 
                     <Table
                       rowSelection={{
                         ...rowSelection,
@@ -365,6 +396,27 @@ const Consultings = () => {
                       rowKey={(record) => record.consulting_code}
                       // onChange={handleTableChange}
                     />
+                    :
+                    <Table
+                    rowSelection={{
+                      ...rowSelection,
+                    }}
+                    pagination={{
+                      total: filteredConsulting.length >0 ? filteredConsulting.length:0,
+                      showTotal: (total, range) =>
+                        `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+                      showSizeChanger: true,
+                      onShowSizeChange: onShowSizeChange,
+                      itemRender: itemRender,
+                    }}
+                    style={{ overflowX: "auto" }}
+                    columns={columns}
+                    bordered
+                    dataSource={filteredConsulting.length >0 ? filteredConsulting:null}
+                    rowKey={(record) => record.consulting_code}
+                    // onChange={handleTableChange}
+                  />
+                  }
                   </div>
                 </div>
               </div>

@@ -60,11 +60,21 @@ export const ConsultingRepo = selector({
             const allConsultingList = await snapshot.getPromise(atomCompanyConsultings);
             const allConsulting = 
             allConsultingList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))||
-                                           (item.receiver && item.receiver.includes(filterText))
+                                           (item.receiver && item.receiver.includes(filterText)) 
             );
             set(atomFilteredConsulting, allConsulting);
             return true;
         });
+        const filterConsultingOri = getCallback(({set, snapshot }) => async (filterText) => {
+            const allConsultingList = await snapshot.getPromise(atomAllConsultings);
+            const allConsulting = 
+            allConsultingList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))||
+                                           (item.receiver && item.receiver.includes(filterText)) ||
+                                           (item.company_name && item.company_name.includes(filterText)) 
+            );
+            set(atomFilteredConsulting, allConsulting);
+            return true;
+        });        
         const modifyConsulting = getCallback(({set, snapshot}) => async (newConsulting) => {
             const input_json = JSON.stringify(newConsulting);
             console.log(`[ modifyConsulting ] input : `, input_json);
@@ -148,6 +158,7 @@ export const ConsultingRepo = selector({
             setCurrentConsulting,
             loadCompanyConsultings,
             filterConsulting,
+            filterConsultingOri,
         };
     }
 });
