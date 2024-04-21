@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRecoilValue } from 'recoil';
 import { PDFViewer } from '@react-pdf/renderer';
 import { Page, Text, View, Document, StyleSheet, Font } from '@react-pdf/renderer';
@@ -108,6 +108,19 @@ const ConvertComment = (comment) => {
         </>
     );
 };
+
+const common_items = [
+    "#. DX TOOL 제공 : 노드데이타 개발 솔리드웍스 속성편집기(\\2,000,000)",
+    "- 설치 매뉴얼 제공",
+    "- 차기 버전 Upgrade 1회",
+    "- On/Off Line 기술 지원 (전화 및 원격지원, 방문 기술지원)",
+    "- nodeDATA 교육 : On/Off Line 참여",
+    "- Disable Request Service 제공 (라이선스 재 활성)",
+    "- SOLIDWORKS CAM Standard (1,820,000원) : 유지보수 기간내 사용 가능",
+    "  (SOLIDWORKS Std 이상 구매시)",
+    "- SOLIDWORKS Visualize Standard (2,527,200원) : 유지보수 기간내 사용 가능",
+    "   (SOLIDWORKS Pro 이상 구매시)",
+];
 
 // Create styles
 const Styles = StyleSheet.create({

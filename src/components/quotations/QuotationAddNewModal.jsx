@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRecoilValue } from "recoil";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
@@ -44,19 +44,6 @@ const default_content_array = [
   ['19', '비고'],
 ];
 
-const common_items = [
-  "#. DX TOOL 제공 : 노드데이타 개발 솔리드웍스 속성편집기(\\2,000,000)",
-  "- 설치 매뉴얼 제공",
-  "- 차기 버전 Upgrade 1회",
-  "- On/Off Line 기술 지원 (전화 및 원격지원, 방문 기술지원)",
-  "- nodeDATA 교육 : On/Off Line 참여",
-  "- Disable Request Service 제공 (라이선스 재 활성)",
-  "- SOLIDWORKS CAM Standard (1,820,000원) : 유지보수 기간내 사용 가능",
-  "  (SOLIDWORKS Std 이상 구매시)",
-  "- SOLIDWORKS Visualize Standard (2,527,200원) : 유지보수 기간내 사용 가능",
-  "   (SOLIDWORKS Pro 이상 구매시)",
-];
-
 const ConvertHeaderInfosToString = (data) => {
   let ret = '1|No|';
   
@@ -100,6 +87,10 @@ const QuotationAddNewModal = () => {
 
   const [ contentColumns, setContentColumns ] = useState([]);
   const [ editHeaders, setEditHeaders ] = useState(false);
+
+  const selectLeadRef = useRef(null);
+  const selectTypeRef = useRef(null);
+  const selectSendTypeRef = useRef(null);
 
   const default_columns = [
     {
@@ -155,8 +146,17 @@ const QuotationAddNewModal = () => {
     setQuotationChange({ ...defaultQuotation });
     setSelectedLead(null);
     setQuotationContents([]);
+
+    if(selectLeadRef.current)
+      selectLeadRef.current.clearValue();
+    if(selectTypeRef.current)
+      selectTypeRef.current.clearValue();
+    if(selectSendTypeRef.current)
+      selectSendTypeRef.current.clearValue();
+
     document.querySelector("#add_new_quotation_form").reset();
-  }, []);
+  }, [selectLeadRef, selectTypeRef, selectSendTypeRef]);
+
   const handleQuotationChange = useCallback((e) => {
     const modifiedData = {
       ...quotationChange,
@@ -164,6 +164,7 @@ const QuotationAddNewModal = () => {
     };
     setQuotationChange(modifiedData);
   }, [quotationChange]);
+
   const handleSelectLead = useCallback((value) => {
     const tempChanges = {
       ...quotationChange,
@@ -179,6 +180,7 @@ const QuotationAddNewModal = () => {
     };
     setQuotationChange(tempChanges);
   }, [companiesForSelection, quotationChange]);
+
   const handleQuotationDateChange = (date) => {
     setQuotationDate(date);
     const localDate = formateDate(date);
@@ -188,6 +190,7 @@ const QuotationAddNewModal = () => {
     };
     setQuotationChange(tempChanges);
   };
+
   const handleConfirmDateChange = (date) => {
     setConfirmDate(date);
     const localDate = formateDate(date);
@@ -197,20 +200,27 @@ const QuotationAddNewModal = () => {
     };
     setQuotationChange(tempChanges);
   };
+
   const handleSelectQuotationType = useCallback((value) => {
-    const tempChanges = {
-      ...quotationChange,
-      quotation_type: value.value,
-    };
-    setQuotationChange(tempChanges);
+    if(value) {
+      const tempChanges = {
+        ...quotationChange,
+        quotation_type: value.value,
+      };
+      setQuotationChange(tempChanges);
+    }
   }, [quotationChange]);
+
   const handleSelectQuotationSendType = useCallback((value) => {
-    const tempChanges = {
-      ...quotationChange,
-      quotation_send_type: value.value,
-    };
-    setQuotationChange(tempChanges);
+    if(value) {
+      const tempChanges = {
+        ...quotationChange,
+        quotation_send_type: value.value,
+      };
+      setQuotationChange(tempChanges);
+    }
   }, [quotationChange]);
+
   const handleAddNewQuotation = useCallback((event) => {
     // Check data if they are available
     if (quotationChange.lead_name === null
@@ -238,6 +248,7 @@ const QuotationAddNewModal = () => {
     };
   }, [quotationChange, quotationContents, contentColumns, cookies.myLationCrmUserId, modifyQuotation, initializeQuotationTemplate]);
 
+
   // --- Functions dealing with contents table -------------------------------
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
@@ -249,6 +260,7 @@ const QuotationAddNewModal = () => {
       setSelectedRows(selectedRows);
     },
   };
+
   const handleHeaderCheckChange = useCallback((event) => {
     const targetName = event.target.name;
     const targetIndex = Number(targetName);
@@ -279,6 +291,7 @@ const QuotationAddNewModal = () => {
       setContentColumns(tempColumns);
     }
   }, [contentColumns, setContentColumns]);
+
   const handleHeaderSizeChange = useCallback((event) => {
     const targetName = event.target.name;
     const foundIndex = contentColumns.findIndex(
@@ -297,6 +310,7 @@ const QuotationAddNewModal = () => {
     }
   }, [contentColumns]);
 
+
   // --- Functions used for editting content ------------------------------
   const handleLoadNewTemporaryContent = useCallback(() => {
     const tempContent = {
@@ -305,9 +319,11 @@ const QuotationAddNewModal = () => {
     };
     setTemporaryContent(tempContent);
   }, [quotationContents]);
+
   const handleLoadSelectedContent = useCallback((data) => {
     setTemporaryContent(data);
   }, [setTemporaryContent]);
+
   const handleDeleteSelectedConetents = useCallback(()=>{
     console.log('handleDeleteSelectedConetents : ', selectedRows);
     let tempContents=[
@@ -329,7 +345,8 @@ const QuotationAddNewModal = () => {
     setQuotationChange(tempQuotation);
     console.log('handleDeleteSelectedConetents / final : ', finalContents);
     setQuotationContents(finalContents);
-  }, [selectedRows, quotationContents, quotationChange, setQuotationContents, setQuotationChange])
+  }, [selectedRows, quotationContents, quotationChange, setQuotationContents, setQuotationChange]);
+
   const handleEditTemporaryContent = useCallback((event) => {
     const tempContent = {
       ...temporaryContent,
@@ -337,6 +354,7 @@ const QuotationAddNewModal = () => {
     };
     setTemporaryContent(tempContent);
   }, [temporaryContent, setTemporaryContent]);
+
   const handleSaveTemporaryEdit = useCallback(() => {
     const contentToSave = {
       ...temporaryContent
@@ -371,9 +389,11 @@ const QuotationAddNewModal = () => {
     setQuotationChange(tempQuotationChange);
     setTemporaryContent(null);
   }, [temporaryContent, quotationContents, setQuotationContents, setTemporaryContent]);
+
   const handleCloseTemporaryEdit = useCallback(() => {
     setTemporaryContent(null);
   }, [setTemporaryContent]);
+
 
   useEffect(() => {
     // ----- Load companies and set up the relation between lead and company by company code ---
@@ -463,16 +483,14 @@ const QuotationAddNewModal = () => {
                   <label>Name</label>
                 </div>
                 <div className="col-sm-8">
-                  <Select 
+                  <Select
+                    ref={selectLeadRef}
                     options={leadsForSelection}
-                    styles={{
-                      borderColor: '#e3e3e3',
-                      boxShadow: 'none',
-                      fontSize: '15px',
-                      height: '20px'}}
                     onChange={(value) => {
-                      handleSelectLead(value.value);
-                      setSelectedLead({ ...value.value });
+                      if(value){
+                        handleSelectLead(value.value);
+                        setSelectedLead({ ...value.value });
+                      }
                   }} />
                 </div>
               </div>
@@ -527,7 +545,11 @@ const QuotationAddNewModal = () => {
                 </div>
                 <div className="col-sm-3">
                   <label className="col-form-label">Type</label>
-                  <Select options={QuotationTypes} onChange={handleSelectQuotationType} />
+                  <Select
+                    ref={selectTypeRef}
+                    options={QuotationTypes}
+                    onChange={handleSelectQuotationType}
+                  />
                 </div>
               </div>
               <div className="form-group row">
@@ -547,7 +569,11 @@ const QuotationAddNewModal = () => {
                   <div className="form-group row">
                     <div className="col-sm-4">Send Type</div>
                     <div className="col-sm-7">
-                      <Select options={QuotationSendTypes} onChange={handleSelectQuotationSendType} />
+                      <Select
+                        ref={selectSendTypeRef}
+                        options={QuotationSendTypes}
+                        onChange={handleSelectQuotationSendType}
+                      />
                     </div>
                   </div>
                   <div className="form-group row">

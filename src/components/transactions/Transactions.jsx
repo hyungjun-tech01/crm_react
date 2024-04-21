@@ -27,7 +27,7 @@ const Transactions = () => {
   const allLeadData = useRecoilValue(atomAllLeads);
   const allTransactionData = useRecoilValue(atomAllTransactions);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
-  const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
+  const { loadAllLeads } = useRecoilValue(LeadRepo);
   const { loadAllTransactions, modifyTransaction, setCurrentTransaction } = useRecoilValue(TransactionRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName"]);
 
