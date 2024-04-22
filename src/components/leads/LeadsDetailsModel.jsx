@@ -38,7 +38,7 @@ const LeadsDetailsModel = () => {
   const [activeTab, setActiveTab] = useState(""); // 상태 관리를 위한 useState
   const [expanded, setExpaned] = useState(false);
   const [statusSearch, setStatusSearch] = useState("");
-  const [searchCondition, setSearchCondition] = useState("")
+  const [searchCondition, setSearchCondition] = useState("");
   const { loadCompanyConsultings, filterConsulting, setCurrentConsulting} = useRecoilValue(ConsultingRepo);
   
   // 상태(state) 정의
@@ -48,18 +48,21 @@ const [selectedRow, setSelectedRow] = useState(null);
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
-    filterConsulting(newValue);  // filterLeads(newValue);
+    console.log("handleSearchCondition",statusSearch, searchCondition)
+    filterConsulting(statusSearch, newValue);  // filterLeads(newValue);
   };
 
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
     if(newValue === "All"){
       loadCompanyConsultings(selectedLead.company_code); 
+      setSearchCondition("");
     }else{
-      loadCompanyConsultings(selectedLead.company_code); 
+      filterConsulting(newValue, searchCondition);
+      //loadCompanyConsultings(selectedLead.company_code); 
     }
     setExpaned(false);
-    setSearchCondition("");
+   
   }
 
   const handleCheckEditState = useCallback((name) => {

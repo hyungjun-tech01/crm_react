@@ -56,12 +56,24 @@ export const ConsultingRepo = selector({
                 console.error(`loadAllCompanies / Error : ${err}`);
             };
         });
-        const filterConsulting = getCallback(({set, snapshot }) => async (filterText) => {
+        const filterConsulting = getCallback(({set, snapshot }) => async (statusText, filterText) => {
             const allConsultingList = await snapshot.getPromise(atomCompanyConsultings);
-            const allConsulting = 
-            allConsultingList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))||
-                                           (item.receiver && item.receiver.includes(filterText)) 
-            );
+            
+            let allConsulting;
+            if (statusText === 'All' || statusText === '') {
+                allConsulting = 
+                allConsultingList.filter(item => ((item.lead_name &&item.lead_name.includes(filterText))||
+                                                  (item.receiver && item.receiver.includes(filterText)))
+                );
+            }
+            else {
+                allConsulting = 
+                allConsultingList.filter(item => ((item.status &&item.status.includes(statusText)))
+                                               &&((item.lead_name &&item.lead_name.includes(filterText))||
+                                                  (item.receiver && item.receiver.includes(filterText)))
+                );
+            }
+           
             set(atomFilteredConsulting, allConsulting);
             return true;
         });
