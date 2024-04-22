@@ -2,18 +2,18 @@ import React from 'react';
 // import ReactDOM from 'react-dom';
 import ReactDOM from 'react-dom/client'; // -- react v18 권고에 따라 변경;
 import { RecoilRoot } from "recoil";
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { red } from '@mui/material/colors';
+// import { ThemeProvider, createTheme } from '@mui/material/styles';
+// import { red } from '@mui/material/colors';
 
 import AppRouter from './approuter';
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: red[500],
-    },
-  },
-});
+// const theme = createTheme({
+//   palette: {
+//     primary: {
+//       main: red[500],
+//     },
+//   },
+// });
 
 // import * as serviceWorker from './client/serviceWorker';
 
@@ -24,9 +24,9 @@ const root = ReactDOM.createRoot(
 root.render(
     <React.StrictMode>
         <RecoilRoot>
-            <ThemeProvider theme={theme}>
+            {/* <ThemeProvider theme={theme}> */}
                 <AppRouter/>
-            </ThemeProvider>
+            {/* </ThemeProvider> */}
         </RecoilRoot>
     </React.StrictMode>
 );

@@ -8,12 +8,12 @@ import { itemRender, onShowSizeChange } from "../paginationfunction";
 import "../antdstyle.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { AddBoxOutlined, ModeEdit, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
+import { AddBoxOutlined, ModeEdit, IndeterminateCheckBoxOutlined } from '@mui/icons-material';
 
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
-import { TransactionRepo, TransactionTypes, TransactionSendTypes } from "../../repository/transaction";
-import { atomAllCompanies, atomAllTransactions, atomAllLeads, defaultTransaction } from "../../atoms/atoms";
+import { TransactionRepo } from "../../repository/transaction";
+import { atomAllCompanies, atomAllLeads, defaultTransaction } from "../../atoms/atoms";
 import { formateDate } from "../../constants/functions";
 import "./transaction.style.css";
 
@@ -37,47 +37,105 @@ const default_transaction_content = {
   "modify_date": null,
 };
 
-const default_content_array = [
-  ['2', '분류'],
-  ['3', '제조회사'],
-  ['4', '모델명'],
-  ['5', '품목'],
-  ['6', '재질'],
-  ['7', '타입'],
-  ['8', '색상'],
-  ['9', '규격'],
-  ['10', '세부사양'],
-  ['11', '단위'],
-  ['12', '수량'],
-  ['13', '소비자가'],
-  ['14', '할인%'],
-  ['15', '견적단가'],
-  ['16', '견적금액'],
-  ['17', '원가'],
-  ['18', '이익금액'],
-  ['19', '비고'],
+const trans_key_to_name = {
+  "transaction_code": '거래코드',
+  "month_day": '월일',
+  "product_name": '품목',
+  "standard": '규격',
+  "unit": '단위',
+  "quantity": '수량',
+  "unit_price": '단가',
+  "supply_price": '공급가액',
+  "tax_price": '세액',
+  "total_price": '합계금액',
+  "memo": '비고',
+  "trasaction_sub_index": '순번',
+  "lead_code": '거래처코드',
+  "company_name": '거래처명',
+  "statement_number": '전표번호',
+  "transaction_sub_type": '구분',
+  "modify_date": '날짜',
+};
+
+const default_columns = [
+  {
+    title: "Month /Day",
+    dataIndex: 'month_day',
+    render: (text, record) => <>{text}</>,
+  },
+  {
+    title: "Product",
+    dataIndex: 'product_name',
+    render: (text, record) => <>{text}</>,
+  },
+  {
+    title: "Standard",
+    dataIndex: 'standard',
+    render: (text, record) => <>{text}</>,
+  },
+  {
+    title: "Unit",
+    dataIndex: 'unit',
+    render: (text, record) => <>{text}</>,
+  },
+  {
+    title: "Quantity",
+    dataIndex: 'quantity',
+    render: (text, record) => <>{text}</>,
+  },
+  {
+    title: "Unit Price",
+    dataIndex: 'unit_price',
+    render: (text, record) => <>{text}</>,
+  },
+  {
+    title: "Supply Price",
+    dataIndex: 'supply_price',
+    render: (text, record) => <>{text}</>,
+  },
+  {
+    title: "Tax Price",
+    dataIndex: 'tax_price',
+    render: (text, record) => <>{text}</>,
+  },
+  {
+    title: "Total Price",
+    dataIndex: 'total_price',
+    render: (text, record) => <>{text}</>,
+  },
+  {
+    title: "Modified",
+    dataIndex: 'modify_date',
+    render: (text, record) => <>{text}</>,
+  },
+  {
+    title: "Edit",
+    render: (text, record) => (
+      <div className="dropdown dropdown-action text-center">
+        <ModeEdit onClick={() => {
+          handleLoadSelectedContent(record);
+        }} />
+      </div>
+    ),
+  },
 ];
 
 const TransactionAddNewModal = () => {
-  const allCompnayData = useRecoilValue(atomAllCompanies);
+  const allCompanyData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
-  const allTransactionData = useRecoilValue(atomAllTransactions);
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
   const { loadAllLeads } = useRecoilValue(LeadRepo);
   const { modifyTransaction } = useRecoilValue(TransactionRepo);
   const [ cookies] = useCookies(["myLationCrmUserId"]);
 
-  const [ companiesForSelection, setCompaniesForSelection ] = useState([]);
-  const [ leadsForSelection, setLeadsForSelection ] = useState(null);
-  const [ selectedLead, setSelectedLead ] = useState(null);
+  const [ leadsForSelection, setLeadsForSelection ] = useState([]);
+  const [ selectedCompany, setSelectedCompany ] = useState(null);
   const [ transactionChange, setTransactionChange ] = useState(null);
   const [ publishDate, setPublishDate ] = useState(new Date());
 
   const [ transactionContents, setTransactionContents ] = useState([]);
   const [ temporaryContent, setTemporaryContent ] = useState(null);
   const [ selectedRows, setSelectedRows ] = useState([]);
-
-  const [ contentColumns, setContentColumns ] = useState([]);
 
   const handlePublishDateChange = useCallback((date) => {
     setPublishDate(date);
@@ -91,66 +149,17 @@ const TransactionAddNewModal = () => {
 
   const selectLeadRef = useRef(null);
 
-  const default_columns = [
-    {
-      title: "No",
-      dataIndex: '1',
-      size: 5,
-      render: (text, record) => <>{text}</>,
-    },
-    {
-      title: "품목",
-      dataIndex: '5',
-      size: 50,
-      render: (text, record) => <>{text}</>,
-    },
-    {
-      title: "세부사양",
-      dataIndex: '10',
-      size: 10,
-      render: (text, record) => <>{text}</>,
-    },
-    {
-      title: "수량",
-      dataIndex: '12',
-      size: 10,
-      render: (text, record) => <>{text}</>,
-    },
-    {
-      title: "견적단가",
-      dataIndex: '15',
-      size: 15,
-      render: (text, record) => <>{text}</>,
-    },
-    {
-      title: "견적금액",
-      dataIndex: '16',
-      size: 15,
-      render: (text, record) => <>{text}</>,
-    },
-    {
-      title: "Edit",
-      render: (text, record) => (
-        <div className="dropdown dropdown-action text-center">
-          <ModeEdit onClick={() => {
-            handleLoadSelectedContent(record);
-          }} />
-        </div>
-      ),
-    },
-  ];
-
   // --- Functions used for adding new transaction ------------------------------
   const initializeTransactionTemplate = useCallback(() => {
     setTransactionChange({ ...defaultTransaction });
-    setSelectedLead(null);
+    setSelectedCompany(null);
     setTransactionContents([]);
 
     if(selectLeadRef.current)
       selectLeadRef.current.clearValue();
 
     document.querySelector("#add_new_transaction_form").reset();
-  }, [selectLeadRef, ]);
+  }, [selectLeadRef.current, defaultTransaction]);
 
   const handleTransactionChange = useCallback((e) => {
     const modifiedData = {
@@ -160,21 +169,25 @@ const TransactionAddNewModal = () => {
     setTransactionChange(modifiedData);
   }, [transactionChange]);
 
-  const handleSelectLead = useCallback((value) => {
-    const tempChanges = {
-      ...transactionChange,
-      lead_code: value.code,
-      lead_name: value.name,
-      department: value.department,
-      position: value.position,
-      mobile_number: value.mobile,
-      phone_number: value.phone,
-      email: value.email,
-      company_name: value.company,
-      company_code: companiesForSelection[value.company],
-    };
-    setTransactionChange(tempChanges);
-  }, [companiesForSelection, transactionChange]);
+  const handleSelectLead= useCallback((value) => {
+    console.log('\thandleSelectLead / value ', value);
+    if(value) {
+      const tempChanges = {
+        ...transactionChange,
+        lead_code: value.value.lead_code,
+        company_code: value.value.company_code,
+        company_name: value.value.company_name,
+        ceo_name: value.value.ceo_name,
+        address: value.value.company_address,
+        business_type: value.value.business_type,
+        business_item: value.value.business_item,
+        business_reg_code: value.value.business_registration_code,
+      };
+      console.log('\thandleSelectLead : ', tempChanges);
+      setTransactionChange(tempChanges);
+      setSelectedCompany(value.value.company_code)
+    }
+  }, [transactionChange]);
 
   const handleAddNewTransaction = useCallback((event) => {
     // Check data if they are available
@@ -200,7 +213,7 @@ const TransactionAddNewModal = () => {
       initializeTransactionTemplate();
       //close modal ?
     };
-  }, [transactionChange, transactionContents, contentColumns, cookies.myLationCrmUserId, modifyTransaction, initializeTransactionTemplate]);
+  }, [transactionChange, transactionContents, cookies.myLationCrmUserId, modifyTransaction, initializeTransactionTemplate]);
 
 
   // --- Functions dealing with contents table -------------------------------
@@ -215,71 +228,27 @@ const TransactionAddNewModal = () => {
     },
   };
 
-  const handleHeaderCheckChange = useCallback((event) => {
-    const targetName = event.target.name;
-    const targetIndex = Number(targetName);
-
-    if(event.target.checked) {
-      const foundIndex = contentColumns.findIndex(
-        item => Number(item.dataIndex) > targetIndex);
-      
-      const tempColumns = [
-        ...contentColumns.slice(0, foundIndex),
-        {
-          title: default_content_array[targetIndex - 2][1],
-          dataIndex: targetName,
-          size: 0,
-          render: (text, record) => <>{text}</>,
-        },
-        ...contentColumns.slice(foundIndex,),
-      ];
-      setContentColumns(tempColumns);
-    } else {
-      const foundIndex = contentColumns.findIndex(
-        item => Number(item.dataIndex) === targetIndex);
-
-      const tempColumns = [
-        ...contentColumns.slice(0, foundIndex),
-        ...contentColumns.slice(foundIndex + 1,),
-      ];
-      setContentColumns(tempColumns);
-    }
-  }, [contentColumns, setContentColumns]);
-
-  const handleHeaderSizeChange = useCallback((event) => {
-    const targetName = event.target.name;
-    const foundIndex = contentColumns.findIndex(
-      item => item.dataIndex === targetName);
-    if(foundIndex !== -1){
-      const tempColumn = {
-        ...contentColumns.at(foundIndex),
-        size: event.target.value,
-      }
-      const tempColumns = [
-        ...contentColumns.slice(0, foundIndex),
-        tempColumn,
-        ...contentColumns.slice(foundIndex + 1,),
-      ];
-      setContentColumns(tempColumns);
-    }
-  }, [contentColumns]);
-
 
   // --- Functions used for editting content ------------------------------
   const handleLoadNewTemporaryContent = useCallback(() => {
+    if(!transactionChange.company_name) {
+      console.log('\t[handleLoadNewTemporaryContent] No company is selected');
+      return;
+    };
+
     const tempContent = {
       ...default_transaction_content,
-      '1': transactionContents.length + 1,
+      trasaction_sub_index: transactionContents.length + 1,
     };
     setTemporaryContent(tempContent);
-  }, [transactionContents]);
-
-  const handleLoadSelectedContent = useCallback((data) => {
-    setTemporaryContent(data);
-  }, [setTemporaryContent]);
+  }, [transactionContents, transactionChange]);
 
   const handleDeleteSelectedConetents = useCallback(()=>{
-    console.log('handleDeleteSelectedConetents : ', selectedRows);
+    if(selectedRows.length === 0) {
+      console.log('\t[handleDeleteSelectedConetents] No row is selected');
+      return;
+    };
+
     let tempContents=[
       ...transactionContents
     ];
@@ -351,54 +320,65 @@ const TransactionAddNewModal = () => {
 
   useEffect(() => {
     // ----- Load companies and set up the relation between lead and company by company code ---
-    if (allCompnayData.length === 0) {
+    if (allCompanyData.length === 0) {
       loadAllCompanies();
-    } else {
-      let company_subset = {};
-      allCompnayData.forEach((data) => {
-        company_subset[data.company_name] = data.company_code;
-      });
-      setCompaniesForSelection(company_subset);
     };
 
     // ----- Load Leads and set up the options of lead to select -----
     if (allLeadData.length === 0) {
       loadAllLeads();
     } else {
-      const temp_data = allLeadData.map(lead => {
-        return {
-          label: lead.lead_name + " / " + lead.company_name,
-          value: {
-            code: lead.lead_code,
-            name: lead.lead_name,
-            department: lead.department,
-            position: lead.position,
-            mobile: lead.mobile_number,
-            phone: lead.phone_number,
-            email: lead.email,
-            company: lead.company_name
+      if(allCompanyData.length > 0) {
+        const temp_data = allLeadData.map(lead => {
+          const foundIdx = allCompanyData.findIndex(com => com.company_code === lead.company_code);
+          if(foundIdx !== -1) {
+            const foundCompany = allCompanyData[foundIdx];
+            return {
+              label: lead.lead_name + " / " + lead.company_name,
+              value: {
+                lead_code: lead.lead_code,
+                company_code: foundCompany.company_code,
+                company_name: foundCompany.company_name,
+                ceo_name: foundCompany.ceo_name,
+                address: foundCompany.company_address,
+                business_type: foundCompany.business_type,
+                business_item: foundCompany.business_item,
+                business_reg_code: foundCompany.business_registration_code,
+              }
+            };
+          };
+          return {
+            label: lead.lead_name + " / " + lead.company_name,
+            value: {
+              lead_code: lead.lead_code,
+              company_code: lead.company_code,
+              company_name: lead.company_name,
+              ceo_name: null,
+              address: null,
+              business_type: null,
+              business_item: null,
+              business_reg_code: null,
+            }
+          };
+        });
+        temp_data.sort((a, b) => {
+          if (a.label > b.label) {
+            return 1;
           }
-        }
-      });
-      temp_data.sort((a, b) => {
-        if (a.label > b.label) {
-          return 1;
-        }
-        if (a.label < b.label) {
-          return -1;
-        }
-        // a must be equal to b
-        return 0;
-      });
-      setLeadsForSelection(temp_data);
+          if (a.label < b.label) {
+            return -1;
+          }
+          // a must be equal to b
+          return 0;
+        });
+        setLeadsForSelection(temp_data);
+      }
     };
 
     // ----- Initialize template to store values -----
     initializeTransactionTemplate();
-    if (contentColumns.length === 0) {
-      setContentColumns(default_columns);
-    }
-  }, [allCompnayData, allLeadData, allTransactionData, initializeTransactionTemplate, loadAllCompanies, loadAllLeads]);
+
+  }, [allCompanyData, allLeadData, initializeTransactionTemplate, loadAllCompanies, loadAllLeads, setLeadsForSelection]);
 
   return (
     <div
@@ -433,94 +413,103 @@ const TransactionAddNewModal = () => {
             <form className="forms-sampme" id="add_new_transaction_form">
               <h4>Transaction Information</h4>
               <div className="form-group row">
-                <div className="col-sm-9">
-                  <label className="col-form-label">Name <span className="text-danger">*</span></label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Name"
-                    name="transaction_title"
-                    onChange={handleTransactionChange}
-                  />
+                <div className="col-sm-2">
+                  <label className="col-form-label">Title <span className="text-danger">*</span></label>
                 </div>
-                <div className="col-sm-3">
-                  <label className="col-form-label">Type</label>
+                <div className="col-sm-10">
                   <input
                     type="text"
-                    className="form-control"
-                    placeholder="Type"
-                    name="transaction_type"
+                    className="form-control form-control-sm"
+                    placeholder="Title"
+                    name="transaction_title"
                     onChange={handleTransactionChange}
                   />
                 </div>
               </div>
               <div className="form-group row">
-                <div className="col-sm-8">
-                  <label className="col-form-label">Publish Date</label>
-                  <DatePicker
-                    className="form-control"
-                    selected={publishDate}
-                    onChange={handlePublishDateChange}
-                    dateFormat="yyyy.MM.dd"
+                <div className="col-sm-4">
+                  <label className="col-form-label">Type</label>
+                  <input
+                    type="text"
+                    className="form-control form-control-sm"
+                    placeholder="Type"
+                    name="transaction_type"
+                    onChange={handleTransactionChange}
                   />
+                </div>
+                <div className="col-sm-4">
+                  <label className="col-form-label">Publish Date</label>
+                  <div className="cal-icon cal-icon-sm">
+                    <DatePicker
+                      className="form-control form-control-sm"
+                      selected={publishDate}
+                      onChange={handlePublishDateChange}
+                      dateFormat="yyyy.MM.dd"
+                    />
+                  </div>
                 </div>
                 <div className="col-sm-4">
                   <label className="col-form-label">Publish Type</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control form-control-sm"
                     placeholder="Publish Type"
                     name="publish_type"
                     onChange={handleTransactionChange}
                   />
                 </div>
               </div>
-              <h4>Lead Information</h4>
+              <h4>Lead / Organization Information</h4>
               <div className="form-group row">
                 <div className="col-sm-6">
-                  <label className="col-form-label">Lead Name</label>
-                  <Select options={leadsForSelection} onChange={handleSelectLead} />
+                  <label className="col-form-label">Lead / Organization</label>
+                  <Select ref={selectLeadRef} options={leadsForSelection} onChange={handleSelectLead} />
                 </div>
               </div>
-              { (transactionChange && transactionChange.lead_code) && 
-                <>
-                  <h4>Company Information</h4>
-                  <div className="form-group row">
-                    <div className="col-sm-6">
-                      <label className="col-form-label">Organization</label>
-                      <label className="col-form-label">{transactionChange.company_name}</label>
-                    </div>
-                    <div className="col-sm-6">
-                      <label className="col-form-label">CEO Name</label>
-                      <label className="col-form-label">{transactionChange.ceo_name}</label>
-                    </div>
+              { selectedCompany &&
+                <div className="form-group row">
+                  <div className="col-sm-6">
+                    <table className="table">
+                      <tbody>
+                        <tr>
+                          <td className="border-0">CEO Name</td>
+                          <td className="border-0">{transactionChange.ceo_name}</td>
+                        </tr>
+                        <tr>
+                          <td>Registration No.</td>
+                          <td>{transactionChange.business_registration_code}</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
-                  <div className="form-group row">
-                    <div className="col-sm-12">
-                      <label className="col-form-label">Address</label>
-                      <label className="col-form-label">{transactionChange.company_address}</label>
-                    </div>
+                  <div className="col-sm-6">
+                    <table className="table">
+                      <tbody>
+                        <tr>
+                          <td className="border-0">Business Type</td>
+                          <td className="border-0">{transactionChange.business_type}</td>
+                        </tr>
+                        <tr>
+                          <td>Business Item</td>
+                          <td>{transactionChange.business_item}</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
-                  <div className="form-group row">
-                    <div className="col-sm-6">
-                      <label className="col-form-label">Business Type </label>
-                      <label className="col-form-label">{transactionChange.business_type}</label>
-                    </div>
-                    <div className="col-sm-6">
-                      <label className="col-form-label">Business Item </label>
-                      <label className="col-form-label">{transactionChange.business_item}</label>
-                    </div>
+                  <div className="col-sm-12">
+                    <table className="table">
+                      <tbody>
+                        <tr>
+                          <td className="border-0">Address</td>
+                          <td className="border-0">{transactionChange.company_address}</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
-                  <div className="form-group row">
-                    <div className="col-sm-12">
-                      <label className="col-form-label">Registration No.</label>
-                      <label className="col-form-label">{transactionChange.business_registration_code}</label>
-                    </div>
-                  </div>
-                </>
+                </div>
               }
-              <h4>Price Table</h4>
-              <div className="form-group row">
+              <h4 className="h4-price">
+                <div>Price Table</div>
                 <div className="text-end flex-row">
                   <div>
                     <AddBoxOutlined
@@ -534,7 +523,7 @@ const TransactionAddNewModal = () => {
                     />
                   </div>
                 </div>
-              </div>
+              </h4>
               <div className="form-group row">
                 <Table
                   rowSelection={{
@@ -549,10 +538,10 @@ const TransactionAddNewModal = () => {
                     itemRender: itemRender,
                   }}
                   style={{ overflowX: "auto" }}
-                  columns={contentColumns}
+                  columns={default_columns}
                   bordered
                   dataSource={transactionContents}
-                  rowKey={(record) => record['1']}
+                  rowKey={(record) => record.trasaction_sub_index}
                 // onChange={handleTableChange}
                 />
               </div>
@@ -584,69 +573,140 @@ const TransactionAddNewModal = () => {
           </div>
           <table className="table">
             <tbody>
-            {default_content_array.map((item, index) => {
-              if (index % 2 === 0) {
-                if (index !== default_content_array.length - 1) return;
-                return (
-                  <tr key={index}>
-                    <td>
-                      {item.at(1)}
-                    </td>
-                    <td>
-                      <input 
-                        name={item.at(0)} 
-                        className="input-group-text input-group-text-sm"
-                        type="text"
-                        defaultValue={temporaryContent[item.at(0)]}
-                        onChange={handleEditTemporaryContent}
-                      />
-                    </td>
-                  </tr>
-                )
-              };
-              return (
-                <tr key={index}>
-                  <td>
-                    {default_content_array[index - 1][1]}
+              <tr>
+                <td>{trans_key_to_name.company_name}</td>
+                <td>
+                  <input 
+                    name={temporaryContent.company_name}
+                    className="input-group-text input-group-text-sm"
+                    type="text"
+                    defaultValue={temporaryContent.company_name}
+                    onChange={handleEditTemporaryContent}
+                  />
+                </td>
+                <td>{trans_key_to_name.transaction_sub_type}</td>
+                <td>
+                  <input 
+                    name={temporaryContent.transaction_sub_type} 
+                    className="input-group-text input-group-text-sm"
+                    type="text"
+                    defaultValue={temporaryContent.transaction_sub_type}
+                    onChange={handleEditTemporaryContent}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>{trans_key_to_name.month_day}</td>
+                <td>
+                  <input 
+                    name={temporaryContent.month_day} 
+                    className="input-group-text input-group-text-sm"
+                    type="text"
+                    defaultValue={temporaryContent.month_day}
+                    onChange={handleEditTemporaryContent}
+                  />
+                </td>
+                <td>{trans_key_to_name.product_name}</td>
+                <td>
+                  <input 
+                    name={temporaryContent.product_name} 
+                    className="input-group-text input-group-text-sm"
+                    type="text"
+                    defaultValue={temporaryContent.product_name}
+                    onChange={handleEditTemporaryContent}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>{trans_key_to_name.standard}</td>
+                <td>
+                  <input 
+                    name={temporaryContent.standard} 
+                    className="input-group-text input-group-text-sm"
+                    type="text"
+                    defaultValue={temporaryContent.standard}
+                    onChange={handleEditTemporaryContent}
+                  />
+                </td>
+                <td>{trans_key_to_name.unit}</td>
+                <td>
+                  <input 
+                    name={temporaryContent.unit} 
+                    className="input-group-text input-group-text-sm"
+                    type="text"
+                    defaultValue={temporaryContent.unit}
+                    onChange={handleEditTemporaryContent}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>{trans_key_to_name.unit_price}</td>
+                <td>
+                  <input 
+                    name={temporaryContent.unit_price} 
+                    className="input-group-text input-group-text-sm"
+                    type="text"
+                    defaultValue={temporaryContent.unit_price}
+                    onChange={handleEditTemporaryContent}
+                  />
+                </td>
+                <td>{trans_key_to_name.quantity}</td>
+                <td>
+                  <input 
+                    name={temporaryContent.quantity} 
+                    className="input-group-text input-group-text-sm"
+                    type="text"
+                    defaultValue={temporaryContent.quantity}
+                    onChange={handleEditTemporaryContent}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>{trans_key_to_name.supply_price}</td>
+                <td>
+                  <input 
+                    name={temporaryContent.supply_price} 
+                    className="input-group-text input-group-text-sm"
+                    type="text"
+                    defaultValue={temporaryContent.supply_price}
+                    onChange={handleEditTemporaryContent}
+                  />
+                </td>
+                <td>{trans_key_to_name.tax_price}</td>
+                <td>
+                  <input 
+                    name={temporaryContent.tax_price}
+                    className="input-group-text input-group-text-sm"
+                    type="text"
+                    defaultValue={temporaryContent.tax_price}
+                    onChange={handleEditTemporaryContent}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>{trans_key_to_name.total_price}</td>
+                <td>
+                  <input 
+                    name={temporaryContent.total_price} 
+                    className="input-group-text input-group-text-sm"
+                    type="text"
+                    defaultValue={temporaryContent.total_price}
+                    onChange={handleEditTemporaryContent}
+                  />
                   </td>
-                  <td>
-                    <input
-                      name={default_content_array[index - 1][0]}
-                      className="input-group-text input-group-text-sm"
-                      type="text"
-                      defaultValue={temporaryContent[default_content_array[index - 1][0]]}
-                      onChange={handleEditTemporaryContent}
-                    />
-                  </td>
-                  <td>
-                    {item.at(1)}
-                  </td>
-                  <td>
-                    <input
-                      name={item.at(0)}
-                      className="input-group-text input-group-text-sm"
-                      type="text"
-                      defaultValue={temporaryContent[item.at(0)]}
-                      onChange={handleEditTemporaryContent}
-                    />
-                  </td>
-                </tr>
-              )
-            })}
+              </tr>
             </tbody>
           </table>
-          { !!temporaryContent['10'] &&
-            <div>
-              <textarea
-                className="form-control"
-                rows={3}
-                placeholder='Comment'
-                defaultValue={temporaryContent['998']}
-                name='998'
-                onChange={handleEditTemporaryContent}
-              />
-            </div>
-          }
+          <div>
+            <textarea
+              className="form-control"
+              rows={3}
+              placeholder='Memo'
+              defaultValue={temporaryContent.memo}
+              name='memo'
+              onChange={handleEditTemporaryContent}
+            />
+          </div>
           <div className="edit-content-footer" >
             <button
               type="button"

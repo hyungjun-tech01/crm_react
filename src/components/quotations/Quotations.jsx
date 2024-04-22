@@ -24,7 +24,7 @@ import { atomAllCompanies, atomAllQuotations, atomAllLeads } from "../../atoms/a
 import { compareCompanyName, compareText } from "../../constants/functions";
 
 const Quotations = () => {
-  const allCompnayData = useRecoilValue(atomAllCompanies);
+  const allCompanyData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
   const allQuotationData = useRecoilValue(atomAllQuotations);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
@@ -176,7 +176,7 @@ const Quotations = () => {
   };
 
   useEffect(() => {
-    if (allCompnayData.length === 0) {
+    if (allCompanyData.length === 0) {
       loadAllCompanies();
     };
     if (allLeadData.length === 0) {
@@ -185,7 +185,7 @@ const Quotations = () => {
     if (allQuotationData.length === 0) {
       loadAllQuotations();
     };
-  }, [allCompnayData, allLeadData, allQuotationData]);
+  }, [allCompanyData, allLeadData, allQuotationData]);
 
   return (
     <HelmetProvider>

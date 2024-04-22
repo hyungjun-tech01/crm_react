@@ -313,6 +313,11 @@ const QuotationAddNewModal = () => {
 
   // --- Functions used for editting content ------------------------------
   const handleLoadNewTemporaryContent = useCallback(() => {
+    if(!quotationChange.lead_name) {
+      console.log('\t[handleLoadNewTemporaryContent] No lead is selected');
+      return;
+    };
+
     const tempContent = {
       ...default_quotation_content,
       '1': quotationContents.length + 1,
@@ -325,7 +330,11 @@ const QuotationAddNewModal = () => {
   }, [setTemporaryContent]);
 
   const handleDeleteSelectedConetents = useCallback(()=>{
-    console.log('handleDeleteSelectedConetents : ', selectedRows);
+    if(selectedRows.length === 0) {
+      console.log('\t[handleDeleteSelectedConetents] No row is selected');
+      return;
+    };
+
     let tempContents=[
       ...quotationContents
     ];
@@ -501,16 +510,16 @@ const QuotationAddNewModal = () => {
                       <table className="table">
                         <tbody>
                           <tr>
-                            <td>Department</td>
-                            <td>{selectedLead.department}</td>
+                            <td className="border-0">Department</td>
+                            <td className="border-0">{selectedLead.department}</td>
                           </tr>
                           <tr>
                             <td>Mobile</td>
                             <td>{selectedLead.mobile}</td>
                           </tr>
                           <tr>
-                            <td>Email</td>
-                            <td>{selectedLead.email}</td>
+                            <td className="border-0">Email</td>
+                            <td className="border-0">{selectedLead.email}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -519,8 +528,8 @@ const QuotationAddNewModal = () => {
                       <table className="table">
                         <tbody>
                           <tr>
-                            <td>Position</td>
-                            <td>{selectedLead.position}</td>
+                            <td className="border-0">Position</td>
+                            <td className="border-0">{selectedLead.position}</td>
                           </tr>
                           <tr>
                             <td>Phone</td>
@@ -700,8 +709,8 @@ const QuotationAddNewModal = () => {
                   </div>
                 </div>
               </div>
-              <h4>Price Table</h4>
-              <div className="form-group row">
+              <h4 className="h4-price">
+                <div>Price Table</div>
                 <div className="text-end flex-row">
                   <div>
                     <AddBoxOutlined
@@ -719,7 +728,7 @@ const QuotationAddNewModal = () => {
                     />
                   </div>
                 </div>
-              </div>
+              </h4>
               <div className="form-group row">
                 <Table
                   rowSelection={{
