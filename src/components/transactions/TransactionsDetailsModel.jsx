@@ -10,6 +10,7 @@ import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailDateItem from "../../constants/DetailDateItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
 import TransactionView from "./TransactionView";
+import { ConverTextAmount } from "../../constants/functions";
 
 const TransactionsDetailsModel = () => {
   const { Panel } = Collapse;
@@ -141,7 +142,7 @@ const TransactionsDetailsModel = () => {
   }, [editedValues, savedValues, orgPublishDate, publishDate]);
 
   useEffect(() => {
-    console.log("[TransactionDetailsModel] called!");
+    console.log("[TransactionDetailsModel] called! : ", selectedTransaction);
     setOrgPublishDate(
       selectedTransaction.publish_date
       ? new Date(selectedTransaction.publish_date)
@@ -348,7 +349,7 @@ const TransactionsDetailsModel = () => {
                                       <DetailDateItem
                                         saved={savedValues}
                                         name="publish_date"
-                                        title="MA Contact Date"
+                                        title="Publish Date"
                                         orgTimeData={orgPublishDate}
                                         timeData={publishDate}
                                         timeDataChange={handlePublishDateChange}
@@ -468,7 +469,7 @@ const TransactionsDetailsModel = () => {
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
-                                        defaultText={selectedTransaction.supply_price}
+                                        defaultText={ConverTextAmount(selectedTransaction.supply_price)}
                                         saved={savedValues}
                                         name="supply_price"
                                         title="Supply Price"
@@ -481,7 +482,7 @@ const TransactionsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        defaultText={selectedTransaction.tax_price}
+                                        defaultText={ConverTextAmount(selectedTransaction.tax_price)}
                                         saved={savedValues}
                                         name="tax_price"
                                         title="Tax Price"
@@ -493,7 +494,7 @@ const TransactionsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        defaultText={selectedTransaction.total_price}
+                                        defaultText={ConverTextAmount(selectedTransaction.total_price)}
                                         saved={savedValues}
                                         name="total_price"
                                         title="Total Price"

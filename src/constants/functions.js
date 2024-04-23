@@ -46,10 +46,10 @@ export const ConverTextAmount = (amount) => {
 
     let input = null;
     if(typeof amount === 'number'){
-        input = amount;
+        input = amount.toString();
     } else if(typeof amount === 'string')
     {
-        input = amount.toString();
+        input = amount;
     };
     
     let ret = "";

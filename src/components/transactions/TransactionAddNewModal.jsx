@@ -10,11 +10,10 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { AddBoxOutlined, ModeEdit, IndeterminateCheckBoxOutlined } from '@mui/icons-material';
 
-import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { TransactionRepo } from "../../repository/transaction";
 import { atomAllCompanies, atomAllLeads, defaultTransaction } from "../../atoms/atoms";
-import { formateDate } from "../../constants/functions";
+import { ConverTextAmount, formateDate } from "../../constants/functions";
 import "./transaction.style.css";
 
 const default_transaction_content = {
@@ -57,73 +56,10 @@ const trans_key_to_name = {
   "modify_date": '날짜',
 };
 
-const default_columns = [
-  {
-    title: "Month /Day",
-    dataIndex: 'month_day',
-    render: (text, record) => <>{text}</>,
-  },
-  {
-    title: "Product",
-    dataIndex: 'product_name',
-    render: (text, record) => <>{text}</>,
-  },
-  {
-    title: "Standard",
-    dataIndex: 'standard',
-    render: (text, record) => <>{text}</>,
-  },
-  {
-    title: "Unit",
-    dataIndex: 'unit',
-    render: (text, record) => <>{text}</>,
-  },
-  {
-    title: "Quantity",
-    dataIndex: 'quantity',
-    render: (text, record) => <>{text}</>,
-  },
-  {
-    title: "Unit Price",
-    dataIndex: 'unit_price',
-    render: (text, record) => <>{text}</>,
-  },
-  {
-    title: "Supply Price",
-    dataIndex: 'supply_price',
-    render: (text, record) => <>{text}</>,
-  },
-  {
-    title: "Tax Price",
-    dataIndex: 'tax_price',
-    render: (text, record) => <>{text}</>,
-  },
-  {
-    title: "Total Price",
-    dataIndex: 'total_price',
-    render: (text, record) => <>{text}</>,
-  },
-  {
-    title: "Modified",
-    dataIndex: 'modify_date',
-    render: (text, record) => <>{text}</>,
-  },
-  {
-    title: "Edit",
-    render: (text, record) => (
-      <div className="dropdown dropdown-action text-center">
-        <ModeEdit onClick={() => {
-          handleLoadSelectedContent(record);
-        }} />
-      </div>
-    ),
-  },
-];
-
-const TransactionAddNewModal = () => {
+const TransactionAddNewModal = (props) => {
+  const { init, handleInit } = props;
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
-  const { loadAllCompanies } = useRecoilValue(CompanyRepo);
   const { loadAllLeads } = useRecoilValue(LeadRepo);
   const { modifyTransaction } = useRecoilValue(TransactionRepo);
   const [ cookies] = useCookies(["myLationCrmUserId"]);
@@ -136,6 +72,10 @@ const TransactionAddNewModal = () => {
   const [ transactionContents, setTransactionContents ] = useState([]);
   const [ temporaryContent, setTemporaryContent ] = useState(null);
   const [ selectedRows, setSelectedRows ] = useState([]);
+
+  const [ supplyPrice, setSupplyPrice ] = useState(0);
+  const [ taxyPrice, setTaxPrice ] = useState(0);
+  const [ totalPrice, setTotalPrice ] = useState(0);
 
   const handlePublishDateChange = useCallback((date) => {
     setPublishDate(date);
@@ -151,7 +91,9 @@ const TransactionAddNewModal = () => {
 
   // --- Functions used for adding new transaction ------------------------------
   const initializeTransactionTemplate = useCallback(() => {
+    console.log('\tinitializeTransactionTemplate called');
     setTransactionChange({ ...defaultTransaction });
+    setPublishDate(null);
     setSelectedCompany(null);
     setTransactionContents([]);
 
@@ -159,6 +101,12 @@ const TransactionAddNewModal = () => {
       selectLeadRef.current.clearValue();
 
     document.querySelector("#add_new_transaction_form").reset();
+
+    setSupplyPrice(0);
+    setTaxPrice(0);
+    setTotalPrice(0);
+
+    handleInit(!init);
   }, [selectLeadRef.current, defaultTransaction]);
 
   const handleTransactionChange = useCallback((e) => {
@@ -170,7 +118,6 @@ const TransactionAddNewModal = () => {
   }, [transactionChange]);
 
   const handleSelectLead= useCallback((value) => {
-    console.log('\thandleSelectLead / value ', value);
     if(value) {
       const tempChanges = {
         ...transactionChange,
@@ -183,7 +130,6 @@ const TransactionAddNewModal = () => {
         business_item: value.value.business_item,
         business_reg_code: value.value.business_registration_code,
       };
-      console.log('\thandleSelectLead : ', tempChanges);
       setTransactionChange(tempChanges);
       setSelectedCompany(value.value.company_code)
     }
@@ -191,9 +137,8 @@ const TransactionAddNewModal = () => {
 
   const handleAddNewTransaction = useCallback((event) => {
     // Check data if they are available
-    if (transactionChange.lead_name === null
-      || transactionChange.lead_name === ''
-      || transactionChange.transaction_type === null
+    if (transactionChange.company_name === null
+      || transactionChange.company_name === ''
       || transactionContents.length === 0
     ) {
       console.log("Necessary information isn't submitted!");
@@ -203,8 +148,6 @@ const TransactionAddNewModal = () => {
       ...transactionChange,
       transaction_contents: JSON.stringify(transactionContents),
       action_type: 'ADD',
-      lead_number: '99999',// Temporary
-      counter: 0,
       modify_user: cookies.myLationCrmUserId,
     };
     console.log(`[ handleAddNewTransaction ]`, newTransactionData);
@@ -228,6 +171,68 @@ const TransactionAddNewModal = () => {
     },
   };
 
+  const default_columns = [
+    {
+      title: "Month /Day",
+      dataIndex: 'month_day',
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: "Product",
+      dataIndex: 'product_name',
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: "Standard",
+      dataIndex: 'standard',
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: "Unit",
+      dataIndex: 'unit',
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: "Quantity",
+      dataIndex: 'quantity',
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: "Unit Price",
+      dataIndex: 'unit_price',
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: "Supply Price",
+      dataIndex: 'supply_price',
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: "Tax Price",
+      dataIndex: 'tax_price',
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: "Total Price",
+      dataIndex: 'total_price',
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: "Modified",
+      dataIndex: 'modify_date',
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: "Edit",
+      render: (text, record) => (
+        <div className="dropdown dropdown-action text-center">
+          <ModeEdit onClick={() => {
+            handleLoadSelectedContent(record);
+          }} />
+        </div>
+      ),
+    },
+  ];
 
   // --- Functions used for editting content ------------------------------
   const handleLoadNewTemporaryContent = useCallback(() => {
@@ -238,10 +243,15 @@ const TransactionAddNewModal = () => {
 
     const tempContent = {
       ...default_transaction_content,
-      trasaction_sub_index: transactionContents.length + 1,
+      trasaction_sub_index: transactionContents.length,
+      company_name: transactionChange.company_name,
     };
     setTemporaryContent(tempContent);
   }, [transactionContents, transactionChange]);
+
+  const handleLoadSelectedContent = useCallback((data) => {
+    setTemporaryContent(data);
+  }, [setTemporaryContent]);
 
   const handleDeleteSelectedConetents = useCallback(()=>{
     if(selectedRows.length === 0) {
@@ -253,17 +263,23 @@ const TransactionAddNewModal = () => {
       ...transactionContents
     ];
     selectedRows.forEach(row => {
-      const filteredContents = tempContents.filter(item => item['1'] !== row['1']);
+      const filteredContents = tempContents.filter(item => item.trasaction_sub_index !== row.trasaction_sub_index);
       tempContents = filteredContents;
     });
-    let temp_total_amount = 0;
+    let temp_supply_price = 0;
+    let temp_tax_price = 0;
+    let temp_total_price = 0;
     const finalContents = tempContents.map((item, index) => {
-      temp_total_amount += item['16'];
-      return { ...item, '1': index + 1};
+      temp_supply_price += item.supply_price;
+      temp_tax_price += item.tax_price;
+      temp_total_price += item.total_price;
+      return { ...item, trasaction_sub_index: index};
     });
     const tempTransaction = {
       ...transactionChange,
-      total_transaction_amount : temp_total_amount,
+      supply_price: temp_supply_price,
+      tax_price: temp_tax_price,
+      total_price: temp_total_price,
     };
     setTransactionChange(tempTransaction);
     console.log('handleDeleteSelectedConetents / final : ', finalContents);
@@ -271,10 +287,49 @@ const TransactionAddNewModal = () => {
   }, [selectedRows, transactionContents, transactionChange, setTransactionContents, setTransactionChange]);
 
   const handleEditTemporaryContent = useCallback((event) => {
-    const tempContent = {
-      ...temporaryContent,
-      [event.target.name]: event.target.value,
+    let temp_value = null;
+    let tempContent = {
+      ...temporaryContent
     };
+    if(event.target.name === 'unit_price') {
+      temp_value = Number(event.target.value);
+      if(isNaN(temp_value)) {
+        console.log('\t[ handleEditTemporaryContent ] Wrong input value');
+        return;
+      };
+      if(temp_value !== 0) {
+        tempContent.unit_price = temp_value;
+        if(tempContent.quantity !== 0) {
+          tempContent.supply_price = temp_value * tempContent.quantity;
+          tempContent.tax_price = tempContent.supply_price*0.1;
+          tempContent.total_price = tempContent.supply_price + tempContent.tax_price;
+          setSupplyPrice(tempContent.supply_price);
+          setTaxPrice(tempContent.tax_price);
+          setTotalPrice(tempContent.total_price);
+        };
+      }
+    } else if(event.target.name === 'quantity'){
+      temp_value = Number(event.target.value);
+      if(isNaN(temp_value)) {
+        console.log('\t[ handleEditTemporaryContent ] Wrong input value');
+        return;
+      };
+      if(temp_value !== 0) {
+        tempContent.quantity = temp_value;
+        if(tempContent.unit_price !== 0) {
+          tempContent.supply_price = temp_value * tempContent.unit_price;
+          tempContent.tax_price = tempContent.supply_price*0.1;
+          tempContent.total_price = tempContent.supply_price + tempContent.tax_price;
+          setSupplyPrice(tempContent.supply_price);
+          setTaxPrice(tempContent.tax_price);
+          setTotalPrice(tempContent.total_price);
+        };
+      }
+      
+    } else {
+      tempContent[event.target.name] = event.target.value;
+    }
+    
     setTemporaryContent(tempContent);
   }, [temporaryContent, setTemporaryContent]);
 
@@ -282,22 +337,25 @@ const TransactionAddNewModal = () => {
     const contentToSave = {
       ...temporaryContent
     };
-    if(!contentToSave['1'] || !contentToSave['5'] || !contentToSave['16']){
-      console.log('[ Transaction / handleSaveTemporaryEdit ] Necessary Input is ommited!');
-      return;
-    };
-    const temp_index = contentToSave['1'] - 1;
+    const temp_index = contentToSave.trasaction_sub_index;
     let tempContents = [];
-    let temp_total_amount = contentToSave['16'];
-    if(transactionChange['total_transaction_amount']) {
-      temp_total_amount = transactionChange['total_transaction_amount'];
-    };
+    let temp_supply_price = contentToSave.supply_price;
+    let temp_tax_price = contentToSave.tax_price;
+    let temp_total_price = contentToSave.total_price;
+
+    temp_supply_price += transactionChange.supply_price;
+    temp_tax_price = transactionChange.tax_price;
+    temp_total_price = transactionChange.total_price;
+
     if (temp_index === transactionContents.length) {
       tempContents = [
         ...transactionContents,
         contentToSave
       ];
     } else {
+      temp_supply_price -= transactionContents[temp_index].supply_price;
+      temp_tax_price -= transactionContents[temp_index].tax_price;
+      temp_total_price -= transactionContents[temp_index].total_price;
       tempContents = [
         ...transactionContents.slice(0, temp_index),
         contentToSave,
@@ -305,24 +363,35 @@ const TransactionAddNewModal = () => {
       ];
     }
     setTransactionContents(tempContents);
+
     const tempTransactionChange = {
       ...transactionChange,
-      total_transaction_amount: temp_total_amount,
+      supply_price: temp_supply_price,
+      tax_price: temp_tax_price,
+      total_price: temp_total_price,
     };
     setTransactionChange(tempTransactionChange);
     setTemporaryContent(null);
+    setSupplyPrice(0);
+    setTaxPrice(0);
+    setTotalPrice(0);
   }, [temporaryContent, transactionContents, setTransactionContents, setTemporaryContent]);
 
   const handleCloseTemporaryEdit = useCallback(() => {
     setTemporaryContent(null);
+    setTemporaryContent(null);
+    setSupplyPrice(0);
+    setTaxPrice(0);
+    setTotalPrice(0);
   }, [setTemporaryContent]);
 
 
   useEffect(() => {
+    console.log('[ TransactionAddNewModal ] called / init : ', init);
     // ----- Load companies and set up the relation between lead and company by company code ---
-    if (allCompanyData.length === 0) {
-      loadAllCompanies();
-    };
+    // if (allCompanyData.length === 0) {
+    //   loadAllCompanies();
+    // };
 
     // ----- Load Leads and set up the options of lead to select -----
     if (allLeadData.length === 0) {
@@ -376,9 +445,10 @@ const TransactionAddNewModal = () => {
     };
 
     // ----- Initialize template to store values -----
-    initializeTransactionTemplate();
-
-  }, [allCompanyData, allLeadData, initializeTransactionTemplate, loadAllCompanies, loadAllLeads, setLeadsForSelection]);
+    if(init) {
+      initializeTransactionTemplate();
+    }
+  }, [allLeadData, init]);
 
   return (
     <div
@@ -427,7 +497,7 @@ const TransactionAddNewModal = () => {
                 </div>
               </div>
               <div className="form-group row">
-                <div className="col-sm-4">
+                <div className="col-sm-3">
                   <label className="col-form-label">Type</label>
                   <input
                     type="text"
@@ -437,7 +507,7 @@ const TransactionAddNewModal = () => {
                     onChange={handleTransactionChange}
                   />
                 </div>
-                <div className="col-sm-4">
+                <div className="col-sm-3">
                   <label className="col-form-label">Publish Date</label>
                   <div className="cal-icon cal-icon-sm">
                     <DatePicker
@@ -448,7 +518,7 @@ const TransactionAddNewModal = () => {
                     />
                   </div>
                 </div>
-                <div className="col-sm-4">
+                <div className="col-sm-3">
                   <label className="col-form-label">Publish Type</label>
                   <input
                     type="text"
@@ -458,11 +528,21 @@ const TransactionAddNewModal = () => {
                     onChange={handleTransactionChange}
                   />
                 </div>
+                <div className="col-sm-3">
+                  <label className="col-form-label">Currency</label>
+                  <input
+                    type="text"
+                    className="form-control form-control-sm"
+                    placeholder="Currency"
+                    name="currency"
+                    onChange={handleTransactionChange}
+                  />
+                </div>
               </div>
               <h4>Lead / Organization Information</h4>
               <div className="form-group row">
                 <div className="col-sm-6">
-                  <label className="col-form-label">Lead / Organization</label>
+                  <label className="col-form-label">Lead / Organization  <span className="text-danger">*</span></label>
                   <Select ref={selectLeadRef} options={leadsForSelection} onChange={handleSelectLead} />
                 </div>
               </div>
@@ -509,7 +589,7 @@ const TransactionAddNewModal = () => {
                 </div>
               }
               <h4 className="h4-price">
-                <div>Price Table</div>
+                <div>Content Table</div>
                 <div className="text-end flex-row">
                   <div>
                     <AddBoxOutlined
@@ -574,20 +654,12 @@ const TransactionAddNewModal = () => {
           <table className="table">
             <tbody>
               <tr>
-                <td>{trans_key_to_name.company_name}</td>
+                <td><b>{trans_key_to_name.company_name}</b></td>
+                <td>{temporaryContent.company_name}</td>
+                <td><b>{trans_key_to_name.transaction_sub_type}</b></td>
                 <td>
                   <input 
-                    name={temporaryContent.company_name}
-                    className="input-group-text input-group-text-sm"
-                    type="text"
-                    defaultValue={temporaryContent.company_name}
-                    onChange={handleEditTemporaryContent}
-                  />
-                </td>
-                <td>{trans_key_to_name.transaction_sub_type}</td>
-                <td>
-                  <input 
-                    name={temporaryContent.transaction_sub_type} 
+                    name='transaction_sub_type'
                     className="input-group-text input-group-text-sm"
                     type="text"
                     defaultValue={temporaryContent.transaction_sub_type}
@@ -596,20 +668,20 @@ const TransactionAddNewModal = () => {
                 </td>
               </tr>
               <tr>
-                <td>{trans_key_to_name.month_day}</td>
+                <td><b>{trans_key_to_name.month_day}</b></td>
                 <td>
                   <input 
-                    name={temporaryContent.month_day} 
+                    name='month_day'
                     className="input-group-text input-group-text-sm"
                     type="text"
                     defaultValue={temporaryContent.month_day}
                     onChange={handleEditTemporaryContent}
                   />
                 </td>
-                <td>{trans_key_to_name.product_name}</td>
+                <td><b>{trans_key_to_name.product_name}</b></td>
                 <td>
                   <input 
-                    name={temporaryContent.product_name} 
+                    name='product_name'
                     className="input-group-text input-group-text-sm"
                     type="text"
                     defaultValue={temporaryContent.product_name}
@@ -618,20 +690,20 @@ const TransactionAddNewModal = () => {
                 </td>
               </tr>
               <tr>
-                <td>{trans_key_to_name.standard}</td>
+                <td><b>{trans_key_to_name.standard}</b></td>
                 <td>
                   <input 
-                    name={temporaryContent.standard} 
+                    name='standard'
                     className="input-group-text input-group-text-sm"
                     type="text"
                     defaultValue={temporaryContent.standard}
                     onChange={handleEditTemporaryContent}
                   />
                 </td>
-                <td>{trans_key_to_name.unit}</td>
+                <td><b>{trans_key_to_name.unit}</b></td>
                 <td>
                   <input 
-                    name={temporaryContent.unit} 
+                    name='unit'
                     className="input-group-text input-group-text-sm"
                     type="text"
                     defaultValue={temporaryContent.unit}
@@ -640,20 +712,20 @@ const TransactionAddNewModal = () => {
                 </td>
               </tr>
               <tr>
-                <td>{trans_key_to_name.unit_price}</td>
+                <td><b>{trans_key_to_name.unit_price}</b></td>
                 <td>
                   <input 
-                    name={temporaryContent.unit_price} 
+                    name='unit_price'
                     className="input-group-text input-group-text-sm"
                     type="text"
                     defaultValue={temporaryContent.unit_price}
                     onChange={handleEditTemporaryContent}
                   />
                 </td>
-                <td>{trans_key_to_name.quantity}</td>
+                <td><b>{trans_key_to_name.quantity}</b></td>
                 <td>
                   <input 
-                    name={temporaryContent.quantity} 
+                    name='quantity'
                     className="input-group-text input-group-text-sm"
                     type="text"
                     defaultValue={temporaryContent.quantity}
@@ -662,38 +734,20 @@ const TransactionAddNewModal = () => {
                 </td>
               </tr>
               <tr>
-                <td>{trans_key_to_name.supply_price}</td>
+                <td><b>{trans_key_to_name.supply_price}</b></td>
                 <td>
-                  <input 
-                    name={temporaryContent.supply_price} 
-                    className="input-group-text input-group-text-sm"
-                    type="text"
-                    defaultValue={temporaryContent.supply_price}
-                    onChange={handleEditTemporaryContent}
-                  />
+                  {ConverTextAmount(supplyPrice)}
                 </td>
-                <td>{trans_key_to_name.tax_price}</td>
+                <td><b>{trans_key_to_name.tax_price}</b></td>
                 <td>
-                  <input 
-                    name={temporaryContent.tax_price}
-                    className="input-group-text input-group-text-sm"
-                    type="text"
-                    defaultValue={temporaryContent.tax_price}
-                    onChange={handleEditTemporaryContent}
-                  />
+                  {ConverTextAmount(taxyPrice)}
                 </td>
               </tr>
               <tr>
-                <td>{trans_key_to_name.total_price}</td>
+                <td><b>{trans_key_to_name.total_price}</b></td>
                 <td>
-                  <input 
-                    name={temporaryContent.total_price} 
-                    className="input-group-text input-group-text-sm"
-                    type="text"
-                    defaultValue={temporaryContent.total_price}
-                    onChange={handleEditTemporaryContent}
-                  />
-                  </td>
+                  {ConverTextAmount(totalPrice)}
+                </td>
               </tr>
             </tbody>
           </table>

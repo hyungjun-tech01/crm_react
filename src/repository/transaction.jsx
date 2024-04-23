@@ -44,8 +44,7 @@ export const TransactionRepo = selector({
                     const updatedNewTransaction = {
                         ...newTransaction,
                         transaction_code : data.out_transaction_code,
-                        create_user : data.out_create_user,
-                        create_date : data.out_create_date,
+                        creater : data.out_create_user,
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };

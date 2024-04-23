@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
@@ -24,6 +24,7 @@ const Transactions = () => {
   const allTransactionData = useRecoilValue(atomAllTransactions);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const { loadAllTransactions, setCurrentTransaction } = useRecoilValue(TransactionRepo);
+  const [ initAddNewTransaction, setInitAddNewTransaction ] = useState(false);
 
   
   // --- Section for Table ------------------------------
@@ -132,6 +133,10 @@ const Transactions = () => {
     }),
   };
 
+  const handleAddNewTransaction = useCallback(() => {
+    setInitAddNewTransaction(!initAddNewTransaction);
+  }, [initAddNewTransaction]);
+
   useEffect(() => {
     if (allCompanyData.length === 0) {
       loadAllCompanies();
@@ -202,6 +207,7 @@ const Transactions = () => {
                       id="add-task"
                       data-bs-toggle="modal"
                       data-bs-target="#add_new_transaction"
+                      onClick={handleAddNewTransaction}
                     >
                       Add Transaction
                     </button>
@@ -246,7 +252,7 @@ const Transactions = () => {
         <SystemUserModel />
         <CompanyDetailsModel />
         <TransactionsDetailsModel />
-        <TransactionAddNewModal/>
+        <TransactionAddNewModal init={initAddNewTransaction} handleInit={setInitAddNewTransaction}/>
         {/* cchange pipeline stage Modal */}
         <div className="modal" id="pipeline-stage">
           <div className="modal-dialog">
