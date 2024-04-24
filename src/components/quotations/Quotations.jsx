@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
@@ -10,8 +10,8 @@ import QuotationsDetailsModel from "./QuotationsDetailsModel";
 import QuotationAddNewModal from "./QuotationAddNewModal";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
-import DealDetailsModel from "../deals/DealDetailsModel";
-import ProjectDetailsModel from "../project/ProjectDetailsModel";
+// import DealDetailsModel from "../deals/DealDetailsModel";
+// import ProjectDetailsModel from "../project/ProjectDetailsModel";
 import LeadsDetailsModel from "../leads/LeadsDetailsModel";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -20,16 +20,20 @@ import { BiCalculator } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { QuotationRepo } from "../../repository/quotation";
-import { atomAllCompanies, atomAllQuotations, atomAllLeads } from "../../atoms/atoms";
+import { atomAllCompanies, atomAllQuotations, atomAllLeads, defaultCompany, defaultLead, defaultQuotation, atomCurrentCompany, atomCurrentLead, atomCurrentQuotation } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 
 const Quotations = () => {
   const allCompanyData = useRecoilValue(atomAllCompanies);
+  const currentCompany = useRecoilValue(atomCurrentCompany);
   const allLeadData = useRecoilValue(atomAllLeads);
+  const currentLead = useRecoilValue(atomCurrentLead);
   const allQuotationData = useRecoilValue(atomAllQuotations);
+  const currentQuotation = useRecoilValue(atomCurrentQuotation);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
   const { loadAllQuotations, setCurrentQuotation } = useRecoilValue(QuotationRepo);
+  const [ initAddNewQuotation, setInitAddNewQuotation ] = useState(false);
 
   // --- Section for Table ------------------------------
   const columns = [
@@ -175,6 +179,10 @@ const Quotations = () => {
     }),
   };
 
+  const handleAddNewQuotation = useCallback(() => {
+    setInitAddNewQuotation(!initAddNewQuotation);
+  }, [initAddNewQuotation]);
+
   useEffect(() => {
     if (allCompanyData.length === 0) {
       loadAllCompanies();
@@ -248,6 +256,7 @@ const Quotations = () => {
                       id="add-task"
                       data-bs-toggle="modal"
                       data-bs-target="#add_quotation"
+                      onClick={handleAddNewQuotation}
                     >
                       Add Quotation
                     </button>
@@ -289,7 +298,7 @@ const Quotations = () => {
           {/* /Content End */}
         </div>
         {/* /Page Content */}
-        <QuotationAddNewModal />
+        <QuotationAddNewModal init={initAddNewQuotation} handleInit={setInitAddNewQuotation}/>
         {/* modal */}
         {/* cchange pipeline stage Modal */}
         <div className="modal" id="pipeline-stage">
@@ -336,11 +345,11 @@ const Quotations = () => {
           </div>
         </div>
         <SystemUserModel />
-        <CompanyDetailsModel />
-        <DealDetailsModel />
-        <ProjectDetailsModel />
-        <LeadsDetailsModel />
-        <QuotationsDetailsModel />
+        {(currentCompany !== defaultCompany) && <CompanyDetailsModel />}
+        {/* <DealDetailsModel /> */}
+        {/* <ProjectDetailsModel /> */}
+        {(currentLead !== defaultLead) && <LeadsDetailsModel />}
+        {(currentQuotation !== defaultQuotation) && <QuotationsDetailsModel />}
       </div>
     </HelmetProvider>
   );

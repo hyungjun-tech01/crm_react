@@ -14,7 +14,7 @@ import QuotationView from "./QuotationtView";
 const QuotationsDetailsModel = () => {
   const { Panel } = Collapse;
   const selectedQuotation = useRecoilValue(atomCurrentQuotation);
-  const { modifyQuotation } = useRecoilValue(QuotationRepo);
+  const { modifyQuotation, setCurrentQuotation } = useRecoilValue(QuotationRepo);
   const [cookies] = useCookies(["myLationCrmUserId"]);
 
   const [editedValues, setEditedValues] = useState(null);
@@ -183,7 +183,7 @@ const QuotationsDetailsModel = () => {
         ? new Date(selectedQuotation.comfirm_date)
         : null
     );
-    if(selectedQuotation && selectedQuotation !== defaultQuotation)
+    if(selectedQuotation !== defaultQuotation)
     {
       console.log('- Check :', selectedQuotation.quotation_table);
       const headerValues = selectedQuotation.quotation_table.split('|');
@@ -495,7 +495,7 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
-                                        defaultText={selectedQuotation.sales_representati}
+                                        defaultText={selectedQuotation.sales_representative}
                                         saved={savedValues}
                                         name="sales_representati"
                                         title="Sales Representative"
@@ -889,7 +889,7 @@ const QuotationsDetailsModel = () => {
 {/*---- End   -- Tab : Product Lists - Quotation ---------------------------------------------------*/}
 {/*---- Start -- Tab : PDF View - Quotation --------------------------------------------------------*/}
                         <div className="tab-pane task-related p-0" id="quotation-pdf-view">
-                          { selectedQuotation !== defaultQuotation &&
+                          { selectedQuotation &&
                             <QuotationView/>
                           }
                         </div>

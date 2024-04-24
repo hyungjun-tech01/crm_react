@@ -10,11 +10,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { AddBoxOutlined, ModeEdit, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
 
-import { CompanyRepo } from "../../repository/company";
-import { LeadRepo } from "../../repository/lead";
 import { QuotationRepo, QuotationTypes, QuotationSendTypes } from "../../repository/quotation";
-import { atomAllCompanies, atomAllQuotations, atomAllLeads, defaultQuotation } from "../../atoms/atoms";
-import { formateDate } from "../../constants/functions";
+import { atomAllCompanies, atomAllLeads, defaultQuotation } from "../../atoms/atoms";
+import { ConverTextAmount, formateDate } from "../../constants/functions";
 import "./quotation.style.css";
 
 const default_quotation_content = {
@@ -44,6 +42,15 @@ const default_content_array = [
   ['19', '비고'],
 ];
 
+const default_prices = {
+  'consumer_price': 0,
+  'discount_rate': 0,
+  'quotation_unit_price': 0,
+  'quotation_total_price': 0,
+  'raw_price': 0,
+  'profit': 0,
+};
+
 const ConvertHeaderInfosToString = (data) => {
   let ret = '1|No|';
   
@@ -65,12 +72,10 @@ const ConvertHeaderInfosToString = (data) => {
   return ret;
 };
 
-const QuotationAddNewModal = () => {
+const QuotationAddNewModal = (props) => {
+  const { init, handleInit } = props;
   const allCompnayData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
-  const allQuotationData = useRecoilValue(atomAllQuotations);
-  const { loadAllCompanies } = useRecoilValue(CompanyRepo);
-  const { loadAllLeads } = useRecoilValue(LeadRepo);
   const { modifyQuotation } = useRecoilValue(QuotationRepo);
   const [ cookies] = useCookies(["myLationCrmUserId"]);
 
@@ -88,10 +93,74 @@ const QuotationAddNewModal = () => {
   const [ contentColumns, setContentColumns ] = useState([]);
   const [ editHeaders, setEditHeaders ] = useState(false);
 
+  const [ prices, setPrices ] = useState(default_prices);
+
+  // --- Functions / Variables dealing with editing -------------------------------
   const selectLeadRef = useRef(null);
   const selectTypeRef = useRef(null);
   const selectSendTypeRef = useRef(null);
 
+  const handleSelectLead = useCallback((value) => {
+    if(value) {
+      const selectedValue = value.value;
+      const tempChanges = {
+        ...quotationChange,
+        lead_code: selectedValue.code,
+        lead_name: selectedValue.name,
+        department: selectedValue.department,
+        position: selectedValue.position,
+        mobile_number: selectedValue.mobile,
+        phone_number: selectedValue.phone,
+        email: selectedValue.email,
+        company_name: selectedValue.company,
+        company_code: companiesForSelection[selectedValue.company],
+      };
+      setQuotationChange(tempChanges);
+      setSelectedLead({...selectedValue});
+    }
+  }, [companiesForSelection, quotationChange]);
+
+  const handleQuotationDateChange = (date) => {
+    setQuotationDate(date);
+    const localDate = formateDate(date);
+    const tempChanges = {
+      ...quotationChange,
+      quotation_date: localDate,
+    };
+    setQuotationChange(tempChanges);
+  };
+
+  const handleConfirmDateChange = (date) => {
+    setConfirmDate(date);
+    const localDate = formateDate(date);
+    const tempChanges = {
+      ...quotationChange,
+      comfirm_date: localDate,
+    };
+    setQuotationChange(tempChanges);
+  };
+
+  const handleSelectQuotationType = useCallback((value) => {
+    if(value) {
+      const tempChanges = {
+        ...quotationChange,
+        quotation_type: value.value,
+      };
+      setQuotationChange(tempChanges);
+    }
+  }, [quotationChange]);
+
+  const handleSelectQuotationSendType = useCallback((value) => {
+    if(value) {
+      const tempChanges = {
+        ...quotationChange,
+        quotation_send_type: value.value,
+      };
+      setQuotationChange(tempChanges);
+    }
+  }, [quotationChange]);
+
+  // --- Functions / Variables dealing with contents table -------------------------------
   const default_columns = [
     {
       title: "No",
@@ -141,115 +210,6 @@ const QuotationAddNewModal = () => {
     },
   ];
 
-  // --- Functions used for adding new quotation ------------------------------
-  const initializeQuotationTemplate = useCallback(() => {
-    setQuotationChange({ ...defaultQuotation });
-    setSelectedLead(null);
-    setQuotationContents([]);
-
-    if(selectLeadRef.current)
-      selectLeadRef.current.clearValue();
-    if(selectTypeRef.current)
-      selectTypeRef.current.clearValue();
-    if(selectSendTypeRef.current)
-      selectSendTypeRef.current.clearValue();
-
-    document.querySelector("#add_new_quotation_form").reset();
-  }, [selectLeadRef, selectTypeRef, selectSendTypeRef]);
-
-  const handleQuotationChange = useCallback((e) => {
-    const modifiedData = {
-      ...quotationChange,
-      [e.target.name]: e.target.value,
-    };
-    setQuotationChange(modifiedData);
-  }, [quotationChange]);
-
-  const handleSelectLead = useCallback((value) => {
-    const tempChanges = {
-      ...quotationChange,
-      lead_code: value.code,
-      lead_name: value.name,
-      department: value.department,
-      position: value.position,
-      mobile_number: value.mobile,
-      phone_number: value.phone,
-      email: value.email,
-      company_name: value.company,
-      company_code: companiesForSelection[value.company],
-    };
-    setQuotationChange(tempChanges);
-  }, [companiesForSelection, quotationChange]);
-
-  const handleQuotationDateChange = (date) => {
-    setQuotationDate(date);
-    const localDate = formateDate(date);
-    const tempChanges = {
-      ...quotationChange,
-      quotation_date: localDate,
-    };
-    setQuotationChange(tempChanges);
-  };
-
-  const handleConfirmDateChange = (date) => {
-    setConfirmDate(date);
-    const localDate = formateDate(date);
-    const tempChanges = {
-      ...quotationChange,
-      comfirm_date: localDate,
-    };
-    setQuotationChange(tempChanges);
-  };
-
-  const handleSelectQuotationType = useCallback((value) => {
-    if(value) {
-      const tempChanges = {
-        ...quotationChange,
-        quotation_type: value.value,
-      };
-      setQuotationChange(tempChanges);
-    }
-  }, [quotationChange]);
-
-  const handleSelectQuotationSendType = useCallback((value) => {
-    if(value) {
-      const tempChanges = {
-        ...quotationChange,
-        quotation_send_type: value.value,
-      };
-      setQuotationChange(tempChanges);
-    }
-  }, [quotationChange]);
-
-  const handleAddNewQuotation = useCallback((event) => {
-    // Check data if they are available
-    if (quotationChange.lead_name === null
-      || quotationChange.lead_name === ''
-      || quotationChange.quotation_type === null
-      || quotationContents.length === 0
-    ) {
-      console.log("Necessary information isn't submitted!");
-      return;
-    };
-    const newQuotationData = {
-      ...quotationChange,
-      quotation_table: ConvertHeaderInfosToString(contentColumns),
-      quotation_contents: JSON.stringify(quotationContents),
-      action_type: 'ADD',
-      lead_number: '99999',// Temporary
-      counter: 0,
-      modify_user: cookies.myLationCrmUserId,
-    };
-    console.log(`[ handleAddNewQuotation ]`, newQuotationData);
-    const result = modifyQuotation(newQuotationData);
-    if (result) {
-      initializeQuotationTemplate();
-      //close modal ?
-    };
-  }, [quotationChange, quotationContents, contentColumns, cookies.myLationCrmUserId, modifyQuotation, initializeQuotationTemplate]);
-
-
-  // --- Functions dealing with contents table -------------------------------
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
       console.log(
@@ -310,8 +270,7 @@ const QuotationAddNewModal = () => {
     }
   }, [contentColumns]);
 
-
-  // --- Functions used for editting content ------------------------------
+  // --- Functions used for editing content ------------------------------
   const handleLoadNewTemporaryContent = useCallback(() => {
     if(!quotationChange.lead_name) {
       console.log('\t[handleLoadNewTemporaryContent] No lead is selected');
@@ -323,7 +282,7 @@ const QuotationAddNewModal = () => {
       '1': quotationContents.length + 1,
     };
     setTemporaryContent(tempContent);
-  }, [quotationContents]);
+  }, [quotationContents, quotationChange]);
 
   const handleLoadSelectedContent = useCallback((data) => {
     setTemporaryContent(data);
@@ -403,12 +362,67 @@ const QuotationAddNewModal = () => {
     setTemporaryContent(null);
   }, [setTemporaryContent]);
 
+  // --- Functions used for adding new quotation ------------------------------
+  const initializeQuotationTemplate = useCallback(() => {
+    console.log('\initializeQuotationTemplate called : ', init);
+    setQuotationChange({ ...defaultQuotation });
+    setQuotationDate(null);
+    setConfirmDate(null);
+    setSelectedLead(null);
+    setQuotationContents([]);
+    setPrices(default_prices);
+
+    if(selectLeadRef.current)
+      selectLeadRef.current.clearValue();
+    if(selectTypeRef.current)
+      selectTypeRef.current.clearValue();
+    if(selectSendTypeRef.current)
+      selectSendTypeRef.current.clearValue();
+
+    document.querySelector("#add_new_quotation_form").reset();
+
+    handleInit(!init);
+  }, [selectLeadRef.current, selectTypeRef.current, selectSendTypeRef.current, defaultQuotation]);
+
+  const handleQuotationChange = useCallback((e) => {
+    const modifiedData = {
+      ...quotationChange,
+      [e.target.name]: e.target.value,
+    };
+    setQuotationChange(modifiedData);
+  }, [quotationChange]);
+
+  const handleAddNewQuotation = useCallback((event) => {
+    // Check data if they are available
+    if (quotationChange.lead_name === null
+      || quotationChange.lead_name === ''
+      || quotationChange.quotation_type === null
+      || quotationContents.length === 0
+    ) {
+      console.log("Necessary information isn't submitted!");
+      return;
+    };
+    const newQuotationData = {
+      ...quotationChange,
+      quotation_table: ConvertHeaderInfosToString(contentColumns),
+      quotation_contents: JSON.stringify(quotationContents),
+      action_type: 'ADD',
+      lead_number: '99999',// Temporary
+      counter: 0,
+      modify_user: cookies.myLationCrmUserId,
+    };
+    console.log(`[ handleAddNewQuotation ]`, newQuotationData);
+    const result = modifyQuotation(newQuotationData);
+    if (result) {
+      initializeQuotationTemplate();
+      //close modal ?
+    };
+  }, [quotationChange, quotationContents, contentColumns, cookies.myLationCrmUserId, modifyQuotation, initializeQuotationTemplate]);
+
 
   useEffect(() => {
     // ----- Load companies and set up the relation between lead and company by company code ---
-    if (allCompnayData.length === 0) {
-      loadAllCompanies();
-    } else {
+    if(!companiesForSelection || (companiesForSelection.length !== allCompnayData.length)){
       let company_subset = {};
       allCompnayData.forEach((data) => {
         company_subset[data.company_name] = data.company_code;
@@ -417,9 +431,7 @@ const QuotationAddNewModal = () => {
     };
 
     // ----- Load Leads and set up the options of lead to select -----
-    if (allLeadData.length === 0) {
-      loadAllLeads();
-    } else {
+    if(!leadsForSelection || (leadsForSelection.length !== allLeadData.length)){
       const temp_data = allLeadData.map(lead => {
         return {
           label: lead.lead_name + " / " + lead.company_name,
@@ -446,14 +458,13 @@ const QuotationAddNewModal = () => {
         return 0;
       });
       setLeadsForSelection(temp_data);
-    };
+    }
 
     // ----- Initialize template to store values -----
-    initializeQuotationTemplate();
-    if (contentColumns.length === 0) {
-      setContentColumns(default_columns);
-    }
-  }, [allCompnayData, allLeadData, allQuotationData, initializeQuotationTemplate, loadAllCompanies, loadAllLeads]);
+    if(init) initializeQuotationTemplate();
+    if(contentColumns.length === 0) setContentColumns(default_columns);
+    
+  }, [allCompnayData, allLeadData, init]);
 
   return (
     <div
@@ -495,31 +506,26 @@ const QuotationAddNewModal = () => {
                   <Select
                     ref={selectLeadRef}
                     options={leadsForSelection}
-                    onChange={(value) => {
-                      if(value){
-                        handleSelectLead(value.value);
-                        setSelectedLead({ ...value.value });
-                      }
-                  }} />
+                    onChange={handleSelectLead} />
                 </div>
               </div>
-              {(selectedLead !== null) &&
+              {selectedLead &&
                 <>
                   <div className="form-group row">
                     <div className="col-sm-6">
                       <table className="table">
                         <tbody>
                           <tr>
-                            <td className="border-0">Department</td>
-                            <td className="border-0">{selectedLead.department}</td>
+                            <td className="border-0">Organization</td>
+                            <td className="border-0">{selectedLead.company_name}</td>
                           </tr>
                           <tr>
-                            <td>Mobile</td>
-                            <td>{selectedLead.mobile}</td>
+                            <td>Department</td>
+                            <td>{selectedLead.department}</td>
                           </tr>
                           <tr>
-                            <td className="border-0">Email</td>
-                            <td className="border-0">{selectedLead.email}</td>
+                            <td className="border-0">Position</td>
+                            <td className="border-0">{selectedLead.position}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -528,12 +534,16 @@ const QuotationAddNewModal = () => {
                       <table className="table">
                         <tbody>
                           <tr>
-                            <td className="border-0">Position</td>
-                            <td className="border-0">{selectedLead.position}</td>
+                            <td className="border-0">Mobile</td>
+                            <td className="border-0">{selectedLead.mobile_number}</td>
                           </tr>
                           <tr>
                             <td>Phone</td>
                             <td>{selectedLead.phone}</td>
+                          </tr>
+                          <tr>
+                            <td className="border-0">Email</td>
+                            <td className="border-0">{selectedLead.email}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -784,7 +794,7 @@ const QuotationAddNewModal = () => {
                 return (
                   <tr key={index}>
                     <td>
-                      {item.at(1)}
+                      <b>{item.at(1)}</b>
                     </td>
                     <td>
                       <input 
@@ -801,7 +811,7 @@ const QuotationAddNewModal = () => {
               return (
                 <tr key={index}>
                   <td>
-                    {default_content_array[index - 1][1]}
+                    <b>{default_content_array[index - 1][1]}</b>
                   </td>
                   <td>
                     <input
@@ -813,7 +823,7 @@ const QuotationAddNewModal = () => {
                     />
                   </td>
                   <td>
-                    {item.at(1)}
+                    <b>{item.at(1)}</b>
                   </td>
                   <td>
                     <input

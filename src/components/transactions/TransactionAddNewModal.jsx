@@ -77,45 +77,9 @@ const TransactionAddNewModal = (props) => {
   const [ taxyPrice, setTaxPrice ] = useState(0);
   const [ totalPrice, setTotalPrice ] = useState(0);
 
-  const handlePublishDateChange = useCallback((date) => {
-    setPublishDate(date);
-    const localDate = formateDate(date);
-    const tempChanges = {
-      ...transactionChange,
-      publish_date: localDate,
-    };
-    setTransactionChange(tempChanges);
-  }, [transactionChange]);
-
+  
+  // --- Functions / Variables dealing with editing -------------------------------
   const selectLeadRef = useRef(null);
-
-  // --- Functions used for adding new transaction ------------------------------
-  const initializeTransactionTemplate = useCallback(() => {
-    console.log('\tinitializeTransactionTemplate called');
-    setTransactionChange({ ...defaultTransaction });
-    setPublishDate(null);
-    setSelectedCompany(null);
-    setTransactionContents([]);
-
-    if(selectLeadRef.current)
-      selectLeadRef.current.clearValue();
-
-    document.querySelector("#add_new_transaction_form").reset();
-
-    setSupplyPrice(0);
-    setTaxPrice(0);
-    setTotalPrice(0);
-
-    handleInit(!init);
-  }, [selectLeadRef.current, defaultTransaction]);
-
-  const handleTransactionChange = useCallback((e) => {
-    const modifiedData = {
-      ...transactionChange,
-      [e.target.name]: e.target.value,
-    };
-    setTransactionChange(modifiedData);
-  }, [transactionChange]);
 
   const handleSelectLead= useCallback((value) => {
     if(value) {
@@ -135,31 +99,17 @@ const TransactionAddNewModal = (props) => {
     }
   }, [transactionChange]);
 
-  const handleAddNewTransaction = useCallback((event) => {
-    // Check data if they are available
-    if (transactionChange.company_name === null
-      || transactionChange.company_name === ''
-      || transactionContents.length === 0
-    ) {
-      console.log("Necessary information isn't submitted!");
-      return;
-    };
-    const newTransactionData = {
+  const handlePublishDateChange = useCallback((date) => {
+    setPublishDate(date);
+    const localDate = formateDate(date);
+    const tempChanges = {
       ...transactionChange,
-      transaction_contents: JSON.stringify(transactionContents),
-      action_type: 'ADD',
-      modify_user: cookies.myLationCrmUserId,
+      publish_date: localDate,
     };
-    console.log(`[ handleAddNewTransaction ]`, newTransactionData);
-    const result = modifyTransaction(newTransactionData);
-    if (result) {
-      initializeTransactionTemplate();
-      //close modal ?
-    };
-  }, [transactionChange, transactionContents, cookies.myLationCrmUserId, modifyTransaction, initializeTransactionTemplate]);
+    setTransactionChange(tempChanges);
+  }, [transactionChange]);
 
-
-  // --- Functions dealing with contents table -------------------------------
+  // --- Functions / Variables dealing with contents -------------------------------
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
       console.log(
@@ -234,7 +184,6 @@ const TransactionAddNewModal = (props) => {
     },
   ];
 
-  // --- Functions used for editting content ------------------------------
   const handleLoadNewTemporaryContent = useCallback(() => {
     if(!transactionChange.company_name) {
       console.log('\t[handleLoadNewTemporaryContent] No company is selected');
@@ -385,9 +334,59 @@ const TransactionAddNewModal = (props) => {
     setTotalPrice(0);
   }, [setTemporaryContent]);
 
+  // --- Functions used for adding/editing new transaction ------------------------------
+  const initializeTransactionTemplate = useCallback(() => {
+    console.log('\tinitializeTransactionTemplate called : ', init);
+    setTransactionChange({ ...defaultTransaction });
+    setPublishDate(null);
+    setSelectedCompany(null);
+    setTransactionContents([]);
+
+    if(selectLeadRef.current)
+      selectLeadRef.current.clearValue();
+
+    document.querySelector("#add_new_transaction_form").reset();
+
+    setSupplyPrice(0);
+    setTaxPrice(0);
+    setTotalPrice(0);
+
+    handleInit(!init);
+  }, [selectLeadRef.current, defaultTransaction]);
+
+  const handleTransactionChange = useCallback((e) => {
+    const modifiedData = {
+      ...transactionChange,
+      [e.target.name]: e.target.value,
+    };
+    setTransactionChange(modifiedData);
+  }, [transactionChange]);
+
+  const handleAddNewTransaction = useCallback((event) => {
+    // Check data if they are available
+    if (transactionChange.company_name === null
+      || transactionChange.company_name === ''
+      || transactionContents.length === 0
+    ) {
+      console.log("Necessary information isn't submitted!");
+      return;
+    };
+    const newTransactionData = {
+      ...transactionChange,
+      transaction_contents: JSON.stringify(transactionContents),
+      action_type: 'ADD',
+      modify_user: cookies.myLationCrmUserId,
+    };
+    console.log(`[ handleAddNewTransaction ]`, newTransactionData);
+    const result = modifyTransaction(newTransactionData);
+    if (result) {
+      initializeTransactionTemplate();
+      //close modal ?
+    };
+  }, [transactionChange, transactionContents, cookies.myLationCrmUserId, modifyTransaction, initializeTransactionTemplate]);
+
 
   useEffect(() => {
-    console.log('[ TransactionAddNewModal ] called / init : ', init);
     // ----- Load companies and set up the relation between lead and company by company code ---
     // if (allCompanyData.length === 0) {
     //   loadAllCompanies();
@@ -445,9 +444,8 @@ const TransactionAddNewModal = (props) => {
     };
 
     // ----- Initialize template to store values -----
-    if(init) {
-      initializeTransactionTemplate();
-    }
+    if(init) initializeTransactionTemplate();
+
   }, [allLeadData, init]);
 
   return (
