@@ -74,7 +74,7 @@ const ConvertHeaderInfosToString = (data) => {
 
 const QuotationAddNewModal = (props) => {
   const { init, handleInit } = props;
-  const allCompnayData = useRecoilValue(atomAllCompanies);
+  const allCompanyData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
   const { modifyQuotation } = useRecoilValue(QuotationRepo);
   const [ cookies] = useCookies(["myLationCrmUserId"]);
@@ -422,9 +422,9 @@ const QuotationAddNewModal = (props) => {
 
   useEffect(() => {
     // ----- Load companies and set up the relation between lead and company by company code ---
-    if(!companiesForSelection || (companiesForSelection.length !== allCompnayData.length)){
+    if(!companiesForSelection || (companiesForSelection.length !== allCompanyData.length)){
       let company_subset = {};
-      allCompnayData.forEach((data) => {
+      allCompanyData.forEach((data) => {
         company_subset[data.company_name] = data.company_code;
       });
       setCompaniesForSelection(company_subset);
@@ -464,7 +464,7 @@ const QuotationAddNewModal = (props) => {
     if(init) initializeQuotationTemplate();
     if(contentColumns.length === 0) setContentColumns(default_columns);
     
-  }, [allCompnayData, allLeadData, init]);
+  }, [allCompanyData, allLeadData, init]);
 
   return (
     <div

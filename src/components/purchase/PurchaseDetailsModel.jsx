@@ -257,14 +257,6 @@ const PurchaseDetailsModel = () => {
         aria-modal="true"
       >
         <div className="modal-dialog" role="document">
-          <button
-            type="button"
-            className="close md-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          >
-            {" "}
-          </button>
           <div className="modal-content">
             <div className="modal-header">
               <div className="row w-100">
@@ -273,8 +265,8 @@ const PurchaseDetailsModel = () => {
                     <img src={C_logo} alt="User" className="user-image" />
                   </div>
                   <div>
-                    <p className="mb-0">Purchase</p>
-                    <span className="modal-title">Detail Information</span>
+                    <p className="mb-0">System User</p>
+                    <span className="modal-title">{' '}</span>
                     <span className="rating-star">
                       <i className="fa fa-star" aria-hidden="true" />
                     </span>
@@ -283,96 +275,12 @@ const PurchaseDetailsModel = () => {
                     </span>
                   </div>
                 </div>
-                <div className="col-md-5 text-end">
-                  <ul className="list-unstyled list-style-none">
-                    <li className="dropdown list-inline-item">
-                      <br />
-                      <Link
-                        className="dropdown-toggle"
-                        to="#"
-                        role="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        {" "}
-                        Actions{" "}
-                      </Link>
-                      <div className="dropdown-menu">
-                        <Link className="dropdown-item" to="#">
-                          Edit This Purchase
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Change Organization Image
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Delete This Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Change Record Owner
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Generate Merge Document
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Print This Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Task For Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Event For Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add Activity Set To Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Contact For Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Opportunity For Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Opportunity For Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Project For Organization
-                        </Link>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
               </div>
               <button
                 type="button"
                 className="btn-close xs-close"
                 data-bs-dismiss="modal"
               />
-            </div>
-            <div className="card due-dates">
-              <div className="card-body">
-                <div className="row">
-                  <div className="col">
-                    <span>Title</span>
-                    <p>Enquiry</p>
-                  </div>
-                  <div className="col">
-                    <span>Companies</span>
-                    <p>{selectedPurchase.purchase_name}</p>
-                  </div>
-                  <div className="col">
-                    <span>Phone</span>
-                    <p>{selectedPurchase.purchase_phone_number}</p>
-                  </div>
-                  <div className="col">
-                    <span>Fax</span>
-                    <p>{selectedPurchase.purchase_fax_number}</p>
-                  </div>
-                  <div className="col">
-                    <span>Contact owner</span>
-                    <p>{selectedPurchase.ceo_name}</p>
-                  </div>
-                </div>
-              </div>
             </div>
             <div className="modal-body">
               <div className="task-infos">
@@ -392,34 +300,7 @@ const PurchaseDetailsModel = () => {
                       to="#task-related"
                       data-bs-toggle="tab"
                     >
-                      Lead
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#task-related"
-                      data-bs-toggle="tab"
-                    >
-                      Purchase
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#task-related"
-                      data-bs-toggle="tab"
-                    >
-                      Quatation
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#task-related"
-                      data-bs-toggle="tab"
-                    >
-                      Transaction
+                      Related
                     </Link>
                   </li>
                   {/* <li className="nav-item">
@@ -446,16 +327,7 @@ const PurchaseDetailsModel = () => {
                     <div className="crms-tasks">
                       <div className="tasks__item crms-task-item active">
                         <Collapse accordion expandIconPosition="end">
-                          <Panel header="Product" key="1">
-                            <table className="table">
-                              <tbody>{}</tbody>
-                            </table>
-                          </Panel>
-                        </Collapse>
-                      </div>
-                      <div className="tasks__item crms-task-item active">
-                        <Collapse accordion expandIconPosition="end">
-                          <Panel header="Deal" key="1">
+                          <Panel header="Purchase Info" key="1">
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
@@ -589,6 +461,15 @@ const PurchaseDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                               </tbody>
+                            </table>
+                          </Panel>
+                        </Collapse>
+                      </div>
+                      <div className="tasks__item crms-task-item active">
+                        <Collapse accordion expandIconPosition="end">
+                          <Panel header="Product" key="1">
+                            <table className="table">
+                              <tbody>{}</tbody>
                             </table>
                           </Panel>
                         </Collapse>

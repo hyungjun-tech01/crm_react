@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
@@ -9,27 +9,30 @@ import { itemRender, onShowSizeChange } from "../paginationfunction";
 import PurchaseDetailsModel from "./PurchaseDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-// import { MoreVert } from '@mui/icons-material';
 import { BiShoppingBag } from "react-icons/bi";
 import { PurchaseRepo } from "../../repository/purchase";
-import { atomAllLeads, atomAllPurchases, defaultPurchase } from "../../atoms/atoms";
+import { atomAllCompanies, atomAllPurchases, defaultPurchase } from "../../atoms/atoms";
+import { CompanyRepo } from "../../repository/company";
 import { compareText } from "../../constants/functions";
-import { LeadRepo } from "../../repository/lead";
 
 const Purchase = () => {
-  const { loadAllLeads } = useRecoilValue(LeadRepo);
-  const { loadAllPurchases, modifyPurchase, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
-  const allLeadData = useRecoilValue(atomAllLeads);
+  const allCompanyData = useRecoilValue(atomAllCompanies);
   const allPurchaseData = useRecoilValue(atomAllPurchases);
+  const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
+  const { loadAllPurchases, modifyPurchase, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName",  "myLationCrmUserId"]);
 
   const [ purchaseChange, setPurchaseChange ] = useState(null);
-  const [ leadForSelection, setLeadForSelection ] = useState(null);
+  const [ companiesForSelection, setCompaniesForSelection ] = useState(null);
 
   const [ deliveryDate, setDeliveryDate ] = useState(new Date());
   const [ contactDate, setContactDate ] = useState(new Date());
   const [ finishDate, setFinishDate ] = useState(new Date());
   const [ registerDate, setRegisterDate ] = useState(new Date());
+
+  const [ initAddNewPurchase, setInitAddNewPurchase ] = useState(false);
+  
+  const selectCompanyRef = useRef(null);
 
   // --- Functions used for Table ------------------------------
   const handleClickPurchase = useCallback((id)=>{
@@ -44,10 +47,18 @@ const Purchase = () => {
   // --- Functions used for Add New Purchase ------------------------------
   const initializePurchaseTemplate = useCallback(() => {
     setPurchaseChange({...defaultPurchase});
+    setDeliveryDate(null);
+    setContactDate(null);
+    setFinishDate(null);
+    setRegisterDate(null);
+
+    if(selectCompanyRef.current)
+      selectCompanyRef.current.clearValue();
+
     document.querySelector("#add_new_purchase_form").reset();
   }, [defaultPurchase]);
 
-  const handleLeadSelectionChange = useCallback((value) => {
+  const handleCompanySelectionChange = useCallback((value) => {
     purchaseChange.lead_code = value.value.lead_code;
     purchaseChange.company_code = value.value.company_code;
   });
@@ -283,33 +294,34 @@ const Purchase = () => {
   };
 
   useEffect(() => {
-    if(allLeadData.length === 0) {
-      loadAllLeads();
+    if(allCompanyData.length === 0) {
+      loadAllCompanies();
     } else {
-      const temp_data = allLeadData.map(lead => {return {
-        label : lead.lead_name,
-        value : {
-          lead_code: lead.lead_code,
-          company_code: lead.company_code,
-        }
-      }});
-      temp_data.sort((a, b) => {
-        if (a.label > b.label) {
-          return 1;
-        }
-        if (a.label < b.label) {
-          return -1;
-        }
-        // a must be equal to b
-        return 0;
-      });
-      setLeadForSelection(temp_data);
+      if(!companiesForSelection || (companiesForSelection.length !== allCompanyData.length)){
+        const company_subset = allCompanyData.map((data) => {
+          return {
+            label: data.company_name,
+            value: data.company_code,
+          }
+        });
+        company_subset.sort((a, b) => {
+          if (a.label > b.label) {
+            return 1;
+          }
+          if (a.label < b.label) {
+            return -1;
+          }
+          // a must be equal to b
+          return 0;
+        });
+        setCompaniesForSelection(company_subset);
+      };
     };
     if (allPurchaseData.length === 0) {
       loadAllPurchases();
     };
-    initializePurchaseTemplate();
-  }, [allLeadData, allPurchaseData, initializePurchaseTemplate, loadAllPurchases]);
+    if(initAddNewPurchase) initializePurchaseTemplate();
+  }, [allCompanyData, allPurchaseData, initAddNewPurchase, initializePurchaseTemplate, loadAllPurchases]);
 
   return (
     <HelmetProvider>
@@ -569,7 +581,7 @@ const Purchase = () => {
                             Lead Name
                             <span className="text-danger">*</span>
                           </label>
-                          <Select options={leadForSelection} onChange={handleLeadSelectionChange}/>
+                          <Select options={companiesForSelection} onChange={handleCompanySelectionChange}/>
                         </div>
                       </div>
                       <h4>Product</h4>
