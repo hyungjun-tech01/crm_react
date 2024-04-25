@@ -181,7 +181,7 @@ export const defaultQuotation = {
     profit: 0,
     profit_rate: 0,
     quotation_table: null,
-    quotation_contents: null,
+    quotation_contents: [],
     print_template: null,
     upper_memo: null,
     lower_memo: null,

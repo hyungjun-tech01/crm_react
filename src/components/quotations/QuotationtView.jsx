@@ -213,7 +213,7 @@ const QuotationView = () => {
     const [ quotationTables, setQuotationTables ] = useState([]);
 
     useEffect(() => {
-        console.log('Load QuotationView');
+        console.log('[QuotationView] called');
         if(currentQuotation && currentQuotation !== defaultQuotation){
             const tempContents = JSON.parse(currentQuotation.quotation_contents);
             if(tempContents && Array.isArray(tempContents)){

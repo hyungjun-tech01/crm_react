@@ -10,8 +10,6 @@ import QuotationsDetailsModel from "./QuotationsDetailsModel";
 import QuotationAddNewModal from "./QuotationAddNewModal";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
-// import DealDetailsModel from "../deals/DealDetailsModel";
-// import ProjectDetailsModel from "../project/ProjectDetailsModel";
 import LeadsDetailsModel from "../leads/LeadsDetailsModel";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -20,16 +18,13 @@ import { BiCalculator } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { QuotationRepo } from "../../repository/quotation";
-import { atomAllCompanies, atomAllQuotations, atomAllLeads, defaultCompany, defaultLead, defaultQuotation, atomCurrentCompany, atomCurrentLead, atomCurrentQuotation } from "../../atoms/atoms";
+import { atomAllCompanies, atomAllQuotations, atomAllLeads, } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 
 const Quotations = () => {
   const allCompanyData = useRecoilValue(atomAllCompanies);
-  const currentCompany = useRecoilValue(atomCurrentCompany);
   const allLeadData = useRecoilValue(atomAllLeads);
-  const currentLead = useRecoilValue(atomCurrentLead);
   const allQuotationData = useRecoilValue(atomAllQuotations);
-  const currentQuotation = useRecoilValue(atomCurrentQuotation);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
   const { loadAllQuotations, setCurrentQuotation } = useRecoilValue(QuotationRepo);
@@ -288,7 +283,6 @@ const Quotations = () => {
                       bordered
                       dataSource={allQuotationData}
                       rowKey={(record) => record.quotation_code}
-                      // onChange={handleTableChange}
                     />
                   </div>
                 </div>
@@ -345,11 +339,9 @@ const Quotations = () => {
           </div>
         </div>
         <SystemUserModel />
-        {(currentCompany !== defaultCompany) && <CompanyDetailsModel />}
-        {/* <DealDetailsModel /> */}
-        {/* <ProjectDetailsModel /> */}
-        {(currentLead !== defaultLead) && <LeadsDetailsModel />}
-        {(currentQuotation !== defaultQuotation) && <QuotationsDetailsModel />}
+        <CompanyDetailsModel />
+        <LeadsDetailsModel />
+        <QuotationsDetailsModel />
       </div>
     </HelmetProvider>
   );

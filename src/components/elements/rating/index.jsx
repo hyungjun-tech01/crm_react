@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import "../../../assets/css/font-awesome.min.css";
 import ReactStars from "react-rating-stars-component";
 import { Rate } from "antd";
 const Rating = () => {

@@ -216,7 +216,7 @@ const CompanyDetailsModel = () => {
       const companyPurchases = allPurchases.filter(purchase => purchase.company_code === selectedCompany.company_code);
       setPurchaseByCompany(companyPurchases);
     };
-  }, [selectedCompany, savedValues, allLeads, allConsultings, allQuotations, allTransactions, allPurchases, loadAllLeads, loadAllConsultings, loadAllQuotations, loadAllTransactions, loadAllPurchases]);
+  }, [selectedCompany, allLeads, allConsultings, allQuotations, allTransactions, allPurchases, loadAllLeads, loadAllConsultings, loadAllQuotations, loadAllTransactions, loadAllPurchases]);
 
   return (
     <>
