@@ -326,6 +326,18 @@ const QuotationsDetailsModel = () => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <DetailLabelItem
+                                        defaultText={selectedQuotation.quotation_number}
+                                        saved={savedValues}
+                                        name="quotation_number"
+                                        title="Document No"
+                                        checkEdit={handleCheckEditState}
+                                        startEdit={handleStartEdit}
+                                        editing={handleEditing}
+                                        endEdit={handleEndEdit}
+                                        checkSaved={handleCheckSaved}
+                                        cancelSaved={handleCancelSaved}
+                                      />
+                                      <DetailLabelItem
                                         defaultText={selectedQuotation.quotation_manager}
                                         saved={savedValues}
                                         name="quotation_manager"

@@ -13,18 +13,26 @@ module.exports = {
   entry: path.join(__dirname, "src", "index.js"),
   output: {
     path: path.resolve(__dirname, "dist"),
+    clean: true,
   },
+  optimization: {
+    runtimeChunk: 'single',
+  },
+  devtool: 'source-map',
   devServer: {
     static: {
       directory: path.join(__dirname, "public/"),
     },
-    port: 3001,
+    port: 80,
     historyApiFallback: true,
     open: true, // Automatically open the browser
-    onAfterSetupMiddleware() {
-      // Open the browser after the dev server is up and running
-      opn(`http://localhost:${this.port}`);
-    },  
+    hot: true,
+    compress: true,
+    historyApiFallback: true,
+    // onAfterSetupMiddleware() {
+    //   // Open the browser after the dev server is up and running
+    //   opn(`http://localhost:${this.port}`);
+    // },  
   },
 
   externals: {
@@ -95,7 +103,6 @@ module.exports = {
   },
 
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "public", "index.html"),
       filename: "./index.html",
