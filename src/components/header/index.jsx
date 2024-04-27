@@ -1,18 +1,28 @@
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
 import { useCookies } from "react-cookie";
-import { Logo, S_Logo, avatar02, avatar03, avatar05, avatar06, avatar08, avatar09, avatar13, avatar17, avatar21, Flag_de, Flag_es, Flag_fr, Flag_us } from "../imagepath";
+import { Logo, S_Logo, avatar02, avatar03, avatar05, avatar06, avatar08, avatar09, avatar13, avatar17, avatar21, Flag_kr, Flag_us } from "../imagepath";
 import { FiBell, FiSearch } from "react-icons/fi";
 import { BiMessageRounded } from "react-icons/bi";
 import { Avatar } from "@mui/material";
 import {atomCurrentUser} from "../../atoms/atomsUser.jsx";
 import {useRecoilValue} from "recoil";
+import { useTranslation } from "react-i18next";
+
 
 const Header = (props) => {
   const exclusionArray = [ "login", "register", "forgot-password", "error-404", "error-500", ];
   const [cookies, removeCookie ] = useCookies(["myLationCrmUserId", "myLationCrmUserName", "myLationCrmAuthToken"]);
   const history = useHistory();
   const currentUser = useRecoilValue(atomCurrentUser);
+
+  const { i18n, t } = useTranslation();
+
+  const changeLanguage = (lng) => {   // 언어 변경  
+    i18n.changeLanguage(lng);
+  };
+
+  // let initialLanguageCode = i18n.language;  //현재 언어 
 
   const handleLogout = (event) => {
     event.preventDefault();
@@ -73,26 +83,34 @@ const Header = (props) => {
         {/* /Search */}
         {/* Flag */}
         <li className="nav-item dropdown has-arrow flag-nav">
-          <a
-            className="nav-link dropdown-toggle"
-            data-bs-toggle="dropdown"
-            role="button"
+          <Link className="nav-link dropdown-toggle"
+                data-bs-toggle="dropdown"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.querySelector('#dropdown_lag_menu').classList.toggle('show');
+               }}
+               to="#"
           >
-            <img src={Flag_us} alt="" height={20} /> <span>English</span>
-          </a>
-          <div className="dropdown-menu dropdown-menu-right">
-            <a className="dropdown-item">
-              <img src={Flag_us} alt="" height={16} /> English
-            </a>
-            <a className="dropdown-item">
-              <img src={Flag_fr} alt="" height={16} /> French
-            </a>
-            <a className="dropdown-item">
-              <img src={Flag_es} alt="" height={16} /> Spanish
-            </a>
-            <a className="dropdown-item">
-              <img src={Flag_de} alt="" height={16} /> German
-            </a>
+            <img src={i18n.language === 'ko' ? Flag_kr:Flag_us} alt="" height={20} /> <span>{i18n.language === 'ko' ? t('language.ko'):t('language.en')}</span>
+          </Link>
+
+          <div id="dropdown_lag_menu" className="dropdown-menu dropdown-menu-right">
+
+            <div className="dropdown-item" 
+                onClick={() => 
+                  { changeLanguage('ko'); 
+                    document.querySelector('#dropdown_lag_menu').classList.remove('show'); 
+                  }}
+            >
+              <img src={Flag_us} alt="" height={16} /> {t('language.ko')}
+            </div>
+            <div className="dropdown-item" 
+                  onClick={() => 
+                    { changeLanguage('en'); 
+                      document.querySelector('#dropdown_lag_menu').classList.remove('show'); 
+                    }}>
+              <img src={Flag_us} alt="" height={16} /> {t('language.en')}
+            </div>
           </div>
         </li>
         {/* /Flag */}
@@ -367,9 +385,9 @@ const Header = (props) => {
           >
             <span className="user-img">
               {/* <img src={avatar21} alt="" /> */}
-              <Avatar>{currentUser.userName === undefined ? "":(currentUser.userName).substring(0,2)}</Avatar>
+              <Avatar>{cookies.myLationCrmUserName === undefined ? "":(cookies.myLationCrmUserName).substring(0,1)}</Avatar>
               <span className="status online" /></span>
-            <span>{currentUser.userName}</span>
+            <span>{cookies.myLationCrmUserName}</span>
           </Link>
           <div id="dropdown_menu" className="dropdown-menu">
             {/* <Link className="dropdown-item" to="/Profile" 

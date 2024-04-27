@@ -5,6 +5,8 @@ export {default as Flag_us} from 'Assets/images/flags/us.png';
 export {default as Flag_fr} from 'Assets/images/flags/fr.png';
 export {default as Flag_es} from 'Assets/images/flags/es.png';
 export {default as Flag_de} from 'Assets/images/flags/de.png';
+export {default as Flag_kr} from 'Assets/images/flags/kr.png';
+
 
 export {default as avatar02} from 'Assets/images/profiles/avatar-02.jpg';
 export {default as avatar03} from 'Assets/images/profiles/avatar-03.jpg';

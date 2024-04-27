@@ -33,7 +33,7 @@ const UserInfo = () => {
   },[setCurrentUser]);  
 
   useEffect(() => {
-    if (currentUser.userId === "") {
+    if (currentUser.userId === "") {  
       loadUsers(cookies.myLationCrmUserId);
     }
 

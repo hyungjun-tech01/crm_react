@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client'; // -- react v18 권고에 따라 변경
 import { RecoilRoot } from "recoil";
 // import { ThemeProvider, createTheme } from '@mui/material/styles';
 // import { red } from '@mui/material/colors';
+import './i18n';
 
 import AppRouter from './approuter';
 
