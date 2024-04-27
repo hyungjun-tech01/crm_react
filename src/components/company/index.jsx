@@ -13,6 +13,7 @@ import { BiBuildings } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies, atomFilteredCompany, defaultCompany } from "../../atoms/atoms";
 import { compareCompanyName, compareText, formateDate } from "../../constants/functions";
+import { useTranslation } from "react-i18next";
 
 const Company = () => {
   const { loadAllCompanies, filterCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
@@ -24,6 +25,8 @@ const Company = () => {
   const [ closeDate, setCloseDate ] = useState(null);
 
   const [searchCondition, setSearchCondition] = useState("");
+
+  const { t } = useTranslation();
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
@@ -101,7 +104,7 @@ const Company = () => {
 
   const columns = [
     {
-      title: "Company Name",
+      title: t('company.company_name'),
       dataIndex: "company_name",
       render: (text, record) => (
         <>
@@ -116,25 +119,25 @@ const Company = () => {
       sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
     {
-      title: "Phone",
+      title: t('company.phone'),
       dataIndex: "company_phone_number",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.company_phone_number, b.company_phone_number),
     },
     {
-      title: "Address",
+      title: t('company.address'),
       dataIndex: "company_address",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => a.company_address.length - b.company_address.length,
     },
     {
-      title: "Salesman",
+      title: t('company.salesman'),
       dataIndex: "sales_resource",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.sales_resource, b.sales_resource),
     },
     {
-      title: "Engineer",
+      title: t('company.engineer'),
       dataIndex: "application_engineer",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.application_engineer, b.application_engineer),
@@ -232,7 +235,7 @@ const Company = () => {
     <HelmetProvider>
       <div className="page-wrapper">
         <Helmet>
-          <title>Companies - CRMS admin Template</title>
+          <title>{t('company.company')}</title>
           <meta name="description" content="Reactify Blank Page" />
         </Helmet>
         <div className="content container-fluid">
@@ -245,7 +248,7 @@ const Company = () => {
                     <BiBuildings />
                   </i>
                 </span>{" "}
-                Companies{" "}
+                {t('company.company')}{" "}
               </h3>
             </div>
             <div className="col text-end">
@@ -253,7 +256,7 @@ const Company = () => {
                 <li className="breadcrumb-item">
                   <Link to="/">Dashboard</Link>
                 </li>
-                <li className="breadcrumb-item active">Companies</li>
+                <li className="breadcrumb-item active">{t('company.company')}</li>
               </ul>
             </div>
           </div>
@@ -302,7 +305,7 @@ const Company = () => {
                       id = "searchCondition"
                       className="form-control" 
                       type="text"
-                      placeholder="Company Name,Sales Man" 
+                      placeholder={t('company.company_name')}
                       style={{width:'300px', display: 'inline'}}
                       value={searchCondition}
                       onChange ={(e) => handleSearchCondition(e.target.value)}
@@ -344,7 +347,7 @@ const Company = () => {
                       data-bs-target="#add_company"
                       onClick={handleAddNewCompanyClicked}
                     >
-                      New Company
+                      {t('company.new_company')}
                     </button>
                   </li>
                 </ul>

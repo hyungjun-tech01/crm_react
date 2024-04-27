@@ -15,7 +15,7 @@ import {ConsultingRepo} from "../../repository/consulting"
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { atomAllCompanies, atomAllLeads, atomFilteredLead, defaultLead } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
-
+import { useTranslation } from "react-i18next";
 
 const Leads = () => {
   const allCompnayData = useRecoilValue(atomAllCompanies);
@@ -31,6 +31,8 @@ const Leads = () => {
 
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState("");
+
+  const { t } = useTranslation();
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
@@ -117,7 +119,7 @@ const Leads = () => {
 
   const columns = [
     {
-      title: "Full Name",
+      title: t('lead.full_name'),
       dataIndex: "lead_name",
       render: (text, record) => (
         <>
@@ -142,47 +144,47 @@ const Leads = () => {
       sorter: (a, b) => compareText(a.lead_name, b.lead_name),
     },
     {
-      title: "Title",
+      title: t('lead.title'),
       dataIndex: "position",
       sorter: (a, b) => compareText(a.position, b.position),
     },
     {
-      title: "Department",
+      title: t('lead.department'),
       dataIndex: "department",
       sorter: (a, b) => compareText(a.department, b.department),
     },
     {
-      title: "Company",
+      title: t('company.company_name'),
       dataIndex: "company_name",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
     {
-      title: "Mobile",
+      title: t('lead.mobile'),
       dataIndex: "mobile_number",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.mobile_number, b.mobile_number),
     },
     {
-      title: "Email Address",
+      title: t('lead.email'),
       dataIndex: "email",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.email, b.email),
     },
     {
-      title: "Lead Status",
+      title: t('lead.lead_status'),
       dataIndex: "status",
       render: (text, record) => <label>{text}</label>,
       sorter: (a, b) => compareText(a.status, b.status.length),
     },
     {
-      title: "Lead Modified",
+      title: t('lead.lead_modified'),
       dataIndex: "modify_date",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => a.modify_date - b.modify_date,
     },
     {
-      title: "Lead Sales",
+      title: t('lead.lead_sales'),
       dataIndex: "sales_resource",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.sales_resource, b.sales_resource),
@@ -197,7 +199,7 @@ const Leads = () => {
     // },
 
     {
-      title: "Actions",
+      title: t('lead.actions'),
       dataIndex: "status_",
       render: (text, record) => (
         <div className="dropdown dropdown-action">
@@ -298,7 +300,7 @@ const Leads = () => {
     <HelmetProvider>
       <div className="page-wrapper">
         <Helmet>
-          <title>Leads - CRMS admin Template</title>
+          <title>{t('lead.lead')}</title>
           <meta name="description" content="Reactify Blank Page" />
         </Helmet>
         <div className="content container-fluid">
@@ -311,7 +313,7 @@ const Leads = () => {
                     <BiUser />
                   </i>
                 </span>{" "}
-                Leads{" "}
+                {t('lead.lead')}{" "}
               </h3>
             </div>
             <div className="col text-end">
@@ -319,7 +321,7 @@ const Leads = () => {
                 <li className="breadcrumb-item">
                   <Link to="/">Dashboard</Link>
                 </li>
-                <li className="breadcrumb-item active">Leads</li>
+                <li className="breadcrumb-item active">{t('lead.lead')}</li>
               </ul>
             </div>
           </div>
@@ -343,7 +345,7 @@ const Leads = () => {
                       id = "searchCondition"
                       className="form-control" 
                       type="text"
-                      placeholder="이름,Company,Lead Sales" 
+                      placeholder= {t('lead.full_name')}
                       style={{width:'300px', display: 'inline'}}
                       value={searchCondition}
                       onChange ={(e) => handleSearchCondition(e.target.value)}
@@ -425,7 +427,7 @@ const Leads = () => {
                       data-bs-target="#add_lead"
                       onClick={handleAddNewLeadClicked}
                     >
-                      New Lead
+                      {t('lead.new_lead')}
                     </button>
                   </li>
                 </ul>

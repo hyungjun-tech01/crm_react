@@ -91,7 +91,7 @@ const Header = (props) => {
                }}
                to="#"
           >
-            <img src={i18n.language === 'ko' ? Flag_kr:Flag_us} alt="" height={20} /> <span>{i18n.language === 'ko' ? t('language.ko'):t('language.en')}</span>
+            <img src={i18n.language === 'ko' ? Flag_kr:Flag_us} alt="" height={20} /> <span>{i18n.language === 'ko' ? t('header.ko'):t('header.en')}</span>
           </Link>
 
           <div id="dropdown_lag_menu" className="dropdown-menu dropdown-menu-right">
@@ -102,14 +102,14 @@ const Header = (props) => {
                     document.querySelector('#dropdown_lag_menu').classList.remove('show'); 
                   }}
             >
-              <img src={Flag_us} alt="" height={16} /> {t('language.ko')}
+              <img src={Flag_us} alt="" height={16} /> {t('header.ko')}
             </div>
             <div className="dropdown-item" 
                   onClick={() => 
                     { changeLanguage('en'); 
                       document.querySelector('#dropdown_lag_menu').classList.remove('show'); 
                     }}>
-              <img src={Flag_us} alt="" height={16} /> {t('language.en')}
+              <img src={Flag_us} alt="" height={16} /> {t('header.en')}
             </div>
           </div>
         </li>
