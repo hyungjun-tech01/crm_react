@@ -25,6 +25,8 @@ import { ConsultingRepo, ConsultingTypes } from "../../repository/consulting";
 import { atomAllCompanies, atomAllConsultings, atomAllLeads, defaultConsulting, atomFilteredConsulting } from "../../atoms/atoms";
 import { compareCompanyName, compareText, formateDate } from "../../constants/functions";
 
+import { useTranslation } from "react-i18next";
+
 const Consultings = () => {
   const allCompnayData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
@@ -43,6 +45,7 @@ const Consultings = () => {
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState("");
 
+  const { t } = useTranslation();
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
@@ -142,7 +145,7 @@ const Consultings = () => {
   // --- Section for Table ------------------------------
   const columns = [
     {
-      title: "Company",
+      title: t('company.company_name'),
       dataIndex: "company_name",
       render: (text, record) => (
         <>
@@ -160,7 +163,7 @@ const Consultings = () => {
       sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
     {
-      title: "Type",
+      title: t('consulting.type'),
       dataIndex: "consulting_type",
       render: (text, record) => (
         <>
@@ -178,7 +181,7 @@ const Consultings = () => {
       sorter: (a, b) => compareText(a.consulting_type, b.consulting_type),
     },
     {
-      title: "Lead",
+      title: t('lead.full_name'),
       dataIndex: "lead_name",
       render: (text, record) => (
         <>
@@ -196,19 +199,19 @@ const Consultings = () => {
       sorter: (a, b) => compareText(a.lead_name, b.lead_name),
     },
     {
-      title: "Mobile",
+      title: t('lead.mobile'),
       dataIndex: "mobile_number",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.mobile_number, b.mobile_number),
     },
     {
-      title: "Phone",
+      title: t('company.phone'),
       dataIndex: "phone_number",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.phone_number, b.phone_number),
     },
     {
-      title: "Action",
+      title: t('lead.actions'),
       render: (text, record) => (
         <div className="dropdown dropdown-action text-center">
           <a
@@ -293,7 +296,7 @@ const Consultings = () => {
     <HelmetProvider>
       <div className="page-wrapper">
         <Helmet>
-          <title>Consultings - CRMS admin Template</title>
+          <title>{t('consulting.consulting')}</title>
           <meta name="description" content="Reactify Blank Page" />
         </Helmet>
         {/* Page Content */}
@@ -307,7 +310,7 @@ const Consultings = () => {
                     <BiClipboard />
                   </i>
                 </span>{" "}
-                Consultings{" "}
+                {t('consulting.consulting')}{" "}
               </h3>
             </div>
             <div className="col p-0 text-end">
@@ -315,7 +318,7 @@ const Consultings = () => {
                 <li className="breadcrumb-item">
                   <Link to="/">Dashboard</Link>
                 </li>
-                <li className="breadcrumb-item active">Consultings</li>
+                <li className="breadcrumb-item active">{t('consulting.consulting')}</li>
               </ul>
             </div>
           </div>
@@ -347,7 +350,7 @@ const Consultings = () => {
                       id = "searchCondition"
                       className="form-control" 
                       type="text"
-                      placeholder="Company,Lead" 
+                      placeholder= {t('company.company_name')}
                       style={{width:'300px', display: 'inline'}}
                       value={searchCondition}
                       onChange ={(e) => handleSearchCondition(e.target.value)}
@@ -363,7 +366,7 @@ const Consultings = () => {
                       data-bs-target="#add_consulting"
                       onClick={handleAddNewConsultingClicked}
                     >
-                      Add Consulting
+                      {t('consulting.add_consulting')}
                     </button>
                   </li>
                 </ul>

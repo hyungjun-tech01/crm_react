@@ -14,6 +14,8 @@ import { PurchaseRepo } from "../../repository/purchase";
 import { atomAllCompanies, atomAllPurchases, defaultPurchase } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
 import { compareText } from "../../constants/functions";
+import { useTranslation } from "react-i18next";
+
 
 const Purchase = () => {
   const allCompanyData = useRecoilValue(atomAllCompanies);
@@ -33,6 +35,8 @@ const Purchase = () => {
   const [ initAddNewPurchase, setInitAddNewPurchase ] = useState(false);
   
   const selectCompanyRef = useRef(null);
+
+  const { t } = useTranslation();
 
   // --- Functions used for Table ------------------------------
   const handleClickPurchase = useCallback((id)=>{
@@ -119,7 +123,7 @@ const Purchase = () => {
 
   const columns = [
     {
-      title: "Purchase Type",
+      title: t('purchase.product_type'),
       dataIndex: "product_type",
       render: (text, record) => (
         <>
@@ -129,13 +133,13 @@ const Purchase = () => {
       sorter: (a, b) => compareText(a.purchase_type, b.purchase_type),
     },
     {
-      title: "Product Name",
+      title: t('purchase.product_name'),
       dataIndex: "product_name",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.product_name, b.product_name),
     },
     {
-      title: "Serial Number",
+      title: t('purchase.serial'),
       dataIndex: "serial_number",
       render: (text, record) =>
         <>
@@ -146,7 +150,7 @@ const Purchase = () => {
       sorter: (a, b) => compareText(a.serial_number, b.serial_number),
     },
     {
-      title: "Delivery Date",
+      title: t('purchase.delivery_date'),
       dataIndex: "delivery_date",
       render: (text, record) =>
         <>
@@ -155,7 +159,7 @@ const Purchase = () => {
       sorter: (a, b) => a.delivery_date - b.delivery_date,
     },
     {
-      title: "MA Contact Date",
+      title: t('purchase.ma_contract_date'),
       dataIndex: "MA_contact_date",
       render: (text, record) =>
         <>
@@ -164,7 +168,7 @@ const Purchase = () => {
       sorter: (a, b) => a.MA_contact_date - b.MA_contact_date,
     },
     {
-      title: "MA Finish Date",
+      title: t('purchase.ma_finish_date'),
       dataIndex: "MA_finish_date",
       render: (text, record) =>
         <>
@@ -173,31 +177,31 @@ const Purchase = () => {
       sorter: (a, b) => a.MA_finish_date - b.MA_finish_date,
     },
     {
-      title: "Quantity",
+      title: t('purchase.quantity'),
       dataIndex: "quantity",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => a.quantity - b.quantity,
     },
     {
-      title: "Price",
+      title: t('purchase.price'),
       dataIndex: "price",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => a.price - b.price,
     },
     {
-      title: "Currency",
+      title: t('purchase.currency'),
       dataIndex: "currency",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => a.currency - b.currency,
     },
     {
-      title: "Register",
+      title: t('purchase.register'),
       dataIndex: "register",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => a.register - b.register,
     },
     {
-      title: "Registration Date",
+      title:t('purchase.registration_date'),
       dataIndex: "registration_date",
       render: (text, record) => 
       <>
@@ -206,7 +210,7 @@ const Purchase = () => {
       sorter: (a, b) => a.registration_date - b.registration_date,
     },
     {
-      title: "Registration Code",
+      title: t('purchase.registration_code'),
       dataIndex: "regcode",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.regcode, b.regcode),
@@ -327,7 +331,7 @@ const Purchase = () => {
     <HelmetProvider>
       <div className="page-wrapper">
         <Helmet>
-          <title>Purchase - CRMS admin Template</title>
+          <title>{t('purchase.purchase')}</title>
           <meta name="description" content="Reactify Blank Page" />
         </Helmet>
         <div className="content container-fluid">
@@ -340,7 +344,7 @@ const Purchase = () => {
                     <BiShoppingBag />
                   </i>
                 </span>{" "}
-                Purchase{" "}
+                {t('purchase.purchase')}{" "}
               </h3>
             </div>
             <div className="col text-end">
@@ -428,7 +432,7 @@ const Purchase = () => {
                       data-bs-target="#add_purchase"
                       onClick={handleAddNewPurchaseClicked}
                     >
-                      New Purchase
+                      {t('purchase.add_purchase')}
                     </button>
                   </li>
                 </ul>
