@@ -37,7 +37,7 @@ const koResource = {
             type:'컨설팅타입',
         },
         quotation : {
-            add_new_quotation: '신규 견적서 작성',
+            add_new_quotation: '신규 견적서 추가',
             confirm_date: '확정일자',
             consumer_price: '소비자가',
             delivery_period: '배송기일',

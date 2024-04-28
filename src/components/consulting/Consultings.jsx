@@ -205,7 +205,7 @@ const Consultings = () => {
       sorter: (a, b) => compareText(a.mobile_number, b.mobile_number),
     },
     {
-      title: t('company.phone'),
+      title: t('common.phone'),
       dataIndex: "phone_number",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.phone_number, b.phone_number),
