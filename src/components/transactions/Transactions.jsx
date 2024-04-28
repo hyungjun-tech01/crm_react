@@ -18,6 +18,7 @@ import { TransactionRepo } from "../../repository/transaction";
 import { atomAllCompanies, atomAllTransactions } from "../../atoms/atoms";
 import { compareCompanyName , compareText } from "../../constants/functions";
 import TransactionAddNewModal from "./TransactionAddNewModal";
+import { useTranslation } from "react-i18next";
 
 const Transactions = () => {
   const allCompanyData = useRecoilValue(atomAllCompanies);
@@ -26,11 +27,12 @@ const Transactions = () => {
   const { loadAllTransactions, setCurrentTransaction } = useRecoilValue(TransactionRepo);
   const [ initAddNewTransaction, setInitAddNewTransaction ] = useState(false);
 
+  const { t } = useTranslation();
   
   // --- Section for Table ------------------------------
   const columns = [
     {
-      title: "Compay",
+      title: t('company.company_name'),
       dataIndex: "company_name",
       render: (text, record) => (
         <>
@@ -45,7 +47,7 @@ const Transactions = () => {
       sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
     {
-      title: "Title",
+      title: t('transaction.title'),
       dataIndex: "transaction_title",
       render: (text, record) => (
         <>
@@ -61,7 +63,7 @@ const Transactions = () => {
       sorter: (a, b) => compareText(a.transaction_title, b.transaction_title),
     },
     {
-      title: "Type",
+      title: t('transaction.type'),
       dataIndex: "transaction_type",
       render: (text, record) => (
         <>
@@ -77,7 +79,7 @@ const Transactions = () => {
       sorter: (a, b) => compareText(a.transaction_type, b.transaction_type),
     },
     {
-      title: "Publish Date",
+      title: t('transaction.publish_date'),
       dataIndex: "publish_date",
       render: (text, record) => 
         <>
@@ -86,19 +88,19 @@ const Transactions = () => {
       sorter: (a, b) => a.publish_date - b.publish_date,
     },
     {
-      title: "Publish Type",
+      title: t('transaction.publish_type'),
       dataIndex: "publish_type",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.publish_type, b.publish_type),
     },
     {
-      title: "Payment Type",
+      title: t('transaction.payment_type'),
       dataIndex: "payment_type",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.payment_type, b.payment_type),
     },
     {
-      title: "Action",
+      title: t('lead.actions'),
       render: (text, record) => (
         <div className="dropdown dropdown-action text-center">
           <a
@@ -150,7 +152,7 @@ const Transactions = () => {
     <HelmetProvider>
       <div className="page-wrapper">
         <Helmet>
-          <title>Transactions - CRMS admin Template</title>
+          <title>{t('transaction.transaction')}</title>
           <meta name="description" content="Reactify Blank Page" />
         </Helmet>
         {/* Page Content */}
@@ -164,7 +166,7 @@ const Transactions = () => {
                     <BiReceipt />
                   </i>
                 </span>{" "}
-                Transactions{" "}
+                {t('transaction.transaction')}{" "}
               </h3>
             </div>
             <div className="col p-0 text-end">
@@ -172,7 +174,7 @@ const Transactions = () => {
                 <li className="breadcrumb-item">
                   <Link to="/">Dashboard</Link>
                 </li>
-                <li className="breadcrumb-item active">Transactions</li>
+                <li className="breadcrumb-item active">{t('transaction.transaction')}</li>
               </ul>
             </div>
           </div>
@@ -209,7 +211,7 @@ const Transactions = () => {
                       data-bs-target="#add_new_transaction"
                       onClick={handleAddNewTransaction}
                     >
-                      Add Transaction
+                      {t('transaction.add_transaction')}
                     </button>
                   </li>
                 </ul>

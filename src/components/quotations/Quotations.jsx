@@ -21,6 +21,8 @@ import { QuotationRepo } from "../../repository/quotation";
 import { atomAllCompanies, atomAllQuotations, atomAllLeads, } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 
+import { useTranslation } from "react-i18next";
+
 const Quotations = () => {
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
@@ -30,10 +32,12 @@ const Quotations = () => {
   const { loadAllQuotations, setCurrentQuotation } = useRecoilValue(QuotationRepo);
   const [ initAddNewQuotation, setInitAddNewQuotation ] = useState(false);
 
+  const { t } = useTranslation();
+
   // --- Section for Table ------------------------------
   const columns = [
     {
-      title: "Company",
+      title: t('company.company_name'),
       dataIndex: "company_name",
       render: (text, record) => (
         <>
@@ -51,7 +55,7 @@ const Quotations = () => {
       sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
     {
-      title: "Type",
+      title: t('quotation.type'),
       dataIndex: "quotation_type",
       render: (text, record) => (
         <>
@@ -69,7 +73,7 @@ const Quotations = () => {
       sorter: (a, b) => compareText(a.quotation_type, b.quotation_type),
     },
     {
-      title: "Title",
+      title: t('quotation.title'),
       dataIndex: "quotation_title",
       render: (text, record) => (
         <>
@@ -87,7 +91,7 @@ const Quotations = () => {
       sorter: (a, b) => compareText(a.quotation_title, b.quotation_title),
     },
     {
-      title: "Date",
+      title: t('quotation.date'),
       dataIndex: "quotation_date",
       render: (text, record) => (
         <>
@@ -105,7 +109,7 @@ const Quotations = () => {
       sorter: (a, b) => compareText(a.quotation_date, b.quotation_date),
     },
     {
-      title: "Lead",
+      title: t('lead.full_name'),
       dataIndex: "lead_name",
       render: (text, record) => (
         <>
@@ -123,25 +127,25 @@ const Quotations = () => {
       sorter: (a, b) => compareText(a.lead_name, b.lead_name),
     },
     {
-      title: "Mobile",
+      title: t('lead.mobile'),
       dataIndex: "mobile_number",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.mobile_number, b.mobile_number),
     },
     {
-      title: "Phone",
+      title: t('company.phone'),
       dataIndex: "phone_number",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.phone_number, b.phone_number),
     },
     {
-      title: "Email",
+      title: t('lead.email'),
       dataIndex: "email",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.email, b.email),
     },
     {
-      title: "Action",
+      title: t('lead.actions'),
       render: (text, record) => (
         <div className="dropdown dropdown-action text-center">
           <a
@@ -194,7 +198,7 @@ const Quotations = () => {
     <HelmetProvider>
       <div className="page-wrapper">
         <Helmet>
-          <title>Quotations - CRMS admin Template</title>
+          <title>{t('quotation.quotation')}</title>
           <meta name="description" content="Reactify Blank Page" />
         </Helmet>
         {/* Page Content */}
@@ -208,7 +212,7 @@ const Quotations = () => {
                     <BiCalculator />
                   </i>
                 </span>{" "}
-                Quotations{" "}
+                {t('quotation.quotation')}{" "}
               </h3>
             </div>
             <div className="col p-0 text-end">
@@ -216,7 +220,7 @@ const Quotations = () => {
                 <li className="breadcrumb-item">
                   <Link to="/">Dashboard</Link>
                 </li>
-                <li className="breadcrumb-item active">Quotations</li>
+                <li className="breadcrumb-item active">{t('quotation.quotation')}</li>
               </ul>
             </div>
           </div>
@@ -253,7 +257,7 @@ const Quotations = () => {
                       data-bs-target="#add_quotation"
                       onClick={handleAddNewQuotation}
                     >
-                      Add Quotation
+                      {t('quotation.add_quotation')}
                     </button>
                   </li>
                 </ul>

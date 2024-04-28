@@ -31,6 +31,11 @@ const enResource = {
             lead_sales:'Lead Sales',
             actions:'Actions'
         },
+        consulting:{
+            consulting:'Consultings',
+            add_consulting:'Add Consulting',
+            type:'Consulting Type',
+        },
         quotation : {
             add_new_quotation: 'Add New Quotation',
             confirm_date: 'Confirm Date',
@@ -50,11 +55,38 @@ const enResource = {
             quotation_amount: 'Quotation Amount',
             quotation_date: 'Quotation Date',
             quotation_manager: 'Quotation Manager',
+            quotation_type: 'Quotation Type',
             quotation_unit_price: 'Quotation Unit Price',
             raw_price: 'Raw Price',
             sales_rep: 'Sales Representative',
             send_type: 'Send Type',
             warranty: 'Warranty Period',
+        },
+        transaction:{
+            transaction:'Transactions',
+            add_transaction:'Add Transaction',
+            type:'Transaction Type',
+            title:'Transaction Title',
+            publish_date:'Publish Date',
+            publish_type:'Publish Type',
+            payment_type:'Payment Type',
+        },
+        purchase:{
+            purchase:'Purchase',
+            add_purchase:'Add Purchase',
+            type:'Purchase Type',
+            product_name:'Product Name',
+            product_type:'Product Type',
+            serial:'Serial Number',
+            delivery_date:'Delivery Date',
+            ma_finish_date:'MA Finish Date',
+            ma_contract_date:'MA Date',
+            quantity:'Quantity',
+            price:'Price',
+            currency:'Currency',
+            register:'Register',
+            registration_date:'Registration Date',
+            registration_code:'Registraction Code',
         },
         common:{
             cancel: 'Cancel',
@@ -78,7 +110,6 @@ const enResource = {
             unit: 'Unit',
             visible: 'Visible',
         },
-        
-    }
+    },
 }
 export default enResource;
