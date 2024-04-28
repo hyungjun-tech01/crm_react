@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRecoilValue } from "recoil";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
+import { useTranslation } from "react-i18next";
 import "antd/dist/reset.css";
 import { Table } from 'antd';
 import { itemRender, onShowSizeChange } from "../paginationfunction";
@@ -21,26 +22,6 @@ const default_quotation_content = {
   '11': null, '12': null, '13': null, '14': null, '15': null,
   '16': null, '17': null, '18': null, '19': null, '998': null,
 };
-const default_content_array = [
-  ['2', '분류'],
-  ['3', '제조회사'],
-  ['4', '모델명'],
-  ['5', '품목'],
-  ['6', '재질'],
-  ['7', '타입'],
-  ['8', '색상'],
-  ['9', '규격'],
-  ['10', '세부사양'],
-  ['11', '단위'],
-  ['12', '수량'],
-  ['13', '소비자가'],
-  ['14', '할인%'],
-  ['15', '견적단가'],
-  ['16', '견적금액'],
-  ['17', '원가'],
-  ['18', '이익금액'],
-  ['19', '비고'],
-];
 
 const default_prices = {
   'consumer_price': 0,
@@ -51,33 +32,13 @@ const default_prices = {
   'profit': 0,
 };
 
-const ConvertHeaderInfosToString = (data) => {
-  let ret = '1|No|';
-  
-  if(data[0]['title'] === 'No') ret += data[0]['size']
-  else ret += '0';
-
-  default_content_array.forEach(item => {
-    ret += '|' + item.at(0) + '|' + item.at(1) + '|';
-
-    const foundIdx = data.findIndex(col => col.title === item.at(1));
-    if(foundIdx === -1) {
-      ret += '0';
-    } else {
-      ret += data[foundIdx]['size'];
-    }
-  });
-
-  console.log('\t[ ConvertHeaderInfosToString ] Result : ', ret);
-  return ret;
-};
-
 const QuotationAddNewModal = (props) => {
   const { init, handleInit } = props;
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
   const { modifyQuotation } = useRecoilValue(QuotationRepo);
   const [ cookies] = useCookies(["myLationCrmUserId"]);
+  const [ t ] = useTranslation();
 
   const [ companiesForSelection, setCompaniesForSelection ] = useState([]);
   const [ leadsForSelection, setLeadsForSelection ] = useState([]);
@@ -99,6 +60,48 @@ const QuotationAddNewModal = (props) => {
   const selectLeadRef = useRef(null);
   const selectTypeRef = useRef(null);
   const selectSendTypeRef = useRef(null);
+
+  const default_content_array = [
+    ['2', t('common.category')],
+    ['3', t('common.maker')],
+    ['4', t('quotation.model_name')],
+    ['5', t('common.product')],
+    ['6', t('common.material')],
+    ['7', t('common.type')],
+    ['8', t('common.color')],
+    ['9', t('common.standard')],
+    ['10', t('quotation.detail_spec')],
+    ['11', t('common.unit')],
+    ['12', t('common.quantity')],
+    ['13', t('quotation.consumer_price')],
+    ['14', t('quotation.discount_rate')],
+    ['15', t('quotation.quotation_unit_price')],
+    ['16', t('quotation.quotation_amount')],
+    ['17', t('quotation.raw_price')],
+    ['18', t('quotation.profile_amount')],
+    ['19', t('quotation.note')],
+  ];
+
+  const ConvertHeaderInfosToString = (data) => {
+    let ret = '1|No|';
+    
+    if(data[0]['title'] === 'No') ret += data[0]['size']
+    else ret += '0';
+  
+    default_content_array.forEach(item => {
+      ret += '|' + item.at(0) + '|' + item.at(1) + '|';
+  
+      const foundIdx = data.findIndex(col => col.title === item.at(1));
+      if(foundIdx === -1) {
+        ret += '0';
+      } else {
+        ret += data[foundIdx]['size'];
+      }
+    });
+  
+    console.log('\t[ ConvertHeaderInfosToString ] Result : ', ret);
+    return ret;
+  };
 
   const handleSelectLead = useCallback((value) => {
     if(value) {
@@ -169,31 +172,31 @@ const QuotationAddNewModal = (props) => {
       render: (text, record) => <>{text}</>,
     },
     {
-      title: "품목",
+      title: t('common.product'),
       dataIndex: '5',
       size: 50,
       render: (text, record) => <>{text}</>,
     },
     {
-      title: "세부사양",
+      title: t('quotation.detail_spec'),
       dataIndex: '10',
       size: 10,
       render: (text, record) => <>{text}</>,
     },
     {
-      title: "수량",
+      title: t('common.quantity'),
       dataIndex: '12',
       size: 10,
       render: (text, record) => <>{text}</>,
     },
     {
-      title: "견적단가",
+      title: t('quotation.quotation_unit_price'),
       dataIndex: '15',
       size: 15,
       render: (text, record) => <>{text}</>,
     },
     {
-      title: "견적금액",
+      title: t('quotation.quotation_amount'),
       dataIndex: '16',
       size: 15,
       render: (text, record) => <>{text}</>,
@@ -488,7 +491,7 @@ const QuotationAddNewModal = (props) => {
         </button>
         <div className="modal-content">
           <div className="modal-header">
-            <h4 className="modal-title"><b>Add New Quotation</b></h4>
+            <h4 className="modal-title"><b>{t('quotation.add_new_quotation')}</b></h4>
             <button
               type="button"
               className="btn-close"
@@ -497,10 +500,10 @@ const QuotationAddNewModal = (props) => {
           </div>
           <div className="modal-body">
             <form className="forms-sampme" id="add_new_quotation_form">
-              <h4>Lead Information</h4>
+              <h4>{t('lead.lead')} {t('common.information')}</h4>
               <div className="form-group row">
                 <div className="col-sm-4">
-                  <label>Name</label>
+                  <label>{t('common.name')}</label>
                 </div>
                 <div className="col-sm-8">
                   <Select
@@ -516,15 +519,15 @@ const QuotationAddNewModal = (props) => {
                       <table className="table">
                         <tbody>
                           <tr>
-                            <td className="border-0">Organization</td>
+                            <td className="border-0">{t('company.company')}</td>
                             <td className="border-0">{selectedLead.company_name}</td>
                           </tr>
                           <tr>
-                            <td>Department</td>
+                            <td>{t('lead.department')}</td>
                             <td>{selectedLead.department}</td>
                           </tr>
                           <tr>
-                            <td className="border-0">Position</td>
+                            <td className="border-0">{t('lead.position')}</td>
                             <td className="border-0">{selectedLead.position}</td>
                           </tr>
                         </tbody>
@@ -534,15 +537,15 @@ const QuotationAddNewModal = (props) => {
                       <table className="table">
                         <tbody>
                           <tr>
-                            <td className="border-0">Mobile</td>
+                            <td className="border-0">{t('lead.mobile')}</td>
                             <td className="border-0">{selectedLead.mobile_number}</td>
                           </tr>
                           <tr>
-                            <td>Phone</td>
+                            <td>{t('common.phone')}</td>
                             <td>{selectedLead.phone}</td>
                           </tr>
                           <tr>
-                            <td className="border-0">Email</td>
+                            <td className="border-0">{t('lead.email')}</td>
                             <td className="border-0">{selectedLead.email}</td>
                           </tr>
                         </tbody>
@@ -550,20 +553,20 @@ const QuotationAddNewModal = (props) => {
                     </div>
                   </div>
                 </>}
-              <h4>Quotation Information</h4>
+              <h4>{t('quotation.quotation')} {t('common.information')}</h4>
               <div className="form-group row">
                 <div className="col-sm-9">
-                  <label className="col-form-label">Title</label>
+                  <label className="col-form-label">{t('common.title')}</label>
                   <input
                     type="text"
                     className="form-control form-control-sm"
-                    placeholder="Title"
+                    placeholder={t('common.title')}
                     name="quotation_title"
                     onChange={handleQuotationChange}
                   />
                 </div>
                 <div className="col-sm-3">
-                  <label className="col-form-label">Type</label>
+                  <label className="col-form-label">{t('common.type')}</label>
                   <Select
                     ref={selectTypeRef}
                     options={QuotationTypes}
@@ -574,19 +577,19 @@ const QuotationAddNewModal = (props) => {
               <div className="form-group row">
                 <div className="col-sm-6">
                   <div className="form-group row">
-                    <div className="col-sm-4">Document No</div>
+                    <div className="col-sm-4">{t('quotation.doc_no')}</div>
                     <div className="col-sm-7">
                       <input
                         type="text"
                         className="form-control form-control-sm"
-                        placeholder="Document No"
+                        placeholder={t('quotation.doc_no')}
                         name="quotation_number"
                         onChange={handleQuotationChange}
                       />
                     </div>
                   </div>
                   <div className="form-group row">
-                    <div className="col-sm-4">Send Type</div>
+                    <div className="col-sm-4">{t('quotation.send_type')}</div>
                     <div className="col-sm-7">
                       <Select
                         ref={selectSendTypeRef}
@@ -597,7 +600,7 @@ const QuotationAddNewModal = (props) => {
                   </div>
                   <div className="form-group row">
                     <div className="col-sm-4">
-                      <label className="col-form-label">Quotation Date</label>
+                      <label className="col-form-label">{t('quotation.quotation_date')}</label>
                     </div>
                     <div className="col-sm-7">
                       <div className="cal-icon cal-icon-sm">
@@ -612,13 +615,13 @@ const QuotationAddNewModal = (props) => {
                   </div>
                   <div className="form-group row">
                     <div className="col-sm-4">
-                      <label className="col-form-label">Location</label>
+                      <label className="col-form-label">{t('common.location')}</label>
                     </div>
                     <div className="col-sm-7">
                       <input
                         type="text"
                         className="form-control form-control-sm"
-                        placeholder="Location"
+                        placeholder={t('common.location')}
                         name="delivery_location"
                         onChange={handleQuotationChange}
                       />
@@ -626,13 +629,13 @@ const QuotationAddNewModal = (props) => {
                   </div>
                   <div className="form-group row">
                     <div className="col-sm-4">
-                      <label className="col-form-label">Payment Type</label>
+                      <label className="col-form-label">{t('quotation.payment_type')}</label>
                     </div>
                     <div className="col-sm-7">
                       <input
                         type="text"
                         className="form-control form-control-sm"
-                        placeholder="Payment Type"
+                        placeholder={t('quotation.payment_type')}
                         name="payment_type"
                         onChange={handleQuotationChange}
                       />
@@ -640,13 +643,13 @@ const QuotationAddNewModal = (props) => {
                   </div>
                   <div className="form-group row">
                     <div className="col-sm-4">
-                      <label className="col-form-label">Warranty</label>
+                      <label className="col-form-label">{t('quotation.warranty')}</label>
                     </div>
                     <div className="col-sm-7">
                       <input
                         type="text"
                         className="form-control form-control-sm"
-                        placeholder="Warranty Period"
+                        placeholder={t('quotation.warranty')}
                         name="warranty_period"
                         onChange={handleQuotationChange}
                       />
@@ -655,36 +658,36 @@ const QuotationAddNewModal = (props) => {
                 </div>
                 <div className="col-sm-6">
                   <div className="form-group row">
-                    <div className="col-sm-4">Delivery Period</div>
+                    <div className="col-sm-4">{t('quotation.delivery_period')}</div>
                     <div className="col-sm-7">
                       <input
                         type="text"
                         className="form-control form-control-sm"
-                        placeholder="Delivery Period"
+                        placeholder={t('quotation.delivery_period')}
                         name="delivery_period"
                         onChange={handleQuotationChange}
                       />
                     </div>
                   </div>
                   <div className="form-group row">
-                    <div className="col-sm-4">Expiry Date</div>
+                    <div className="col-sm-4">{t('quotation.expiry_date')}</div>
                     <div className="col-sm-7">
                       <input
                         type="text"
                         className="form-control form-control-sm"
-                        placeholder="Expiry Date"
+                        placeholder={t('quotation.expiry_date')}
                         name="quotation_expiration_date"
                         onChange={handleQuotationChange}
                       />
                     </div>
                   </div>
                   <div className="form-group row">
-                    <div className="col-sm-4">Status</div>
+                    <div className="col-sm-4">{t('common.status')}</div>
                     <div className="col-sm-7">
                       <input
                         type="text"
                         className="form-control form-control-sm"
-                        placeholder="Status"
+                        placeholder={t('common.status')}
                         name="status"
                         onChange={handleQuotationChange}
                       />
@@ -692,7 +695,7 @@ const QuotationAddNewModal = (props) => {
                   </div>
                   <div className="form-group row">
                     <div className="col-sm-4">
-                      <label className="col-form-label">Confirm Date</label>
+                      <label className="col-form-label">{t('quotation.confirm_date')}</label>
                     </div>
                     <div className="col-sm-7">
                       <div className="cal-icon cal-icon-sm">
@@ -706,13 +709,25 @@ const QuotationAddNewModal = (props) => {
                     </div>
                   </div>
                   <div className="form-group row">
-                    <div className="col-sm-4">Representative</div>
+                    <div className="col-sm-4">{t('quotation.sales_rep')}</div>
                     <div className="col-sm-7">
                       <input
                         type="text"
                         className="form-control form-control-sm"
-                        placeholder="Representative"
+                        placeholder={t('quotation.sales_rep')}
                         name="sales_representative"
+                        onChange={handleQuotationChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group row">
+                    <div className="col-sm-4">{t('quotation.quotation_manager')}</div>
+                    <div className="col-sm-7">
+                      <input
+                        type="text"
+                        className="form-control form-control-sm"
+                        placeholder={t('quotation.quotation_manager')}
+                        name="quotation_manager"
                         onChange={handleQuotationChange}
                       />
                     </div>
@@ -720,7 +735,7 @@ const QuotationAddNewModal = (props) => {
                 </div>
               </div>
               <h4 className="h4-price">
-                <div>Price Table</div>
+                <div>{t('common.product')} {t('common.table')}</div>
                 <div className="text-end flex-row">
                   <div>
                     <AddBoxOutlined
@@ -766,7 +781,7 @@ const QuotationAddNewModal = (props) => {
                   className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
                   onClick={handleAddNewQuotation}
                 >
-                  Save
+                  {t('common.save')}
                 </button>
                 &nbsp;&nbsp;
                 <button
@@ -774,7 +789,7 @@ const QuotationAddNewModal = (props) => {
                   className="btn btn-secondary btn-rounded"
                   data-bs-dismiss="modal"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
               </div>
             </form>
@@ -784,7 +799,7 @@ const QuotationAddNewModal = (props) => {
       {temporaryContent &&
         <div className="edit-content">
           <div className="edit-content-header">
-            <h4>&nbsp;&nbsp;<b>Edit Content</b></h4>
+            <h4>&nbsp;&nbsp;<b>{t('common.edit_content')}</b></h4>
           </div>
           <table className="table">
             <tbody>
@@ -857,7 +872,7 @@ const QuotationAddNewModal = (props) => {
               className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
               onClick={handleSaveTemporaryEdit}
             >
-              Save
+              {t('common.save')}
             </button>
             &nbsp;&nbsp;
             <button
@@ -865,7 +880,7 @@ const QuotationAddNewModal = (props) => {
               className="btn btn-secondary btn-rounded"
               onClick={handleCloseTemporaryEdit}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         </div>
@@ -873,7 +888,7 @@ const QuotationAddNewModal = (props) => {
       {editHeaders && 
         <div className="edit-content">
           <div className="edit-content-header">
-            <h4><b>Header Setting</b></h4>
+            <h4><b>{t('quotation.header_setting')}</b></h4>
             <button
               type="button"
               className="edit-content-close"
@@ -886,9 +901,9 @@ const QuotationAddNewModal = (props) => {
             <table className="table">
               <thead>
                 <tr>
-                  <th scope="col">Title</th>
-                  <th scope="col">Visible</th>
-                  <th scope="col">Size</th>
+                  <th scope="col">{t('common.title')}</th>
+                  <th scope="col">{t('common.visible')}</th>
+                  <th scope="col">{t('common.size')}</th>
                 </tr>
               </thead>
               <tbody>

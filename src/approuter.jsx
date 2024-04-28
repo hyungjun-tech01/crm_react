@@ -10,7 +10,6 @@ const AppRouter = (props) => {
         </Router>
     );
     
-}
-
+};
 
 export default AppRouter;

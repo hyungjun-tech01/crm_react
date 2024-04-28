@@ -604,4 +604,5 @@ const AppUniversal = (props) => {
     </Router>
   );
 };
+
 export default AppUniversal;
