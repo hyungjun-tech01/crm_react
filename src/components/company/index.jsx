@@ -108,8 +108,8 @@ const Company = () => {
       dataIndex: "company_name",
       render: (text, record) => (
         <>
-          <a href="#" className="avatar">
-            <img alt="" src={record.image} />
+          <a href="#" className="person-circle-a person-circle">
+            {text.charAt(0)}
           </a>
           <a href="#" data-bs-toggle="modal" data-bs-target="#company-details" onClick={()=>{handleClickCompanyName(record.company_code);}}>
             {text}
