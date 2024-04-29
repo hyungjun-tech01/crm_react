@@ -136,6 +136,7 @@ import "./assets/css/line-awesome.min.css";
 import "./assets/css/theme-settings.css";
 import "./assets/css/style.css";
 import "react-datepicker/dist/react-datepicker.css";
+import "./assets/css/custom.style.css";
 
 import SystemUserModel from "./components/task/SystemUserModel";
 import TaskDetailModel from "./components/task/TaskDetailModel";

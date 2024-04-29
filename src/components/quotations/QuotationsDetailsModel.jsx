@@ -2,12 +2,14 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
+import { useTranslation } from "react-i18next";
 import { SystemUser } from "../imagepath";
 import { Collapse } from "antd";
 import { atomCurrentQuotation, defaultQuotation } from "../../atoms/atoms";
 import { QuotationRepo } from "../../repository/quotation";
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailDateItem from "../../constants/DetailDateItem";
+import DetailTextareaItem from "../../constants/DetailTextareaItem";
 import QuotationView from "./QuotationtView";
 
 const QuotationsDetailsModel = () => {
@@ -15,6 +17,7 @@ const QuotationsDetailsModel = () => {
   const selectedQuotation = useRecoilValue(atomCurrentQuotation);
   const { modifyQuotation } = useRecoilValue(QuotationRepo);
   const [cookies] = useCookies(["myLationCrmUserId"]);
+  const [ t ] = useTranslation();
 
   const [editedValues, setEditedValues] = useState(null);
   const [savedValues, setSavedValues] = useState(null);
@@ -26,6 +29,9 @@ const QuotationsDetailsModel = () => {
 
   const [ quotationContents, setQuotationContents ] = useState([]);
   const [ quotationHeaders, setQuotationHeaders ] = useState([]);
+
+  const [editedContentValues, setEditedContentValues] = useState([]);
+  const [savedContentValues, setSavedContentValues] = useState(null);
 
   // --- Funtions for Editing ---------------------------------
   const handleCheckEditState = useCallback((name) => {
@@ -70,6 +76,32 @@ const QuotationsDetailsModel = () => {
     delete tempEdited[name];
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, selectedQuotation]);
+
+  // --- Funtions for Content Editing ---------------------------------
+  const handleCheckContentEditState = useCallback((no, name) => {
+    return editedContentValues.at(no) !== null && name in editedContentValues.at(no);
+  }, [editedValues]);
+
+  const handleContentStartEdit = useCallback((no, name) => {
+    const tempEdited = {
+      ...editedContentValues.at(no),
+      [name]: selectedQuotation.quotation_contents[no][name],
+    };
+    const tempContents =[
+      ...selectedQuotation.quotation_contents.slice(0, no),
+      tempEdited,
+      ...selectedQuotation.quotation_contents.slice(no + 1, ),
+    ];
+    setEditedContentValues(tempContents);
+  }, [editedValues, selectedQuotation]);
+
+  const handleContentEditing = useCallback((e) => {
+    const tempEdited = {
+      ...editedValues,
+      [e.target.name]: e.target.value,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues]);
 
   // --- Funtions for Saving ---------------------------------
   const handleCheckSaved = useCallback((name) => {
@@ -239,15 +271,15 @@ const QuotationsDetailsModel = () => {
               <div className="card-body">
                 <div className="row">
                   <div className="col">
-                    <span>Quotation Status</span>
+                    <span>{t('quotation.quotation')} {t('common.status')}</span>
                     <p>{selectedQuotation.status}</p>
                   </div>
                   <div className="col">
-                    <span>Name</span>
+                    <span>{t('common.name')}</span>
                     <p>{selectedQuotation.lead_name}</p>
                   </div>
                   <div className="col">
-                    <span>Quotation owner</span>
+                    <span>{t('quotation.quotation_owner')}</span>
                     <p>{selectedQuotation.sales_representative}</p>
                   </div>
                 </div>
@@ -269,7 +301,7 @@ const QuotationsDetailsModel = () => {
                             to="#quotation-details"
                             data-bs-toggle="tab"
                           >
-                            Details
+                            {t('common.details')}
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -278,7 +310,7 @@ const QuotationsDetailsModel = () => {
                             to="#quotation-products"
                             data-bs-toggle="tab"
                           >
-                            Product Lists
+                            {t('quotation.product_lists')}
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -287,7 +319,7 @@ const QuotationsDetailsModel = () => {
                             to="#quotation-pdf-view"
                             data-bs-toggle="tab"
                           >
-                            View
+                            {t('common.view')}
                           </Link>
                         </li>
                       </ul>
@@ -297,14 +329,14 @@ const QuotationsDetailsModel = () => {
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
                               <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                                <Panel header="Quotation Main Information" key="1">
+                                <Panel header={t('quotation.quotation_main_information')} key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedQuotation.quotation_type}
                                         saved={savedValues}
                                         name="quotation_type"
-                                        title="Quotation Type"
+                                        title={t('quotation.quotation_type')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -317,7 +349,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.quotation_title}
                                         saved={savedValues}
                                         name="quotation_title"
-                                        title="Quotation Title"
+                                        title={t('quotation.quotation')+' '+t('common.title')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -329,7 +361,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.quotation_number}
                                         saved={savedValues}
                                         name="quotation_number"
-                                        title="Document No"
+                                        title={t('quotation.doc_no')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -341,7 +373,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.quotation_manager}
                                         saved={savedValues}
                                         name="quotation_manager"
-                                        title="Manager"
+                                        title={t('quotation.quotation_manager')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -353,7 +385,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.quotation_send_type}
                                         saved={savedValues}
                                         name="quotation_send_type"
-                                        title="Send Type"
+                                        title={t('quotation.send_type')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -364,7 +396,7 @@ const QuotationsDetailsModel = () => {
                                       <DetailDateItem
                                         saved={savedValues}
                                         name="quotation_date"
-                                        title="Quotation Date"
+                                        title={t('quotation.quotation_date')}
                                         orgTimeData={orgQuotationDate}
                                         timeData={quotationDate}
                                         timeDataChange={handleQuotationDateChange}
@@ -378,7 +410,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.quotation_expiration_date}
                                         saved={savedValues}
                                         name="quotation_expiration_date"
-                                        title="Expriy Date"
+                                        title={t('quotation.expiry_date')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -389,7 +421,7 @@ const QuotationsDetailsModel = () => {
                                       <DetailDateItem
                                         saved={savedValues}
                                         name="comfirm_date"
-                                        title="Confirm Date"
+                                        title={t('quotation.confirm_date')}
                                         orgTimeData={orgConfirmDate}
                                         timeData={confirmDate}
                                         timeDataChange={handleConfirmDateChange}
@@ -403,7 +435,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.delivery_location}
                                         saved={savedValues}
                                         name="delivery_location"
-                                        title="Delivery Location"
+                                        title={t('quotation.delivery_location')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -415,7 +447,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.delivery_period}
                                         saved={savedValues}
                                         name="delivery_period"
-                                        title="Delivery Period"
+                                        title={t('quotation.delivery_period')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -427,7 +459,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.warranty_period}
                                         saved={savedValues}
                                         name="warranty_period"
-                                        title="Warranty Period"
+                                        title={t('quotation.warranty')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -439,7 +471,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.sales_representative}
                                         saved={savedValues}
                                         name="sales_representati"
-                                        title="Sales Representative"
+                                        title={t('quotation.sales_rep')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -455,14 +487,14 @@ const QuotationsDetailsModel = () => {
                             </div>
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Quotation Price Information" key="1">
+                                <Panel header={t('quotation.quotation_price_information')} key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedQuotation.payment_type}
                                         saved={savedValues}
                                         name="payment_type"
-                                        title="Payment Type"
+                                        title={t('quotation.payment_type')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -475,7 +507,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.currency}
                                         saved={savedValues}
                                         name="currency"
-                                        title="Currency"
+                                        title={t('common.currency')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -487,7 +519,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.list_price}
                                         saved={savedValues}
                                         name="list_price"
-                                        title="List Price"
+                                        title={t('quotation.list_price')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -499,7 +531,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.list_price_dc}
                                         saved={savedValues}
                                         name="list_price_dc"
-                                        title="List Price DC"
+                                        title={t('quotation.list_price_dc')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -511,7 +543,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.sub_total_amount}
                                         saved={savedValues}
                                         name="sub_total_amount"
-                                        title="Sub Total Amount"
+                                        title={t('quotation.sub_total_amount')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -523,7 +555,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.dc_rate}
                                         saved={savedValues}
                                         name="dc_rate"
-                                        title="DC Rate"
+                                        title={t('quotation.dc_rate')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -535,7 +567,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.quotation_amount}
                                         saved={savedValues}
                                         name="quotation_amount"
-                                        title="Quotation Amount"
+                                        title={t('quotation.quotation_amount')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -547,7 +579,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.tax_amount}
                                         saved={savedValues}
                                         name="tax_amount"
-                                        title="Tax Amount"
+                                        title={t('quotation.tax_amount')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -559,7 +591,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.cutoff_amount}
                                         saved={savedValues}
                                         name="cutoff_amount"
-                                        title="Cut-Off Amount"
+                                        title={t('quotation.cutoff_amount')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -571,7 +603,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.total_quotation_amount}
                                         saved={savedValues}
                                         name="total_quotation_amount"
-                                        title="Total Quotation Amount"
+                                        title={t('quotation.total_quotation_amount')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -583,7 +615,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.total_cost_price}
                                         saved={savedValues}
                                         name="total_cost_price"
-                                        title="Total Cost Amount"
+                                        title={t('quotation.total_quotation_amount')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -595,7 +627,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.profit}
                                         saved={savedValues}
                                         name="profit"
-                                        title="Profit"
+                                        title={t('quotation.profit_amount')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -607,7 +639,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.profit_rate}
                                         saved={savedValues}
                                         name="profit_rate"
-                                        title="Profit Rate"
+                                        title={t('quotation.profit_rate')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -615,11 +647,12 @@ const QuotationsDetailsModel = () => {
                                         checkSaved={handleCheckSaved}
                                         cancelSaved={handleCancelSaved}
                                       />
-                                      <DetailLabelItem
+                                      <DetailTextareaItem
                                         defaultText={selectedQuotation.upper_memo}
                                         saved={savedValues}
                                         name="upper_memo"
-                                        title="Upper Memo"
+                                        title={t('quotation.upper_memo')}
+                                        row_no='3'
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -627,11 +660,12 @@ const QuotationsDetailsModel = () => {
                                         checkSaved={handleCheckSaved}
                                         cancelSaved={handleCancelSaved}
                                       />
-                                      <DetailLabelItem
+                                      <DetailTextareaItem
                                         defaultText={selectedQuotation.lower_memo}
                                         saved={savedValues}
                                         name="lower_memo"
-                                        title="Lower Memo"
+                                        title={t('quotation.lower_memo')}
+                                        row_no='5'
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -647,14 +681,14 @@ const QuotationsDetailsModel = () => {
                             </div>
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Lead Information" key="1">
+                                <Panel header={t('lead.lead') + ' ' + t('common.information')} key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedQuotation.lead_name}
                                         saved={savedValues}
                                         name="lead_name"
-                                        title="Lead Name"
+                                        title={t('lead.lead_name')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -667,7 +701,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.department}
                                         saved={savedValues}
                                         name="department"
-                                        title="Department"
+                                        title={t('lead.department')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -679,7 +713,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.position}
                                         saved={savedValues}
                                         name="position"
-                                        title="Position"
+                                        title={t('lead.position')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -691,7 +725,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.mobile_number}
                                         saved={savedValues}
                                         name="mobile_number"
-                                        title="Mobile"
+                                        title={t('lead.mobile')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -703,7 +737,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.phone_number}
                                         saved={savedValues}
                                         name="phone_number"
-                                        title="Phone"
+                                        title={t('common.phone')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -727,7 +761,7 @@ const QuotationsDetailsModel = () => {
                                         defaultText={selectedQuotation.email}
                                         saved={savedValues}
                                         name="email"
-                                        title="Email"
+                                        title={t('lead.email')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -743,14 +777,14 @@ const QuotationsDetailsModel = () => {
                             </div>
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Company Information" key="1">
+                                <Panel header={t('company.company') + ' ' + t('common.information')} key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedQuotation.company_name}
                                         saved={savedValues}
                                         name="company_name"
-                                        title="Organization"
+                                        title={t('company.company_name')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -766,14 +800,14 @@ const QuotationsDetailsModel = () => {
                             </div>
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Status Information" key="1">
+                                <Panel header={t('common.status') + ' ' + t('common.information')} key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedQuotation.status}
                                         saved={savedValues}
                                         name="status"
-                                        title="Status"
+                                        title={t('common.status')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -795,46 +829,48 @@ const QuotationsDetailsModel = () => {
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
                             { quotationContents && quotationContents.length > 0 && 
-                                quotationContents.map((content, index1) => 
-                                  <Collapse key={index1} accordion expandIconPosition="end">
-                                    <Panel header={"No." + content["1"]} key={index1}>
-                                      <table className="table">
-                                        <tbody>
-                                          { content['2'] && 
-                                            <tr key={1}>
-                                              <td className="border-0">분류</td>
-                                              <td className="border-0">{content['2']}</td>
-                                            </tr>
-                                          }
-                                          { index1 === 2 && (
-                                            content['2'] ?
-                                              <tr key={2}>
-                                                <td>제조회사</td>
-                                                <td>{content['3']}</td>
-                                              </tr> :
-                                              <tr key={2}>
-                                                <td className="border-0">제조회사</td>
-                                                <td className="border-0">{content['3']}</td>
-                                              </tr> )
-                                          }
-                                          { quotationHeaders.map((value, index2) => (
-                                            value.at(0) !== "1" && value.at(0) !== "2" && 
-                                              <tr key={index2}>
-                                                <td>{value.at(1)}</td>
-                                                <td>{content[value.at(0)]}</td>
+                                quotationContents.map((content, index1) => {
+                                  if(content['1'] === null || content['1'] === 'null') return;
+                                  return (
+                                    <Collapse key={index1} accordion expandIconPosition="end">
+                                      <Panel header={"No." + content["1"]} key={index1}>
+                                        <table className="table">
+                                          <tbody>
+                                            { content['2'] && 
+                                              <tr key={1}>
+                                                <td className="border-0">분류</td>
+                                                <td className="border-0">{content['2']}</td>
                                               </tr>
-                                          ))}
-                                          { content['998'] && 
-                                            <tr key={998}>
-                                              <td className="border-0">Comment</td>
-                                              <td className="border-0">{content['998']}</td>
-                                            </tr>
-                                          }
-                                        </tbody>
-                                      </table>
-                                    </Panel>
-                                  </Collapse>
-                            )}
+                                            }
+                                            { index1 === 2 && (
+                                              content['2'] ?
+                                                <tr key={2}>
+                                                  <td>제조회사</td>
+                                                  <td>{content['3']}</td>
+                                                </tr> :
+                                                <tr key={2}>
+                                                  <td className="border-0">제조회사</td>
+                                                  <td className="border-0">{content['3']}</td>
+                                                </tr> )
+                                            }
+                                            { quotationHeaders.map((value, index2) => (
+                                              value.at(0) !== "1" && value.at(0) !== "2" && 
+                                                <tr key={index2}>
+                                                  <td>{value.at(1)}</td>
+                                                  <td>{content[value.at(0)]}</td>
+                                                </tr>
+                                            ))}
+                                            { content['998'] && 
+                                              <tr key={998}>
+                                                <td className="border-0">Comment</td>
+                                                <td className="border-0">{content['998']}</td>
+                                              </tr>
+                                            }
+                                          </tbody>
+                                        </table>
+                                      </Panel>
+                                    </Collapse>
+                              )})}
                             </div>
                           </div>
                         </div>

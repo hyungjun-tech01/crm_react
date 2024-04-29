@@ -11,10 +11,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { AddBoxOutlined, ModeEdit, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
 
-import { QuotationRepo, QuotationTypes, QuotationSendTypes } from "../../repository/quotation";
+import { QuotationRepo, QuotationSendTypes } from "../../repository/quotation";
 import { atomAllCompanies, atomAllLeads, defaultQuotation } from "../../atoms/atoms";
 import { ConverTextAmount, formateDate } from "../../constants/functions";
-import "./quotation.style.css";
 
 const default_quotation_content = {
   '1': null, '2': null, '3': null, '4': null, '5': null,
@@ -78,8 +77,13 @@ const QuotationAddNewModal = (props) => {
     ['15', t('quotation.quotation_unit_price')],
     ['16', t('quotation.quotation_amount')],
     ['17', t('quotation.raw_price')],
-    ['18', t('quotation.profile_amount')],
+    ['18', t('quotation.profit_amount')],
     ['19', t('quotation.note')],
+  ];
+
+  const QuotationTypes = [
+    { value: 'quotation', label: t('quotation.quotation')},
+    { value: 'order', label: t('quotation.order')},
   ];
 
   const ConvertHeaderInfosToString = (data) => {

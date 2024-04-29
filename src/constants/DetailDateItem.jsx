@@ -14,12 +14,12 @@ const DetailDateItem = (props) => {
 
     if(checkEdit(name)) {
         return (
-            <tr>
-                <td className={no_border && "border-0"}>{title}</td>
+            <tr className='detail-tr'>
+                <td className={"detail-td-left" + (no_border && " border-0")}>{title}</td>
                 <td className={no_border && "border-0"} >
                     { selectTime ? 
                         <DatePicker
-                            className="form-control"
+                            className="detail-edit-datepicker"
                             selected={ timeData }
                             onChange={ timeDataChange }
                             dateFormat="yyyy-MM-dd hh:mm:ss"
@@ -27,14 +27,14 @@ const DetailDateItem = (props) => {
                         />
                         :
                         <DatePicker
-                            className="form-control"
+                            className="detail-edit-datepicker"
                             selected={ timeData }
                             onChange={ timeDataChange }
                             dateFormat="yyyy-MM-dd"
                         />
                     }
                 </td>
-                <td className={no_border && "border-0"}>
+                <td className={"detail-td-right" + (no_border && " border-0")}>
                     <div onClick={() => { endEdit(); }}>
                         <SaveAlt />
                     </div>
@@ -44,12 +44,12 @@ const DetailDateItem = (props) => {
     };
     if(checkSaved(name)) {
         return (
-            <tr>
-                <td className={no_border && "border-0"}>{title}</td>
+            <tr className='detail-tr'>
+                <td className={"detail-td-left" + (no_border && " border-0")}>{title}</td>
                 <td className={no_border && "border-0"}>
                     { saved[name] && (new Date(saved[name])).toLocaleDateString('ko-KR', options) }
                 </td>
-                <td className={no_border && "border-0"}>
+                <td className={"detail-td-right" + (no_border && " border-0")}>
                     <div onClick={() => { cancelSaved(name); }}>
                         <Cancel />
                     </div>
@@ -59,12 +59,12 @@ const DetailDateItem = (props) => {
     };
 
     return (
-        <tr>
-            <td className={no_border && "border-0"}>{title}</td>
+        <tr className='detail-tr'>
+            <td className={"detail-td-left" + (no_border && " border-0")}>{title}</td>
             <td className={no_border && "border-0"}>
                 {orgTimeData && orgTimeData !=='' && (new Date(orgTimeData)).toLocaleDateString('ko-KR', options)}
             </td>
-            <td className={no_border && "border-0"}>
+            <td className={"detail-td-right" + (no_border && " border-0")}>
                 <div onClick={() => { startEdit(name); }}>
                     <Edit />
                 </div>

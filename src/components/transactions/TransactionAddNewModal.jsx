@@ -14,7 +14,6 @@ import { LeadRepo } from "../../repository/lead";
 import { TransactionRepo } from "../../repository/transaction";
 import { atomAllCompanies, atomAllLeads, defaultTransaction } from "../../atoms/atoms";
 import { ConverTextAmount, formateDate } from "../../constants/functions";
-import "./transaction.style.css";
 
 const default_transaction_content = {
   "transaction_code": null,
