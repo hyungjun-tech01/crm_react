@@ -78,11 +78,15 @@ const QuotationsDetailsModel = () => {
   }, [editedValues, savedValues, selectedQuotation]);
 
   // --- Funtions for Content Editing ---------------------------------
-  const handleCheckContentEditState = useCallback((no, name) => {
+  const handleCheckContentEditState = useCallback((input) => {
+    const splitted_input = input.split('.');
+    const [name, no] = splitted_input;
     return editedContentValues.at(no) !== null && name in editedContentValues.at(no);
-  }, [editedValues]);
+  }, [editedContentValues]);
 
-  const handleContentStartEdit = useCallback((no, name) => {
+  const handleStartContentEdit = useCallback((input) => {
+    const splitted_input = input.split('.');
+    const [name, no] = splitted_input;
     const tempEdited = {
       ...editedContentValues.at(no),
       [name]: selectedQuotation.quotation_contents[no][name],
@@ -93,15 +97,62 @@ const QuotationsDetailsModel = () => {
       ...selectedQuotation.quotation_contents.slice(no + 1, ),
     ];
     setEditedContentValues(tempContents);
-  }, [editedValues, selectedQuotation]);
+  }, [editedContentValues, selectedQuotation]);
 
   const handleContentEditing = useCallback((e) => {
+    const splitted = e.target.name.splitted('.');
+    const [name, no] = splitted;
     const tempEdited = {
-      ...editedValues,
-      [e.target.name]: e.target.value,
+      ...editedContentValues.at(no),
+      [name]: e.target.value,
     };
-    setEditedValues(tempEdited);
-  }, [editedValues]);
+    const tempContents =[
+      ...selectedQuotation.quotation_contents.slice(0, no),
+      tempEdited,
+      ...selectedQuotation.quotation_contents.slice(no + 1, ),
+    ];
+    setEditedContentValues(tempContents);
+  }, [editedContentValues]);
+
+  const handleEndContentEdit = useCallback((input) => {
+    const splitted = input.split('.');
+    const [name, no] = splitted;
+    if (editedContentValues[no][name] === selectedQuotation.quotation_contents[no]) {
+      const tempEdited = {
+        ...editedContentValues.at(no),
+      };
+      delete tempEdited[name];
+      const tempContents =[
+        ...selectedQuotation.quotation_contents.slice(0, no),
+        tempEdited,
+        ...selectedQuotation.quotation_contents.slice(no + 1, ),
+      ];
+      setEditedContentValues(tempContents);
+      return;
+    }
+
+    const tempSaved = {
+      ...savedContentValues.at(no),
+      [name]: editedContentValues[no][name],
+    };
+    const tempSavedContents =[
+      ...selectedQuotation.quotation_contents.slice(0, no),
+      tempSaved,
+      ...selectedQuotation.quotation_contents.slice(no + 1, ),
+    ];
+    setSavedContentValues(tempSavedContents);
+
+    const tempEdited = {
+      ...editedContentValues.at(no),
+    };
+    delete tempEdited[name];
+    const tempContents =[
+      ...selectedQuotation.quotation_contents.slice(0, no),
+      tempEdited,
+      ...selectedQuotation.quotation_contents.slice(no + 1, ),
+    ];
+    setEditedContentValues(tempContents);
+  }, [editedContentValues, savedContentValues, selectedQuotation]);
 
   // --- Funtions for Saving ---------------------------------
   const handleCheckSaved = useCallback((name) => {
@@ -149,6 +200,29 @@ const QuotationsDetailsModel = () => {
     setEditedValues(null);
     setSavedValues(null);
   }, []);
+
+  // --- Funtions for Content Saving ---------------------------------
+  const handleCheckContentSaved = useCallback((input) => {
+    const splitted = input.split('.');
+    const [name, no] =  splitted;
+    return savedContentValues.length > no && name in savedContentValues.at(no);
+  }, [savedContentValues]);
+
+  const handleCancelContentSaved = useCallback((input) => {
+    const splitted = input.split('.');
+    const [name, no] =  splitted;
+    const tempSaved = {
+      ...savedContentValues.at(no),
+    };
+    delete tempSaved[name];
+
+    const tempContentSaved = [
+      ...selectedQuotation.quotation_contents.slice(0, no),
+      tempSaved,
+      ...selectedQuotation.quotation_contents.slice(no + 1, ),
+    ];
+    setSavedContentValues(tempContentSaved);
+  }, [savedContentValues, selectedQuotation]);
 
   // --- Funtions for Quotation Date ---------------------------------
   const handleStartQuotationDateEdit = useCallback(() => {
@@ -837,22 +911,56 @@ const QuotationsDetailsModel = () => {
                                         <table className="table">
                                           <tbody>
                                             { content['2'] && 
-                                              <tr key={1}>
-                                                <td className="border-0">분류</td>
-                                                <td className="border-0">{content['2']}</td>
-                                              </tr>
+                                              // <tr key={1}>
+                                              //   <td className="border-0">{t('common.category')}</td>
+                                              //   <td className="border-0">{content['2']}</td>
+                                              // </tr>
+                                              <DetailLabelItem
+                                                key={1}
+                                                defaultText={content['2']}
+                                                saved={savedContentValues}
+                                                name={"category." + index1}
+                                                title={t('common.category')}
+                                                no_border={true}
+                                                checkEdit={handleCheckContentEditState}
+                                                startEdit={handleStartContentEdit}
+                                                endEdit={handleEndContentEdit}
+                                                editing={handleContentEditing}
+                                                checkSaved={handleCheckContentSaved}
+                                                cancelSaved={handleCancelContentSaved}
+                                              />
                                             }
                                             { index1 === 2 && (
                                               content['2'] ?
-                                                <tr key={2}>
-                                                  <td>제조회사</td>
-                                                  <td>{content['3']}</td>
-                                                </tr> :
-                                                <tr key={2}>
-                                                  <td className="border-0">제조회사</td>
-                                                  <td className="border-0">{content['3']}</td>
-                                                </tr> )
-                                            }
+                                                <DetailLabelItem
+                                                  key={2}
+                                                  defaultText={content['3']}
+                                                  saved={savedContentValues}
+                                                  name={"maker." + index1}
+                                                  title={t('common.maker')}
+                                                  checkEdit={handleCheckContentEditState}
+                                                  startEdit={handleStartContentEdit}
+                                                  endEdit={handleEndContentEdit}
+                                                  editing={handleContentEditing}
+                                                  checkSaved={handleCheckContentSaved}
+                                                  cancelSaved={handleCancelContentSaved}
+                                                />
+                                                :
+                                                <DetailLabelItem
+                                                  key={2}
+                                                  defaultText={content['3']}
+                                                  saved={savedContentValues}
+                                                  name={"maker." + index1}
+                                                  title={t('common.maker')}
+                                                  no_border={true}
+                                                  checkEdit={handleCheckContentEditState}
+                                                  startEdit={handleStartContentEdit}
+                                                  endEdit={handleEndContentEdit}
+                                                  editing={handleContentEditing}
+                                                  checkSaved={handleCheckContentSaved}
+                                                  cancelSaved={handleCancelContentSaved}
+                                                />
+                                            )}
                                             { quotationHeaders.map((value, index2) => (
                                               value.at(0) !== "1" && value.at(0) !== "2" && 
                                                 <tr key={index2}>
