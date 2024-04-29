@@ -12,6 +12,7 @@ const enResource = {
             company:'Company',
             new_company:'New Company',
             company_name:'Company Name',
+            eng_company_name:'English Company Name',
             phone:'Phone',
             address:'Address',
             salesman:'SalesMan',

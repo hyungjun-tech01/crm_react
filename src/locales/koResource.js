@@ -12,6 +12,7 @@ const koResource = {
             company:'회사',
             new_company:'회사 등록',
             company_name:'회사명',
+            eng_company_name:'영문회사명',
             phone:'전화번호',
             address:'주소',
             salesman:'영업사원',

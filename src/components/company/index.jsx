@@ -528,23 +528,23 @@ const Company = () => {
                         </div> */}
                         <div className="col-sm-6">
                           <label className="col-form-label">
-                            Organization Name
+                            {t('company.company_name')}
                             <span className="text-danger">*</span>
                           </label>
                           <input
                             className="form-control"
                             type="text"
-                            placeholder="Organization Name"
+                            placeholder={t('company.company_name')}
                             name="company_name"
                             onChange={handleCompanyChange}
                           />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">English Name</label>
+                          <label className="col-form-label">{t('company.eng_company_name')}</label>
                           <input
                             type="text"
                             className="form-control"
-                            placeholder="English Name"
+                            placeholder={t('company.eng_company_name')}
                             name="company_name_eng"
                             onChange={handleCompanyChange}
                           />

@@ -352,7 +352,7 @@ const Purchase = () => {
                 <li className="breadcrumb-item">
                   <Link to="/">Dashboard</Link>
                 </li>
-                <li className="breadcrumb-item active">Purchase</li>
+                <li className="breadcrumb-item active">{t('purchase.purchase')}</li>
               </ul>
             </div>
           </div>

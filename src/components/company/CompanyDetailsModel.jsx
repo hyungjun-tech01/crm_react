@@ -14,6 +14,7 @@ import { PurchaseRepo } from "../../repository/purchase";
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailDateItem from "../../constants/DetailDateItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
+import { useTranslation } from "react-i18next";
 
 const CompanyDetailsModel = () => {
   const { Panel } = Collapse;
@@ -43,6 +44,8 @@ const CompanyDetailsModel = () => {
   const [ quotationByCompany, setQuotationByCompany] = useState([]);
   const [ transactionByCompany, setTransactionByCompany] = useState([]);
   const [ purchaseByCompany, setPurchaseByCompany] = useState([]);
+
+  const { t } = useTranslation();
 
   // --- Funtions for Editing ---------------------------------
   const handleCheckEditState = useCallback((name) => {
@@ -399,7 +402,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.company_name}
                                   saved={savedValues}
                                   name="company_name"
-                                  title="Name"
+                                  title={t('company.company_name')}
                                   no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
@@ -412,7 +415,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.company_name_eng}
                                   saved={savedValues}
                                   name="company_name_eng"
-                                  title="English Name"
+                                  title={t('company.eng_company_name')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
