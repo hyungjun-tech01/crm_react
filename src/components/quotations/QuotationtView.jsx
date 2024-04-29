@@ -428,7 +428,7 @@ const QuotationView = () => {
                                     </View>
                                 }
                             </View>
-                            <View style={{width:'100%',height:40,margin:0,padding:0,borderTop:1,flexDirection:'row',flexGrow:0}}>
+                            <View style={{width:'100%',height:25,margin:0,padding:0,borderTop:1,flexDirection:'row',flexGrow:0}}>
                                 <View style={{height:'100%',margin:0,padding:0,borderRight:1,flexGrow:1}}>
                                     <Text style={Styles.text}>{}</Text>
                                 </View>
@@ -447,6 +447,11 @@ const QuotationView = () => {
                                         )
                                     }
                                 )}
+                            </View>
+                            <View style={{width:'100%',height:25,margin:0,padding:0,borderTop:1,flexDirection:'row',flexGrow:0}}>
+                                <View style={{height:'100%',margin:0,padding:0,borderRight:1,flexGrow:1}}>
+                                    <Text style={Styles.text}>{currentQuotation.lower_memo}</Text>
+                                </View>
                             </View>
                         </View>
                     </View>

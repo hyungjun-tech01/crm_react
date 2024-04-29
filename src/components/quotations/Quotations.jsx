@@ -55,7 +55,7 @@ const Quotations = () => {
       sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
     {
-      title: t('quotation.type'),
+      title: t('quotation.quotation_type'),
       dataIndex: "quotation_type",
       render: (text, record) => (
         <>
@@ -73,7 +73,7 @@ const Quotations = () => {
       sorter: (a, b) => compareText(a.quotation_type, b.quotation_type),
     },
     {
-      title: t('quotation.title'),
+      title: t('common.title'),
       dataIndex: "quotation_title",
       render: (text, record) => (
         <>
@@ -91,7 +91,7 @@ const Quotations = () => {
       sorter: (a, b) => compareText(a.quotation_title, b.quotation_title),
     },
     {
-      title: t('quotation.date'),
+      title: t('quotation.quotation_date'),
       dataIndex: "quotation_date",
       render: (text, record) => (
         <>
@@ -133,7 +133,7 @@ const Quotations = () => {
       sorter: (a, b) => compareText(a.mobile_number, b.mobile_number),
     },
     {
-      title: t('company.phone'),
+      title: t('common.phone'),
       dataIndex: "phone_number",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.phone_number, b.phone_number),
@@ -257,7 +257,7 @@ const Quotations = () => {
                       data-bs-target="#add_quotation"
                       onClick={handleAddNewQuotation}
                     >
-                      {t('quotation.add_quotation')}
+                      {t('quotation.add_new_quotation')}
                     </button>
                   </li>
                 </ul>

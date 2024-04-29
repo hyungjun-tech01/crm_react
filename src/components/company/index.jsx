@@ -119,7 +119,7 @@ const Company = () => {
       sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
     {
-      title: t('company.phone'),
+      title: t('common.phone'),
       dataIndex: "company_phone_number",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.company_phone_number, b.company_phone_number),

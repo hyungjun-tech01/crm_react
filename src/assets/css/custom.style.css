@@ -1,0 +1,116 @@
+.h4-price {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+}
+.edit-content {
+    position: absolute;
+    top: 15%;
+    right: 12%;
+    z-index: 1000;
+    display: block;
+    min-width: 12rem;
+    padding: 0 0 0.5rem 0;
+    margin-top: 0.125rem;
+    font-size: 1rem;
+    color: #212529;
+    align-items: center;
+    text-align: left;
+    list-style: none;
+    background-color: #f2eaf0;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.25rem;
+}
+.edit-content-header {
+    padding: 0.5rem 0.75rem;
+    margin: 0;
+    background-color: #d2bccc;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: 'row' !important;
+}
+.edit-content-footer{
+    padding: 0.5rem 0;
+    justify-content: center;
+    text-align: center !important;
+}
+.edit-content-close {
+	color: #000;
+    box-sizing: content-box;
+    width: 1em;
+    height: 1em;
+    padding: 0.25em;
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+    border: 0;
+    border-radius: 0.25rem;
+    opacity: 0.5;
+}
+.detail-tr {
+    width: '100%';
+    margin: 0;
+    padding: 0;
+}
+.detail-td-left {
+    width: 25%;
+}
+/* .detail-td-center {
+    margin: 0;
+    padding: 0;
+    border: 1 solid black;
+} */
+.detail-td-right {
+    width: 50px;
+}
+.detail-edit-label {
+    display: block;
+    width: 100%;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 400;
+    line-height: 1.5;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 1px solid cornflowerblue;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    background-color:blanchedalmond;
+}
+.detail-edit-textarea {
+    display: block;
+    width: 100%;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color:blanchedalmond;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.detail-edit-datepicker {
+    display: block;
+    width: 100%;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color:blanchedalmond;
+    background-clip: padding-box;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 1px solid cornflowerblue;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
