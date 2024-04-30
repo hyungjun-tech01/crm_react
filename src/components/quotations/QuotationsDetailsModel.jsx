@@ -30,7 +30,7 @@ const QuotationsDetailsModel = () => {
   const [ quotationContents, setQuotationContents ] = useState([]);
   const [ quotationHeaders, setQuotationHeaders ] = useState([]);
 
-  const [editedContentValues, setEditedContentValues] = useState([]);
+  const [editedContentValues, setEditedContentValues] = useState(null);
   const [savedContentValues, setSavedContentValues] = useState(null);
 
   // --- Funtions for Editing ---------------------------------
@@ -77,83 +77,6 @@ const QuotationsDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, selectedQuotation]);
 
-  // --- Funtions for Content Editing ---------------------------------
-  const handleCheckContentEditState = useCallback((input) => {
-    const splitted_input = input.split('.');
-    const [name, no] = splitted_input;
-    return editedContentValues.at(no) !== null && name in editedContentValues.at(no);
-  }, [editedContentValues]);
-
-  const handleStartContentEdit = useCallback((input) => {
-    const splitted_input = input.split('.');
-    const [name, no] = splitted_input;
-    const tempEdited = {
-      ...editedContentValues.at(no),
-      [name]: selectedQuotation.quotation_contents[no][name],
-    };
-    const tempContents =[
-      ...selectedQuotation.quotation_contents.slice(0, no),
-      tempEdited,
-      ...selectedQuotation.quotation_contents.slice(no + 1, ),
-    ];
-    setEditedContentValues(tempContents);
-  }, [editedContentValues, selectedQuotation]);
-
-  const handleContentEditing = useCallback((e) => {
-    const splitted = e.target.name.splitted('.');
-    const [name, no] = splitted;
-    const tempEdited = {
-      ...editedContentValues.at(no),
-      [name]: e.target.value,
-    };
-    const tempContents =[
-      ...selectedQuotation.quotation_contents.slice(0, no),
-      tempEdited,
-      ...selectedQuotation.quotation_contents.slice(no + 1, ),
-    ];
-    setEditedContentValues(tempContents);
-  }, [editedContentValues]);
-
-  const handleEndContentEdit = useCallback((input) => {
-    const splitted = input.split('.');
-    const [name, no] = splitted;
-    if (editedContentValues[no][name] === selectedQuotation.quotation_contents[no]) {
-      const tempEdited = {
-        ...editedContentValues.at(no),
-      };
-      delete tempEdited[name];
-      const tempContents =[
-        ...selectedQuotation.quotation_contents.slice(0, no),
-        tempEdited,
-        ...selectedQuotation.quotation_contents.slice(no + 1, ),
-      ];
-      setEditedContentValues(tempContents);
-      return;
-    }
-
-    const tempSaved = {
-      ...savedContentValues.at(no),
-      [name]: editedContentValues[no][name],
-    };
-    const tempSavedContents =[
-      ...selectedQuotation.quotation_contents.slice(0, no),
-      tempSaved,
-      ...selectedQuotation.quotation_contents.slice(no + 1, ),
-    ];
-    setSavedContentValues(tempSavedContents);
-
-    const tempEdited = {
-      ...editedContentValues.at(no),
-    };
-    delete tempEdited[name];
-    const tempContents =[
-      ...selectedQuotation.quotation_contents.slice(0, no),
-      tempEdited,
-      ...selectedQuotation.quotation_contents.slice(no + 1, ),
-    ];
-    setEditedContentValues(tempContents);
-  }, [editedContentValues, savedContentValues, selectedQuotation]);
-
   // --- Funtions for Saving ---------------------------------
   const handleCheckSaved = useCallback((name) => {
     return savedValues !== null && name in savedValues;
@@ -177,7 +100,7 @@ const QuotationsDetailsModel = () => {
         ...savedValues,
         action_type: "UPDATE",
         modify_user: cookies.myLationCrmUserId,
-        Quotation_code: selectedQuotation.Quotation_code,
+        quotation_code: selectedQuotation.quotation_code,
       };
       if (modifyQuotation(temp_all_saved)) {
         console.log(`Succeeded to modify Quotation`);
@@ -201,28 +124,113 @@ const QuotationsDetailsModel = () => {
     setSavedValues(null);
   }, []);
 
+  // --- Funtions for Content Editing ---------------------------------
+  const handleCheckContentEditState = useCallback((key) => {
+    return editedContentValues !== null && key in editedContentValues;
+  }, [editedContentValues]);
+
+  const handleStartContentEdit = useCallback((input) => {
+    const splitted = input.split('.');
+    const [index, key] = splitted;
+    const tempEdited = {
+      ...editedContentValues,
+      [input]: quotationContents[index][key],
+    };
+    setEditedContentValues(tempEdited);
+  }, [editedContentValues, quotationContents]);
+
+  const handleContentEditing = useCallback((e) => {
+    const tempEdited = {
+      ...editedContentValues,
+      [e.target.name]: e.target.value,
+    };
+    setEditedContentValues(tempEdited);
+  }, [editedContentValues]);
+
+  const handleEndContentEdit = useCallback((input) => {
+    const splitted = input.split('.');
+    const [index, key] = splitted;
+    if (editedContentValues[input] === quotationContents[index][key])
+    {
+      const tempEdited = {
+        ...editedContentValues,
+      };
+      delete tempEdited[input];
+      setEditedContentValues(tempEdited);
+      return;
+    }
+
+    const tempSaved = {
+      ...savedContentValues,
+      [input]: editedContentValues[input],
+    };
+    setSavedContentValues(tempSaved);
+
+    const tempEdited = {
+      ...editedContentValues,
+    };
+    delete tempEdited[input];
+    setEditedContentValues(tempEdited);
+  }, [editedContentValues, savedContentValues, quotationContents]);
+
   // --- Funtions for Content Saving ---------------------------------
   const handleCheckContentSaved = useCallback((input) => {
-    const splitted = input.split('.');
-    const [name, no] =  splitted;
-    return savedContentValues.length > no && name in savedContentValues.at(no);
+    return savedContentValues !== null && input in savedContentValues;
   }, [savedContentValues]);
 
   const handleCancelContentSaved = useCallback((input) => {
-    const splitted = input.split('.');
-    const [name, no] =  splitted;
     const tempSaved = {
-      ...savedContentValues.at(no),
+      ...savedContentValues,
     };
-    delete tempSaved[name];
-
-    const tempContentSaved = [
-      ...selectedQuotation.quotation_contents.slice(0, no),
-      tempSaved,
-      ...selectedQuotation.quotation_contents.slice(no + 1, ),
-    ];
-    setSavedContentValues(tempContentSaved);
+    delete tempSaved[input];
+    setSavedContentValues(tempSaved);
   }, [savedContentValues, selectedQuotation]);
+
+  const handleSaveContentAll = useCallback(() => {
+    if (
+      savedContentValues !== null &&
+      selectedQuotation &&
+      selectedQuotation !== defaultQuotation
+    ) {
+      let tempContents = [
+        ...quotationContents,
+      ];
+      Object.keys(savedContentValues).forEach(item => {
+        console.log('\thandleSaveContentAll / item - ', item);
+        const [no, index] = item.split('.');
+        tempContents[no][index] = savedContentValues[item];
+      });
+
+      const temp_all_saved = {
+        ...selectedQuotation,
+        quotation_contents: JSON.stringify(quotationContents),
+        action_type: "UPDATE",
+        modify_user: cookies.myLationCrmUserId,
+        quotation_code: selectedQuotation.quotation_code,
+      };
+      if (modifyQuotation(temp_all_saved)) {
+        console.log(`Succeeded to modify Quotation`);
+        setQuotationContents(tempContents);
+      } else {
+        console.error("Failed to modify Quotation");
+      }
+    } else {
+      console.log("[ QuotationDetailModel ] No saved data");
+    }
+    setEditedContentValues(null);
+    setSavedContentValues(null);
+  }, [
+    cookies.myLationCrmUserId,
+    modifyQuotation,
+    savedContentValues,
+    selectedQuotation,
+    quotationContents,
+  ]);
+
+  const handleCancelContentAll = useCallback(() => {
+    setEditedContentValues(null);
+    setSavedContentValues(null);
+  }, []);
 
   // --- Funtions for Quotation Date ---------------------------------
   const handleStartQuotationDateEdit = useCallback(() => {
@@ -896,6 +904,26 @@ const QuotationsDetailsModel = () => {
                               </Collapse>
                             </div>
                           </div>
+                          { savedValues !== null &&
+                            Object.keys(savedValues).length !== 0 && (
+                              <div className="text-center py-3">
+                                <button
+                                  type="button"
+                                  className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                                  onClick={handleSaveAll}
+                                >
+                                  Save
+                                </button>
+                                &nbsp;&nbsp;
+                                <button
+                                  type="button"
+                                  className="btn btn-secondary btn-rounded"
+                                  onClick={handleCancelAll}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                          )}
                         </div>
 {/*---- End   -- Tab : Detail Quotation ------------------------------------------------------------*/}
 {/*---- Start -- Tab : Product Lists - Quotation ---------------------------------------------------*/}
@@ -911,15 +939,11 @@ const QuotationsDetailsModel = () => {
                                         <table className="table">
                                           <tbody>
                                             { content['2'] && 
-                                              // <tr key={1}>
-                                              //   <td className="border-0">{t('common.category')}</td>
-                                              //   <td className="border-0">{content['2']}</td>
-                                              // </tr>
                                               <DetailLabelItem
                                                 key={1}
                                                 defaultText={content['2']}
                                                 saved={savedContentValues}
-                                                name={"category." + index1}
+                                                name={index1 + '.2'}
                                                 title={t('common.category')}
                                                 no_border={true}
                                                 checkEdit={handleCheckContentEditState}
@@ -936,7 +960,7 @@ const QuotationsDetailsModel = () => {
                                                   key={2}
                                                   defaultText={content['3']}
                                                   saved={savedContentValues}
-                                                  name={"maker." + index1}
+                                                  name={index1 + '.3'}
                                                   title={t('common.maker')}
                                                   checkEdit={handleCheckContentEditState}
                                                   startEdit={handleStartContentEdit}
@@ -950,7 +974,7 @@ const QuotationsDetailsModel = () => {
                                                   key={2}
                                                   defaultText={content['3']}
                                                   saved={savedContentValues}
-                                                  name={"maker." + index1}
+                                                  name={index1 + '.3'}
                                                   title={t('common.maker')}
                                                   no_border={true}
                                                   checkEdit={handleCheckContentEditState}
@@ -962,17 +986,37 @@ const QuotationsDetailsModel = () => {
                                                 />
                                             )}
                                             { quotationHeaders.map((value, index2) => (
-                                              value.at(0) !== "1" && value.at(0) !== "2" && 
-                                                <tr key={index2}>
-                                                  <td>{value.at(1)}</td>
-                                                  <td>{content[value.at(0)]}</td>
-                                                </tr>
+                                              value.at(0) !== "1" && value.at(0) !== "2" &&
+                                                <DetailLabelItem
+                                                  key={index2}
+                                                  defaultText={content[value.at(0)]}
+                                                  saved={savedContentValues}
+                                                  name={index1 + '.' + value.at(0)}
+                                                  title={value.at(1)}
+                                                  checkEdit={handleCheckContentEditState}
+                                                  startEdit={handleStartContentEdit}
+                                                  endEdit={handleEndContentEdit}
+                                                  editing={handleContentEditing}
+                                                  checkSaved={handleCheckContentSaved}
+                                                  cancelSaved={handleCancelContentSaved}
+                                                />
                                             ))}
                                             { content['998'] && 
-                                              <tr key={998}>
-                                                <td className="border-0">Comment</td>
-                                                <td className="border-0">{content['998']}</td>
-                                              </tr>
+                                              <DetailTextareaItem
+                                                  key={998}
+                                                  defaultText={content['998']}
+                                                  saved={savedContentValues}
+                                                  name={index1 + '.998'}
+                                                  title='Comment'
+                                                  row_no={5}
+                                                  no_border={true}
+                                                  checkEdit={handleCheckContentEditState}
+                                                  startEdit={handleStartContentEdit}
+                                                  endEdit={handleEndContentEdit}
+                                                  editing={handleContentEditing}
+                                                  checkSaved={handleCheckContentSaved}
+                                                  cancelSaved={handleCancelContentSaved}
+                                                />
                                             }
                                           </tbody>
                                         </table>
@@ -981,6 +1025,26 @@ const QuotationsDetailsModel = () => {
                               )})}
                             </div>
                           </div>
+                          { savedContentValues !== null &&
+                            Object.keys(savedContentValues).length !== 0 && (
+                              <div className="text-center py-3">
+                                <button
+                                  type="button"
+                                  className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                                  onClick={handleSaveContentAll}
+                                >
+                                  Save
+                                </button>
+                                &nbsp;&nbsp;
+                                <button
+                                  type="button"
+                                  className="btn btn-secondary btn-rounded"
+                                  onClick={handleCancelContentAll}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                          )}
                         </div>
 {/*---- End   -- Tab : Product Lists - Quotation ---------------------------------------------------*/}
 {/*---- Start -- Tab : PDF View - Quotation --------------------------------------------------------*/}
@@ -991,26 +1055,6 @@ const QuotationsDetailsModel = () => {
                         </div>
 {/*---- End   -- Tab : PDF View - Quotation---------------------------------------------------------*/}
                       </div>
-                      { savedValues !== null &&
-                        Object.keys(savedValues).length !== 0 && (
-                          <div className="text-center py-3">
-                            <button
-                              type="button"
-                              className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                              onClick={handleSaveAll}
-                            >
-                              Save
-                            </button>
-                            &nbsp;&nbsp;
-                            <button
-                              type="button"
-                              className="btn btn-secondary btn-rounded"
-                              onClick={handleCancelAll}
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        )}
                     </div>
                   </div>
                 </div>

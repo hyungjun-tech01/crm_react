@@ -8,16 +8,16 @@ const koResource = {
             userId:'사용자아이디',
             password:'패스워드',
         },
-          company:{
+        company:{
             company:'회사',
             new_company:'회사 등록',
             company_name:'회사명',
-            
+            eng_company_name:'영문회사명',
             address:'주소',
             salesman:'영업사원',
             engineer:'엔지니어'
         },
-        lead : {
+        lead: {
             lead:'고객',
             lead_name: '고객 이름',
             new_lead:'고객 등록',
