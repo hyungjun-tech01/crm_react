@@ -11,6 +11,7 @@ import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailDateItem from "../../constants/DetailDateItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
 import QuotationView from "./QuotationtView";
+import { AddBoxOutlined, IndeterminateCheckBoxOutlined } from '@mui/icons-material';
 
 const QuotationsDetailsModel = () => {
   const { Panel } = Collapse;
@@ -33,7 +34,7 @@ const QuotationsDetailsModel = () => {
   const [editedContentValues, setEditedContentValues] = useState(null);
   const [savedContentValues, setSavedContentValues] = useState(null);
 
-  // --- Funtions for Editing ---------------------------------
+  // --- Funtions for Editing ----------------------------------------------------------
   const handleCheckEditState = useCallback((name) => {
     return editedValues !== null && name in editedValues;
   }, [editedValues]);
@@ -77,7 +78,7 @@ const QuotationsDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, selectedQuotation]);
 
-  // --- Funtions for Saving ---------------------------------
+  // --- Funtions for Saving -----------------------------------------------------------
   const handleCheckSaved = useCallback((name) => {
     return savedValues !== null && name in savedValues;
   }, [savedValues]);
@@ -124,7 +125,7 @@ const QuotationsDetailsModel = () => {
     setSavedValues(null);
   }, []);
 
-  // --- Funtions for Content Editing ---------------------------------
+  // --- Funtions for Content Editing --------------------------------------------------
   const handleCheckContentEditState = useCallback((key) => {
     return editedContentValues !== null && key in editedContentValues;
   }, [editedContentValues]);
@@ -173,7 +174,7 @@ const QuotationsDetailsModel = () => {
     setEditedContentValues(tempEdited);
   }, [editedContentValues, savedContentValues, quotationContents]);
 
-  // --- Funtions for Content Saving ---------------------------------
+  // --- Funtions for Content Saving ----------------------------------------------------
   const handleCheckContentSaved = useCallback((input) => {
     return savedContentValues !== null && input in savedContentValues;
   }, [savedContentValues]);
@@ -232,7 +233,7 @@ const QuotationsDetailsModel = () => {
     setSavedContentValues(null);
   }, []);
 
-  // --- Funtions for Quotation Date ---------------------------------
+  // --- Funtions for Quotation Date ----------------------------------------------------
   const handleStartQuotationDateEdit = useCallback(() => {
     const tempEdited = {
       ...editedValues,
@@ -258,7 +259,7 @@ const QuotationsDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, orgQuotationDate, quotationDate]);
 
-  // --- Funtions for Confirm Date ---------------------------------
+  // --- Funtions for Confirm Date ------------------------------------------------------
   const handleStartConfirmDateEdit = useCallback(() => {
     const tempEdited = {
       ...editedValues,
@@ -283,6 +284,32 @@ const QuotationsDetailsModel = () => {
     delete tempEdited.comfirm_date;
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, orgConfirmDate, confirmDate]);
+
+  // --- Funtions for Dealing Content ------------------------------------------------------
+  const handleAddContent = useCallback(() => {
+    const content_no = quotationContents.length;
+
+    let tempContent = {};
+    quotationHeaders.forEach((header) => {
+      const edit_index = content_no + '.' + header[0];
+      editedContentValues[edit_index] = null;
+      tempContent[header[0]] = null;
+    });
+    tempContent['1'] = content_no;
+    const tempContents = [
+      ...quotationContents,
+      tempContent
+    ];
+    setQuotationContents(tempContents);
+  }, [quotationHeaders]);
+
+  const handleDeleteConetent = useCallback((index) => {
+    const tempContents = [
+      ...quotationContents.slice(0, index),
+      ...quotationContents.slice(index + 1, ),
+    ];
+    setQuotationContents(tempContents);
+  }, [quotationContents]);
 
   useEffect(() => {
     console.log('[QuotationsDetailsModel] called!');
@@ -935,7 +962,11 @@ const QuotationsDetailsModel = () => {
                                   if(content['1'] === null || content['1'] === 'null') return;
                                   return (
                                     <Collapse key={index1} accordion expandIconPosition="end">
-                                      <Panel header={"No." + content["1"]} key={index1}>
+                                      <Panel header={"No." + content["1"]} key={index1}
+                                        extra={ <IndeterminateCheckBoxOutlined
+                                                  style={{ color: 'gray' }}
+                                                  onClick={()=>{ handleDeleteConetent(index1);}}
+                                                /> } >
                                         <table className="table">
                                           <tbody>
                                             { content['2'] && 
@@ -1022,7 +1053,13 @@ const QuotationsDetailsModel = () => {
                                         </table>
                                       </Panel>
                                     </Collapse>
-                              )})}
+                                )})}
+                            </div>
+                            <div className="">
+                              <AddBoxOutlined
+                                style={{ height: 32, width: 32, color: 'gray' }}
+                                onClick={ handleAddContent }
+                              />
                             </div>
                           </div>
                           { savedContentValues !== null &&

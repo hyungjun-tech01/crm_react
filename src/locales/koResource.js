@@ -58,7 +58,7 @@ const koResource = {
             note: '비고',
             order: '발주서',
             payment_type: '지불조건',
-            product_lists: '품목 목록',
+            product_lists: '품목',
             profit_amount: '이익금액',
             profit_rate: '이익율',
             quotation: '견적서',
