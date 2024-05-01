@@ -32,13 +32,21 @@ export const LeadRepo = selector({
                 console.error(`loadAllCompanies / Error : ${err}`);
             };
         });
-        const filterLeads = getCallback(({set, snapshot }) => async (filterText) => {
+        const filterLeads = getCallback(({set, snapshot }) => async (itemName, filterText) => {
             const allLeadList = await snapshot.getPromise(atomAllLeads);
-            const allLeads = 
-                allLeadList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))||
+            let allLeads = null;
+            
+            if( itemName === 'common.All' ) {
+                allLeads = allLeadList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))||
                                            (item.company_name && item.company_name.includes(filterText))||
+                                           (item.position && item.position.includes(filterText))||
+                                           (item.department && item.department.includes(filterText))||
+                                           (item.mobile_number && item.mobile_number.includes(filterText))||
+                                           (item.email && item.email.includes(filterText))||
+                                           (item.lead_status && item.lead_status.includes(filterText))||
                                            (item.sales_resource && item.sales_resource.includes(filterText))  
-            );
+                );
+            }
             set(atomFilteredLead, allLeads);
             return true;
         });

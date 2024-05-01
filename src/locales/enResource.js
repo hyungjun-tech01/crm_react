@@ -129,6 +129,7 @@ const enResource = {
             unit: 'Unit',
             view: 'View',
             visible: 'Visible',
+            All:'All',
         },
     },
 }

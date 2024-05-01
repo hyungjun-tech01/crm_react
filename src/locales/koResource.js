@@ -129,6 +129,7 @@ const koResource = {
             unit: '단위',
             view: '보기',
             visible: '보기',
+            All:'전체',
         },
     },
 }

@@ -30,22 +30,20 @@ const Leads = () => {
   const [ companyData, setCompanyData ] = useState([]);
 
   const [searchCondition, setSearchCondition] = useState("");
-  const [statusSearch, setStatusSearch] = useState("");
 
   const { t } = useTranslation();
 
+  const [statusSearch, setStatusSearch] = useState('common.All');
+
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
-    filterLeads(newValue);
+    filterLeads(statusSearch, newValue);
   };
 
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
-    if(newValue === "All Leads"){
-      loadAllLeads();
-    }else{
-      loadAllLeads();
-    }
+    loadAllLeads();
+
     setExpaned(false);
     setSearchCondition("");
   }
@@ -144,7 +142,7 @@ const Leads = () => {
       sorter: (a, b) => compareText(a.lead_name, b.lead_name),
     },
     {
-      title: t('lead.title'),
+      title: t('lead.position'),
       dataIndex: "position",
       sorter: (a, b) => compareText(a.position, b.position),
     },
@@ -330,13 +328,17 @@ const Leads = () => {
             <div className="row ">
               <div className="text-start" style={{width:'150px'}}>
                 <div className="dropdown">
-                  <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ?"All Leads":statusSearch}</button>
+                  <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.All'):t(statusSearch)}</button>
                     <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('All Leads')}>All Leads</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('Not Contacted')}>Not Contacted</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('Attempted Contact')}>Attempted Contact</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('Contact')}>Contact</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('Converted')}>Converted</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.All')}>{t('common.All')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.lead_name')}>{t('lead.lead_name')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.position')}>{t('lead.position')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.department')}>{t('lead.department')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.mobile')}>{t('lead.mobile')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.email')}>{t('lead.email')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.lead_status')}>{t('lead.lead_status')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.lead_sales')}>{t('lead.lead_sales')}</button>
                     </div>
                   </div>
                 </div>
@@ -345,7 +347,7 @@ const Leads = () => {
                       id = "searchCondition"
                       className="form-control" 
                       type="text"
-                      placeholder= {t('lead.full_name')}
+                      placeholder= ""
                       style={{width:'300px', display: 'inline'}}
                       value={searchCondition}
                       onChange ={(e) => handleSearchCondition(e.target.value)}
