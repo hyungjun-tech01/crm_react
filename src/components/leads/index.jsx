@@ -340,8 +340,8 @@ const Leads = () => {
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.lead_status')}>{t('lead.lead_status')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.lead_sales')}>{t('lead.lead_sales')}</button>
                     </div>
-                  </div>
                 </div>
+              </div>
               <div className="col text-start" style={{width:'400px'}}>
                 <input
                       id = "searchCondition"

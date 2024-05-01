@@ -25,13 +25,24 @@ const Company = () => {
   const [ closeDate, setCloseDate ] = useState(null);
 
   const [searchCondition, setSearchCondition] = useState("");
+  const [expanded, setExpaned] = useState(false);
 
   const { t } = useTranslation();
+
+  const [statusSearch, setStatusSearch] = useState('common.All');
+
+  const handleStatusSearch = (newValue) => {
+    setStatusSearch(newValue);
+    loadAllCompanies();
+
+    setExpaned(false);
+    setSearchCondition("");
+  }
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
     console.log('handle search', newValue);
-    filterCompanies(newValue);
+    filterCompanies(statusSearch, newValue);
   };
 
   // --- Functions used for Table ------------------------------
@@ -142,71 +153,6 @@ const Company = () => {
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.application_engineer, b.application_engineer),
     },
-    // {
-    //   title: "",
-    //   dataIndex: "star",
-    //   render: (text, record) => (
-    //     <i className="fa fa-star" aria-hidden="true" />
-    //   ),
-    //   sorter: (a, b) => a.status.length - b.status.length,
-    // },
-    // {
-    //   title: "Actions",
-    //   dataIndex: "status",
-    //   render: (text, record) => (
-    //     <div className="dropdown dropdown-action">
-    //       <a
-    //         href="#"
-    //         className="action-icon dropdown-toggle"
-    //         data-bs-toggle="dropdown"
-    //         aria-expanded="false"
-    //       >
-    //         <MoreVert />
-    //       </a>
-    //       <div className="dropdown-menu dropdown-menu-right">
-    //         <a className="dropdown-item" href="#">
-    //           Edit This Company
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Change Organization Image
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Delete This Organization
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Change Record Owner
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Generate Merge Document
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Print This Organization
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Add New Task For Organization
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Add New Event For Organization
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Add Activity Set To Organization
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Add New Contact For Organization
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Add New Opportunity For Organization
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Add New Opportunity For Organization
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Add New Project For Organization
-    //         </a>
-    //       </div>
-    //     </div>
-    //   ),
-    // },
   ];
 
   const rowSelection = {
@@ -263,49 +209,27 @@ const Company = () => {
           {/* Page Header */}
           <div className="page-header pt-3 mb-0 ">
             <div className="row">
-              <div className="text-start"  style={{width:'120px'}}>
+            <div className="text-start" style={{width:'150px'}}>
                 <div className="dropdown">
-                  <a
-                    className="dropdown-toggle recently-viewed"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    {" "}
-                    Recently
-                  </a>
-                  <div className="dropdown-menu">
-                    <a className="dropdown-item" href="#">
-                      Recently Viewed
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Items I'm following
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      All Companies
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Companies added in the last 24 hours
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Companies added in the last 7 days
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Companies with no notes in the last month
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Companies with no notes in the last 7 days
-                    </a>
-                  </div>
+                  <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.All'):t(statusSearch)}</button>
+                    <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.All')}>{t('common.All')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.phone')}>{t('common.phone')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.address')}>{t('company.address')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.salesman')}>{t('company.salesman')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.engineer')}>{t('company.engineer')}</button>
+                    </div>
                 </div>
               </div>
+
+              
               <div className="col text-start" style={{width:'400px'}}>
                 <input
                       id = "searchCondition"
                       className="form-control" 
                       type="text"
-                      placeholder={t('company.company_name')}
+                      placeholder=""
                       style={{width:'300px', display: 'inline'}}
                       value={searchCondition}
                       onChange ={(e) => handleSearchCondition(e.target.value)}

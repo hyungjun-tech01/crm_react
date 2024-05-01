@@ -46,6 +46,30 @@ export const LeadRepo = selector({
                                            (item.lead_status && item.lead_status.includes(filterText))||
                                            (item.sales_resource && item.sales_resource.includes(filterText))  
                 );
+            }else if(itemName === 'lead.lead_name'){
+                allLeads = allLeadList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))
+                );
+            }else if(itemName === 'company.company_name'){
+                allLeads = allLeadList.filter(item => (item.company_name && item.company_name.includes(filterText))
+                );
+            }else if(itemName === 'lead.position'){
+                allLeads = allLeadList.filter(item => (item.position && item.position.includes(filterText))
+                );
+            }else if(itemName === 'lead.department'){
+                allLeads = allLeadList.filter(item => (item.department && item.department.includes(filterText))
+                );
+            }else if(itemName === 'lead.mobile_number'){
+                allLeads = allLeadList.filter(item => (item.mobile_number && item.mobile_number.includes(filterText))
+                );
+            }else if(itemName === 'lead.email'){
+                allLeads = allLeadList.filter(item => (item.email && item.email.includes(filterText))
+                );
+            }else if(itemName === 'lead.lead_status'){
+                allLeads = allLeadList.filter(item => (item.lead_status && item.lead_status.includes(filterText))
+                );
+            }else if(itemName === 'lead.sales_resource'){
+                allLeads = allLeadList.filter(item => (item.sales_resource && item.sales_resource.includes(filterText))
+                );
             }
             set(atomFilteredLead, allLeads);
             return true;

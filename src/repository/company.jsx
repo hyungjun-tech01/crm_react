@@ -24,15 +24,38 @@ export const CompanyRepo = selector({
                 console.error(`\t[ loadAllCompanies ] Error : ${err}`);
             };
         });
-        const filterCompanies = getCallback(({set, snapshot }) => async (filterText) => {
+
+        const filterCompanies = getCallback(({set, snapshot }) => async (itemName, filterText) => {
             const allCompanyList = await snapshot.getPromise(atomAllCompanies);
-            const allCompanies = 
-            allCompanyList.filter(item => (item.company_name &&item.company_name.includes(filterText))||
-                                           (item.sales_resource && item.sales_resource.includes(filterText))  
-            );
+            let allCompanies;
+
+            if( itemName === 'common.All' ) {
+                allCompanies = allCompanyList.filter(item => (item.company_name &&item.company_name.includes(filterText))||
+                                            (item.company_phone_number &&item.company_phone_number.includes(filterText))||
+                                            (item.company_address &&item.company_address.includes(filterText))||
+                                           (item.sales_resource && item.sales_resource.includes(filterText))  ||
+                                           (item.application_engineer && item.application_engineer.includes(filterText))                       
+                );
+            }else if(itemName === 'company.company_name' ){
+                allCompanies = allCompanyList.filter(item => (item.company_name &&item.company_name.includes(filterText))
+                );
+            }else if(itemName === 'common.phone' ){
+                allCompanies = allCompanyList.filter(item => (item.company_phone_number &&item.company_phone_number.includes(filterText))
+                );
+            }else if(itemName === 'company.address' ){
+                allCompanies = allCompanyList.filter(item => (item.company_address &&item.company_address.includes(filterText))
+                );
+            }else if(itemName === 'company.salesman' ){
+                allCompanies = allCompanyList.filter(item => (item.sales_resource &&item.sales_resource.includes(filterText))
+                );
+            }else if(itemName === 'company.engineer' ){
+                allCompanies = allCompanyList.filter(item => (item.application_engineer &&item.application_engineer.includes(filterText))
+                );
+            }
             set(atomFilteredCompany, allCompanies);
             return true;
         });
+
         const modifyCompany = getCallback(({set, snapshot}) => async (newCompany) => {
             const input_json = JSON.stringify(newCompany);
             console.log(`[ modifyCompany ] input : `, input_json);
