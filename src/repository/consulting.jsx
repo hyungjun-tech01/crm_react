@@ -77,13 +77,41 @@ export const ConsultingRepo = selector({
             set(atomFilteredConsulting, allConsulting);
             return true;
         });
-        const filterConsultingOri = getCallback(({set, snapshot }) => async (filterText) => {
+        const filterConsultingOri = getCallback(({set, snapshot }) => async (itemName, filterText) => {
             const allConsultingList = await snapshot.getPromise(atomAllConsultings);
-            const allConsulting = 
-            allConsultingList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))||
-                                           (item.receiver && item.receiver.includes(filterText)) ||
-                                           (item.company_name && item.company_name.includes(filterText)) 
-            );
+            let  allConsulting ;
+            if(itemName === 'common.All'){
+                allConsulting = allConsultingList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))||
+                                            (item.receiver && item.receiver.includes(filterText)) ||
+                                            (item.company_name && item.company_name.includes(filterText)) ||
+                                            (item.consulting_type && item.consulting_type.includes(filterText)) ||
+                                            (item.mobile_number && item.mobile_number.includes(filterText)) || 
+                                            (item.phone_number && item.phone_number.includes(filterText)) || 
+                                            (item.request_content && item.request_content.includes(filterText)) || 
+                                            (item.action_content && item.action_content.includes(filterText)) 
+                );
+            }else if(itemName === 'company.company_name'){
+                allConsulting = allConsultingList.filter(item => (item.company_name &&item.company_name.includes(filterText))
+                );    
+            }else if(itemName === 'consulting.type'){
+                allConsulting = allConsultingList.filter(item => (item.consulting_type &&item.consulting_type.includes(filterText))
+                );    
+            }else if(itemName === 'lead.full_name'){
+                allConsulting = allConsultingList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))
+                );    
+            }else if(itemName === 'lead.mobile'){
+                allConsulting = allConsultingList.filter(item => (item.mobile_number &&item.mobile_number.includes(filterText))
+                );    
+            }else if(itemName === 'common.phone'){
+                allConsulting = allConsultingList.filter(item => (item.phone_number &&item.phone_number.includes(filterText))
+                );    
+            }else if(itemName === 'consulting.request_content'){
+                allConsulting = allConsultingList.filter(item => (item.request_content &&item.request_content.includes(filterText))
+                );    
+            }else if(itemName === 'consulting.action_content'){
+                allConsulting = allConsultingList.filter(item => (item.action_content &&item.action_content.includes(filterText))
+                );    
+            }
             set(atomFilteredConsulting, allConsulting);
             return true;
         });        

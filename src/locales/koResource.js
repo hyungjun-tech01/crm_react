@@ -36,6 +36,9 @@ const koResource = {
             consulting:'컨설팅',
             add_consulting:'컨설팅 등록',
             type:'컨설팅타입',
+            receiver:'접수자',
+            request_content:'문의내용',
+            action_content:'조치내용'
         },
         quotation : {
             add_new_quotation: '신규 견적서 추가',

@@ -43,22 +43,22 @@ const Consultings = () => {
   const [ selectedLead, setSelectedLead ] = useState(null);
   const [ receiptDate, setReceiptDate ] = useState(new Date());
   const [searchCondition, setSearchCondition] = useState("");
-  const [statusSearch, setStatusSearch] = useState("");
+
+  const [expanded, setExpaned] = useState(false);
 
   const { t } = useTranslation();
 
+  const [statusSearch, setStatusSearch] = useState('common.All');
+
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
-    filterConsultingOri(newValue);
+    filterConsultingOri(statusSearch, newValue);
   };
 
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
-    if(newValue === "All Consulting"){
-      loadAllConsultings();
-    }else{
-      loadAllConsultings();
-    }
+    loadAllConsultings();
+    setExpaned(false);
     setSearchCondition("");
   }
 
@@ -326,31 +326,26 @@ const Consultings = () => {
             <div className="row">
               <div className="text-start" style={{width:'150px'}}>
                 <div className="dropdown">
-                  <a
-                    className="dropdown-toggle recently-viewed"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                   {statusSearch === "" ?"All Consulting":statusSearch}
-                  </a>
-                  <div className="dropdown-menu">
-                    <a className="dropdown-item" onClick={()=>handleStatusSearch('All Consulting')}>All</a>
-                    <a className="dropdown-item" onClick={()=>handleStatusSearch('초기')}>초기</a>
-                    <a className="dropdown-item" onClick={()=>handleStatusSearch('진행중')}>진행중</a>
-                    <a className="dropdown-item" onClick={()=>handleStatusSearch('보류')}>보류</a>
-                    <a className="dropdown-item" onClick={()=>handleStatusSearch('취소')}>취소</a>
-                    <a className="dropdown-item" onClick={()=>handleStatusSearch('완료')}>완료</a>
-                    <a className="dropdown-item" onClick={()=>handleStatusSearch('기타')}>기타</a>
-                  </div>
+                  <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.All'):t(statusSearch)}</button>
+                    <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.All')}>{t('common.All')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('consulting.type')}>{t('consulting.type')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.full_name')}>{t('lead.full_name')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.mobile')}>{t('lead.mobile')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.phone')}>{t('common.phone')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('consulting.request_content')}>{t('consulting.request_content')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('consulting.action_content')}>{t('consulting.action_content')}</button>
+                    </div>
                 </div>
               </div>
+
               <div className="col text-start" style={{width:'400px'}}>
                 <input
                       id = "searchCondition"
                       className="form-control" 
                       type="text"
-                      placeholder= {t('company.company_name')}
+                      placeholder= ""
                       style={{width:'300px', display: 'inline'}}
                       value={searchCondition}
                       onChange ={(e) => handleSearchCondition(e.target.value)}

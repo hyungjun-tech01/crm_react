@@ -36,6 +36,9 @@ const enResource = {
             consulting:'Consultings',
             add_consulting:'Add Consulting',
             type:'Consulting Type',
+            receiver:'Receiver',
+            request_content:'Request Content',
+            action_content:'Action Content'
         },
         quotation : {
             add_new_quotation: 'Add New Quotation',

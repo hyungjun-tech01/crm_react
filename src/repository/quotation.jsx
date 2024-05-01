@@ -1,6 +1,6 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentQuotation, atomAllQuotations, defaultQuotation } from '../atoms/atoms';
+import { atomCurrentQuotation, atomAllQuotations, defaultQuotation, atomFilteredQuotation } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
@@ -29,6 +29,45 @@ export const QuotationRepo = selector({
                 console.error(`loadAllCompanies / Error : ${err}`);
             };
         });
+        
+        const filterQuotations = getCallback(({set, snapshot }) => async (itemName, filterText) => {
+            const allQuotationList = await snapshot.getPromise(atomAllQuotations);
+            let  allQuotation ;
+            console.log('filterQuotations', itemName, filterText);
+            if(itemName === 'common.All'){
+                allQuotation = allQuotationList.filter(item => (item.company_name &&item.company_name.includes(filterText))||
+                                            (item.quotation_type && item.quotation_type.includes(filterText)) ||
+                                            (item.quotation_title && item.quotation_title.includes(filterText)) ||
+                                            (item.lead_name && item.lead_name.includes(filterText)) ||
+                                            (item.mobile_number && item.mobile_number.includes(filterText)) || 
+                                            (item.phone_number && item.phone_number.includes(filterText)) || 
+                                            (item.email && item.email.includes(filterText)) 
+                );
+            }else if(itemName === 'company.company_name'){
+                allQuotation = allQuotationList.filter(item => (item.company_name &&item.company_name.includes(filterText))
+                );    
+            }else if(itemName === 'quotation.quotation_type'){
+                allQuotation = allQuotationList.filter(item => (item.quotation_type &&item.quotation_type.includes(filterText))
+                );    
+            }else if(itemName === 'common.title'){
+                allQuotation = allQuotationList.filter(item => (item.quotation_title &&item.quotation_title.includes(filterText))
+                );    
+            }else if(itemName === 'lead.full_name'){
+                allQuotation = allQuotationList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))
+                );    
+            }else if(itemName === 'lead.mobile'){
+                allQuotation = allQuotationList.filter(item => (item.mobile_number &&item.mobile_number.includes(filterText))
+                );    
+            }else if(itemName === 'common.phone'){
+                allQuotation = allQuotationList.filter(item => (item.phone_number &&item.phone_number.includes(filterText))
+                );    
+            }else if(itemName === 'lead.email'){
+                allQuotation = allQuotationList.filter(item => (item.email &&item.email.includes(filterText))
+                );    
+            }
+            set(atomFilteredQuotation, allQuotation);
+            return true;
+        });     
         const modifyQuotation = getCallback(({set, snapshot}) => async (newQuotation) => {
             const input_json = JSON.stringify(newQuotation);
             console.log(`[ modifyQuotation ] input : `, input_json);
@@ -111,6 +150,7 @@ export const QuotationRepo = selector({
             loadAllQuotations,
             modifyQuotation,
             setCurrentQuotation,
+            filterQuotations,
         };
     }
 });

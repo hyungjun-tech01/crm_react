@@ -209,20 +209,19 @@ const Company = () => {
           {/* Page Header */}
           <div className="page-header pt-3 mb-0 ">
             <div className="row">
-            <div className="text-start" style={{width:'150px'}}>
-                <div className="dropdown">
-                  <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.All'):t(statusSearch)}</button>
-                    <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.All')}>{t('common.All')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.phone')}>{t('common.phone')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.address')}>{t('company.address')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.salesman')}>{t('company.salesman')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.engineer')}>{t('company.engineer')}</button>
-                    </div>
-                </div>
+              <div className="text-start" style={{width:'150px'}}>
+                  <div className="dropdown">
+                    <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.All'):t(statusSearch)}</button>
+                      <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
+                        <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.All')}>{t('common.All')}</button>
+                        <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
+                        <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.phone')}>{t('common.phone')}</button>
+                        <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.address')}>{t('company.address')}</button>
+                        <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.salesman')}>{t('company.salesman')}</button>
+                        <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.engineer')}>{t('company.engineer')}</button>
+                      </div>
+                  </div>
               </div>
-
               
               <div className="col text-start" style={{width:'400px'}}>
                 <input

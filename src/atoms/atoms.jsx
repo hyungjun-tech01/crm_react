@@ -217,6 +217,12 @@ export const atomAllQuotations = atom({
     default: [],
 });
 
+export const atomFilteredQuotation = atom({
+    key: "filteredQuotations",
+    default: [],
+});
+
+
 //----- Transaction ------------------------
 export const defaultTransaction = {
     //-----Transaction info --------------
