@@ -15,7 +15,7 @@ import { BiReceipt } from "react-icons/bi";
 import { MoreVert } from '@mui/icons-material';
 import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
-import { atomAllCompanies, atomAllTransactions } from "../../atoms/atoms";
+import { atomAllCompanies, atomAllTransactions, atomFilteredTransaction} from "../../atoms/atoms";
 import { compareCompanyName , compareText } from "../../constants/functions";
 import TransactionAddNewModal from "./TransactionAddNewModal";
 import { useTranslation } from "react-i18next";
@@ -23,11 +23,30 @@ import { useTranslation } from "react-i18next";
 const Transactions = () => {
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const allTransactionData = useRecoilValue(atomAllTransactions);
+  const filteredTransaction= useRecoilValue(atomFilteredTransaction);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
-  const { loadAllTransactions, setCurrentTransaction } = useRecoilValue(TransactionRepo);
+  const { loadAllTransactions, setCurrentTransaction , filterTransactions} = useRecoilValue(TransactionRepo);
   const [ initAddNewTransaction, setInitAddNewTransaction ] = useState(false);
 
   const { t } = useTranslation();
+
+  const [searchCondition, setSearchCondition] = useState("");
+  const [expanded, setExpaned] = useState(false);
+
+  const [statusSearch, setStatusSearch] = useState('common.All');
+
+  const handleStatusSearch = (newValue) => {
+    setStatusSearch(newValue);
+    loadAllTransactions();
+
+    setExpaned(false);
+    setSearchCondition("");
+  }
+
+  const handleSearchCondition =  (newValue)=> {
+    setSearchCondition(newValue);
+    filterTransactions(statusSearch, newValue);
+  };
   
   // --- Section for Table ------------------------------
   const columns = [
@@ -180,26 +199,29 @@ const Transactions = () => {
           </div>
           <div className="page-header pt-3 mb-0 ">
             <div className="row">
-              <div className="col">
+              <div className="text-start" style={{width:'120px'}}>
                 <div className="dropdown">
-                  <a
-                    className="dropdown-toggle recently-viewed"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    {" "}
-                    Propose Times{" "}
-                  </a>
-                  <div className="dropdown-menu">
-                    <a className="dropdown-item">Recently Viewed</a>
-                    <a className="dropdown-item">Items I'm following</a>
-                    <a className="dropdown-item">All Transactions</a>
-                    <a className="dropdown-item">All Closed Transactions</a>
-                    <a className="dropdown-item">All Open Transactions</a>
-                    <a className="dropdown-item">My Transactions</a>
-                  </div>
+                  <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.All'):t(statusSearch)}</button>
+                    <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.All')}>{t('common.All')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('transaction.title')}>{t('transaction.title')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('transaction.type')}>{t('transaction.type')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('transaction.publish_type')}>{t('transaction.publish_type')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('transaction.payment_type')}>{t('transaction.payment_type')}</button>
+                    </div>
                 </div>
+              </div>
+              <div className="col text-start" style={{width:'400px'}}>
+                <input
+                      id = "searchCondition"
+                      className="form-control" 
+                      type="text"
+                      placeholder= ""
+                      style={{width:'300px', display: 'inline'}}
+                      value={searchCondition}
+                      onChange ={(e) => handleSearchCondition(e.target.value)}
+                />  
               </div>
               <div className="col text-end">
                 <ul className="list-inline-item pl-0">
@@ -224,12 +246,32 @@ const Transactions = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive activity-tables">
-                    <Table
+                    { searchCondition === "" ?  
+                      <Table
+                        rowSelection={{
+                          ...rowSelection,
+                        }}
+                        pagination={{
+                          total: allTransactionData.length,
+                          showTotal: (total, range) =>
+                            `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+                          showSizeChanger: true,
+                          onShowSizeChange: onShowSizeChange,
+                          itemRender: itemRender,
+                        }}
+                        style={{ overflowX: "auto" }}
+                        columns={columns}
+                        bordered
+                        dataSource={allTransactionData}
+                        rowKey={(record) => record.transaction_code}
+                        // onChange={handleTableChange}
+                      />:
+                      <Table
                       rowSelection={{
                         ...rowSelection,
                       }}
                       pagination={{
-                        total: allTransactionData.length,
+                        total: filteredTransaction.length >0 ? filteredTransaction.length:0,
                         showTotal: (total, range) =>
                           `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                         showSizeChanger: true,
@@ -239,10 +281,11 @@ const Transactions = () => {
                       style={{ overflowX: "auto" }}
                       columns={columns}
                       bordered
-                      dataSource={allTransactionData}
+                      dataSource={filteredTransaction.length >0 ? filteredTransaction:null}
                       rowKey={(record) => record.transaction_code}
                       // onChange={handleTableChange}
                     />
+                  }
                   </div>
                 </div>
               </div>

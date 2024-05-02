@@ -262,6 +262,12 @@ export const atomAllTransactions = atom({
     default: [],
 });
 
+export const atomFilteredTransaction = atom({
+    key: "allFilteredTransactions",
+    default: [],
+});
+
+
 //----- Purchase ------------------------
 export const defaultPurchase = {
     //-----Purchase info --------------
