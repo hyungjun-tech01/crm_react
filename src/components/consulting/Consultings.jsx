@@ -255,14 +255,17 @@ const Consultings = () => {
         company_subset[data.company_name] = data.company_code;
       });
       setCompaniesForSelection(company_subset);
-    }
+    };
+
     if (allLeadData.length === 0) {
       loadAllLeads();
-    } else {
+    };
+    
+    if(!leadsForSelection || (leadsForSelection.length !== allLeadData.length)){
       const temp_data = allLeadData.map(lead => {
         return {
-          label : lead.lead_name,
-          value : {
+          label: lead.lead_name + " / " + lead.company_name,
+          value: {
             code: lead.lead_code,
             name: lead.lead_name,
             department: lead.department,
@@ -270,7 +273,7 @@ const Consultings = () => {
             mobile: lead.mobile_number,
             phone: lead.phone_number,
             email: lead.email,
-            company: lead.company_name,
+            company: lead.company_name
           }
         }
       });
@@ -286,9 +289,11 @@ const Consultings = () => {
       });
       setLeadsForSelection(temp_data);
     };
+
     if (allConsultingData.length === 0) {
       loadAllConsultings();
     };
+    
     initializeConsultingTemplate();
   }, [allCompnayData, allLeadData, allConsultingData]);
 
@@ -451,7 +456,7 @@ const Consultings = () => {
             </button>
             <div className="modal-content">
               <div className="modal-header">
-                <h4 className="modal-title"><b>Add New Consulting</b></h4>
+                <h4 className="modal-title"><b>{t('consulting.add_consulting')}</b></h4>
                 <button
                   type="button"
                   className="btn-close"
@@ -460,10 +465,10 @@ const Consultings = () => {
               </div>
               <div className="modal-body">
                 <form className="forms-sampme" id="add_new_consulting_form">
-                  <h4>Lead Information</h4>
+                  <h4>{t('lead.lead')} {t('common.information')}</h4>
                   <div className="form-group row">
                     <div className="col-sm-4">
-                      <label>Name</label>
+                      <label>{t('common.name')}</label>
                     </div>
                     <div className="col-sm-8">
                       <Select options={leadsForSelection} onChange={(value) => { 
@@ -478,47 +483,47 @@ const Consultings = () => {
                             <table className="table">
                               <tbody>
                                 <tr>
-                                  <td>Department</td>
+                                  <td>{t('lead.department')}</td>
                                   <td>{selectedLead.department}</td>
                                 </tr>
                                 <tr>
-                                  <td>Position</td>
+                                  <td>{t('lead.position')}</td>
                                   <td>{selectedLead.position}</td>
                                 </tr>
                                 <tr>
-                                  <td>Mobile</td>
+                                  <td>{t('lead.mobile')}</td>
                                   <td>{selectedLead.mobile}</td>
                                 </tr>
                                 <tr>
-                                  <td>Phone</td>
+                                <td>{t('common.phone')}</td>
                                   <td>{selectedLead.phone}</td>
                                 </tr>
                                 <tr>
-                                  <td>Email</td>
+                                <td>{t('lead.email')}</td>
                                   <td>{selectedLead.email}</td>
                                 </tr>
                               </tbody>
                             </table>
                         </div>
                       </div>
-                      <h4>Company Information</h4>
+                      <h4>{t('company.company')} {t('common.information')}</h4>
                       <div className="form-group row">
                         <div className="col-sm-6">
-                          <label>Company Name</label>
+                          <label>{t('company.company_name')}</label>
                         </div>
                         <div className="col-sm-6">
                           <label>{selectedLead.company}</label>
                         </div>
                       </div>
                     </>}
-                  <h4>Consulting Information</h4>
+                  <h4>{t('consulting.consulting')} {t('common.information')}</h4>
                   <div className="form-group row">
                     <div className="col-sm-4">
-                      <label className="col-form-label">Type</label>
+                      <label className="col-form-label">{t('consulting.type')}</label>
                       <Select options={ConsultingTypes} onChange={handleSelectConsultingType} />
                     </div>
                     <div className="col-sm-4">
-                      <label className="col-form-label">Receipt</label>
+                      <label className="col-form-label">{t('consulting.receipt_time')}</label>
                         <div className="cal-icon">
                           <DatePicker
                             className="form-control"
@@ -530,11 +535,11 @@ const Consultings = () => {
                         </div>
                     </div>
                     <div className="col-sm-4">
-                      <label className="col-form-label">Receiver</label>
+                      <label className="col-form-label">{t('consulting.receiver')}</label>
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Receiver"
+                        placeholder={t('consulting.receiver')}
                         name="receiver"
                         onChange={handleConsultingChange}
                       />
@@ -542,21 +547,21 @@ const Consultings = () => {
                   </div>
                   <div className="form-group row">
                     <div className="col-sm-6">
-                      <label className="col-form-label">Lead Time</label>
+                      <label className="col-form-label">{t('consulting.lead_time')}</label>
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Lead Time"
+                        placeholder={t('consulting.lead_time')}
                         name="lead_time"
                         onChange={handleConsultingChange}
                       />
                     </div>
                     <div className="col-sm-6">
-                      <label className="col-form-label">Request Type</label>
+                      <label className="col-form-label">{t('consulting.request_type')}</label>
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Request Type"
+                        placeholder={t('consulting.request_type')}
                         name="request_type"
                         onChange={handleConsultingChange}
                       />
@@ -564,11 +569,11 @@ const Consultings = () => {
                   </div>
                   <div className="form-group row">
                     <div className="col-sm-12">
-                      <label className="col-form-label">Request Content</label>
+                      <label className="col-form-label">{t('consulting.request_content')}</label>
                       <textarea
                         className="form-control"
                         rows={2}
-                        placeholder="Request Content"
+                        placeholder={t('consulting.request_content')}
                         name="request_content"
                         defaultValue={""}
                         onChange={handleConsultingChange}
@@ -577,11 +582,11 @@ const Consultings = () => {
                   </div>
                   <div className="form-group row">
                     <div className="col-sm-12">
-                      <label className="col-form-label">Action Content</label>
+                      <label className="col-form-label">{t('consulting.action_content')}</label>
                       <textarea
                         className="form-control"
                         rows={2}
-                        placeholder="Action Content"
+                        placeholder={t('consulting.action_content')}
                         name="action_content"
                         defaultValue={""}
                         onChange={handleConsultingChange}
@@ -590,21 +595,21 @@ const Consultings = () => {
                   </div>
                   <div className="form-group row">
                     <div className="col-sm-6">
-                      <label className="col-form-label">Sales Representative</label>
+                      <label className="col-form-label">{t('lead.lead_sales')}</label>
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Sales Representative"
+                        placeholder={t('lead.lead_sales')}
                         name="sales_representati"
                         onChange={handleConsultingChange}
                       />
                     </div>
                     <div className="col-sm-6">
-                      <label className="col-form-label">Status</label>
+                      <label className="col-form-label">{t('common.status')}</label>
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Status"
+                        placeholder={t('common.status')}
                         name="status"
                         onChange={handleConsultingChange}
                       />
@@ -640,54 +645,8 @@ const Consultings = () => {
         </div>
 {/*---- End : Add New Consulting Modal-------------------------------------------------------*/}
         {/* modal */}
-        {/* cchange pipeline stage Modal */}
-        <div className="modal" id="pipeline-stage">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              {/* Modal Header */}
-              <div className="modal-header">
-                <h4 className="modal-title">Change Pipeline Stage</h4>
-                <button type="button" className="close" data-bs-dismiss="modal">
-                  ×
-                </button>
-              </div>
-              {/* Modal body */}
-              <div className="modal-body">
-                <form>
-                  <div className="form-group">
-                    <label className="col-form-label">New Stage</label>
-                    <select className="form-control" id="related-to">
-                      <option>Plan</option>
-                      <option>Design</option>
-                      <option>Develop</option>
-                      <option>Complete</option>
-                    </select>
-                  </div>
-                </form>
-              </div>
-              {/* Modal footer */}
-              <div className="modal-footer text-center">
-                <button
-                  type="button"
-                  className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                >
-                  Save
-                </button>
-                &nbsp;&nbsp;
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-rounded cancel-button"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
         <SystemUserModel />
         <CompanyDetailsModel />
-        <DealDetailsModel />
-        <ProjectDetailsModel />
         <LeadsDetailsModel />
         <ConsultingsDetailsModel />
       </div>
