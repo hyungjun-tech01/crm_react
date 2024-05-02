@@ -16,7 +16,6 @@ import { CompanyRepo } from "../../repository/company";
 import { compareText } from "../../constants/functions";
 import { useTranslation } from "react-i18next";
 
-
 const Purchase = () => {
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const allPurchaseData = useRecoilValue(atomAllPurchases);
@@ -37,6 +36,24 @@ const Purchase = () => {
   const selectCompanyRef = useRef(null);
 
   const { t } = useTranslation();
+
+  const [searchCondition, setSearchCondition] = useState("");
+  const [expanded, setExpaned] = useState(false);
+
+  const [statusSearch, setStatusSearch] = useState('common.All');
+
+  const handleStatusSearch = (newValue) => {
+    setStatusSearch(newValue);
+    loadAllPurchases();
+
+    setExpaned(false);
+    setSearchCondition("");
+  }
+
+  const handleSearchCondition =  (newValue)=> {
+    setSearchCondition(newValue);
+    //filterQuotations(statusSearch, newValue);
+  };
 
   // --- Functions used for Table ------------------------------
   const handleClickPurchase = useCallback((id)=>{
@@ -359,42 +376,31 @@ const Purchase = () => {
           {/* Page Header */}
           <div className="page-header pt-3 mb-0 ">
             <div className="row">
-              <div className="col">
+              <div className="text-start" style={{width:'120px'}}>
                 <div className="dropdown">
-                  <a
-                    className="dropdown-toggle recently-viewed"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    {" "}
-                    Recently Viewed
-                  </a>
-                  <div className="dropdown-menu">
-                    <a className="dropdown-item" href="#">
-                      Recently Viewed
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Items I'm following
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      All Purchase
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Purchase added in the last 24 hours
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Purchase added in the last 7 days
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Purchase with no notes in the last month
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Purchase with no notes in the last 7 days
-                    </a>
-                  </div>
+                  <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.All'):t(statusSearch)}</button>
+                    <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.All')}>{t('common.All')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('purchase.product_type')}>{t('purchase.product_type')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('purchase.product_name')}>{t('purchase.product_name')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.title')}>{t('common.title')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.full_name')}>{t('lead.full_name')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.mobile')}>{t('lead.mobile')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.phone')}>{t('common.phone')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.email')}>{t('lead.email')}</button>
+                    </div>
                 </div>
+              </div>
+              <div className="col text-start" style={{width:'400px'}}>
+                <input
+                      id = "searchCondition"
+                      className="form-control" 
+                      type="text"
+                      placeholder= ""
+                      style={{width:'300px', display: 'inline'}}
+                      value={searchCondition}
+                      onChange ={(e) => handleSearchCondition(e.target.value)}
+                />  
               </div>
               <div className="col text-end">
                 <ul className="list-inline-item pl-0">
