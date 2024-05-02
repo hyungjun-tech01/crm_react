@@ -114,3 +114,13 @@
     border-radius: 0.25rem;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
+.detail-add-content {
+    display: flex;
+    border: 1px dashed rgb(204, 204, 204);
+    border-top: 0;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    background-color: #f0ecec;
+    justify-content: center;
+    align-items: center;
+}

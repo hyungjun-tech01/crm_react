@@ -11,16 +11,19 @@ import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailDateItem from "../../constants/DetailDateItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
 import QuotationView from "./QuotationtView";
+import { Add, Remove } from '@mui/icons-material';
+
+const content_indices = ['3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18'];
 
 const QuotationsDetailsModel = () => {
   const { Panel } = Collapse;
   const selectedQuotation = useRecoilValue(atomCurrentQuotation);
   const { modifyQuotation } = useRecoilValue(QuotationRepo);
-  const [cookies] = useCookies(["myLationCrmUserId"]);
+  const [ cookies ] = useCookies(["myLationCrmUserId"]);
   const [ t ] = useTranslation();
 
-  const [editedValues, setEditedValues] = useState(null);
-  const [savedValues, setSavedValues] = useState(null);
+  const [ editedValues, setEditedValues ] = useState(null);
+  const [ savedValues, setSavedValues ] = useState(null);
 
   const [ orgQuotationDate, setOrgQuotationDate ] = useState(null);
   const [ quotationDate, setQuotationDate ] = useState(new Date());
@@ -30,10 +33,12 @@ const QuotationsDetailsModel = () => {
   const [ quotationContents, setQuotationContents ] = useState([]);
   const [ quotationHeaders, setQuotationHeaders ] = useState([]);
 
-  const [editedContentValues, setEditedContentValues] = useState(null);
-  const [savedContentValues, setSavedContentValues] = useState(null);
+  const [ editedContentValues, setEditedContentValues ] = useState(null);
+  const [ savedContentValues, setSavedContentValues ] = useState(null);
 
-  // --- Funtions for Editing ---------------------------------
+  const [ checkTemporaryContent, setCheckTemporaryContent ] = useState([]);
+
+  // --- Funtions for Editing ----------------------------------------------------------
   const handleCheckEditState = useCallback((name) => {
     return editedValues !== null && name in editedValues;
   }, [editedValues]);
@@ -77,7 +82,7 @@ const QuotationsDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, selectedQuotation]);
 
-  // --- Funtions for Saving ---------------------------------
+  // --- Funtions for Saving -----------------------------------------------------------
   const handleCheckSaved = useCallback((name) => {
     return savedValues !== null && name in savedValues;
   }, [savedValues]);
@@ -124,7 +129,7 @@ const QuotationsDetailsModel = () => {
     setSavedValues(null);
   }, []);
 
-  // --- Funtions for Content Editing ---------------------------------
+  // --- Funtions for Content Editing --------------------------------------------------
   const handleCheckContentEditState = useCallback((key) => {
     return editedContentValues !== null && key in editedContentValues;
   }, [editedContentValues]);
@@ -173,7 +178,7 @@ const QuotationsDetailsModel = () => {
     setEditedContentValues(tempEdited);
   }, [editedContentValues, savedContentValues, quotationContents]);
 
-  // --- Funtions for Content Saving ---------------------------------
+  // --- Funtions for Content Saving ----------------------------------------------------
   const handleCheckContentSaved = useCallback((input) => {
     return savedContentValues !== null && input in savedContentValues;
   }, [savedContentValues]);
@@ -195,11 +200,32 @@ const QuotationsDetailsModel = () => {
       let tempContents = [
         ...quotationContents,
       ];
+
       Object.keys(savedContentValues).forEach(item => {
         console.log('\thandleSaveContentAll / item - ', item);
         const [no, index] = item.split('.');
         tempContents[no][index] = savedContentValues[item];
+
+        const foundIdx = checkTemporaryContent.findIndex(idx => idx === no);
+        if(foundIdx !== -1){
+          const tempCheckTempContent = [
+            ...checkTemporaryContent.slice(0, foundIdx),
+            ...checkTemporaryContent.slice(foundIdx, ),
+          ];
+          setCheckTemporaryContent(tempCheckTempContent);
+        };
       });
+
+      if(checkTemporaryContent.length > 0) {
+        // This means that there is(are) newly added content(s), but it doesn't have any data actually.
+        checkTemporaryContent.forEach(idx => {
+          const tempContents = [
+            ...quotationContents.slice(0, idx),
+            ...quotationContents.slice(idx + 1, ),
+          ];
+          setQuotationContents(tempContents);
+        });
+      }
 
       const temp_all_saved = {
         ...selectedQuotation,
@@ -228,11 +254,21 @@ const QuotationsDetailsModel = () => {
   ]);
 
   const handleCancelContentAll = useCallback(() => {
+    if(checkTemporaryContent){
+      checkTemporaryContent.forEach(idx => {
+        const tempContents = [
+          ...quotationContents.slice(0, idx),
+          ...quotationContents.slice(idx + 1,),
+        ];
+        setQuotationContents(tempContents);
+      })
+    }
+    setCheckTemporaryContent([]);
     setEditedContentValues(null);
     setSavedContentValues(null);
   }, []);
 
-  // --- Funtions for Quotation Date ---------------------------------
+  // --- Funtions for Quotation Date ----------------------------------------------------
   const handleStartQuotationDateEdit = useCallback(() => {
     const tempEdited = {
       ...editedValues,
@@ -258,7 +294,7 @@ const QuotationsDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, orgQuotationDate, quotationDate]);
 
-  // --- Funtions for Confirm Date ---------------------------------
+  // --- Funtions for Confirm Date ------------------------------------------------------
   const handleStartConfirmDateEdit = useCallback(() => {
     const tempEdited = {
       ...editedValues,
@@ -283,6 +319,43 @@ const QuotationsDetailsModel = () => {
     delete tempEdited.comfirm_date;
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, orgConfirmDate, confirmDate]);
+
+  // --- Funtions for Dealing Content ------------------------------------------------------
+  const handleAddContent = useCallback(() => {
+    const content_no = quotationContents.length;
+    const tempCheckTempContent =[
+      ...checkTemporaryContent,
+      content_no,
+    ];
+    setCheckTemporaryContent(tempCheckTempContent);
+
+    let tempContent = {};
+    quotationHeaders.forEach((header) => {
+      tempContent[header[0]] = null;
+    });
+    tempContent['1'] = content_no + 1;
+    const tempContents = [
+      ...quotationContents,
+      tempContent
+    ];
+    setQuotationContents(tempContents);
+  }, [quotationHeaders]);
+
+  const handleDeleteConetent = useCallback((index) => {
+    const foundIdx = checkTemporaryContent.findIndex(idx => idx === index);
+    if(foundIdx !== -1){
+      const tempCheckTempContent = [
+        ...checkTemporaryContent.slice(0, foundIdx),
+        ...checkTemporaryContent.slice(foundIdx + 1, ),
+      ];
+      setCheckTemporaryContent(tempCheckTempContent);
+    };
+    const tempContents = [
+      ...quotationContents.slice(0, index),
+      ...quotationContents.slice(index + 1, ),
+    ];
+    setQuotationContents(tempContents);
+  }, [quotationContents]);
 
   useEffect(() => {
     console.log('[QuotationsDetailsModel] called!');
@@ -934,17 +1007,66 @@ const QuotationsDetailsModel = () => {
                                 quotationContents.map((content, index1) => {
                                   if(content['1'] === null || content['1'] === 'null') return;
                                   return (
-                                    <Collapse key={index1} accordion expandIconPosition="end">
-                                      <Panel header={"No." + content["1"]} key={index1}>
+                                    <Collapse key={index1} accordion expandIconPosition="start">
+                                      <Panel header={"No." + content["1"]} key={index1}
+                                        extra={ <Remove
+                                                  style={{ color: 'gray' }}
+                                                  onClick={()=>{ handleDeleteConetent(index1);}}
+                                                /> } >
                                         <table className="table">
                                           <tbody>
-                                            { content['2'] && 
-                                              <DetailLabelItem
-                                                key={1}
-                                                defaultText={content['2']}
+                                            <DetailLabelItem
+                                              key={21}
+                                              defaultText={content['2']}
+                                              saved={savedContentValues}
+                                              name={index1 + '.2'}
+                                              no_border={true}
+                                              title={t('common.category')}
+                                              checkEdit={handleCheckContentEditState}
+                                              startEdit={handleStartContentEdit}
+                                              endEdit={handleEndContentEdit}
+                                              editing={handleContentEditing}
+                                              checkSaved={handleCheckContentSaved}
+                                              cancelSaved={handleCancelContentSaved}
+                                            />
+                                            { content_indices.map((value, index2) =>
+                                                <DetailLabelItem
+                                                  key={index2}
+                                                  defaultText={content[value]}
+                                                  saved={savedContentValues}
+                                                  name={index1 + '.' + value}
+                                                  title={quotationHeaders[value - 1][1]}
+                                                  checkEdit={handleCheckContentEditState}
+                                                  startEdit={handleStartContentEdit}
+                                                  endEdit={handleEndContentEdit}
+                                                  editing={handleContentEditing}
+                                                  checkSaved={handleCheckContentSaved}
+                                                  cancelSaved={handleCancelContentSaved}
+                                                />
+                                            )}
+                                            <DetailTextareaItem
+                                              key={22}
+                                              defaultText={content['19']}
+                                              saved={savedContentValues}
+                                              name={index1 + '.19'}
+                                              title={t('quotation.note')}
+                                              row_no={3}
+                                              no_border={ content['998'] ? false : true}
+                                              checkEdit={handleCheckContentEditState}
+                                              startEdit={handleStartContentEdit}
+                                              endEdit={handleEndContentEdit}
+                                              editing={handleContentEditing}
+                                              checkSaved={handleCheckContentSaved}
+                                              cancelSaved={handleCancelContentSaved}
+                                            />
+                                            { content['998'] && 
+                                              <DetailTextareaItem
+                                                key={23}
+                                                defaultText={content['998']}
                                                 saved={savedContentValues}
-                                                name={index1 + '.2'}
-                                                title={t('common.category')}
+                                                name={index1 + '.998'}
+                                                title='Comment'
+                                                row_no={5}
                                                 no_border={true}
                                                 checkEdit={handleCheckContentEditState}
                                                 startEdit={handleStartContentEdit}
@@ -954,75 +1076,17 @@ const QuotationsDetailsModel = () => {
                                                 cancelSaved={handleCancelContentSaved}
                                               />
                                             }
-                                            { index1 === 2 && (
-                                              content['2'] ?
-                                                <DetailLabelItem
-                                                  key={2}
-                                                  defaultText={content['3']}
-                                                  saved={savedContentValues}
-                                                  name={index1 + '.3'}
-                                                  title={t('common.maker')}
-                                                  checkEdit={handleCheckContentEditState}
-                                                  startEdit={handleStartContentEdit}
-                                                  endEdit={handleEndContentEdit}
-                                                  editing={handleContentEditing}
-                                                  checkSaved={handleCheckContentSaved}
-                                                  cancelSaved={handleCancelContentSaved}
-                                                />
-                                                :
-                                                <DetailLabelItem
-                                                  key={2}
-                                                  defaultText={content['3']}
-                                                  saved={savedContentValues}
-                                                  name={index1 + '.3'}
-                                                  title={t('common.maker')}
-                                                  no_border={true}
-                                                  checkEdit={handleCheckContentEditState}
-                                                  startEdit={handleStartContentEdit}
-                                                  endEdit={handleEndContentEdit}
-                                                  editing={handleContentEditing}
-                                                  checkSaved={handleCheckContentSaved}
-                                                  cancelSaved={handleCancelContentSaved}
-                                                />
-                                            )}
-                                            { quotationHeaders.map((value, index2) => (
-                                              value.at(0) !== "1" && value.at(0) !== "2" &&
-                                                <DetailLabelItem
-                                                  key={index2}
-                                                  defaultText={content[value.at(0)]}
-                                                  saved={savedContentValues}
-                                                  name={index1 + '.' + value.at(0)}
-                                                  title={value.at(1)}
-                                                  checkEdit={handleCheckContentEditState}
-                                                  startEdit={handleStartContentEdit}
-                                                  endEdit={handleEndContentEdit}
-                                                  editing={handleContentEditing}
-                                                  checkSaved={handleCheckContentSaved}
-                                                  cancelSaved={handleCancelContentSaved}
-                                                />
-                                            ))}
-                                            { content['998'] && 
-                                              <DetailTextareaItem
-                                                  key={998}
-                                                  defaultText={content['998']}
-                                                  saved={savedContentValues}
-                                                  name={index1 + '.998'}
-                                                  title='Comment'
-                                                  row_no={5}
-                                                  no_border={true}
-                                                  checkEdit={handleCheckContentEditState}
-                                                  startEdit={handleStartContentEdit}
-                                                  endEdit={handleEndContentEdit}
-                                                  editing={handleContentEditing}
-                                                  checkSaved={handleCheckContentSaved}
-                                                  cancelSaved={handleCancelContentSaved}
-                                                />
-                                            }
                                           </tbody>
                                         </table>
                                       </Panel>
                                     </Collapse>
-                              )})}
+                                )})}
+                            </div>
+                            <div className="detail-add-content">
+                              <Add
+                                style={{ height: 32, width: 32, color: '#d9c9c9' }}
+                                onClick={ handleAddContent }
+                              />
                             </div>
                           </div>
                           { savedContentValues !== null &&

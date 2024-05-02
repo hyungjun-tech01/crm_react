@@ -33,8 +33,15 @@ const enResource = {
             actions:'Actions'
         },
         consulting:{
-            consulting:'Consultings',
+            action_content: 'Consulting Conclusion',
             add_consulting:'Add Consulting',
+            consulting:'Consultings',
+            lead_time: 'Lead Time',
+            product_type: 'Product Type',
+            receipt_time: 'Receipt Date',
+            receiver: 'Receiver',
+            request_content: 'Consulting Content',
+            request_type: 'Request Type',
             type:'Consulting Type',
             receiver:'Receiver',
             request_content:'Request Content',
@@ -109,6 +116,7 @@ const enResource = {
             registration_code:'Registraction Code',
         },
         common:{
+            activity: 'Activity',
             cancel: 'Cancel',
             category: 'Category',
             color: 'Color',
@@ -122,6 +130,7 @@ const enResource = {
             phone:'Phone',
             product: 'Product',
             quantity: 'Quantity',
+            related: 'Related',
             save: 'Save',
             size: 'Size',
             standard: 'Standard',

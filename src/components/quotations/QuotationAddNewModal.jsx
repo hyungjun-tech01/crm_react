@@ -53,7 +53,7 @@ const QuotationAddNewModal = (props) => {
   const [ contentColumns, setContentColumns ] = useState([]);
   const [ editHeaders, setEditHeaders ] = useState(false);
 
-  const [ prices, setPrices ] = useState(default_prices);
+  // const [ prices, setPrices ] = useState(default_prices);
 
   // --- Functions / Variables dealing with editing -------------------------------
   const selectLeadRef = useRef(null);
@@ -377,7 +377,7 @@ const QuotationAddNewModal = (props) => {
     setConfirmDate(null);
     setSelectedLead(null);
     setQuotationContents([]);
-    setPrices(default_prices);
+    // setPrices(default_prices);
 
     if(selectLeadRef.current)
       selectLeadRef.current.clearValue();

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
+import { useTranslation } from "react-i18next";
 import { CircleImg, SystemUser } from "../imagepath";
 import { Collapse } from "antd";
 import { atomCurrentConsulting, defaultConsulting } from "../../atoms/atoms";
@@ -17,6 +18,7 @@ const ConsultingsDetailsModel = () => {
   const selectedConsulting = useRecoilValue(atomCurrentConsulting);
   const { modifyConsulting } = useRecoilValue(ConsultingRepo);
   const [cookies] = useCookies(["myLationCrmUserId"]);
+  const [ t ] = useTranslation();
 
   const [editedValues, setEditedValues] = useState(null);
   const [ savedValues, setSavedValues ] = useState(null);
@@ -206,67 +208,6 @@ const ConsultingsDetailsModel = () => {
                     </span>
                   </div>
                 </div>
-                <div className="col-md-5 text-end">
-                  <ul className="list-unstyled list-style-none">
-                    <li className="dropdown list-inline-item">
-                      <br />
-                      <Link
-                        className="dropdown-toggle"
-                        to="#"
-                        role="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        {" "}
-                        Actions{" "}
-                      </Link>
-                      <div className="dropdown-menu">
-                        <Link className="dropdown-item" to="#">
-                          Edit This Consulting
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Change Consulting Image
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Delete This Consulting
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Email This Consulting
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Clone This Consulting
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Change Record Owner
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Generate Merge Document
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Change Consulting to Contact
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Convert Consulting
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Print This Consulting
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Merge Into Consulting
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          SmartMerge Consulting
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add Activity Set To Consulting
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Event For Consulting
-                        </Link>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
               </div>
               <button
                 type="button"
@@ -278,24 +219,16 @@ const ConsultingsDetailsModel = () => {
               <div className="card-body">
                 <div className="row">
                   <div className="col">
-                    <span>Consulting Status</span>
-                    <p>Not Contacted</p>
+                    <span>{t('consulting.consulting')} {t('common.status')}</span>
+                    <p>{selectedConsulting.status}</p>
                   </div>
                   <div className="col">
-                    <span>Name</span>
-                    <p>Anne Lynch</p>
+                    <span>{t('common.name')}</span>
+                    <p>{selectedConsulting.lead_name}</p>
                   </div>
                   <div className="col">
-                    <span>Consulting Source</span>
-                    <p>Phone Enquiry</p>
-                  </div>
-                  <div className="col">
-                    <span>Consulting Rating</span>
-                    <p>0</p>
-                  </div>
-                  <div className="col">
-                    <span>Consulting owner</span>
-                    <p>John Doe</p>
+                    <span>{t('consulting.receiver')}</span>
+                    <p>{selectedConsulting.receiver}</p>
                   </div>
                 </div>
               </div>
@@ -316,7 +249,7 @@ const ConsultingsDetailsModel = () => {
                             to="#not-contact-task-details"
                             data-bs-toggle="tab"
                           >
-                            Details
+                            {t('common.details')}
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -325,7 +258,7 @@ const ConsultingsDetailsModel = () => {
                             to="#not-contact-task-related"
                             data-bs-toggle="tab"
                           >
-                            Related
+                            {t('common.related')}
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -345,15 +278,15 @@ const ConsultingsDetailsModel = () => {
                         >
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
-                              <Collapse accordion expandIconPosition="end">
-                                <Panel header="Consulting Information" key="1">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
+                                <Panel header={t('consulting.consulting') + ' ' + t('common.information')} key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedConsulting.consulting_type}
                                         saved={savedValues}
                                         name="consulting_type"
-                                        title="Consulting Type"
+                                        title={t('consulting.type')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -365,7 +298,7 @@ const ConsultingsDetailsModel = () => {
                                       <DetailDateItem
                                         saved={savedValues}
                                         name="receipt_time"
-                                        title="Receipt Date"
+                                        title={t('consulting.receipt_time')}
                                         orgTimeData={orgReceiptTime}
                                         timeData={receiptTime}
                                         timeDataChange={handleReceiptTimeChange}
@@ -380,7 +313,7 @@ const ConsultingsDetailsModel = () => {
                                         defaultText={selectedConsulting.receiver}
                                         saved={savedValues}
                                         name="receiver"
-                                        title="Receiver"
+                                        title={t('consulting.receiver')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -392,7 +325,7 @@ const ConsultingsDetailsModel = () => {
                                         defaultText={selectedConsulting.product_type}
                                         saved={savedValues}
                                         name="product_type"
-                                        title="Product Type"
+                                        title={t('consulting.product_type')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -404,7 +337,7 @@ const ConsultingsDetailsModel = () => {
                                         defaultText={selectedConsulting.lead_time}
                                         saved={savedValues}
                                         name="lead_time"
-                                        title="Lead Time"
+                                        title={t('consulting.lead_time')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -416,7 +349,7 @@ const ConsultingsDetailsModel = () => {
                                         defaultText={selectedConsulting.request_type}
                                         saved={savedValues}
                                         name="request_type"
-                                        title="Request Type"
+                                        title={t('consulting.request_type')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -428,7 +361,7 @@ const ConsultingsDetailsModel = () => {
                                         defaultText={selectedConsulting.request_content}
                                         saved={savedValues}
                                         name="request_content"
-                                        title="Request Content"
+                                        title={t('consulting.request_content')}
                                         row_no={3}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
@@ -442,7 +375,7 @@ const ConsultingsDetailsModel = () => {
                                         defaultText={selectedConsulting.action_content}
                                         saved={savedValues}
                                         name="action_content"
-                                        title="Action Content"
+                                        title={t('consulting.action_content')}
                                         row_no={3}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
@@ -456,7 +389,7 @@ const ConsultingsDetailsModel = () => {
                                         defaultText={selectedConsulting.sales_representati}
                                         saved={savedValues}
                                         name="sales_representati"
-                                        title="Sales Representative"
+                                        title={t('lead.lead_sales')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -472,14 +405,14 @@ const ConsultingsDetailsModel = () => {
                             </div>
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Lead Information" key="1">
+                                <Panel header={t('lead.lead') + ' ' + t('common.information')} key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedConsulting.lead_name}
                                         saved={savedValues}
                                         name="lead_name"
-                                        title="Lead Name"
+                                        title={t('lead.lead_name')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -492,7 +425,7 @@ const ConsultingsDetailsModel = () => {
                                         defaultText={selectedConsulting.department}
                                         saved={savedValues}
                                         name="department"
-                                        title="Department"
+                                        title={t('lead.department')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -504,7 +437,7 @@ const ConsultingsDetailsModel = () => {
                                         defaultText={selectedConsulting.position}
                                         saved={savedValues}
                                         name="position"
-                                        title="Position"
+                                        title={t('lead.position')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -516,7 +449,7 @@ const ConsultingsDetailsModel = () => {
                                         defaultText={selectedConsulting.mobile_number}
                                         saved={savedValues}
                                         name="mobile_number"
-                                        title="Mobile"
+                                        title={t('lead.mobile')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -528,7 +461,7 @@ const ConsultingsDetailsModel = () => {
                                         defaultText={selectedConsulting.phone_number}
                                         saved={savedValues}
                                         name="phone_number"
-                                        title="Phone"
+                                        title={t('common.phone')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -540,7 +473,7 @@ const ConsultingsDetailsModel = () => {
                                         defaultText={selectedConsulting.email}
                                         saved={savedValues}
                                         name="email"
-                                        title="Email"
+                                        title={t('lead.email')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -556,14 +489,14 @@ const ConsultingsDetailsModel = () => {
                             </div>
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Company Information" key="1">
+                                <Panel header={t('company.company') + ' ' + t('common.information')} key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedConsulting.company_name}
                                         saved={savedValues}
                                         name="company_name"
-                                        title="Organization"
+                                        title={t('company.company_name')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -579,14 +512,14 @@ const ConsultingsDetailsModel = () => {
                             </div>
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Status Information" key="1">
+                                <Panel header={t('common.status') + ' ' + t('common.information')} key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedConsulting.status}
                                         saved={savedValues}
                                         name="status"
-                                        title="Status"
+                                        title={t('common.status')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
