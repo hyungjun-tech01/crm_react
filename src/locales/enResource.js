@@ -43,9 +43,6 @@ const enResource = {
             request_content: 'Consulting Content',
             request_type: 'Request Type',
             type:'Consulting Type',
-            receiver:'Receiver',
-            request_content:'Request Content',
-            action_content:'Action Content'
         },
         quotation : {
             add_new_quotation: 'Add New Quotation',

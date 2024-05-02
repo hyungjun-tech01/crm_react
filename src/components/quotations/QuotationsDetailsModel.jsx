@@ -985,7 +985,7 @@ const QuotationsDetailsModel = () => {
                                   className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
                                   onClick={handleSaveAll}
                                 >
-                                  Save
+                                  {t('common.save')}
                                 </button>
                                 &nbsp;&nbsp;
                                 <button
@@ -993,7 +993,7 @@ const QuotationsDetailsModel = () => {
                                   className="btn btn-secondary btn-rounded"
                                   onClick={handleCancelAll}
                                 >
-                                  Cancel
+                                  {t('common.cancel')}
                                 </button>
                               </div>
                           )}
@@ -1097,7 +1097,7 @@ const QuotationsDetailsModel = () => {
                                   className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
                                   onClick={handleSaveContentAll}
                                 >
-                                  Save
+                                  {t('common.save')}
                                 </button>
                                 &nbsp;&nbsp;
                                 <button
@@ -1105,7 +1105,7 @@ const QuotationsDetailsModel = () => {
                                   className="btn btn-secondary btn-rounded"
                                   onClick={handleCancelContentAll}
                                 >
-                                  Cancel
+                                  {t('common.cancel')}
                                 </button>
                               </div>
                           )}

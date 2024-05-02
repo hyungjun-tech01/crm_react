@@ -974,7 +974,7 @@ const ConsultingsDetailsModel = () => {
                             className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
                             onClick={handleSaveAll}
                           >
-                            Save
+                            {t('common.save')}
                           </button>
                           &nbsp;&nbsp;
                           <button
@@ -982,7 +982,7 @@ const ConsultingsDetailsModel = () => {
                             className="btn btn-secondary btn-rounded"
                             onClick={handleCancelAll}
                           >
-                            Cancel
+                            {t('common.cancel')}
                           </button>
                         </div>
                       }

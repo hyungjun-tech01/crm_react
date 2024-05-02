@@ -75,7 +75,7 @@ const koResource = {
             quotation_manager: '견적담당',
             quotation_owner: '견적담당자',
             quotation_price_information: '견적 가격 정보',
-            quotation_type: '견적구분',
+            quotation_type: '견적유형',
             quotation_unit_price: '견적단가',
             raw_price: '원가',
             sales_rep: '영업담당',

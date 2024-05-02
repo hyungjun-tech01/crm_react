@@ -622,7 +622,7 @@ const Consultings = () => {
                       className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
                       onClick={handleAddNewConsulting}
                     >
-                      Save
+                      {t('common.save')}
                     </button>
                     &nbsp;&nbsp;
                     <button
@@ -630,7 +630,7 @@ const Consultings = () => {
                       className="btn btn-secondary btn-rounded"
                       data-bs-dismiss="modal"
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </button>
                   </div>
                 </form>

@@ -570,7 +570,7 @@ const QuotationAddNewModal = (props) => {
                   />
                 </div>
                 <div className="col-sm-3">
-                  <label className="col-form-label">{t('common.type')}</label>
+                  <label className="col-form-label">{t('quotation.quotation_type')}</label>
                   <Select
                     ref={selectTypeRef}
                     options={QuotationTypes}
