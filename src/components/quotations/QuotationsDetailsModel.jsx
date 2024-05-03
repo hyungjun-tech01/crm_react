@@ -14,6 +14,7 @@ import QuotationView from "./QuotationtView";
 import { Add, Remove } from '@mui/icons-material';
 
 const content_indices = ['3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18'];
+const _ADD_CONTENT = 0;
 
 const QuotationsDetailsModel = () => {
   const { Panel } = Collapse;
@@ -30,13 +31,66 @@ const QuotationsDetailsModel = () => {
   const [ orgConfirmDate, setOrgConfirmDate ] = useState(null);
   const [ confirmDate, setConfirmDate ] = useState(new Date());
 
+  const [ orgQuotationContents, setOrgQuotationContents ] = useState([]);
   const [ quotationContents, setQuotationContents ] = useState([]);
   const [ quotationHeaders, setQuotationHeaders ] = useState([]);
 
   const [ editedContentValues, setEditedContentValues ] = useState(null);
   const [ savedContentValues, setSavedContentValues ] = useState(null);
 
-  const [ checkTemporaryContent, setCheckTemporaryContent ] = useState([]);
+  const [ checkContentChange, setCheckContentChange ] = useState(null);
+
+  // --- Funtions for Quotation Date ----------------------------------------------------
+  const handleStartQuotationDateEdit = useCallback(() => {
+    const tempEdited = {
+      ...editedValues,
+      quotation_date: orgQuotationDate,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues, orgQuotationDate]);
+  const handleQuotationDateChange = useCallback((date) => {
+    setQuotationDate(date);
+  }, []);
+  const handleEndQuotationDateEdit = useCallback(() => {
+    if (quotationDate !== orgQuotationDate) {
+      const tempSaved = {
+        ...savedValues,
+        quotation_date: quotationDate,
+      };
+      setSavedValues(tempSaved);
+    }
+    const tempEdited = {
+      ...editedValues,
+    };
+    delete tempEdited.quotation_date;
+    setEditedValues(tempEdited);
+  }, [editedValues, savedValues, orgQuotationDate, quotationDate]);
+
+  // --- Funtions for Confirm Date ------------------------------------------------------
+  const handleStartConfirmDateEdit = useCallback(() => {
+    const tempEdited = {
+      ...editedValues,
+      comfirm_date: orgConfirmDate,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues, orgConfirmDate]);
+  const handleConfirmDateChange = useCallback((date) => {
+    setConfirmDate(date);
+  }, []);
+  const handleEndConfirmDateEdit = useCallback(() => {
+    if (confirmDate !== orgConfirmDate) {
+      const tempSaved = {
+        ...savedValues,
+        comfirm_date: confirmDate,
+      };
+      setSavedValues(tempSaved);
+    }
+    const tempEdited = {
+      ...editedValues,
+    };
+    delete tempEdited.comfirm_date;
+    setEditedValues(tempEdited);
+  }, [editedValues, savedValues, orgConfirmDate, confirmDate]);
 
   // --- Funtions for Editing ----------------------------------------------------------
   const handleCheckEditState = useCallback((name) => {
@@ -191,40 +245,102 @@ const QuotationsDetailsModel = () => {
     setSavedContentValues(tempSaved);
   }, [savedContentValues, selectedQuotation]);
 
+  // --- Funtions for Dealing Content ------------------------------------------------------
+  const handleAddContent = useCallback(() => {
+    const content_no = quotationContents.length;
+    const tempCheckTempContent = {
+      ...checkContentChange,
+      [content_no]: _ADD_CONTENT,
+    };
+    setCheckContentChange(tempCheckTempContent);
+
+    let tempContent = {};
+    quotationHeaders.forEach((header) => {
+      tempContent[header[0]] = null;
+    });
+    tempContent['1'] = content_no + 1;
+    const tempContents = [
+      ...quotationContents,
+      tempContent
+    ];
+    setQuotationContents(tempContents);
+  }, [checkContentChange, quotationContents, quotationHeaders]);
+
+  const handleDeleteConetent = useCallback((index) => {
+    if(checkContentChange[index]) {
+        const tempCheckContent = {
+          ...checkContentChange,
+        };
+        delete tempCheckContent[index];
+        setCheckContentChange(tempCheckContent);
+    };
+
+    // Check 'editedContentValues' and clear data related content
+    let tempEditedContent = {
+      ...editedContentValues
+    };
+    Object.keys(editedContentValues).forEach(key => {
+      const [no, idx] = key.split('.');
+      if(no === index){
+        delete tempEditedContent[key];
+      };
+    });
+    setEditedContentValues(tempEditedContent);
+
+    // Check 'savedContentValues' and clear data related content
+    let tempSavedContent = {
+      ...savedContentValues
+    };
+    Object.keys(savedContentValues).forEach(key => {
+      const [no, idx] = key.split('.');
+      if(no === index){
+        delete tempSavedContent[key];
+      };
+    });
+    setSavedContentValues(tempSavedContent);
+
+    // Finally, ---------------------------------------------
+    const tempContents = [
+      ...quotationContents.slice(0, index),
+      ...quotationContents.slice(index + 1, ),
+    ];
+    setQuotationContents(tempContents);
+  }, [checkContentChange, quotationContents, savedContentValues]);
+
   const handleSaveContentAll = useCallback(() => {
     if (
       savedContentValues !== null &&
       selectedQuotation &&
       selectedQuotation !== defaultQuotation
     ) {
+      // Transfer data in temporary variable into content data.
       let tempContents = [
         ...quotationContents,
       ];
 
       Object.keys(savedContentValues).forEach(item => {
-        console.log('\thandleSaveContentAll / item - ', item);
         const [no, index] = item.split('.');
         tempContents[no][index] = savedContentValues[item];
 
-        const foundIdx = checkTemporaryContent.findIndex(idx => idx === no);
-        if(foundIdx !== -1){
-          const tempCheckTempContent = [
-            ...checkTemporaryContent.slice(0, foundIdx),
-            ...checkTemporaryContent.slice(foundIdx, ),
-          ];
-          setCheckTemporaryContent(tempCheckTempContent);
+        // If there is at least one data in temporary variable to save releated to newly added content, store it
+        if(checkContentChange[no]){
+          const tempCheckContent = {
+            ...checkContentChange,
+          };
+          delete tempCheckContent[no];
+          setCheckContentChange(tempCheckContent);
         };
       });
 
-      if(checkTemporaryContent.length > 0) {
-        // This means that there is(are) newly added content(s), but it doesn't have any data actually.
-        checkTemporaryContent.forEach(idx => {
+      if(checkContentChange) {
+        // This means some contents are newly added, but they have no date in it
+        Object.keys(checkContentChange).forEach(key => {
           const tempContents = [
-            ...quotationContents.slice(0, idx),
-            ...quotationContents.slice(idx + 1, ),
+           ...quotationContents.slice(0, key),
+           ...quotationContents.slice(key + 1, 0),
           ];
           setQuotationContents(tempContents);
-        });
+        })
       }
 
       const temp_all_saved = {
@@ -246,6 +362,7 @@ const QuotationsDetailsModel = () => {
     setEditedContentValues(null);
     setSavedContentValues(null);
   }, [
+    checkContentChange,
     cookies.myLationCrmUserId,
     modifyQuotation,
     savedContentValues,
@@ -254,109 +371,16 @@ const QuotationsDetailsModel = () => {
   ]);
 
   const handleCancelContentAll = useCallback(() => {
-    if(checkTemporaryContent){
-      checkTemporaryContent.forEach(idx => {
-        const tempContents = [
-          ...quotationContents.slice(0, idx),
-          ...quotationContents.slice(idx + 1,),
-        ];
-        setQuotationContents(tempContents);
-      })
-    }
-    setCheckTemporaryContent([]);
+    setCheckContentChange(null);
     setEditedContentValues(null);
     setSavedContentValues(null);
-  }, []);
-
-  // --- Funtions for Quotation Date ----------------------------------------------------
-  const handleStartQuotationDateEdit = useCallback(() => {
-    const tempEdited = {
-      ...editedValues,
-      quotation_date: orgQuotationDate,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues, orgQuotationDate]);
-  const handleQuotationDateChange = useCallback((date) => {
-    setQuotationDate(date);
-  }, []);
-  const handleEndQuotationDateEdit = useCallback(() => {
-    if (quotationDate !== orgQuotationDate) {
-      const tempSaved = {
-        ...savedValues,
-        quotation_date: quotationDate,
-      };
-      setSavedValues(tempSaved);
-    }
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited.quotation_date;
-    setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgQuotationDate, quotationDate]);
-
-  // --- Funtions for Confirm Date ------------------------------------------------------
-  const handleStartConfirmDateEdit = useCallback(() => {
-    const tempEdited = {
-      ...editedValues,
-      comfirm_date: orgConfirmDate,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues, orgConfirmDate]);
-  const handleConfirmDateChange = useCallback((date) => {
-    setConfirmDate(date);
-  }, []);
-  const handleEndConfirmDateEdit = useCallback(() => {
-    if (confirmDate !== orgConfirmDate) {
-      const tempSaved = {
-        ...savedValues,
-        comfirm_date: confirmDate,
-      };
-      setSavedValues(tempSaved);
-    }
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited.comfirm_date;
-    setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgConfirmDate, confirmDate]);
-
-  // --- Funtions for Dealing Content ------------------------------------------------------
-  const handleAddContent = useCallback(() => {
-    const content_no = quotationContents.length;
-    const tempCheckTempContent =[
-      ...checkTemporaryContent,
-      content_no,
-    ];
-    setCheckTemporaryContent(tempCheckTempContent);
-
-    let tempContent = {};
-    quotationHeaders.forEach((header) => {
-      tempContent[header[0]] = null;
-    });
-    tempContent['1'] = content_no + 1;
     const tempContents = [
-      ...quotationContents,
-      tempContent
+      ...orgQuotationContents
     ];
     setQuotationContents(tempContents);
-  }, [quotationHeaders]);
+  }, []);
 
-  const handleDeleteConetent = useCallback((index) => {
-    const foundIdx = checkTemporaryContent.findIndex(idx => idx === index);
-    if(foundIdx !== -1){
-      const tempCheckTempContent = [
-        ...checkTemporaryContent.slice(0, foundIdx),
-        ...checkTemporaryContent.slice(foundIdx + 1, ),
-      ];
-      setCheckTemporaryContent(tempCheckTempContent);
-    };
-    const tempContents = [
-      ...quotationContents.slice(0, index),
-      ...quotationContents.slice(index + 1, ),
-    ];
-    setQuotationContents(tempContents);
-  }, [quotationContents]);
-
+  // --- useEffect ------------------------------------------------------
   useEffect(() => {
     console.log('[QuotationsDetailsModel] called!');
     setOrgQuotationDate(
@@ -380,9 +404,11 @@ const QuotationsDetailsModel = () => {
         };
         setQuotationHeaders(tableHeaders);
       };
+
       const tempContents = JSON.parse(selectedQuotation.quotation_contents);
       if(tempContents && Array.isArray(tempContents)){
-          setQuotationContents(tempContents);
+        setOrgQuotationContents([...tempContents]);
+        setQuotationContents([...tempContents]);
       };
     }
   }, [ selectedQuotation, savedValues ]);

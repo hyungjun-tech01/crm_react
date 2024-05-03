@@ -118,6 +118,7 @@ const enResource = {
             category: 'Category',
             color: 'Color',
             currency: 'Currency',
+            dashboard: 'Dashboard',
             details: 'Details',
             information:'Information',
             location: 'Location',

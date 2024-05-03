@@ -1,8 +1,9 @@
 import React from "react";
 import { Link, withRouter } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import { avatar17 } from "../imagepath";
-import { BiEdit, BiSearchAlt2, BiStation } from "react-icons/bi";
+import { BiSearchAlt2 } from "react-icons/bi";
 import { Business
   , CalculateOutlined
   , EditCalendarOutlined
@@ -13,6 +14,7 @@ import { Business
 } from "@mui/icons-material";
 
 const SidebarNav = (props) => {
+  const [ t ] = useTranslation();
 
   const exclusionArray = ["login", "register", "forgot-password", "error-404", "error-500", "email", "mail-view", "components"];
   if (exclusionArray.indexOf(props.location.pathname.split("/")[1]) >= 0) {
@@ -46,7 +48,7 @@ const SidebarNav = (props) => {
                         <span className="font-weight-bold mb-2">
                           {" "}
                         </span>
-                        <span className="text-white text-small">Company</span>
+                        <span className="text-white text-small">{t('company.company')}</span>
                   </div>
                   <i className="mdi mdi-bookmark-check text-success nav-profile-badge" />
                 </Link>
@@ -65,36 +67,36 @@ const SidebarNav = (props) => {
               </li> */}
               <li>
                 <Link to="/" className={`${pathname === "/" || pathname === "/projects-dashboard" || pathname === "/index" || pathname === "/leads-dashboard" ? "active subdrop" : ""}`}>
-                  <SpaceDashboardOutlined /> <span> Dashboard</span> <span className="menu-arrow" /></Link>
+                  <SpaceDashboardOutlined /> <span>{t('common.dashboard')}</span> <span className="menu-arrow" /></Link>
                 </li>
               <li>
                 <Link className={`${pathname.includes("companies") ? "active" : "" }`} to="/companies">
-                  <Business /> <span>Companies</span>
+                  <Business /> <span>{t('company.company')}</span>
                 </Link>
               </li>
               <li>
                 <Link className={`${pathname.includes("leads") ? "active" : ""}`} to="/leads">
-                  <PersonOutlineOutlined /> <span>Leads</span>
+                  <PersonOutlineOutlined /> <span>{t('lead.lead')}</span>
                 </Link>
               </li>
               <li>
                 <Link className={`${pathname.includes("consultings") ? "active" : ""}`} to="/consultings">
-                  <EditCalendarOutlined/> <span>Consultings</span>
+                  <EditCalendarOutlined/> <span>{t('consulting.consulting')}</span>
                 </Link>
               </li>
               <li>
                 <Link className={`${pathname.includes("quotations") ? "active" : ""}`} to="/quotations">
-                  <CalculateOutlined /> <span>Quotations</span>
+                  <CalculateOutlined /> <span>{t('quotation.quotation')}</span>
                 </Link>
               </li>
               <li>
                 <Link className={`${pathname.includes("transactions") ? "active" : ""}`} to="/transactions">
-                  <ReceiptLongOutlined /> <span>Transactions</span>
+                  <ReceiptLongOutlined /> <span>{t('transaction.transaction')}</span>
                 </Link>
               </li>
               <li>
                 <Link className={`${pathname.includes("purchases") ? "active" : ""}`} to="/purchases">
-                  <ShoppingBagOutlined /> <span>Purchases</span>
+                  <ShoppingBagOutlined /> <span>{t('purchase.purchase')}</span>
                 </Link>
               </li>
               {/* <li>
