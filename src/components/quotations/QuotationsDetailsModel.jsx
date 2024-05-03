@@ -15,6 +15,7 @@ import { Add, Remove } from '@mui/icons-material';
 
 const content_indices = ['3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18'];
 const _ADD_CONTENT = 0;
+const _DELETE_CONTENT = 1;
 
 const QuotationsDetailsModel = () => {
   const { Panel } = Collapse;
@@ -38,7 +39,7 @@ const QuotationsDetailsModel = () => {
   const [ editedContentValues, setEditedContentValues ] = useState(null);
   const [ savedContentValues, setSavedContentValues ] = useState(null);
 
-  const [ checkContentChange, setCheckContentChange ] = useState(null);
+  const [ keyForContent, setKeyForContent ] = useState(0);
 
   // --- Funtions for Quotation Date ----------------------------------------------------
   const handleStartQuotationDateEdit = useCallback(() => {
@@ -247,34 +248,21 @@ const QuotationsDetailsModel = () => {
 
   // --- Funtions for Dealing Content ------------------------------------------------------
   const handleAddContent = useCallback(() => {
-    const content_no = quotationContents.length;
-    const tempCheckTempContent = {
-      ...checkContentChange,
-      [content_no]: _ADD_CONTENT,
-    };
-    setCheckContentChange(tempCheckTempContent);
 
-    let tempContent = {};
+    let tempContent = {unique_key: keyForContent};
     quotationHeaders.forEach((header) => {
       tempContent[header[0]] = null;
     });
-    tempContent['1'] = content_no + 1;
+    tempContent['1'] = quotationContents.length;
     const tempContents = [
       ...quotationContents,
       tempContent
     ];
     setQuotationContents(tempContents);
-  }, [checkContentChange, quotationContents, quotationHeaders]);
+    setKeyForContent(keyForContent + 1);
+  }, [keyForContent, quotationContents, quotationHeaders]);
 
   const handleDeleteConetent = useCallback((index) => {
-    if(checkContentChange[index]) {
-        const tempCheckContent = {
-          ...checkContentChange,
-        };
-        delete tempCheckContent[index];
-        setCheckContentChange(tempCheckContent);
-    };
-
     // Check 'editedContentValues' and clear data related content
     let tempEditedContent = {
       ...editedContentValues
@@ -305,7 +293,7 @@ const QuotationsDetailsModel = () => {
       ...quotationContents.slice(index + 1, ),
     ];
     setQuotationContents(tempContents);
-  }, [checkContentChange, quotationContents, savedContentValues]);
+  }, [quotationContents, savedContentValues]);
 
   const handleSaveContentAll = useCallback(() => {
     if (
@@ -314,6 +302,7 @@ const QuotationsDetailsModel = () => {
       selectedQuotation !== defaultQuotation
     ) {
       // Transfer data in temporary variable into content data.
+      let savedContentKeys = {};
       let tempContents = [
         ...quotationContents,
       ];
@@ -322,26 +311,13 @@ const QuotationsDetailsModel = () => {
         const [no, index] = item.split('.');
         tempContents[no][index] = savedContentValues[item];
 
-        // If there is at least one data in temporary variable to save releated to newly added content, store it
-        if(checkContentChange[no]){
-          const tempCheckContent = {
-            ...checkContentChange,
-          };
-          delete tempCheckContent[no];
-          setCheckContentChange(tempCheckContent);
+        if(!savedContentKeys[no]){
+          savedContentKeys[no] = tempContents[no]['unique_key'];
         };
       });
 
-      if(checkContentChange) {
-        // This means some contents are newly added, but they have no date in it
-        Object.keys(checkContentChange).forEach(key => {
-          const tempContents = [
-           ...quotationContents.slice(0, key),
-           ...quotationContents.slice(key + 1, 0),
-          ];
-          setQuotationContents(tempContents);
-        })
-      }
+      // Check if there is a newly added content having no date in it
+      
 
       const temp_all_saved = {
         ...selectedQuotation,
@@ -405,8 +381,15 @@ const QuotationsDetailsModel = () => {
         setQuotationHeaders(tableHeaders);
       };
 
-      const tempContents = JSON.parse(selectedQuotation.quotation_contents);
-      if(tempContents && Array.isArray(tempContents)){
+      const contentsData = JSON.parse(selectedQuotation.quotation_contents);
+      if(contentsData && Array.isArray(contentsData)){
+        const tempContents = contentsData.map((data, index) => {
+          return {
+            unique_key: index,
+            ...data,
+          }
+        });
+        setKeyForContent(contentsData.length);
         setOrgQuotationContents([...tempContents]);
         setQuotationContents([...tempContents]);
       };
@@ -1115,7 +1098,7 @@ const QuotationsDetailsModel = () => {
                               />
                             </div>
                           </div>
-                          { savedContentValues !== null &&
+                          { savedContentValues &&
                             Object.keys(savedContentValues).length !== 0 && (
                               <div className="text-center py-3">
                                 <button
