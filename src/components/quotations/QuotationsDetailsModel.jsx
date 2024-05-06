@@ -14,8 +14,6 @@ import QuotationView from "./QuotationtView";
 import { Add, Remove } from '@mui/icons-material';
 
 const content_indices = ['3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18'];
-const _ADD_CONTENT = 0;
-const _DELETE_CONTENT = 1;
 
 const QuotationsDetailsModel = () => {
   const { Panel } = Collapse;
@@ -39,7 +37,8 @@ const QuotationsDetailsModel = () => {
   const [ editedContentValues, setEditedContentValues ] = useState(null);
   const [ savedContentValues, setSavedContentValues ] = useState(null);
 
-  const [ keyForContent, setKeyForContent ] = useState(0);
+  const [ checkContentState, setCheckContentState ] = useState(null);
+  const [ isNewlyAdded, setIsNewlyAdded ] = useState(false);
 
   // --- Funtions for Quotation Date ----------------------------------------------------
   const handleStartQuotationDateEdit = useCallback(() => {
@@ -248,44 +247,56 @@ const QuotationsDetailsModel = () => {
 
   // --- Funtions for Dealing Content ------------------------------------------------------
   const handleAddContent = useCallback(() => {
-
-    let tempContent = {unique_key: keyForContent};
+    let tempContent = {};
     quotationHeaders.forEach((header) => {
       tempContent[header[0]] = null;
     });
-    tempContent['1'] = quotationContents.length;
+    tempContent['1'] = quotationContents.length + 1;
     const tempContents = [
       ...quotationContents,
       tempContent
     ];
     setQuotationContents(tempContents);
-    setKeyForContent(keyForContent + 1);
-  }, [keyForContent, quotationContents, quotationHeaders]);
+
+    const tempCheck=[
+      ...checkContentState,
+      true,
+    ];
+    setCheckContentState(tempCheck);
+
+    if(!isNewlyAdded){
+      setIsNewlyAdded(true);
+    };
+  }, [checkContentState, isNewlyAdded, quotationContents, quotationHeaders]);
 
   const handleDeleteConetent = useCallback((index) => {
     // Check 'editedContentValues' and clear data related content
     let tempEditedContent = {
       ...editedContentValues
     };
-    Object.keys(editedContentValues).forEach(key => {
-      const [no, idx] = key.split('.');
-      if(no === index){
-        delete tempEditedContent[key];
-      };
-    });
-    setEditedContentValues(tempEditedContent);
+    if(editedContentValues){
+      Object.keys(editedContentValues).forEach(key => {
+        const [no, idx] = key.split('.');
+        if(no === index){
+          delete tempEditedContent[key];
+        };
+      });
+      setEditedContentValues(tempEditedContent);
+    }
 
     // Check 'savedContentValues' and clear data related content
     let tempSavedContent = {
       ...savedContentValues
     };
-    Object.keys(savedContentValues).forEach(key => {
-      const [no, idx] = key.split('.');
-      if(no === index){
-        delete tempSavedContent[key];
-      };
-    });
-    setSavedContentValues(tempSavedContent);
+    if(savedContentValues){
+      Object.keys(savedContentValues).forEach(key => {
+        const [no, idx] = key.split('.');
+        if(no === index){
+          delete tempSavedContent[key];
+        };
+      });
+      setSavedContentValues(tempSavedContent);
+    }
 
     // Finally, ---------------------------------------------
     const tempContents = [
@@ -293,7 +304,22 @@ const QuotationsDetailsModel = () => {
       ...quotationContents.slice(index + 1, ),
     ];
     setQuotationContents(tempContents);
-  }, [quotationContents, savedContentValues]);
+
+    const tempCheck = [
+      ...checkContentState
+    ];
+    tempCheck.splice(index, 1);
+    setCheckContentState(tempCheck);
+
+    let isThereNewlyAdded = false;
+    for(let i=0; i<tempCheck.length; i++){
+      if(tempCheck[i]){
+        isThereNewlyAdded = true;
+        break;
+      };
+    };
+    setIsNewlyAdded(isThereNewlyAdded);
+  }, [checkContentState, isNewlyAdded, quotationContents, savedContentValues]);
 
   const handleSaveContentAll = useCallback(() => {
     if (
@@ -302,7 +328,7 @@ const QuotationsDetailsModel = () => {
       selectedQuotation !== defaultQuotation
     ) {
       // Transfer data in temporary variable into content data.
-      let savedContentKeys = {};
+      let contents_in_saved = {};
       let tempContents = [
         ...quotationContents,
       ];
@@ -310,18 +336,21 @@ const QuotationsDetailsModel = () => {
       Object.keys(savedContentValues).forEach(item => {
         const [no, index] = item.split('.');
         tempContents[no][index] = savedContentValues[item];
-
-        if(!savedContentKeys[no]){
-          savedContentKeys[no] = tempContents[no]['unique_key'];
+        if(!contents_in_saved[no]){
+          contents_in_saved[no] = true;
         };
       });
 
       // Check if there is a newly added content having no date in it
-      
+      for(let i=checkContentState.length - 1; i >= 0; i--){
+        if(checkContentState[i] && !contents_in_saved[i]){
+          tempContents.splice(i, 1);
+        };
+      };
 
       const temp_all_saved = {
         ...selectedQuotation,
-        quotation_contents: JSON.stringify(quotationContents),
+        quotation_contents: JSON.stringify(tempContents),
         action_type: "UPDATE",
         modify_user: cookies.myLationCrmUserId,
         quotation_code: selectedQuotation.quotation_code,
@@ -329,6 +358,13 @@ const QuotationsDetailsModel = () => {
       if (modifyQuotation(temp_all_saved)) {
         console.log(`Succeeded to modify Quotation`);
         setQuotationContents(tempContents);
+        setOrgQuotationContents(tempContents);
+        let tempCheck = [];
+        tempContents.forEach(content => {
+          tempCheck.push(true);
+        });
+        setCheckContentState(tempCheck);
+        setIsNewlyAdded(false);
       } else {
         console.error("Failed to modify Quotation");
       }
@@ -338,7 +374,7 @@ const QuotationsDetailsModel = () => {
     setEditedContentValues(null);
     setSavedContentValues(null);
   }, [
-    checkContentChange,
+    checkContentState,
     cookies.myLationCrmUserId,
     modifyQuotation,
     savedContentValues,
@@ -347,7 +383,6 @@ const QuotationsDetailsModel = () => {
   ]);
 
   const handleCancelContentAll = useCallback(() => {
-    setCheckContentChange(null);
     setEditedContentValues(null);
     setSavedContentValues(null);
     const tempContents = [
@@ -383,15 +418,14 @@ const QuotationsDetailsModel = () => {
 
       const contentsData = JSON.parse(selectedQuotation.quotation_contents);
       if(contentsData && Array.isArray(contentsData)){
-        const tempContents = contentsData.map((data, index) => {
-          return {
-            unique_key: index,
-            ...data,
-          }
-        });
-        setKeyForContent(contentsData.length);
-        setOrgQuotationContents([...tempContents]);
-        setQuotationContents([...tempContents]);
+        setOrgQuotationContents([...contentsData]);
+        setQuotationContents([...contentsData]);
+
+        let tempCheck = [];
+        for(let i=0; i<contentsData.length; i++){
+          tempCheck.push(false);
+        };
+        setCheckContentState(tempCheck);
       };
     }
   }, [ selectedQuotation, savedValues ]);
@@ -1098,8 +1132,9 @@ const QuotationsDetailsModel = () => {
                               />
                             </div>
                           </div>
-                          { savedContentValues &&
-                            Object.keys(savedContentValues).length !== 0 && (
+                          { ((savedContentValues && Object.keys(savedContentValues).length !== 0)
+                              || isNewlyAdded)
+                            && (
                               <div className="text-center py-3">
                                 <button
                                   type="button"
