@@ -472,9 +472,9 @@ const handleRowClick = (row) => {
                   </div>
                   <div className="col">
                     <span>{t('company.homepage')}</span>
-                    <p>{selectedLead.homepage}</p>
+                    <a href={selectedLead.homepage} target="_blank" rel="noopener noreferrer">{selectedLead.homepage}</a>
                   </div>
-                </div>
+                </div>s
               </div>
             </div>
             <div className="modal-body">
@@ -829,7 +829,7 @@ const handleRowClick = (row) => {
                                   <table className="table">
                                     <tbody>
                                       <DetailTextareaItem
-                                        defaultText={selectedLead.status}
+                                        defaultText={selectedLead.status === null ? 'Not Contacted':selectedLead.status}
                                         saved={savedValues}
                                         name="status"
                                         title={t('lead.lead_status')}
