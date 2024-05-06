@@ -16,6 +16,7 @@ import {ConsultingRepo} from "../../repository/consulting"
 import {ExpandMore} from "@mui/icons-material";
 import ConsultingsDetailsModel from "../consulting/ConsultingsDetailsModel";
 import {  Edit } from '@mui/icons-material';
+import { useTranslation } from "react-i18next";
 
 
 const LeadsDetailsModel = () => {
@@ -25,6 +26,7 @@ const LeadsDetailsModel = () => {
   const companyConsultings = useRecoilValue(atomCompanyConsultings);
   const filteredConsultings = useRecoilValue(atomFilteredConsulting);
 
+  const { t } = useTranslation();
 
   const { modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
   const { modifyCompany } = useRecoilValue(CompanyRepo);
@@ -261,6 +263,22 @@ const [selectedRow, setSelectedRow] = useState(null);
     setSavedValuesCompany(null);
   }, []);  
 
+  //change status chage 
+  const handleChangeStatus = (newStatus)=>{
+    const tempEdited = {
+      status:newStatus,
+      action_type: "UPDATE",
+      modify_user: cookies.myLationCrmUserId,
+      lead_code: selectedLead.lead_code,
+    };
+
+    if (modifyLead(tempEdited)) {
+      console.log(`Succeeded to lead change status`);
+    } else {
+      console.error('Failed to modify lead')
+    }
+  };
+
   // --- Funtions for Establishment Date ---------------------------------
   const [ orgEstablishDate, setOrgEstablishDate ] = useState(null);
   const [ establishDate, setEstablishDate ] = useState(new Date());
@@ -437,26 +455,26 @@ const handleRowClick = (row) => {
               <div className="card-body">
                 <div className="row">
                   <div className="col">
-                    <span>Lead Status</span>
+                    <span>{t('lead.lead_status')}</span>
                     <p>{selectedLead.status=== null ? "Not Contacted":selectedLead.status}</p>
                   </div>
                   <div className="col">
-                    <span>Name</span>
+                    <span>{t('lead.lead_name')}</span>
                     <p>{selectedLead.lead_name}</p>
                   </div>
                   <div className="col">
-                    <span>Company</span>
+                    <span>{t('company.company_name')}</span>
                     <p>{selectedLead.company_name}</p>
                   </div>
                   <div className="col">
-                    <span>Sales Resource</span>
+                    <span>{t('company.salesman')}</span>
                     <p>{selectedLead.sales_resource}</p>
                   </div>
                   <div className="col">
-                    <span>Homepage</span>
-                    <p>{selectedLead.homepage}</p>
+                    <span>{t('company.homepage')}</span>
+                    <a href={selectedLead.homepage} target="_blank" rel="noopener noreferrer">{selectedLead.homepage}</a>
                   </div>
-                </div>
+                </div>s
               </div>
             </div>
             <div className="modal-body">
@@ -469,11 +487,12 @@ const handleRowClick = (row) => {
                     <li role="presentation">
                       <Link
                         to="#not-contacted"
-                        className="active"
+                        className={selectedLead.status === "Not Contacted" || selectedLead.status === null ? "active":"" }
                         aria-controls="not-contacted"
                         role="tab"
                         data-bs-toggle="tab"
-                        aria-expanded="true"
+                        aria-expanded={selectedLead.status === "Not Contacted" ? "true":"false" }
+                        onClick={() => handleChangeStatus("Not Contacted")}
                       >
                         <span className="octicon octicon-light-bulb" />
                         Not Contacted
@@ -482,10 +501,12 @@ const handleRowClick = (row) => {
                     <li role="presentation" className="">
                       <Link
                         to="#attempted-contact"
+                        className={selectedLead.status === "Attempted Contact" ? "active":"inactive" }
                         aria-controls="attempted-contact"
                         role="tab"
                         data-bs-toggle="tab"
-                        aria-expanded="false"
+                        aria-expanded={selectedLead.status === "Attempted Contact" ? "true":"false" }
+                        onClick={() => handleChangeStatus("Attempted Contact")}
                       >
                         <span className="octicon octicon-diff-added" />
                         Attempted Contact
@@ -494,10 +515,12 @@ const handleRowClick = (row) => {
                     <li role="presentation" className="">
                       <Link
                         to="#contact"
+                        className={selectedLead.status === "Contact" ? "active":"inactive" }
                         aria-controls="contact"
                         role="tab"
                         data-bs-toggle="tab"
-                        aria-expanded="false"
+                        aria-expanded={selectedLead.status === "Contact" ? "true":"false" }
+                        onClick={() => handleChangeStatus("Contact")}
                       >
                         <span className="octicon octicon-comment-discussion" />
                         Contact
@@ -506,10 +529,12 @@ const handleRowClick = (row) => {
                     <li role="presentation" className="">
                       <Link
                         to="#converted"
+                        className={selectedLead.status === "Converted" ? "active":"inactive" }
                         aria-controls="contact"
                         role="tab"
                         data-bs-toggle="tab"
-                        aria-expanded="false"
+                        aria-expanded={selectedLead.status === "Converted" ? "true":"false" }
+                        onClick={() => handleChangeStatus("Converted")}
                       >
                         <span className="octicon octicon-comment-discussion" />
                         Converted
@@ -544,7 +569,7 @@ const handleRowClick = (row) => {
                             to="#not-contact-task-details"
                             data-bs-toggle="tab"
                           >
-                            Details
+                            {t('lead.detail_information')}
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -553,7 +578,7 @@ const handleRowClick = (row) => {
                             to="#not-contact-task-related"
                             data-bs-toggle="tab"
                           >
-                            업체정보
+                             {t('lead.company_information')}
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -562,7 +587,7 @@ const handleRowClick = (row) => {
                             to="#not-contact-task-consult"
                             data-bs-toggle="tab"
                           >
-                            상담이력
+                            {t('lead.consulting_history')}
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -571,7 +596,7 @@ const handleRowClick = (row) => {
                             to="#not-contact-task-quotation"
                             data-bs-toggle="tab"
                           >
-                            견적정보
+                            {t('lead.quotation_history')}
                           </Link>
                         </li>   
                         <li className="nav-item">
@@ -590,15 +615,15 @@ const handleRowClick = (row) => {
                           id="not-contact-task-details" >
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
-                              <Collapse accordion expandIconPosition="end">
-                                <Panel header="Lead Information" key="1">
+                              <Collapse accordion expandIconPosition="end" defaultActiveKey={['1']}>
+                                <Panel header={t('lead.lead_information')} key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedLead.lead_name}
                                         saved={savedValues}
                                         name="lead_name"
-                                        title="Name"
+                                        title={t('lead.lead_name')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -611,7 +636,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedLead.position}
                                         saved={savedValues}
                                         name="position"
-                                        title="Title"
+                                        title={t('lead.position')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -623,7 +648,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedLead.department}
                                         saved={savedValues}
                                         name="department"
-                                        title="Department"
+                                        title={t('lead.department')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -635,7 +660,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedLead.company_name}
                                         saved={savedValues}
                                         name="company_name"
-                                        title="Organization"
+                                        title={t('company.company_name')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -647,7 +672,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedLead.is_keyman}
                                         saved={savedValues}
                                         name="is_keyman"
-                                        title="Key Man"
+                                        title={t('lead.is_keyman')}
                                         options={KeyManForSelection}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -659,7 +684,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedLead.group_}
                                         saved={savedValues}
                                         name="group_"
-                                        title="Group"
+                                        title={t('lead.lead_group')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -671,7 +696,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedLead.region}
                                         saved={savedValues}
                                         name="region"
-                                        title="Region"
+                                        title={t('common.region')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -683,7 +708,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedLead.sales_resource}
                                         saved={savedValues}
                                         name="sales_resource"
-                                        title="Sales Resource"
+                                        title={t('company.salesman')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -695,7 +720,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedLead.application_engineer}
                                         saved={savedValues}
                                         name="application_engineer"
-                                        title="Application Engineer"
+                                        title={t('company.engineer')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -704,7 +729,7 @@ const handleRowClick = (row) => {
                                         cancelSaved={handleCancelSaved}
                                       />
                                       <tr>
-                                        <td className="border-0">Lead Created</td>
+                                        <td className="border-0">{t('common.created')}</td>
                                         <td className="border-0">
                                           {new Date(selectedLead.create_date).toLocaleDateString('ko-KR', {year:"numeric", month: 'short', day:'numeric'})}
                                         </td>
@@ -716,14 +741,14 @@ const handleRowClick = (row) => {
                             </div>
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Contact Information" key="1">
+                                <Panel header={t('common.contact_details')} key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedLead.email}
                                         saved={savedValues}
                                         name="email"
-                                        title="Email"
+                                        title={t('lead.email')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -736,31 +761,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedLead.mobile_number}
                                         saved={savedValues}
                                         name="mobile_number"
-                                        title="Mobile"
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedLead.company_phone_number}
-                                        saved={savedValues}
-                                        name="company_phone_number"
-                                        title="Phone"
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedLead.company_fax_number}
-                                        saved={savedValues}
-                                        name="company_fax_number"
-                                        title="Fax"
+                                        title={t('lead.mobile')}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -772,7 +773,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedLead.homepage}
                                         saved={savedValues}
                                         name="homepage"
-                                        title="Website"
+                                        title={t('lead.homepage')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -788,14 +789,14 @@ const handleRowClick = (row) => {
                             </div>
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Address Information" key="1">
+                                <Panel header={t('company.address')} key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedLead.company_address}
                                         saved={savedValues}
                                         name="company_address"
-                                        title="Address"
+                                        title={t('company.address')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -808,7 +809,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedLead.company_zip_code}
                                         saved={savedValues}
                                         name="company_zip_code"
-                                        title="Postal Code"
+                                        title={t('lead.zip_code')}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
@@ -824,14 +825,14 @@ const handleRowClick = (row) => {
                             </div>
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Status Information" key="1">
+                                <Panel header={t('lead.lead_status')} key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailTextareaItem
-                                        defaultText={selectedLead.status}
+                                        defaultText={selectedLead.status === null ? 'Not Contacted':selectedLead.status}
                                         saved={savedValues}
                                         name="status"
-                                        title="Status"
+                                        title={t('lead.lead_status')}
                                         row_no={2}
                                         no_border={true}
                                         checkEdit={handleCheckEditState}
@@ -853,7 +854,7 @@ const handleRowClick = (row) => {
                           id="not-contact-task-related" >
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse accordion expandIconPosition="end" defaultActiveKey={['1']}>
                                 <Panel header="Organization Name" key="1">
                                   <table className="table">
                                     <tbody>
@@ -888,7 +889,7 @@ const handleRowClick = (row) => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item active">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse accordion expandIconPosition="end" defaultActiveKey={['1']}>
                                 <Panel header="Organization Details" key="1">
                                   <table className="table">
                                     <tbody>

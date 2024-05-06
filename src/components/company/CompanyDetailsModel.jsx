@@ -560,7 +560,7 @@ const CompanyDetailsModel = () => {
                       </div>
                       <div className="tasks__item crms-task-item">
                         <Collapse accordion expandIconPosition="end">
-                          <Panel header= {t('company.company_contact_details')} key="1">
+                          <Panel header= {t('common.contact_details')} key="1">
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
@@ -674,7 +674,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.account_owner}
                                   saved={savedValues}
                                   name="account_owner"
-                                  title= {t('company.acount_owner')}
+                                  title= {t('company.account_owner')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -710,7 +710,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.region}
                                   saved={savedValues}
                                   name="region"
-                                  title= {t('company.region')}
+                                  title= {t('common.region')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}

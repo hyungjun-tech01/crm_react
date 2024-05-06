@@ -615,7 +615,7 @@ const Leads = () => {
                       </div>
                       <div className="form-group row">
                         <div className="col-sm-6">
-                          <label className="col-form-label">Lead Status</label>
+                          <label className="col-form-label">{t('lead.lead_status')}</label>
                           <select className="form-control">
                             <option>Select</option>
                             <option>Open - Contacted</option>
