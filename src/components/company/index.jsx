@@ -647,7 +647,7 @@ const Company = () => {
                             className="form-control"
                             type="text"
                             placeholder={t('company.account_code')}
-                            name="acount_code"
+                            name="account_code"
                             onChange={handleCompanyChange}
                           />
                         </div>

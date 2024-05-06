@@ -13,7 +13,6 @@ const enResource = {
             new_company:'New Company',
             company_name:'Company Name',
             company_details:'Company Details',
-            company_contact_details:'Contact Detials',
             eng_company_name:'English Company Name',
             address:'Address',
             salesman:'SalesMan',
@@ -37,7 +36,7 @@ const enResource = {
             account_code:'Account Code',
             bank_name:'Bank Name',
             account_owner:'Account Owner',
-            region:'Region',
+           
         },
         lead:{
             lead:'Leads',
@@ -52,7 +51,17 @@ const enResource = {
             lead_status :'Lead Status',
             lead_modified:'Lead Modified',
             lead_sales:'Lead Sales',
-            actions:'Actions'
+            actions:'Actions',
+            lead_status:'Lead Status',
+            detail_information:'Lead Detail',
+            company_information:'Company Infomation',
+            consulting_history:'Consulting History',
+            quotation_history:'Quotation History',
+            lead_information:'Lead Information',
+            is_keyman:'Is Keyman',
+            lead_group:'Group',
+            homepage:'Lead Homepage',
+            zip_code:'Lead Postal Code',
         },
         consulting:{
             action_content: 'Consulting Conclusion',
@@ -165,6 +174,9 @@ const enResource = {
             additional_information:'Additional Information',
             information:'Information',
             memo:'Memo',
+            region:'Region',
+            created:'Creation Date',
+            contact_details:'Contact Detials',
         },
     },
 }
