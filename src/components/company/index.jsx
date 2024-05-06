@@ -639,64 +639,64 @@ const Company = () => {
                           />
                         </div>
                       </div>
-                      <h4>Additional Information</h4>
+                      <h4>{t('common.additional_information')}</h4>
                       <div className="form-group row">
                         <div className="col-sm-6">
-                          <label className="col-form-label">Bank Account</label>
+                          <label className="col-form-label">{t('company.account_code')}</label>
                           <input
                             className="form-control"
                             type="text"
-                            placeholder="Bank Account"
+                            placeholder={t('company.account_code')}
                             name="acount_code"
                             onChange={handleCompanyChange}
                           />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Bank Name</label>
+                          <label className="col-form-label">{t('company.bank_name')}</label>
                           <input
                             className="form-control"
                             type="text"
-                            placeholder="Bank Name"
+                            placeholder={t('company.bank_name')}
                             name="bank_name"
                             onChange={handleCompanyChange}
                           />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Account Owner</label>
+                          <label className="col-form-label">{t('company.account_owner')}</label>
                           <input
                             className="form-control"
                             type="text"
-                            placeholder="Account Owner"
+                            placeholder={t('company.account_owner')}
                             name="account_owner"
                             onChange={handleCompanyChange}
                           />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Sales Resource</label>
+                          <label className="col-form-label">{t('company.salesman')}</label>
                           <input
                             className="form-control"
                             type="text"
-                            placeholder="Sales Resource"
+                            placeholder={t('company.salesman')}
                             name="sales_resource"
                             onChange={handleCompanyChange}
                           />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Application Engineer</label>
+                          <label className="col-form-label">{t('company.engineer')}</label>
                           <input
                             className="form-control"
                             type="text"
-                            placeholder="Application Engineer"
+                            placeholder={t('company.engineer')}
                             name="application_engineer"
                             onChange={handleCompanyChange}
                           />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Region</label>
+                          <label className="col-form-label">{t('company.region')}</label>
                           <input
                             className="form-control"
                             type="text"
-                            placeholder="Region"
+                            placeholder={t('company.region')}
                             name="region"
                             onChange={handleCompanyChange}
                           />
@@ -705,11 +705,11 @@ const Company = () => {
                       <h4>Memo</h4>
                       <div className="form-group row">
                         <div className="col-sm-12">
-                          <label className="col-form-label">Memo</label>
+                          <label className="col-form-label">{t('company.memo')}</label>
                           <textarea
                             className="form-control"
                             rows={3}
-                            placeholder="Memo"
+                            placeholder={t('company.memo')}
                             defaultValue={""}
                             name="memo"
                             onChange={handleCompanyChange}
