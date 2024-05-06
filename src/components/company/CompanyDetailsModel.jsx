@@ -247,7 +247,7 @@ const CompanyDetailsModel = () => {
                     <img src={C_logo} alt="User" className="user-image" />
                   </div>
                   <div>
-                    <p className="mb-0">Company</p>
+                    <p className="mb-0">{t('company.company')}</p>
                     <span className="modal-title">
                       {selectedCompany.company_name}
                     </span>
@@ -328,23 +328,19 @@ const CompanyDetailsModel = () => {
               <div className="card-body">
                 <div className="row">
                   <div className="col">
-                    <span>Title</span>
-                    <p>Enquiry</p>
-                  </div>
-                  <div className="col">
-                    <span>Companies</span>
+                    <span>{t('company.company_name')}</span>
                     <p>{selectedCompany.company_name}</p>
                   </div>
                   <div className="col">
-                    <span>Phone</span>
+                    <span>{t('company.phone_number')}</span>
                     <p>{selectedCompany.company_phone_number}</p>
                   </div>
                   <div className="col">
-                    <span>Fax</span>
-                    <p>{selectedCompany.company_fax_number}</p>
+                    <span>{t('company.fax_number')}</span>
+                    <p>{selectedCompany.company_fax_number}</p> 
                   </div>
                   <div className="col">
-                    <span>Contact owner</span>
+                    <span>{t('company.ceo_name')}</span>
                     <p>{selectedCompany.ceo_name}</p>
                   </div>
                 </div>
@@ -359,7 +355,7 @@ const CompanyDetailsModel = () => {
                       to="#task-details"
                       data-bs-toggle="tab"
                     >
-                      Details
+                      {t('common.details')}
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -368,7 +364,7 @@ const CompanyDetailsModel = () => {
                       to="#task-related"
                       data-bs-toggle="tab"
                     >
-                      Related
+                      {t('common.related')}
                     </Link>
                   </li>
                   {/* <li className="nav-item">
@@ -395,7 +391,7 @@ const CompanyDetailsModel = () => {
                     <div className="crms-tasks">
                       <div className="tasks__item crms-task-item active">
                         <Collapse accordion expandIconPosition="end">
-                          <Panel header="Organization Name" key="1">
+                          <Panel header={t('company.company_name')} key="1">
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
@@ -430,14 +426,14 @@ const CompanyDetailsModel = () => {
                       </div>
                       <div className="tasks__item crms-task-item active">
                         <Collapse accordion expandIconPosition="end">
-                          <Panel header="Organization Details" key="1">
+                          <Panel header= {t('company.company_details')}  key="1">
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
                                   defaultText={selectedCompany.group_}
                                   saved={savedValues}
                                   name="group_"
-                                  title="Group"
+                                  title={t('company.group')}
                                   no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
@@ -450,7 +446,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.company_scale}
                                   saved={savedValues}
                                   name="company_scale"
-                                  title="Company Scale"
+                                  title={t('company.company_scale')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -462,7 +458,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.deal_type}
                                   saved={savedValues}
                                   name="deal_type"
-                                  title="Deal Type"
+                                  title={t('company.deal_type')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -474,7 +470,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.business_registration_code}
                                   saved={savedValues}
                                   name="business_registration_code"
-                                  title="Business Registration Code"
+                                  title={t('company.business_registration_code')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -485,7 +481,7 @@ const CompanyDetailsModel = () => {
                                 <DetailDateItem
                                   saved={savedValues}
                                   name="establishment_date"
-                                  title="Establishment Date"
+                                  title={t('company.establishment_date')}
                                   orgTimeData={orgEstablishDate}
                                   timeData={establishDate}
                                   timeDataChange={handleEstablishDateChange}
@@ -498,7 +494,7 @@ const CompanyDetailsModel = () => {
                                 <DetailDateItem
                                   saved={savedValues}
                                   name="closure_date"
-                                  title="Closure Date"
+                                  title={t('company.closure_date')}
                                   orgTimeData={orgCloseDate}
                                   timeData={closeDate}
                                   timeDataChange={handleCloseDateChange}
@@ -513,7 +509,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.ceo_name}
                                   saved={savedValues}
                                   name="ceo_name"
-                                  title="Ceo Name"
+                                  title={t('company.ceo_name')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -525,7 +521,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.business_type}
                                   saved={savedValues}
                                   name="business_type"
-                                  title="Business Type"
+                                  title= {t('company.business_type')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -537,7 +533,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.business_item}
                                   saved={savedValues}
                                   name="business_item"
-                                  title="Business Item"
+                                  title= {t('company.business_type')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -549,7 +545,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.industry_type}
                                   saved={savedValues}
                                   name="industry_type"
-                                  title="Industry Type"
+                                  title= {t('company.industry_type')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -564,14 +560,14 @@ const CompanyDetailsModel = () => {
                       </div>
                       <div className="tasks__item crms-task-item">
                         <Collapse accordion expandIconPosition="end">
-                          <Panel header="Organization Contact Details" key="1">
+                          <Panel header= {t('company.company_contact_details')} key="1">
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
                                   defaultText={selectedCompany.company_phone_number}
                                   saved={savedValues}
                                   name="company_phone_number"
-                                  title="Phone"
+                                  title= {t('company.phone_number')} 
                                   no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
@@ -584,7 +580,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.company_fax_number}
                                   saved={savedValues}
                                   name="company_fax_number"
-                                  title="Fax"
+                                  title= {t('company.fax_number')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -596,7 +592,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.homepage}
                                   saved={savedValues}
                                   name="homepage"
-                                  title="Website"
+                                  title= {t('company.homepage')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -611,14 +607,14 @@ const CompanyDetailsModel = () => {
                       </div>
                       <div className="tasks__item crms-task-item">
                         <Collapse accordion expandIconPosition="end">
-                          <Panel header="Address Information" key="1">
+                          <Panel header= {t('company.address')} key="1">
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
                                   defaultText={selectedCompany.company_address}
                                   saved={savedValues}
                                   name="company_address"
-                                  title="Address"
+                                  title= {t('company.address')}
                                   no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
@@ -631,7 +627,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.company_zip_code}
                                   saved={savedValues}
                                   name="company_zip_code"
-                                  title="Postal code"
+                                  title={t('company.zip_code')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -646,14 +642,14 @@ const CompanyDetailsModel = () => {
                       </div>
                       <div className="tasks__item crms-task-item">
                         <Collapse accordion expandIconPosition="end">
-                          <Panel header="Additional Information" key="1">
+                          <Panel header= {t('common.additional_information')} key="1">
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
                                   defaultText={selectedCompany.account_code}
                                   saved={savedValues}
                                   name="account_code"
-                                  title="Account Code"
+                                  title= {t('company.account_code')}
                                   no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
@@ -666,7 +662,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.bank_name}
                                   saved={savedValues}
                                   name="bank_name"
-                                  title="Bank Name"
+                                  title= {t('company.bank_name')} 
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -678,7 +674,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.account_owner}
                                   saved={savedValues}
                                   name="account_owner"
-                                  title="Account Owner"
+                                  title= {t('company.acount_owner')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -690,7 +686,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.sales_resource}
                                   saved={savedValues}
                                   name="sales_resource"
-                                  title="Sales Resource"
+                                  title= {t('company.salesman')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -702,7 +698,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.application_engineer}
                                   saved={savedValues}
                                   name="application_engineer"
-                                  title="Application Engineer"
+                                  title= {t('company.engineer')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -714,7 +710,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.region}
                                   saved={savedValues}
                                   name="region"
-                                  title="Region"
+                                  title= {t('company.region')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -729,14 +725,14 @@ const CompanyDetailsModel = () => {
                       </div>
                       <div className="tasks__item crms-task-item">
                         <Collapse accordion expandIconPosition="end">
-                          <Panel header="Memo" key="1">
+                          <Panel header= {t('common.memo')}  key="1">
                             <table className="table">
                               <tbody>
                                 <DetailTextareaItem
                                   defaultText={selectedCompany.memo}
                                   saved={savedValues}
                                   name="memo"
-                                  title="Memo"
+                                  title={t('company.memo')}
                                   row_no={3}
                                   no_border={true}
                                   checkEdit={handleCheckEditState}
