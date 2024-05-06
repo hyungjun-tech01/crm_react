@@ -1,8 +1,8 @@
 const enResource = {
     translation: {
         header:{
-            ko:'한글1',
-            en:'English1'
+            ko:'한글',
+            en:'English'
         },
         login: {
             userId:'User Id',
@@ -28,7 +28,7 @@ const enResource = {
             business_type :'Business Type',
             business_item : 'Business Item',
             industry_type :'Industry Type',
-            zip_code : 'Company Zip Code',
+            zip_code : 'Company Postal Code',
             phone_number : 'Company Phone Number',
             fax_number : 'Company Fax Number',
             homepage :'Homepage',

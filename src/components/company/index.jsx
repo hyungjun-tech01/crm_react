@@ -424,7 +424,7 @@ const Company = () => {
             </button>
             <div className="modal-content">
               <div className="modal-header">
-                <h4 className="modal-title text-center"><b>Add Company</b></h4>
+                <h4 className="modal-title text-center"><b>{t('company.new_company')}</b></h4>
                 <button
                   type="button"
                   className="btn-close"
@@ -435,7 +435,7 @@ const Company = () => {
                 <div className="row">
                   <div className="col-md-12">
                     <form id="add_new_company_form">
-                      <h4>Organization Name</h4>
+                      <h4>{t('company.company_name')}</h4>
                       <div className="form-group row">
                         {/* <div className="col-md-12">
                           <label className="col-form-label">
@@ -473,10 +473,10 @@ const Company = () => {
                           />
                         </div>
                       </div>
-                      <h4>Organization Information Details</h4>
+                      <h4>{t('company.company_details')}</h4>
                       <div className="form-group row">
                         <div className="col-sm-6">
-                          <label className="col-form-label">Group</label>
+                          <label className="col-form-label">{t('company.group')}</label>
                           <select className="form-control"  name="group_" onChange={handleCompanyChange}>
                             <option value="">choose proper group</option>
                             <optgroup label="Shared Group">
@@ -487,17 +487,17 @@ const Company = () => {
                           </select>
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Company Scale</label>
+                          <label className="col-form-label">{t('company.company_scale')}</label>
                             <input
                               className="form-control"
                               type="text"
-                              placeholder="Company Scale"
+                              placeholder={t('company.company_scale')}
                               name="company_scale"
                               onChange={handleCompanyChange}
                             />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Deal Type</label>
+                          <label className="col-form-label">{t('company.deal_type')}</label>
                           <select className="form-control" name="deal_type" onChange={handleCompanyChange}>
                             <option value="">choose proper deal type</option>
                             <option value="buyer">Buyer</option>
@@ -505,17 +505,17 @@ const Company = () => {
                           </select>
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Bussiness Registration Code</label>
+                          <label className="col-form-label">{t('company.business_registration_code')}</label>
                             <input
                               className="form-control"
                               type="text"
-                              placeholder="Bussiness Registration Code"
+                              placeholder={t('company.business_registration_code')}
                               name="business_registration_code"
                               onChange={handleCompanyChange}
                             />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Establishment Date</label>
+                          <label className="col-form-label">{t('company.establishment_date')}</label>
                           <div className="cal-icon">
                             <DatePicker
                               className="form-control"
@@ -527,7 +527,7 @@ const Company = () => {
                           </div>
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Closure Date</label>
+                          <label className="col-form-label">{t('company.closure_date')}</label>
                           <div className="cal-icon">
                             <DatePicker
                               className="form-control"
@@ -539,64 +539,64 @@ const Company = () => {
                           </div>
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">CEO Name</label>
+                          <label className="col-form-label">{t('company.ceo_name')}</label>
                             <input
                               className="form-control"
                               type="text"
-                              placeholder="CEO Name"
+                              placeholder={t('company.ceo_name')}
                               name="ceo_name"
                               onChange={handleCompanyChange}
                             />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Business Type</label>
+                          <label className="col-form-label">{t('company.business_type')}</label>
                           <input
                             className="form-control"
                             type="text"
-                            placeholder="Business Type"
+                            placeholder={t('company.business_type')}
                             name="business_type"
                             onChange={handleCompanyChange}
                           />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Business Item</label>
+                          <label className="col-form-label">{t('company.business_item')}</label>
                           <input
                             type="text"
                             className="form-control"
-                            placeholder="Business Item"
+                            placeholder={t('company.business_item')}
                             name="business_item"
                             onChange={handleCompanyChange}
                           />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Industry Type</label>
+                          <label className="col-form-label">{t('company.industry_type')}</label>
                           <input
                             className="form-control"
                             type="text"
-                            placeholder="Industry Type"
+                            placeholder={t('company.industry_type')}
                             name="industry_type"
                             onChange={handleCompanyChange}
                           />
                         </div>
                       </div>
-                      <h4>Organization Contact Details</h4>
+                      <h4>{t('company.company_contact_details')}</h4>
                       <div className="form-group row">
                         <div className="col-sm-6">
-                          <label className="col-form-label">Phone</label>
+                          <label className="col-form-label">{t('company.phone_number')}</label>
                           <input
                             type="text"
                             className="form-control"
-                            placeholder="Phone"
+                            placeholder={t('company.phone_number')}
                             name="company_phone_number"
                             onChange={handleCompanyChange}
                           />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Fax</label>
+                          <label className="col-form-label">{t('company.fax_number')}</label>
                           <input
                             type="text"
                             className="form-control"
-                            placeholder="Fax"
+                            placeholder={t('company.fax_number')}
                             name="company_fax_number"
                             onChange={handleCompanyChange}
                           />
@@ -604,66 +604,24 @@ const Company = () => {
                       </div>
                       <div className="form-group row">
                         <div className="col-sm-6">
-                          <label className="col-form-label">Website</label>
+                          <label className="col-form-label">{t('company.homepage')}</label>
                           <input
                             type="text"
                             className="form-control"
-                            placeholder="Website"
+                            placeholder={t('company.homepage')}
                             name="homepage"
                             onChange={handleCompanyChange}
                           />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Linkedin</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            name="linkedin"
-                            placeholder="Linkedin"
-                          />
-                        </div>
+                        </div>                       
                       </div>
+                      <h4>{t('company.address')}</h4>
                       <div className="form-group row">
                         <div className="col-sm-6">
-                          <label className="col-form-label">Facebook</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            name="fb"
-                            placeholder="Facebook"
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Twitter</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            name="twitter"
-                            placeholder="Twitter"
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">
-                            Email Domains
-                          </label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            name="domains"
-                            placeholder="Email Domains"
-                          />
-                        </div>
-                      </div>
-                      <h4>Address Information</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Address</label>
+                          <label className="col-form-label">{t('company.address')}</label>
                           <textarea
                             className="form-control"
                             rows={3}
-                            placeholder="Address"
+                            placeholder={t('company.address')}
                             defaultValue={""}
                             name="company_address"
                             onChange={handleCompanyChange}
@@ -675,7 +633,7 @@ const Company = () => {
                           <input
                             type="text"
                             className="form-control"
-                            placeholder="Postal code"
+                            placeholder={t('company.zip_code')}
                             name="company_zip_code"
                             onChange={handleCompanyChange}
                           />
