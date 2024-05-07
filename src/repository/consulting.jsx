@@ -80,7 +80,7 @@ export const ConsultingRepo = selector({
         const filterConsultingOri = getCallback(({set, snapshot }) => async (itemName, filterText) => {
             const allConsultingList = await snapshot.getPromise(atomAllConsultings);
             let  allConsulting ;
-            if(itemName === 'common.All'){
+            if(itemName === 'common.all'){
                 allConsulting = allConsultingList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))||
                                             (item.receiver && item.receiver.includes(filterText)) ||
                                             (item.company_name && item.company_name.includes(filterText)) ||

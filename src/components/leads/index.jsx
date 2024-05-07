@@ -33,7 +33,7 @@ const Leads = () => {
 
   const { t } = useTranslation();
 
-  const [statusSearch, setStatusSearch] = useState('common.All');
+  const [statusSearch, setStatusSearch] = useState('common.all');
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
@@ -328,9 +328,9 @@ const Leads = () => {
             <div className="row ">
               <div className="text-start" style={{width:'120px'}}>
                 <div className="dropdown">
-                  <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.All'):t(statusSearch)}</button>
+                  <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.all'):t(statusSearch)}</button>
                     <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.All')}>{t('common.All')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.all')}>{t('common.all')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.lead_name')}>{t('lead.lead_name')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.position')}>{t('lead.position')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.department')}>{t('lead.department')}</button>

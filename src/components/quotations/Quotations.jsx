@@ -36,9 +36,9 @@ const Quotations = () => {
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
 
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
 
-  const [statusSearch, setStatusSearch] = useState('common.All');
+  const [statusSearch, setStatusSearch] = useState('common.all');
 
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
@@ -247,9 +247,9 @@ const Quotations = () => {
             <div className="row">
               <div className="text-start" style={{width:'120px'}}>
                 <div className="dropdown">
-                  <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.All'):t(statusSearch)}</button>
+                  <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.all'):t(statusSearch)}</button>
                     <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.All')}>{t('common.All')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.all')}>{t('common.all')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('quotation.quotation_type')}>{t('quotation.quotation_type')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.title')}>{t('common.title')}</button>
@@ -302,7 +302,10 @@ const Quotations = () => {
                       pagination={{
                         total: allQuotationData.length,
                         showTotal: (total, range) =>
-                          `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+                          { return i18n.language === 'ko' ? 
+                          `${total} 항목 중, ${range[0]}에서 ${range[1]}` :
+                            `Showing ${range[0]} to ${range[1]} of ${total} entries`
+                          },
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
                         itemRender: itemRender,
@@ -321,7 +324,10 @@ const Quotations = () => {
                       pagination={{
                         total: filteredQuotation.length >0 ? filteredQuotation.length:0,
                         showTotal: (total, range) =>
-                          `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+                          { return i18n.language === 'ko' ? 
+                            `${total} 항목 중, ${range[0]}에서 ${range[1]}` :
+                            `Showing ${range[0]} to ${range[1]} of ${total} entries`
+                          },
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
                         itemRender: itemRender,

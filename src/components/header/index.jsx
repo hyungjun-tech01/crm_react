@@ -84,14 +84,24 @@ const Header = (props) => {
         {/* Flag */}
         <li className="nav-item dropdown has-arrow flag-nav">
           <Link className="nav-link dropdown-toggle"
-                data-bs-toggle="dropdown"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.querySelector('#dropdown_lag_menu').classList.toggle('show');
-               }}
-               to="#"
+            data-bs-toggle="dropdown"
+            onClick={(e) => {
+              e.preventDefault();
+              document.querySelector('#dropdown_lag_menu').classList.toggle('show');
+            }}
+            to="#"
           >
-            <img src={i18n.language === 'ko' ? Flag_kr:Flag_us} alt="" height={20} /> <span>{i18n.language === 'ko' ? t('header.ko'):t('header.en')}</span>
+            { i18n.language === 'ko' ? (
+              <>
+                <img src={Flag_kr} alt="" height={20} />
+                <span>{t('header.ko')}</span>
+              </>
+            ):(
+              <>
+                <img src={Flag_us} alt="" height={20} />
+                <span>{t('header.en')}</span>
+              </>
+            )}
           </Link>
 
           <div id="dropdown_lag_menu" className="dropdown-menu dropdown-menu-right">

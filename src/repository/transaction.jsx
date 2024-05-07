@@ -27,7 +27,7 @@ export const TransactionRepo = selector({
             const allTransactionList = await snapshot.getPromise(atomAllTransactions);
             let  allTransaction ;
             console.log('filterTransactions', itemName, filterText);
-            if(itemName === 'common.All'){
+            if(itemName === 'common.all'){
                 allTransaction = allTransactionList.filter(item => (item.company_name &&item.company_name.includes(filterText))||
                                             (item.transaction_title && item.transaction_title.includes(filterText)) ||
                                             (item.transaction_type && item.transaction_type.includes(filterText)) ||

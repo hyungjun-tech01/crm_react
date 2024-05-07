@@ -34,7 +34,7 @@ export const QuotationRepo = selector({
             const allQuotationList = await snapshot.getPromise(atomAllQuotations);
             let  allQuotation ;
             console.log('filterQuotations', itemName, filterText);
-            if(itemName === 'common.All'){
+            if(itemName === 'common.all'){
                 allQuotation = allQuotationList.filter(item => (item.company_name &&item.company_name.includes(filterText))||
                                             (item.quotation_type && item.quotation_type.includes(filterText)) ||
                                             (item.quotation_title && item.quotation_title.includes(filterText)) ||

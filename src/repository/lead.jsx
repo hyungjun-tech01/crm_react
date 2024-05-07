@@ -36,7 +36,7 @@ export const LeadRepo = selector({
             const allLeadList = await snapshot.getPromise(atomAllLeads);
             let allLeads = null;
             
-            if( itemName === 'common.All' ) {
+            if( itemName === 'common.all' ) {
                 allLeads = allLeadList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))||
                                            (item.company_name && item.company_name.includes(filterText))||
                                            (item.position && item.position.includes(filterText))||

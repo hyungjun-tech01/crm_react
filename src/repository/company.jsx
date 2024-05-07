@@ -29,7 +29,7 @@ export const CompanyRepo = selector({
             const allCompanyList = await snapshot.getPromise(atomAllCompanies);
             let allCompanies;
 
-            if( itemName === 'common.All' ) {
+            if( itemName === 'common.all' ) {
                 allCompanies = allCompanyList.filter(item => (item.company_name &&item.company_name.includes(filterText))||
                                             (item.company_phone_number &&item.company_phone_number.includes(filterText))||
                                             (item.company_address &&item.company_address.includes(filterText))||

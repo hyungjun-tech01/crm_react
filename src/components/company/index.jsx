@@ -27,9 +27,9 @@ const Company = () => {
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
 
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
 
-  const [statusSearch, setStatusSearch] = useState('common.All');
+  const [statusSearch, setStatusSearch] = useState('common.all');
 
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
@@ -211,9 +211,9 @@ const Company = () => {
             <div className="row">
               <div className="text-start" style={{width:'120px'}}>
                   <div className="dropdown">
-                    <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.All'):t(statusSearch)}</button>
+                    <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.all'):t(statusSearch)}</button>
                       <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
-                        <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.All')}>{t('common.All')}</button>
+                        <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.all')}>{t('common.all')}</button>
                         <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
                         <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.phone')}>{t('common.phone')}</button>
                         <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.address')}>{t('company.address')}</button>
@@ -290,7 +290,10 @@ const Company = () => {
                       pagination={{
                         total:  allCompanyData.length,
                         showTotal: (total, range) =>
-                          `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+                          { return i18n.language === 'ko' ? 
+                            `${total} 항목 중, ${range[0]}에서 ${range[1]}` :
+                            `Showing ${range[0]} to ${range[1]} of ${total} entries`
+                          },
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
                         itemRender: itemRender,
@@ -307,7 +310,10 @@ const Company = () => {
                       pagination={{
                         total:  filteredCompany.length > 0 ? filteredCompany.length:0,
                         showTotal: (total, range) =>
-                          `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+                          { return i18n.language === 'ko' ? 
+                            `${total} 항목 중, ${range[0]}에서 ${range[1]}` :
+                            `Showing ${range[0]} to ${range[1]} of ${total} entries`
+                          },
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
                         itemRender: itemRender,
@@ -579,7 +585,7 @@ const Company = () => {
                           />
                         </div>
                       </div>
-                      <h4>{t('company.company_contact_details')}</h4>
+                      <h4>{t('common.contact_details')}</h4>
                       <div className="form-group row">
                         <div className="col-sm-6">
                           <label className="col-form-label">{t('company.phone_number')}</label>
@@ -692,11 +698,11 @@ const Company = () => {
                           />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.region')}</label>
+                          <label className="col-form-label">{t('common.region')}</label>
                           <input
                             className="form-control"
                             type="text"
-                            placeholder={t('company.region')}
+                            placeholder={t('common.region')}
                             name="region"
                             onChange={handleCompanyChange}
                           />
