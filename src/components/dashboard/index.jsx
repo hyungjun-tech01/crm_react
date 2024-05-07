@@ -1,6 +1,7 @@
 import React, {useEffect} from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link , useHistory} from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import PieChart from "./piechart";
 import HorizontalBarChart from "./barchart/horizontalchart";
@@ -14,7 +15,7 @@ import { useCookies } from "react-cookie";
 
 
 const Dashboard = () => {
-
+  const [ t ] = useTranslation();
   const [cookies, removeCookie] = useCookies([
     "myLationCrmUserId",
     "myLationCrmUserName",
@@ -68,7 +69,7 @@ const Dashboard = () => {
             <div className="col-md-6">
               <div className="card h-100">
                 <div className="card-body">
-                  <h3 className="card-title">Total Lead</h3>
+                  <h3 className="card-title">{t('dashboard.total_lead')}</h3>
                   <PieChart />
                 </div>
               </div>
@@ -76,7 +77,7 @@ const Dashboard = () => {
             <div className="col-md-6">
               <div className="card h-100">
                 <div className="card-body">
-                  <h3 className="card-title">Products Yearly Sales</h3>
+                  <h3 className="card-title">{t('dashboard.product_yearly_sales')}</h3>
                   <HorizontalBarChart />
                 </div>
               </div>
@@ -86,7 +87,7 @@ const Dashboard = () => {
             <div className="col-md-6">
               <div className="card h-100">
                 <div className="card-body">
-                  <h3 className="card-title">Sales Overview</h3>
+                  <h3 className="card-title">{t('dashboard.sales_overview')}</h3>
                   <LineChart />
                 </div>
               </div>
@@ -94,7 +95,7 @@ const Dashboard = () => {
             <div className="col-md-6">
               <div className="card h-100">
                 <div className="card-body">
-                  <h3 className="card-title">Total Sales</h3>
+                  <h3 className="card-title">{t('common.total')} {t('common.sales')}</h3>
                   <SingleChart />
                 </div>
               </div>
@@ -104,7 +105,7 @@ const Dashboard = () => {
             <div className="col-md-6">
               <div className="card h-100">
                 <div className="card-body">
-                  <h3 className="card-title">Yearly Projects</h3>
+                  <h3 className="card-title">{t('dashboard.yearly_projects')}</h3>
                   <BarChart />
                 </div>
               </div>
@@ -112,7 +113,7 @@ const Dashboard = () => {
             <div className="col-md-6">
               <div className="card h-100">
                 <div className="card-body">
-                  <h3 className="card-title">Total Revenue</h3>
+                  <h3 className="card-title">{t('common.total')} {t('common.revenue')}</h3>
                   <TotalRevenuechart />
                 </div>
               </div>
@@ -122,7 +123,7 @@ const Dashboard = () => {
             <div className="col-md-6">
               <div className="card h-100">
                 <div className="card-body">
-                  <h3 className="card-title">Sales Statistics</h3>
+                  <h3 className="card-title">{t('dashboard.sales_statistics')}</h3>
                   <Salesstatictschart />
                 </div>
               </div>
@@ -130,7 +131,7 @@ const Dashboard = () => {
             <div className="col-md-6">
               <div className="card h-100">
                 <div className="card-body">
-                  <h3 className="card-title">Completed Tasks</h3>
+                  <h3 className="card-title">{t('dashboard.completed_tasks')}</h3>
                   <Completedtaskchart />
                 </div>
               </div>

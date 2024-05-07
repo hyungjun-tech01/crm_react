@@ -102,7 +102,7 @@ const Header = (props) => {
                     document.querySelector('#dropdown_lag_menu').classList.remove('show'); 
                   }}
             >
-              <img src={Flag_us} alt="" height={16} /> {t('header.ko')}
+              <img src={Flag_kr} alt="" height={16} /> {t('header.ko')}
             </div>
             <div className="dropdown-item" 
                   onClick={() => 
