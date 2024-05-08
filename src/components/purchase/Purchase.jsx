@@ -394,7 +394,7 @@ const Purchase = () => {
               <div className="col text-start" style={{width:'400px'}}>
                 <input
                       id = "searchCondition"
-                      className="form-control" 
+                      className="form-control form-control-sm" 
                       type="text"
                       placeholder= ""
                       style={{width:'300px', display: 'inline'}}
@@ -497,7 +497,7 @@ const Purchase = () => {
                     <div className="col-sm-8">
                       <input
                         type="text"
-                        className="form-control"
+                        className="form-control form-control-sm"
                         id="view-name"
                         placeholder="New View Name"
                       />
@@ -572,7 +572,7 @@ const Purchase = () => {
             </button>
             <div className="modal-content">
               <div className="modal-header">
-                <h4 className="modal-title text-center"><b>Add Purchase</b></h4>
+                <h4 className="modal-title text-center"><b>{t('purchase.add_purchase')}</b></h4>
                 <button
                   type="button"
                   className="btn-close"
@@ -583,45 +583,45 @@ const Purchase = () => {
                 <div className="row">
                   <div className="col-md-12">
                     <form id="add_new_purchase_form">
-                      <h4>Lead</h4>
+                      <h4>{t('company.company')}</h4>
                       <div className="form-group row">
                         <div className="col-sm-6">
                           <label className="col-form-label">
-                            Lead Name
+                            {t('company.company_name')}
                             <span className="text-danger">*</span>
                           </label>
                           <Select options={companiesForSelection} onChange={handleCompanySelectionChange}/>
                         </div>
                       </div>
-                      <h4>Product</h4>
+                      <h4>{t('common.product')}</h4>
                       <h4>Deal</h4>
                       <div className="form-group row">
                         <div className="col-sm-3">
-                          <label className="col-form-label">Quantity</label>
+                          <label className="col-form-label">{t('common.quantity')}</label>
                           <input
                             type="text"
-                            className="form-control"
-                            placeholder="Quantity"
+                            className="form-control form-control-sm"
+                            placeholder={t('common.quantity')}
                             name="quantity"
                             onChange={handlePurchaseChange}
                           />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Price</label>
+                          <label className="col-form-label">{t('common.price')}</label>
                           <input
                             type="text"
-                            className="form-control"
-                            placeholder="Price"
+                            className="form-control form-control-sm"
+                            placeholder={t('common.price')}
                             name="price"
                             onChange={handlePurchaseChange}
                           />
                         </div>
                         <div className="col-sm-3">
-                          <label className="col-form-label">Currency</label>
+                          <label className="col-form-label">{t('common.currency')}</label>
                           <input
                             type="text"
-                            className="form-control"
-                            placeholder="Currency"
+                            className="form-control form-control-sm"
+                            placeholder={t('common.currency')}
                             name="currency"
                             onChange={handlePurchaseChange}
                           />
@@ -629,27 +629,27 @@ const Purchase = () => {
                       </div>
                       <div className="form-group row">
                         <div className="col-sm-4">
-                          <label className="col-form-label">Delivery Date</label>
+                          <label className="col-form-label">{t('purchase.delivery_date')}</label>
                           <DatePicker
-                            className="form-control"
+                            className="form-control form-control-sm"
                             selected={deliveryDate}
                             dateFormat="yyyy.MM.dd"
                             onChange={handleDeliveryDateChange}
                           />
                         </div>
                         <div className="col-sm-4">
-                          <label className="col-form-label">MA Contact Date</label>
+                          <label className="col-form-label">{t('purchase.ma_contract_date')}</label>
                           <DatePicker
-                            className="form-control"
+                            className="form-control form-control-sm"
                             selected={contactDate}
                             dateFormat="yyyy.MM.dd"
                             onChange={handleContactDateChange}
                           />
                         </div>
                         <div className="col-sm-4">
-                          <label className="col-form-label">MA Finish Date</label>
+                          <label className="col-form-label">{t('purchase.ma_finish_date')}</label>
                           <DatePicker
-                            className="form-control"
+                            className="form-control form-control-sm"
                             selected={finishDate}
                             dateFormat="yyyy.MM.dd"
                             onChange={handleFinishDateChange}
@@ -658,29 +658,29 @@ const Purchase = () => {
                       </div>
                       <div className="form-group row">
                         <div className="col-sm-4">
-                          <label className="col-form-label">Register</label>
+                          <label className="col-form-label">{t('purchase.register')}</label>
                           <input
                             type="text"
-                            className="form-control"
-                            placeholder="Register"
+                            className="form-control form-control-sm"
+                            placeholder={t('purchase.register')}
                             name="register"
                             onChange={handlePurchaseChange}
                           />
                         </div>
                         <div className="col-sm-4">
-                          <label className="col-form-label">Register Code</label>
+                          <label className="col-form-label">{t('purchase.registration_code')}</label>
                           <input
                             type="text"
-                            className="form-control"
-                            placeholder="Register Code"
+                            className="form-control form-control-sm"
+                            placeholder={t('purchase.registration_code')}
                             name="regcode"
                             onChange={handlePurchaseChange}
                           />
                         </div>
                         <div className="col-sm-4">
-                          <label className="col-form-label">Registration Date</label>
+                          <label className="col-form-label">{t('purchase.registration_date')}</label>
                           <DatePicker
-                            className="form-control"
+                            className="form-control form-control-sm"
                             selected={registerDate}
                             dateFormat="yyyy.MM.dd"
                             onChange={handleRegisterDateChange}
@@ -689,24 +689,24 @@ const Purchase = () => {
                       </div>
                       <div className="form-group row">
                         <div className="col-sm-12">
-                          <label className="col-form-label">Momo</label>
+                          <label className="col-form-label">{t('common.memo')}</label>
                           <textarea
                             className="form-control"
                             rows={2}
                             name="purchase_memo"
-                            placeholder="Memo"
+                            placeholder={t('common.memo')}
                             onChange={handlePurchaseChange}
                           />
                         </div>
                       </div>
-                      <h4>Status Information</h4>
+                      <h4>{t('common.status')} {t('common.information')}</h4>
                       <div className="form-group row">
                         <div className="col-sm-12">
                           <textarea
                             className="form-control"
                             rows={2}
                             name="status"
-                            placeholder="Status"
+                            placeholder={t('common.status')}
                             onChange={handlePurchaseChange}
                           />
                         </div>
@@ -717,7 +717,7 @@ const Purchase = () => {
                           className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
                           onClick={handleAddNewPurchase}
                         >
-                          Save
+                          {t('common.save')}
                         </button>
                         &nbsp;&nbsp;
                         <button
@@ -725,7 +725,7 @@ const Purchase = () => {
                           className="btn btn-secondary btn-rounded"
                           data-bs-dismiss="modal"
                         >
-                          Cancel
+                          {t('common.cancel')}
                         </button>
                       </div>
                     </form>

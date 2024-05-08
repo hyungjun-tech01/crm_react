@@ -182,6 +182,7 @@ const enResource = {
             next: 'Next',
             phone: 'Phone',
             previous: 'Previous',
+            price: 'Price',
             product: 'Product',
             quantity: 'Quantity',
             region:'Region',

@@ -182,6 +182,7 @@ const koResource = {
             next: '다음',
             phone:'전화번호',
             previous: '이전',
+            price: '가격',
             product: '품목',
             quantity: '수량',
             region:'지역',
