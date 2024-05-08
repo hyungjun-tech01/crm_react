@@ -627,7 +627,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.company_zip_code}
                                   saved={savedValues}
                                   name="company_zip_code"
-                                  title={t('company.zip_code')}
+                                  title= {t('company.zip_code')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -732,7 +732,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.memo}
                                   saved={savedValues}
                                   name="memo"
-                                  title={t('company.memo')}
+                                  title= {t('company.memo')}
                                   row_no={3}
                                   no_border={true}
                                   checkEdit={handleCheckEditState}
