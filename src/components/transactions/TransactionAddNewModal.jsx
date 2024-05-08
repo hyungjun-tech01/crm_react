@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRecoilValue } from "recoil";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
+import { useTranslation } from "react-i18next";
 import "antd/dist/reset.css";
 import { Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
@@ -62,6 +63,7 @@ const TransactionAddNewModal = (props) => {
   const { loadAllLeads } = useRecoilValue(LeadRepo);
   const { modifyTransaction } = useRecoilValue(TransactionRepo);
   const [ cookies] = useCookies(["myLationCrmUserId"]);
+  const { t } = useTranslation();
 
   const [ leadsForSelection, setLeadsForSelection ] = useState([]);
   const [ selectedCompany, setSelectedCompany ] = useState(null);
@@ -122,57 +124,57 @@ const TransactionAddNewModal = (props) => {
 
   const default_columns = [
     {
-      title: "Month /Day",
+      title: t('transaction.month_day'),
       dataIndex: 'month_day',
       render: (text, record) => <>{text}</>,
     },
     {
-      title: "Product",
+      title: t('common.product'),
       dataIndex: 'product_name',
       render: (text, record) => <>{text}</>,
     },
     {
-      title: "Standard",
+      title: t('common.standard'),
       dataIndex: 'standard',
       render: (text, record) => <>{text}</>,
     },
     {
-      title: "Unit",
+      title: t('common.unit'),
       dataIndex: 'unit',
       render: (text, record) => <>{text}</>,
     },
     {
-      title: "Quantity",
+      title: t('common.quantity'),
       dataIndex: 'quantity',
       render: (text, record) => <>{text}</>,
     },
     {
-      title: "Unit Price",
+      title: t('transaction.unit_price'),
       dataIndex: 'unit_price',
       render: (text, record) => <>{text}</>,
     },
     {
-      title: "Supply Price",
+      title: t('transaction.supply_price'),
       dataIndex: 'supply_price',
       render: (text, record) => <>{text}</>,
     },
     {
-      title: "Tax Price",
+      title: t('transaction.tax_price'),
       dataIndex: 'tax_price',
       render: (text, record) => <>{text}</>,
     },
     {
-      title: "Total Price",
+      title: t('transaction.total_price'),
       dataIndex: 'total_price',
       render: (text, record) => <>{text}</>,
     },
     {
-      title: "Modified",
+      title: t('transaction.modified'),
       dataIndex: 'modify_date',
       render: (text, record) => <>{text}</>,
     },
     {
-      title: "Edit",
+      title: t('common.edit'),
       render: (text, record) => (
         <div className="dropdown dropdown-action text-center">
           <ModeEdit onClick={() => {
@@ -469,7 +471,7 @@ const TransactionAddNewModal = (props) => {
         </button>
         <div className="modal-content">
           <div className="modal-header">
-            <h4 className="modal-title"><b>Add New Transaction</b></h4>
+            <h4 className="modal-title"><b>{t('transaction.add_transaction')}</b></h4>
             <button
               type="button"
               className="btn-close"
@@ -478,16 +480,16 @@ const TransactionAddNewModal = (props) => {
           </div>
           <div className="modal-body">
             <form className="forms-sampme" id="add_new_transaction_form">
-              <h4>Transaction Information</h4>
+              <h4>{t('transaction.information')}</h4>
               <div className="form-group row">
                 <div className="col-sm-2">
-                  <label className="col-form-label">Title <span className="text-danger">*</span></label>
+                  <label className="col-form-label">{t('common.title')} <span className="text-danger">*</span></label>
                 </div>
                 <div className="col-sm-10">
                   <input
                     type="text"
                     className="form-control form-control-sm"
-                    placeholder="Title"
+                    placeholder={t('common.title')}
                     name="transaction_title"
                     onChange={handleTransactionChange}
                   />
@@ -495,17 +497,17 @@ const TransactionAddNewModal = (props) => {
               </div>
               <div className="form-group row">
                 <div className="col-sm-3">
-                  <label className="col-form-label">Type</label>
+                  <label className="col-form-label">{t('transaction.type')}</label>
                   <input
                     type="text"
                     className="form-control form-control-sm"
-                    placeholder="Type"
+                    placeholder={t('transaction.type')}
                     name="transaction_type"
                     onChange={handleTransactionChange}
                   />
                 </div>
                 <div className="col-sm-3">
-                  <label className="col-form-label">Publish Date</label>
+                  <label className="col-form-label">{t('transaction.publish_date')}</label>
                   <div className="cal-icon cal-icon-sm">
                     <DatePicker
                       className="form-control form-control-sm"
@@ -516,30 +518,30 @@ const TransactionAddNewModal = (props) => {
                   </div>
                 </div>
                 <div className="col-sm-3">
-                  <label className="col-form-label">Publish Type</label>
+                  <label className="col-form-label">{t('transaction.publish_type')}</label>
                   <input
                     type="text"
                     className="form-control form-control-sm"
-                    placeholder="Publish Type"
+                    placeholder={t('transaction.publish_type')}
                     name="publish_type"
                     onChange={handleTransactionChange}
                   />
                 </div>
                 <div className="col-sm-3">
-                  <label className="col-form-label">Currency</label>
+                  <label className="col-form-label">{t('common.currency')}</label>
                   <input
                     type="text"
                     className="form-control form-control-sm"
-                    placeholder="Currency"
+                    placeholder={t('common.currency')}
                     name="currency"
                     onChange={handleTransactionChange}
                   />
                 </div>
               </div>
-              <h4>Lead / Organization Information</h4>
+              <h4>{t('transaction.lead_org_info')}</h4>
               <div className="form-group row">
                 <div className="col-sm-6">
-                  <label className="col-form-label">Lead / Organization  <span className="text-danger">*</span></label>
+                  <label className="col-form-label">{t('transaction.lead_org_info')}<span className="text-danger">*</span></label>
                   <Select ref={selectLeadRef} options={leadsForSelection} onChange={handleSelectLead} />
                 </div>
               </div>
@@ -549,11 +551,11 @@ const TransactionAddNewModal = (props) => {
                     <table className="table">
                       <tbody>
                         <tr>
-                          <td className="border-0">CEO Name</td>
+                          <td className="border-0">{t('company.ceo_name')}</td>
                           <td className="border-0">{transactionChange.ceo_name}</td>
                         </tr>
                         <tr>
-                          <td>Registration No.</td>
+                          <td>{t('company.business_registration_code')}</td>
                           <td>{transactionChange.business_registration_code}</td>
                         </tr>
                       </tbody>
@@ -563,11 +565,11 @@ const TransactionAddNewModal = (props) => {
                     <table className="table">
                       <tbody>
                         <tr>
-                          <td className="border-0">Business Type</td>
+                          <td className="border-0">{t('company.business_type')}</td>
                           <td className="border-0">{transactionChange.business_type}</td>
                         </tr>
                         <tr>
-                          <td>Business Item</td>
+                          <td>{t('company.business_item')}</td>
                           <td>{transactionChange.business_item}</td>
                         </tr>
                       </tbody>
@@ -577,7 +579,7 @@ const TransactionAddNewModal = (props) => {
                     <table className="table">
                       <tbody>
                         <tr>
-                          <td className="border-0">Address</td>
+                          <td className="border-0">{t('company.address')}</td>
                           <td className="border-0">{transactionChange.company_address}</td>
                         </tr>
                       </tbody>
@@ -586,7 +588,7 @@ const TransactionAddNewModal = (props) => {
                 </div>
               }
               <h4 className="h4-price">
-                <div>Content Table</div>
+                <div>{t('transaction.content_table')}</div>
                 <div className="text-end flex-row">
                   <div>
                     <AddBoxOutlined
@@ -618,7 +620,6 @@ const TransactionAddNewModal = (props) => {
                   bordered
                   dataSource={transactionContents}
                   rowKey={(record) => record.trasaction_sub_index}
-                // onChange={handleTableChange}
                 />
               </div>
               <div className="text-center">
@@ -627,7 +628,7 @@ const TransactionAddNewModal = (props) => {
                   className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
                   onClick={handleAddNewTransaction}
                 >
-                  Save
+                  {t('common.save')}
                 </button>
                 &nbsp;&nbsp;
                 <button
@@ -635,7 +636,7 @@ const TransactionAddNewModal = (props) => {
                   className="btn btn-secondary btn-rounded"
                   data-bs-dismiss="modal"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
               </div>
             </form>
@@ -645,7 +646,7 @@ const TransactionAddNewModal = (props) => {
       {temporaryContent &&
         <div className="edit-content">
           <div className="edit-content-header">
-            <h4>&nbsp;&nbsp;<b>Edit Content</b></h4>
+            <h4>&nbsp;&nbsp;<b>{t('quotation.edit_content')}</b></h4>
           </div>
           <table className="table">
             <tbody>
@@ -763,7 +764,7 @@ const TransactionAddNewModal = (props) => {
               className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
               onClick={handleSaveTemporaryEdit}
             >
-              Save
+              {t('common.save')}
             </button>
             &nbsp;&nbsp;
             <button
@@ -771,7 +772,7 @@ const TransactionAddNewModal = (props) => {
               className="btn btn-secondary btn-rounded"
               onClick={handleCloseTemporaryEdit}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         </div>
