@@ -345,7 +345,7 @@ const Leads = () => {
               <div className="col text-start" style={{width:'400px'}}>
                 <input
                       id = "searchCondition"
-                      className="form-control" 
+                      className="form-control form-control-sm" 
                       type="text"
                       placeholder= ""
                       style={{width:'300px', display: 'inline'}}
@@ -429,7 +429,7 @@ const Leads = () => {
                       data-bs-target="#add_lead"
                       onClick={handleAddNewLeadClicked}
                     >
-                      {t('lead.new_lead')}
+                      {t('lead.add_lead')}
                     </button>
                   </li>
                 </ul>
@@ -493,72 +493,6 @@ const Leads = () => {
                   ×
                 </button>
               </div>
-              {/* Modal body */}
-              <div className="modal-body">
-                <form className="forms-sample">
-                  <div className="form-group row">
-                    <label
-                      htmlFor="view-name"
-                      className="col-sm-4 col-form-label"
-                    >
-                      New View Name
-                    </label>
-                    <div className="col-sm-8">
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="view-name"
-                        placeholder="New View Name"
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group row pt-4">
-                    <label className="col-sm-4 col-form-label">
-                      Sharing Settings
-                    </label>
-                    <div className="col-sm-8">
-                      <div className="form-group">
-                        <div className="form-check">
-                          <label className="form-check-label">
-                            <input
-                              type="radio"
-                              className="form-check-input"
-                              name="optionsRadios"
-                              id="optionsRadios1"
-                              defaultValue
-                            />{" "}
-                            Just For Me <i className="input-helper" />
-                          </label>
-                        </div>
-                        <br />
-                        <div className="form-check">
-                          <label className="form-check-label">
-                            <input
-                              type="radio"
-                              className="form-check-input"
-                              name="optionsRadios"
-                              id="optionsRadios2"
-                              defaultValue="option2"
-                              defaultChecked
-                            />{" "}
-                            Share Filter with Everyone{" "}
-                            <i className="input-helper" />
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <button
-                      type="submit"
-                      className="btn btn-gradient-primary me-2"
-                    >
-                      Submit
-                    </button>
-                    <button className="btn btn-light">Cancel</button>
-                  </div>
-                </form>
-              </div>
             </div>
           </div>
         </div>
@@ -582,7 +516,7 @@ const Leads = () => {
             <div className="modal-content">
               <div className="modal-header">
                 <h4 className="modal-title text-center">
-                  <b>Add Lead</b>
+                  <b>{t('lead.add_lead')}</b>
                 </h4>
                 <button
                   type="button"
@@ -594,39 +528,30 @@ const Leads = () => {
                 <div className="row">
                   <div className="col-md-12">
                     <form id="add_new_lead_form">
-                      <h4>Lead Information</h4>
+                      <h4>{t('lead.lead_information')}</h4>
                       <div className="form-group row">
                         <div className="col-sm-6">
-                          <label className="col-form-label">Name <span className="text-danger">*</span></label>
+                          <label className="col-form-label">{t('common.name')} <span className="text-danger">*</span></label>
                           <input
                             type="text"
-                            className="form-control"
+                            className="form-control form-control-sm"
                             placeholder="Name"
                             name="lead_name"
                             onChange={handleLeadChange}
                           />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">is Keyman</label>
+                          <label className="col-form-label">{t('lead.is_keyman')}</label>
                           <Select options={KeyManForSelection} onChange={handleSelectKeyMan} />
                         </div>
                       </div>
                       <div className="form-group row">
                         <div className="col-sm-6">
                           <label className="col-form-label">{t('lead.lead_status')}</label>
-                          <select className="form-control">
+                          <select className="form-control form-control-sm">
                             <option>Select</option>
                             <option>Open - Contacted</option>
                             <option>Open - Not Contacted</option>
-                          </select>
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">
-                            User Responsible
-                          </label>
-                          <select className="form-control">
-                            <option>Select</option>
-                            <option>John Doe</option>
                           </select>
                         </div>
                       </div>
@@ -635,24 +560,24 @@ const Leads = () => {
                           <label className="col-form-label">Lead Rating</label>
                           <input
                             type="number"
-                            className="form-control"
+                            className="form-control form-control-sm"
                             name="rating"
                             placeholder="Rating"
                           />
                         </div>
                       </div> */}
-                      <h4>Company Information</h4>
+                      <h4>{t('lead.company_information')}</h4>
                       <div className="form-group row">
                         <div className="col-sm-6">
-                          <label className="col-form-label">Organization</label>
+                          <label className="col-form-label">{t('company.company_name')}</label>
                           <Select options={companyData} onChange={handleSelectCompany} />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Title</label>
+                          <label className="col-form-label">{t('lead.position')}</label>
                           <input
                             type="text"
-                            className="form-control"
-                            placeholder="Title"
+                            className="form-control form-control-sm"
+                            placeholder={t('lead.position')}
                             name="position"
                             onChange={handleLeadChange}
                           />
@@ -660,21 +585,21 @@ const Leads = () => {
                       </div>
                       <div className="form-group row">
                         <div className="col-sm-6">
-                          <label className="col-form-label">Department</label>
+                          <label className="col-form-label">{t('lead.department')}</label>
                           <input
                             type="text"
-                            className="form-control"
-                            placeholder="Department"
+                            className="form-control form-control-sm"
+                            placeholder={t('lead.department')}
                             name="department"
                             onChange={handleLeadChange}
                           />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Group</label>
+                          <label className="col-form-label">{t('company.group')}</label>
                           <input
                             type="text"
-                            className="form-control"
-                            placeholder="Group"
+                            className="form-control form-control-sm"
+                            placeholder={t('company.group')}
                             name="group_"
                             onChange={handleLeadChange}
                           />
@@ -683,34 +608,34 @@ const Leads = () => {
                       
                       <div className="form-group row">
                         <div className="col-sm-6">
-                          <label className="col-form-label">Region </label>
+                          <label className="col-form-label">{t('common.region')}</label>
                           <input
                             type="text"
-                            className="form-control"
-                            placeholder="Region"
+                            className="form-control form-control-sm"
+                            placeholder={t('common.region')}
                             name="region"
                             onChange={handleLeadChange}
                           />
                         </div>
                       </div>
-                      <h4>Contact Information</h4>
+                      <h4>{t('common.contact_details')}</h4>
                       <div className="form-group row">
                         <div className="col-sm-6">
-                          <label className="col-form-label">Mobile</label>
+                          <label className="col-form-label">{t('lead.mobile')}</label>
                           <input
                             type="text"
-                            className="form-control"
-                            placeholder="Mobile"
+                            className="form-control form-control-sm"
+                            placeholder={t('lead.mobile')}
                             name="mobile_number"
                             onChange={handleLeadChange}
                           />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Email</label>
+                          <label className="col-form-label">{t('lead.email')}</label>
                           <input
                             type="text"
-                            className="form-control"
-                            placeholder="Email"
+                            className="form-control form-control-sm"
+                            placeholder={t('lead.email')}
                             name="email"
                             onChange={handleLeadChange}
                           />
@@ -729,21 +654,21 @@ const Leads = () => {
                       </div>
                       <div className="form-group row">
                         <div className="col-sm-6">
-                          <label className="col-form-label">Phone</label>
+                          <label className="col-form-label">{t('company.phone_number')}</label>
                           <input
                             type="text"
-                            className="form-control"
-                            placeholder="Phone"
+                            className="form-control form-control-sm"
+                            placeholder={t('company.phone_number')}
                             name="company_phone_number"
                             onChange={handleLeadChange}
                           />
                         </div>
                         <div className="col-sm-6">
-                          <label className="col-form-label">Fax</label>
+                          <label className="col-form-label">{t('company.fax_number')}</label>
                           <input
                             type="text"
-                            className="form-control"
-                            placeholder="Fax"
+                            className="form-control form-control-sm"
+                            placeholder={t('company.fax_number')}
                             name="company_fax_number"
                             onChange={handleLeadChange}
                           />
@@ -751,11 +676,11 @@ const Leads = () => {
                       </div>
                       <div className="form-group row">
                         <div className="col-sm-6">
-                          <label className="col-form-label">Website</label>
+                          <label className="col-form-label">{t('company.homepage')}</label>
                           <input
                             type="text"
-                            className="form-control"
-                            placeholder="Website"
+                            className="form-control form-control-sm"
+                            placeholder={t('company.homepage')}
                             name="homepage"
                             onChange={handleLeadChange}
                           />
@@ -792,7 +717,7 @@ const Leads = () => {
                         <div className="col-sm-6">
                           <input
                             type="text"
-                            className="form-control"
+                            className="form-control form-control-sm"
                             placeholder="City"
                             name="city"
                           />
@@ -800,7 +725,7 @@ const Leads = () => {
                         <div className="col-sm-6">
                           <input
                             type="text"
-                            className="form-control"
+                            className="form-control form-control-sm"
                             placeholder="State/Provience"
                             name="state"
                           />
@@ -810,7 +735,7 @@ const Leads = () => {
                         <div className="col-sm-6">
                           <input
                             type="text"
-                            className="form-control"
+                            className="form-control form-control-sm"
                             placeholder="Postal Code"
                             name="postal"
                           />
@@ -823,15 +748,15 @@ const Leads = () => {
                           </select>
                         </div>
                       </div> */}
-                      <h4>Additional Information</h4>
+                      <h4>{t('common.additional_information')}</h4>
                       <div className="form-group row">
                         <div className="col-sm-6">
                           <label className="col-form-label">
-                            Sales Resource{" "}
+                            {t('company.salesman')}{" "}
                           </label>
                           <input
                             type="text"
-                            className="form-control"
+                            className="form-control form-control-sm"
                             placeholder="Sales Resource"
                             name="sales_resource"
                             onChange={handleLeadChange}
@@ -839,11 +764,11 @@ const Leads = () => {
                         </div>
                         <div className="col-sm-6">
                           <label className="col-form-label">
-                            Application Engineer
+                            {t('company.engineer')}
                           </label>
                           <input
                             type="text"
-                            className="form-control"
+                            className="form-control form-control-sm"
                             placeholder="Application Engineer"
                             name="application_engineer"
                             onChange={handleLeadChange}
@@ -852,11 +777,11 @@ const Leads = () => {
                       </div>
                       <div className="form-group row">
                         <div className="col-sm-12">
-                          <label className="col-form-label">Status</label>
+                          <label className="col-form-label">{t('common.status')}</label>
                           <textarea
                             className="form-control"
                             rows={3}
-                            placeholder="Status"
+                            placeholder={t('common.status')}
                             defaultValue={""}
                             name="status"
                             onChange={handleLeadChange}
@@ -869,7 +794,7 @@ const Leads = () => {
                           <label className="col-form-label">Tag List</label>
                           <input
                             type="text"
-                            className="form-control"
+                            className="form-control form-control-sm"
                             name="tag-name"
                             placeholder="Tag List"
                           />
@@ -891,7 +816,7 @@ const Leads = () => {
                           className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
                           onClick={handleAddNewLead}
                         >
-                          Save
+                          {t('common.save')}
                         </button>
                         &nbsp;&nbsp;
                         <button
@@ -899,7 +824,7 @@ const Leads = () => {
                           className="btn btn-secondary btn-rounded"
                           data-bs-dismiss="modal"
                         >
-                          Cancel
+                          {t('common.cancel')}
                         </button>
                       </div>
                     </form>
