@@ -5,7 +5,7 @@ import { ReportsImg } from "../imagepath";
 import { Table } from "antd";
 import "antd/dist/reset.css";
 import "../antdstyle.css";
-import { itemRender, onShowSizeChange } from "../paginationfunction";
+import { ItemRender, onShowSizeChange } from "../paginationfunction";
 import { BiBarChartAlt2 } from "react-icons/bi";
 
 const Reports = () => {
@@ -273,7 +273,7 @@ const Reports = () => {
                               `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                             showSizeChanger: true,
                             onShowSizeChange: onShowSizeChange,
-                            itemRender: itemRender,
+                            ItemRender: ItemRender,
                           }}
                           style={{ overflowX: "auto" }}
                           columns={columns}

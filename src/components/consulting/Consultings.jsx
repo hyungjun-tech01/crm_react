@@ -7,13 +7,11 @@ import { useCookies } from "react-cookie";
 import { MoreVert } from '@mui/icons-material';
 import { Table } from "antd";
 import "antd/dist/reset.css";
-import { itemRender, onShowSizeChange } from "../paginationfunction";
+import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import ConsultingsDetailsModel from "./ConsultingsDetailsModel";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
-import DealDetailsModel from "../deals/DealDetailsModel";
-import ProjectDetailsModel from "../project/ProjectDetailsModel";
 import LeadsDetailsModel from "../leads/LeadsDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -46,7 +44,7 @@ const Consultings = () => {
 
   const [expanded, setExpaned] = useState(false);
 
-  const { i18n, t } = useTranslation();
+  const { t } = useTranslation();
 
   const [statusSearch, setStatusSearch] = useState('common.all');
 
@@ -386,14 +384,10 @@ const Consultings = () => {
                       }}
                       pagination={{
                         total: allConsultingData.length,
-                        showTotal: (total, range) =>
-                          { return i18n.language === 'ko' ? 
-                            `${total} 항목 중, ${range[0]}에서 ${range[1]}` :
-                            `Showing ${range[0]} to ${range[1]} of ${total} entries`
-                          },
+                        showTotal: ShowTotal,
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
-                        itemRender: itemRender,
+                        ItemRender: ItemRender,
                       }}
                       style={{ overflowX: "auto" }}
                       columns={columns}
@@ -408,14 +402,10 @@ const Consultings = () => {
                     }}
                     pagination={{
                       total: filteredConsulting.length >0 ? filteredConsulting.length:0,
-                      showTotal: (total, range) =>
-                        { return i18n.language === 'ko' ? 
-                          `${total} 항목 중, ${range[0]}에서 ${range[1]}` :
-                          `Showing ${range[0]} to ${range[1]} of ${total} entries`
-                        },
+                      showTotal: ShowTotal,
                       showSizeChanger: true,
                       onShowSizeChange: onShowSizeChange,
-                      itemRender: itemRender,
+                      ItemRender: ItemRender,
                     }}
                     style={{ overflowX: "auto" }}
                     columns={columns}

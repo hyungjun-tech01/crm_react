@@ -5,7 +5,7 @@ import { Table } from "antd";
 import { Link } from "react-router-dom";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
-import { itemRender, onShowSizeChange } from "../paginationfunction";
+import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import LeadsDetailsModel from "./LeadsDetailsModel";
 import { MoreVert } from '@mui/icons-material';
@@ -449,11 +449,10 @@ const Leads = () => {
                       className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
                       pagination={{
                         total: allLeadData.length,
-                        showTotal: (total, range) =>
-                          `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+                        showTotal: ShowTotal,
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
-                        itemRender: itemRender,
+                        ItemRender: ItemRender,
                       }}
                       style={{ overflowX: "auto" }}
                       columns={columns}
@@ -466,11 +465,10 @@ const Leads = () => {
                       className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
                       pagination={{
                         total: filteredLead.length >0 ? filteredLead.length:0,
-                        showTotal: (total, range) =>
-                          `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+                        showTotal: ShowTotal,
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
-                        itemRender: itemRender,
+                        ItemRender: ItemRender,
                       }}
                       style={{ overflowX: "auto" }}
                       columns={columns}

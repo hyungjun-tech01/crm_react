@@ -4,7 +4,7 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { Table } from "antd";
 import "antd/dist/reset.css";
-import { itemRender, onShowSizeChange } from "../paginationfunction";
+import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import QuotationsDetailsModel from "./QuotationsDetailsModel";
 import QuotationAddNewModal from "./QuotationAddNewModal";
@@ -36,7 +36,7 @@ const Quotations = () => {
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
 
-  const { i18n, t } = useTranslation();
+  const { t } = useTranslation();
 
   const [statusSearch, setStatusSearch] = useState('common.all');
 
@@ -301,14 +301,10 @@ const Quotations = () => {
                       }}
                       pagination={{
                         total: allQuotationData.length,
-                        showTotal: (total, range) =>
-                          { return i18n.language === 'ko' ? 
-                          `${total} 항목 중, ${range[0]}에서 ${range[1]}` :
-                            `Showing ${range[0]} to ${range[1]} of ${total} entries`
-                          },
+                        showTotal: ShowTotal,
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
-                        itemRender: itemRender,
+                        ItemRender: ItemRender,
                       }}
                       style={{ overflowX: "auto" }}
                       columns={columns}
@@ -323,14 +319,10 @@ const Quotations = () => {
                       }}
                       pagination={{
                         total: filteredQuotation.length >0 ? filteredQuotation.length:0,
-                        showTotal: (total, range) =>
-                          { return i18n.language === 'ko' ? 
-                            `${total} 항목 중, ${range[0]}에서 ${range[1]}` :
-                            `Showing ${range[0]} to ${range[1]} of ${total} entries`
-                          },
+                        showTotal: ShowTotal,
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
-                        itemRender: itemRender,
+                        ItemRender: ItemRender,
                       }}
                       style={{ overflowX: "auto" }}
                       columns={columns}

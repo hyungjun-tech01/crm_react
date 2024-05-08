@@ -15,7 +15,7 @@ import {
   IMG10,
 } from "./img";
 import { Table } from "antd";
-import { itemRender, onShowSizeChange } from "../../paginationfunction";
+import { ItemRender, onShowSizeChange } from "../../paginationfunction";
 import {
   FiBookOpen,
   FiBookmark,
@@ -764,7 +764,7 @@ const Invoices = () => {
                             `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                           showSizeChanger: true,
                           onShowSizeChange: onShowSizeChange,
-                          itemRender: itemRender,
+                          ItemRender: ItemRender,
                         }}
                         className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
                         style={{ overflowX: "auto" }}

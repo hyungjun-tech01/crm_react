@@ -4,7 +4,7 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { Table } from "antd";
 import "antd/dist/reset.css";
-import { itemRender, onShowSizeChange } from "../paginationfunction";
+import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import TransactionsDetailsModel from "./TransactionsDetailsModel";
 import SystemUserModel from "../task/SystemUserModel";
@@ -28,7 +28,7 @@ const Transactions = () => {
   const { loadAllTransactions, setCurrentTransaction , filterTransactions} = useRecoilValue(TransactionRepo);
   const [ initAddNewTransaction, setInitAddNewTransaction ] = useState(false);
 
-  const { i18n, t } = useTranslation();
+  const { t } = useTranslation();
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -253,14 +253,10 @@ const Transactions = () => {
                         }}
                         pagination={{
                           total: allTransactionData.length,
-                          showTotal: (total, range) =>
-                            { return i18n.language === 'ko' ? 
-                              `${total} 항목 중, ${range[0]}에서 ${range[1]}` :
-                              `Showing ${range[0]} to ${range[1]} of ${total} entries`
-                            },
+                          showTotal: ShowTotal,
                           showSizeChanger: true,
                           onShowSizeChange: onShowSizeChange,
-                          itemRender: itemRender,
+                          ItemRender: ItemRender,
                         }}
                         style={{ overflowX: "auto" }}
                         columns={columns}
@@ -275,14 +271,10 @@ const Transactions = () => {
                       }}
                       pagination={{
                         total: filteredTransaction.length >0 ? filteredTransaction.length:0,
-                        showTotal: (total, range) =>
-                          { return i18n.language === 'ko' ? 
-                            `${total} 항목 중, ${range[0]}에서 ${range[1]}` :
-                            `Showing ${range[0]} to ${range[1]} of ${total} entries`
-                          },
+                        showTotal: ShowTotal,
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
-                        itemRender: itemRender,
+                        ItemRender: ItemRender,
                       }}
                       style={{ overflowX: "auto" }}
                       columns={columns}

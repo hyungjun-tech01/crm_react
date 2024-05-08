@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
-import { itemRender, onShowSizeChange } from "../paginationfunction";
+import { ItemRender, onShowSizeChange } from "../paginationfunction";
 import "../antdstyle.css";
 import TaskDetailModel from "./TaskDetailModel";
 import SystemUserModel from "./SystemUserModel";
@@ -341,7 +341,7 @@ const Task = () => {
                           `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
-                        itemRender: itemRender,
+                        ItemRender: ItemRender,
                       }}
                       columns={columns}
                       dataSource={data}

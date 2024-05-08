@@ -3,7 +3,7 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
 import { avatar11, avatar10, avatar25, avatar26 } from "../imagepath";
-import { itemRender, onShowSizeChange } from "../paginationfunction";
+import { ItemRender, onShowSizeChange } from "../paginationfunction";
 import "../antdstyle.css";
 import SystemUserModel from "../task/SystemUserModel";
 import DatePicker from "react-datepicker";
@@ -311,7 +311,7 @@ const Contacts = () => {
                           `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
-                        itemRender: itemRender,
+                        ItemRender: ItemRender,
                       }}
                       className="table"
                       style={{ overflowX: "auto" }}

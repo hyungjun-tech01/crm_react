@@ -3,7 +3,7 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
 import "antd/dist/reset.css";
-import { itemRender, onShowSizeChange } from "../paginationfunction";
+import { ItemRender, onShowSizeChange } from "../paginationfunction";
 import "../antdstyle.css";
 import DealDetailsModel from "./DealDetailsModel";
 import CompanyDetails from "./CompanyDetails";
@@ -478,7 +478,7 @@ const Deals = () => {
                           `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
-                        itemRender: itemRender,
+                        ItemRender: ItemRender,
                       }}
                       style={{ overflowX: "auto" }}
                       columns={columns}

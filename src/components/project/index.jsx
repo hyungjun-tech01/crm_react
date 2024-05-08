@@ -4,7 +4,7 @@ import { Table } from "antd";
 import { Link } from "react-router-dom";
 import "antd/dist/reset.css";
 import "../antdstyle.css";
-import { itemRender, onShowSizeChange } from "../paginationfunction";
+import { ItemRender, onShowSizeChange } from "../paginationfunction";
 import ProjectDetailsModel from "./ProjectDetailsModel";
 import SystemUserModel from "../task/SystemUserModel";
 import { BiGridAlt } from "react-icons/bi";
@@ -407,7 +407,7 @@ const Project = () => {
                           `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
-                        itemRender: itemRender,
+                        ItemRender: ItemRender,
                       }}
                       className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
                       columns={columns}

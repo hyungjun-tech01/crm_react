@@ -4,7 +4,7 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
 import { useCookies } from "react-cookie";
-import { itemRender, onShowSizeChange } from "../paginationfunction";
+import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import CompanyDetailsModel from "./CompanyDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -27,7 +27,7 @@ const Company = () => {
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
 
-  const { i18n, t } = useTranslation();
+  const { t } = useTranslation();
 
   const [statusSearch, setStatusSearch] = useState('common.all');
 
@@ -289,14 +289,10 @@ const Company = () => {
                       rowSelection={rowSelection}
                       pagination={{
                         total:  allCompanyData.length,
-                        showTotal: (total, range) =>
-                          { return i18n.language === 'ko' ? 
-                            `${total} 항목 중, ${range[0]}에서 ${range[1]}` :
-                            `Showing ${range[0]} to ${range[1]} of ${total} entries`
-                          },
+                        showTotal: ShowTotal,
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
-                        itemRender: itemRender,
+                        ItemRender: ItemRender,
                       }}
                       className="table"
                       style={{ overflowX: "auto" }}
@@ -309,14 +305,10 @@ const Company = () => {
                       rowSelection={rowSelection}
                       pagination={{
                         total:  filteredCompany.length > 0 ? filteredCompany.length:0,
-                        showTotal: (total, range) =>
-                          { return i18n.language === 'ko' ? 
-                            `${total} 항목 중, ${range[0]}에서 ${range[1]}` :
-                            `Showing ${range[0]} to ${range[1]} of ${total} entries`
-                          },
+                        showTotal: ShowTotal,
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
-                        itemRender: itemRender,
+                        ItemRender: ItemRender,
                       }}
                       className="table"
                       style={{ overflowX: "auto" }}

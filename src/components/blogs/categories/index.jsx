@@ -2,7 +2,7 @@ import React from 'react';
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { Table } from "antd";
-import { itemRender, onShowSizeChange } from "../../paginationfunction"
+import { ItemRender, onShowSizeChange } from "../../paginationfunction"
 import { iOutlinePlusCircle } from "react-icons/ai";
 import "../../antdstyle.css"
 import { FiEdit, FiPlusCircle, FiTrash2, FiXCircle } from 'react-icons/fi';
@@ -162,7 +162,7 @@ const Categories = () => {
                         pagination={{
                           total: data.length,
                           showTotal: (total, range) => `Showing ${range[0]} to ${range[1]} of ${total} entries`,
-                          showSizeChanger: true, onShowSizeChange: onShowSizeChange, itemRender: itemRender
+                          showSizeChanger: true, onShowSizeChange: onShowSizeChange, ItemRender: ItemRender
                         }}
                         columns={columns}
                         dataSource={data}

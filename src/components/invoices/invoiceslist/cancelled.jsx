@@ -4,7 +4,7 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { IMG06, IMG07, IMG08, IMG09, IMG10 } from "./img";
 import Breadcrumb from "./common.jsx";
 import { Table } from "antd";
-import { itemRender, onShowSizeChange } from "../../paginationfunction";
+import { ItemRender, onShowSizeChange } from "../../paginationfunction";
 import "../../antdstyle.css";
 const cancelledInvoices = () => {
   const data = [
@@ -171,7 +171,7 @@ const cancelledInvoices = () => {
                               `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                             showSizeChanger: true,
                             onShowSizeChange: onShowSizeChange,
-                            itemRender: itemRender,
+                            ItemRender: ItemRender,
                           }}
                           className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
                           style={{ overflowX: "auto" }}

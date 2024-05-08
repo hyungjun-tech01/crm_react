@@ -5,7 +5,7 @@ import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "antd/dist/reset.css";
 import { Table } from 'antd';
-import { itemRender, onShowSizeChange } from "../paginationfunction";
+import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -765,11 +765,10 @@ const QuotationAddNewModal = (props) => {
                   }}
                   pagination={{
                     total: quotationContents.length,
-                    showTotal: (total, range) =>
-                      `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+                    showTotal: ShowTotal,
                     showSizeChanger: true,
                     onShowSizeChange: onShowSizeChange,
-                    itemRender: itemRender,
+                    ItemRender: ItemRender,
                   }}
                   style={{ overflowX: "auto" }}
                   columns={contentColumns}
