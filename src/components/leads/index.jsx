@@ -550,8 +550,10 @@ const Leads = () => {
                           <label className="col-form-label">{t('lead.lead_status')}</label>
                           <select className="form-control form-control-sm">
                             <option>Select</option>
-                            <option>Open - Contacted</option>
-                            <option>Open - Not Contacted</option>
+                            <option>Not Contacted</option>
+                            <option>Attempted Contact</option>
+                            <option>Contact</option>
+                            <option>Converted</option>
                           </select>
                         </div>
                       </div>

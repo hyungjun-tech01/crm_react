@@ -533,7 +533,7 @@ const CompanyDetailsModel = () => {
                                   defaultText={selectedCompany.business_item}
                                   saved={savedValues}
                                   name="business_item"
-                                  title= {t('company.business_type')}
+                                  title= {t('company.business_item')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}

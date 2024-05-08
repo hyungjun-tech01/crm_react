@@ -474,7 +474,7 @@ const handleRowClick = (row) => {
                     <span>{t('company.homepage')}</span>
                     <a href={selectedLead.homepage} target="_blank" rel="noopener noreferrer">{selectedLead.homepage}</a>
                   </div>
-                </div>s
+                </div>
               </div>
             </div>
             <div className="modal-body">
@@ -855,14 +855,14 @@ const handleRowClick = (row) => {
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
                               <Collapse accordion expandIconPosition="end" defaultActiveKey={['1']}>
-                                <Panel header="Organization Name" key="1">
+                                <Panel header={t('company.company_name')} key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedCompany.company_name}
                                         saved={savedValuesCompany}
                                         name="company_name"
-                                        title="Name"
+                                        title={t('company.company_name')}
                                         no_border={true}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
@@ -875,7 +875,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedCompany.company_name_eng}
                                         saved={savedValuesCompany}
                                         name="company_name_eng"
-                                        title="English Name"
+                                        title={t('company.eng_company_name')}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
@@ -890,14 +890,14 @@ const handleRowClick = (row) => {
                             </div>
                             <div className="tasks__item crms-task-item active">
                               <Collapse accordion expandIconPosition="end" defaultActiveKey={['1']}>
-                                <Panel header="Organization Details" key="1">
+                                <Panel header= {t('company.company_details')}  key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedCompany.group_}
                                         saved={savedValuesCompany}
                                         name="group_"
-                                        title="Group"
+                                        title={t('company.group')}
                                         no_border={true}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
@@ -910,7 +910,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedCompany.company_scale}
                                         saved={savedValuesCompany}
                                         name="company_scale"
-                                        title="Company Scale"
+                                        title={t('company.company_scale')}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
@@ -922,7 +922,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedCompany.deal_type}
                                         saved={savedValuesCompany}
                                         name="deal_type"
-                                        title="Deal Type"
+                                        title={t('company.deal_type')}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
@@ -934,7 +934,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedCompany.business_registration_code}
                                         saved={savedValuesCompany}
                                         name="business_registration_code"
-                                        title="Business Registration Code"
+                                        title={t('company.business_registration_code')}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
@@ -945,7 +945,7 @@ const handleRowClick = (row) => {
                                       <DetailDateItem
                                         saved={savedValuesCompany}
                                         name="establishment_date"
-                                        title="Establishment Date"
+                                        title={t('company.establishment_date')}
                                         orgTimeData={orgEstablishDate}
                                         timeData={establishDate}
                                         timeDataChange={handleEstablishDateChange}
@@ -958,7 +958,7 @@ const handleRowClick = (row) => {
                                       <DetailDateItem
                                         saved={savedValuesCompany}
                                         name="closure_date"
-                                        title="Closure Date"
+                                        title={t('company.closure_date')}
                                         orgTimeData={orgCloseDate}
                                         timeData={closeDate}
                                         timeDataChange={handleCloseDateChange}
@@ -973,7 +973,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedCompany.ceo_name}
                                         saved={savedValuesCompany}
                                         name="ceo_name"
-                                        title="Ceo Name"
+                                        title={t('company.ceo_name')}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
@@ -985,7 +985,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedCompany.business_type}
                                         saved={savedValuesCompany}
                                         name="business_type"
-                                        title="Business Type"
+                                        title={t('company.business_type')}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
@@ -997,7 +997,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedCompany.business_item}
                                         saved={savedValuesCompany}
                                         name="business_item"
-                                        title="Business Item"
+                                        title={t('company.business_item')}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
@@ -1009,7 +1009,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedCompany.industry_type}
                                         saved={savedValuesCompany}
                                         name="industry_type"
-                                        title="Industry Type"
+                                        title={t('company.industry_type')}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
@@ -1024,14 +1024,14 @@ const handleRowClick = (row) => {
                             </div>
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Organization Contact Details" key="1">
+                                <Panel header= {t('common.contact_details')}  key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedCompany.company_phone_number}
                                         saved={savedValuesCompany}
                                         name="company_phone_number"
-                                        title="Phone"
+                                        title={t('company.phone_number')} 
                                         no_border={true}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
@@ -1044,7 +1044,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedCompany.company_fax_number}
                                         saved={savedValuesCompany}
                                         name="company_fax_number"
-                                        title="Fax"
+                                        title={t('company.fax_number')}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
@@ -1056,7 +1056,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedCompany.homepage}
                                         saved={savedValuesCompany}
                                         name="homepage"
-                                        title="Website"
+                                        title= {t('company.homepage')}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
@@ -1071,14 +1071,14 @@ const handleRowClick = (row) => {
                             </div>
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Address Information" key="1">
+                                <Panel header= {t('company.address')} key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedCompany.company_address}
                                         saved={savedValuesCompany}
                                         name="company_address"
-                                        title="Address"
+                                        title= {t('company.address')}
                                         no_border={true}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
@@ -1091,7 +1091,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedCompany.company_zip_code}
                                         saved={savedValuesCompany}
                                         name="company_zip_code"
-                                        title="Postal code"
+                                        title= {t('company.zip_code')}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
@@ -1106,14 +1106,14 @@ const handleRowClick = (row) => {
                             </div>
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Additional Information" key="1">
+                                <Panel header= {t('common.additional_information')} key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedCompany.account_code}
                                         saved={savedValuesCompany}
                                         name="account_code"
-                                        title="Account Code"
+                                        title= {t('company.account_code')}
                                         no_border={true}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
@@ -1126,7 +1126,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedCompany.bank_name}
                                         saved={savedValuesCompany}
                                         name="bank_name"
-                                        title="Bank Name"
+                                        title= {t('company.bank_name')} 
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
@@ -1138,7 +1138,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedCompany.account_owner}
                                         saved={savedValuesCompany}
                                         name="account_owner"
-                                        title="Account Owner"
+                                        title= {t('company.account_owner')}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
@@ -1150,7 +1150,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedCompany.sales_resource}
                                         saved={savedValuesCompany}
                                         name="sales_resource"
-                                        title="Sales Resource"
+                                        title= {t('company.salesman')}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
@@ -1162,7 +1162,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedCompany.application_engineer}
                                         saved={savedValuesCompany}
                                         name="application_engineer"
-                                        title="Application Engineer"
+                                        title= {t('company.engineer')}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
@@ -1174,7 +1174,7 @@ const handleRowClick = (row) => {
                                         defaultText={selectedCompany.region}
                                         saved={savedValuesCompany}
                                         name="region"
-                                        title="Region"
+                                        title= {t('common.region')}
                                         checkEdit={handleCheckEditStateCompany}
                                         startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
@@ -1189,14 +1189,14 @@ const handleRowClick = (row) => {
                             </div>
                             <div className="tasks__item crms-task-item">
                               <Collapse accordion expandIconPosition="end">
-                                <Panel header="Memo" key="1">
+                                <Panel header= {t('common.memo')} key="1">
                                   <table className="table">
                                     <tbody>
                                       <DetailTextareaItem
                                         defaultText={selectedCompany.memo}
                                         saved={savedValuesCompany}
                                         name="memo"
-                                        title="Memo"
+                                        title= {t('company.memo')}
                                         row_no={3}
                                         no_border={true}
                                         checkEdit={handleCheckEditStateCompany}
