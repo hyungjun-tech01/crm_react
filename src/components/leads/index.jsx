@@ -173,7 +173,7 @@ const Leads = () => {
       title: t('lead.lead_status'),
       dataIndex: "status",
       render: (text, record) => <label>{text}</label>,
-      sorter: (a, b) => compareText(a.status, b.status.length),
+      sorter: (a, b) => compareText(a.status, b.status),
     },
     {
       title: t('lead.lead_modified'),
