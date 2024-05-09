@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
+import { useTranslation } from "react-i18next";
 import { Collapse } from "antd";
 import { C_logo, C_logo2, CircleImg } from "../imagepath";
 import { atomAllConsultings, atomAllLeads, atomAllPurchases, atomAllQuotations, atomAllTransactions, atomCurrentCompany, defaultCompany } from "../../atoms/atoms";
@@ -14,7 +15,7 @@ import { PurchaseRepo } from "../../repository/purchase";
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailDateItem from "../../constants/DetailDateItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
-import { useTranslation } from "react-i18next";
+import { MoreVert } from "@mui/icons-material";
 
 const CompanyDetailsModel = () => {
   const { Panel } = Collapse;
@@ -44,6 +45,7 @@ const CompanyDetailsModel = () => {
   const [ quotationByCompany, setQuotationByCompany] = useState([]);
   const [ transactionByCompany, setTransactionByCompany] = useState([]);
   const [ purchaseByCompany, setPurchaseByCompany] = useState([]);
+  const [ expandRelated, setExpandRelated ] = useState([]);
 
   const { t } = useTranslation();
 
@@ -184,6 +186,31 @@ const CompanyDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, orgCloseDate, closeDate]);
 
+  // --- Funtions for Etc ---------------------------------
+  const handleCardClick = useCallback((card) => {
+    if(card === "lead" && leadsByCompany.length === 0) return;
+    if(card === "consulting" && consultingByCompany.length === 0) return;
+    if(card === "quotation" && quotationByCompany.length === 0) return;
+    if(card === "transaction" && transactionByCompany.length === 0) return;
+    if(card === "purchase" && purchaseByCompany.length === 0) return;
+
+    let tempExpanded = [];
+    const foundIdx = expandRelated.findIndex(item => item === card);
+    if(foundIdx === -1){
+      tempExpanded = [
+        ...expandRelated,
+        card
+      ];
+      setExpandRelated(tempExpanded);
+    } else {
+      tempExpanded = [
+        ...expandRelated.slice(0, foundIdx),
+        ...expandRelated.slice(foundIdx + 1, ),
+      ];
+    };
+    setExpandRelated(tempExpanded);
+  }, [expandRelated, leadsByCompany, consultingByCompany, quotationByCompany, transactionByCompany, purchaseByCompany])
+
   useEffect(() => {
     console.log('[CompanyDetailsModel] called!');
     setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
@@ -259,64 +286,6 @@ const CompanyDetailsModel = () => {
                     </span>
                   </div>
                 </div>
-                <div className="col-md-5 text-end">
-                  <ul className="list-unstyled list-style-none">
-                    <li className="dropdown list-inline-item">
-                      <br />
-                      <Link
-                        className="dropdown-toggle"
-                        to="#"
-                        role="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        {" "}
-                        Actions{" "}
-                      </Link>
-                      <div className="dropdown-menu">
-                        <Link className="dropdown-item" to="#">
-                          Edit This Company
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Change Organization Image
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Delete This Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Change Record Owner
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Generate Merge Document
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Print This Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Task For Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Event For Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add Activity Set To Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Contact For Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Opportunity For Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Opportunity For Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Project For Organization
-                        </Link>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
               </div>
               <button
                 type="button"
@@ -390,7 +359,7 @@ const CompanyDetailsModel = () => {
                   <div className="tab-pane show active" id="task-details">
                     <div className="crms-tasks">
                       <div className="tasks__item crms-task-item active">
-                        <Collapse accordion expandIconPosition="end">
+                        <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                           <Panel header={t('company.company_name')} key="1">
                             <table className="table">
                               <tbody>
@@ -425,7 +394,7 @@ const CompanyDetailsModel = () => {
                         </Collapse>
                       </div>
                       <div className="tasks__item crms-task-item active">
-                        <Collapse accordion expandIconPosition="end">
+                        <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                           <Panel header= {t('company.company_details')}  key="1">
                             <table className="table">
                               <tbody>
@@ -559,7 +528,7 @@ const CompanyDetailsModel = () => {
                         </Collapse>
                       </div>
                       <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition="end">
+                        <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                           <Panel header= {t('common.contact_details')} key="1">
                             <table className="table">
                               <tbody>
@@ -606,7 +575,7 @@ const CompanyDetailsModel = () => {
                         </Collapse>
                       </div>
                       <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition="end">
+                        <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                           <Panel header= {t('company.address')} key="1">
                             <table className="table">
                               <tbody>
@@ -641,7 +610,7 @@ const CompanyDetailsModel = () => {
                         </Collapse>
                       </div>
                       <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition="end">
+                        <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                           <Panel header= {t('common.additional_information')} key="1">
                             <table className="table">
                               <tbody>
@@ -724,7 +693,7 @@ const CompanyDetailsModel = () => {
                         </Collapse>
                       </div>
                       <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition="end">
+                        <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                           <Panel header= {t('common.memo')}  key="1">
                             <table className="table">
                               <tbody>
@@ -753,14 +722,14 @@ const CompanyDetailsModel = () => {
                     <div className="row">
                       <div className="col-md-4">
                         <div className="card bg-gradient-danger card-img-holder text-white h-100">
-                          <div className="card-body">
+                          <div className="card-body" onClick={()=>handleCardClick('lead')}>
                             <img
                               src={CircleImg}
                               className="card-img-absolute"
                               alt="circle"
                             />
                             <h4 className="font-weight-normal mb-3">
-                              Leads
+                              {t('lead.lead')}
                             </h4>
                             <span>{leadsByCompany.length}</span>
                           </div>
@@ -768,26 +737,26 @@ const CompanyDetailsModel = () => {
                       </div>
                       <div className="col-md-4">
                         <div className="card bg-gradient-info card-img-holder text-white h-100">
-                          <div className="card-body">
+                        <div className="card-body" onClick={()=>handleCardClick('consulting')}>
                             <img
                               src={CircleImg}
                               className="card-img-absolute"
                               alt="circle"
                             />
-                            <h4 className="font-weight-normal mb-3">Consulting</h4>
+                            <h4 className="font-weight-normal mb-3">{t('consulting.consulting')}</h4>
                             <span>{consultingByCompany.length}</span>
                           </div>
                         </div>
                       </div>
                       <div className="col-md-4">
                         <div className="card bg-gradient-success card-img-holder text-white h-100">
-                          <div className="card-body">
+                        <div className="card-body" onClick={()=>handleCardClick('quotation')}>
                             <img
                               src={CircleImg}
                               className="card-img-absolute"
                               alt="circle"
                             />
-                            <h4 className="font-weight-normal mb-3">Quotation</h4>
+                            <h4 className="font-weight-normal mb-3">{t('quotation.quotation')}</h4>
                             <span>{quotationByCompany.length}</span>
                           </div>
                         </div>
@@ -796,26 +765,26 @@ const CompanyDetailsModel = () => {
                     <div className="row pt-3">
                       <div className="col-md-4">
                         <div className="card bg-gradient-success card-img-holder text-white h-100">
-                          <div className="card-body">
+                        <div className="card-body" onClick={()=>handleCardClick('transaction')}>
                             <img
                               src={CircleImg}
                               className="card-img-absolute"
                               alt="circle"
                             />
-                            <h4 className="font-weight-normal mb-3">Transaction</h4>
+                            <h4 className="font-weight-normal mb-3">{t('transaction.transaction')}</h4>
                             <span>{transactionByCompany.length}</span>
                           </div>
                         </div>
                       </div>
                       <div className="col-md-4">
                         <div className="card bg-gradient-danger card-img-holder text-white h-100">
-                          <div className="card-body">
+                        <div className="card-body" onClick={()=>handleCardClick('purchase')}>
                             <img
                               src={CircleImg}
                               className="card-img-absolute"
                               alt="circle"
                             />
-                            <h4 className="font-weight-normal mb-3">Purchase</h4>
+                            <h4 className="font-weight-normal mb-3">{t('purchase.purchase')}</h4>
                             <span>{purchaseByCompany.length}</span>
                           </div>
                         </div>
@@ -824,265 +793,43 @@ const CompanyDetailsModel = () => {
                     <div className="row">
                       <div className="crms-tasks p-2">
                         <div className="tasks__item crms-task-item active">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Lead" key="1">
+                          <Collapse
+                            accordion expandIconPosition="end"
+                            activeKey={expandRelated}
+                          >
+                            <Panel
+                              collapsible={ leadsByCompany.length > 0 ? 'header' : 'disabled'}
+                              header={t('lead.lead')}
+                              key="lead"
+                              onClick={()=>handleCardClick('lead')}
+                            >
                               <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                 <thead>
                                   <tr>
-                                    <th>Lead Name</th>
-                                    <th>Mobile</th>
-                                    <th>Email</th>
-                                    <th className="text-end">Actions</th>
+                                    <th>{t('lead.lead_name')}</th>
+                                    <th>{t('lead.mobile')}</th>
+                                    <th>{t('lead.email')}</th>
+                                    <th className="text-end">{t('common.actions')}</th>
                                   </tr>
                                 </thead>
-                                { leadsByCompany.length > 0 &&
-                                  <tbody>
-                                    { leadsByCompany.map((lead, index) => 
-                                        <tr key={index}>
-                                          <td>
-                                            <Link to="#" className="avatar">
-                                              <img alt="" src={C_logo2} />
-                                            </Link>
-                                            <Link
-                                              to="#"
-                                              data-bs-toggle="modal"
-                                              data-bs-target="#lead-details"
-                                              onClick={()=> setCurrentLead(lead.lead_code)}
-                                            >
-                                              {lead.lead_name}
-                                            </Link>
-                                          </td>
-                                          <td>{lead.mobile_number}</td>
-                                          <td>{lead.email}</td>
-                                          <td className="text-center">
-                                            <div className="dropdown dropdown-action">
-                                              <Link
-                                                to="#"
-                                                className="action-icon dropdown-toggle"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false"
-                                              >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
-                                              </Link>
-                                              <div className="dropdown-menu dropdown-menu-right">
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Edit Link
-                                                </Link>
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Delete Link
-                                                </Link>
-                                              </div>
-                                            </div>
-                                          </td>
-                                        </tr>
-                                      )
-                                    }
-                                  </tbody>
-                                }
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                        <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Consultings" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Type</th>
-                                    <th>Date/Time</th>
-                                    <th>Receiver</th>
-                                    <th>Request</th>
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                { consultingByCompany.length > 0 &&
-                                  <tbody>
-                                    { consultingByCompany.map((consulting, index) =>
-                                      <tr key={index}>
-                                        <td>{consulting.consulting_type}</td>
-                                        <td>{consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
-                                        {consulting.receipt_time && new Date(consulting.receipt_time).toLocaleDateString('ko-KR', {hour:'numeric',minute:'numeric',second:'numeric'})}
-                                        </td>
-                                        <td>{consulting.receiver}</td>
-                                        <td>{consulting.request_type}</td>
-                                        <td className="text-center">
-                                          <div className="dropdown dropdown-action">
-                                            <Link
-                                              to="#"
-                                              className="action-icon dropdown-toggle"
-                                              data-bs-toggle="dropdown"
-                                              aria-expanded="false"
-                                            >
-                                              <i className="material-icons">
-                                                more_vert
-                                              </i>
-                                            </Link>
-                                            <div className="dropdown-menu dropdown-menu-right">
-                                              <Link
-                                                className="dropdown-item"
-                                                to="#"
-                                              >
-                                                Edit Link
-                                              </Link>
-                                              <Link
-                                                className="dropdown-item"
-                                                to="#"
-                                              >
-                                                Delete Link
-                                              </Link>
-                                            </div>
-                                          </div>
-                                        </td>
-                                      </tr>
-                                    )}
-                                  </tbody>
-                                }
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                        <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Quotations" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Title</th>
-                                    <th>Date</th>
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                { quotationByCompany.length > 0 && 
-                                  <tbody>
-                                    { quotationByCompany.map((quotation, index) =>
-                                      <tr key={index}>
-                                        <td>{quotation.quotation_title}</td>
-                                        <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}</td>
-                                        <td className="text-center">
-                                          <div className="dropdown dropdown-action">
-                                            <Link
-                                              to="#"
-                                              className="action-icon dropdown-toggle"
-                                              data-bs-toggle="dropdown"
-                                              aria-expanded="false"
-                                            >
-                                              <i className="material-icons">
-                                                more_vert
-                                              </i>
-                                            </Link>
-                                            <div className="dropdown-menu dropdown-menu-right">
-                                              <Link
-                                                className="dropdown-item"
-                                                to="#"
-                                              >
-                                                Edit Link
-                                              </Link>
-                                              <Link
-                                                className="dropdown-item"
-                                                to="#"
-                                              >
-                                                Delete Link
-                                              </Link>
-                                            </div>
-                                          </div>
-                                        </td>
-                                      </tr>
-                                    )}
-                                  </tbody>
-                                }
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                        <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Transaction" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Title</th>
-                                    <th>Publish Date</th>
-                                    <th>Publish Type</th>
-                                    <th>Supply Price</th>
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                { transactionByCompany.length > 0 &&
-                                  <tbody>
-                                    { transactionByCompany.map((trans, index) =>
-                                      <tr key={index}>
-                                        <td>{trans.transaction_title}</td>
-                                        <td>{trans.publish_date && new Date(trans.publish_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
-                                        <td>{trans.publish_type}</td>
-                                        <td>{trans.supply_price}</td>
-                                        <td className="text-center">
-                                          <div className="dropdown dropdown-action">
-                                            <Link
-                                              to="#"
-                                              className="action-icon dropdown-toggle"
-                                              data-bs-toggle="dropdown"
-                                              aria-expanded="false"
-                                            >
-                                              <i className="material-icons">
-                                                more_vert
-                                              </i>
-                                            </Link>
-                                            <div className="dropdown-menu dropdown-menu-right">
-                                              <Link
-                                                className="dropdown-item"
-                                                to="#"
-                                              >
-                                                Edit Link
-                                              </Link>
-                                              <Link
-                                                className="dropdown-item"
-                                                to="#"
-                                              >
-                                                Delete Link
-                                              </Link>
-                                            </div>
-                                          </div>
-                                        </td>
-                                      </tr>
-                                    )}
-                                  </tbody>
-                                }
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                        <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Purchase" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Product Name</th>
-                                    <th>Quantity</th>
-                                    <th>Price</th>
-                                    <th>Delivery Date</th>
-                                    <th>Registration Date</th>
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                { purchaseByCompany.length > 0 && 
-                                  <tbody>
-                                  { purchaseByCompany.map((purchase, index) =>
+                                <tbody>
+                                  { leadsByCompany.map((lead, index) => 
                                     <tr key={index}>
-                                      <td>{purchase.product_name}</td>
-                                      <td>{purchase.quantity}</td>
-                                      <td>{purchase.price}</td>
-                                      <td>{purchase.delivery_date && new Date(purchase.delivery_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
-                                      <td>{purchase.registration_date && new Date(purchase.registration_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
+                                      <td>
+                                        <Link to="#" className="avatar">
+                                          <img alt="" src={C_logo2} />
+                                        </Link>
+                                        <Link
+                                          to="#"
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#lead-details"
+                                          onClick={()=> setCurrentLead(lead.lead_code)}
+                                        >
+                                          {lead.lead_name}
+                                        </Link>
+                                      </td>
+                                      <td>{lead.mobile_number}</td>
+                                      <td>{lead.email}</td>
                                       <td className="text-center">
                                         <div className="dropdown dropdown-action">
                                           <Link
@@ -1091,9 +838,7 @@ const CompanyDetailsModel = () => {
                                             data-bs-toggle="dropdown"
                                             aria-expanded="false"
                                           >
-                                            <i className="material-icons">
-                                              more_vert
-                                            </i>
+                                            <MoreVert />
                                           </Link>
                                           <div className="dropdown-menu dropdown-menu-right">
                                             <Link
@@ -1113,79 +858,194 @@ const CompanyDetailsModel = () => {
                                       </td>
                                     </tr>
                                   )}
-                                  </tbody>
-                                }
+                                </tbody>
                               </table>
                             </Panel>
-                          </Collapse>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="tab-pane" id="task-activity">
-                    <div className="row">
-                      <div className="col-md-4">
-                        <div className="card bg-gradient-danger card-img-holder text-white h-100">
-                          <div className="card-body">
-                            <img
-                              src={CircleImg}
-                              className="card-img-absolute"
-                              alt="circle"
-                            />
-                            <h4 className="font-weight-normal mb-3">
-                              Total Activities
-                            </h4>
-                            <span>2</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-4">
-                        <div className="card bg-gradient-info card-img-holder text-white h-100">
-                          <div className="card-body">
-                            <img
-                              src={CircleImg}
-                              className="card-img-absolute"
-                              alt="circle"
-                            />
-                            <h4 className="font-weight-normal mb-3">
-                              Last Activity
-                            </h4>
-                            <span>1</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="row">
-                      <div className="crms-tasks  p-2">
-                        <div className="tasks__item crms-task-item active">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Upcoming Activity" key="1">
+                            <Panel
+                              collapsible={ consultingByCompany.length > 0 ? 'header' : 'disabled'}
+                              header={t('consulting.consulting')}
+                              key="consulting"
+                              onClick={()=>handleCardClick('consulting')}
+                            >
                               <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                 <thead>
                                   <tr>
-                                    <th>Type</th>
-                                    <th>Activity Name</th>
-                                    <th>Assigned To</th>
-                                    <th>Due Date</th>
-                                    <th>Status</th>
-                                    <th className="text-end">Actions</th>
+                                    <th>{t('consulting.type')}</th>
+                                    <th>{t('consulting.receipt_time')}</th>
+                                    <th>{t('consulting.receiver')}</th>
+                                    <th>{t('consulting.request_type')}</th>
+                                    <th className="text-end">{t('common.actions')}</th>
                                   </tr>
                                 </thead>
                                 <tbody>
+                                  { consultingByCompany.map((consulting, index) =>
+                                    <tr key={index}>
+                                      <td>{consulting.consulting_type}</td>
+                                      <td>{consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
+                                      {consulting.receipt_time && new Date(consulting.receipt_time).toLocaleDateString('ko-KR', {hour:'numeric',minute:'numeric',second:'numeric'})}
+                                      </td>
+                                      <td>{consulting.receiver}</td>
+                                      <td>{consulting.request_type}</td>
+                                      <td className="text-center">
+                                        <div className="dropdown dropdown-action">
+                                          <Link
+                                            to="#"
+                                            className="action-icon dropdown-toggle"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false"
+                                          >
+                                            <MoreVert />
+                                          </Link>
+                                          <div className="dropdown-menu dropdown-menu-right">
+                                            <Link
+                                              className="dropdown-item"
+                                              to="#"
+                                            >
+                                              Edit Link
+                                            </Link>
+                                            <Link
+                                              className="dropdown-item"
+                                              to="#"
+                                            >
+                                              Delete Link
+                                            </Link>
+                                          </div>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  )}
+                                </tbody>
+                              </table>
+                            </Panel>
+                            <Panel
+                              collapsible={ quotationByCompany.length > 0 ? 'header' : 'disabled'}
+                              header={t('quotation.quotation')}
+                              key="quotation"
+                              onClick={()=>handleCardClick('quotation')}
+                            >
+                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
+                                <thead>
                                   <tr>
-                                    <td>Meeting</td>
-                                    <td>Call Enquiry</td>
-                                    <td>John Doe</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td>
-                                      <label className="container-checkbox">
-                                        <input
-                                          type="checkbox"
-                                          defaultChecked=""
-                                        />
-                                        <span className="checkmark" />
-                                      </label>
-                                    </td>
+                                    <th>{t('common.title')}</th>
+                                    <th>{t('quotation.quotation_date')}</th>
+                                    <th className="text-end">{t('common.actions')}</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  { quotationByCompany.map((quotation, index) =>
+                                    <tr key={index}>
+                                      <td>{quotation.quotation_title}</td>
+                                      <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}</td>
+                                      <td className="text-center">
+                                        <div className="dropdown dropdown-action">
+                                          <Link
+                                            to="#"
+                                            className="action-icon dropdown-toggle"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false"
+                                          >
+                                            <MoreVert />
+                                          </Link>
+                                          <div className="dropdown-menu dropdown-menu-right">
+                                            <Link
+                                              className="dropdown-item"
+                                              to="#"
+                                            >
+                                              Edit Link
+                                            </Link>
+                                            <Link
+                                              className="dropdown-item"
+                                              to="#"
+                                            >
+                                              Delete Link
+                                            </Link>
+                                          </div>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  )}
+                                </tbody>
+                              </table>
+                            </Panel>
+                            <Panel
+                              collapsible={ transactionByCompany.length > 0 ? 'header' : 'disabled'}
+                              header={t('transaction.transaction')}
+                              key="transaction"
+                              onClick={()=>handleCardClick('transaction')}
+                            >
+                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
+                                <thead>
+                                  <tr>
+                                    <th>{t('common.title')}</th>
+                                    <th>{t('transaction.publish_date')}</th>
+                                    <th>{t('transaction.publish_type')}</th>
+                                    <th>{t('transaction.supply_price')}</th>
+                                    <th className="text-end">{t('common.actions')}</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  { transactionByCompany.map((trans, index) =>
+                                    <tr key={index}>
+                                      <td>{trans.transaction_title}</td>
+                                      <td>{trans.publish_date && new Date(trans.publish_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
+                                      <td>{trans.publish_type}</td>
+                                      <td>{trans.supply_price}</td>
+                                      <td className="text-center">
+                                        <div className="dropdown dropdown-action">
+                                          <Link
+                                            to="#"
+                                            className="action-icon dropdown-toggle"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false"
+                                          >
+                                            <MoreVert />
+                                          </Link>
+                                          <div className="dropdown-menu dropdown-menu-right">
+                                            <Link
+                                              className="dropdown-item"
+                                              to="#"
+                                            >
+                                              Edit Link
+                                            </Link>
+                                            <Link
+                                              className="dropdown-item"
+                                              to="#"
+                                            >
+                                              Delete Link
+                                            </Link>
+                                          </div>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  )}
+                                </tbody>
+                              </table>
+                            </Panel>
+                            <Panel
+                              collapsible={ purchaseByCompany.length > 0 ? 'header' : 'disabled'}
+                              header={t('purchase.purchase')}
+                              key="purchase"
+                              onClick={()=>handleCardClick('purchase')}
+                            >
+                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
+                                <thead>
+                                  <tr>
+                                    <th>{t('purchase.product_name')}</th>
+                                    <th>{t('common.title')}</th>
+                                    <th>{t('purchase.price')}</th>
+                                    <th>{t('purchase.delivery_date')}</th>
+                                    <th>{t('purchase.registration_date')}</th>
+                                    <th className="text-end">{t('common.actions')}</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                { purchaseByCompany.map((purchase, index) =>
+                                  <tr key={index}>
+                                    <td>{purchase.product_name}</td>
+                                    <td>{purchase.quantity}</td>
+                                    <td>{purchase.price}</td>
+                                    <td>{purchase.delivery_date && new Date(purchase.delivery_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
+                                    <td>{purchase.registration_date && new Date(purchase.registration_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
                                     <td className="text-center">
                                       <div className="dropdown dropdown-action">
                                         <Link
@@ -1194,149 +1054,31 @@ const CompanyDetailsModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link
                                             className="dropdown-item"
                                             to="#"
                                           >
-                                            Add New Task
+                                            Edit Link
                                           </Link>
                                           <Link
                                             className="dropdown-item"
                                             to="#"
                                           >
-                                            Add New Event
+                                            Delete Link
                                           </Link>
                                         </div>
                                       </div>
                                     </td>
                                   </tr>
-                                  <tr>
-                                    <td>Meeting</td>
-                                    <td>Phone Enquiry</td>
-                                    <td>David</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td>
-                                      <label className="container-checkbox">
-                                        <input
-                                          type="checkbox"
-                                          defaultChecked=""
-                                        />
-                                        <span className="checkmark" />
-                                      </label>
-                                    </td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Add New Task
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Add New Event
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
+                                )}
                                 </tbody>
                               </table>
                             </Panel>
                           </Collapse>
                         </div>
-                        <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Past Activity" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Type</th>
-                                    <th>Activity Name</th>
-                                    <th>Assigned To</th>
-                                    <th>Due Date</th>
-                                    <th>Status</th>
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    <td>Meeting</td>
-                                    <td>Call Enquiry</td>
-                                    <td>John Doe</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td>
-                                      <label className="container-checkbox">
-                                        <input
-                                          type="checkbox"
-                                          defaultChecked=""
-                                        />
-                                        <span className="checkmark" />
-                                      </label>
-                                    </td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Add New Task
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Add New Event
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="tab-pane" id="task-news">
-                    <div className="row">
-                      <div className="col-md-12">
-                        <h4>News Items</h4>
-                        <p>
-                          Current news items about this Organization are sourced
-                          from Google News
-                        </p>
                       </div>
                     </div>
                   </div>
@@ -1348,7 +1090,7 @@ const CompanyDetailsModel = () => {
                       className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
                       onClick={handleSaveAll}
                     >
-                      Save
+                      {t('common.save')}
                     </button>
                     &nbsp;&nbsp;
                     <button
@@ -1356,7 +1098,7 @@ const CompanyDetailsModel = () => {
                       className="btn btn-secondary btn-rounded"
                       onClick={handleCancelAll}
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </button>
                   </div>
                 }

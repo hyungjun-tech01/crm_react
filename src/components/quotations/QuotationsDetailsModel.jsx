@@ -684,7 +684,7 @@ const QuotationsDetailsModel = () => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header={t('quotation.quotation_price_information')} key="1">
                                   <table className="table">
                                     <tbody>
@@ -878,7 +878,7 @@ const QuotationsDetailsModel = () => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header={t('lead.lead') + ' ' + t('common.information')} key="1">
                                   <table className="table">
                                     <tbody>
@@ -974,7 +974,7 @@ const QuotationsDetailsModel = () => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header={t('company.company') + ' ' + t('common.information')} key="1">
                                   <table className="table">
                                     <tbody>
@@ -997,7 +997,7 @@ const QuotationsDetailsModel = () => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header={t('common.status') + ' ' + t('common.information')} key="1">
                                   <table className="table">
                                     <tbody>
@@ -1050,7 +1050,7 @@ const QuotationsDetailsModel = () => {
                                 quotationContents.map((content, index1) => {
                                   if(content['1'] === null || content['1'] === 'null') return;
                                   return (
-                                    <Collapse key={index1} accordion expandIconPosition="start">
+                                    <Collapse key={index1}  defaultActiveKey={[index1]} accordion expandIconPosition="start">
                                       <Panel header={"No." + content["1"]} key={index1}
                                         extra={ <Remove
                                                   style={{ color: 'gray' }}

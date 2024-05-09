@@ -3,6 +3,7 @@ import { C_logo, C_logo2, Circle1, CircleImg } from '../imagepath';
 import 'antd/dist/reset.css';
 import { Collapse } from 'antd';
 import { Link } from "react-router-dom";
+import { MoreVert } from '@mui/icons-material';
 
 const CompanyDetails = () => {
   const { Panel } = Collapse;
@@ -419,9 +420,7 @@ const CompanyDetails = () => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                       >
-                                        <i className="material-icons">
-                                          more_vert
-                                        </i>
+                                        <MoreVert />
                                       </Link>
                                       <div className="dropdown-menu dropdown-menu-right">
                                         <Link className="dropdown-item" to="#">
@@ -457,9 +456,7 @@ const CompanyDetails = () => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                       >
-                                        <i className="material-icons">
-                                          more_vert
-                                        </i>
+                                        <MoreVert />
                                       </Link>
                                       <div className="dropdown-menu dropdown-menu-right">
                                         <Link className="dropdown-item" to="#">
@@ -511,9 +508,7 @@ const CompanyDetails = () => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                       >
-                                        <i className="material-icons">
-                                          more_vert
-                                        </i>
+                                        <MoreVert />
                                       </Link>
                                       <div className="dropdown-menu dropdown-menu-right">
                                         <Link className="dropdown-item" to="#">
@@ -545,9 +540,7 @@ const CompanyDetails = () => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                       >
-                                        <i className="material-icons">
-                                          more_vert
-                                        </i>
+                                        <MoreVert />
                                       </Link>
                                       <div className="dropdown-menu dropdown-menu-right">
                                         <Link className="dropdown-item" to="#">
@@ -592,9 +585,7 @@ const CompanyDetails = () => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                       >
-                                        <i className="material-icons">
-                                          more_vert
-                                        </i>
+                                        <MoreVert />
                                       </Link>
                                       <div className="dropdown-menu dropdown-menu-right">
                                         <Link className="dropdown-item" to="#">
@@ -639,9 +630,7 @@ const CompanyDetails = () => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                       >
-                                        <i className="material-icons">
-                                          more_vert
-                                        </i>
+                                        <MoreVert />
                                       </Link>
                                       <div className="dropdown-menu dropdown-menu-right">
                                         <Link className="dropdown-item" to="#">
@@ -667,9 +656,7 @@ const CompanyDetails = () => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                       >
-                                        <i className="material-icons">
-                                          more_vert
-                                        </i>
+                                        <MoreVert />
                                       </Link>
                                       <div className="dropdown-menu dropdown-menu-right">
                                         <Link className="dropdown-item" to="#">
@@ -716,9 +703,7 @@ const CompanyDetails = () => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                       >
-                                        <i className="material-icons">
-                                          more_vert
-                                        </i>
+                                        <MoreVert />
                                       </Link>
                                       <div className="dropdown-menu dropdown-menu-right">
                                         <Link className="dropdown-item" to="#">
@@ -745,9 +730,7 @@ const CompanyDetails = () => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                       >
-                                        <i className="material-icons">
-                                          more_vert
-                                        </i>
+                                        <MoreVert />
                                       </Link>
                                       <div className="dropdown-menu dropdown-menu-right">
                                         <Link className="dropdown-item" to="#">
@@ -794,9 +777,7 @@ const CompanyDetails = () => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                       >
-                                        <i className="material-icons">
-                                          more_vert
-                                        </i>
+                                        <MoreVert />
                                       </Link>
                                       <div className="dropdown-menu dropdown-menu-right">
                                         <Link className="dropdown-item" to="#">
@@ -823,9 +804,7 @@ const CompanyDetails = () => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                       >
-                                        <i className="material-icons">
-                                          more_vert
-                                        </i>
+                                        <MoreVert />
                                       </Link>
                                       <div className="dropdown-menu dropdown-menu-right">
                                         <Link className="dropdown-item" to="#">
@@ -918,9 +897,7 @@ const CompanyDetails = () => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                       >
-                                        <i className="material-icons">
-                                          more_vert
-                                        </i>
+                                        <MoreVert />
                                       </Link>
                                       <div className="dropdown-menu dropdown-menu-right">
                                         <Link className="dropdown-item" to="#">
@@ -955,9 +932,7 @@ const CompanyDetails = () => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                       >
-                                        <i className="material-icons">
-                                          more_vert
-                                        </i>
+                                        <MoreVert />
                                       </Link>
                                       <div className="dropdown-menu dropdown-menu-right">
                                         <Link className="dropdown-item" to="#">
@@ -1012,9 +987,7 @@ const CompanyDetails = () => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                       >
-                                        <i className="material-icons">
-                                          more_vert
-                                        </i>
+                                        <MoreVert />
                                       </Link>
                                       <div className="dropdown-menu dropdown-menu-right">
                                         <Link className="dropdown-item" to="#">

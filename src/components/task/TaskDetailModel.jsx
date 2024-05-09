@@ -3,6 +3,7 @@ import { Circle1, CircleImg, Task1 } from '../imagepath';
 import 'antd/dist/reset.css';
 import { Collapse } from 'antd';
 import { Link } from "react-router-dom";
+import { MoreVert } from '@mui/icons-material';
 
 const TaskDetailModel = () => {
   const { Panel } = Collapse;
@@ -369,9 +370,7 @@ const TaskDetailModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link className="dropdown-item" to="#">
@@ -402,9 +401,7 @@ const TaskDetailModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link className="dropdown-item" to="#">
@@ -457,9 +454,7 @@ const TaskDetailModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link className="dropdown-item" to="#">
@@ -491,9 +486,7 @@ const TaskDetailModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link className="dropdown-item" to="#">
@@ -539,9 +532,7 @@ const TaskDetailModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link className="dropdown-item" to="#">
@@ -599,9 +590,7 @@ const TaskDetailModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link className="dropdown-item" to="#">

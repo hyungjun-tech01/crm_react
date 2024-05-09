@@ -13,6 +13,7 @@ import ProjectDetailsModel from "../project/ProjectDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { BiClipboard } from "react-icons/bi";
+import { MoreVert } from "@mui/icons-material";
 
 const Activities = () => {
   const [selectedDate1, setSelectedDate1] = useState(new Date());
@@ -137,7 +138,7 @@ const Activities = () => {
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            <i className="material-icons">more_vert</i>
+            <MoreVert />
           </a>
           <div className="dropdown-menu dropdown-menu-right h-100">
             <a style={{ display: "initial" }} className="dropdown-item">

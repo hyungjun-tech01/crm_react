@@ -2,6 +2,7 @@ import React from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { avatar02, avatar16 } from "../imagepath";
+import { MoreVert } from "@mui/icons-material";
 
 const Profile = () => {
   return (
@@ -298,9 +299,7 @@ const Profile = () => {
                                       className="action-icon dropdown-toggle"
                                       href="#"
                                     >
-                                      <i className="material-icons">
-                                        more_vert
-                                      </i>
+                                      <MoreVert />
                                     </a>
                                     <div className="dropdown-menu dropdown-menu-right">
                                       <a href="#" className="dropdown-item">

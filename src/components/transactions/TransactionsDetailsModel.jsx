@@ -178,67 +178,6 @@ const TransactionsDetailsModel = () => {
                     </span>
                   </div>
                 </div>
-                <div className="col-md-5 text-end">
-                  <ul className="list-unstyled list-style-none">
-                    <li className="dropdown list-inline-item">
-                      <br />
-                      <Link
-                        className="dropdown-toggle"
-                        to="#"
-                        role="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        {" "}
-                        Actions{" "}
-                      </Link>
-                      <div className="dropdown-menu">
-                        <Link className="dropdown-item" to="#">
-                          Edit This Transaction
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Change Transaction Image
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Delete This Transaction
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Email This Transaction
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Clone This Transaction
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Change Record Owner
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Generate Merge Document
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Change Transaction to Contact
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Convert Transaction
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Print This Transaction
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Merge Into Transaction
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          SmartMerge Transaction
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add Activity Set To Transaction
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Event For Transaction
-                        </Link>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
               </div>
               <button
                 type="button"
@@ -282,7 +221,7 @@ const TransactionsDetailsModel = () => {
                         >
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header="Transaction Information" key="1">
                                   <table className="table">
                                     <tbody>
@@ -344,7 +283,7 @@ const TransactionsDetailsModel = () => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header="Organization Information" key="1">
                                   <table className="table">
                                     <tbody>
@@ -429,7 +368,7 @@ const TransactionsDetailsModel = () => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header="Price Information" key="1">
                                   <table className="table">
                                     <tbody>

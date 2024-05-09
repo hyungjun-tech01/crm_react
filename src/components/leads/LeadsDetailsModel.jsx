@@ -61,10 +61,8 @@ const [selectedRow, setSelectedRow] = useState(null);
       setSearchCondition("");
     }else{
       filterConsulting(newValue, searchCondition);
-      //loadCompanyConsultings(selectedLead.company_code); 
     }
     setExpaned(false);
-   
   }
 
   const handleCheckEditState = useCallback((name) => {
@@ -336,24 +334,22 @@ const [selectedRow, setSelectedRow] = useState(null);
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, orgCloseDate, closeDate]);
 
-// 각 행 클릭 시 호출되는 함수
-const handleRowClick = (row) => {
-  if (selectedRow === row) {
-    // 이미 선택된 행을 다시 클릭하면 선택 취소
-    setSelectedRow(null);
-  } else {
-    // 새로운 행을 클릭하면 해당 행을 선택
-    setSelectedRow(row);
-  }
-};
+  // 각 행 클릭 시 호출되는 함수
+  const handleRowClick = (row) => {
+    if (selectedRow === row) {
+      // 이미 선택된 행을 다시 클릭하면 선택 취소
+      setSelectedRow(null);
+    } else {
+      // 새로운 행을 클릭하면 해당 행을 선택
+      setSelectedRow(row);
+    }
+  };
 
   useEffect(() => {
     console.log('[LeadsDetailsModel] called!');
     setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
     setOrgCloseDate(selectedCompany.closure_date ? new Date(selectedCompany.closure_date) : null);
-
-
-    }, [selectedLead, savedValues, selectedCompany.establishment_date, selectedCompany.closure_date]);
+  }, [selectedLead, savedValues, selectedCompany.establishment_date, selectedCompany.closure_date]);
 
   return (
     <>
@@ -381,67 +377,6 @@ const handleRowClick = (row) => {
                       <i className="fa fa-lock" aria-hidden="true" />
                     </span>
                   </div>
-                </div>
-                <div className="col-md-5 text-end">
-                  <ul className="list-unstyled list-style-none">
-                    <li className="dropdown list-inline-item">
-                      <br />
-                      <Link
-                        className="dropdown-toggle"
-                        to="#"
-                        role="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        {" "}
-                        Actions{" "}
-                      </Link>
-                      <div className="dropdown-menu">
-                        <Link className="dropdown-item" to="#">
-                          Edit This Lead
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Change Lead Image
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Delete This Lead
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Email This Lead
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Clone This Lead
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Change Record Owner
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Generate Merge Document
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Change Lead to Contact
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Convert Lead
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Print This Lead
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Merge Into Lead
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          SmartMerge Lead
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add Activity Set To Lead
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Event For Lead
-                        </Link>
-                      </div>
-                    </li>
-                  </ul>
                 </div>
               </div>
               <button
@@ -587,7 +522,7 @@ const handleRowClick = (row) => {
                             to="#not-contact-task-consult"
                             data-bs-toggle="tab"
                           >
-                            {t('lead.consulting_history')}
+                            {t('lead.consulting_history') +' (' + companyConsultings.length +')'}
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -615,7 +550,7 @@ const handleRowClick = (row) => {
                           id="not-contact-task-details" >
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
-                              <Collapse accordion expandIconPosition="end" defaultActiveKey={['1']}>
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header={t('lead.lead_information')} key="1">
                                   <table className="table">
                                     <tbody>
@@ -740,7 +675,7 @@ const handleRowClick = (row) => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header={t('common.contact_details')} key="1">
                                   <table className="table">
                                     <tbody>
@@ -788,7 +723,7 @@ const handleRowClick = (row) => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header={t('company.address')} key="1">
                                   <table className="table">
                                     <tbody>
@@ -824,7 +759,7 @@ const handleRowClick = (row) => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header={t('lead.lead_status')} key="1">
                                   <table className="table">
                                     <tbody>
@@ -854,7 +789,7 @@ const handleRowClick = (row) => {
                           id="not-contact-task-related" >
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
-                              <Collapse accordion expandIconPosition="end" defaultActiveKey={['1']}>
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header={t('company.company_name')} key="1">
                                   <table className="table">
                                     <tbody>
@@ -889,7 +824,7 @@ const handleRowClick = (row) => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item active">
-                              <Collapse accordion expandIconPosition="end" defaultActiveKey={['1']}>
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header= {t('company.company_details')}  key="1">
                                   <table className="table">
                                     <tbody>
@@ -1023,7 +958,7 @@ const handleRowClick = (row) => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header= {t('common.contact_details')}  key="1">
                                   <table className="table">
                                     <tbody>
@@ -1070,7 +1005,7 @@ const handleRowClick = (row) => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header= {t('company.address')} key="1">
                                   <table className="table">
                                     <tbody>
@@ -1105,7 +1040,7 @@ const handleRowClick = (row) => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header= {t('common.additional_information')} key="1">
                                   <table className="table">
                                     <tbody>
@@ -1188,7 +1123,7 @@ const handleRowClick = (row) => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header= {t('common.memo')} key="1">
                                   <table className="table">
                                     <tbody>
@@ -1232,18 +1167,16 @@ const handleRowClick = (row) => {
                                   </div>
                                   <div className="col text-start" style={{width:'200px'}}>
                                     <input
-                                          id = "searchCondition"
-                                          className="form-control" 
-                                          type="text"
-                                          value={searchCondition}
-                                          onChange ={(e) => handleSearchCondition(e.target.value)}
-                                          placeholder="Lead Name, Receiver" 
-                                          style={{width:'300px', display: 'inline'}}
-
+                                      id = "searchCondition"
+                                      className="form-control" 
+                                      type="text"
+                                      value={searchCondition}
+                                      onChange ={(e) => handleSearchCondition(e.target.value)}
+                                      placeholder="Lead Name, Receiver" 
+                                      style={{width:'300px', display: 'inline'}}
                                     />  
                                   </div>
                                 </div>
-                                
                               </tr>
                               <tr>
                                 <th>Type</th>
@@ -1352,179 +1285,6 @@ const handleRowClick = (row) => {
                               </div>
                             </div>
                           </div>
-                          <div className="row">
-                            <div className="crms-tasks  p-2">
-                              <div className="tasks__item crms-task-item active">
-                                <Collapse accordion expandIconPosition="end">
-                                  <Panel header="Upcoming Activity" key="1">
-                                    <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                      <thead>
-                                        <tr>
-                                          <th>Type</th>
-                                          <th>Activity Name</th>
-                                          <th>Assigned To</th>
-                                          <th>Due Date</th>
-                                          <th>Status</th>
-                                          <th className="text-end">Actions</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        <tr>
-                                          <td>Meeting</td>
-                                          <td>Call Enquiry</td>
-                                          <td>John Doe</td>
-                                          <td>13-Jul-20 11:37 PM</td>
-                                          <td>
-                                            <label className="container-checkbox">
-                                              <input
-                                                type="checkbox"
-                                                defaultChecked=""
-                                              />
-                                              <span className="checkmark" />
-                                            </label>
-                                          </td>
-                                          <td className="text-center">
-                                            <div className="dropdown dropdown-action">
-                                              <Link
-                                                to="#"
-                                                className="action-icon dropdown-toggle"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false"
-                                              >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
-                                              </Link>
-                                              <div className="dropdown-menu dropdown-menu-right">
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Add New Task
-                                                </Link>
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Add New Event
-                                                </Link>
-                                              </div>
-                                            </div>
-                                          </td>
-                                        </tr>
-                                        <tr>
-                                          <td>Meeting</td>
-                                          <td>Phone Enquiry</td>
-                                          <td>David</td>
-                                          <td>13-Jul-20 11:37 PM</td>
-                                          <td>
-                                            <label className="container-checkbox">
-                                              <input
-                                                type="checkbox"
-                                                defaultChecked=""
-                                              />
-                                              <span className="checkmark" />
-                                            </label>
-                                          </td>
-                                          <td className="text-center">
-                                            <div className="dropdown dropdown-action">
-                                              <Link
-                                                to="#"
-                                                className="action-icon dropdown-toggle"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false"
-                                              >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
-                                              </Link>
-                                              <div className="dropdown-menu dropdown-menu-right">
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Add New Task
-                                                </Link>
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Add New Event
-                                                </Link>
-                                              </div>
-                                            </div>
-                                          </td>
-                                        </tr>
-                                      </tbody>
-                                    </table>
-                                  </Panel>
-                                </Collapse>
-                              </div>
-                              <div className="tasks__item crms-task-item">
-                                <Collapse accordion expandIconPosition="end">
-                                  <Panel header="Past Activity" key="1">
-                                    <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                      <thead>
-                                        <tr>
-                                          <th>Type</th>
-                                          <th>Activity Name</th>
-                                          <th>Assigned To</th>
-                                          <th>Due Date</th>
-                                          <th>Status</th>
-                                          <th className="text-end">Actions</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        <tr>
-                                          <td>Meeting</td>
-                                          <td>Call Enquiry</td>
-                                          <td>John Doe</td>
-                                          <td>13-Jul-20 11:37 PM</td>
-                                          <td>
-                                            <label className="container-checkbox">
-                                              <input
-                                                type="checkbox"
-                                                defaultChecked=""
-                                              />
-                                              <span className="checkmark" />
-                                            </label>
-                                          </td>
-                                          <td className="text-center">
-                                            <div className="dropdown dropdown-action">
-                                              <Link
-                                                to="#"
-                                                className="action-icon dropdown-toggle"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false"
-                                              >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
-                                              </Link>
-                                              <div className="dropdown-menu dropdown-menu-right">
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Add New Task
-                                                </Link>
-                                                <Link
-                                                  className="dropdown-item"
-                                                  to="#"
-                                                >
-                                                  Add New Event
-                                                </Link>
-                                              </div>
-                                            </div>
-                                          </td>
-                                        </tr>
-                                      </tbody>
-                                    </table>
-                                  </Panel>
-                                </Collapse>
-                              </div>
-                            </div>
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -1538,7 +1298,7 @@ const handleRowClick = (row) => {
                       className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
                       onClick={handleSaveAll}
                     >
-                      Save
+                      {t('common.save')}
                     </button>
                     &nbsp;&nbsp;
                     <button
@@ -1546,7 +1306,7 @@ const handleRowClick = (row) => {
                       className="btn btn-secondary btn-rounded"
                       onClick={handleCancelAll}
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </button>
                   </div>
                 }
@@ -1557,7 +1317,7 @@ const handleRowClick = (row) => {
                       className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
                       onClick={handleSaveAllCompany}
                     >
-                      Save
+                      {t('common.save')}
                     </button>
                     &nbsp;&nbsp;
                     <button
@@ -1565,7 +1325,7 @@ const handleRowClick = (row) => {
                       className="btn btn-secondary btn-rounded"
                       onClick={handleCancelAllCompany}
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </button>
                   </div>
                 }

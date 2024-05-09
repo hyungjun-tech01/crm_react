@@ -9,6 +9,8 @@ import SystemUserModel from "../task/SystemUserModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { BiMobileAlt } from "react-icons/bi";
+import { MoreVert } from "@mui/icons-material";
+
 const Contacts = () => {
   const [selectedDate1, setSelectedDate1] = useState(new Date());
   const [selectedDate2, setSelectedDate2] = useState(new Date());
@@ -120,7 +122,7 @@ const Contacts = () => {
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            <i className="material-icons">more_vert</i>
+            <MoreVert />
           </a>
           <div className="dropdown-menu dropdown-menu-right">
             <a className="dropdown-item" href="#">

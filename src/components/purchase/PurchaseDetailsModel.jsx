@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
+import { useTranslation } from "react-i18next";
 import { Collapse } from "antd";
 import { C_logo, C_logo2, CircleImg } from "../imagepath";
 import { atomCurrentPurchase, defaultPurchase } from "../../atoms/atoms";
@@ -9,12 +10,14 @@ import { PurchaseRepo } from "../../repository/purchase";
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailDateItem from "../../constants/DetailDateItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
+import { MoreVert } from "@mui/icons-material";
 
 const PurchaseDetailsModel = () => {
   const { Panel } = Collapse;
   const selectedPurchase = useRecoilValue(atomCurrentPurchase);
   const { modifyPurchase } = useRecoilValue(PurchaseRepo);
   const [cookies] = useCookies(["myLationCrmUserId"]);
+  const { t } = useTranslation();
 
   const [editedValues, setEditedValues] = useState(null);
   const [savedValues, setSavedValues] = useState(null);
@@ -326,7 +329,7 @@ const PurchaseDetailsModel = () => {
                   <div className="tab-pane show active" id="task-details">
                     <div className="crms-tasks">
                       <div className="tasks__item crms-task-item active">
-                        <Collapse accordion expandIconPosition="end">
+                        <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                           <Panel header="Purchase Info" key="1">
                             <table className="table">
                               <tbody>
@@ -466,7 +469,7 @@ const PurchaseDetailsModel = () => {
                         </Collapse>
                       </div>
                       <div className="tasks__item crms-task-item active">
-                        <Collapse accordion expandIconPosition="end">
+                        <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                           <Panel header="Product" key="1">
                             <table className="table">
                               <tbody>{}</tbody>
@@ -475,7 +478,7 @@ const PurchaseDetailsModel = () => {
                         </Collapse>
                       </div>
                       <div className="tasks__item crms-task-item">
-                        <Collapse accordion expandIconPosition="end">
+                        <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                           <Panel header="Status" key="1">
                             <table className="table">
                               <tbody>
@@ -592,7 +595,7 @@ const PurchaseDetailsModel = () => {
                     <div className="row">
                       <div className="crms-tasks p-2">
                         <div className="tasks__item crms-task-item active">
-                          <Collapse accordion expandIconPosition="end">
+                          <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                             <Panel header="Companies" key="1">
                               <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                 <thead>
@@ -627,9 +630,7 @@ const PurchaseDetailsModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link
@@ -671,9 +672,7 @@ const PurchaseDetailsModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link
@@ -698,7 +697,7 @@ const PurchaseDetailsModel = () => {
                           </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
+                          <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                             <Panel header="Deals" key="1">
                               <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                 <thead>
@@ -731,9 +730,7 @@ const PurchaseDetailsModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link
@@ -771,9 +768,7 @@ const PurchaseDetailsModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link
@@ -798,7 +793,7 @@ const PurchaseDetailsModel = () => {
                           </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
+                          <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                             <Panel header="Projects" key="1">
                               <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                 <thead>
@@ -824,9 +819,7 @@ const PurchaseDetailsModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link
@@ -851,7 +844,7 @@ const PurchaseDetailsModel = () => {
                           </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
+                          <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                             <Panel header="Contacts" key="1">
                               <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                 <thead>
@@ -877,9 +870,7 @@ const PurchaseDetailsModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link
@@ -911,9 +902,7 @@ const PurchaseDetailsModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link
@@ -938,7 +927,7 @@ const PurchaseDetailsModel = () => {
                           </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
+                          <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                             <Panel header="Notes" key="1">
                               <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                 <thead>
@@ -966,9 +955,7 @@ const PurchaseDetailsModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link
@@ -1001,9 +988,7 @@ const PurchaseDetailsModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link
@@ -1028,7 +1013,7 @@ const PurchaseDetailsModel = () => {
                           </Collapse>
                         </div>
                         <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
+                          <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                             <Panel header="Files" key="1">
                               <table className="table table-striped table-nowrap custom-table mb-0 datatable">
                                 <thead>
@@ -1056,9 +1041,7 @@ const PurchaseDetailsModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link
@@ -1091,9 +1074,7 @@ const PurchaseDetailsModel = () => {
                                           data-bs-toggle="dropdown"
                                           aria-expanded="false"
                                         >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
+                                          <MoreVert />
                                         </Link>
                                         <div className="dropdown-menu dropdown-menu-right">
                                           <Link
@@ -1153,190 +1134,6 @@ const PurchaseDetailsModel = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="row">
-                      <div className="crms-tasks  p-2">
-                        <div className="tasks__item crms-task-item active">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Upcoming Activity" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Type</th>
-                                    <th>Activity Name</th>
-                                    <th>Assigned To</th>
-                                    <th>Due Date</th>
-                                    <th>Status</th>
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    <td>Meeting</td>
-                                    <td>Call Enquiry</td>
-                                    <td>John Doe</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td>
-                                      <label className="container-checkbox">
-                                        <input
-                                          type="checkbox"
-                                          defaultChecked=""
-                                        />
-                                        <span className="checkmark" />
-                                      </label>
-                                    </td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Add New Task
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Add New Event
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>Meeting</td>
-                                    <td>Phone Enquiry</td>
-                                    <td>David</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td>
-                                      <label className="container-checkbox">
-                                        <input
-                                          type="checkbox"
-                                          defaultChecked=""
-                                        />
-                                        <span className="checkmark" />
-                                      </label>
-                                    </td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Add New Task
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Add New Event
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                        <div className="tasks__item crms-task-item">
-                          <Collapse accordion expandIconPosition="end">
-                            <Panel header="Past Activity" key="1">
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>Type</th>
-                                    <th>Activity Name</th>
-                                    <th>Assigned To</th>
-                                    <th>Due Date</th>
-                                    <th>Status</th>
-                                    <th className="text-end">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    <td>Meeting</td>
-                                    <td>Call Enquiry</td>
-                                    <td>John Doe</td>
-                                    <td>13-Jul-20 11:37 PM</td>
-                                    <td>
-                                      <label className="container-checkbox">
-                                        <input
-                                          type="checkbox"
-                                          defaultChecked=""
-                                        />
-                                        <span className="checkmark" />
-                                      </label>
-                                    </td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <i className="material-icons">
-                                            more_vert
-                                          </i>
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Add New Task
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Add New Event
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="tab-pane" id="task-news">
-                    <div className="row">
-                      <div className="col-md-12">
-                        <h4>News Items</h4>
-                        <p>
-                          Current news items about this Organization are sourced
-                          from Google News
-                        </p>
-                      </div>
-                    </div>
                   </div>
                 </div>
                 {savedValues !== null &&
@@ -1347,7 +1144,7 @@ const PurchaseDetailsModel = () => {
                         className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
                         onClick={handleSaveAll}
                       >
-                        Save
+                        {t('common.save')}
                       </button>
                       &nbsp;&nbsp;
                       <button
@@ -1355,7 +1152,7 @@ const PurchaseDetailsModel = () => {
                         className="btn btn-secondary btn-rounded"
                         onClick={handleCancelAll}
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </button>
                     </div>
                   )}

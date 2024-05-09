@@ -15,7 +15,7 @@ const DetailDateItem = (props) => {
     if(checkEdit(name)) {
         return (
             <tr className='detail-tr'>
-                <td className={"detail-td-left" + (no_border && " border-0")}>{title}</td>
+                <td className={"detail-td-left" + (no_border && " border-0")}><b>{title}</b></td>
                 <td className={no_border && "border-0"} >
                     { selectTime ? 
                         <DatePicker
@@ -45,7 +45,7 @@ const DetailDateItem = (props) => {
     if(checkSaved(name)) {
         return (
             <tr className='detail-tr'>
-                <td className={"detail-td-left" + (no_border && " border-0")}>{title}</td>
+                <td className={"detail-td-left" + (no_border && " border-0")}><b>{title}</b></td>
                 <td className={no_border && "border-0"}>
                     { saved[name] && (new Date(saved[name])).toLocaleDateString('ko-KR', options) }
                 </td>
@@ -60,7 +60,7 @@ const DetailDateItem = (props) => {
 
     return (
         <tr className='detail-tr'>
-            <td className={"detail-td-left" + (no_border && " border-0")}>{title}</td>
+            <td className={"detail-td-left" + (no_border && " border-0")}><b>{title}</b></td>
             <td className={no_border && "border-0"}>
                 {orgTimeData && orgTimeData !=='' && (new Date(orgTimeData)).toLocaleDateString('ko-KR', options)}
             </td>

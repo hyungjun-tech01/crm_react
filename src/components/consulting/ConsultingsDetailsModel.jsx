@@ -10,7 +10,7 @@ import { ConsultingRepo } from "../../repository/consulting";
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailDateItem from "../../constants/DetailDateItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
-
+import { MoreVert } from "@mui/icons-material";
 
 
 const ConsultingsDetailsModel = () => {
@@ -404,7 +404,7 @@ const ConsultingsDetailsModel = () => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header={t('lead.lead') + ' ' + t('common.information')} key="1">
                                   <table className="table">
                                     <tbody>
@@ -488,7 +488,7 @@ const ConsultingsDetailsModel = () => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header={t('company.company') + ' ' + t('common.information')} key="1">
                                   <table className="table">
                                     <tbody>
@@ -511,7 +511,7 @@ const ConsultingsDetailsModel = () => {
                               </Collapse>
                             </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse accordion expandIconPosition="end">
+                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
                                 <Panel header={t('common.status') + ' ' + t('common.information')} key="1">
                                   <table className="table">
                                     <tbody>
@@ -602,9 +602,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -637,9 +635,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -692,9 +688,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -727,9 +721,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -831,9 +823,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -874,9 +864,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -937,9 +925,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -1278,9 +1264,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -1313,9 +1297,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -1368,9 +1350,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -1403,9 +1383,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -1507,9 +1485,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -1550,9 +1526,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -1613,9 +1587,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -1931,9 +1903,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -1966,9 +1936,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -2024,9 +1992,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -2059,9 +2025,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -2163,9 +2127,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -2206,9 +2168,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -2269,9 +2229,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -2594,9 +2552,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -2629,9 +2585,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -2684,9 +2638,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -2719,9 +2671,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -2823,9 +2773,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -2866,9 +2814,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link
@@ -2929,9 +2875,7 @@ const ConsultingsDetailsModel = () => {
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                               >
-                                                <i className="material-icons">
-                                                  more_vert
-                                                </i>
+                                                <MoreVert />
                                               </Link>
                                               <div className="dropdown-menu dropdown-menu-right">
                                                 <Link

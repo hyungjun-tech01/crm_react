@@ -47,8 +47,8 @@ const koResource = {
         },
         lead: {
             actions:'액션',
-            add_lead: '신규 고객 등록',
-            company_information:'업체 정보',
+            add_lead: '고객 등록',
+            company_information:'회사 정보',
             consulting_history:'상담 이력',
             department: '부서',
             detail_information:'고객상세정보',
@@ -71,7 +71,7 @@ const koResource = {
         },
         consulting:{
             action_content: '상담 결과',
-            add_consulting: '신규 상담 등록',
+            add_consulting: '상담 등록',
             consulting: '상담',
             lead_time: '완료 기한',
             product_type: '물품 유형',
@@ -82,7 +82,7 @@ const koResource = {
             type: '상담 유형',
         },
         quotation : {
-            add_new_quotation: '신규 견적 등록',
+            add_new_quotation: '견적 등록',
             confirm_date: '최종확인',
             consumer_price: '소비자가',
             cutoff_amount: '절삭금액',
@@ -124,7 +124,7 @@ const koResource = {
             warranty: '보증기간',
         },
         transaction:{
-            add_transaction: '신규 거래 등록',
+            add_transaction: '거래 등록',
             content_table: '항목표',
             information: '거래 정보',
             lead_org_info: '고객 / 회사 정보',
@@ -161,6 +161,7 @@ const koResource = {
             registration_code:'등록코드',
         },
         common:{
+            actions: '',
             activity: '활동',
             additional_information:'추가 정보',
             all:'전체',

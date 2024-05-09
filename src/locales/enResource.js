@@ -161,6 +161,7 @@ const enResource = {
             registration_code:'Registraction Code',
         },
         common:{
+            actions: 'Actions',
             activity: 'Activity',
             additional_information:'Additional Information',
             all: 'All',

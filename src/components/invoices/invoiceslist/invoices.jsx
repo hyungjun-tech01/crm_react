@@ -3,30 +3,13 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Link } from "react-router-dom";
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import {
-  IMG01,
-  IMG02,
-  IMG03,
-  IMG04,
-  IMG06,
-  IMG07,
-  IMG08,
-  IMG09,
-  IMG10,
-} from "./img";
+import { IMG01, IMG02, IMG03, IMG04, IMG06, IMG07, IMG08, IMG09, IMG10 } from "./img";
 import { Table } from "antd";
 import { ItemRender, onShowSizeChange } from "../../paginationfunction";
-import {
-  FiBookOpen,
-  FiBookmark,
-  FiCalendar,
-  FiGrid,
-  FiList,
-  FiPlusCircle,
-  FiSettings,
-  FiUserPlus,
-} from "react-icons/fi";
+import { FiBookOpen, FiBookmark, FiCalendar, FiGrid, FiList, FiPlusCircle, FiSettings, FiUserPlus } from "react-icons/fi";
 import "../../antdstyle.css";
+import { MoreVert } from "@mui/icons-material";
+
 const Invoices = () => {
   const [isShown1, setIsShown1] = useState(true);
   const [isShown2, setIsShown2] = useState(true);
@@ -197,7 +180,7 @@ const Invoices = () => {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              <i className="material-icons">more_vert</i>
+              <MoreVert />
             </a>
             <div className="dropdown-menu dropdown-menu-end">
               <a className="dropdown-item" href="edit-invoice">

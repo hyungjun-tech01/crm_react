@@ -8,6 +8,7 @@ import { ItemRender, onShowSizeChange } from "../paginationfunction";
 import ProjectDetailsModel from "./ProjectDetailsModel";
 import SystemUserModel from "../task/SystemUserModel";
 import { BiGridAlt } from "react-icons/bi";
+import { MoreVert } from "@mui/icons-material";
 
 const Project = () => {
   const data = [
@@ -228,7 +229,7 @@ const Project = () => {
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            <i className="material-icons">more_vert</i>
+            <MoreVert />
           </a>
           <div className="dropdown-menu dropdown-menu-right">
             <a className="dropdown-item" href="#">
