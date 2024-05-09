@@ -85,10 +85,10 @@ const Header = (props) => {
         <li className="nav-item dropdown has-arrow flag-nav">
           <Link className="nav-link dropdown-toggle"
             data-bs-toggle="dropdown"
-            onClick={(e) => {
-              e.preventDefault();
-              document.querySelector('#dropdown_lag_menu').classList.toggle('show');
-            }}
+            // onClick={(e) => {
+            //   e.preventDefault();
+            //   document.querySelector('#dropdown_lag_menu').classList.toggle('show');
+            // }}
             to="#"
           >
             { i18n.language === 'ko' ? (

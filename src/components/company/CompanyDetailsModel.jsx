@@ -301,16 +301,12 @@ const CompanyDetailsModel = () => {
                     <p>{selectedCompany.company_name}</p>
                   </div>
                   <div className="col">
-                    <span>{t('company.phone_number')}</span>
-                    <p>{selectedCompany.company_phone_number}</p>
+                    <span>{t('company.eng_company_name')}</span>
+                    <p>{selectedCompany.company_name_eng}</p>
                   </div>
                   <div className="col">
-                    <span>{t('company.fax_number')}</span>
-                    <p>{selectedCompany.company_fax_number}</p> 
-                  </div>
-                  <div className="col">
-                    <span>{t('company.ceo_name')}</span>
-                    <p>{selectedCompany.ceo_name}</p>
+                    <span>{t('company.business_registration_code')}</span>
+                    <p>{selectedCompany.business_registration_code}</p> 
                   </div>
                 </div>
               </div>
@@ -358,16 +354,16 @@ const CompanyDetailsModel = () => {
                 <div className="tab-content">
                   <div className="tab-pane show active" id="task-details">
                     <div className="crms-tasks">
-                      <div className="tasks__item crms-task-item active">
+                    <div className="tasks__item crms-task-item">
                         <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                          <Panel header={t('company.company_name')} key="1">
+                          <Panel header= {t('company.address')} key="1">
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
-                                  defaultText={selectedCompany.company_name}
+                                  defaultText={selectedCompany.company_address}
                                   saved={savedValues}
-                                  name="company_name"
-                                  title={t('company.company_name')}
+                                  name="company_address"
+                                  title= {t('company.address')}
                                   no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
@@ -377,10 +373,47 @@ const CompanyDetailsModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />
                                 <DetailLabelItem
-                                  defaultText={selectedCompany.company_name_eng}
+                                  defaultText={selectedCompany.company_zip_code}
                                   saved={savedValues}
-                                  name="company_name_eng"
-                                  title={t('company.eng_company_name')}
+                                  name="company_zip_code"
+                                  title= {t('company.zip_code')}
+                                  checkEdit={handleCheckEditState}
+                                  startEdit={handleStartEdit}
+                                  editing={handleEditing}
+                                  endEdit={handleEndEdit}
+                                  checkSaved={handleCheckSaved}
+                                  cancelSaved={handleCancelSaved}
+                                />
+                                <DetailLabelItem
+                                  defaultText={selectedCompany.company_phone_number}
+                                  saved={savedValues}
+                                  name="company_phone_number"
+                                  title= {t('company.phone_number')} 
+                                  checkEdit={handleCheckEditState}
+                                  startEdit={handleStartEdit}
+                                  editing={handleEditing}
+                                  endEdit={handleEndEdit}
+                                  checkSaved={handleCheckSaved}
+                                  cancelSaved={handleCancelSaved}
+                                />
+                                <DetailLabelItem
+                                  defaultText={selectedCompany.company_fax_number}
+                                  saved={savedValues}
+                                  name="company_fax_number"
+                                  title= {t('company.fax_number')}
+                                  checkEdit={handleCheckEditState}
+                                  startEdit={handleStartEdit}
+                                  editing={handleEditing}
+                                  endEdit={handleEndEdit}
+                                  checkSaved={handleCheckSaved}
+                                  cancelSaved={handleCancelSaved}
+                                />
+                                <DetailLabelItem
+                                  defaultText={selectedCompany.homepage}
+                                  saved={savedValues}
+                                  name="homepage"
+                                  title= {t('company.homepage')}
+                                  no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -515,88 +548,7 @@ const CompanyDetailsModel = () => {
                                   saved={savedValues}
                                   name="industry_type"
                                   title= {t('company.industry_type')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                              </tbody>
-                            </table>
-                          </Panel>
-                        </Collapse>
-                      </div>
-                      <div className="tasks__item crms-task-item">
-                        <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                          <Panel header= {t('common.contact_details')} key="1">
-                            <table className="table">
-                              <tbody>
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.company_phone_number}
-                                  saved={savedValues}
-                                  name="company_phone_number"
-                                  title= {t('company.phone_number')} 
                                   no_border={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.company_fax_number}
-                                  saved={savedValues}
-                                  name="company_fax_number"
-                                  title= {t('company.fax_number')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.homepage}
-                                  saved={savedValues}
-                                  name="homepage"
-                                  title= {t('company.homepage')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                              </tbody>
-                            </table>
-                          </Panel>
-                        </Collapse>
-                      </div>
-                      <div className="tasks__item crms-task-item">
-                        <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                          <Panel header= {t('company.address')} key="1">
-                            <table className="table">
-                              <tbody>
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.company_address}
-                                  saved={savedValues}
-                                  name="company_address"
-                                  title= {t('company.address')}
-                                  no_border={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.company_zip_code}
-                                  saved={savedValues}
-                                  name="company_zip_code"
-                                  title= {t('company.zip_code')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -680,6 +632,7 @@ const CompanyDetailsModel = () => {
                                   saved={savedValues}
                                   name="region"
                                   title= {t('common.region')}
+                                  no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -822,7 +775,7 @@ const CompanyDetailsModel = () => {
                                         <Link
                                           to="#"
                                           data-bs-toggle="modal"
-                                          data-bs-target="#lead-details"
+                                          data-bs-target="#leads-details"
                                           onClick={()=> setCurrentLead(lead.lead_code)}
                                         >
                                           {lead.lead_name}

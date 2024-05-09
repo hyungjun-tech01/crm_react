@@ -4,8 +4,8 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
 import { useCookies } from "react-cookie";
+import { useTranslation } from "react-i18next";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
-import CompanyDetailsModel from "./CompanyDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { BiBuildings } from "react-icons/bi";
@@ -13,7 +13,8 @@ import { BiBuildings } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies, atomFilteredCompany, defaultCompany } from "../../atoms/atoms";
 import { compareCompanyName, compareText, formateDate } from "../../constants/functions";
-import { useTranslation } from "react-i18next";
+import CompanyDetailsModel from "./CompanyDetailsModel";
+import LeadsDetailsModel from "../leads/LeadsDetailsModel";
 
 const Company = () => {
   const { loadAllCompanies, filterCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
@@ -741,6 +742,7 @@ const Company = () => {
           {/* modal-dialog */}
         </div>
         <CompanyDetailsModel />
+        <LeadsDetailsModel />
       </div>
     </HelmetProvider>
   );

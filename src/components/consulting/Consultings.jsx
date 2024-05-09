@@ -466,45 +466,49 @@ const Consultings = () => {
                     </div>
                   </div>
                   { (selectedLead !== null) &&
-                    <>
-                      <div className="form-group row">
-                        <div className="col-sm-12">
-                            <table className="table">
-                              <tbody>
-                                <tr>
-                                  <td>{t('lead.department')}</td>
-                                  <td>{selectedLead.department}</td>
-                                </tr>
-                                <tr>
-                                  <td>{t('lead.position')}</td>
-                                  <td>{selectedLead.position}</td>
-                                </tr>
-                                <tr>
-                                  <td>{t('lead.mobile')}</td>
-                                  <td>{selectedLead.mobile}</td>
-                                </tr>
-                                <tr>
-                                <td>{t('common.phone')}</td>
-                                  <td>{selectedLead.phone}</td>
-                                </tr>
-                                <tr>
-                                <td>{t('lead.email')}</td>
-                                  <td>{selectedLead.email}</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                        </div>
+                    <div className="form-group row">
+                      <div className="col-sm-12">
+                          <table className="table">
+                            <tbody>
+                              <tr>
+                                <td>{t('lead.department')}</td>
+                                <td>{selectedLead.department}</td>
+                              </tr>
+                              <tr>
+                                <td>{t('lead.position')}</td>
+                                <td>{selectedLead.position}</td>
+                              </tr>
+                              <tr>
+                                <td>{t('lead.mobile')}</td>
+                                <td>{selectedLead.mobile}</td>
+                              </tr>
+                              <tr>
+                              <td>{t('common.phone')}</td>
+                                <td>{selectedLead.phone}</td>
+                              </tr>
+                              <tr>
+                              <td>{t('lead.email')}</td>
+                                <td>{selectedLead.email}</td>
+                              </tr>
+                            </tbody>
+                          </table>
                       </div>
-                      <h4>{t('company.company')} {t('common.information')}</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label>{t('company.company_name')}</label>
-                        </div>
-                        <div className="col-sm-6">
-                          <label>{selectedLead.company}</label>
-                        </div>
-                      </div>
-                    </>}
+                    </div>
+                  }
+                  <div className="form-group row">
+                    <div className="col-sm-4">
+                      <label className="col-form-label">{t('lead.lead_sales')}</label>
+                    </div>
+                    <div className="col-sm-8">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder={t('lead.lead_sales')}
+                        name="sales_representati"
+                        onChange={handleConsultingChange}
+                      />
+                    </div>
+                  </div>
                   <h4>{t('consulting.consulting')} {t('common.information')}</h4>
                   <div className="form-group row">
                     <div className="col-sm-4">
@@ -583,17 +587,7 @@ const Consultings = () => {
                     </div>
                   </div>
                   <div className="form-group row">
-                    <div className="col-sm-6">
-                      <label className="col-form-label">{t('lead.lead_sales')}</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder={t('lead.lead_sales')}
-                        name="sales_representati"
-                        onChange={handleConsultingChange}
-                      />
-                    </div>
-                    <div className="col-sm-6">
+                    <div className="col-sm-12">
                       <label className="col-form-label">{t('common.status')}</label>
                       <input
                         type="text"
