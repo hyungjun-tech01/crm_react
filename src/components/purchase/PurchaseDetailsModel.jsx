@@ -294,7 +294,7 @@ const PurchaseDetailsModel = () => {
                       to="#task-details"
                       data-bs-toggle="tab"
                     >
-                      Details
+                      {t('common.details')}
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -303,7 +303,7 @@ const PurchaseDetailsModel = () => {
                       to="#task-related"
                       data-bs-toggle="tab"
                     >
-                      Related
+                      {t('common.related')}
                     </Link>
                   </li>
                   {/* <li className="nav-item">
@@ -330,14 +330,14 @@ const PurchaseDetailsModel = () => {
                     <div className="crms-tasks">
                       <div className="tasks__item crms-task-item active">
                         <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                          <Panel header="Purchase Info" key="1">
+                          <Panel header={t('purchase.information')} key="1">
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
                                   defaultText={selectedPurchase.quantity}
                                   saved={savedValues}
                                   name="quantity"
-                                  title="Quantity"
+                                  title={t('common.quantity')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -349,7 +349,7 @@ const PurchaseDetailsModel = () => {
                                   defaultText={selectedPurchase.price}
                                   saved={savedValues}
                                   name="price"
-                                  title="Price"
+                                  title={t('common.price')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -361,7 +361,7 @@ const PurchaseDetailsModel = () => {
                                   defaultText={selectedPurchase.currency}
                                   saved={savedValues}
                                   name="currency"
-                                  title="Currency"
+                                  title={t('common.currency')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -372,7 +372,7 @@ const PurchaseDetailsModel = () => {
                                 <DetailDateItem
                                   saved={savedValues}
                                   name="delivery_date"
-                                  title="Delivery Date"
+                                  title={t('purchase.delivery_date')}
                                   orgTimeData={orgDeliveryDate}
                                   timeData={deliveryDate}
                                   timeDataChange={handleDeliveryDateChange}
@@ -385,7 +385,7 @@ const PurchaseDetailsModel = () => {
                                 <DetailDateItem
                                   saved={savedValues}
                                   name="MA_contact_date"
-                                  title="MA Contact Date"
+                                  title={t('purchase.ma_contract_date')}
                                   orgTimeData={orgContactDate}
                                   timeData={contactDate}
                                   timeDataChange={handleContactDateChange}
@@ -399,7 +399,7 @@ const PurchaseDetailsModel = () => {
                                 <DetailDateItem
                                   saved={savedValues}
                                   name="MA_finish_date"
-                                  title="MA Finish Date"
+                                  title={t('purchase.ma_finish_date')}
                                   orgTimeData={orgFinishDate}
                                   timeData={finishDate}
                                   timeDataChange={handleFinishDateChange}
@@ -414,7 +414,7 @@ const PurchaseDetailsModel = () => {
                                   defaultText={selectedPurchase.register}
                                   saved={savedValues}
                                   name="register"
-                                  title="Register"
+                                  title={t('purchase.register')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -425,7 +425,7 @@ const PurchaseDetailsModel = () => {
                                 <DetailDateItem
                                   saved={savedValues}
                                   name="registration_date"
-                                  title="Registration Date"
+                                  title={t('purchase.registration_date')}
                                   orgTimeData={orgRegisterDate}
                                   timeData={finishDate}
                                   timeDataChange={handleRegisterDateChange}
@@ -440,7 +440,7 @@ const PurchaseDetailsModel = () => {
                                   defaultText={selectedPurchase.regcode}
                                   saved={savedValues}
                                   name="regcode"
-                                  title="Registration Code"
+                                  title={t('purchase.registration_cde')}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}
@@ -452,7 +452,7 @@ const PurchaseDetailsModel = () => {
                                   defaultText={selectedPurchase.purchase_memo}
                                   saved={savedValues}
                                   name="purchase_memo"
-                                  title="Memo"
+                                  title={t('common.memo')}
                                   row_no={3}
                                   no_border={true}
                                   checkEdit={handleCheckEditState}
@@ -469,7 +469,7 @@ const PurchaseDetailsModel = () => {
                       </div>
                       <div className="tasks__item crms-task-item active">
                         <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                          <Panel header="Product" key="1">
+                          <Panel header={t('common.product')} key="1">
                             <table className="table">
                               <tbody>{}</tbody>
                             </table>
@@ -478,14 +478,14 @@ const PurchaseDetailsModel = () => {
                       </div>
                       <div className="tasks__item crms-task-item">
                         <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                          <Panel header="Status" key="1">
+                          <Panel header={t('common.status')} key="1">
                             <table className="table">
                               <tbody>
                                 <DetailTextareaItem
                                   defaultText={selectedPurchase.status}
                                   saved={savedValues}
                                   name="status"
-                                  title="Status"
+                                  title={t('common.status')}
                                   row_no={3}
                                   no_border={true}
                                   checkEdit={handleCheckEditState}
