@@ -105,20 +105,10 @@ const Header = (props) => {
           </Link>
 
           <div id="dropdown_lag_menu" className="dropdown-menu dropdown-menu-right">
-
-            <div className="dropdown-item" 
-                onClick={() => 
-                  { changeLanguage('ko'); 
-                    document.querySelector('#dropdown_lag_menu').classList.remove('show'); 
-                  }}
-            >
+            <div className="dropdown-item" onClick={() => { changeLanguage('ko'); }} >
               <img src={Flag_kr} alt="" height={16} /> {t('header.ko')}
             </div>
-            <div className="dropdown-item" 
-                  onClick={() => 
-                    { changeLanguage('en'); 
-                      document.querySelector('#dropdown_lag_menu').classList.remove('show'); 
-                    }}>
+            <div className="dropdown-item" onClick={() => { changeLanguage('en');}} >
               <img src={Flag_us} alt="" height={16} /> {t('header.en')}
             </div>
           </div>
@@ -253,12 +243,9 @@ const Header = (props) => {
         {/* /Notifications */}
         {/* Message Notifications */}
         <li className="nav-item dropdown">
-          <a
-            href="#"
-            className="dropdown-toggle nav-link"
-            data-bs-toggle="dropdown"
-          >
-            <BiMessageRounded /> <span className="badge badge-pill">8</span>
+          <a href="#" className="dropdown-toggle nav-link" data-bs-toggle="dropdown">
+            <BiMessageRounded />
+            <span className="badge badge-pill">8</span>
           </a>
           <div className="dropdown-menu notifications">
             <div className="topnav-dropdown-header">
@@ -380,44 +367,21 @@ const Header = (props) => {
         </li>
         {/* /Message Notifications */}
         <li className="nav-item dropdown has-arrow main-drop">
-          {/* <a className="dropdown-toggle nav-link" data-bs-toggle="dropdown">
-            <span className="user-img"><img src={avatar21} alt="" />
-              <span className="status online" /></span> 
-            <span>Admin</span>
-          </a> */}
-          <Link className="dropdown-toggle nav-link"
-                data-bs-toggle="dropdown"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.querySelector('#dropdown_menu').classList.toggle('show');
-               }}
-               to="#"
-          >
+          <a href="#" className="dropdown-toggle nav-link" data-bs-toggle="dropdown">
             <span className="user-img">
-              {/* <img src={avatar21} alt="" /> */}
               <Avatar>{cookies.myLationCrmUserName === undefined ? "":(cookies.myLationCrmUserName).substring(0,1)}</Avatar>
-              <span className="status online" /></span>
+              <span className="status online" />
+            </span>
             <span>{cookies.myLationCrmUserName}</span>
-          </Link>
+          </a>
           <div id="dropdown_menu" className="dropdown-menu">
-            {/* <Link className="dropdown-item" to="/Profile" 
-                  onClick={ ()=>{document.querySelector('#dropdown_menu').classList.remove('show');}}>
-              My Profile
-            </Link> */}
-
-            <Link className="dropdown-item" to="/userinfo" 
-                  onClick={ ()=>{document.querySelector('#dropdown_menu').classList.remove('show');}}>
+            <Link className="dropdown-item" to="/userinfo" >
               My Profile
             </Link>
-            <Link className="dropdown-item" to="/settings"
-               onClick={ ()=>{document.querySelector('#dropdown_menu').classList.remove('show');}}>
+            <Link className="dropdown-item" to="/settings">
               Settings
             </Link>
-            <Link
-              className="dropdown-item"
-              onClick={handleLogout}
-              to="/login"
-            >
+            <Link className="dropdown-item" onClick={handleLogout} to="/login">
               Logout
             </Link>
           </div>
