@@ -535,7 +535,6 @@ const QuotationsDetailsModel = () => {
                                         saved={savedValues}
                                         name="quotation_type"
                                         title={t('quotation.quotation_type')}
-                                        no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -693,7 +692,6 @@ const QuotationsDetailsModel = () => {
                                         saved={savedValues}
                                         name="payment_type"
                                         title={t('quotation.payment_type')}
-                                        no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -887,7 +885,6 @@ const QuotationsDetailsModel = () => {
                                         saved={savedValues}
                                         name="lead_name"
                                         title={t('lead.lead_name')}
-                                        no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}

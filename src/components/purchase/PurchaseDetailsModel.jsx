@@ -338,7 +338,6 @@ const PurchaseDetailsModel = () => {
                                   saved={savedValues}
                                   name="quantity"
                                   title="Quantity"
-                                  no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
                                   editing={handleEditing}

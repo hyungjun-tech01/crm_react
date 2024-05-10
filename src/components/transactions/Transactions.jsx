@@ -281,7 +281,6 @@ const Transactions = () => {
                       bordered
                       dataSource={filteredTransaction.length >0 ? filteredTransaction:null}
                       rowKey={(record) => record.transaction_code}
-                      // onChange={handleTableChange}
                     />
                   }
                   </div>
@@ -296,50 +295,6 @@ const Transactions = () => {
         <CompanyDetailsModel />
         <TransactionsDetailsModel />
         <TransactionAddNewModal init={initAddNewTransaction} handleInit={setInitAddNewTransaction}/>
-        {/* cchange pipeline stage Modal */}
-        <div className="modal" id="pipeline-stage">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              {/* Modal Header */}
-              <div className="modal-header">
-                <h4 className="modal-title">Change Pipeline Stage</h4>
-                <button type="button" className="close" data-bs-dismiss="modal">
-                  ×
-                </button>
-              </div>
-              {/* Modal body */}
-              <div className="modal-body">
-                <form>
-                  <div className="form-group">
-                    <label className="col-form-label">New Stage</label>
-                    <select className="form-control" id="related-to">
-                      <option>Plan</option>
-                      <option>Design</option>
-                      <option>Develop</option>
-                      <option>Complete</option>
-                    </select>
-                  </div>
-                </form>
-              </div>
-              {/* Modal footer */}
-              <div className="modal-footer text-center">
-                <button
-                  type="button"
-                  className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                >
-                  Save
-                </button>
-                &nbsp;&nbsp;
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-rounded cancel-button"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </HelmetProvider>
   );

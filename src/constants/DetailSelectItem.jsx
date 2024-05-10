@@ -9,7 +9,7 @@ const DetailSelectItem = (props) => {
     if(checkEdit && checkEdit(name)) {
         return (
             <tr className='detail-tr'>
-                <td className={"detail-td-left" + no_border && " border-0"}><b>{title}</b></td>
+                <td className={"detail-td-left " + (no_border && "border-0")}>{title}</td>
                 <td className={no_border && "border-0"} >
                     <Select options={options} onChange={endEdit}/>
                 </td>
@@ -24,7 +24,7 @@ const DetailSelectItem = (props) => {
     if(checkSaved && checkSaved(name)) {
         return (
             <tr className='detail-tr'>
-                <td className={"detail-td-left" + no_border && " border-0"}><b>{title}</b></td>
+                <td className={"detail-td-left " + (no_border && "border-0")}>{title}</td>
                 <td className={no_border && "border-0"}>
                     {saved[name]}
                 </td>
@@ -39,7 +39,7 @@ const DetailSelectItem = (props) => {
 
     return (
         <tr className='detail-tr'>
-            <td className={"detail-td-left" + no_border && " border-0"}><b>{title}</b></td>
+            <td className={"detail-td-left " + (no_border && "border-0")}>{title}</td>
             <td className={no_border && "border-0"}>
                 {defaultText}
             </td>
