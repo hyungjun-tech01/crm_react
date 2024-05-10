@@ -261,15 +261,6 @@ const ConsultingsDetailsModel = () => {
                             {t('common.related')}
                           </Link>
                         </li>
-                        <li className="nav-item">
-                          <Link
-                            className="nav-link"
-                            to="#not-contact-task-activity"
-                            data-bs-toggle="tab"
-                          >
-                            Activity
-                          </Link>
-                        </li>
                       </ul>
                       <div className="tab-content">
                         <div
@@ -287,7 +278,6 @@ const ConsultingsDetailsModel = () => {
                                         saved={savedValues}
                                         name="consulting_type"
                                         title={t('consulting.type')}
-                                        no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -363,7 +353,6 @@ const ConsultingsDetailsModel = () => {
                                         name="request_content"
                                         title={t('consulting.request_content')}
                                         row_no={3}
-                                        no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -377,7 +366,6 @@ const ConsultingsDetailsModel = () => {
                                         name="action_content"
                                         title={t('consulting.action_content')}
                                         row_no={3}
-                                        no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
@@ -413,7 +401,6 @@ const ConsultingsDetailsModel = () => {
                                         saved={savedValues}
                                         name="lead_name"
                                         title={t('lead.lead_name')}
-                                        no_border={true}
                                         checkEdit={handleCheckEditState}
                                         startEdit={handleStartEdit}
                                         editing={handleEditing}
