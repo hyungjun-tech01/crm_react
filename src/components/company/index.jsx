@@ -140,7 +140,8 @@ const Company = () => {
       title: t('company.address'),
       dataIndex: "company_address",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.company_address.length - b.company_address.length,
+      // sorter: (a, b) => a.company_address.length - b.company_address.length,
+      sorter: (a, b) => compareText(a.company_address , b.company_address),
     },
     {
       title: t('company.salesman'),

@@ -4,12 +4,12 @@ export const compareCompanyName = (name1, name2) => {
     // At first, remove text not used to sort from input name.
     let text1 = name1;
     delete_text.forEach(text => {
-        text1 = text1.replaceAll(text, '');
+        text1 = text1 === null ? '' : text1.replaceAll(text, '');
     });
 
     let text2 = name2;
     delete_text.forEach(text => {
-        text2 = text2.replaceAll(text, '');
+        text2 = text2 === null ? '' : text2.replaceAll(text, '');
     });
 
     if (text1 > text2) {

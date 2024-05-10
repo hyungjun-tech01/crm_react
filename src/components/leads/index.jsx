@@ -179,7 +179,7 @@ const Leads = () => {
       title: t('lead.lead_modified'),
       dataIndex: "modify_date",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.modify_date - b.modify_date,
+      sorter: (a, b) => compareText(a.modify_date, b.modify_date),
     },
     {
       title: t('lead.lead_sales'),
