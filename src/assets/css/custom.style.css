@@ -53,6 +53,8 @@
 }
 .detail-td-left {
     width: 25%;
+    font-weight: 600;
+    font-size: 0.9rem;
 }
 /* .detail-td-center {
     margin: 0;

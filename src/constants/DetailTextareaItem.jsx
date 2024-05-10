@@ -8,7 +8,7 @@ const DetailTextareaItem = (props) => {
     if(checkEdit(name)) {
         return (
             <tr className='detail-tr'>
-                <td className={"detail-td-left" + (no_border && " border-0")}><b>{title}</b></td>
+                <td className={"detail-td-left " + (no_border && "border-0")}>{title}</td>
                 <td className={no_border && "border-0"} >
                     <textarea
                         className="detail-edit-textarea"
@@ -19,7 +19,7 @@ const DetailTextareaItem = (props) => {
                         onChange={editing}
                     />
                 </td >
-                <td className={"detail-td-right" + (no_border && " border-0")}>
+                <td className={"detail-td-right " + (no_border && "border-0")}>
                     <div onClick={() => { endEdit(name); }}>
                         <SaveAlt />
                     </div>
@@ -30,11 +30,11 @@ const DetailTextareaItem = (props) => {
     if(checkSaved(name)) {
         return (
             <tr className='detail-tr'>
-                <td className={"detail-td-left" + (no_border && " border-0")}><b>{title}</b></td>
+                <td className={"detail-td-left " + (no_border && "border-0")}>{title}</td>
                 <td className={no_border && "border-0"}>
                     {saved[name]}
                 </td>
-                <td className={"detail-td-right" + (no_border && " border-0")}>
+                <td className={"detail-td-right " + (no_border && "border-0")}>
                     <div onClick={() => { cancelSaved(name); }}>
                         <Cancel />
                     </div>
@@ -45,11 +45,11 @@ const DetailTextareaItem = (props) => {
 
     return (
         <tr className='detail-tr'>
-            <td className={"detail-td-left" + (no_border && " border-0")}><b>{title}</b></td>
+            <td className={"detail-td-left " + (no_border && "border-0")}>{title}</td>
             <td className={no_border && "border-0"}>
                 {defaultText}
             </td>
-            <td className={"detail-td-right" + (no_border && " border-0")}>
+            <td className={"detail-td-right " + (no_border && "border-0")}>
                 <div onClick={() => { startEdit(name); }}>
                     <Edit />
                 </div>

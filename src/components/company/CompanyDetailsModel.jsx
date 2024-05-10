@@ -249,756 +249,536 @@ const CompanyDetailsModel = () => {
   }, [selectedCompany, allLeads, allConsultings, allQuotations, allTransactions, allPurchases, loadAllLeads, loadAllConsultings, loadAllQuotations, loadAllTransactions, loadAllPurchases]);
 
   return (
-    <>
-      <div
-        className="modal right fade"
-        id="company-details"
-        tabIndex={-1}
-        role="dialog"
-        aria-modal="true"
-      >
-        <div className="modal-dialog" role="document">
-          <button
-            type="button"
-            className="close md-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          >
-            {" "}
-          </button>
-          <div className="modal-content">
-            <div className="modal-header">
-              <div className="row w-100">
-                <div className="col-md-7 account d-flex">
-                  <div className="company_img">
-                    <img src={C_logo} alt="User" className="user-image" />
-                  </div>
-                  <div>
-                    <p className="mb-0">{t('company.company')}</p>
-                    <span className="modal-title">
-                      {selectedCompany.company_name}
-                    </span>
-                    <span className="rating-star">
-                      <i className="fa fa-star" aria-hidden="true" />
-                    </span>
-                    <span className="lock">
-                      <i className="fa fa-lock" aria-hidden="true" />
-                    </span>
-                  </div>
+    <div
+      className="modal right fade"
+      id="company-details"
+      tabIndex={-1}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="modal-dialog" role="document">
+        <button
+          type="button"
+          className="close md-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          {" "}
+        </button>
+        <div className="modal-content">
+          <div className="modal-header">
+            <div className="row w-100">
+              <div className="col-md-7 account d-flex">
+                <div className="company_img">
+                  <img src={C_logo} alt="User" className="user-image" />
                 </div>
-              </div>
-              <button
-                type="button"
-                className="btn-close xs-close"
-                data-bs-dismiss="modal"
-              />
-            </div>
-            <div className="card due-dates">
-              <div className="card-body">
-                <div className="row">
-                  <div className="col">
-                    <span>{t('company.company_name')}</span>
-                    <p>{selectedCompany.company_name}</p>
-                  </div>
-                  <div className="col">
-                    <span>{t('company.eng_company_name')}</span>
-                    <p>{selectedCompany.company_name_eng}</p>
-                  </div>
-                  <div className="col">
-                    <span>{t('company.business_registration_code')}</span>
-                    <p>{selectedCompany.business_registration_code}</p> 
-                  </div>
+                <div>
+                  <p className="mb-0">{t('company.company')}</p>
+                  <span className="modal-title">
+                    {selectedCompany.company_name}
+                  </span>
+                  <span className="rating-star">
+                    <i className="fa fa-star" aria-hidden="true" />
+                  </span>
+                  <span className="lock">
+                    <i className="fa fa-lock" aria-hidden="true" />
+                  </span>
                 </div>
               </div>
             </div>
-            <div className="modal-body">
-              <div className="task-infos">
-                <ul className="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified">
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link active"
-                      to="#task-details"
-                      data-bs-toggle="tab"
-                    >
-                      {t('common.details')}
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#task-related"
-                      data-bs-toggle="tab"
-                    >
-                      {t('common.related')}
-                    </Link>
-                  </li>
-                  {/* <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#task-activity"
-                      data-bs-toggle="tab"
-                    >
-                      Activity
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#task-news"
-                      data-bs-toggle="tab"
-                    >
-                      News
-                    </Link>
-                  </li> */}
-                </ul>
-                <div className="tab-content">
-                  <div className="tab-pane show active" id="task-details">
-                    <div className="crms-tasks">
+            <button
+              type="button"
+              className="btn-close xs-close"
+              data-bs-dismiss="modal"
+            />
+          </div>
+          <div className="card due-dates">
+            <div className="card-body">
+              <div className="row">
+                <div className="col">
+                  <span>{t('company.company_name')}</span>
+                  <p>{selectedCompany.company_name}</p>
+                </div>
+                <div className="col">
+                  <span>{t('company.eng_company_name')}</span>
+                  <p>{selectedCompany.company_name_eng}</p>
+                </div>
+                <div className="col">
+                  <span>{t('company.business_registration_code')}</span>
+                  <p>{selectedCompany.business_registration_code}</p> 
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="modal-body">
+            <div className="task-infos">
+              <ul className="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified">
+                <li className="nav-item">
+                  <Link
+                    className="nav-link active"
+                    to="#task-details"
+                    data-bs-toggle="tab"
+                  >
+                    {t('common.details')}
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link"
+                    to="#task-related"
+                    data-bs-toggle="tab"
+                  >
+                    {t('common.related')}
+                  </Link>
+                </li>
+                {/* <li className="nav-item">
+                  <Link
+                    className="nav-link"
+                    to="#task-activity"
+                    data-bs-toggle="tab"
+                  >
+                    Activity
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link"
+                    to="#task-news"
+                    data-bs-toggle="tab"
+                  >
+                    News
+                  </Link>
+                </li> */}
+              </ul>
+              <div className="tab-content">
+                <div className="tab-pane show active" id="task-details">
+                  <div className="crms-tasks">
+                  <div className="tasks__item crms-task-item">
+                      <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
+                        <Panel header= {t('company.address')} key="1">
+                          <table className="table">
+                            <tbody>
+                              <DetailLabelItem
+                                defaultText={selectedCompany.company_address}
+                                saved={savedValues}
+                                name="company_address"
+                                title= {t('company.address')}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailLabelItem
+                                defaultText={selectedCompany.company_zip_code}
+                                saved={savedValues}
+                                name="company_zip_code"
+                                title= {t('company.zip_code')}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailLabelItem
+                                defaultText={selectedCompany.company_phone_number}
+                                saved={savedValues}
+                                name="company_phone_number"
+                                title= {t('company.phone_number')} 
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailLabelItem
+                                defaultText={selectedCompany.company_fax_number}
+                                saved={savedValues}
+                                name="company_fax_number"
+                                title= {t('company.fax_number')}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailLabelItem
+                                defaultText={selectedCompany.homepage}
+                                saved={savedValues}
+                                name="homepage"
+                                title= {t('company.homepage')}
+                                no_border={true}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                            </tbody>
+                          </table>
+                        </Panel>
+                      </Collapse>
+                    </div>
+                    <div className="tasks__item crms-task-item active">
+                      <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
+                        <Panel header= {t('company.company_details')}  key="1">
+                          <table className="table">
+                            <tbody>
+                              <DetailLabelItem
+                                defaultText={selectedCompany.group_}
+                                saved={savedValues}
+                                name="group_"
+                                title={t('company.group')}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailLabelItem
+                                defaultText={selectedCompany.company_scale}
+                                saved={savedValues}
+                                name="company_scale"
+                                title={t('company.company_scale')}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailLabelItem
+                                defaultText={selectedCompany.deal_type}
+                                saved={savedValues}
+                                name="deal_type"
+                                title={t('company.deal_type')}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailLabelItem
+                                defaultText={selectedCompany.business_registration_code}
+                                saved={savedValues}
+                                name="business_registration_code"
+                                title={t('company.business_registration_code')}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailDateItem
+                                saved={savedValues}
+                                name="establishment_date"
+                                title={t('company.establishment_date')}
+                                orgTimeData={orgEstablishDate}
+                                timeData={establishDate}
+                                timeDataChange={handleEstablishDateChange}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEstablishDateEdit}
+                                endEdit={handleEndEstablishDateEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailDateItem
+                                saved={savedValues}
+                                name="closure_date"
+                                title={t('company.closure_date')}
+                                orgTimeData={orgCloseDate}
+                                timeData={closeDate}
+                                timeDataChange={handleCloseDateChange}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartCloseDateEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndCloseDateEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailLabelItem
+                                defaultText={selectedCompany.ceo_name}
+                                saved={savedValues}
+                                name="ceo_name"
+                                title={t('company.ceo_name')}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailLabelItem
+                                defaultText={selectedCompany.business_type}
+                                saved={savedValues}
+                                name="business_type"
+                                title= {t('company.business_type')}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailLabelItem
+                                defaultText={selectedCompany.business_item}
+                                saved={savedValues}
+                                name="business_item"
+                                title= {t('company.business_item')}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailLabelItem
+                                defaultText={selectedCompany.industry_type}
+                                saved={savedValues}
+                                name="industry_type"
+                                title= {t('company.industry_type')}
+                                no_border={true}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                            </tbody>
+                          </table>
+                        </Panel>
+                      </Collapse>
+                    </div>
                     <div className="tasks__item crms-task-item">
-                        <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                          <Panel header= {t('company.address')} key="1">
-                            <table className="table">
-                              <tbody>
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.company_address}
-                                  saved={savedValues}
-                                  name="company_address"
-                                  title= {t('company.address')}
-                                  no_border={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.company_zip_code}
-                                  saved={savedValues}
-                                  name="company_zip_code"
-                                  title= {t('company.zip_code')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.company_phone_number}
-                                  saved={savedValues}
-                                  name="company_phone_number"
-                                  title= {t('company.phone_number')} 
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.company_fax_number}
-                                  saved={savedValues}
-                                  name="company_fax_number"
-                                  title= {t('company.fax_number')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.homepage}
-                                  saved={savedValues}
-                                  name="homepage"
-                                  title= {t('company.homepage')}
-                                  no_border={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                              </tbody>
-                            </table>
-                          </Panel>
-                        </Collapse>
+                      <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
+                        <Panel header= {t('common.additional_information')} key="1">
+                          <table className="table">
+                            <tbody>
+                              <DetailLabelItem
+                                defaultText={selectedCompany.account_code}
+                                saved={savedValues}
+                                name="account_code"
+                                title= {t('company.account_code')}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailLabelItem
+                                defaultText={selectedCompany.bank_name}
+                                saved={savedValues}
+                                name="bank_name"
+                                title= {t('company.bank_name')} 
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailLabelItem
+                                defaultText={selectedCompany.account_owner}
+                                saved={savedValues}
+                                name="account_owner"
+                                title= {t('company.account_owner')}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailLabelItem
+                                defaultText={selectedCompany.sales_resource}
+                                saved={savedValues}
+                                name="sales_resource"
+                                title= {t('company.salesman')}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailLabelItem
+                                defaultText={selectedCompany.application_engineer}
+                                saved={savedValues}
+                                name="application_engineer"
+                                title= {t('company.engineer')}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                              <DetailLabelItem
+                                defaultText={selectedCompany.region}
+                                saved={savedValues}
+                                name="region"
+                                title= {t('common.region')}
+                                no_border={true}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                            </tbody>
+                          </table>
+                        </Panel>
+                      </Collapse>
+                    </div>
+                    <div className="tasks__item crms-task-item">
+                      <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
+                        <Panel header= {t('common.memo')}  key="1">
+                          <table className="table">
+                            <tbody>
+                              <DetailTextareaItem
+                                defaultText={selectedCompany.memo}
+                                saved={savedValues}
+                                name="memo"
+                                title= {t('company.memo')}
+                                row_no={3}
+                                no_border={true}
+                                checkEdit={handleCheckEditState}
+                                startEdit={handleStartEdit}
+                                editing={handleEditing}
+                                endEdit={handleEndEdit}
+                                checkSaved={handleCheckSaved}
+                                cancelSaved={handleCancelSaved}
+                              />
+                            </tbody>
+                          </table>
+                        </Panel>
+                      </Collapse>
+                    </div>
+                  </div>
+                </div>
+                <div className="tab-pane task-related" id="task-related">
+                  <div className="row">
+                    <div className="col-md-4">
+                      <div className="card bg-gradient-danger card-img-holder text-white h-100">
+                        <div className="card-body" onClick={()=>handleCardClick('lead')}>
+                          <img
+                            src={CircleImg}
+                            className="card-img-absolute"
+                            alt="circle"
+                          />
+                          <h4 className="font-weight-normal mb-3">
+                            {t('lead.lead')}
+                          </h4>
+                          <span>{leadsByCompany.length}</span>
+                        </div>
                       </div>
-                      <div className="tasks__item crms-task-item active">
-                        <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                          <Panel header= {t('company.company_details')}  key="1">
-                            <table className="table">
-                              <tbody>
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.group_}
-                                  saved={savedValues}
-                                  name="group_"
-                                  title={t('company.group')}
-                                  no_border={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.company_scale}
-                                  saved={savedValues}
-                                  name="company_scale"
-                                  title={t('company.company_scale')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.deal_type}
-                                  saved={savedValues}
-                                  name="deal_type"
-                                  title={t('company.deal_type')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.business_registration_code}
-                                  saved={savedValues}
-                                  name="business_registration_code"
-                                  title={t('company.business_registration_code')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailDateItem
-                                  saved={savedValues}
-                                  name="establishment_date"
-                                  title={t('company.establishment_date')}
-                                  orgTimeData={orgEstablishDate}
-                                  timeData={establishDate}
-                                  timeDataChange={handleEstablishDateChange}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEstablishDateEdit}
-                                  endEdit={handleEndEstablishDateEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailDateItem
-                                  saved={savedValues}
-                                  name="closure_date"
-                                  title={t('company.closure_date')}
-                                  orgTimeData={orgCloseDate}
-                                  timeData={closeDate}
-                                  timeDataChange={handleCloseDateChange}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartCloseDateEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndCloseDateEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.ceo_name}
-                                  saved={savedValues}
-                                  name="ceo_name"
-                                  title={t('company.ceo_name')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.business_type}
-                                  saved={savedValues}
-                                  name="business_type"
-                                  title= {t('company.business_type')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.business_item}
-                                  saved={savedValues}
-                                  name="business_item"
-                                  title= {t('company.business_item')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.industry_type}
-                                  saved={savedValues}
-                                  name="industry_type"
-                                  title= {t('company.industry_type')}
-                                  no_border={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                              </tbody>
-                            </table>
-                          </Panel>
-                        </Collapse>
+                    </div>
+                    <div className="col-md-4">
+                      <div className="card bg-gradient-info card-img-holder text-white h-100">
+                      <div className="card-body" onClick={()=>handleCardClick('consulting')}>
+                          <img
+                            src={CircleImg}
+                            className="card-img-absolute"
+                            alt="circle"
+                          />
+                          <h4 className="font-weight-normal mb-3">{t('consulting.consulting')}</h4>
+                          <span>{consultingByCompany.length}</span>
+                        </div>
                       </div>
-                      <div className="tasks__item crms-task-item">
-                        <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                          <Panel header= {t('common.additional_information')} key="1">
-                            <table className="table">
-                              <tbody>
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.account_code}
-                                  saved={savedValues}
-                                  name="account_code"
-                                  title= {t('company.account_code')}
-                                  no_border={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.bank_name}
-                                  saved={savedValues}
-                                  name="bank_name"
-                                  title= {t('company.bank_name')} 
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.account_owner}
-                                  saved={savedValues}
-                                  name="account_owner"
-                                  title= {t('company.account_owner')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.sales_resource}
-                                  saved={savedValues}
-                                  name="sales_resource"
-                                  title= {t('company.salesman')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.application_engineer}
-                                  saved={savedValues}
-                                  name="application_engineer"
-                                  title= {t('company.engineer')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedCompany.region}
-                                  saved={savedValues}
-                                  name="region"
-                                  title= {t('common.region')}
-                                  no_border={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                              </tbody>
-                            </table>
-                          </Panel>
-                        </Collapse>
-                      </div>
-                      <div className="tasks__item crms-task-item">
-                        <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                          <Panel header= {t('common.memo')}  key="1">
-                            <table className="table">
-                              <tbody>
-                                <DetailTextareaItem
-                                  defaultText={selectedCompany.memo}
-                                  saved={savedValues}
-                                  name="memo"
-                                  title= {t('company.memo')}
-                                  row_no={3}
-                                  no_border={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                              </tbody>
-                            </table>
-                          </Panel>
-                        </Collapse>
+                    </div>
+                    <div className="col-md-4">
+                      <div className="card bg-gradient-success card-img-holder text-white h-100">
+                      <div className="card-body" onClick={()=>handleCardClick('quotation')}>
+                          <img
+                            src={CircleImg}
+                            className="card-img-absolute"
+                            alt="circle"
+                          />
+                          <h4 className="font-weight-normal mb-3">{t('quotation.quotation')}</h4>
+                          <span>{quotationByCompany.length}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div className="tab-pane task-related" id="task-related">
-                    <div className="row">
-                      <div className="col-md-4">
-                        <div className="card bg-gradient-danger card-img-holder text-white h-100">
-                          <div className="card-body" onClick={()=>handleCardClick('lead')}>
-                            <img
-                              src={CircleImg}
-                              className="card-img-absolute"
-                              alt="circle"
-                            />
-                            <h4 className="font-weight-normal mb-3">
-                              {t('lead.lead')}
-                            </h4>
-                            <span>{leadsByCompany.length}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-4">
-                        <div className="card bg-gradient-info card-img-holder text-white h-100">
-                        <div className="card-body" onClick={()=>handleCardClick('consulting')}>
-                            <img
-                              src={CircleImg}
-                              className="card-img-absolute"
-                              alt="circle"
-                            />
-                            <h4 className="font-weight-normal mb-3">{t('consulting.consulting')}</h4>
-                            <span>{consultingByCompany.length}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-4">
-                        <div className="card bg-gradient-success card-img-holder text-white h-100">
-                        <div className="card-body" onClick={()=>handleCardClick('quotation')}>
-                            <img
-                              src={CircleImg}
-                              className="card-img-absolute"
-                              alt="circle"
-                            />
-                            <h4 className="font-weight-normal mb-3">{t('quotation.quotation')}</h4>
-                            <span>{quotationByCompany.length}</span>
-                          </div>
+                  <div className="row pt-3">
+                    <div className="col-md-4">
+                      <div className="card bg-gradient-success card-img-holder text-white h-100">
+                      <div className="card-body" onClick={()=>handleCardClick('transaction')}>
+                          <img
+                            src={CircleImg}
+                            className="card-img-absolute"
+                            alt="circle"
+                          />
+                          <h4 className="font-weight-normal mb-3">{t('transaction.transaction')}</h4>
+                          <span>{transactionByCompany.length}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="row pt-3">
-                      <div className="col-md-4">
-                        <div className="card bg-gradient-success card-img-holder text-white h-100">
-                        <div className="card-body" onClick={()=>handleCardClick('transaction')}>
-                            <img
-                              src={CircleImg}
-                              className="card-img-absolute"
-                              alt="circle"
-                            />
-                            <h4 className="font-weight-normal mb-3">{t('transaction.transaction')}</h4>
-                            <span>{transactionByCompany.length}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-4">
-                        <div className="card bg-gradient-danger card-img-holder text-white h-100">
-                        <div className="card-body" onClick={()=>handleCardClick('purchase')}>
-                            <img
-                              src={CircleImg}
-                              className="card-img-absolute"
-                              alt="circle"
-                            />
-                            <h4 className="font-weight-normal mb-3">{t('purchase.purchase')}</h4>
-                            <span>{purchaseByCompany.length}</span>
-                          </div>
+                    <div className="col-md-4">
+                      <div className="card bg-gradient-danger card-img-holder text-white h-100">
+                      <div className="card-body" onClick={()=>handleCardClick('purchase')}>
+                          <img
+                            src={CircleImg}
+                            className="card-img-absolute"
+                            alt="circle"
+                          />
+                          <h4 className="font-weight-normal mb-3">{t('purchase.purchase')}</h4>
+                          <span>{purchaseByCompany.length}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="row">
-                      <div className="crms-tasks p-2">
-                        <div className="tasks__item crms-task-item active">
-                          <Collapse
-                            accordion expandIconPosition="end"
-                            activeKey={expandRelated}
+                  </div>
+                  <div className="row">
+                    <div className="crms-tasks p-2">
+                      <div className="tasks__item crms-task-item active">
+                        <Collapse
+                          accordion expandIconPosition="end"
+                          activeKey={expandRelated}
+                        >
+                          <Panel
+                            collapsible={ leadsByCompany.length > 0 ? 'header' : 'disabled'}
+                            header={t('lead.lead')}
+                            key="lead"
+                            onClick={()=>handleCardClick('lead')}
                           >
-                            <Panel
-                              collapsible={ leadsByCompany.length > 0 ? 'header' : 'disabled'}
-                              header={t('lead.lead')}
-                              key="lead"
-                              onClick={()=>handleCardClick('lead')}
-                            >
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>{t('lead.lead_name')}</th>
-                                    <th>{t('lead.mobile')}</th>
-                                    <th>{t('lead.email')}</th>
-                                    <th className="text-end">{t('common.actions')}</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  { leadsByCompany.map((lead, index) => 
-                                    <tr key={index}>
-                                      <td>
-                                        <Link to="#" className="avatar">
-                                          <img alt="" src={C_logo2} />
-                                        </Link>
-                                        <Link
-                                          to="#"
-                                          data-bs-toggle="modal"
-                                          data-bs-target="#leads-details"
-                                          onClick={()=> setCurrentLead(lead.lead_code)}
-                                        >
-                                          {lead.lead_name}
-                                        </Link>
-                                      </td>
-                                      <td>{lead.mobile_number}</td>
-                                      <td>{lead.email}</td>
-                                      <td className="text-center">
-                                        <div className="dropdown dropdown-action">
-                                          <Link
-                                            to="#"
-                                            className="action-icon dropdown-toggle"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                          >
-                                            <MoreVert />
-                                          </Link>
-                                          <div className="dropdown-menu dropdown-menu-right">
-                                            <Link
-                                              className="dropdown-item"
-                                              to="#"
-                                            >
-                                              Edit Link
-                                            </Link>
-                                            <Link
-                                              className="dropdown-item"
-                                              to="#"
-                                            >
-                                              Delete Link
-                                            </Link>
-                                          </div>
-                                        </div>
-                                      </td>
-                                    </tr>
-                                  )}
-                                </tbody>
-                              </table>
-                            </Panel>
-                            <Panel
-                              collapsible={ consultingByCompany.length > 0 ? 'header' : 'disabled'}
-                              header={t('consulting.consulting')}
-                              key="consulting"
-                              onClick={()=>handleCardClick('consulting')}
-                            >
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>{t('consulting.type')}</th>
-                                    <th>{t('consulting.receipt_time')}</th>
-                                    <th>{t('consulting.receiver')}</th>
-                                    <th>{t('consulting.request_type')}</th>
-                                    <th className="text-end">{t('common.actions')}</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  { consultingByCompany.map((consulting, index) =>
-                                    <tr key={index}>
-                                      <td>{consulting.consulting_type}</td>
-                                      <td>{consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
-                                      {consulting.receipt_time && new Date(consulting.receipt_time).toLocaleDateString('ko-KR', {hour:'numeric',minute:'numeric',second:'numeric'})}
-                                      </td>
-                                      <td>{consulting.receiver}</td>
-                                      <td>{consulting.request_type}</td>
-                                      <td className="text-center">
-                                        <div className="dropdown dropdown-action">
-                                          <Link
-                                            to="#"
-                                            className="action-icon dropdown-toggle"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                          >
-                                            <MoreVert />
-                                          </Link>
-                                          <div className="dropdown-menu dropdown-menu-right">
-                                            <Link
-                                              className="dropdown-item"
-                                              to="#"
-                                            >
-                                              Edit Link
-                                            </Link>
-                                            <Link
-                                              className="dropdown-item"
-                                              to="#"
-                                            >
-                                              Delete Link
-                                            </Link>
-                                          </div>
-                                        </div>
-                                      </td>
-                                    </tr>
-                                  )}
-                                </tbody>
-                              </table>
-                            </Panel>
-                            <Panel
-                              collapsible={ quotationByCompany.length > 0 ? 'header' : 'disabled'}
-                              header={t('quotation.quotation')}
-                              key="quotation"
-                              onClick={()=>handleCardClick('quotation')}
-                            >
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>{t('common.title')}</th>
-                                    <th>{t('quotation.quotation_date')}</th>
-                                    <th className="text-end">{t('common.actions')}</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  { quotationByCompany.map((quotation, index) =>
-                                    <tr key={index}>
-                                      <td>{quotation.quotation_title}</td>
-                                      <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}</td>
-                                      <td className="text-center">
-                                        <div className="dropdown dropdown-action">
-                                          <Link
-                                            to="#"
-                                            className="action-icon dropdown-toggle"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                          >
-                                            <MoreVert />
-                                          </Link>
-                                          <div className="dropdown-menu dropdown-menu-right">
-                                            <Link
-                                              className="dropdown-item"
-                                              to="#"
-                                            >
-                                              Edit Link
-                                            </Link>
-                                            <Link
-                                              className="dropdown-item"
-                                              to="#"
-                                            >
-                                              Delete Link
-                                            </Link>
-                                          </div>
-                                        </div>
-                                      </td>
-                                    </tr>
-                                  )}
-                                </tbody>
-                              </table>
-                            </Panel>
-                            <Panel
-                              collapsible={ transactionByCompany.length > 0 ? 'header' : 'disabled'}
-                              header={t('transaction.transaction')}
-                              key="transaction"
-                              onClick={()=>handleCardClick('transaction')}
-                            >
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>{t('common.title')}</th>
-                                    <th>{t('transaction.publish_date')}</th>
-                                    <th>{t('transaction.publish_type')}</th>
-                                    <th>{t('transaction.supply_price')}</th>
-                                    <th className="text-end">{t('common.actions')}</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  { transactionByCompany.map((trans, index) =>
-                                    <tr key={index}>
-                                      <td>{trans.transaction_title}</td>
-                                      <td>{trans.publish_date && new Date(trans.publish_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
-                                      <td>{trans.publish_type}</td>
-                                      <td>{trans.supply_price}</td>
-                                      <td className="text-center">
-                                        <div className="dropdown dropdown-action">
-                                          <Link
-                                            to="#"
-                                            className="action-icon dropdown-toggle"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                          >
-                                            <MoreVert />
-                                          </Link>
-                                          <div className="dropdown-menu dropdown-menu-right">
-                                            <Link
-                                              className="dropdown-item"
-                                              to="#"
-                                            >
-                                              Edit Link
-                                            </Link>
-                                            <Link
-                                              className="dropdown-item"
-                                              to="#"
-                                            >
-                                              Delete Link
-                                            </Link>
-                                          </div>
-                                        </div>
-                                      </td>
-                                    </tr>
-                                  )}
-                                </tbody>
-                              </table>
-                            </Panel>
-                            <Panel
-                              collapsible={ purchaseByCompany.length > 0 ? 'header' : 'disabled'}
-                              header={t('purchase.purchase')}
-                              key="purchase"
-                              onClick={()=>handleCardClick('purchase')}
-                            >
-                              <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                                <thead>
-                                  <tr>
-                                    <th>{t('purchase.product_name')}</th>
-                                    <th>{t('common.title')}</th>
-                                    <th>{t('purchase.price')}</th>
-                                    <th>{t('purchase.delivery_date')}</th>
-                                    <th>{t('purchase.registration_date')}</th>
-                                    <th className="text-end">{t('common.actions')}</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                { purchaseByCompany.map((purchase, index) =>
+                            <table className="table table-striped table-nowrap custom-table mb-0 datatable">
+                              <thead>
+                                <tr>
+                                  <th>{t('lead.lead_name')}</th>
+                                  <th>{t('lead.mobile')}</th>
+                                  <th>{t('lead.email')}</th>
+                                  <th className="text-end">{t('common.actions')}</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                { leadsByCompany.map((lead, index) => 
                                   <tr key={index}>
-                                    <td>{purchase.product_name}</td>
-                                    <td>{purchase.quantity}</td>
-                                    <td>{purchase.price}</td>
-                                    <td>{purchase.delivery_date && new Date(purchase.delivery_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
-                                    <td>{purchase.registration_date && new Date(purchase.registration_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
+                                    <td>
+                                      <Link to="#" className="avatar">
+                                        <img alt="" src={C_logo2} />
+                                      </Link>
+                                      <Link
+                                        to="#"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#leads-details"
+                                        onClick={()=> setCurrentLead(lead.lead_code)}
+                                      >
+                                        {lead.lead_name}
+                                      </Link>
+                                    </td>
+                                    <td>{lead.mobile_number}</td>
+                                    <td>{lead.email}</td>
                                     <td className="text-center">
                                       <div className="dropdown dropdown-action">
                                         <Link
@@ -1027,42 +807,256 @@ const CompanyDetailsModel = () => {
                                     </td>
                                   </tr>
                                 )}
-                                </tbody>
-                              </table>
-                            </Panel>
-                          </Collapse>
-                        </div>
+                              </tbody>
+                            </table>
+                          </Panel>
+                          <Panel
+                            collapsible={ consultingByCompany.length > 0 ? 'header' : 'disabled'}
+                            header={t('consulting.consulting')}
+                            key="consulting"
+                            onClick={()=>handleCardClick('consulting')}
+                          >
+                            <table className="table table-striped table-nowrap custom-table mb-0 datatable">
+                              <thead>
+                                <tr>
+                                  <th>{t('consulting.type')}</th>
+                                  <th>{t('consulting.receipt_time')}</th>
+                                  <th>{t('consulting.receiver')}</th>
+                                  <th>{t('consulting.request_type')}</th>
+                                  <th className="text-end">{t('common.actions')}</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                { consultingByCompany.map((consulting, index) =>
+                                  <tr key={index}>
+                                    <td>{consulting.consulting_type}</td>
+                                    <td>{consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
+                                    {consulting.receipt_time && new Date(consulting.receipt_time).toLocaleDateString('ko-KR', {hour:'numeric',minute:'numeric',second:'numeric'})}
+                                    </td>
+                                    <td>{consulting.receiver}</td>
+                                    <td>{consulting.request_type}</td>
+                                    <td className="text-center">
+                                      <div className="dropdown dropdown-action">
+                                        <Link
+                                          to="#"
+                                          className="action-icon dropdown-toggle"
+                                          data-bs-toggle="dropdown"
+                                          aria-expanded="false"
+                                        >
+                                          <MoreVert />
+                                        </Link>
+                                        <div className="dropdown-menu dropdown-menu-right">
+                                          <Link
+                                            className="dropdown-item"
+                                            to="#"
+                                          >
+                                            Edit Link
+                                          </Link>
+                                          <Link
+                                            className="dropdown-item"
+                                            to="#"
+                                          >
+                                            Delete Link
+                                          </Link>
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )}
+                              </tbody>
+                            </table>
+                          </Panel>
+                          <Panel
+                            collapsible={ quotationByCompany.length > 0 ? 'header' : 'disabled'}
+                            header={t('quotation.quotation')}
+                            key="quotation"
+                            onClick={()=>handleCardClick('quotation')}
+                          >
+                            <table className="table table-striped table-nowrap custom-table mb-0 datatable">
+                              <thead>
+                                <tr>
+                                  <th>{t('common.title')}</th>
+                                  <th>{t('quotation.quotation_date')}</th>
+                                  <th className="text-end">{t('common.actions')}</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                { quotationByCompany.map((quotation, index) =>
+                                  <tr key={index}>
+                                    <td>{quotation.quotation_title}</td>
+                                    <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}</td>
+                                    <td className="text-center">
+                                      <div className="dropdown dropdown-action">
+                                        <Link
+                                          to="#"
+                                          className="action-icon dropdown-toggle"
+                                          data-bs-toggle="dropdown"
+                                          aria-expanded="false"
+                                        >
+                                          <MoreVert />
+                                        </Link>
+                                        <div className="dropdown-menu dropdown-menu-right">
+                                          <Link
+                                            className="dropdown-item"
+                                            to="#"
+                                          >
+                                            Edit Link
+                                          </Link>
+                                          <Link
+                                            className="dropdown-item"
+                                            to="#"
+                                          >
+                                            Delete Link
+                                          </Link>
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )}
+                              </tbody>
+                            </table>
+                          </Panel>
+                          <Panel
+                            collapsible={ transactionByCompany.length > 0 ? 'header' : 'disabled'}
+                            header={t('transaction.transaction')}
+                            key="transaction"
+                            onClick={()=>handleCardClick('transaction')}
+                          >
+                            <table className="table table-striped table-nowrap custom-table mb-0 datatable">
+                              <thead>
+                                <tr>
+                                  <th>{t('common.title')}</th>
+                                  <th>{t('transaction.publish_date')}</th>
+                                  <th>{t('transaction.publish_type')}</th>
+                                  <th>{t('transaction.supply_price')}</th>
+                                  <th className="text-end">{t('common.actions')}</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                { transactionByCompany.map((trans, index) =>
+                                  <tr key={index}>
+                                    <td>{trans.transaction_title}</td>
+                                    <td>{trans.publish_date && new Date(trans.publish_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
+                                    <td>{trans.publish_type}</td>
+                                    <td>{trans.supply_price}</td>
+                                    <td className="text-center">
+                                      <div className="dropdown dropdown-action">
+                                        <Link
+                                          to="#"
+                                          className="action-icon dropdown-toggle"
+                                          data-bs-toggle="dropdown"
+                                          aria-expanded="false"
+                                        >
+                                          <MoreVert />
+                                        </Link>
+                                        <div className="dropdown-menu dropdown-menu-right">
+                                          <Link
+                                            className="dropdown-item"
+                                            to="#"
+                                          >
+                                            Edit Link
+                                          </Link>
+                                          <Link
+                                            className="dropdown-item"
+                                            to="#"
+                                          >
+                                            Delete Link
+                                          </Link>
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )}
+                              </tbody>
+                            </table>
+                          </Panel>
+                          <Panel
+                            collapsible={ purchaseByCompany.length > 0 ? 'header' : 'disabled'}
+                            header={t('purchase.purchase')}
+                            key="purchase"
+                            onClick={()=>handleCardClick('purchase')}
+                          >
+                            <table className="table table-striped table-nowrap custom-table mb-0 datatable">
+                              <thead>
+                                <tr>
+                                  <th>{t('purchase.product_name')}</th>
+                                  <th>{t('common.title')}</th>
+                                  <th>{t('purchase.price')}</th>
+                                  <th>{t('purchase.delivery_date')}</th>
+                                  <th>{t('purchase.registration_date')}</th>
+                                  <th className="text-end">{t('common.actions')}</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                              { purchaseByCompany.map((purchase, index) =>
+                                <tr key={index}>
+                                  <td>{purchase.product_name}</td>
+                                  <td>{purchase.quantity}</td>
+                                  <td>{purchase.price}</td>
+                                  <td>{purchase.delivery_date && new Date(purchase.delivery_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
+                                  <td>{purchase.registration_date && new Date(purchase.registration_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
+                                  <td className="text-center">
+                                    <div className="dropdown dropdown-action">
+                                      <Link
+                                        to="#"
+                                        className="action-icon dropdown-toggle"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                      >
+                                        <MoreVert />
+                                      </Link>
+                                      <div className="dropdown-menu dropdown-menu-right">
+                                        <Link
+                                          className="dropdown-item"
+                                          to="#"
+                                        >
+                                          Edit Link
+                                        </Link>
+                                        <Link
+                                          className="dropdown-item"
+                                          to="#"
+                                        >
+                                          Delete Link
+                                        </Link>
+                                      </div>
+                                    </div>
+                                  </td>
+                                </tr>
+                              )}
+                              </tbody>
+                            </table>
+                          </Panel>
+                        </Collapse>
                       </div>
                     </div>
                   </div>
                 </div>
-                { savedValues !== null && Object.keys(savedValues).length !== 0 &&
-                  <div className="text-center py-3">
-                    <button
-                      type="button"
-                      className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                      onClick={handleSaveAll}
-                    >
-                      {t('common.save')}
-                    </button>
-                    &nbsp;&nbsp;
-                    <button
-                      type="button"
-                      className="btn btn-secondary btn-rounded"
-                      onClick={handleCancelAll}
-                    >
-                      {t('common.cancel')}
-                    </button>
-                  </div>
-                }
               </div>
+              { savedValues !== null && Object.keys(savedValues).length !== 0 &&
+                <div className="text-center py-3">
+                  <button
+                    type="button"
+                    className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                    onClick={handleSaveAll}
+                  >
+                    {t('common.save')}
+                  </button>
+                  &nbsp;&nbsp;
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-rounded"
+                    onClick={handleCancelAll}
+                  >
+                    {t('common.cancel')}
+                  </button>
+                </div>
+              }
             </div>
           </div>
-          {/* modal-content */}
         </div>
-        {/* modal-dialog */}
+        {/* modal-content */}
       </div>
-    </>
+    </div>
   );
 };
 
