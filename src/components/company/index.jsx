@@ -55,6 +55,8 @@ const Company = () => {
   // --- Functions used for Add New Company ------------------------------
   const initializeCompanyTemplate = useCallback(() => {
     setCompanyChange({...defaultCompany});
+    setEstablishDate(null);
+    setCloseDate(null);
     document.querySelector("#add_new_company_form").reset();
   }, []);
 

@@ -13,6 +13,14 @@ export const KeyManForSelection = [
     { value: 'NULL', label: 'NULL'},
 ];
 
+export const LeadStatusSelection = [
+    { value: 'Not Contacted', label: 'Not Contacted'},
+    { value: 'Attempted Contact', label: 'Attempted Contact'},
+    { value: 'Contact', label: 'Contact'},
+    { value: 'Converted', label: 'Converted'},
+    { value: 'NULL', label: 'NULL'},
+];
+
 export const LeadRepo = selector({
     key: "LeadRepository",
     get: ({getCallback}) => {

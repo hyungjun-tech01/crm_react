@@ -12,7 +12,7 @@ import { MoreVert } from '@mui/icons-material';
 import { BiUser } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import {ConsultingRepo} from "../../repository/consulting"
-import { KeyManForSelection, LeadRepo } from "../../repository/lead";
+import { KeyManForSelection, LeadStatusSelection, LeadRepo } from "../../repository/lead";
 import { atomAllCompanies, atomAllLeads, atomFilteredLead, defaultLead } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 import { useTranslation } from "react-i18next";
@@ -28,8 +28,13 @@ const Leads = () => {
 
   const [ leadChange, setLeadChange ] = useState(null);
   const [ companyData, setCompanyData ] = useState([]);
+  const [selectedOption, setSelectedOption] = useState([]);
+  const [selectedKeyMan, setSelectedKeyMan] = useState([]);
+  const [selectedLeadStatus, setSelectedLeadStatus] = useState([]);
+  
 
   const [searchCondition, setSearchCondition] = useState("");
+
 
   const { t } = useTranslation();
 
@@ -54,6 +59,9 @@ const Leads = () => {
 
   const initializeLeadTemplate = useCallback(() => {
     setLeadChange({ ...defaultLead });
+    setSelectedOption([]);
+    setSelectedKeyMan([]);
+    setSelectedLeadStatus([]);
     document.querySelector("#add_new_lead_form").reset();
   }, []);
 
@@ -93,6 +101,7 @@ const Leads = () => {
   // --- Funtions for Select ---------------------------------
   const handleSelectCompany = useCallback((value)=>{
     const selected = value.value;
+    setSelectedOption(value);
     const tempLeadChange = {
       ...leadChange,
       company_code: selected.company_code,
@@ -106,9 +115,20 @@ const Leads = () => {
 
   const handleSelectKeyMan = useCallback((value) => {
     const selected = value.value;
+    setSelectedKeyMan(value);
     const tempLeadChange = {
       ...leadChange,
       is_keyman : selected
+    };
+    setLeadChange(tempLeadChange);
+  },[leadChange]);
+
+  const handleSelectedLeadStatus = useCallback((value) => {
+    const selected = value.value;
+    setSelectedLeadStatus(value);
+    const tempLeadChange = {
+      ...leadChange,
+      status : selected
     };
     setLeadChange(tempLeadChange);
   },[leadChange]);
@@ -542,19 +562,13 @@ const Leads = () => {
                         </div>
                         <div className="col-sm-6">
                           <label className="col-form-label">{t('lead.is_keyman')}</label>
-                          <Select options={KeyManForSelection} onChange={handleSelectKeyMan} />
+                          <Select options={KeyManForSelection} value={selectedKeyMan}  onChange={handleSelectKeyMan} />
                         </div>
                       </div>
                       <div className="form-group row">
                         <div className="col-sm-6">
                           <label className="col-form-label">{t('lead.lead_status')}</label>
-                          <select className="form-control form-control-sm">
-                            <option>Select</option>
-                            <option>Not Contacted</option>
-                            <option>Attempted Contact</option>
-                            <option>Contact</option>
-                            <option>Converted</option>
-                          </select>
+                          <Select options={LeadStatusSelection} value={selectedLeadStatus}  onChange={handleSelectedLeadStatus} />
                         </div>
                       </div>
                       {/* <div className="form-group row">
@@ -572,7 +586,7 @@ const Leads = () => {
                       <div className="form-group row">
                         <div className="col-sm-6">
                           <label className="col-form-label">{t('company.company_name')}</label>
-                          <Select options={companyData} onChange={handleSelectCompany} />
+                          <Select options={companyData} value={selectedOption} onChange={handleSelectCompany} />
                         </div>
                         <div className="col-sm-6">
                           <label className="col-form-label">{t('lead.position')}</label>
