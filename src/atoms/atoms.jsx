@@ -217,6 +217,11 @@ export const atomAllQuotations = atom({
     default: [],
 });
 
+export const atomCompanyQuotations = atom({
+    key: "companyQuotations",
+    default: [],
+});
+
 export const atomFilteredQuotation = atom({
     key: "filteredQuotations",
     default: [],

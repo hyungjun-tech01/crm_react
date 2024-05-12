@@ -4,7 +4,7 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { CircleImg, SystemUser } from "../imagepath";
 import { Collapse } from "antd";
-import { atomCurrentLead, defaultLead, atomCurrentCompany, defaultCompany, atomCompanyConsultings,atomFilteredConsulting } from "../../atoms/atoms";
+import { atomCurrentLead, defaultLead, atomCurrentCompany, defaultCompany, atomCompanyConsultings,atomFilteredConsulting, atomCompanyQuotations } from "../../atoms/atoms";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { CompanyRepo} from "../../repository/company";
 import DetailLabelItem from "../../constants/DetailLabelItem";
@@ -13,8 +13,10 @@ import DetailSelectItem from "../../constants/DetailSelectItem";
 import { Avatar } from "@mui/material";
 import DetailDateItem from "../../constants/DetailDateItem";
 import {ConsultingRepo} from "../../repository/consulting"
+import {QuotationRepo} from "../../repository/quotation"
 import {ExpandMore} from "@mui/icons-material";
 import ConsultingsDetailsModel from "../consulting/ConsultingsDetailsModel";
+import QuotationsDetailsModel from "../quotations/QuotationsDetailsModel";
 import {  Edit } from '@mui/icons-material';
 import { useTranslation } from "react-i18next";
 
@@ -25,6 +27,8 @@ const LeadsDetailsModel = () => {
   const selectedCompany = useRecoilValue(atomCurrentCompany);
   const companyConsultings = useRecoilValue(atomCompanyConsultings);
   const filteredConsultings = useRecoilValue(atomFilteredConsulting);
+
+  const companyQuotations = useRecoilValue(atomCompanyQuotations);
 
   const { t } = useTranslation();
 
@@ -42,6 +46,8 @@ const LeadsDetailsModel = () => {
   const [statusSearch, setStatusSearch] = useState("");
   const [searchCondition, setSearchCondition] = useState("");
   const { loadCompanyConsultings, filterConsulting, setCurrentConsulting} = useRecoilValue(ConsultingRepo);
+  const { loadCompanyQuotations, setCurrentQuotation} = useRecoilValue(QuotationRepo);
+  
   
   // 상태(state) 정의
 const [selectedRow, setSelectedRow] = useState(null);
@@ -1246,6 +1252,80 @@ const [selectedRow, setSelectedRow] = useState(null);
                           </table>
                         </div>
 
+
+                        <div className="tab-pane task-related p-0"
+                          id="not-contact-task-quotation" >
+                          <table className="table table-striped table-nowrap custom-table mb-0 datatable">
+                            <thead>
+                              <tr>
+                                <div className="row">
+                                  <div className="col text-start" style={{width:'200px'}}>
+                                    <input
+                                      id = "searchCondition"
+                                      className="form-control" 
+                                      type="text"
+                                      value={searchCondition}
+                                      onChange ={(e) => handleSearchCondition(e.target.value)}
+                                      placeholder="Lead Name, Receiver" 
+                                      style={{width:'300px', display: 'inline'}}
+                                    />  
+                                  </div>
+                                </div>
+                              </tr>
+                              <tr>
+                                <th style={{ width: '80px' }}>{t('quotation.quotation_type')}</th>
+                                <th style={{ width: '300px' }}>{t('common.title')}</th>
+                                <th>{t('quotation.quotation_date')}</th>
+                                <th>{t('lead.full_name')}</th>
+                                <th>{t('quotation.quotation_manager')}</th>
+                              </tr>
+                            </thead>
+                            {
+                              searchCondition === "" ? 
+                              companyQuotations.length > 0 &&
+                              <tbody>
+                                { companyQuotations.map(quotation =>
+                                <React.Fragment key={quotation.quotation_code}>
+                                  <tr key={quotation.quotation_code}>
+                                      <td>{quotation.quotation_type} </td>
+                                      <td>{quotation.quotation_title}
+                                        <a href="#"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#quotations-details"
+                                            onClick={()=>{
+                                              console.log('showQuotationDetail', quotation.quotation_code);
+                                              setCurrentQuotation(quotation.quotation_code);
+                                          }}>
+                                            <Edit fontSize="small"/>
+                                          </a>
+                                      </td>
+                                      <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
+                                      </td>
+                                      <td>{quotation.lead_name}</td>
+                                      <td className="text-end">{quotation.quotation_manager}</td>
+                                  </tr>
+                                  </React.Fragment>
+                                )}
+                              </tbody> 
+                              : 
+                              filteredConsultings.length > 0 &&
+                              <tbody>
+                                { filteredConsultings.map(consulting =>
+                                  <tr key={consulting.consulting_code}>
+                                    <td>{consulting.consulting_type}</td>
+                                    <td>{consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
+                                    {consulting.receipt_time === null ? "":consulting.receipt_time }
+                                    </td>
+                                    <td>{consulting.satatus}</td>
+                                    <td>{consulting.receiver}</td>
+                                    <td className="text-end">{consulting.lead_name}</td>
+                                  </tr>
+                                )}
+                              </tbody> 
+                            }
+                          </table>
+                        </div>
+
                         <div
                           className="tab-pane p-0"
                           id="not-contact-task-activity"
@@ -1333,6 +1413,7 @@ const [selectedRow, setSelectedRow] = useState(null);
         {/* modal-dialog */}
       </div>
       <ConsultingsDetailsModel />
+      <QuotationsDetailsModel  />
     </>
   );
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentQuotation, atomAllQuotations, defaultQuotation, atomFilteredQuotation } from '../atoms/atoms';
+import { atomCurrentQuotation, atomAllQuotations, defaultQuotation, 
+        atomCompanyQuotations, atomFilteredQuotation } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
@@ -30,6 +31,29 @@ export const QuotationRepo = selector({
             };
         });
         
+        const loadCompanyQuotations = getCallback(({set}) => async (company_code) => {
+            const input_json = {company_code:company_code};
+            //JSON.stringify(company_code);
+            try{
+                console.log('loadCompanyConsultings' ,company_code);
+                const response = await fetch(`${BASE_PATH}/companyQuotations`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify(input_json),
+                });
+                const data = await response.json();
+                if(data.message){
+                    console.log('loadCompanyConsultings message:', data.message);
+                    set(atomCompanyQuotations, input_json);
+                    return;
+                }
+                set(atomCompanyQuotations, data);
+            }
+            catch(err){
+                console.error(`loadCompanyConsultings / Error : ${err}`);
+            };
+        });
+
         const filterQuotations = getCallback(({set, snapshot }) => async (itemName, filterText) => {
             const allQuotationList = await snapshot.getPromise(atomAllQuotations);
             let  allQuotation ;
@@ -136,7 +160,7 @@ export const QuotationRepo = selector({
                     set(atomCurrentQuotation, defaultQuotation);
                     return;
                 };
-                const allQuotations = await snapshot.getPromise(atomAllQuotations);
+                const allQuotations = atomAllQuotations.length > 0 ? await snapshot.getPromise(atomAllQuotations) : await snapshot.getPromise(atomCompanyQuotations);
                 const selected_arrary = allQuotations.filter(quotation => quotation.quotation_code === quotation_code);
                 if(selected_arrary.length > 0){
                     set(atomCurrentQuotation, selected_arrary[0]);
@@ -151,6 +175,7 @@ export const QuotationRepo = selector({
             modifyQuotation,
             setCurrentQuotation,
             filterQuotations,
+            loadCompanyQuotations,
         };
     }
 });

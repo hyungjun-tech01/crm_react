@@ -12,6 +12,7 @@ import { MoreVert } from '@mui/icons-material';
 import { BiUser } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import {ConsultingRepo} from "../../repository/consulting"
+import {QuotationRepo} from "../../repository/quotation"
 import { KeyManForSelection, LeadStatusSelection, LeadRepo } from "../../repository/lead";
 import { atomAllCompanies, atomAllLeads, atomFilteredLead, defaultLead } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
@@ -23,6 +24,8 @@ const Leads = () => {
   const filteredLead = useRecoilValue(atomFilteredLead);
   const { loadAllCompanies , setCurrentCompany} = useRecoilValue(CompanyRepo);
   const { loadCompanyConsultings} = useRecoilValue(ConsultingRepo);
+  const { loadCompanyQuotations} = useRecoilValue(QuotationRepo);
+
   const { loadAllLeads, modifyLead, setCurrentLead, filterLeads } = useRecoilValue(LeadRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName",  "myLationCrmUserId",]);
 
@@ -154,6 +157,7 @@ const Leads = () => {
               setCurrentLead(record.lead_code);
               setCurrentCompany(record.company_code);   // 현재 company 세팅 
               loadCompanyConsultings(record.company_code);  // 현재 company에 해당하는 consulting 조회 
+              loadCompanyQuotations(record.company_code);  // 현재 company에 해당하는 quotation 조회 
           }}>
             {text}
           </a>
@@ -656,17 +660,6 @@ const Leads = () => {
                             onChange={handleLeadChange}
                           />
                         </div>
-                        {/* <div className="col-sm-6">
-                          <label className="col-form-label">
-                            Email Opted out
-                          </label>
-                          <div>
-                            <label className="container-checkbox">
-                              <input type="checkbox" />
-                              <span className="checkmark" />
-                            </label>
-                          </div>
-                        </div> */}
                       </div>
                       <div className="form-group row">
                         <div className="col-sm-6">
@@ -702,68 +695,6 @@ const Leads = () => {
                           />
                         </div>
                       </div>
-                      {/* <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Sales Resource</label>
-                          <select className="form-control">
-                            <option>Web</option>
-                            <option>Phone Enquiry</option>
-                            <option>Partner Referral</option>
-                            <option>Purchased List</option>
-                            <option>Other</option>
-                          </select>
-                        </div>
-                      </div> */}
-                      {/* <h4>Address Information</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-12">
-                          <label className="col-form-label">
-                            Mailing Address
-                          </label>
-                          <textarea
-                            className="form-control"
-                            rows={3}
-                            name="address"
-                            placeholder="Address"
-                            defaultValue={""}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder="City"
-                            name="city"
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder="State/Provience"
-                            name="state"
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder="Postal Code"
-                            name="postal"
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <select className="form-control">
-                            <option>India</option>
-                            <option>US</option>
-                            <option>Japan</option>
-                          </select>
-                        </div>
-                      </div> */}
                       <h4>{t('common.additional_information')}</h4>
                       <div className="form-group row">
                         <div className="col-sm-6">
@@ -773,7 +704,7 @@ const Leads = () => {
                           <input
                             type="text"
                             className="form-control form-control-sm"
-                            placeholder="Sales Resource"
+                            placeholder={t('company.salesman')}
                             name="sales_resource"
                             onChange={handleLeadChange}
                           />
@@ -785,51 +716,17 @@ const Leads = () => {
                           <input
                             type="text"
                             className="form-control form-control-sm"
-                            placeholder="Application Engineer"
+                            placeholder={t('company.engineer')}
                             name="application_engineer"
                             onChange={handleLeadChange}
                           />
                         </div>
                       </div>
-                      <div className="form-group row">
-                        <div className="col-sm-12">
-                          <label className="col-form-label">{t('common.status')}</label>
-                          <textarea
-                            className="form-control"
-                            rows={3}
-                            placeholder={t('common.status')}
-                            defaultValue={""}
-                            name="status"
-                            onChange={handleLeadChange}
-                          />
-                        </div>
-                      </div>
-                      {/* <h4>Tag Information</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-12">
-                          <label className="col-form-label">Tag List</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            name="tag-name"
-                            placeholder="Tag List"
-                          />
-                        </div>
-                      </div>
-                      <h4>Permissions</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Permission</label>
-                          <select className="form-control">
-                            <option>Task Visibility</option>
-                            <option>Private Task</option>
-                          </select>
-                        </div>
-                      </div> */}
                       <div className="text-center py-3">
                         <button
                           type="button"
                           className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                          data-bs-dismiss="modal"
                           onClick={handleAddNewLead}
                         >
                           {t('common.save')}
