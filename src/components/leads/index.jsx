@@ -554,8 +554,8 @@ const Leads = () => {
                     <form id="add_new_lead_form">
                       <h4>{t('lead.lead_information')}</h4>
                       <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('common.name')} <span className="text-danger">*</span></label>
+                        <div className="col-sm-6  d-flex" >
+                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('common.name')} <span className="text-danger">*</span></label>
                           <input
                             type="text"
                             className="form-control form-control-sm"
@@ -564,15 +564,15 @@ const Leads = () => {
                             onChange={handleLeadChange}
                           />
                         </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('lead.is_keyman')}</label>
-                          <Select options={KeyManForSelection} value={selectedKeyMan}  onChange={handleSelectKeyMan} />
+                        <div className="col-sm-6  d-flex">
+                          <label className="col-form-label  col-sm-4" style={{fontWeight:'bold'}}>{t('lead.is_keyman')}</label>
+                          <Select className = "col-sm-8" options={KeyManForSelection} value={selectedKeyMan}  onChange={handleSelectKeyMan} />
                         </div>
                       </div>
                       <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('lead.lead_status')}</label>
-                          <Select options={LeadStatusSelection} value={selectedLeadStatus}  onChange={handleSelectedLeadStatus} />
+                        <div className="col-sm-6 d-flex">
+                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('lead.lead_status')}</label>
+                          <Select className= "col-sm-8" options={LeadStatusSelection} value={selectedLeadStatus}  onChange={handleSelectedLeadStatus} />
                         </div>
                       </div>
                       {/* <div className="form-group row">
@@ -587,13 +587,13 @@ const Leads = () => {
                         </div>
                       </div> */}
                       <h4>{t('lead.company_information')}</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.company_name')}</label>
-                          <Select options={companyData} value={selectedOption} onChange={handleSelectCompany} />
+                      <div className="form-group row" >
+                        <div className="col-sm-6 d-flex " >
+                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('company.company_name')}</label>
+                          <Select  className="col-sm-8" options={companyData} value={selectedOption} onChange={handleSelectCompany} />
                         </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('lead.position')}</label>
+                        <div className="col-sm-6 d-flex" >
+                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold' }}>{t('lead.position')}</label>
                           <input
                             type="text"
                             className="form-control form-control-sm"
@@ -604,8 +604,8 @@ const Leads = () => {
                         </div>
                       </div>
                       <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('lead.department')}</label>
+                        <div className="col-sm-6 d-flex">
+                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('lead.department')}</label>
                           <input
                             type="text"
                             className="form-control form-control-sm"
@@ -614,8 +614,8 @@ const Leads = () => {
                             onChange={handleLeadChange}
                           />
                         </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.group')}</label>
+                        <div className="col-sm-6 d-flex">
+                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('company.group')}</label>
                           <input
                             type="text"
                             className="form-control form-control-sm"
@@ -627,8 +627,8 @@ const Leads = () => {
                       </div>
                       
                       <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('common.region')}</label>
+                        <div className="col-sm-6 d-flex">
+                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('common.region')}</label>
                           <input
                             type="text"
                             className="form-control form-control-sm"
@@ -640,8 +640,8 @@ const Leads = () => {
                       </div>
                       <h4>{t('common.contact_details')}</h4>
                       <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('lead.mobile')}</label>
+                        <div className="col-sm-6 d-flex">
+                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('lead.mobile')}</label>
                           <input
                             type="text"
                             className="form-control form-control-sm"
@@ -650,8 +650,8 @@ const Leads = () => {
                             onChange={handleLeadChange}
                           />
                         </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('lead.email')}</label>
+                        <div className="col-sm-6 d-flex">
+                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('lead.email')}</label>
                           <input
                             type="text"
                             className="form-control form-control-sm"
@@ -662,8 +662,8 @@ const Leads = () => {
                         </div>
                       </div>
                       <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.phone_number')}</label>
+                        <div className="col-sm-6 d-flex">
+                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('company.phone_number')}</label>
                           <input
                             type="text"
                             className="form-control form-control-sm"
@@ -672,8 +672,8 @@ const Leads = () => {
                             onChange={handleLeadChange}
                           />
                         </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.fax_number')}</label>
+                        <div className="col-sm-6 d-flex">
+                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('company.fax_number')}</label>
                           <input
                             type="text"
                             className="form-control form-control-sm"
@@ -684,8 +684,8 @@ const Leads = () => {
                         </div>
                       </div>
                       <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.homepage')}</label>
+                        <div className="col-sm-6 d-flex">
+                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('company.homepage')}</label>
                           <input
                             type="text"
                             className="form-control form-control-sm"
@@ -697,10 +697,8 @@ const Leads = () => {
                       </div>
                       <h4>{t('common.additional_information')}</h4>
                       <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">
-                            {t('company.salesman')}{" "}
-                          </label>
+                        <div className="col-sm-6 d-flex">
+                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('company.salesman')}</label>
                           <input
                             type="text"
                             className="form-control form-control-sm"
@@ -709,10 +707,8 @@ const Leads = () => {
                             onChange={handleLeadChange}
                           />
                         </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">
-                            {t('company.engineer')}
-                          </label>
+                        <div className="col-sm-6 d-flex">
+                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('company.engineer')}</label>
                           <input
                             type="text"
                             className="form-control form-control-sm"
