@@ -1,6 +1,6 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentPurchase, atomAllPurchases } from '../atoms/atoms';
+import { atomCurrentPurchase, atomAllPurchases, atomCompanyPurchases } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
@@ -18,6 +18,28 @@ export const PurchaseRepo = selector({
                     return;
                 }
                 set(atomAllPurchases, data);
+            }
+            catch(err){
+                console.error(`loadAllCompanies / Error : ${err}`);
+            };
+        });
+        const loadCompanyPurchases = getCallback(({set}) => async (company_code) => {
+            const input_json = {company_code:company_code};
+            //JSON.stringify(company_code);
+            try{
+                const response = await fetch(`${BASE_PATH}/companyPurchases`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify(input_json),
+                });
+
+                const data = await response.json();
+                if(data.message){
+                    console.log('loadCompanyPurchases message:', data.message);
+                    set(atomCompanyPurchases, input_json);
+                    return;
+                }
+                set(atomCompanyPurchases, data);
             }
             catch(err){
                 console.error(`loadAllCompanies / Error : ${err}`);
@@ -98,6 +120,7 @@ export const PurchaseRepo = selector({
         });
         return {
             loadAllPurchases,
+            loadCompanyPurchases,
             modifyPurchase,
             setCurrentPurchase,
         };

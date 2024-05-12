@@ -81,6 +81,7 @@ const koResource = {
             receiver: '상담 진행자',
             request_type: '요청 유형',
             type: '상담 유형',
+            receipt_date:'접수 일자',
         },
         quotation : {
             add_new_quotation: '견적 등록',

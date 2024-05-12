@@ -42,9 +42,9 @@ const LeadsDetailsModel = () => {
   const [ editedValuesCompany, setEditedValuesCompany ] = useState(null);
   const [ savedValuesCompany, setSavedValuesCompany ] = useState(null);
   const [activeTab, setActiveTab] = useState(""); // 상태 관리를 위한 useState
-  const [expanded, setExpaned] = useState(false);
   const [statusSearch, setStatusSearch] = useState("");
   const [searchCondition, setSearchCondition] = useState("");
+  const [searchQuotationCondition, setSearchQuotationCondition] = useState("");
   const { loadCompanyConsultings, filterConsulting, setCurrentConsulting} = useRecoilValue(ConsultingRepo);
   const { loadCompanyQuotations, setCurrentQuotation} = useRecoilValue(QuotationRepo);
   
@@ -56,20 +56,15 @@ const [selectedRow, setSelectedRow] = useState(null);
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
+    console.log("handleSearchCondition", searchCondition)
+    filterConsulting(newValue);  // filterLeads(newValue);
+  };
+
+  const handleSearchQuotationCondition = (newValue)=> {
+    setSearchCondition(newValue);
     console.log("handleSearchCondition",statusSearch, searchCondition)
     filterConsulting(statusSearch, newValue);  // filterLeads(newValue);
   };
-
-  const handleStatusSearch = (newValue) => {
-    setStatusSearch(newValue);
-    if(newValue === "All"){
-      loadCompanyConsultings(selectedLead.company_code); 
-      setSearchCondition("");
-    }else{
-      filterConsulting(newValue, searchCondition);
-    }
-    setExpaned(false);
-  }
 
   const handleCheckEditState = useCallback((name) => {
     return editedValues !== null && name in editedValues;
@@ -528,7 +523,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                             to="#not-contact-task-consult"
                             data-bs-toggle="tab"
                           >
-                            {t('lead.consulting_history') +' (' + companyConsultings.length +')'}
+                            {t('lead.consulting_history')+'('} { companyConsultings.length === undefined ? 0:companyConsultings.length }{')'}
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -537,7 +532,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                             to="#not-contact-task-quotation"
                             data-bs-toggle="tab"
                           >
-                            {t('lead.quotation_history')}
+                            {t('lead.quotation_history')+'('} { companyQuotations.length === undefined ? 0:companyQuotations.length }{')'}
                           </Link>
                         </li>   
                         <li className="nav-item">
@@ -1157,17 +1152,6 @@ const [selectedRow, setSelectedRow] = useState(null);
                             <thead>
                               <tr>
                                 <div className="row">
-                                  <div className="text-start" style={{width:'80px'}}>
-                                    <div className="dropdown">
-                                      <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> Status</button>
-                                        <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
-                                          <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('All')}>All</button>
-                                          <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('접수')}>접수</button>
-                                          <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('진행중')}>진행</button>
-                                          <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('완료')}>완료</button>
-                                        </div>
-                                    </div>
-                                  </div>
                                   <div className="col text-start" style={{width:'200px'}}>
                                     <input
                                       id = "searchCondition"
@@ -1175,18 +1159,17 @@ const [selectedRow, setSelectedRow] = useState(null);
                                       type="text"
                                       value={searchCondition}
                                       onChange ={(e) => handleSearchCondition(e.target.value)}
-                                      placeholder="Lead Name, Receiver" 
                                       style={{width:'300px', display: 'inline'}}
                                     />  
                                   </div>
                                 </div>
                               </tr>
                               <tr>
-                                <th>Type</th>
-                                <th>Date/Time</th>
-                                <th>Status</th>
-                                <th>Receiver</th>
-                                <th className="text-end">Lead Name</th>
+                                <th>{t('consulting.type')}</th>
+                                <th>{t('consulting.receipt_date')}</th>
+                                <th>{t('common.status')}</th>
+                                <th>{t('consulting.receiver')}</th>
+                                <th className="text-end">{t('lead.lead_name')}</th>
                               </tr>
                             </thead>
                             {
@@ -1261,11 +1244,11 @@ const [selectedRow, setSelectedRow] = useState(null);
                                 <div className="row">
                                   <div className="col text-start" style={{width:'200px'}}>
                                     <input
-                                      id = "searchCondition"
+                                      id = "searchQuotationCondition"
                                       className="form-control" 
                                       type="text"
-                                      value={searchCondition}
-                                      onChange ={(e) => handleSearchCondition(e.target.value)}
+                                      value={searchQuotationCondition}
+                                      onChange ={(e) => handleSearchQuotationCondition(e.target.value)}
                                       placeholder="Lead Name, Receiver" 
                                       style={{width:'300px', display: 'inline'}}
                                     />  
@@ -1278,6 +1261,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                                 <th>{t('quotation.quotation_date')}</th>
                                 <th>{t('lead.full_name')}</th>
                                 <th>{t('quotation.quotation_manager')}</th>
+                                <th>{t('quotation.total_quotation_amount')}</th>
                               </tr>
                             </thead>
                             {
@@ -1302,7 +1286,8 @@ const [selectedRow, setSelectedRow] = useState(null);
                                       <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
                                       </td>
                                       <td>{quotation.lead_name}</td>
-                                      <td className="text-end">{quotation.quotation_manager}</td>
+                                      <td>{quotation.quotation_manager}</td>
+                                      <td className="text-end">{quotation.total_quotation_amount}</td>
                                   </tr>
                                   </React.Fragment>
                                 )}

@@ -81,6 +81,7 @@ const enResource = {
             request_content: 'Consulting Content',
             request_type: 'Request Type',
             type:'Consulting Type',
+            receipt_date:'Receipt Date',
         },
         quotation : {
             add_new_quotation: 'Add New Quotation',

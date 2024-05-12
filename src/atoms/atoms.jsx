@@ -310,3 +310,8 @@ export const atomAllPurchases = atom({
     key: "allPurchases",
     default: [],
 });
+
+export const atomCompanyPurchases = atom({
+    key: "companyPurchases",
+    default: [],
+});
