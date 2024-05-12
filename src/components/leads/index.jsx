@@ -552,7 +552,6 @@ const Leads = () => {
                 <div className="row">
                   <div className="col-md-12">
                     <form id="add_new_lead_form">
-                      <h4>{t('lead.lead_information')}</h4>
                       <div className="form-group row">
                         <div className="col-sm-6  d-flex" >
                           <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('common.name')} <span className="text-danger">*</span></label>
@@ -586,7 +585,6 @@ const Leads = () => {
                           />
                         </div>
                       </div> */}
-                      <h4>{t('lead.company_information')}</h4>
                       <div className="form-group row" >
                         <div className="col-sm-6 d-flex " >
                           <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('company.company_name')}</label>
@@ -638,7 +636,6 @@ const Leads = () => {
                           />
                         </div>
                       </div>
-                      <h4>{t('common.contact_details')}</h4>
                       <div className="form-group row">
                         <div className="col-sm-6 d-flex">
                           <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('lead.mobile')}</label>
@@ -695,7 +692,6 @@ const Leads = () => {
                           />
                         </div>
                       </div>
-                      <h4>{t('common.additional_information')}</h4>
                       <div className="form-group row">
                         <div className="col-sm-6 d-flex">
                           <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('company.salesman')}</label>
