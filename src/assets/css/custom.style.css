@@ -67,6 +67,7 @@
 .detail-edit-label {
     display: block;
     width: 100%;
+    margin: 0;
     padding: 0.15rem 0.5rem;
     font-size: 0.8rem;
     font-weight: 400;
@@ -125,4 +126,10 @@
     background-color: #f0ecec;
     justify-content: center;
     align-items: center;
+}
+.detail-card-before {
+    border: 0;
+    padding: 0;
+    width: 80px;
+    font-weight: 600;
 }

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Collapse } from "antd";
+import { Collapse, Space, Switch } from "antd";
 import { C_logo, C_logo2, CircleImg } from "../imagepath";
 import { atomAllConsultings, atomAllLeads, atomAllPurchases, atomAllQuotations, atomAllTransactions, atomCurrentCompany, defaultCompany } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
@@ -12,9 +12,7 @@ import { ConsultingRepo } from "../../repository/consulting";
 import { QuotationRepo } from "../../repository/quotation";
 import { TransactionRepo } from "../../repository/transaction";
 import { PurchaseRepo } from "../../repository/purchase";
-import DetailLabelItem from "../../constants/DetailLabelItem";
-import DetailDateItem from "../../constants/DetailDateItem";
-import DetailTextareaItem from "../../constants/DetailTextareaItem";
+import DetailCardItem from "../../constants/DetailCardItem";
 import { MoreVert } from "@mui/icons-material";
 
 const CompanyDetailsModel = () => {
@@ -32,6 +30,7 @@ const CompanyDetailsModel = () => {
   const allPurchases = useRecoilValue(atomAllPurchases);
   const { loadAllPurchases } = useRecoilValue(PurchaseRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+  const { t } = useTranslation();
 
   const [ editedValues, setEditedValues ] = useState(null);
   const [ savedValues, setSavedValues ] = useState(null);
@@ -46,8 +45,7 @@ const CompanyDetailsModel = () => {
   const [ transactionByCompany, setTransactionByCompany] = useState([]);
   const [ purchaseByCompany, setPurchaseByCompany] = useState([]);
   const [ expandRelated, setExpandRelated ] = useState([]);
-
-  const { t } = useTranslation();
+  const [ isFullscreen, setIsFullscreen ] = useState(false);
 
   // --- Funtions for Editing ---------------------------------
   const handleCheckEditState = useCallback((name) => {
@@ -209,7 +207,35 @@ const CompanyDetailsModel = () => {
       ];
     };
     setExpandRelated(tempExpanded);
-  }, [expandRelated, leadsByCompany, consultingByCompany, quotationByCompany, transactionByCompany, purchaseByCompany])
+  }, [expandRelated, leadsByCompany, consultingByCompany, quotationByCompany, transactionByCompany, purchaseByCompany]);
+
+  const handleWidthChange = useCallback((checked) => {
+    setIsFullscreen(checked);
+  }, []);
+
+  const company_items_info = [
+    ['company_address','company.address',{ type:'label', extra:'long' }],
+    ['company_phone_number','company.phone_number',{ type:'label' }],
+    ['company_zip_code','company.zip_code',{ type:'label' }],
+    ['company_fax_number','company.fax_number',{ type:'label' }],
+    ['homepage','company.homepage',{ type:'label' }],
+    ['company_scale','company.company_scale',{ type:'label' }],
+    ['deal_type','company.deal_type',{ type:'label' }],
+    ['industry_type','company.industry_type',{ type:'label' }],
+    ['business_type','company.business_type',{ type:'label' }],
+    ['business_item','company.business_item',{ type:'label' }],
+    ['establishment_date','company.establishment_date',
+      { type:'date', orgTimeData: orgEstablishDate, timeData: establishDate, timeDataChange: handleEstablishDateChange, startEditTime: handleStartEstablishDateEdit, endEditTime: handleEndEstablishDateEdit }
+    ],
+    ['ceo_name','company.ceo_name',{ type:'label' }],
+    ['account_code','company.account_code',{ type:'label' }],
+    ['bank_name','company.bank_name',{ type:'label' }],
+    ['account_owner','company.account_owner',{ type:'label' }],
+    ['sales_resource','company.salesman',{ type:'label' }],
+    ['application_engineer','company.engineer',{ type:'label' }],
+    ['region','common.region',{ type:'label' }],
+    ['memo','common.memo',{ type:'textarea', extra:'long' }],
+  ]
 
   useEffect(() => {
     console.log('[CompanyDetailsModel] called!');
@@ -256,7 +282,7 @@ const CompanyDetailsModel = () => {
       role="dialog"
       aria-modal="true"
     >
-      <div className="modal-dialog" role="document">
+      <div className={isFullscreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
         <button
           type="button"
           className="close md-close"
@@ -268,47 +294,32 @@ const CompanyDetailsModel = () => {
         <div className="modal-content">
           <div className="modal-header">
             <div className="row w-100">
-              <div className="col-md-7 account d-flex">
+              <div className="col-md-4 account d-flex">
                 <div className="company_img">
                   <img src={C_logo} alt="User" className="user-image" />
                 </div>
                 <div>
-                  <p className="mb-0">{t('company.company')}</p>
+                  <p className="mb-0"><b>{t('company.company')}</b></p>
                   <span className="modal-title">
                     {selectedCompany.company_name}
                   </span>
-                  <span className="rating-star">
-                    <i className="fa fa-star" aria-hidden="true" />
-                  </span>
-                  <span className="lock">
-                    <i className="fa fa-lock" aria-hidden="true" />
-                  </span>
                 </div>
               </div>
+              <div className="col-md-4">
+                <span><b>{t('company.eng_company_name')}</b></span>
+                <p>{selectedCompany.company_name_eng}</p>
+              </div>
+              <div className="col-md-4">
+                <span><b>{t('company.business_registration_code')}</b></span>
+                <p>{selectedCompany.business_registration_code}</p> 
+              </div>
             </div>
+            <Switch checkedChildren="full" onChange={handleWidthChange}/>
             <button
               type="button"
               className="btn-close xs-close"
               data-bs-dismiss="modal"
             />
-          </div>
-          <div className="card due-dates">
-            <div className="card-body">
-              <div className="row">
-                <div className="col">
-                  <span>{t('company.company_name')}</span>
-                  <p>{selectedCompany.company_name}</p>
-                </div>
-                <div className="col">
-                  <span>{t('company.eng_company_name')}</span>
-                  <p>{selectedCompany.company_name_eng}</p>
-                </div>
-                <div className="col">
-                  <span>{t('company.business_registration_code')}</span>
-                  <p>{selectedCompany.business_registration_code}</p> 
-                </div>
-              </div>
-            </div>
           </div>
           <div className="modal-body">
             <div className="task-infos">
@@ -353,317 +364,31 @@ const CompanyDetailsModel = () => {
               <div className="tab-content">
                 <div className="tab-pane show active" id="task-details">
                   <div className="crms-tasks">
-                  <div className="tasks__item crms-task-item">
-                      <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                        <Panel header= {t('company.address')} key="1">
-                          <table className="table">
-                            <tbody>
-                              <DetailLabelItem
-                                defaultText={selectedCompany.company_address}
-                                saved={savedValues}
-                                name="company_address"
-                                title= {t('company.address')}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailLabelItem
-                                defaultText={selectedCompany.company_zip_code}
-                                saved={savedValues}
-                                name="company_zip_code"
-                                title= {t('company.zip_code')}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailLabelItem
-                                defaultText={selectedCompany.company_phone_number}
-                                saved={savedValues}
-                                name="company_phone_number"
-                                title= {t('company.phone_number')} 
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailLabelItem
-                                defaultText={selectedCompany.company_fax_number}
-                                saved={savedValues}
-                                name="company_fax_number"
-                                title= {t('company.fax_number')}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailLabelItem
-                                defaultText={selectedCompany.homepage}
-                                saved={savedValues}
-                                name="homepage"
-                                title= {t('company.homepage')}
-                                no_border={true}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                            </tbody>
-                          </table>
-                        </Panel>
-                      </Collapse>
-                    </div>
-                    <div className="tasks__item crms-task-item active">
-                      <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                        <Panel header= {t('company.company_details')}  key="1">
-                          <table className="table">
-                            <tbody>
-                              <DetailLabelItem
-                                defaultText={selectedCompany.group_}
-                                saved={savedValues}
-                                name="group_"
-                                title={t('company.group')}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailLabelItem
-                                defaultText={selectedCompany.company_scale}
-                                saved={savedValues}
-                                name="company_scale"
-                                title={t('company.company_scale')}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailLabelItem
-                                defaultText={selectedCompany.deal_type}
-                                saved={savedValues}
-                                name="deal_type"
-                                title={t('company.deal_type')}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailLabelItem
-                                defaultText={selectedCompany.business_registration_code}
-                                saved={savedValues}
-                                name="business_registration_code"
-                                title={t('company.business_registration_code')}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailDateItem
-                                saved={savedValues}
-                                name="establishment_date"
-                                title={t('company.establishment_date')}
-                                orgTimeData={orgEstablishDate}
-                                timeData={establishDate}
-                                timeDataChange={handleEstablishDateChange}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEstablishDateEdit}
-                                endEdit={handleEndEstablishDateEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailDateItem
-                                saved={savedValues}
-                                name="closure_date"
-                                title={t('company.closure_date')}
-                                orgTimeData={orgCloseDate}
-                                timeData={closeDate}
-                                timeDataChange={handleCloseDateChange}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartCloseDateEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndCloseDateEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailLabelItem
-                                defaultText={selectedCompany.ceo_name}
-                                saved={savedValues}
-                                name="ceo_name"
-                                title={t('company.ceo_name')}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailLabelItem
-                                defaultText={selectedCompany.business_type}
-                                saved={savedValues}
-                                name="business_type"
-                                title= {t('company.business_type')}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailLabelItem
-                                defaultText={selectedCompany.business_item}
-                                saved={savedValues}
-                                name="business_item"
-                                title= {t('company.business_item')}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailLabelItem
-                                defaultText={selectedCompany.industry_type}
-                                saved={savedValues}
-                                name="industry_type"
-                                title= {t('company.industry_type')}
-                                no_border={true}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                            </tbody>
-                          </table>
-                        </Panel>
-                      </Collapse>
-                    </div>
                     <div className="tasks__item crms-task-item">
-                      <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                        <Panel header= {t('common.additional_information')} key="1">
-                          <table className="table">
-                            <tbody>
-                              <DetailLabelItem
-                                defaultText={selectedCompany.account_code}
-                                saved={savedValues}
-                                name="account_code"
-                                title= {t('company.account_code')}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailLabelItem
-                                defaultText={selectedCompany.bank_name}
-                                saved={savedValues}
-                                name="bank_name"
-                                title= {t('company.bank_name')} 
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailLabelItem
-                                defaultText={selectedCompany.account_owner}
-                                saved={savedValues}
-                                name="account_owner"
-                                title= {t('company.account_owner')}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailLabelItem
-                                defaultText={selectedCompany.sales_resource}
-                                saved={savedValues}
-                                name="sales_resource"
-                                title= {t('company.salesman')}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailLabelItem
-                                defaultText={selectedCompany.application_engineer}
-                                saved={savedValues}
-                                name="application_engineer"
-                                title= {t('company.engineer')}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                              <DetailLabelItem
-                                defaultText={selectedCompany.region}
-                                saved={savedValues}
-                                name="region"
-                                title= {t('common.region')}
-                                no_border={true}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                            </tbody>
-                          </table>
-                        </Panel>
-                      </Collapse>
-                    </div>
-                    <div className="tasks__item crms-task-item">
-                      <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                        <Panel header= {t('common.memo')}  key="1">
-                          <table className="table">
-                            <tbody>
-                              <DetailTextareaItem
-                                defaultText={selectedCompany.memo}
-                                saved={savedValues}
-                                name="memo"
-                                title= {t('company.memo')}
-                                row_no={3}
-                                no_border={true}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
-                                editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
-                              />
-                            </tbody>
-                          </table>
-                        </Panel>
-                      </Collapse>
+                      <Space
+                        align="start"
+                        direction="horizontal"
+                        size="small"
+                        style={{ display: 'flex', marginBottom: '0.5rem' }}
+                        wrap
+                      >
+                        { company_items_info.map((item, index) => 
+                          <DetailCardItem
+                            key={index}
+                            defaultText={selectedCompany[item.at(0)]}
+                            saved={savedValues}
+                            name={item.at(0)}
+                            title={t(item.at(1))}
+                            detail={item.at(2)}
+                            checkEdit={handleCheckEditState}
+                            startEdit={handleStartEdit}
+                            editing={handleEditing}
+                            endEdit={handleEndEdit}
+                            checkSaved={handleCheckSaved}
+                            cancelSaved={handleCancelSaved}
+                          />
+                        )}
+                      </Space>
                     </div>
                   </div>
                 </div>
