@@ -167,7 +167,7 @@ const Consultings = () => {
         <>
           <a href="#"
             data-bs-toggle="modal"
-            data-bs-target="#consultings-details"
+            data-bs-target="#consulting-details"
             onClick={()=>{
               console.log("[Consulting] set current consulting : ", record.consulting_code);
               setCurrentConsulting(record.consulting_code);

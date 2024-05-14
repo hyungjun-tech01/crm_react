@@ -1183,7 +1183,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                                         <ExpandMore  onClick={() => handleRowClick(consulting)}/>
                                         <a href="#"
                                           data-bs-toggle="modal"
-                                          data-bs-target="#consultings-details"
+                                          data-bs-target="#consulting-details"
                                           onClick={()=>{
                                             console.log('showConsultingDetail', consulting.consulting_code);
                                             setCurrentConsulting(consulting.consulting_code);

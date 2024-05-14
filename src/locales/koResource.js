@@ -82,6 +82,7 @@ const koResource = {
             request_type: '요청 유형',
             type: '상담 유형',
             receipt_date:'접수 일자',
+            status: '상담 상태',
         },
         quotation : {
             add_new_quotation: '견적 등록',
