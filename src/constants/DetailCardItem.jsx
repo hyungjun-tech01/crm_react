@@ -5,7 +5,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const DateInput = (props) => {
-    const { addonBefore, addonAfter, style, value, change, format, showTimeSelet, name } = props;
+    const { name, addonBefore, addonAfter, change, format, showTime, style, value } = props;
     return (
         <div class="ant-space-item">
             <span className='ant-input-group-wrapper
@@ -17,14 +17,23 @@ const DateInput = (props) => {
                     <span className='ant-input-group-addon'>
                         {addonBefore}
                     </span>
-                    <DatePicker
-                        className="ant-input ant-input-group-wrapper-outlined detail-input-extra"
-                        name={ name }
-                        selected={ value }
-                        onChange={ change }
-                        dateFormat={ format }
-                        showTimeSelect={showTimeSelet}
-                    />
+                    {showTime ? 
+                        <DatePicker
+                            className="ant-input css-dev-only-do-not-override-1uweeqc ant-input-outlined"
+                            name={ name }
+                            selected={ value }
+                            onChange={ change }
+                            dateFormat={ format }
+                            showTimeSelect
+                        /> :
+                        <DatePicker
+                            className="ant-input css-dev-only-do-not-override-1uweeqc ant-input-outlined"
+                            name={ name }
+                            selected={ value }
+                            onChange={ change }
+                            dateFormat={ format }
+                        />
+                    }
                     <span className='ant-input-group-addon'>
                         {addonAfter}
                     </span>
@@ -35,7 +44,7 @@ const DateInput = (props) => {
 };
 
 const TextareaInput = (props) => {
-    const { addonBefore, addonAfter, style, row_no, title, value, change, disabled, name } = props;
+    const { name, addonBefore, addonAfter, style, row_no, title, value, change, disabled } = props;
     return (
         <div class="ant-space-item">
             <span className='ant-input-group-wrapper
@@ -45,20 +54,21 @@ const TextareaInput = (props) => {
             >
                 <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-1uweeqc'>
                     <span className='ant-input-group-addon'>
-                        {addonBefore}
+                        { addonBefore }
                     </span>
                     <textarea
                         className="ant-input detail-input-extra"
                         name={ name }
                         rows={ row_no }
                         placeholder={ title }
-                        defaultValue={ value }
                         onChange={ change }
                         disabled={ disabled ? true : false}
                         style={{ backgroundColor: 'white' }}
-                    />
+                    >
+                        { value }
+                    </textarea>
                     <span className='ant-input-group-addon'>
-                        {addonAfter}
+                        { addonAfter }
                     </span>
                 </span>
             </span>
@@ -96,7 +106,7 @@ const SelectInput = (props) => {
 };
 
 const DetailCardItem = (props) => {
-    const { defaultText, saved, name, title, detail,
+    const { defaultText, edited, saved, name, title, detail,
         checkEdit, startEdit, endEdit,
         editing, checkSaved, cancelSaved
     } = props;
@@ -105,12 +115,12 @@ const DetailCardItem = (props) => {
         if(detail.type === 'label') {
             return (
                 <Input
-                    name={name}
+                    name={ name }
                     addonBefore={ <div className='detail-card-before'>{title}</div> }
                     addonAfter={ <SaveAlt onClick={() => { endEdit(name); }}/>}
-                    defaultValue={ defaultText }
+                    value={ edited[name] }
                     style={ detail.extra === 'long' ? { width: 760 } : { width: 375}}
-                    onChange={editing}
+                    onChange={ editing }
                     onPressEnter={() => endEdit(name)}
                 />
             );
@@ -119,28 +129,28 @@ const DetailCardItem = (props) => {
             const timeformat = detail.time ? "yyyy-MM-dd hh:mm:ss" : "yyyy-MM-dd";
             return (
                 <DateInput
-                    name={name}
+                    name={ name }
                     addonBefore={ <div className='detail-card-before'>{title}</div> }
                     addonAfter={ <SaveAlt onClick={() => { detail.endEditTime(name); }}/> }
                     change={ detail.timeDataChange }
                     format={ timeformat }
+                    showTime={ detail.time }
                     style={{ width: 375 }}
-                    value={ detail.timeData ? detail.timeData : '' }
-                    showTimeSelect={ detail.time }
-                    onPressEnter={() => detail.endEditTime(name)}
+                    value={ detail.timeData }
                 />
             );
         };
         if(detail.type === 'textarea') {
             return (
                 <TextareaInput
-                    name={name}
+                    name={ name }
                     addonBefore={ <div className='detail-card-before'>{title}</div> }
                     addonAfter={ <SaveAlt onClick={() => { endEdit(name); }}/>}
                     style={ detail.extra === 'long' ? { width: 760 } : { width: 375}}
                     row_no={ detail.row_no ? detail.row_no : 2}
                     title={ title }
-                    change={editing}
+                    value={ edited[name] }
+                    change={ editing }
                     onPressEnter={() => endEdit(name)}
                 />
             );
@@ -227,6 +237,7 @@ const DetailCardItem = (props) => {
             />
         );
     };
+    
     return (
         <Input
             addonBefore={ <div className='detail-card-before'>{title}</div> }

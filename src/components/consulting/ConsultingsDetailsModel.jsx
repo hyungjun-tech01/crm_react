@@ -315,6 +315,7 @@ const ConsultingsDetailsModel = () => {
                                 <DetailCardItem
                                   key={index}
                                   defaultText={selectedConsulting[item.at(0)]}
+                                  edited={editedValues}
                                   saved={savedValues}
                                   name={item.at(0)}
                                   title={t(item.at(1))}
