@@ -7,7 +7,11 @@ import "react-datepicker/dist/react-datepicker.css";
 const DateInput = (props) => {
     const { addonBefore, addonAfter, styleValue, value, change, format, showTimeSelet } = props;
     return (
-        <span className='ant-input-group-wrapper ant-input-group-wrapper-outlined css-dev-only-do-not-override-1uweeqc' style={styleValue}>
+        <span className='ant-input-group-wrapper
+            ant-input-group-wrapper-outlined
+            css-dev-only-do-not-override-1uweeqc'
+            style={styleValue}
+        >
             <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-1uweeqc'>
                 <span className='ant-input-group-addon'>
                     {addonBefore}

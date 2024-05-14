@@ -13,6 +13,7 @@ import { QuotationRepo } from "../../repository/quotation";
 import { TransactionRepo } from "../../repository/transaction";
 import { PurchaseRepo } from "../../repository/purchase";
 import DetailCardItem from "../../constants/DetailCardItem";
+import DetailTitleItem from "../../constants/DetailTitleItem";
 import { MoreVert } from "@mui/icons-material";
 
 const CompanyDetailsModel = () => {
@@ -305,14 +306,30 @@ const CompanyDetailsModel = () => {
                   </span>
                 </div>
               </div>
-              <div className="col-md-4">
-                <span><b>{t('company.eng_company_name')}</b></span>
-                <p>{selectedCompany.company_name_eng}</p>
-              </div>
-              <div className="col-md-4">
-                <span><b>{t('company.business_registration_code')}</b></span>
-                <p>{selectedCompany.business_registration_code}</p> 
-              </div>
+              <DetailTitleItem
+                defaultText={selectedCompany.company_name_eng}
+                saved={savedValues}
+                name='company_name_eng'
+                title={t('company.eng_company_name')}
+                checkEdit={handleCheckEditState}
+                startEdit={handleStartEdit}
+                endEdit={handleEndEdit}
+                editing={handleEditing}
+                checkSaved={handleCheckSaved}
+                cancelSaved={handleCancelSaved}
+              />
+              <DetailTitleItem
+                defaultText={selectedCompany.business_registration_code}
+                saved={savedValues}
+                name='company_name_eng'
+                title={t('company.business_registration_code')}
+                checkEdit={handleCheckEditState}
+                startEdit={handleStartEdit}
+                endEdit={handleEndEdit}
+                editing={handleEditing}
+                checkSaved={handleCheckSaved}
+                cancelSaved={handleCancelSaved}
+              />
             </div>
             <Switch checkedChildren="full" onChange={handleWidthChange}/>
             <button
