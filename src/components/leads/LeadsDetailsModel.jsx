@@ -2,23 +2,24 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
-import { CircleImg, SystemUser } from "../imagepath";
-import { Collapse } from "antd";
+import { CircleImg } from "../imagepath";
+import { Collapse, Space, Switch } from "antd";
 import { atomCurrentLead, defaultLead, atomCurrentCompany, defaultCompany, atomCompanyConsultings,atomFilteredConsulting, atomCompanyQuotations } from "../../atoms/atoms";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { CompanyRepo} from "../../repository/company";
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
-import DetailSelectItem from "../../constants/DetailSelectItem";
 import { Avatar } from "@mui/material";
 import DetailDateItem from "../../constants/DetailDateItem";
-import {ConsultingRepo} from "../../repository/consulting"
-import {QuotationRepo} from "../../repository/quotation"
-import {ExpandMore} from "@mui/icons-material";
+import { ConsultingRepo } from "../../repository/consulting"
+import { QuotationRepo } from "../../repository/quotation"
+import { ExpandMore } from "@mui/icons-material";
 import ConsultingsDetailsModel from "../consulting/ConsultingsDetailsModel";
 import QuotationsDetailsModel from "../quotations/QuotationsDetailsModel";
 import {  Edit } from '@mui/icons-material';
 import { useTranslation } from "react-i18next";
+import DetailCardItem from "../../constants/DetailCardItem";
+import DetailTitleItem from "../../constants/DetailTitleItem";
 
 
 const LeadsDetailsModel = () => {
@@ -47,6 +48,7 @@ const LeadsDetailsModel = () => {
   const [searchQuotationCondition, setSearchQuotationCondition] = useState("");
   const { loadCompanyConsultings, filterConsulting, setCurrentConsulting} = useRecoilValue(ConsultingRepo);
   const { loadCompanyQuotations, setCurrentQuotation} = useRecoilValue(QuotationRepo);
+  const [ isFullscreen, setIsFullscreen ] = useState(false);
   
   
   // 상태(state) 정의
@@ -346,6 +348,28 @@ const [selectedRow, setSelectedRow] = useState(null);
     }
   };
 
+  const handleWidthChange = useCallback((checked) => {
+    setIsFullscreen(checked);
+  }, []);
+
+  const lead_items_info = [
+    ['is_keyman','lead.is_keyman',{ type:'label'}],
+    ['department','lead.department',{ type:'label'}],
+    ['position','lead.position',{ type:'label'}],
+    ['email','lead.email',{ type:'label'}],
+    ['homepage','lead.homepage',{ type:'label'}],
+    ['group_','lead.lead_group',{ type:'label'}],
+    ['region','common.region',{ type:'label'}],
+    ['sales_resource','quotation.sales_rep',{ type:'label'}],
+    ['application_engineer','company.engineer',{ type:'label'}],
+    ['company_name','company.company_name',{ type:'label'}],
+    ['company_name_en','company.eng_company_name',{ type:'label'}],
+    ['company_zip_code','company.zip_code',{ type:'label'}],
+    ['company_address','company.address',{ type:'label'}],
+    ['company_phone_number','company.phone_number',{ type:'label'}],
+    ['company_fax_number','company.fax_number',{ type:'label'}],
+  ];
+
   useEffect(() => {
     console.log('[LeadsDetailsModel] called!');
     setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
@@ -361,57 +385,59 @@ const [selectedRow, setSelectedRow] = useState(null);
         role="dialog"
         aria-modal="true"
       >
-        <div className="modal-dialog" role="document">
+        <div className={isFullscreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
           <div className="modal-content">
             <div className="modal-header">
               <div className="row w-100">
-                <div className="col-md-7 account d-flex">
+                <div className="col-md-1 account d-flex">
                   <div className="company_img">
-                  <Avatar>{selectedLead.lead_name === null ? "":(selectedLead.lead_name).substring(0,1)}</Avatar>
-                  </div>
-                  <div>
-                    <span className="modal-title">{selectedLead.lead_name}</span>
-                    <span className="rating-star">
-                      <i className="fa fa-star" aria-hidden="true" />
-                    </span>
-                    <span className="lock">
-                      <i className="fa fa-lock" aria-hidden="true" />
-                    </span>
+                    <Avatar>{selectedLead.lead_name === null ? "":(selectedLead.lead_name).substring(0,1)}</Avatar>
                   </div>
                 </div>
+                <DetailTitleItem
+                  defaultText={ selectedLead.lead_name }
+                  saved={savedValues}
+                  name='status'
+                  title={t('lead.lead_name')}
+                  checkEdit={handleCheckEditState}
+                  startEdit={handleStartEdit}
+                  endEdit={handleEndEdit}
+                  editing={handleEditing}
+                  checkSaved={handleCheckSaved}
+                  cancelSaved={handleCancelSaved}
+                />
+                <DetailTitleItem
+                  defaultText={ selectedLead.mobile }
+                  saved={savedValues}
+                  name='status'
+                  title={t('lead.mobile')}
+                  checkEdit={handleCheckEditState}
+                  startEdit={handleStartEdit}
+                  endEdit={handleEndEdit}
+                  editing={handleEditing}
+                  checkSaved={handleCheckSaved}
+                  cancelSaved={handleCancelSaved}
+                />
+                <DetailTitleItem
+                  defaultText={ selectedLead.status ? selectedLead.status : "Not Contacted" }
+                  saved={savedValues}
+                  name='status'
+                  title={t('common.status')}
+                  checkEdit={handleCheckEditState}
+                  startEdit={handleStartEdit}
+                  endEdit={handleEndEdit}
+                  editing={handleEditing}
+                  checkSaved={handleCheckSaved}
+                  cancelSaved={handleCancelSaved}
+                />
               </div>
+              <Switch checkedChildren="full" onChange={handleWidthChange}/>
               <button
                 type="button"
                 className="btn-close xs-close"
                 data-bs-dismiss="modal"
-                onClick={()=>setCurrentLead()}
+                onClick={()=>setCurrentLead(defaultLead)}
               />
-            </div>
-            <div className="card due-dates">
-              <div className="card-body">
-                <div className="row">
-                  <div className="col">
-                    <span>{t('lead.lead_status')}</span>
-                    <p>{selectedLead.status=== null ? "Not Contacted":selectedLead.status}</p>
-                  </div>
-                  <div className="col">
-                    <span>{t('lead.lead_name')}</span>
-                    <p>{selectedLead.lead_name}</p>
-                  </div>
-                  <div className="col">
-                    <span>{t('company.company_name')}</span>
-                    <p>{selectedLead.company_name}</p>
-                  </div>
-                  <div className="col">
-                    <span>{t('company.salesman')}</span>
-                    <p>{selectedLead.sales_resource}</p>
-                  </div>
-                  <div className="col">
-                    <span>{t('company.homepage')}</span>
-                    <a href={selectedLead.homepage} target="_blank" rel="noopener noreferrer">{selectedLead.homepage}</a>
-                  </div>
-                </div>
-              </div>
             </div>
             <div className="modal-body">
               <div className="row">
@@ -550,235 +576,32 @@ const [selectedRow, setSelectedRow] = useState(null);
                           className="tab-pane show active p-0"
                           id="not-contact-task-details" >
                           <div className="crms-tasks">
-                            <div className="tasks__item crms-task-item active">
-                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                                <Panel header={t('lead.lead_information')} key="1">
-                                  <table className="table">
-                                    <tbody>
-                                      <DetailLabelItem
-                                        defaultText={selectedLead.lead_name}
-                                        saved={savedValues}
-                                        name="lead_name"
-                                        title={t('lead.lead_name')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedLead.position}
-                                        saved={savedValues}
-                                        name="position"
-                                        title={t('lead.position')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedLead.department}
-                                        saved={savedValues}
-                                        name="department"
-                                        title={t('lead.department')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedLead.company_name}
-                                        saved={savedValues}
-                                        name="company_name"
-                                        title={t('company.company_name')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailSelectItem
-                                        defaultText={selectedLead.is_keyman}
-                                        saved={savedValues}
-                                        name="is_keyman"
-                                        title={t('lead.is_keyman')}
-                                        options={KeyManForSelection}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        endEdit={handleEndEditKeyMan}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedLead.group_}
-                                        saved={savedValues}
-                                        name="group_"
-                                        title={t('lead.lead_group')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedLead.region}
-                                        saved={savedValues}
-                                        name="region"
-                                        title={t('common.region')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedLead.sales_resource}
-                                        saved={savedValues}
-                                        name="sales_resource"
-                                        title={t('company.salesman')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedLead.application_engineer}
-                                        saved={savedValues}
-                                        name="application_engineer"
-                                        title={t('company.engineer')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <tr>
-                                        <td className="detail-td-left border-0">{t('common.created')}</td>
-                                        <td className='border-0'>
-                                          {new Date(selectedLead.create_date).toLocaleDateString('ko-KR', {year:"numeric", month: 'short', day:'numeric'})}
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
-                            </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                                <Panel header={t('common.contact_details')} key="1">
-                                  <table className="table">
-                                    <tbody>
-                                      <DetailLabelItem
-                                        defaultText={selectedLead.email}
-                                        saved={savedValues}
-                                        name="email"
-                                        title={t('lead.email')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedLead.mobile_number}
-                                        saved={savedValues}
-                                        name="mobile_number"
-                                        title={t('lead.mobile')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedLead.homepage}
-                                        saved={savedValues}
-                                        name="homepage"
-                                        title={t('lead.homepage')}
-                                        no_border={true}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
-                            </div>
-                            <div className="tasks__item crms-task-item">
-                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                                <Panel header={t('company.address')} key="1">
-                                  <table className="table">
-                                    <tbody>
-                                      <DetailLabelItem
-                                        defaultText={selectedLead.company_address}
-                                        saved={savedValues}
-                                        name="company_address"
-                                        title={t('company.address')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedLead.company_zip_code}
-                                        saved={savedValues}
-                                        name="company_zip_code"
-                                        title={t('lead.zip_code')}
-                                        no_border={true}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
-                            </div>
-                            <div className="tasks__item crms-task-item">
-                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                                <Panel header={t('lead.lead_status')} key="1">
-                                  <table className="table">
-                                    <tbody>
-                                      <DetailTextareaItem
-                                        defaultText={selectedLead.status === null ? 'Not Contacted':selectedLead.status}
-                                        saved={savedValues}
-                                        name="status"
-                                        title={t('lead.lead_status')}
-                                        row_no={2}
-                                        no_border={true}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
+                              <Space
+                                align="start"
+                                direction="horizontal"
+                                size="small"
+                                style={{ display: 'flex', marginBottom: '0.5rem' }}
+                                wrap
+                              >
+                                { lead_items_info.map((item, index) => 
+                                  <DetailCardItem
+                                    key={index}
+                                    defaultText={selectedLead[item.at(0)]}
+                                    edited={editedValues}
+                                    saved={savedValues}
+                                    name={item.at(0)}
+                                    title={t(item.at(1))}
+                                    detail={item.at(2)}
+                                    checkEdit={handleCheckEditState}
+                                    startEdit={handleStartEdit}
+                                    editing={handleEditing}
+                                    endEdit={handleEndEdit}
+                                    checkSaved={handleCheckSaved}
+                                    cancelSaved={handleCancelSaved}
+                                  />
+                                )}
+                              </Space>
                             </div>
                           </div>
                         </div>

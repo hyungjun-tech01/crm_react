@@ -160,8 +160,11 @@ export const QuotationRepo = selector({
                     set(atomCurrentQuotation, defaultQuotation);
                     return;
                 };
-                const allQuotations = atomAllQuotations.length > 0 ? await snapshot.getPromise(atomAllQuotations) : await snapshot.getPromise(atomCompanyQuotations);
-                const selected_arrary = allQuotations.filter(quotation => quotation.quotation_code === quotation_code);
+                let queriedQotations = await snapshot.getPromise(atomAllQuotations);
+                if(queriedQotations.length === 0){
+                    queriedQotations = await snapshot.getPromise(atomCompanyQuotations);
+                };
+                const selected_arrary = queriedQotations.filter(quotation => quotation.quotation_code === quotation_code);
                 if(selected_arrary.length > 0){
                     set(atomCurrentQuotation, selected_arrary[0]);
                 }

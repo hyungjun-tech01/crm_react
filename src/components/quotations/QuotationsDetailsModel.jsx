@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { SystemUser } from "../imagepath";
-import { Collapse } from "antd";
+import { Collapse, Space, Switch } from "antd";
 import { atomCurrentQuotation, defaultQuotation } from "../../atoms/atoms";
 import { QuotationRepo } from "../../repository/quotation";
 import DetailLabelItem from "../../constants/DetailLabelItem";
-import DetailDateItem from "../../constants/DetailDateItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
+import DetailCardItem from "../../constants/DetailCardItem";
+import DetailTitleItem from "../../constants/DetailTitleItem";
 import QuotationView from "./QuotationtView";
 import { Add, Remove } from '@mui/icons-material';
 
@@ -18,7 +18,7 @@ const content_indices = ['3','4','5','6','7','8','9','10','11','12','13','14','1
 const QuotationsDetailsModel = () => {
   const { Panel } = Collapse;
   const selectedQuotation = useRecoilValue(atomCurrentQuotation);
-  const { modifyQuotation } = useRecoilValue(QuotationRepo);
+  const { modifyQuotation, setCurrentQuotation } = useRecoilValue(QuotationRepo);
   const [ cookies ] = useCookies(["myLationCrmUserId"]);
   const [ t ] = useTranslation();
 
@@ -39,6 +39,7 @@ const QuotationsDetailsModel = () => {
 
   const [ checkContentState, setCheckContentState ] = useState(null);
   const [ isNewlyAdded, setIsNewlyAdded ] = useState(false);
+  const [ isFullscreen, setIsFullscreen ] = useState(false);
 
   // --- Funtions for Quotation Date ----------------------------------------------------
   const handleStartQuotationDateEdit = useCallback(() => {
@@ -391,9 +392,51 @@ const QuotationsDetailsModel = () => {
     setQuotationContents(tempContents);
   }, []);
 
+  const handleWidthChange = useCallback((checked) => {
+    setIsFullscreen(checked);
+  }, []);
+
+  const qotation_items_info = [
+    ['quotation_type','quotation.quotation_type',{ type:'label'}],
+    ['quotation_manager','quotation.quotation_manager',{ type:'label'}],
+    ['quotation_send_type','quotation.send_type',{ type:'label' }],
+    ['quotation_date','quotation.quotation_date',
+      { type:'date', orgTimeData: orgQuotationDate, timeData: quotationDate, timeDataChange: handleQuotationDateChange, startEditTime: handleStartQuotationDateEdit, endEditTime: handleEndQuotationDateEdit }
+    ],
+    ['quotation_expiration_date','quotation.expiry_date',{ type:'label' }],
+    ['comfirm_date','quotation.confirm_date',
+      { type:'date', orgTimeData: orgConfirmDate, timeData: confirmDate, timeDataChange: handleConfirmDateChange, startEditTime: handleStartConfirmDateEdit, endEditTime: handleEndConfirmDateEdit }
+    ],
+    ['delivery_location','quotation.delivery_location',{ type:'label' }],
+    ['delivery_period','quotation.delivery_period',{ type:'label' }],
+    ['warranty_period','quotation.warranty',{ type:'label' }],
+    ['sales_representative','quotation.sales_rep',{ type:'label' }],
+    ['payment_type','quotation.payment_type',{ type:'label' }],
+    ['list_price','quotation.list_price',{ type:'label' }],
+    ['list_price_dc','quotation.list_price_dc',{ type:'label' }],
+    ['sub_total_amount','quotation.sub_total_amount',{ type:'label' }],
+    ['dc_rate','quotation.dc_rate',{ type:'label' }],
+    ['cutoff_amount','quotation.cutoff_amount',{ type:'label' }],
+    ['total_quotation_amount','quotation.total_quotation_amount',{ type:'label' }],
+    ['profit','quotation.profit_amount',{ type:'label' }],
+    ['profit_rate','quotation.profit_rate',{ type:'label' }],
+
+    ['upper_memo','quotation.upper_memo',{ type:'textarea', extra:'long' }],
+    ['lower_memo','quotation.lower_memo',{ type:'textarea', extra:'long' }],
+
+    ['lead_name','lead.lead_name',{ type:'label' }],
+    ['department','lead.department',{ type:'label' }],
+    ['position','lead.position',{ type:'label' }],
+    ['mobile_number','lead.mobile',{ type:'label' }],
+    ['phone_number','common.phone',{ type:'label' }],
+    ['fax_number','lead.fax_number',{ type:'label' }],
+    ['email','lead.email',{ type:'label' }],
+    ['company_name','company.company_name',{ type:'label' }],
+  ];
+
   // --- useEffect ------------------------------------------------------
   useEffect(() => {
-    console.log('[QuotationsDetailsModel] called!');
+    console.log('[QuotationsDetailsModel] called!', selectedQuotation);
     setOrgQuotationDate(
       selectedQuotation.quotation_date
         ? new Date(selectedQuotation.quotation_date)
@@ -439,49 +482,54 @@ const QuotationsDetailsModel = () => {
         role="dialog"
         aria-modal="true"
       >
-        <div className="modal-dialog" role="document">
+        <div className={isFullscreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
           <div className="modal-content">
             <div className="modal-header">
               <div className="row w-100">
-                <div className="col-md-7 account d-flex">
-                  <div className="company_img">
-                    <img src={SystemUser} alt="User" className="user-image" />
-                  </div>
-                  <div>
-                    <p className="mb-0">System User</p>
-                    <span className="modal-title">{' '}</span>
-                    <span className="rating-star">
-                      <i className="fa fa-star" aria-hidden="true" />
-                    </span>
-                    <span className="lock">
-                      <i className="fa fa-lock" aria-hidden="true" />
-                    </span>
-                  </div>
-                </div>
+                <DetailTitleItem
+                  defaultText={selectedQuotation.quotation_title}
+                  saved={savedValues}
+                  name='title'
+                  title={t('common.title')}
+                  checkEdit={handleCheckEditState}
+                  startEdit={handleStartEdit}
+                  endEdit={handleEndEdit}
+                  editing={handleEditing}
+                  checkSaved={handleCheckSaved}
+                  cancelSaved={handleCancelSaved}
+                />
+                <DetailTitleItem
+                  defaultText={selectedQuotation.quotation_number}
+                  saved={savedValues}
+                  name='quotation_number'
+                  title={t('quotation.doc_no')}
+                  checkEdit={handleCheckEditState}
+                  startEdit={handleStartEdit}
+                  endEdit={handleEndEdit}
+                  editing={handleEditing}
+                  checkSaved={handleCheckSaved}
+                  cancelSaved={handleCancelSaved}
+                />
+                <DetailTitleItem
+                  defaultText={selectedQuotation.status}
+                  saved={savedValues}
+                  name='status'
+                  title={t('common.status')}
+                  checkEdit={handleCheckEditState}
+                  startEdit={handleStartEdit}
+                  endEdit={handleEndEdit}
+                  editing={handleEditing}
+                  checkSaved={handleCheckSaved}
+                  cancelSaved={handleCancelSaved}
+                />
               </div>
+              <Switch checkedChildren="full" onChange={handleWidthChange}/>
               <button
                 type="button"
                 className="btn-close xs-close"
                 data-bs-dismiss="modal"
+                onClick={() => setCurrentQuotation()}
               />
-            </div>
-            <div className="card due-dates">
-              <div className="card-body">
-                <div className="row">
-                  <div className="col">
-                    <span>{t('quotation.quotation')} {t('common.status')}</span>
-                    <p>{selectedQuotation.status}</p>
-                  </div>
-                  <div className="col">
-                    <span>{t('common.name')}</span>
-                    <p>{selectedQuotation.lead_name}</p>
-                  </div>
-                  <div className="col">
-                    <span>{t('quotation.quotation_owner')}</span>
-                    <p>{selectedQuotation.sales_representative}</p>
-                  </div>
-                </div>
-              </div>
             </div>
             <div className="modal-body">
               <div className="tab-content pipeline-tabs border-0">
@@ -525,496 +573,32 @@ const QuotationsDetailsModel = () => {
 {/*---- Start -- Tab : Detail Quotation-------------------------------------------------------------*/}
                         <div className="tab-pane show active p-0" id="quotation-details">
                           <div className="crms-tasks">
-                            <div className="tasks__item crms-task-item active">
-                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                                <Panel header={t('quotation.quotation_main_information')} key="1">
-                                  <table className="table">
-                                    <tbody>
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.quotation_type}
-                                        saved={savedValues}
-                                        name="quotation_type"
-                                        title={t('quotation.quotation_type')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.quotation_title}
-                                        saved={savedValues}
-                                        name="quotation_title"
-                                        title={t('quotation.quotation')+' '+t('common.title')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.quotation_number}
-                                        saved={savedValues}
-                                        name="quotation_number"
-                                        title={t('quotation.doc_no')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.quotation_manager}
-                                        saved={savedValues}
-                                        name="quotation_manager"
-                                        title={t('quotation.quotation_manager')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.quotation_send_type}
-                                        saved={savedValues}
-                                        name="quotation_send_type"
-                                        title={t('quotation.send_type')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailDateItem
-                                        saved={savedValues}
-                                        name="quotation_date"
-                                        title={t('quotation.quotation_date')}
-                                        orgTimeData={orgQuotationDate}
-                                        timeData={quotationDate}
-                                        timeDataChange={handleQuotationDateChange}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartQuotationDateEdit}
-                                        endEdit={handleEndQuotationDateEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.quotation_expiration_date}
-                                        saved={savedValues}
-                                        name="quotation_expiration_date"
-                                        title={t('quotation.expiry_date')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailDateItem
-                                        saved={savedValues}
-                                        name="comfirm_date"
-                                        title={t('quotation.confirm_date')}
-                                        orgTimeData={orgConfirmDate}
-                                        timeData={confirmDate}
-                                        timeDataChange={handleConfirmDateChange}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartConfirmDateEdit}
-                                        endEdit={handleEndConfirmDateEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.delivery_location}
-                                        saved={savedValues}
-                                        name="delivery_location"
-                                        title={t('quotation.delivery_location')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.delivery_period}
-                                        saved={savedValues}
-                                        name="delivery_period"
-                                        title={t('quotation.delivery_period')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.warranty_period}
-                                        saved={savedValues}
-                                        name="warranty_period"
-                                        title={t('quotation.warranty')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.sales_representative}
-                                        saved={savedValues}
-                                        name="sales_representati"
-                                        title={t('quotation.sales_rep')}
-                                        no_border={true}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
-                            </div>
                             <div className="tasks__item crms-task-item">
-                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                                <Panel header={t('quotation.quotation_price_information')} key="1">
-                                  <table className="table">
-                                    <tbody>
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.payment_type}
-                                        saved={savedValues}
-                                        name="payment_type"
-                                        title={t('quotation.payment_type')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.currency}
-                                        saved={savedValues}
-                                        name="currency"
-                                        title={t('common.currency')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.list_price}
-                                        saved={savedValues}
-                                        name="list_price"
-                                        title={t('quotation.list_price')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.list_price_dc}
-                                        saved={savedValues}
-                                        name="list_price_dc"
-                                        title={t('quotation.list_price_dc')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.sub_total_amount}
-                                        saved={savedValues}
-                                        name="sub_total_amount"
-                                        title={t('quotation.sub_total_amount')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.dc_rate}
-                                        saved={savedValues}
-                                        name="dc_rate"
-                                        title={t('quotation.dc_rate')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.quotation_amount}
-                                        saved={savedValues}
-                                        name="quotation_amount"
-                                        title={t('quotation.quotation_amount')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.tax_amount}
-                                        saved={savedValues}
-                                        name="tax_amount"
-                                        title={t('quotation.tax_amount')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.cutoff_amount}
-                                        saved={savedValues}
-                                        name="cutoff_amount"
-                                        title={t('quotation.cutoff_amount')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.total_quotation_amount}
-                                        saved={savedValues}
-                                        name="total_quotation_amount"
-                                        title={t('quotation.total_quotation_amount')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.total_cost_price}
-                                        saved={savedValues}
-                                        name="total_cost_price"
-                                        title={t('quotation.total_quotation_amount')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.profit}
-                                        saved={savedValues}
-                                        name="profit"
-                                        title={t('quotation.profit_amount')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.profit_rate}
-                                        saved={savedValues}
-                                        name="profit_rate"
-                                        title={t('quotation.profit_rate')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailTextareaItem
-                                        defaultText={selectedQuotation.upper_memo}
-                                        saved={savedValues}
-                                        name="upper_memo"
-                                        title={t('quotation.upper_memo')}
-                                        row_no='3'
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailTextareaItem
-                                        defaultText={selectedQuotation.lower_memo}
-                                        saved={savedValues}
-                                        name="lower_memo"
-                                        title={t('quotation.lower_memo')}
-                                        row_no='5'
-                                        no_border={true}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
-                            </div>
-                            <div className="tasks__item crms-task-item">
-                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                                <Panel header={t('lead.lead') + ' ' + t('common.information')} key="1">
-                                  <table className="table">
-                                    <tbody>
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.lead_name}
-                                        saved={savedValues}
-                                        name="lead_name"
-                                        title={t('lead.lead_name')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.department}
-                                        saved={savedValues}
-                                        name="department"
-                                        title={t('lead.department')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.position}
-                                        saved={savedValues}
-                                        name="position"
-                                        title={t('lead.position')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.mobile_number}
-                                        saved={savedValues}
-                                        name="mobile_number"
-                                        title={t('lead.mobile')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.phone_number}
-                                        saved={savedValues}
-                                        name="phone_number"
-                                        title={t('common.phone')}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.fax_number}
-                                        saved={savedValues}
-                                        name="fax_number"
-                                        title="Fax"
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.email}
-                                        saved={savedValues}
-                                        name="email"
-                                        title={t('lead.email')}
-                                        no_border={true}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
-                            </div>
-                            <div className="tasks__item crms-task-item">
-                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                                <Panel header={t('company.company') + ' ' + t('common.information')} key="1">
-                                  <table className="table">
-                                    <tbody>
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.company_name}
-                                        saved={savedValues}
-                                        name="company_name"
-                                        title={t('company.company_name')}
-                                        no_border={true}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
-                            </div>
-                            <div className="tasks__item crms-task-item">
-                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                                <Panel header={t('common.status') + ' ' + t('common.information')} key="1">
-                                  <table className="table">
-                                    <tbody>
-                                      <DetailLabelItem
-                                        defaultText={selectedQuotation.status}
-                                        saved={savedValues}
-                                        name="status"
-                                        title={t('common.status')}
-                                        no_border={true}
-                                        checkEdit={handleCheckEditState}
-                                        startEdit={handleStartEdit}
-                                        editing={handleEditing}
-                                        endEdit={handleEndEdit}
-                                        checkSaved={handleCheckSaved}
-                                        cancelSaved={handleCancelSaved}
-                                      />
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
+                              <Space
+                                align="start"
+                                direction="horizontal"
+                                size="small"
+                                style={{ display: 'flex', marginBottom: '0.5rem' }}
+                                wrap
+                              >
+                                { qotation_items_info.map((item, index) => 
+                                  <DetailCardItem
+                                    key={index}
+                                    defaultText={selectedQuotation[item.at(0)]}
+                                    edited={editedValues}
+                                    saved={savedValues}
+                                    name={item.at(0)}
+                                    title={t(item.at(1))}
+                                    detail={item.at(2)}
+                                    checkEdit={handleCheckEditState}
+                                    startEdit={handleStartEdit}
+                                    editing={handleEditing}
+                                    endEdit={handleEndEdit}
+                                    checkSaved={handleCheckSaved}
+                                    cancelSaved={handleCancelSaved}
+                                  />
+                                )}
+                              </Space>
                             </div>
                           </div>
                           { savedValues !== null &&

@@ -19,7 +19,7 @@ import { MoreVert } from "@mui/icons-material";
 const CompanyDetailsModel = () => {
   const { Panel } = Collapse;
   const selectedCompany = useRecoilValue(atomCurrentCompany);
-  const { modifyCompany } = useRecoilValue(CompanyRepo);
+  const { modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allLeads = useRecoilValue(atomAllLeads);
   const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
   const allConsultings = useRecoilValue(atomAllConsultings);
@@ -336,6 +336,7 @@ const CompanyDetailsModel = () => {
               type="button"
               className="btn-close xs-close"
               data-bs-dismiss="modal"
+              onClick={()=>setCurrentCompany()}
             />
           </div>
           <div className="modal-body">
