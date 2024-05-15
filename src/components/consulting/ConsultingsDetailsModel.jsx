@@ -206,7 +206,6 @@ const ConsultingsDetailsModel = () => {
           };
         };
         setOrgReceiptTime(input_time);
-        setReceiptTime(input_time);
       };
     }
   }, [cookies.myLationCrmUserName, selectedConsulting]);

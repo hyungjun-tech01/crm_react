@@ -240,7 +240,7 @@ const CompanyDetailsModel = () => {
     ['business_type','company.business_type',{ type:'label' }],
     ['business_item','company.business_item',{ type:'label' }],
     ['establishment_date','company.establishment_date',
-      { type:'date', orgTimeData: orgEstablishDate, timeData: establishDate, timeDataChange: handleEstablishDateChange, startEditTime: handleStartEstablishDateEdit, endEditTime: handleEndEstablishDateEdit }
+      { type:'date', orgTimeData: orgEstablishDate, timeDataChange: handleEstablishDateChange, startEditTime: handleStartEstablishDateEdit, endEditTime: handleEndEstablishDateEdit }
     ],
     ['ceo_name','company.ceo_name',{ type:'label' }],
     ['account_code','company.account_code',{ type:'label' }],
