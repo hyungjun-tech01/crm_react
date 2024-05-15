@@ -21,7 +21,6 @@ const TransactionsDetailsModel = () => {
   const [savedValues, setSavedValues] = useState(null);
   
   const [ orgPublishDate, setOrgPublishDate ] = useState(null);
-  const [ publishDate, setPublishDate ] = useState(new Date());
   const [ isFullscreen, setIsFullscreen ] = useState(false);
 
   // --- Funtions for Editing ---------------------------------
@@ -95,6 +94,9 @@ const TransactionsDetailsModel = () => {
       };
       if (modifyTransaction(temp_all_saved)) {
         console.log(`Succeeded to modify transaction`);
+        if(savedValues.publish_date){
+          setOrgPublishDate(savedValues.publish_date);
+        };
       } else {
         console.error("Failed to modify transaction");
       }
@@ -124,9 +126,14 @@ const TransactionsDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, orgPublishDate]);
   const handlePublishDateChange = useCallback((time) => {
-    setPublishDate(time);
-  }, []);
+    const tempEdited = {
+      ...editedValues,
+      publish_date: time,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues]);
   const handleEndPublishDateEdit = useCallback(() => {
+    const publishDate = editedValues.publish_date;
     if (publishDate !== orgPublishDate) {
       const tempSaved = {
         ...savedValues,
@@ -139,7 +146,7 @@ const TransactionsDetailsModel = () => {
     };
     delete tempEdited.publish_date;
     setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgPublishDate, publishDate]);
+  }, [editedValues, savedValues, orgPublishDate]);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullscreen(checked);
@@ -152,7 +159,7 @@ const TransactionsDetailsModel = () => {
     ['payment_type','transaction.payment_type',{ type:'label' }],
     ['currency','common.currency',{ type:'label' }],
     ['publish_date','transaction.publish_date',
-      { type:'date', time: true, orgTimeData: orgPublishDate, timeData: publishDate, timeDataChange: handlePublishDateChange, startEditTime: handleStartPublishDateEdit, endEditTime: handleEndPublishDateEdit }
+      { type:'date', orgTimeData: orgPublishDate, timeDataChange: handlePublishDateChange, startEditTime: handleStartPublishDateEdit, endEditTime: handleEndPublishDateEdit }
     ],
     ['supply_price','transaction.supply_price',{ type:'label' }],
     ['tax_price','transaction.tax_price',{ type:'label' }],

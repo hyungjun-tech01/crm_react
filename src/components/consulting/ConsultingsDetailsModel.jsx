@@ -22,7 +22,6 @@ const ConsultingsDetailsModel = () => {
   const [ editedValues, setEditedValues ] = useState(null);
   const [ savedValues, setSavedValues ] = useState(null);
   const [ orgReceiptTime, setOrgReceiptTime ] = useState(new Date());
-  const [ receiptTime, setReceiptTime ] = useState(new Date());
   const [ isFullscreen, setIsFullscreen ] = useState(false);
 
 
@@ -103,6 +102,9 @@ const ConsultingsDetailsModel = () => {
 
       if (modifyConsulting(temp_all_saved)) {
         console.log(`Succeeded to modify company`);
+        if(savedValues.receipt_time){
+          setOrgReceiptTime(savedValues.receipt_time);
+        };
       } else {
         console.error('Failed to modify company')
       }
@@ -127,9 +129,14 @@ const ConsultingsDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, orgReceiptTime]);
   const handleReceiptTimeChange = useCallback((time) => {
-    setReceiptTime(time);
-  }, []);
+    const tempEdited = {
+      ...editedValues,
+      receipt_time: time,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues]);
   const handleEndReceiptTimeEdit = useCallback(() => {
+    const receiptTime = editedValues.receipt_time;
     if(receiptTime !== orgReceiptTime) {
       const tempSaved = {
         ...savedValues,
@@ -142,7 +149,7 @@ const ConsultingsDetailsModel = () => {
     };
     delete tempEdited.receipt_time;
     setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgReceiptTime, receiptTime]);
+  }, [editedValues, savedValues, orgReceiptTime]);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullscreen(checked);
@@ -151,7 +158,7 @@ const ConsultingsDetailsModel = () => {
   const consulting_items_info = [
     ['consulting_type','consulting.type',{ type:'label'}],
     ['receipt_time','consulting.receipt_time',
-      { type:'date', time: true, orgTimeData: orgReceiptTime, timeData: receiptTime, timeDataChange: handleReceiptTimeChange, startEditTime: handleStartReceiptTimeEdit, endEditTime: handleEndReceiptTimeEdit }
+      { type:'date', time: true, orgTimeData: orgReceiptTime, timeDataChange: handleReceiptTimeChange, startEditTime: handleStartReceiptTimeEdit, endEditTime: handleEndReceiptTimeEdit }
     ],
     ['product_type','consulting.product_type',{ type:'label' }],
     ['lead_time','consulting.lead_time',{ type:'label' }],

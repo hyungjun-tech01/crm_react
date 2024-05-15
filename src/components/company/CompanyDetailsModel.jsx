@@ -36,9 +36,7 @@ const CompanyDetailsModel = () => {
   const [ editedValues, setEditedValues ] = useState(null);
   const [ savedValues, setSavedValues ] = useState(null);
   const [ orgEstablishDate, setOrgEstablishDate ] = useState(null);
-  const [ establishDate, setEstablishDate ] = useState(new Date());
   const [ orgCloseDate, setOrgCloseDate ] = useState(null);
-  const [ closeDate, setCloseDate ] = useState(new Date());
 
   const [ leadsByCompany, setLeadsByCompany] = useState([]);
   const [ consultingByCompany, setConsultingByCompany] = useState([]);
@@ -118,6 +116,12 @@ const CompanyDetailsModel = () => {
       };
       if (modifyCompany(temp_all_saved)) {
         console.log(`Succeeded to modify company`);
+        if(savedValues.establishment_date){
+          setOrgEstablishDate(savedValues.establishment_date);
+        };
+        if(savedValues.closure_date){
+          setOrgCloseDate(savedValues.closure_date);
+        };
       } else {
         console.error('Failed to modify company')
       }
@@ -142,9 +146,14 @@ const CompanyDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, orgEstablishDate]);
   const handleEstablishDateChange = useCallback((date) => {
-    setEstablishDate(date);
-  }, []);
+    const tempEdited = {
+      ...editedValues,
+      establishment_date: date,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues]);
   const handleEndEstablishDateEdit = useCallback(() => {
+    const establishDate = editedValues.establishment_date;
     if(establishDate !== orgEstablishDate) {
       const tempSaved = {
         ...savedValues,
@@ -157,7 +166,7 @@ const CompanyDetailsModel = () => {
     };
     delete tempEdited.establishment_date;
     setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgEstablishDate, establishDate]);
+  }, [editedValues, savedValues, orgEstablishDate]);
 
   // --- Funtions for Closure Date ---------------------------------
   const handleStartCloseDateEdit = useCallback(() => {
@@ -168,9 +177,14 @@ const CompanyDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, orgCloseDate]);
   const handleCloseDateChange = useCallback((date) => {
-    setCloseDate(date);
-  }, []);
+    const tempEdited = {
+      ...editedValues,
+      closure_date: date,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues]);
   const handleEndCloseDateEdit = useCallback(() => {
+    const closeDate = editedValues.closure_date;
     if(closeDate !== orgCloseDate) {
       const tempSaved = {
         ...savedValues,
@@ -183,7 +197,7 @@ const CompanyDetailsModel = () => {
     };
     delete tempEdited.closure_date;
     setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgCloseDate, closeDate]);
+  }, [editedValues, savedValues, orgCloseDate]);
 
   // --- Funtions for Etc ---------------------------------
   const handleCardClick = useCallback((card) => {

@@ -7,9 +7,6 @@ import { Collapse, Space, Switch } from "antd";
 import { C_logo, C_logo2, CircleImg } from "../imagepath";
 import { atomCurrentPurchase, defaultPurchase } from "../../atoms/atoms";
 import { PurchaseRepo } from "../../repository/purchase";
-import DetailLabelItem from "../../constants/DetailLabelItem";
-import DetailDateItem from "../../constants/DetailDateItem";
-import DetailTextareaItem from "../../constants/DetailTextareaItem";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import { MoreVert } from "@mui/icons-material";
@@ -26,14 +23,9 @@ const PurchaseDetailsModel = () => {
   const [savedValues, setSavedValues] = useState(null);
 
   const [orgDeliveryDate, setOrgDeliveryDate] = useState(null);
-  const [deliveryDate, setDeliveryDate] = useState(new Date());
   const [orgContactDate, setOrgContactDate] = useState(null);
-  const [contactDate, setContactDate] = useState(new Date());
   const [orgFinishDate, setOrgFinishDate] = useState(null);
-  const [finishDate, setFinishDate] = useState(new Date());
   const [orgRegisterDate, setOrgRegisterDate] = useState(null);
-  const [registerDate, setRegisterDate] = useState(new Date());
-
   const [ isFullscreen, setIsFullscreen ] = useState(false);
 
   // --- Funtions for Editing ---------------------------------
@@ -107,6 +99,18 @@ const PurchaseDetailsModel = () => {
       };
       if (modifyPurchase(temp_all_saved)) {
         console.log(`Succeeded to modify purchase`);
+        if(savedValues.delivery_date){
+          setOrgDeliveryDate(savedValues.delivery_date);
+        };
+        if(savedValues.MA_contact_date){
+          setOrgContactDate(savedValues.MA_contact_date);
+        };
+        if(savedValues.MA_finish_date){
+          setOrgFinishDate(savedValues.MA_finish_date);
+        };
+        if(savedValues.registration_date){
+          setOrgRegisterDate(savedValues.registration_date);
+        };
       } else {
         console.error("Failed to modify purchase");
       }
@@ -131,27 +135,32 @@ const PurchaseDetailsModel = () => {
   const handleStartDeliveryDateEdit = useCallback(() => {
     const tempEdited = {
       ...editedValues,
-      deliveryment_date: orgDeliveryDate,
+      delivery_date: orgDeliveryDate,
     };
     setEditedValues(tempEdited);
   }, [editedValues, orgDeliveryDate]);
   const handleDeliveryDateChange = useCallback((date) => {
-    setDeliveryDate(date);
-  }, []);
+    const tempEdited = {
+      ...editedValues,
+      delivery_date: date,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues]);
   const handleEndDeliveryDateEdit = useCallback(() => {
+    const deliveryDate = editedValues.delivery_date;
     if (deliveryDate !== orgDeliveryDate) {
       const tempSaved = {
         ...savedValues,
-        deliveryment_date: deliveryDate,
+        delivery_date: deliveryDate,
       };
       setSavedValues(tempSaved);
     }
     const tempEdited = {
       ...editedValues,
     };
-    delete tempEdited.deliveryment_date;
+    delete tempEdited.delivery_date;
     setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgDeliveryDate, deliveryDate]);
+  }, [editedValues, savedValues, orgDeliveryDate]);
 
   // --- Funtions for MA Contact Date ---------------------------------
   const handleStartContactDateEdit = useCallback(() => {
@@ -162,22 +171,27 @@ const PurchaseDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, orgContactDate]);
   const handleContactDateChange = useCallback((date) => {
-    setContactDate(date);
-  }, []);
+    const tempEdited = {
+      ...editedValues,
+      MA_contact_date: date,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues]);
   const handleEndContactDateEdit = useCallback(() => {
+    const contactDate = editedValues.MA_contact_date;
     if (contactDate !== orgContactDate) {
       const tempSaved = {
         ...savedValues,
         MA_contact_date: contactDate,
       };
       setSavedValues(tempSaved);
-    }
+    };
     const tempEdited = {
       ...editedValues,
     };
     delete tempEdited.MA_contact_date;
     setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgContactDate, contactDate]);
+  }, [editedValues, savedValues, orgContactDate]);
 
   // --- Funtions for Finishment Date ---------------------------------
   const handleStartFinishDateEdit = useCallback(() => {
@@ -188,9 +202,14 @@ const PurchaseDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, orgFinishDate]);
   const handleFinishDateChange = useCallback((date) => {
-    setFinishDate(date);
-  }, []);
+    const tempEdited = {
+      ...editedValues,
+      MA_finish_date: date,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues]);
   const handleEndFinishDateEdit = useCallback(() => {
+    const finishDate = editedValues.MA_finish_date;
     if(finishDate !== orgFinishDate) {
       const tempSaved = {
         ...savedValues,
@@ -203,7 +222,7 @@ const PurchaseDetailsModel = () => {
     };
     delete tempEdited.MA_finish_date;
     setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgFinishDate, finishDate]);
+  }, [editedValues, savedValues, orgFinishDate]);
 
   // --- Funtions for Registerment Date ---------------------------------
   const handleStartRegisterDateEdit = useCallback(() => {
@@ -214,22 +233,27 @@ const PurchaseDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, orgRegisterDate]);
   const handleRegisterDateChange = useCallback((date) => {
-    setRegisterDate(date);
-  }, []);
+    const tempEdited = {
+      ...editedValues,
+      registration_date: date,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues]);
   const handleEndRegisterDateEdit = useCallback(() => {
+    const registerDate = editedValues.registration_date;
     if(registerDate !== orgRegisterDate) {
       const tempSaved = {
         ...savedValues,
         registration_date : registerDate,
       };
       setSavedValues(tempSaved);
-    }
+    };
     const tempEdited = {
       ...editedValues,
     };
     delete tempEdited.registration_date;
     setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgRegisterDate, registerDate]);
+  }, [editedValues, savedValues, orgRegisterDate]);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullscreen(checked);
@@ -241,17 +265,17 @@ const PurchaseDetailsModel = () => {
     ['price','common.price',{ type:'label' }],
     ['currency','common.currency',{ type:'label' }],
     ['delivery_date','purchase.delivery_date',
-      { type:'date', time: true, orgTimeData: orgDeliveryDate, timeData: deliveryDate, timeDataChange: handleDeliveryDateChange, startEditTime: handleStartDeliveryDateEdit, endEditTime: handleEndDeliveryDateEdit }
+      { type:'date', orgTimeData: orgDeliveryDate, timeDataChange: handleDeliveryDateChange, startEditTime: handleStartDeliveryDateEdit, endEditTime: handleEndDeliveryDateEdit }
     ],
     ['MA_contact_date','purchase.ma_contract_date',
-      { type:'date', time: true, orgTimeData: orgContactDate, timeData: contactDate, timeDataChange: handleContactDateChange, startEditTime: handleStartContactDateEdit, endEditTime: handleEndContactDateEdit }
+      { type:'date', orgTimeData: orgContactDate, timeDataChange: handleContactDateChange, startEditTime: handleStartContactDateEdit, endEditTime: handleEndContactDateEdit }
     ],
     ['MA_finish_date','purchase.ma_finish_date',
-      { type:'date', time: true, orgTimeData: orgFinishDate, timeData: finishDate, timeDataChange: handleFinishDateChange, startEditTime: handleStartFinishDateEdit, endEditTime: handleEndFinishDateEdit }
+      { type:'date', orgTimeData: orgFinishDate, timeDataChange: handleFinishDateChange, startEditTime: handleStartFinishDateEdit, endEditTime: handleEndFinishDateEdit }
     ],
     ['register','purchase.register',{ type:'label' }],
     ['registration_date','purchase.registration_date',
-      { type:'date', time: true, orgTimeData: orgRegisterDate, timeData: registerDate, timeDataChange: handleRegisterDateChange, startEditTime: handleStartRegisterDateEdit, endEditTime: handleEndRegisterDateEdit }
+      { type:'date', orgTimeData: orgRegisterDate, timeDataChange: handleRegisterDateChange, startEditTime: handleStartRegisterDateEdit, endEditTime: handleEndRegisterDateEdit }
     ],
     ['regcode','purchase.registration_code',{ type:'label' }],
     ['status','common.status',{ type:'label' }],

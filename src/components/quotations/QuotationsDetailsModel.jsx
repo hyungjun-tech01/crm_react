@@ -26,9 +26,7 @@ const QuotationsDetailsModel = () => {
   const [ savedValues, setSavedValues ] = useState(null);
 
   const [ orgQuotationDate, setOrgQuotationDate ] = useState(null);
-  const [ quotationDate, setQuotationDate ] = useState(new Date());
   const [ orgConfirmDate, setOrgConfirmDate ] = useState(null);
-  const [ confirmDate, setConfirmDate ] = useState(new Date());
 
   const [ orgQuotationContents, setOrgQuotationContents ] = useState([]);
   const [ quotationContents, setQuotationContents ] = useState([]);
@@ -50,9 +48,14 @@ const QuotationsDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, orgQuotationDate]);
   const handleQuotationDateChange = useCallback((date) => {
-    setQuotationDate(date);
-  }, []);
+    const tempEdited = {
+      ...editedValues,
+      quotation_date: date,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues]);
   const handleEndQuotationDateEdit = useCallback(() => {
+    const quotationDate = editedValues.quotation_date;
     if (quotationDate !== orgQuotationDate) {
       const tempSaved = {
         ...savedValues,
@@ -65,7 +68,7 @@ const QuotationsDetailsModel = () => {
     };
     delete tempEdited.quotation_date;
     setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgQuotationDate, quotationDate]);
+  }, [editedValues, savedValues, orgQuotationDate]);
 
   // --- Funtions for Confirm Date ------------------------------------------------------
   const handleStartConfirmDateEdit = useCallback(() => {
@@ -76,9 +79,14 @@ const QuotationsDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, orgConfirmDate]);
   const handleConfirmDateChange = useCallback((date) => {
-    setConfirmDate(date);
-  }, []);
+    const tempEdited = {
+      ...editedValues,
+      comfirm_date: date,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues])
   const handleEndConfirmDateEdit = useCallback(() => {
+    const confirmDate = editedValues.comfirm_date;
     if (confirmDate !== orgConfirmDate) {
       const tempSaved = {
         ...savedValues,
@@ -91,7 +99,7 @@ const QuotationsDetailsModel = () => {
     };
     delete tempEdited.comfirm_date;
     setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgConfirmDate, confirmDate]);
+  }, [editedValues, savedValues, orgConfirmDate]);
 
   // --- Funtions for Editing ----------------------------------------------------------
   const handleCheckEditState = useCallback((name) => {
@@ -164,6 +172,12 @@ const QuotationsDetailsModel = () => {
       };
       if (modifyQuotation(temp_all_saved)) {
         console.log(`Succeeded to modify Quotation`);
+        if(savedValues.quotation_date){
+          setOrgQuotationDate(savedValues.quotation_date);
+        };
+        if(savedValues.confirm_date){
+          setOrgConfirmDate(savedValues.confirm_date);
+        };
       } else {
         console.error("Failed to modify Quotation");
       }
@@ -401,11 +415,11 @@ const QuotationsDetailsModel = () => {
     ['quotation_manager','quotation.quotation_manager',{ type:'label'}],
     ['quotation_send_type','quotation.send_type',{ type:'label' }],
     ['quotation_date','quotation.quotation_date',
-      { type:'date', orgTimeData: orgQuotationDate, timeData: quotationDate, timeDataChange: handleQuotationDateChange, startEditTime: handleStartQuotationDateEdit, endEditTime: handleEndQuotationDateEdit }
+      { type:'date', orgTimeData: orgQuotationDate, timeDataChange: handleQuotationDateChange, startEditTime: handleStartQuotationDateEdit, endEditTime: handleEndQuotationDateEdit }
     ],
     ['quotation_expiration_date','quotation.expiry_date',{ type:'label' }],
     ['comfirm_date','quotation.confirm_date',
-      { type:'date', orgTimeData: orgConfirmDate, timeData: confirmDate, timeDataChange: handleConfirmDateChange, startEditTime: handleStartConfirmDateEdit, endEditTime: handleEndConfirmDateEdit }
+      { type:'date', orgTimeData: orgConfirmDate, timeDataChange: handleConfirmDateChange, startEditTime: handleStartConfirmDateEdit, endEditTime: handleEndConfirmDateEdit }
     ],
     ['delivery_location','quotation.delivery_location',{ type:'label' }],
     ['delivery_period','quotation.delivery_period',{ type:'label' }],
@@ -436,7 +450,7 @@ const QuotationsDetailsModel = () => {
 
   // --- useEffect ------------------------------------------------------
   useEffect(() => {
-    console.log('[QuotationsDetailsModel] called!', selectedQuotation);
+    console.log('[QuotationsDetailsModel] called!');
     setOrgQuotationDate(
       selectedQuotation.quotation_date
         ? new Date(selectedQuotation.quotation_date)

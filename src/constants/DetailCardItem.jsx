@@ -136,7 +136,7 @@ const DetailCardItem = (props) => {
                     format={ timeformat }
                     showTime={ detail.time }
                     style={{ width: 375 }}
-                    value={ detail.timeData }
+                    value={ edited[name] }
                 />
             );
         };
