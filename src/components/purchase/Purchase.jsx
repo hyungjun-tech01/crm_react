@@ -194,19 +194,19 @@ const Purchase = () => {
       sorter: (a, b) => a.MA_finish_date - b.MA_finish_date,
     },
     {
-      title: t('purchase.quantity'),
+      title: t('common.quantity'),
       dataIndex: "quantity",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => a.quantity - b.quantity,
     },
     {
-      title: t('purchase.price'),
+      title: t('common.price'),
       dataIndex: "price",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => a.price - b.price,
     },
     {
-      title: t('purchase.currency'),
+      title: t('common.currency'),
       dataIndex: "currency",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => a.currency - b.currency,

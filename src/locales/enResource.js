@@ -150,7 +150,6 @@ const enResource = {
         },
         purchase:{
             add_purchase:'Add Purchase',
-            currency:'Currency',
             delivery_date:'Delivery Date',
             information: 'Purchase Information',
             ma_contract_date:'MA Date',
@@ -158,7 +157,6 @@ const enResource = {
             product_name:'Product Name',
             product_type:'Product Type',
             purchase:'Purchase',
-            quantity:'Quantity',
             register:'Register',
             registration_code:'Registraction Code',
             registration_date:'Registration Date',

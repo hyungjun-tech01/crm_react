@@ -150,7 +150,6 @@ const koResource = {
         },
         purchase:{
             add_purchase:'구매 제품 등록',
-            currency:'통화',
             delivery_date:'납품일자',
             information: '구매 정보',
             ma_contract_date:'유지보수계약일',
@@ -158,7 +157,6 @@ const koResource = {
             product_name:'제품이름',
             product_type:'제품유형',
             purchase:'구매',
-            quantity:'수량',
             register:'등록자',
             registration_code:'등록코드',
             registration_date:'등록일',
