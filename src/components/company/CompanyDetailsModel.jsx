@@ -725,7 +725,7 @@ const CompanyDetailsModel = () => {
                                 <tr>
                                   <th>{t('purchase.product_name')}</th>
                                   <th>{t('common.title')}</th>
-                                  <th>{t('purchase.price')}</th>
+                                  <th>{t('common.price')}</th>
                                   <th>{t('purchase.delivery_date')}</th>
                                   <th>{t('purchase.registration_date')}</th>
                                   <th className="text-end">{t('common.actions')}</th>
