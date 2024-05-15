@@ -15,6 +15,10 @@ import { atomAllCompanies, atomFilteredCompany, defaultCompany } from "../../ato
 import { compareCompanyName, compareText, formateDate } from "../../constants/functions";
 import CompanyDetailsModel from "./CompanyDetailsModel";
 import LeadsDetailsModel from "../leads/LeadsDetailsModel";
+import ConsultingsDetailsModel from "../consulting/ConsultingsDetailsModel";
+import QuotationsDetailsModel from "../quotations/QuotationsDetailsModel";
+import TransactionsDetailsModel from "../transactions/TransactionsDetailsModel";
+import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
 
 const Company = () => {
   const { loadAllCompanies, filterCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
@@ -746,6 +750,10 @@ const Company = () => {
         </div>
         <CompanyDetailsModel />
         <LeadsDetailsModel />
+        <ConsultingsDetailsModel />
+        <QuotationsDetailsModel />
+        <TransactionsDetailsModel />
+        <PurchaseDetailsModel />
       </div>
     </HelmetProvider>
   );

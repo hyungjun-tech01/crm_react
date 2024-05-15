@@ -23,13 +23,13 @@ const CompanyDetailsModel = () => {
   const allLeads = useRecoilValue(atomAllLeads);
   const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
   const allConsultings = useRecoilValue(atomAllConsultings);
-  const { loadAllConsultings } = useRecoilValue(ConsultingRepo);
+  const { loadAllConsultings, setCurrentConsulting } = useRecoilValue(ConsultingRepo);
   const allQuotations = useRecoilValue(atomAllQuotations);
-  const { loadAllQuotations } = useRecoilValue(QuotationRepo);
+  const { loadAllQuotations, setCurrentQuotation } = useRecoilValue(QuotationRepo);
   const allTransactions = useRecoilValue(atomAllTransactions);
-  const { loadAllTransactions } = useRecoilValue(TransactionRepo);
+  const { loadAllTransactions, setCurrentTransaction } = useRecoilValue(TransactionRepo);
   const allPurchases = useRecoilValue(atomAllPurchases);
-  const { loadAllPurchases } = useRecoilValue(PurchaseRepo);
+  const { loadAllPurchases, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
   const { t } = useTranslation();
 
@@ -589,8 +589,16 @@ const CompanyDetailsModel = () => {
                                 { consultingByCompany.map((consulting, index) =>
                                   <tr key={index}>
                                     <td>{consulting.consulting_type}</td>
-                                    <td>{consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
-                                    {consulting.receipt_time && new Date(consulting.receipt_time).toLocaleDateString('ko-KR', {hour:'numeric',minute:'numeric',second:'numeric'})}
+                                    <td>
+                                      <Link
+                                        to="#"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#consulting-details"
+                                        onClick={()=> setCurrentConsulting(consulting.consulting_code)}
+                                      >
+                                        {consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
+                                        {consulting.receipt_time && new Date(consulting.receipt_time).toLocaleDateString('ko-KR', {hour:'numeric',minute:'numeric',second:'numeric'})}
+                                      </Link>
                                     </td>
                                     <td>{consulting.receiver}</td>
                                     <td>{consulting.request_type}</td>
@@ -642,7 +650,16 @@ const CompanyDetailsModel = () => {
                               <tbody>
                                 { quotationByCompany.map((quotation, index) =>
                                   <tr key={index}>
-                                    <td>{quotation.quotation_title}</td>
+                                    <td>
+                                      <Link
+                                        to="#"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#quotation-details"
+                                        onClick={()=> setCurrentQuotation(quotation.quotation_code)}
+                                      >
+                                        {quotation.quotation_title}
+                                      </Link>
+                                    </td>
                                     <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}</td>
                                     <td className="text-center">
                                       <div className="dropdown dropdown-action">
@@ -694,7 +711,16 @@ const CompanyDetailsModel = () => {
                               <tbody>
                                 { transactionByCompany.map((trans, index) =>
                                   <tr key={index}>
-                                    <td>{trans.transaction_title}</td>
+                                    <td>
+                                      <Link
+                                        to="#"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#transaction-details"
+                                        onClick={()=> setCurrentTransaction(trans.transaction_code)}
+                                      >
+                                        {trans.transaction_title}
+                                      </Link>
+                                    </td>
                                     <td>{trans.publish_date && new Date(trans.publish_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
                                     <td>{trans.publish_type}</td>
                                     <td>{trans.supply_price}</td>
@@ -749,7 +775,16 @@ const CompanyDetailsModel = () => {
                               <tbody>
                               { purchaseByCompany.map((purchase, index) =>
                                 <tr key={index}>
-                                  <td>{purchase.product_name}</td>
+                                  <td>
+                                    <Link
+                                      to="#"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#purchase-details"
+                                      onClick={()=> setCurrentTransaction(purchase.purchase_code)}
+                                    >
+                                      {purchase.product_name}
+                                    </Link>
+                                  </td>
                                   <td>{purchase.quantity}</td>
                                   <td>{purchase.price}</td>
                                   <td>{purchase.delivery_date && new Date(purchase.delivery_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
