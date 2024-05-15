@@ -256,6 +256,7 @@ const CompanyDetailsModel = () => {
     console.log('[CompanyDetailsModel] called!');
     setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
     setOrgCloseDate(selectedCompany.closure_date ? new Date(selectedCompany.closure_date) : null);
+    setExpandRelated([]);
 
     if(allLeads.length === 0){
       loadAllLeads();
