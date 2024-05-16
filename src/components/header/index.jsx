@@ -66,8 +66,8 @@ const Header = (props) => {
     return "";
   };
 
-  const topTitle = (itemsArray.indexOf(addressValue) >= 0);
-  console.log('Header / topTitle :', topTitle);
+  const titleOnTop = (itemsArray.indexOf(addressValue) >= 0);
+  console.log('Header / topTitle :', titleOnTop);
 
   return (
     <div className="header" id="heading">
@@ -87,7 +87,7 @@ const Header = (props) => {
         </span>
       </a>
       {/* Header Title */}
-      { topTitle ? 
+      { titleOnTop ? 
         <div className="page-title-box">
           <div className="page-title">
             { titleElements[addressValue] }
@@ -120,22 +120,23 @@ const Header = (props) => {
       <ul className="nav user-menu">
         {/* Search */}
         <li className="nav-item">
-          { topTitle === false && 
-          <div className="top-nav-search">
-            <a className="responsive-search">
-              <i className="fa fa-search" />
-            </a>
-            <form action="search.html">
-              <input
-                className="form-control"
-                type="text"
-                placeholder="Search here"
-              />
-              <button className="btn" type="submit">
-                <FiSearch />
-              </button>
-            </form>
-          </div>}
+          { titleOnTop && 
+            <div className="top-nav-search-right">
+              <a className="responsive-search active">
+                <i className="fa fa-search" />
+              </a>
+              <form action="search.html">
+                <input
+                  className="form-control"
+                  type="text"
+                  placeholder="Search here"
+                />
+                <button className="btn" type="submit">
+                  <FiSearch />
+                </button>
+              </form>
+            </div>
+          }
         </li>
         {/* /Search */}
         {/* Flag */}
