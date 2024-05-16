@@ -15,8 +15,6 @@ import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import LeadsDetailsModel from "../leads/LeadsDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-import { BiClipboard } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { ConsultingRepo, ConsultingTypes } from "../../repository/consulting";
@@ -229,21 +227,6 @@ const Consultings = () => {
     },
   ];
 
-  const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
-    },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
-      name: record.name,
-      className: "checkbox-red",
-    }),
-  };
-
   useEffect(() => {
     if (allCompnayData.length === 0) {
       loadAllCompanies();
@@ -304,27 +287,6 @@ const Consultings = () => {
         </Helmet>
         {/* Page Content */}
         <div className="content container-fluid">
-          <div className="crms-title row bg-white">
-            <div className="col  p-0">
-              <h3 className="page-title m-0">
-                <span className="page-title-icon bg-gradient-primary text-white me-2">
-                  {/* <i className="feather-calendar" /> */}
-                  <i>
-                    <BiClipboard />
-                  </i>
-                </span>{" "}
-                {t('consulting.consulting')}{" "}
-              </h3>
-            </div>
-            <div className="col p-0 text-end">
-              <ul className="breadcrumb bg-white float-end m-0 pl-0 pr-0">
-                <li className="breadcrumb-item">
-                  <Link to="/">Dashboard</Link>
-                </li>
-                <li className="breadcrumb-item active">{t('consulting.consulting')}</li>
-              </ul>
-            </div>
-          </div>
           <div className="page-header pt-3 mb-0 ">
             <div className="row">
               <div className="text-start" style={{width:'120px'}}>
@@ -379,9 +341,6 @@ const Consultings = () => {
                   <div className="table-responsive activity-tables">
                     {searchCondition=== "" ? 
                     <Table
-                      rowSelection={{
-                        ...rowSelection,
-                      }}
                       pagination={{
                         total: allConsultingData.length,
                         showTotal: ShowTotal,
@@ -397,9 +356,6 @@ const Consultings = () => {
                     />
                     :
                     <Table
-                    rowSelection={{
-                      ...rowSelection,
-                    }}
                     pagination={{
                       total: filteredConsulting.length >0 ? filteredConsulting.length:0,
                       showTotal: ShowTotal,

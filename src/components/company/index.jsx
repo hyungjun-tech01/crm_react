@@ -163,21 +163,6 @@ const Company = () => {
     },
   ];
 
-  const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
-    },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
-      name: record.name,
-      className: "checkbox-red",
-    }),
-  };
-
   useEffect(() => {    
     if (allCompanyData.length === 0) {
       loadAllCompanies();
@@ -193,27 +178,6 @@ const Company = () => {
           <meta name="description" content="Reactify Blank Page" />
         </Helmet>
         <div className="content container-fluid">
-          <div className="crms-title row bg-white">
-            <div className="col">
-              <h3 className="page-title m-0">
-                <span className="page-title-icon bg-gradient-primary text-white me-2">
-                  {/* <i className="feather-database" /> */}
-                  <i>
-                    <BiBuildings />
-                  </i>
-                </span>{" "}
-                {t('company.company')}{" "}
-              </h3>
-            </div>
-            <div className="col text-end">
-              <ul className="breadcrumb bg-white float-end m-0 pl-0 pr-0">
-                <li className="breadcrumb-item">
-                  <Link to="/">Dashboard</Link>
-                </li>
-                <li className="breadcrumb-item active">{t('company.company')}</li>
-              </ul>
-            </div>
-          </div>
           {/* Page Header */}
           <div className="page-header pt-3 mb-0 ">
             <div className="row">
@@ -294,7 +258,6 @@ const Company = () => {
                   <div className="table-responsive">
                     { searchCondition === "" ? 
                     <Table
-                      rowSelection={rowSelection}
                       pagination={{
                         total:  allCompanyData.length,
                         showTotal: ShowTotal,
@@ -310,7 +273,6 @@ const Company = () => {
                     />
                     :
                     <Table
-                      rowSelection={rowSelection}
                       pagination={{
                         total:  filteredCompany.length > 0 ? filteredCompany.length:0,
                         showTotal: ShowTotal,

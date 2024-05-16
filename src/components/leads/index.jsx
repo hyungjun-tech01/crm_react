@@ -9,7 +9,6 @@ import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import LeadsDetailsModel from "./LeadsDetailsModel";
 import { MoreVert } from '@mui/icons-material';
-import { BiUser } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import {ConsultingRepo} from "../../repository/consulting"
 import {QuotationRepo} from "../../repository/quotation"
@@ -281,20 +280,6 @@ const Leads = () => {
       ),
     },
   ];
-  const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
-    },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
-      name: record.name,
-      className: "checkbox-red",
-    }),
-  };
 
   useEffect(() => {
     if (allCompnayData.length === 0) {
@@ -326,27 +311,6 @@ const Leads = () => {
           <meta name="description" content="Reactify Blank Page" />
         </Helmet>
         <div className="content container-fluid">
-          <div className="crms-title row bg-white">
-            <div className="col">
-              <h3 className="page-title m-0">
-                <span className="page-title-icon bg-gradient-primary text-white me-2">
-                  {/* <i className="feather-user" /> */}
-                  <i>
-                    <BiUser />
-                  </i>
-                </span>{" "}
-                {t('lead.lead')}{" "}
-              </h3>
-            </div>
-            <div className="col text-end">
-              <ul className="breadcrumb bg-white float-end m-0 pl-0 pr-0">
-                <li className="breadcrumb-item">
-                  <Link to="/">Dashboard</Link>
-                </li>
-                <li className="breadcrumb-item active">{t('lead.lead')}</li>
-              </ul>
-            </div>
-          </div>
           {/* Page Header */}
           <div className="page-header pt-3 mb-0 ">
             <div className="row ">
@@ -469,7 +433,6 @@ const Leads = () => {
                   <div className="table-responsive">
                     {searchCondition === "" ? 
                     <Table
-                      rowSelection={rowSelection}
                       className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
                       pagination={{
                         total: allLeadData.length,
@@ -485,7 +448,6 @@ const Leads = () => {
                     /> 
                     :
                     <Table
-                      rowSelection={rowSelection}
                       className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
                       pagination={{
                         total: filteredLead.length >0 ? filteredLead.length:0,

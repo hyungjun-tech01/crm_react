@@ -9,7 +9,6 @@ import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import PurchaseDetailsModel from "./PurchaseDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { BiShoppingBag } from "react-icons/bi";
 import { PurchaseRepo } from "../../repository/purchase";
 import { atomAllCompanies, atomAllPurchases, defaultPurchase } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
@@ -299,21 +298,6 @@ const Purchase = () => {
     // },
   ];
 
-  const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
-    },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
-      name: record.name,
-      className: "checkbox-red",
-    }),
-  };
-
   useEffect(() => {
     if(allCompanyData.length === 0) {
       loadAllCompanies();
@@ -352,27 +336,6 @@ const Purchase = () => {
           <meta name="description" content="Reactify Blank Page" />
         </Helmet>
         <div className="content container-fluid">
-          <div className="crms-title row bg-white">
-            <div className="col">
-              <h3 className="page-title m-0">
-                <span className="page-title-icon bg-gradient-primary text-white me-2">
-                  {/* <i className="feather-database" /> */}
-                  <i>
-                    <BiShoppingBag />
-                  </i>
-                </span>{" "}
-                {t('purchase.purchase')}{" "}
-              </h3>
-            </div>
-            <div className="col text-end">
-              <ul className="breadcrumb bg-white float-end m-0 pl-0 pr-0">
-                <li className="breadcrumb-item">
-                  <Link to="/">Dashboard</Link>
-                </li>
-                <li className="breadcrumb-item active">{t('purchase.purchase')}</li>
-              </ul>
-            </div>
-          </div>
           {/* Page Header */}
           <div className="page-header pt-3 mb-0 ">
             <div className="row">
@@ -453,7 +416,6 @@ const Purchase = () => {
                 <div className="card-body">
                   <div className="table-responsive">
                     <Table
-                      rowSelection={rowSelection}
                       pagination={{
                         total: allPurchaseData.length,
                         showTotal: ShowTotal,

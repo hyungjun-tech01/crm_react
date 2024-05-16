@@ -299,14 +299,6 @@ const CompanyDetailsModel = () => {
       aria-modal="true"
     >
       <div className={isFullscreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
-        <button
-          type="button"
-          className="close md-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        >
-          {" "}
-        </button>
         <div className="modal-content">
           <div className="modal-header">
             <div className="row w-100">

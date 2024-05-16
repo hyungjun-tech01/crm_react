@@ -9,14 +9,42 @@ import {atomCurrentUser} from "../../atoms/atomsUser.jsx";
 import {useRecoilValue} from "recoil";
 import { useTranslation } from "react-i18next";
 
+import { BiBuildings, BiCalculator, BiClipboard, BiReceipt, BiShoppingBag, BiUser } from "react-icons/bi";
+
+const titleElementBase = (title, icon) => {
+  return (
+    <div className="crms-title row bg-white">
+      <div className="col">
+        <h3 className="page-title m-0">
+          <span className="page-title-icon bg-gradient-primary text-white me-2">
+            <i>
+              {icon}
+            </i>
+          </span>{" "}
+          {title}{" "}
+        </h3>
+      </div>
+    </div>
+  );
+};
 
 const Header = (props) => {
-  const exclusionArray = [ "login", "register", "forgot-password", "error-404", "error-500", ];
   const [cookies, removeCookie ] = useCookies(["myLationCrmUserId", "myLationCrmUserName", "myLationCrmAuthToken"]);
   const history = useHistory();
+  const { i18n, t } = useTranslation();
   const currentUser = useRecoilValue(atomCurrentUser);
 
-  const { i18n, t } = useTranslation();
+  const exclusionArray = [ "login", "register", "forgot-password", "error-404", "error-500", ];
+  const itemsArray = ["companies", "leads", "consultings", "quotations", "transactions", "purchases"];
+  
+  const titleElements = {
+    companies : titleElementBase(t('company.company'), <BiBuildings />),
+    leads : titleElementBase(t('lead.lead'), <BiUser />),
+    consultings : titleElementBase(t('consulting.consulting'), <BiClipboard />),
+    quotations : titleElementBase(t('quotation.quotation'), <BiCalculator />),
+    transactions : titleElementBase(t('transaction.transaction'), <BiReceipt />),
+    purchases : titleElementBase(t('purchase.purchase'), <BiShoppingBag />),
+  }
 
   const changeLanguage = (lng) => {   // 언어 변경  
     i18n.changeLanguage(lng);
@@ -33,9 +61,13 @@ const Header = (props) => {
     history.push("/login");
   };
 
-  if (exclusionArray.indexOf(props.location.pathname.split("/")[1]) >= 0) {
+  const addressValue = props.location.pathname.split("/")[1];
+  if (exclusionArray.indexOf(addressValue) >= 0) {
     return "";
-  }
+  };
+
+  const topTitle = (itemsArray.indexOf(addressValue) >= 0);
+  console.log('Header / topTitle :', topTitle);
 
   return (
     <div className="header" id="heading">
@@ -55,23 +87,31 @@ const Header = (props) => {
         </span>
       </a>
       {/* Header Title */}
-      <div className="page-title-box">
-        <div className="top-nav-search">
-          <a className="responsive-search">
-            <i className="fa fa-search" />
-          </a>
-          <form action="search.html">
-            <input
-              className="form-control"
-              type="text"
-              placeholder="Search here"
-            />
-            <button className="btn" type="submit">
-              <FiSearch />
-            </button>
-          </form>
+      { topTitle ? 
+        <div className="page-title-box">
+          <div className="page-title">
+            { titleElements[addressValue] }
+          </div>
         </div>
-      </div>
+        :
+        <div className="page-title-box">
+          <div className="top-nav-search">
+            <a className="responsive-search">
+              <i className="fa fa-search" />
+            </a>
+            <form action="search.html">
+              <input
+                className="form-control"
+                type="text"
+                placeholder="Search here"
+              />
+              <button className="btn" type="submit">
+                <FiSearch />
+              </button>
+            </form>
+          </div>
+        </div>
+      }
       {/* /Header Title */}
       <a id="mobile_btn" className="mobile_btn" href="#sidebar">
         <i className="fa fa-bars" />
@@ -79,16 +119,29 @@ const Header = (props) => {
       {/* Header Menu */}
       <ul className="nav user-menu">
         {/* Search */}
-        <li className="nav-item"></li>
+        <li className="nav-item">
+          { topTitle === false && 
+          <div className="top-nav-search">
+            <a className="responsive-search">
+              <i className="fa fa-search" />
+            </a>
+            <form action="search.html">
+              <input
+                className="form-control"
+                type="text"
+                placeholder="Search here"
+              />
+              <button className="btn" type="submit">
+                <FiSearch />
+              </button>
+            </form>
+          </div>}
+        </li>
         {/* /Search */}
         {/* Flag */}
         <li className="nav-item dropdown has-arrow flag-nav">
           <Link className="nav-link dropdown-toggle"
             data-bs-toggle="dropdown"
-            // onClick={(e) => {
-            //   e.preventDefault();
-            //   document.querySelector('#dropdown_lag_menu').classList.toggle('show');
-            // }}
             to="#"
           >
             { i18n.language === 'ko' ? (

@@ -14,7 +14,6 @@ import LeadsDetailsModel from "../leads/LeadsDetailsModel";
 import "react-datepicker/dist/react-datepicker.css";
 
 import { MoreVert } from '@mui/icons-material';
-import { BiCalculator } from "react-icons/bi";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { QuotationRepo } from "../../repository/quotation";
@@ -184,19 +183,6 @@ const Quotations = () => {
     },
   ];
 
-  const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`, "selectedRows: ", selectedRows
-      );
-    },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
-      name: record.name,
-      className: "checkbox-red",
-    }),
-  };
-
   const handleAddNewQuotation = useCallback(() => {
     setInitAddNewQuotation(!initAddNewQuotation);
   }, [initAddNewQuotation]);
@@ -222,27 +208,6 @@ const Quotations = () => {
         </Helmet>
         {/* Page Content */}
         <div className="content container-fluid">
-          <div className="crms-title row bg-white">
-            <div className="col  p-0">
-              <h3 className="page-title m-0">
-                <span className="page-title-icon bg-gradient-primary text-white me-2">
-                  {/* <i className="feather-calendar" /> */}
-                  <i>
-                    <BiCalculator />
-                  </i>
-                </span>{" "}
-                {t('quotation.quotation')}{" "}
-              </h3>
-            </div>
-            <div className="col p-0 text-end">
-              <ul className="breadcrumb bg-white float-end m-0 pl-0 pr-0">
-                <li className="breadcrumb-item">
-                  <Link to="/">Dashboard</Link>
-                </li>
-                <li className="breadcrumb-item active">{t('quotation.quotation')}</li>
-              </ul>
-            </div>
-          </div>
           <div className="page-header pt-3 mb-0 ">
             <div className="row">
               <div className="text-start" style={{width:'120px'}}>
@@ -296,9 +261,6 @@ const Quotations = () => {
                   <div className="table-responsive activity-tables">
                   {searchCondition=== "" ? 
                     <Table
-                      rowSelection={{
-                        ...rowSelection,
-                      }}
                       pagination={{
                         total: allQuotationData.length,
                         showTotal: ShowTotal,
@@ -314,9 +276,6 @@ const Quotations = () => {
                     />
                     :
                     <Table
-                      rowSelection={{
-                        ...rowSelection,
-                      }}
                       pagination={{
                         total: filteredQuotation.length >0 ? filteredQuotation.length:0,
                         showTotal: ShowTotal,
