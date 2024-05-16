@@ -119,7 +119,7 @@ const DetailCardItem = (props) => {
                     addonBefore={ <div className='detail-card-before'>{title}</div> }
                     addonAfter={ <SaveAlt onClick={() => { endEdit(name); }}/>}
                     value={ edited[name] }
-                    style={ detail.extra === 'long' ? { width: 760 } : { width: 375}}
+                    style={ detail.extra === 'long' ? { width: 770 } : { width: 380}}
                     onChange={ editing }
                     onPressEnter={() => endEdit(name)}
                 />
@@ -135,7 +135,7 @@ const DetailCardItem = (props) => {
                     change={ detail.timeDataChange }
                     format={ timeformat }
                     showTime={ detail.time }
-                    style={{ width: 375 }}
+                    style={{ width: 380 }}
                     value={ edited[name] }
                 />
             );
@@ -146,7 +146,7 @@ const DetailCardItem = (props) => {
                     name={ name }
                     addonBefore={ <div className='detail-card-before'>{title}</div> }
                     addonAfter={ <SaveAlt onClick={() => { endEdit(name); }}/>}
-                    style={ detail.extra === 'long' ? { width: 760 } : { width: 375}}
+                    style={ detail.extra === 'long' ? { width: 770 } : { width: 380}}
                     row_no={ detail.row_no ? detail.row_no : 2}
                     title={ title }
                     value={ edited[name] }
@@ -161,7 +161,7 @@ const DetailCardItem = (props) => {
                 addonBefore={ <div className='detail-card-before'>{title}</div> }
                 addonAfter={ <SaveAlt onClick={() => { detail.endEditTime(name); }}/> }
                 change={ editing }
-                style={ detail.extra === 'long' ? { width: 760 } : { width: 375}}
+                style={ detail.extra === 'long' ? { width: 770 } : { width: 380}}
                 options={ detail.options }
                 value={ defaultText }
             />
@@ -177,7 +177,7 @@ const DetailCardItem = (props) => {
                 <Input
                     addonBefore={ <div className='detail-card-before'>{title}</div> }
                     addonAfter={ <Cancel onClick={() => { cancelSaved(name); }}/>}
-                    style={{ width: 375 }}
+                    style={{ width: 380 }}
                     value={ checked_value }
                     onChange={e => e.preventDefault()}
                 />
@@ -188,7 +188,7 @@ const DetailCardItem = (props) => {
                 <TextareaInput
                     addonBefore={ <div className='detail-card-before'>{title}</div> }
                     addonAfter={ <Cancel onClick={() => { cancelSaved(name); }}/>}
-                    style={ detail.extra === 'long' ? { width: 760 } : { width: 375}}
+                    style={ detail.extra === 'long' ? { width: 770 } : { width: 380}}
                     row_no={ detail.row_no ? detail.row_no : 2}
                     title={ title }
                     value={ saved[name] }
@@ -200,7 +200,7 @@ const DetailCardItem = (props) => {
             <Input
                 addonBefore={ <div className='detail-card-before'>{title}</div> }
                 addonAfter={ <Cancel onClick={() => { cancelSaved(name); }}/>}
-                style={ detail.extra === 'long' ? { width: 760 } : { width: 375}}
+                style={ detail.extra === 'long' ? { width: 770 } : { width: 380}}
                 value={ saved[name] }
                 onChange={e => e.preventDefault()}
             />
@@ -218,7 +218,7 @@ const DetailCardItem = (props) => {
             <Input
                 addonBefore={ <div className='detail-card-before'>{title}</div> }
                 addonAfter={ <Edit onClick={() => { detail.startEditTime(); }}/> }
-                style={ detail.extra === 'long' ? { width: 760 } : { width: 375}}
+                style={ detail.extra === 'long' ? { width: 770 } : { width: 380}}
                 value={ checked_value }
                 onChange={e => e.preventDefault()}
             />
@@ -230,7 +230,7 @@ const DetailCardItem = (props) => {
                 addonBefore={ <div className='detail-card-before'>{title}</div> }
                 addonAfter={ <Edit onClick={() => { startEdit(name); }}/> }
                 row_no={ detail.row_no ? detail.row_no : 2}
-                style={ detail.extra === 'long' ? { width: 760 } : { width: 375}}
+                style={ detail.extra === 'long' ? { width: 770 } : { width: 380}}
                 title={ title }
                 value={ defaultText }
                 disabled
@@ -242,7 +242,7 @@ const DetailCardItem = (props) => {
         <Input
             addonBefore={ <div className='detail-card-before'>{title}</div> }
             addonAfter={ <Edit onClick={() => { startEdit(name); }}/> }
-            style={ detail.extra === 'long' ? { width: 765 } : { width: 375}}
+            style={ detail.extra === 'long' ? { width: 770 } : { width: 380}}
             value={ defaultText ? defaultText : '' }
             onChange={e => e.preventDefault()}
         />

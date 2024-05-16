@@ -7772,7 +7772,7 @@ form .btn-gradient-primary {
 .modal.right .modal-dialog {
 	position: fixed;
 	margin: auto;
-	width: 800px;
+	width: auto;
 	height: 100%;
 	-webkit-transform: translate3d(0%, 0, 0);
 	-ms-transform: translate3d(0%, 0, 0);
@@ -7807,8 +7807,22 @@ form .btn-gradient-primary {
 	right: 0;
 }
 
-.right .modal-dialog {
-	max-width: 800px;
+@media (992px < width <= 1200px) {
+	.right .modal-dialog {
+		max-width: 805px;
+	}
+}
+
+@media (1200px < width <= 1600px) {
+	.right .modal-dialog {
+		max-width: 1175px;
+	}
+}
+
+@media (1600px < width) {
+	.right .modal-dialog {
+		max-width: 1580px;
+	}
 }
 
 .right form h4 {
