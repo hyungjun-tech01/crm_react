@@ -442,7 +442,7 @@ const QuotationsDetailsModel = () => {
     ['department','lead.department',{ type:'label' }],
     ['position','lead.position',{ type:'label' }],
     ['mobile_number','lead.mobile',{ type:'label' }],
-    ['phone_number','common.phone',{ type:'label' }],
+    ['phone_number','common.phone_no',{ type:'label' }],
     ['fax_number','lead.fax_number',{ type:'label' }],
     ['email','lead.email',{ type:'label' }],
     ['company_name','company.company_name',{ type:'label' }],

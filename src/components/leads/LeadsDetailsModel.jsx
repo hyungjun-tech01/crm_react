@@ -358,16 +358,16 @@ const [selectedRow, setSelectedRow] = useState(null);
     ['position','lead.position',{ type:'label'}],
     ['email','lead.email',{ type:'label'}],
     ['homepage','lead.homepage',{ type:'label'}],
-    ['group_','lead.lead_group',{ type:'label'}],
+    ['group_','lead.lead_group',{ type:'label', extra:'long'}],
     ['region','common.region',{ type:'label'}],
     ['sales_resource','quotation.sales_rep',{ type:'label'}],
     ['application_engineer','company.engineer',{ type:'label'}],
     ['company_name','company.company_name',{ type:'label'}],
     ['company_name_en','company.eng_company_name',{ type:'label'}],
-    ['company_zip_code','company.zip_code',{ type:'label'}],
+    ['company_zip_code','common.zip_code',{ type:'label'}],
     ['company_address','company.address',{ type:'label'}],
-    ['company_phone_number','company.phone_number',{ type:'label'}],
-    ['company_fax_number','company.fax_number',{ type:'label'}],
+    ['company_phone_number','common.phone_no',{ type:'label'}],
+    ['company_fax_number','common.fax_no',{ type:'label'}],
   ];
 
   useEffect(() => {

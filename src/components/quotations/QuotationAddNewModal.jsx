@@ -545,7 +545,7 @@ const QuotationAddNewModal = (props) => {
                             <td className="border-0">{selectedLead.mobile_number}</td>
                           </tr>
                           <tr>
-                            <td>{t('common.phone')}</td>
+                            <td>{t('common.phone_no')}</td>
                             <td>{selectedLead.phone}</td>
                           </tr>
                           <tr>

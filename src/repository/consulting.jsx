@@ -98,7 +98,7 @@ export const ConsultingRepo = selector({
             }else if(itemName === 'lead.mobile'){
                 allConsulting = allConsultingList.filter(item => (item.mobile_number &&item.mobile_number.includes(filterText))
                 );    
-            }else if(itemName === 'common.phone'){
+            }else if(itemName === 'common.phone_no'){
                 allConsulting = allConsultingList.filter(item => (item.phone_number &&item.phone_number.includes(filterText))
                 );    
             }else if(itemName === 'consulting.request_content'){

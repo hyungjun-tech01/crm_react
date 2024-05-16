@@ -82,7 +82,7 @@ export const QuotationRepo = selector({
             }else if(itemName === 'lead.mobile'){
                 allQuotation = allQuotationList.filter(item => (item.mobile_number &&item.mobile_number.includes(filterText))
                 );    
-            }else if(itemName === 'common.phone'){
+            }else if(itemName === 'common.phone_no'){
                 allQuotation = allQuotationList.filter(item => (item.phone_number &&item.phone_number.includes(filterText))
                 );    
             }else if(itemName === 'lead.email'){

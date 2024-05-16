@@ -39,7 +39,7 @@ export const CompanyRepo = selector({
             }else if(itemName === 'company.company_name' ){
                 allCompanies = allCompanyList.filter(item => (item.company_name &&item.company_name.includes(filterText))
                 );
-            }else if(itemName === 'common.phone' ){
+            }else if(itemName === 'common.phone_no' ){
                 allCompanies = allCompanyList.filter(item => (item.company_phone_number &&item.company_phone_number.includes(filterText))
                 );
             }else if(itemName === 'company.address' ){

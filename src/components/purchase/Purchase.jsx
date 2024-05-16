@@ -386,7 +386,7 @@ const Purchase = () => {
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.title')}>{t('common.title')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.full_name')}>{t('lead.full_name')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.mobile')}>{t('lead.mobile')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.phone')}>{t('common.phone')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.phone_no')}>{t('common.phone_no')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.email')}>{t('lead.email')}</button>
                     </div>
                 </div>

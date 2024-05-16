@@ -229,10 +229,10 @@ const CompanyDetailsModel = () => {
   }, []);
 
   const company_items_info = [
-    ['company_address','company.address',{ type:'label', extra:'long' }],
-    ['company_phone_number','company.phone_number',{ type:'label' }],
-    ['company_zip_code','company.zip_code',{ type:'label' }],
-    ['company_fax_number','company.fax_number',{ type:'label' }],
+    ['company_address','common.address',{ type:'label', extra:'long' }],
+    ['company_phone_number','common.phone_no',{ type:'label' }],
+    ['company_zip_code','common.zip_code',{ type:'label' }],
+    ['company_fax_number','common.fax_no',{ type:'label' }],
     ['homepage','company.homepage',{ type:'label' }],
     ['company_scale','company.company_scale',{ type:'label' }],
     ['deal_type','company.deal_type',{ type:'label' }],
@@ -336,7 +336,7 @@ const CompanyDetailsModel = () => {
               <DetailTitleItem
                 defaultText={selectedCompany.business_registration_code}
                 saved={savedValues}
-                name='company_name_eng'
+                name='business_registration_code'
                 title={t('company.business_registration_code')}
                 checkEdit={handleCheckEditState}
                 startEdit={handleStartEdit}
@@ -780,7 +780,7 @@ const CompanyDetailsModel = () => {
                                       to="#"
                                       data-bs-toggle="modal"
                                       data-bs-target="#purchase-details"
-                                      onClick={()=> setCurrentTransaction(purchase.purchase_code)}
+                                      onClick={()=> setCurrentPurchase(purchase.purchase_code)}
                                     >
                                       {purchase.product_name}
                                     </Link>

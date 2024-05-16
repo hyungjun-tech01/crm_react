@@ -137,7 +137,7 @@ const Company = () => {
       sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
     {
-      title: t('common.phone'),
+      title: t('common.phone_no'),
       dataIndex: "company_phone_number",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.company_phone_number, b.company_phone_number),
@@ -223,7 +223,7 @@ const Company = () => {
                       <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
                         <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.all')}>{t('common.all')}</button>
                         <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
-                        <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.phone')}>{t('common.phone')}</button>
+                        <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.phone_no')}>{t('common.phone_no')}</button>
                         <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.address')}>{t('company.address')}</button>
                         <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.salesman')}>{t('company.salesman')}</button>
                         <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.engineer')}>{t('company.engineer')}</button>

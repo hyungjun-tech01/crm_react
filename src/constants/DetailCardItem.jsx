@@ -242,7 +242,7 @@ const DetailCardItem = (props) => {
         <Input
             addonBefore={ <div className='detail-card-before'>{title}</div> }
             addonAfter={ <Edit onClick={() => { startEdit(name); }}/> }
-            style={ detail.extra === 'long' ? { width: 760 } : { width: 375}}
+            style={ detail.extra === 'long' ? { width: 765 } : { width: 375}}
             value={ defaultText ? defaultText : '' }
             onChange={e => e.preventDefault()}
         />
