@@ -26,7 +26,7 @@ const PurchaseDetailsModel = () => {
   const [orgContactDate, setOrgContactDate] = useState(null);
   const [orgFinishDate, setOrgFinishDate] = useState(null);
   const [orgRegisterDate, setOrgRegisterDate] = useState(null);
-  const [ isFullscreen, setIsFullscreen ] = useState(false);
+  const [ isFullScreen, setIsFullScreen ] = useState(false);
 
   // --- Funtions for Editing ---------------------------------
   const handleCheckEditState = useCallback((name) => {
@@ -256,7 +256,11 @@ const PurchaseDetailsModel = () => {
   }, [editedValues, savedValues, orgRegisterDate]);
 
   const handleWidthChange = useCallback((checked) => {
-    setIsFullscreen(checked);
+    setIsFullScreen(checked);
+    if(checked)
+      localStorage.setItem('isFullScreen', '1');
+    else
+      localStorage.setItem('isFullScreen', '0');
   }, []);
 
   const purchase_items_info = [
@@ -283,27 +287,39 @@ const PurchaseDetailsModel = () => {
   ];
 
   useEffect(() => {
-    console.log("[PurchaseDetailsModel] called!");
-    setOrgDeliveryDate(
-      selectedPurchase.delivery_date
-        ? new Date(selectedPurchase.delivery_date)
-        : null
-    );
-    setOrgContactDate(
-      selectedPurchase.MA_contact_date
-        ? new Date(selectedPurchase.MA_contact_date)
-        : null
-    );
-    setOrgFinishDate(
-      selectedPurchase.MA_finish_date
-        ? new Date(selectedPurchase.MA_finish_date)
-        : null
-    );
-    setOrgRegisterDate(
-      selectedPurchase.registration_date
-        ? new Date(selectedPurchase.registration_date)
-        : null
-    );
+    if(selectedPurchase !== defaultPurchase) {
+      console.log("[PurchaseDetailsModel] called!");
+      setOrgDeliveryDate(
+        selectedPurchase.delivery_date
+          ? new Date(selectedPurchase.delivery_date)
+          : null
+      );
+      setOrgContactDate(
+        selectedPurchase.MA_contact_date
+          ? new Date(selectedPurchase.MA_contact_date)
+          : null
+      );
+      setOrgFinishDate(
+        selectedPurchase.MA_finish_date
+          ? new Date(selectedPurchase.MA_finish_date)
+          : null
+      );
+      setOrgRegisterDate(
+        selectedPurchase.registration_date
+          ? new Date(selectedPurchase.registration_date)
+          : null
+      );
+
+      const detailViewStatus = localStorage.getItem("isFullScreen");
+      if(detailViewStatus === null){
+        localStorage.setItem("isFullScreen", '0');
+        setIsFullScreen(false);
+      } else if(detailViewStatus === '0'){
+        setIsFullScreen(false);
+      } else {
+        setIsFullScreen(true);
+      };
+    };
   }, [selectedPurchase, savedValues]);
 
   return (
@@ -315,7 +331,7 @@ const PurchaseDetailsModel = () => {
         role="dialog"
         aria-modal="true"
       >
-        <div className={isFullscreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
+        <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
           <div className="modal-content">
             <div className="modal-header">
               <div className="row w-100">
@@ -346,7 +362,7 @@ const PurchaseDetailsModel = () => {
                   cancelSaved={handleCancelSaved}
                 />
               </div>
-              <Switch checkedChildren="full" onChange={handleWidthChange}/>
+              <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
               <button
                 type="button"
                 className="btn-close xs-close"

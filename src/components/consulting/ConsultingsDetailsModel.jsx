@@ -22,7 +22,7 @@ const ConsultingsDetailsModel = () => {
   const [ editedValues, setEditedValues ] = useState(null);
   const [ savedValues, setSavedValues ] = useState(null);
   const [ orgReceiptTime, setOrgReceiptTime ] = useState(new Date());
-  const [ isFullscreen, setIsFullscreen ] = useState(false);
+  const [ isFullScreen, setIsFullScreen ] = useState(false);
 
 
   // --- Funtions for Editing ---------------------------------
@@ -152,7 +152,11 @@ const ConsultingsDetailsModel = () => {
   }, [editedValues, savedValues, orgReceiptTime]);
 
   const handleWidthChange = useCallback((checked) => {
-    setIsFullscreen(checked);
+    setIsFullScreen(checked);
+    if(checked)
+      localStorage.setItem('isFullScreen', '1');
+    else
+      localStorage.setItem('isFullScreen', '0');
   }, []);
 
   const consulting_items_info = [
@@ -176,8 +180,18 @@ const ConsultingsDetailsModel = () => {
   ];
 
   useEffect(() => {
-    console.log('[ConsultingsDetailsModel] called!');
-    if (selectedConsulting && (selectedConsulting !== defaultConsulting)) {
+    if(selectedConsulting !== defaultConsulting) {
+      console.log('[ConsultingsDetailsModel] called!');
+
+      const detailViewStatus = localStorage.getItem("isFullScreen");
+      if(detailViewStatus === null){
+        localStorage.setItem("isFullScreen", '0');
+        setIsFullScreen(false);
+      } else if(detailViewStatus === '0'){
+        setIsFullScreen(false);
+      } else {
+        setIsFullScreen(true);
+      };
 
       // Set time from selected consulting data
       let input_time = new Date();
@@ -207,7 +221,7 @@ const ConsultingsDetailsModel = () => {
         };
         setOrgReceiptTime(input_time);
       };
-    }
+    };
   }, [cookies.myLationCrmUserName, selectedConsulting]);
 
   return (
@@ -218,7 +232,7 @@ const ConsultingsDetailsModel = () => {
       role="dialog"
       aria-modal="true"
     >
-      <div className={isFullscreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
+      <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
         <div className="modal-content">
           <div className="modal-header">
             <div className="row w-100">
@@ -259,7 +273,7 @@ const ConsultingsDetailsModel = () => {
                 cancelSaved={handleCancelSaved}
               />
             </div>
-            <Switch checkedChildren="full" onChange={handleWidthChange}/>
+            <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
             <button
               type="button"
               className="btn-close xs-close"

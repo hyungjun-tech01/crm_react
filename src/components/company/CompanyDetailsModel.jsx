@@ -44,7 +44,7 @@ const CompanyDetailsModel = () => {
   const [ transactionByCompany, setTransactionByCompany] = useState([]);
   const [ purchaseByCompany, setPurchaseByCompany] = useState([]);
   const [ expandRelated, setExpandRelated ] = useState([]);
-  const [ isFullscreen, setIsFullscreen ] = useState(false);
+  const [ isFullScreen, setIsFullScreen ] = useState(false);
 
   // --- Funtions for Editing ---------------------------------
   const handleCheckEditState = useCallback((name) => {
@@ -105,7 +105,6 @@ const CompanyDetailsModel = () => {
 
   const handleSaveAll = useCallback(() => {
     if(savedValues !== null
-      && selectedCompany
       && selectedCompany !== defaultCompany)
     {
       const temp_all_saved = {
@@ -225,7 +224,11 @@ const CompanyDetailsModel = () => {
   }, [expandRelated, leadsByCompany, consultingByCompany, quotationByCompany, transactionByCompany, purchaseByCompany]);
 
   const handleWidthChange = useCallback((checked) => {
-    setIsFullscreen(checked);
+    setIsFullScreen(checked);
+    if(checked)
+      localStorage.setItem('isFullScreen', '1');
+    else
+      localStorage.setItem('isFullScreen', '0');
   }, []);
 
   const company_items_info = [
@@ -250,43 +253,61 @@ const CompanyDetailsModel = () => {
     ['application_engineer','company.engineer',{ type:'label' }],
     ['region','common.region',{ type:'label' }],
     ['memo','common.memo',{ type:'textarea', extra:'long' }],
-  ]
+  ];
 
   useEffect(() => {
-    console.log('[CompanyDetailsModel] called!');
-    setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
-    setOrgCloseDate(selectedCompany.closure_date ? new Date(selectedCompany.closure_date) : null);
-    setExpandRelated([]);
+    if(selectedCompany !== defaultCompany) {
+      console.log('[CompanyDetailsModel] called!');
+      setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
+      setOrgCloseDate(selectedCompany.closure_date ? new Date(selectedCompany.closure_date) : null);
+      setExpandRelated([]);
 
-    if(allLeads.length === 0){
-      loadAllLeads();
-    } else {
-      const companyleads = allLeads.filter(lead => lead.company_code === selectedCompany.company_code);
-      setLeadsByCompany(companyleads);
-    };
-    if(allConsultings.length === 0){
-      loadAllConsultings();
-    } else {
-      const companyConsultings = allConsultings.filter(consult => consult.company_code === selectedCompany.company_code);
-      setConsultingByCompany(companyConsultings);
-    };
-    if(allQuotations.length === 0){
-      loadAllQuotations();
-    } else {
-      const companyQuotations = allQuotations.filter(quotation => quotation.company_code === selectedCompany.company_code);
-      setQuotationByCompany(companyQuotations);
-    };
-    if(allTransactions.length === 0){
-      loadAllTransactions();
-    } else {
-      const companyTransactions = allTransactions.filter(transaction => transaction.company_name === selectedCompany.company_name);
-      setTransactionByCompany(companyTransactions);
-    };
-    if(allPurchases.length === 0){
-      loadAllPurchases();
-    } else {
-      const companyPurchases = allPurchases.filter(purchase => purchase.company_code === selectedCompany.company_code);
-      setPurchaseByCompany(companyPurchases);
+      const detailViewStatus = localStorage.getItem("isFullScreen");
+      console.log('[CompanyDetailsModel] detailViewStatus :', detailViewStatus);
+
+      if(detailViewStatus === null){
+        localStorage.setItem("isFullScreen", '0');
+        console.log('\tCheck - it is the first time saving variable about screen');
+        setIsFullScreen(false);
+        console.log('\tCheck - setIsFullScreen');
+      } else if(detailViewStatus === '0'){
+        setIsFullScreen(false);
+        console.log('\tCheck - setIsFullScreen');
+      } else {
+        setIsFullScreen(true);
+        console.log('\tCheck - setIsFullScreen');
+      };
+
+      if(allLeads.length === 0){
+        loadAllLeads();
+      } else {
+        const companyleads = allLeads.filter(lead => lead.company_code === selectedCompany.company_code);
+        setLeadsByCompany(companyleads);
+      };
+      if(allConsultings.length === 0){
+        loadAllConsultings();
+      } else {
+        const companyConsultings = allConsultings.filter(consult => consult.company_code === selectedCompany.company_code);
+        setConsultingByCompany(companyConsultings);
+      };
+      if(allQuotations.length === 0){
+        loadAllQuotations();
+      } else {
+        const companyQuotations = allQuotations.filter(quotation => quotation.company_code === selectedCompany.company_code);
+        setQuotationByCompany(companyQuotations);
+      };
+      if(allTransactions.length === 0){
+        loadAllTransactions();
+      } else {
+        const companyTransactions = allTransactions.filter(transaction => transaction.company_name === selectedCompany.company_name);
+        setTransactionByCompany(companyTransactions);
+      };
+      if(allPurchases.length === 0){
+        loadAllPurchases();
+      } else {
+        const companyPurchases = allPurchases.filter(purchase => purchase.company_code === selectedCompany.company_code);
+        setPurchaseByCompany(companyPurchases);
+      };
     };
   }, [selectedCompany, allLeads, allConsultings, allQuotations, allTransactions, allPurchases, loadAllLeads, loadAllConsultings, loadAllQuotations, loadAllTransactions, loadAllPurchases]);
 
@@ -298,7 +319,7 @@ const CompanyDetailsModel = () => {
       role="dialog"
       aria-modal="true"
     >
-      <div className={isFullscreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
+      <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
         <div className="modal-content">
           <div className="modal-header">
             <div className="row w-100">
@@ -338,7 +359,7 @@ const CompanyDetailsModel = () => {
                 cancelSaved={handleCancelSaved}
               />
             </div>
-            <Switch checkedChildren="full" onChange={handleWidthChange}/>
+            <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
             <button
               type="button"
               className="btn-close xs-close"

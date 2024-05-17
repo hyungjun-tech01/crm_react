@@ -21,7 +21,7 @@ const TransactionsDetailsModel = () => {
   const [savedValues, setSavedValues] = useState(null);
   
   const [ orgPublishDate, setOrgPublishDate ] = useState(null);
-  const [ isFullscreen, setIsFullscreen ] = useState(false);
+  const [ isFullScreen, setIsFullScreen ] = useState(false);
 
   // --- Funtions for Editing ---------------------------------
   const handleCheckEditState = useCallback((name) => {
@@ -149,7 +149,11 @@ const TransactionsDetailsModel = () => {
   }, [editedValues, savedValues, orgPublishDate]);
 
   const handleWidthChange = useCallback((checked) => {
-    setIsFullscreen(checked);
+    setIsFullScreen(checked);
+    if(checked)
+      localStorage.setItem('isFullScreen', '1');
+    else
+      localStorage.setItem('isFullScreen', '0');
   }, []);
 
   const transaction_items_info = [
@@ -170,12 +174,24 @@ const TransactionsDetailsModel = () => {
   ];
 
   useEffect(() => {
-    console.log("[TransactionDetailsModel] called!");
-    setOrgPublishDate(
-      selectedTransaction.publish_date
-      ? new Date(selectedTransaction.publish_date)
-      : null
-    );
+    if(selectedTransaction !== defaultTransaction) {
+      console.log("[TransactionDetailsModel] called!");
+      setOrgPublishDate(
+        selectedTransaction.publish_date
+        ? new Date(selectedTransaction.publish_date)
+        : null
+      );
+
+      const detailViewStatus = localStorage.getItem("isFullScreen");
+      if(detailViewStatus === null){
+        localStorage.setItem("isFullScreen", '0');
+        setIsFullScreen(false);
+      } else if(detailViewStatus === '0'){
+        setIsFullScreen(false);
+      } else {
+        setIsFullScreen(true);
+      };
+    };
   }, [selectedTransaction, savedValues]);
 
   return (
@@ -186,7 +202,7 @@ const TransactionsDetailsModel = () => {
       role="dialog"
       aria-modal="true"
     >
-      <div className={isFullscreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
+      <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
         <div className="modal-content">
           <div className="modal-header">
             <div className="row w-100">
@@ -228,7 +244,7 @@ const TransactionsDetailsModel = () => {
                 cancelSaved={handleCancelSaved}
               />
             </div>
-            <Switch checkedChildren="full" onChange={handleWidthChange}/>
+            <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
             <button
               type="button"
               className="btn-close xs-close"

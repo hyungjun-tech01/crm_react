@@ -67,7 +67,6 @@ const Header = (props) => {
   };
 
   const titleOnTop = (itemsArray.indexOf(addressValue) >= 0);
-  console.log('Header / topTitle :', titleOnTop);
 
   return (
     <div className="header" id="heading">

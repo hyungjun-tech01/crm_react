@@ -42,13 +42,14 @@ const LeadsDetailsModel = () => {
 
   const [ editedValuesCompany, setEditedValuesCompany ] = useState(null);
   const [ savedValuesCompany, setSavedValuesCompany ] = useState(null);
+
   const [activeTab, setActiveTab] = useState(""); // 상태 관리를 위한 useState
   const [statusSearch, setStatusSearch] = useState("");
   const [searchCondition, setSearchCondition] = useState("");
   const [searchQuotationCondition, setSearchQuotationCondition] = useState("");
   const { loadCompanyConsultings, filterConsulting, setCurrentConsulting} = useRecoilValue(ConsultingRepo);
   const { loadCompanyQuotations, setCurrentQuotation} = useRecoilValue(QuotationRepo);
-  const [ isFullscreen, setIsFullscreen ] = useState(false);
+  const [ isFullScreen, setIsFullScreen ] = useState(false);
   
   
   // 상태(state) 정의
@@ -126,7 +127,6 @@ const [selectedRow, setSelectedRow] = useState(null);
 
   const handleSaveAll = useCallback(() => {
     if(savedValues !== null
-      && selectedLead
       && selectedLead !== defaultLead)
     {
       const temp_all_saved = {
@@ -349,7 +349,11 @@ const [selectedRow, setSelectedRow] = useState(null);
   };
 
   const handleWidthChange = useCallback((checked) => {
-    setIsFullscreen(checked);
+    setIsFullScreen(checked);
+    if(checked)
+      localStorage.setItem('isFullScreen', '1');
+    else
+      localStorage.setItem('isFullScreen', '0');
   }, []);
 
   const lead_items_info = [
@@ -371,9 +375,21 @@ const [selectedRow, setSelectedRow] = useState(null);
   ];
 
   useEffect(() => {
-    console.log('[LeadsDetailsModel] called!');
-    setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
-    setOrgCloseDate(selectedCompany.closure_date ? new Date(selectedCompany.closure_date) : null);
+    if(selectedLead !== defaultLead) {
+      console.log('[LeadsDetailsModel] called!');
+      setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
+      setOrgCloseDate(selectedCompany.closure_date ? new Date(selectedCompany.closure_date) : null);
+
+      const detailViewStatus = localStorage.getItem("isFullScreen");
+      if(detailViewStatus === null){
+        localStorage.setItem("isFullScreen", '0');
+        setIsFullScreen(false);
+      } else if(detailViewStatus === '0'){
+        setIsFullScreen(false);
+      } else {
+        setIsFullScreen(true);
+      };
+    };
   }, [selectedLead, savedValues, selectedCompany.establishment_date, selectedCompany.closure_date]);
 
   return (
@@ -385,7 +401,7 @@ const [selectedRow, setSelectedRow] = useState(null);
         role="dialog"
         aria-modal="true"
       >
-        <div className={isFullscreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
+        <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
           <div className="modal-content">
             <div className="modal-header">
               <div className="row w-100">
@@ -431,7 +447,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                   cancelSaved={handleCancelSaved}
                 />
               </div>
-              <Switch checkedChildren="full" onChange={handleWidthChange}/>
+              <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
               <button
                 type="button"
                 className="btn-close xs-close"

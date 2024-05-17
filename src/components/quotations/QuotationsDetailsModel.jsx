@@ -37,7 +37,7 @@ const QuotationsDetailsModel = () => {
 
   const [ checkContentState, setCheckContentState ] = useState(null);
   const [ isNewlyAdded, setIsNewlyAdded ] = useState(false);
-  const [ isFullscreen, setIsFullscreen ] = useState(false);
+  const [ isFullScreen, setIsFullScreen ] = useState(false);
 
   // --- Funtions for Quotation Date ----------------------------------------------------
   const handleStartQuotationDateEdit = useCallback(() => {
@@ -407,7 +407,11 @@ const QuotationsDetailsModel = () => {
   }, []);
 
   const handleWidthChange = useCallback((checked) => {
-    setIsFullscreen(checked);
+    setIsFullScreen(checked);
+    if(checked)
+      localStorage.setItem('isFullScreen', '1');
+    else
+      localStorage.setItem('isFullScreen', '0');
   }, []);
 
   const qotation_items_info = [
@@ -450,19 +454,20 @@ const QuotationsDetailsModel = () => {
 
   // --- useEffect ------------------------------------------------------
   useEffect(() => {
-    console.log('[QuotationsDetailsModel] called!');
-    setOrgQuotationDate(
-      selectedQuotation.quotation_date
-        ? new Date(selectedQuotation.quotation_date)
-        : null
-    );
-    setOrgConfirmDate(
-      selectedQuotation.comfirm_date
-        ? new Date(selectedQuotation.comfirm_date)
-        : null
-    );
-    if(selectedQuotation !== defaultQuotation)
-    {
+    if(selectedQuotation !== defaultQuotation) {
+      console.log('[QuotationsDetailsModel] called!');
+      setOrgQuotationDate(
+        selectedQuotation.quotation_date
+          ? new Date(selectedQuotation.quotation_date)
+          : null
+      );
+
+      setOrgConfirmDate(
+        selectedQuotation.comfirm_date
+          ? new Date(selectedQuotation.comfirm_date)
+          : null
+      );
+
       const headerValues = selectedQuotation.quotation_table.split('|');
       if(headerValues && Array.isArray(headerValues)){
         let tableHeaders = [];
@@ -484,7 +489,17 @@ const QuotationsDetailsModel = () => {
         };
         setCheckContentState(tempCheck);
       };
-    }
+
+      const detailViewStatus = localStorage.getItem("isFullScreen");
+      if(detailViewStatus === null){
+        localStorage.setItem("isFullScreen", '0');
+        setIsFullScreen(false);
+      } else if(detailViewStatus === '0'){
+        setIsFullScreen(false);
+      } else {
+        setIsFullScreen(true);
+      };
+    };
   }, [ selectedQuotation, savedValues ]);
 
   return (
@@ -496,7 +511,7 @@ const QuotationsDetailsModel = () => {
         role="dialog"
         aria-modal="true"
       >
-        <div className={isFullscreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
+        <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
           <div className="modal-content">
             <div className="modal-header">
               <div className="row w-100">
@@ -537,7 +552,7 @@ const QuotationsDetailsModel = () => {
                   cancelSaved={handleCancelSaved}
                 />
               </div>
-              <Switch checkedChildren="full" onChange={handleWidthChange}/>
+              <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
               <button
                 type="button"
                 className="btn-close xs-close"
