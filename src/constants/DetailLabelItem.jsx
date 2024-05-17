@@ -11,6 +11,7 @@ const DetailLabelItem = (props) => {
                 <td className={"detail-td-left " + (no_border && "border-0")}>{title}</td>
                 <td className={"detail-td-center " + (no_border && "border-0")} >
                     <input
+                        autoFocus
                         className='detail-edit-label'
                         type={type ? type : "text"}
                         placeholder={title}
