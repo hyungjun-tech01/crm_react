@@ -7,7 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 const DateInput = (props) => {
     const { name, addonBefore, addonAfter, change, format, showTime, style, value } = props;
     return (
-        <div class="ant-space-item">
+        <div className="ant-space-item">
             <span className='ant-input-group-wrapper
                 ant-input-group-wrapper-outlined
                 css-dev-only-do-not-override-1uweeqc'
@@ -46,7 +46,7 @@ const DateInput = (props) => {
 const TextareaInput = (props) => {
     const { name, addonBefore, addonAfter, style, row_no, title, value, change, disabled } = props;
     return (
-        <div class="ant-space-item">
+        <div className="ant-space-item">
             <span className='ant-input-group-wrapper
                 ant-input-group-wrapper-outlined
                 css-dev-only-do-not-override-1uweeqc'
@@ -79,7 +79,7 @@ const TextareaInput = (props) => {
 const SelectInput = (props) => {
     const { addonBefore, addonAfter, style, value, change, disabled, options } = props;
     return (
-        <div class="ant-space-item">
+        <div className="ant-space-item">
             <span className='ant-input-group-wrapper
                 ant-input-group-wrapper-outlined
                 css-dev-only-do-not-override-1uweeqc'

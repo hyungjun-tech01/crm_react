@@ -77,8 +77,8 @@ const TransactionView = () => {
     const [ transactionContents, setTransactionContents ] = useState([]);
 
     useEffect(() => {
-        console.log('Load TransactionView');
-        if(currentTransaction && currentTransaction !== defaultTransaction){
+        if(currentTransaction !== defaultTransaction){
+            console.log('Load TransactionView');
             const tempContents = JSON.parse(currentTransaction.transaction_contents);
             if(tempContents && Array.isArray(tempContents)){
                 const num_10 = Math.ceil(tempContents.length / 10) * 10;

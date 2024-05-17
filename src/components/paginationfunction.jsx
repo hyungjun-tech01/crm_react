@@ -20,6 +20,6 @@ export function onShowSizeChange(current, pageSize) {
 export function ShowTotal(total, range) {
   const { i18n } = useTranslation();
   return i18n.language === 'ko' ? 
-    `${total} 항목 중, ${range[0]}에서 ${range[1]}` :
+    `${total} 항목 중, ${range[0]}에서 ${range[1]}까지` :
     `Showing ${range[0]} to ${range[1]} of ${total} entries`;
 }
