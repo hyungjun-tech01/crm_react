@@ -279,6 +279,7 @@ export const defaultPurchase = {
     purchase_code: null,
     //----- Company info --------------
     company_code: null,
+    company_name: null,
     //----- Product info --------------
     product_code: null,
     product_type: null,
@@ -313,5 +314,9 @@ export const atomAllPurchases = atom({
 
 export const atomCompanyPurchases = atom({
     key: "companyPurchases",
+    default: [],
+});
+export const atomFilteredPurchase = atom({
+    key: "allFilteredPurchases",
     default: [],
 });

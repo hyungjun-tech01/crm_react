@@ -66,7 +66,8 @@ export const ConsultingRepo = selector({
             else {
                 allConsulting = 
                 allConsultingList.filter(item => ( (item.lead_name &&item.lead_name.includes(filterText))||
-                                                  (item.receiver && item.receiver.includes(filterText))
+                                                  (item.receiver && item.receiver.includes(filterText))||
+                                                  (item.consulting_type && item.consulting_type .includes(filterText))
                 ));
             }
            

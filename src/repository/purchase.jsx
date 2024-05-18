@@ -1,6 +1,6 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentPurchase, atomAllPurchases, atomCompanyPurchases } from '../atoms/atoms';
+import { atomCurrentPurchase, atomAllPurchases, atomCompanyPurchases , atomFilteredPurchase} from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
@@ -42,9 +42,48 @@ export const PurchaseRepo = selector({
                 set(atomCompanyPurchases, data);
             }
             catch(err){
-                console.error(`loadAllCompanies / Error : ${err}`);
+                console.error(`loadCompanyPurchases / Error : ${err}`);
             };
         });
+        const filterCompanyPurchase = getCallback(({set, snapshot }) => async (filterText) => {
+            const allPurchaseList = await snapshot.getPromise(atomCompanyPurchases);
+            
+            let allPurchase;
+            if (filterText === '') {
+                allPurchase = allPurchaseList;
+            }
+            else {
+                allPurchase = 
+                allPurchaseList.filter(item => ( item.product_type && item.product_type.includes(filterText)||
+                                                item.product_name && item.product_name.includes(filterText)             
+                ));
+            }
+            set(atomFilteredPurchase, allPurchase);
+            return true;
+        });
+
+        const filterPurchases = getCallback(({set, snapshot }) => async (itemName, filterText) => {
+            const allPurchaseList = await snapshot.getPromise(atomAllPurchases);
+            let  allQPurchase ;
+            console.log('filterPurchases', itemName, filterText);
+            if(itemName === 'common.all'){
+                allQPurchase = allPurchaseList.filter(item => (item.product_type &&item.product_type.includes(filterText))||
+                                            (item.product_name && item.product_name.includes(filterText)) ||
+                                            (item.company_name && item.company_name.includes(filterText)) 
+                );
+            }else if(itemName === 'purchase.product_type'){
+                allQPurchase = allPurchaseList.filter(item => (item.product_type &&item.product_type.includes(filterText))
+                );    
+            }else if(itemName === 'purchase.product_name'){
+                allQPurchase = allPurchaseList.filter(item => (item.product_name &&item.product_name.includes(filterText))
+                );  
+            }else if(itemName === 'company.company_name'){
+                allQPurchase = allPurchaseList.filter(item => (item.company_name &&item.company_name.includes(filterText))
+                );  
+            }
+            set(atomFilteredPurchase, allQPurchase);
+            return true;
+        });            
         const modifyPurchase = getCallback(({set, snapshot}) => async (newPurchase) => {
             const input_json = JSON.stringify(newPurchase);
             console.log(`[ modifyPurchase ] input : `, input_json);
@@ -108,8 +147,16 @@ export const PurchaseRepo = selector({
         });
         const setCurrentPurchase = getCallback(({set, snapshot}) => async (purchase_code) => {
             try{
-                const allPurchases = await snapshot.getPromise(atomAllPurchases);
-                const selected_arrary = allPurchases.filter(purchase => purchase.purchase_code === purchase_code);
+                if(purchase_code === undefined || purchase_code === null) {
+                    set(atomCurrentPurchase, defaultPurchase);
+                    return;
+                };
+                let queriedPurchases = await snapshot.getPromise(atomAllPurchases);
+
+                if(queriedPurchases.length === 0){
+                    queriedPurchases = await snapshot.getPromise(atomCompanyPurchases);
+                };
+                const selected_arrary = queriedPurchases.filter(purchase => purchase.purchase_code === purchase_code);
                 if(selected_arrary.length > 0){
                     set(atomCurrentPurchase, selected_arrary[0]);
                 }
@@ -123,6 +170,8 @@ export const PurchaseRepo = selector({
             loadCompanyPurchases,
             modifyPurchase,
             setCurrentPurchase,
+            filterPurchases,
+            filterCompanyPurchase
         };
     }
 });
