@@ -5,7 +5,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const DateInput = forwardRef((props, ref) => {
-    const { name, addonBefore, addonAfter, onChange, format, showTime, style, value } = props;
+    const { name, addonBefore, addonAfter, onChange, format, showTime, style, value, disabled } = props;
     return (
         <div className="ant-space-item">
             <span className='ant-input-group-wrapper
@@ -26,6 +26,7 @@ const DateInput = forwardRef((props, ref) => {
                             onChange={ onChange }
                             dateFormat={ format }
                             showTimeSelect
+                            disabled={disabled}
                         /> :
                         <DatePicker
                             className="ant-input css-dev-only-do-not-override-1uweeqc ant-input-outlined"
@@ -34,6 +35,7 @@ const DateInput = forwardRef((props, ref) => {
                             selected={ value }
                             onChange={ onChange }
                             dateFormat={ format }
+                            disabled={disabled}
                         />
                     }
                     <span className='ant-input-group-addon'>
@@ -58,8 +60,8 @@ const TextareaInput = forwardRef((props, ref) => {
                     <span className='ant-input-group-addon'>
                         { addonBefore }
                     </span>
-                    <textarea
-                        className="ant-input detail-input-extra"
+                    <Input.TextArea
+                        // className="ant-input detail-input-extra"
                         ref={ref}
                         name={ name }
                         rows={ row_no }
@@ -121,7 +123,7 @@ const DetailCardItem = (props) => {
     const startEditFunc = detail.type !== 'date'
         ? () => {
             startEdit(name);
-            if(detail.type === 'label'){
+            if(detail.type === 'label' || detail.type === 'textarea'){
                 console.log('\tDetailCardItem / startEnditFunc :', inputRef.current);
                 inputRef.current.focus({cursor: 'end',});
             }
@@ -132,7 +134,6 @@ const DetailCardItem = (props) => {
         }
         : () => {
             detail.startEditTime();
-            // inputRef.current.focus();
         };
     
     const endEditFunc = detail.type !== 'date'
@@ -142,15 +143,11 @@ const DetailCardItem = (props) => {
     const changeFunc = detail.type !== 'date'
         ? editing : detail.timeDataChange;
     
-    // const options = detail.time ?
-    //     {year: 'numeric', month: 'short', day: 'numeric', hour:'numeric', minute:'numeric', second:'numeric'} :
-    //     {year: 'numeric', month: 'short', day: 'numeric'};
-    
     const currentValue = detail.type === 'date'
         ? detail.orgTimeData : (defaultText ? defaultText : '');
+
     const editedValue = editChecked ? edited[name] : null;
     const savedValue = saveChecked ? saved[name] : null;
-    
     const finalValue = editChecked ? editedValue : (saveChecked ? savedValue : currentValue);
 
     const SharedProps = {
@@ -173,18 +170,18 @@ const DetailCardItem = (props) => {
     };
 
     if(detail.type === 'date'){
-        if(finalValue === '') {
-            return <Input {...SharedProps} ref={inputRef} />;
-        };
+        // if(!editChecked){
+        //     return <Input {...SharedProps} ref={inputRef} />;
+        // };
         const timeformat = detail.time ? "yyyy-MM-dd hh:mm:ss" : "yyyy-MM-dd";
-        return <DateInput {...SharedProps} ref={inputRef} format={ timeformat } showTime={ detail.time } disabled={!editChecked} />;
+        return <DateInput {...SharedProps} ref={inputRef} format={ timeformat } showTime={ detail.time } disabled={!editChecked}/>;
     };
 
     if(detail.type === 'textarea'){
-        return <TextareaInput {...SharedProps} ref={inputRef} row_no={ detail.row_no ? detail.row_no : 2} disabled={!editChecked}/>;
+        return <TextareaInput {...SharedProps} ref={inputRef} row_no={ detail.row_no ? detail.row_no : 2} />;
     };
 
-    return <SelectInput {...SharedProps} ref={inputRef} options={detail.options} disabled={!editChecked}/>;
+    return <SelectInput {...SharedProps} ref={inputRef} options={detail.options} disabled={!editChecked} />;
 };
 
 export default DetailCardItem;

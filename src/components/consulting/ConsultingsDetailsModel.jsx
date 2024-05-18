@@ -205,13 +205,11 @@ const ConsultingsDetailsModel = () => {
       if(selectedConsulting.receipt_date !== null
         && selectedConsulting.receipt_date !== '' && selectedConsulting.receipt_date !== undefined)
       {
-        console.log('\tuseEffect / receipt date :', selectedConsulting.receipt_date);
         input_time.setTime(Date.parse(selectedConsulting.receipt_date));
 
         if(selectedConsulting.receipt_time !== null
           && selectedConsulting.receipt_time !== '' && selectedConsulting.receipt_time !== undefined)
         {
-          console.log('\tuseEffect / receipt time :', selectedConsulting.receipt_time);
           let converted_time = '';
           const splitted = selectedConsulting.receipt_time.split(' ');
           if(splitted.length === 2) {
