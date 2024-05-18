@@ -14,7 +14,7 @@ import { AddBoxOutlined, ModeEdit, IndeterminateCheckBoxOutlined } from '@mui/ic
 import { LeadRepo } from "../../repository/lead";
 import { TransactionRepo } from "../../repository/transaction";
 import { atomAllCompanies, atomAllLeads, defaultTransaction } from "../../atoms/atoms";
-import { ConverTextAmount, formateDate } from "../../constants/functions";
+import { ConverTextAmount, formatDate } from "../../constants/functions";
 
 const default_transaction_content = {
   "transaction_code": null,
@@ -102,7 +102,7 @@ const TransactionAddNewModal = (props) => {
 
   const handlePublishDateChange = useCallback((date) => {
     setPublishDate(date);
-    const localDate = formateDate(date);
+    const localDate = formatDate(date);
     const tempChanges = {
       ...transactionChange,
       publish_date: localDate,

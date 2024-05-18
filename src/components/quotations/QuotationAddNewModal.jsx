@@ -13,7 +13,7 @@ import { AddBoxOutlined, ModeEdit, IndeterminateCheckBoxOutlined, SettingsOutlin
 
 import { QuotationRepo, QuotationSendTypes } from "../../repository/quotation";
 import { atomAllCompanies, atomAllLeads, defaultQuotation } from "../../atoms/atoms";
-import { ConverTextAmount, formateDate } from "../../constants/functions";
+import { ConverTextAmount, formatDate } from "../../constants/functions";
 
 const default_quotation_content = {
   '1': null, '2': null, '3': null, '4': null, '5': null,
@@ -129,7 +129,7 @@ const QuotationAddNewModal = (props) => {
 
   const handleQuotationDateChange = (date) => {
     setQuotationDate(date);
-    const localDate = formateDate(date);
+    const localDate = formatDate(date);
     const tempChanges = {
       ...quotationChange,
       quotation_date: localDate,
@@ -139,7 +139,7 @@ const QuotationAddNewModal = (props) => {
 
   const handleConfirmDateChange = (date) => {
     setConfirmDate(date);
-    const localDate = formateDate(date);
+    const localDate = formatDate(date);
     const tempChanges = {
       ...quotationChange,
       comfirm_date: localDate,

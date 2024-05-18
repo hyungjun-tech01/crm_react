@@ -90,7 +90,6 @@ const CompanyDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, selectedCompany]);
 
-  // --- Funtions for Saving ---------------------------------
   const handleCheckSaved = useCallback((name) => {
     return savedValues !== null && name in savedValues;
   }, [savedValues]);
@@ -103,6 +102,7 @@ const CompanyDetailsModel = () => {
     setSavedValues(tempSaved);
   }, [savedValues]);
 
+  // --- Funtions for Saving ---------------------------------
   const handleSaveAll = useCallback(() => {
     if(savedValues !== null
       && selectedCompany !== defaultCompany)
@@ -144,6 +144,7 @@ const CompanyDetailsModel = () => {
     };
     setEditedValues(tempEdited);
   }, [editedValues, orgEstablishDate]);
+
   const handleEstablishDateChange = useCallback((date) => {
     const tempEdited = {
       ...editedValues,
@@ -151,6 +152,7 @@ const CompanyDetailsModel = () => {
     };
     setEditedValues(tempEdited);
   }, [editedValues]);
+
   const handleEndEstablishDateEdit = useCallback(() => {
     const establishDate = editedValues.establishment_date;
     if(establishDate !== orgEstablishDate) {
@@ -175,6 +177,7 @@ const CompanyDetailsModel = () => {
     };
     setEditedValues(tempEdited);
   }, [editedValues, orgCloseDate]);
+
   const handleCloseDateChange = useCallback((date) => {
     const tempEdited = {
       ...editedValues,
@@ -182,6 +185,7 @@ const CompanyDetailsModel = () => {
     };
     setEditedValues(tempEdited);
   }, [editedValues]);
+
   const handleEndCloseDateEdit = useCallback(() => {
     const closeDate = editedValues.closure_date;
     if(closeDate !== orgCloseDate) {
@@ -198,7 +202,7 @@ const CompanyDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, orgCloseDate]);
 
-  // --- Funtions for Etc ---------------------------------
+  // --- Funtions for Related Items ---------------------------------
   const handleCardClick = useCallback((card) => {
     if(card === "lead" && leadsByCompany.length === 0) return;
     if(card === "consulting" && consultingByCompany.length === 0) return;
@@ -223,12 +227,19 @@ const CompanyDetailsModel = () => {
     setExpandRelated(tempExpanded);
   }, [expandRelated, leadsByCompany, consultingByCompany, quotationByCompany, transactionByCompany, purchaseByCompany]);
 
+  // --- Funtions for Control Windows ---------------------------------
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
     if(checked)
       localStorage.setItem('isFullScreen', '1');
     else
       localStorage.setItem('isFullScreen', '0');
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setEditedValues(null);
+    setSavedValues(null);
+    setCurrentCompany();
   }, []);
 
   const company_items_info = [
@@ -263,19 +274,14 @@ const CompanyDetailsModel = () => {
       setExpandRelated([]);
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
-      console.log('[CompanyDetailsModel] detailViewStatus :', detailViewStatus);
 
       if(detailViewStatus === null){
         localStorage.setItem("isFullScreen", '0');
-        console.log('\tCheck - it is the first time saving variable about screen');
         setIsFullScreen(false);
-        console.log('\tCheck - setIsFullScreen');
       } else if(detailViewStatus === '0'){
         setIsFullScreen(false);
-        console.log('\tCheck - setIsFullScreen');
       } else {
         setIsFullScreen(true);
-        console.log('\tCheck - setIsFullScreen');
       };
 
       if(allLeads.length === 0){
@@ -364,7 +370,7 @@ const CompanyDetailsModel = () => {
               type="button"
               className="btn-close xs-close"
               data-bs-dismiss="modal"
-              onClick={()=>setCurrentCompany()}
+              onClick={ handleClose }
             />
           </div>
           <div className="modal-body">

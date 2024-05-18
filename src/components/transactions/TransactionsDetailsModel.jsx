@@ -156,6 +156,12 @@ const TransactionsDetailsModel = () => {
       localStorage.setItem('isFullScreen', '0');
   }, []);
 
+  const handleClose = useCallback(() => {
+    setEditedValues(null);
+    setSavedValues(null);
+    setCurrentTransaction();
+  }, []);
+
   const transaction_items_info = [
     ['transaction_title','transaction.title',{ type:'label',extra:'long' }],
     ['transaction_type','transaction.type',{ type:'label' }],
@@ -249,7 +255,7 @@ const TransactionsDetailsModel = () => {
               type="button"
               className="btn-close xs-close"
               data-bs-dismiss="modal"
-              onClick={() => setCurrentTransaction()}
+              onClick={ handleClose }
             />
           </div>
           <div className="modal-body">

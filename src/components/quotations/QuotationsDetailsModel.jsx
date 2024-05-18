@@ -414,6 +414,12 @@ const QuotationsDetailsModel = () => {
       localStorage.setItem('isFullScreen', '0');
   }, []);
 
+  const handleClose = useCallback(() => {
+    setEditedValues(null);
+    setSavedValues(null);
+    setCurrentQuotation();
+  }, []);
+
   const qotation_items_info = [
     ['quotation_type','quotation.quotation_type',{ type:'label'}],
     ['quotation_manager','quotation.quotation_manager',{ type:'label'}],
@@ -557,7 +563,7 @@ const QuotationsDetailsModel = () => {
                 type="button"
                 className="btn-close xs-close"
                 data-bs-dismiss="modal"
-                onClick={() => setCurrentQuotation()}
+                onClick={ handleClose }
               />
             </div>
             <div className="modal-body">

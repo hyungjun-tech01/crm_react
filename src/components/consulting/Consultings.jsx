@@ -19,7 +19,7 @@ import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { ConsultingRepo, ConsultingTypes } from "../../repository/consulting";
 import { atomAllCompanies, atomAllConsultings, atomAllLeads, defaultConsulting, atomFilteredConsulting } from "../../atoms/atoms";
-import { compareCompanyName, compareText, formateDate } from "../../constants/functions";
+import { compareCompanyName, compareText, formatDate } from "../../constants/functions";
 
 import { useTranslation } from "react-i18next";
 
@@ -60,7 +60,7 @@ const Consultings = () => {
 
   const handleReceiptDateChange = (date) => {
     setReceiptDate(date);
-    const localDate = formateDate(date);
+    const localDate = formatDate(date);
     const localTime = date.toLocaleTimeString('ko-KR');
     const tempChanges = {
       ...consultingChange,

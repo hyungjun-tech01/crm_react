@@ -33,12 +33,21 @@ export const compareText = (text1, text2) => {
     return 0;
 };
 
-export const formateDate = (date_value) => {
+export const formatDate = (date_value) => {
     const month = date_value.getMonth() + 1;
     const date = date_value.getDate();
     return date_value.getFullYear()
           + "." + (month < 10 ? "0" + month.toString() : month.toString())
           + "." + (date < 10 ? "0" + date.toString() : date.toString());
+};
+
+export const formatTime = (date_value) => {
+    const hours = date_value.getHours();
+    const min = date_value.getMinutes();
+    const sec = date_value.getSeconds();
+    return (hours < 10 ? "0" + hours.toString() : hours.toString())
+          + ":" + (min < 10 ? "0" + min.toString() : min.toString())
+          + ":" + (sec < 10 ? "0" + sec.toString() : sec.toString());
 };
 
 export const ConverTextAmount = (amount) => {

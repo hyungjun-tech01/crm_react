@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useRef, forwardRef } from 'react';
 import { Input, Select } from 'antd';
 import { Cancel, Edit, SaveAlt } from '@mui/icons-material';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const DateInput = (props) => {
-    const { name, addonBefore, addonAfter, change, format, showTime, style, value } = props;
+const DateInput = forwardRef((props, ref) => {
+    const { name, addonBefore, addonAfter, onChange, format, showTime, style, value } = props;
     return (
         <div className="ant-space-item">
             <span className='ant-input-group-wrapper
@@ -20,17 +20,19 @@ const DateInput = (props) => {
                     {showTime ? 
                         <DatePicker
                             className="ant-input css-dev-only-do-not-override-1uweeqc ant-input-outlined"
+                            ref={ref}
                             name={ name }
                             selected={ value }
-                            onChange={ change }
+                            onChange={ onChange }
                             dateFormat={ format }
                             showTimeSelect
                         /> :
                         <DatePicker
                             className="ant-input css-dev-only-do-not-override-1uweeqc ant-input-outlined"
+                            ref={ref}
                             name={ name }
                             selected={ value }
-                            onChange={ change }
+                            onChange={ onChange }
                             dateFormat={ format }
                         />
                     }
@@ -41,10 +43,10 @@ const DateInput = (props) => {
             </span>
         </div>
     );
-};
+});
 
-const TextareaInput = (props) => {
-    const { name, addonBefore, addonAfter, style, row_no, title, value, change, disabled } = props;
+const TextareaInput = forwardRef((props, ref) => {
+    const { name, addonBefore, addonAfter, style, row_no, title, value, onChange, disabled } = props;
     return (
         <div className="ant-space-item">
             <span className='ant-input-group-wrapper
@@ -58,15 +60,15 @@ const TextareaInput = (props) => {
                     </span>
                     <textarea
                         className="ant-input detail-input-extra"
+                        ref={ref}
                         name={ name }
                         rows={ row_no }
                         placeholder={ title }
-                        onChange={ change }
-                        disabled={ disabled ? true : false}
+                        onChange={ onChange }
+                        disabled={ disabled }
                         style={{ backgroundColor: 'white' }}
-                    >
-                        { value }
-                    </textarea>
+                        value={ value }
+                    />
                     <span className='ant-input-group-addon'>
                         { addonAfter }
                     </span>
@@ -74,10 +76,10 @@ const TextareaInput = (props) => {
             </span>
         </div>
     );
-};
+});
 
-const SelectInput = (props) => {
-    const { addonBefore, addonAfter, style, value, change, disabled, options } = props;
+const SelectInput = forwardRef((props, ref) => {
+    const { addonBefore, addonAfter, style, value, onChange, disabled, options } = props;
     return (
         <div className="ant-space-item">
             <span className='ant-input-group-wrapper
@@ -91,9 +93,10 @@ const SelectInput = (props) => {
                     </span>
                     <Select
                         className="ant-input css-dev-only-do-not-override-1uweeqc detail-input-extra"
+                        ref={ref}
                         defaultValue={value}
                         options={options}
-                        onChange={change}
+                        onChange={onChange}
                         disabled={ disabled ? true : false}
                     />
                     <span className='ant-input-group-addon'>
@@ -103,150 +106,85 @@ const SelectInput = (props) => {
             </span>
         </div>
     );
-};
+});
 
 const DetailCardItem = (props) => {
     const { defaultText, edited, saved, name, title, detail,
         checkEdit, startEdit, endEdit,
         editing, checkSaved, cancelSaved
     } = props;
-
-    if(checkEdit && checkEdit(name)) {
-        if(detail.type === 'label') {
-            return (
-                <Input
-                    name={ name }
-                    addonBefore={ <div className='detail-card-before'>{title}</div> }
-                    addonAfter={ <SaveAlt onClick={() => { endEdit(name); }}/>}
-                    value={ edited[name] }
-                    style={ detail.extra === 'long' ? { width: 770 } : { width: 380}}
-                    onChange={ editing }
-                    onPressEnter={() => endEdit(name)}
-                />
-            );
-        };
-        if(detail.type === 'date') {
-            const timeformat = detail.time ? "yyyy-MM-dd hh:mm:ss" : "yyyy-MM-dd";
-            return (
-                <DateInput
-                    name={ name }
-                    addonBefore={ <div className='detail-card-before'>{title}</div> }
-                    addonAfter={ <SaveAlt onClick={() => { detail.endEditTime(name); }}/> }
-                    change={ detail.timeDataChange }
-                    format={ timeformat }
-                    showTime={ detail.time }
-                    style={{ width: 380 }}
-                    value={ edited[name] }
-                />
-            );
-        };
-        if(detail.type === 'textarea') {
-            return (
-                <TextareaInput
-                    name={ name }
-                    addonBefore={ <div className='detail-card-before'>{title}</div> }
-                    addonAfter={ <SaveAlt onClick={() => { endEdit(name); }}/>}
-                    style={ detail.extra === 'long' ? { width: 770 } : { width: 380}}
-                    row_no={ detail.row_no ? detail.row_no : 2}
-                    title={ title }
-                    value={ edited[name] }
-                    change={ editing }
-                    onPressEnter={() => endEdit(name)}
-                />
-            );
-        };
-        return (
-            <SelectInput
-                name={name}
-                addonBefore={ <div className='detail-card-before'>{title}</div> }
-                addonAfter={ <SaveAlt onClick={() => { detail.endEditTime(name); }}/> }
-                change={ editing }
-                style={ detail.extra === 'long' ? { width: 770 } : { width: 380}}
-                options={ detail.options }
-                value={ defaultText }
-            />
-        );
-    };
-    if(checkSaved && checkSaved(name)) {
-        if(detail.type === 'date') {
-            const options = detail.time ?
-                {year: 'numeric', month: 'short', day: 'numeric', hour:'numeric', minute:'numeric', second:'numeric'} :
-                {year: 'numeric', month: 'short', day: 'numeric'};
-            const checked_value = (saved[name]) ? (new Date(saved[name])).toLocaleDateString('ko-KR', options) : '';
-            return (
-                <Input
-                    addonBefore={ <div className='detail-card-before'>{title}</div> }
-                    addonAfter={ <Cancel onClick={() => { cancelSaved(name); }}/>}
-                    style={{ width: 380 }}
-                    value={ checked_value }
-                    onChange={e => e.preventDefault()}
-                />
-            );
-        };
-        if(detail.type === 'textarea') {
-            return (
-                <TextareaInput
-                    addonBefore={ <div className='detail-card-before'>{title}</div> }
-                    addonAfter={ <Cancel onClick={() => { cancelSaved(name); }}/>}
-                    style={ detail.extra === 'long' ? { width: 770 } : { width: 380}}
-                    row_no={ detail.row_no ? detail.row_no : 2}
-                    title={ title }
-                    value={ saved[name] }
-                    onChange={e => e.preventDefault()}
-                />
-            )
-        };
-        return (
-            <Input
-                addonBefore={ <div className='detail-card-before'>{title}</div> }
-                addonAfter={ <Cancel onClick={() => { cancelSaved(name); }}/>}
-                style={ detail.extra === 'long' ? { width: 770 } : { width: 380}}
-                value={ saved[name] }
-                onChange={e => e.preventDefault()}
-            />
-        )
-    };
-
-    if(detail.type === 'date') {
-        const options = detail.time ?
-                {year: 'numeric', month: 'short', day: 'numeric', hour:'numeric', minute:'numeric', second:'numeric'} :
-                {year: 'numeric', month: 'short', day: 'numeric'};
-        const checked_value = (detail.orgTimeData && detail.orgTimeData !=='')
-            ? (new Date(detail.orgTimeData)).toLocaleDateString('ko-KR', options)
-            : '';
-        return (
-            <Input
-                addonBefore={ <div className='detail-card-before'>{title}</div> }
-                addonAfter={ <Edit onClick={() => { detail.startEditTime(); }}/> }
-                style={ detail.extra === 'long' ? { width: 770 } : { width: 380}}
-                value={ checked_value }
-                onChange={e => e.preventDefault()}
-            />
-        );
-    };
-    if(detail.type === 'textarea') {
-        return (
-            <TextareaInput
-                addonBefore={ <div className='detail-card-before'>{title}</div> }
-                addonAfter={ <Edit onClick={() => { startEdit(name); }}/> }
-                row_no={ detail.row_no ? detail.row_no : 2}
-                style={ detail.extra === 'long' ? { width: 770 } : { width: 380}}
-                title={ title }
-                value={ defaultText }
-                disabled
-            />
-        );
-    };
     
-    return (
-        <Input
-            addonBefore={ <div className='detail-card-before'>{title}</div> }
-            addonAfter={ <Edit onClick={() => { startEdit(name); }}/> }
-            style={ detail.extra === 'long' ? { width: 770 } : { width: 380}}
-            value={ defaultText ? defaultText : '' }
-            onChange={e => e.preventDefault()}
-        />
-    );
+    const inputRef = useRef(null);
+    const editChecked = edited && checkEdit(name);
+    const saveChecked = saved && checkSaved(name);
+
+    const startEditFunc = detail.type !== 'date'
+        ? () => {
+            startEdit(name);
+            if(detail.type === 'label'){
+                console.log('\tDetailCardItem / startEnditFunc :', inputRef.current);
+                inputRef.current.focus({cursor: 'end',});
+            }
+            else {
+                console.log('\tDetailCardItem / startEnditFunc :', inputRef.current);
+                inputRef.current.focus();
+            }
+        }
+        : () => {
+            detail.startEditTime();
+            // inputRef.current.focus();
+        };
+    
+    const endEditFunc = detail.type !== 'date'
+        ? () => { endEdit(name); }
+        : () => { detail.endEditTime(name); };
+    
+    const changeFunc = detail.type !== 'date'
+        ? editing : detail.timeDataChange;
+    
+    // const options = detail.time ?
+    //     {year: 'numeric', month: 'short', day: 'numeric', hour:'numeric', minute:'numeric', second:'numeric'} :
+    //     {year: 'numeric', month: 'short', day: 'numeric'};
+    
+    const currentValue = detail.type === 'date'
+        ? detail.orgTimeData : (defaultText ? defaultText : '');
+    const editedValue = editChecked ? edited[name] : null;
+    const savedValue = saveChecked ? saved[name] : null;
+    
+    const finalValue = editChecked ? editedValue : (saveChecked ? savedValue : currentValue);
+
+    const SharedProps = {
+        name: name,
+        addonBefore: <div className='detail-card-before'>{title}</div>,
+        addonAfter: editChecked
+            ? <SaveAlt onClick={ endEditFunc }/>
+            : (saveChecked
+                ? <Cancel onClick={() => { cancelSaved(name); }}/>
+                : <Edit onClick={ startEditFunc }/>
+            ),
+        style: detail.extra === 'long' ? { width: 770 } : { width: 380},
+        value: finalValue,
+        onChange: editChecked ? changeFunc : e => e.preventDefault(),
+        onPressEnter: editChecked ? () => endEdit(name) : null,
+    };
+
+    if(detail.type === 'label'){
+        return <Input {...SharedProps} ref={inputRef} />;
+    };
+
+    if(detail.type === 'date'){
+        if(finalValue === '') {
+            return <Input {...SharedProps} ref={inputRef} />;
+        };
+        const timeformat = detail.time ? "yyyy-MM-dd hh:mm:ss" : "yyyy-MM-dd";
+        return <DateInput {...SharedProps} ref={inputRef} format={ timeformat } showTime={ detail.time } disabled={!editChecked} />;
+    };
+
+    if(detail.type === 'textarea'){
+        return <TextareaInput {...SharedProps} ref={inputRef} row_no={ detail.row_no ? detail.row_no : 2} disabled={!editChecked}/>;
+    };
+
+    return <SelectInput {...SharedProps} ref={inputRef} options={detail.options} disabled={!editChecked}/>;
 };
 
 export default DetailCardItem;

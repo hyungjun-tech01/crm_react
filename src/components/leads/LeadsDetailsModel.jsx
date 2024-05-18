@@ -356,6 +356,12 @@ const [selectedRow, setSelectedRow] = useState(null);
       localStorage.setItem('isFullScreen', '0');
   }, []);
 
+  const handleClose = useCallback(() => {
+    setEditedValues(null);
+    setSavedValues(null);
+    setCurrentLead();
+  }, []);
+
   const lead_items_info = [
     ['is_keyman','lead.is_keyman',{ type:'label'}],
     ['department','lead.department',{ type:'label'}],
@@ -452,7 +458,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                 type="button"
                 className="btn-close xs-close"
                 data-bs-dismiss="modal"
-                onClick={()=>setCurrentLead(defaultLead)}
+                onClick={ handleClose }
               />
             </div>
             <div className="modal-body">

@@ -263,6 +263,12 @@ const PurchaseDetailsModel = () => {
       localStorage.setItem('isFullScreen', '0');
   }, []);
 
+  const handleClose = useCallback(() => {
+    setEditedValues(null);
+    setSavedValues(null);
+    setCurrentPurchase();
+  }, []);
+
   const purchase_items_info = [
     ['serial_number','purchase.serial',{ type:'label',extra:'long'}],
     ['quantity','common.quantity',{ type:'label'}],
@@ -367,7 +373,7 @@ const PurchaseDetailsModel = () => {
                 type="button"
                 className="btn-close xs-close"
                 data-bs-dismiss="modal"
-                onClick={() => setCurrentPurchase()}
+                onClick={ handleClose }
               />
             </div>
             <div className="modal-body">

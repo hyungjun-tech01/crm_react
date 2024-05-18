@@ -12,7 +12,7 @@ import { BiBuildings } from "react-icons/bi";
 // import { MoreVert } from '@mui/icons-material';
 import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies, atomFilteredCompany, defaultCompany } from "../../atoms/atoms";
-import { compareCompanyName, compareText, formateDate } from "../../constants/functions";
+import { compareCompanyName, compareText, formatDate } from "../../constants/functions";
 import CompanyDetailsModel from "./CompanyDetailsModel";
 import LeadsDetailsModel from "../leads/LeadsDetailsModel";
 import ConsultingsDetailsModel from "../consulting/ConsultingsDetailsModel";
@@ -84,7 +84,7 @@ const Company = () => {
     if(e.target.name === 'establishment_date' || e.target.name === 'closure_date'){
       const date_value = new Date(e.target.value);
       if(!isNaN(date_value.valueOf())){
-        input_data = formateDate(date_value);
+        input_data = formatDate(date_value);
       };
     } else {
       input_data = e.target.value;

@@ -9,6 +9,7 @@ import { atomCurrentConsulting, defaultConsulting } from "../../atoms/atoms";
 import { ConsultingRepo } from "../../repository/consulting";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
+import { formatDate, formatTime } from "../../constants/functions";
 import { MoreVert } from "@mui/icons-material";
 
 
@@ -90,9 +91,9 @@ const ConsultingsDetailsModel = () => {
       let temp_all_saved = {
         ...savedValues
       };
-      if(savedValues.receipt_date) {
-        const date_string = savedValues.toLocaleDateString('ko-KR', {year:'numeric', month:'numeric', day:'numeric'});
-        const time_string = savedValues.toLocaleDateString('ko-KR', {hour:'numeric', minute:'numeric', second:'numeric'});
+      if(savedValues.receipt_time) {
+        const date_string = formatDate(savedValues.receipt_time);
+        const time_string = formatTime(savedValues.receipt_time);
         temp_all_saved['receipt_date'] = date_string;
         temp_all_saved['receipt_time'] = time_string;
       };
@@ -159,6 +160,12 @@ const ConsultingsDetailsModel = () => {
       localStorage.setItem('isFullScreen', '0');
   }, []);
 
+  const handleClose = useCallback(() => {
+    setEditedValues(null);
+    setSavedValues(null);
+    setCurrentConsulting();
+  }, []);
+
   const consulting_items_info = [
     ['consulting_type','consulting.type',{ type:'label'}],
     ['receipt_time','consulting.receipt_time',
@@ -195,13 +202,16 @@ const ConsultingsDetailsModel = () => {
 
       // Set time from selected consulting data
       let input_time = new Date();
-      if(selectedConsulting.receipt_date !== null)
+      if(selectedConsulting.receipt_date !== null
+        && selectedConsulting.receipt_date !== '' && selectedConsulting.receipt_date !== undefined)
       {
+        console.log('\tuseEffect / receipt date :', selectedConsulting.receipt_date);
         input_time.setTime(Date.parse(selectedConsulting.receipt_date));
 
         if(selectedConsulting.receipt_time !== null
           && selectedConsulting.receipt_time !== '' && selectedConsulting.receipt_time !== undefined)
         {
+          console.log('\tuseEffect / receipt time :', selectedConsulting.receipt_time);
           let converted_time = '';
           const splitted = selectedConsulting.receipt_time.split(' ');
           if(splitted.length === 2) {
@@ -210,6 +220,8 @@ const ConsultingsDetailsModel = () => {
             } else if(splitted[0] === '오후'){
               converted_time = splitted[1] + ' PM';
             }
+          } else {
+            converted_time = selectedConsulting.receipt_time;
           };
 
           if(converted_time !==''){
@@ -278,7 +290,7 @@ const ConsultingsDetailsModel = () => {
               type="button"
               className="btn-close xs-close"
               data-bs-dismiss="modal"
-              onClick={() => setCurrentConsulting()}
+              onClick={ handleClose }
             />
           </div>
           <div className="modal-body">
