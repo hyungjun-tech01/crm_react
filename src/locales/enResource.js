@@ -70,6 +70,7 @@ const enResource = {
             position:'Position',
             quotation_history:'Quotation History',
             zip_code:'Lead Postal Code',
+            purchase_product:'Purchase Product',
         },
         consulting:{
             action_content: 'Consulting Conclusion',

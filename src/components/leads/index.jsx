@@ -10,8 +10,9 @@ import "../antdstyle.css";
 import LeadsDetailsModel from "./LeadsDetailsModel";
 import { MoreVert } from '@mui/icons-material';
 import { CompanyRepo } from "../../repository/company";
-import {ConsultingRepo} from "../../repository/consulting"
-import {QuotationRepo} from "../../repository/quotation"
+import {ConsultingRepo} from "../../repository/consulting";
+import {QuotationRepo} from "../../repository/quotation";
+import {PurchaseRepo} from "../../repository/purchase";
 import { KeyManForSelection, LeadStatusSelection, LeadRepo } from "../../repository/lead";
 import { atomAllCompanies, atomAllLeads, atomFilteredLead, defaultLead } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
@@ -24,6 +25,7 @@ const Leads = () => {
   const { loadAllCompanies , setCurrentCompany} = useRecoilValue(CompanyRepo);
   const { loadCompanyConsultings} = useRecoilValue(ConsultingRepo);
   const { loadCompanyQuotations} = useRecoilValue(QuotationRepo);
+  const {loadCompanyPurchases}  = useRecoilValue(PurchaseRepo);
 
   const { loadAllLeads, modifyLead, setCurrentLead, filterLeads } = useRecoilValue(LeadRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName",  "myLationCrmUserId",]);
@@ -157,6 +159,7 @@ const Leads = () => {
               setCurrentCompany(record.company_code);   // 현재 company 세팅 
               loadCompanyConsultings(record.company_code);  // 현재 company에 해당하는 consulting 조회 
               loadCompanyQuotations(record.company_code);  // 현재 company에 해당하는 quotation 조회 
+              loadCompanyPurchases(record.company_code);  // 현재 company에 해당하는 purchase 조회 
           }}>
             {text}
           </a>

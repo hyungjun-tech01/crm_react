@@ -4,18 +4,22 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { CircleImg } from "../imagepath";
 import { Collapse, Space, Switch } from "antd";
-import { atomCurrentLead, defaultLead, atomCurrentCompany, defaultCompany, atomCompanyConsultings,atomFilteredConsulting, atomCompanyQuotations } from "../../atoms/atoms";
+import { atomCurrentLead, defaultLead, atomCurrentCompany, defaultCompany, 
+         atomCompanyConsultings,atomFilteredConsulting, atomCompanyQuotations, atomFilteredQuotation,
+         atomCompanyPurchases } from "../../atoms/atoms";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { CompanyRepo} from "../../repository/company";
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
 import { Avatar } from "@mui/material";
 import DetailDateItem from "../../constants/DetailDateItem";
-import { ConsultingRepo } from "../../repository/consulting"
-import { QuotationRepo } from "../../repository/quotation"
+import { ConsultingRepo } from "../../repository/consulting";
+import { QuotationRepo } from "../../repository/quotation";
+import { PurchaseRepo } from "../../repository/purchase";
 import { ExpandMore } from "@mui/icons-material";
 import ConsultingsDetailsModel from "../consulting/ConsultingsDetailsModel";
 import QuotationsDetailsModel from "../quotations/QuotationsDetailsModel";
+import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
 import {  Edit } from '@mui/icons-material';
 import { useTranslation } from "react-i18next";
 import DetailCardItem from "../../constants/DetailCardItem";
@@ -30,6 +34,10 @@ const LeadsDetailsModel = () => {
   const filteredConsultings = useRecoilValue(atomFilteredConsulting);
 
   const companyQuotations = useRecoilValue(atomCompanyQuotations);
+  const filteredQuotations = useRecoilValue(atomFilteredQuotation);
+
+  const companyPurchases = useRecoilValue(atomCompanyPurchases);
+  
 
   const { t } = useTranslation();
 
@@ -44,11 +52,13 @@ const LeadsDetailsModel = () => {
   const [ savedValuesCompany, setSavedValuesCompany ] = useState(null);
 
   const [activeTab, setActiveTab] = useState(""); // 상태 관리를 위한 useState
-  const [statusSearch, setStatusSearch] = useState("");
+  
   const [searchCondition, setSearchCondition] = useState("");
   const [searchQuotationCondition, setSearchQuotationCondition] = useState("");
-  const { loadCompanyConsultings, filterConsulting, setCurrentConsulting} = useRecoilValue(ConsultingRepo);
-  const { loadCompanyQuotations, setCurrentQuotation} = useRecoilValue(QuotationRepo);
+  const [searchPurchaseCondition, setSearchPurchaseCondition] = useState("");
+  const {  filterConsulting, setCurrentConsulting} = useRecoilValue(ConsultingRepo);
+  const {  setCurrentQuotation, filterCompanyQuotation} = useRecoilValue(QuotationRepo);
+  const {  setCurrentPurchase } = useRecoilValue(PurchaseRepo);
   const [ isFullScreen, setIsFullScreen ] = useState(false);
   
   
@@ -60,14 +70,21 @@ const [selectedRow, setSelectedRow] = useState(null);
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
     console.log("handleSearchCondition", searchCondition)
-    filterConsulting(newValue);  // filterLeads(newValue);
+    filterConsulting(newValue);  
   };
 
   const handleSearchQuotationCondition = (newValue)=> {
-    setSearchCondition(newValue);
-    console.log("handleSearchCondition",statusSearch, searchCondition)
-    filterConsulting(statusSearch, newValue);  // filterLeads(newValue);
+    setSearchQuotationCondition(newValue);
+    console.log("handleSearchCondition", searchQuotationCondition)
+    filterCompanyQuotation(newValue);  
   };
+
+  const handleSearchQPurchaseCondition = (newValue)=> {
+    setSearchQuotationCondition(newValue);
+    console.log("handleSearchCondition", searchQuotationCondition)
+    filterCompanyQuotation(newValue);  
+  };
+
 
   const handleCheckEditState = useCallback((name) => {
     return editedValues !== null && name in editedValues;
@@ -366,7 +383,7 @@ const [selectedRow, setSelectedRow] = useState(null);
     ['region','common.region',{ type:'label'}],
     ['sales_resource','quotation.sales_rep',{ type:'label'}],
     ['application_engineer','company.engineer',{ type:'label'}],
-    ['company_name','company.company_name',{ type:'label'}],
+    ['mobile_number','lead.mobile',{ type:'label'}],
     ['company_name_en','company.eng_company_name',{ type:'label'}],
     ['company_zip_code','common.zip_code',{ type:'label'}],
     ['company_address','company.address',{ type:'label'}],
@@ -410,6 +427,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                     <Avatar>{selectedLead.lead_name === null ? "":(selectedLead.lead_name).substring(0,1)}</Avatar>
                   </div>
                 </div>
+                
                 <DetailTitleItem
                   defaultText={ selectedLead.lead_name }
                   saved={savedValues}
@@ -423,10 +441,10 @@ const [selectedRow, setSelectedRow] = useState(null);
                   cancelSaved={handleCancelSaved}
                 />
                 <DetailTitleItem
-                  defaultText={ selectedLead.mobile }
+                  defaultText={ selectedLead.company_name }
                   saved={savedValues}
                   name='status'
-                  title={t('lead.mobile')}
+                  title={t('company.company_name')}
                   checkEdit={handleCheckEditState}
                   startEdit={handleStartEdit}
                   endEdit={handleEndEdit}
@@ -580,10 +598,10 @@ const [selectedRow, setSelectedRow] = useState(null);
                         <li className="nav-item">
                           <Link
                             className="nav-link"
-                            to="#not-contact-task-production"
+                            to="#not-contact-task-purchase"
                             data-bs-toggle="tab"
                           >
-                            제품관리
+                            {t('lead.purchase_product')+'('} { companyPurchases.length === undefined ? 0:companyPurchases.length }{')'}
                           </Link>
                         </li>                                                  
                       </ul>
@@ -1088,7 +1106,6 @@ const [selectedRow, setSelectedRow] = useState(null);
                                       type="text"
                                       value={searchQuotationCondition}
                                       onChange ={(e) => handleSearchQuotationCondition(e.target.value)}
-                                      placeholder="Lead Name, Receiver" 
                                       style={{width:'300px', display: 'inline'}}
                                     />  
                                   </div>
@@ -1104,7 +1121,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                               </tr>
                             </thead>
                             {
-                              searchCondition === "" ? 
+                              searchQuotationCondition === "" ? 
                               companyQuotations.length > 0 &&
                               <tbody>
                                 { companyQuotations.map(quotation =>
@@ -1132,17 +1149,27 @@ const [selectedRow, setSelectedRow] = useState(null);
                                 )}
                               </tbody> 
                               : 
-                              filteredConsultings.length > 0 &&
+                              filteredQuotations.length > 0 &&
                               <tbody>
-                                { filteredConsultings.map(consulting =>
-                                  <tr key={consulting.consulting_code}>
-                                    <td>{consulting.consulting_type}</td>
-                                    <td>{consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
-                                    {consulting.receipt_time === null ? "":consulting.receipt_time }
-                                    </td>
-                                    <td>{consulting.satatus}</td>
-                                    <td>{consulting.receiver}</td>
-                                    <td className="text-end">{consulting.lead_name}</td>
+                                { filteredQuotations.map(quotation =>
+                                  <tr key={quotation.quotation_code}>
+                                    <td>{quotation.quotation_type}</td>
+                                    <td>{quotation.quotation_title}
+                                        <a href="#"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#quotations-details"
+                                            onClick={()=>{
+                                              console.log('showQuotationDetail', quotation.quotation_code);
+                                              setCurrentQuotation(quotation.quotation_code);
+                                          }}>
+                                            <Edit fontSize="small"/>
+                                          </a>
+                                      </td>
+                                      <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
+                                      </td>
+                                      <td>{quotation.lead_name}</td>
+                                      <td>{quotation.quotation_manager}</td>
+                                      <td className="text-end">{quotation.total_quotation_amount}</td>
                                   </tr>
                                 )}
                               </tbody> 
@@ -1150,43 +1177,93 @@ const [selectedRow, setSelectedRow] = useState(null);
                           </table>
                         </div>
 
-                        <div
-                          className="tab-pane p-0"
-                          id="not-contact-task-activity"
-                        >
-                          <div className="row">
-                            <div className="col-md-4">
-                              <div className="card bg-gradient-danger card-img-holder text-white h-100">
-                                <div className="card-body">
-                                  <img
-                                    src={CircleImg}
-                                    className="card-img-absolute"
-                                    alt="circle-image"
-                                  />
-                                  <h4 className="font-weight-normal mb-3">
-                                    Total Activities
-                                  </h4>
-                                  <span>2</span>
+                        <div className="tab-pane task-related p-0"
+                          id="not-contact-task-purchase" >
+                          <table className="table table-striped table-nowrap custom-table mb-0 datatable">
+                            <thead>
+                              <tr>
+                                <div className="row">
+                                  <div className="col text-start" style={{width:'200px'}}>
+                                    <input
+                                      id = "searchPurchaseCondition"
+                                      className="form-control" 
+                                      type="text"
+                                      value={searchPurchaseCondition}
+                                      onChange ={(e) => handleSearchQPurchaseCondition(e.target.value)}
+                                      style={{width:'300px', display: 'inline'}}
+                                    />  
+                                  </div>
                                 </div>
-                              </div>
-                            </div>
-                            <div className="col-md-4">
-                              <div className="card bg-gradient-success card-img-holder text-white h-100">
-                                <div className="card-body">
-                                  <img
-                                    src={CircleImg}
-                                    className="card-img-absolute"
-                                    alt="circle-image"
-                                  />
-                                  <h4 className="font-weight-normal mb-3">
-                                    Last Activity
-                                  </h4>
-                                  <span>1</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                              </tr>
+                              <tr>
+                                <th style={{ width: '80px' }}>{t('purchase.product_type')}</th>
+                                <th style={{ width: '300px' }}>{t('purchase.product_name')}</th>
+                                <th>{t('purchase.serial')}</th>
+                                <th>{t('purchase.delivery_date')}</th>
+                                <th>{t('purchase.ma_contract_date')}</th>
+                                <th>{t('purchase.ma_finish_date')}</th>
+                                <th>{t('common.quantity')}</th>
+                              </tr>
+                            </thead>
+                            {
+                              searchPurchaseCondition === "" ? 
+                              companyPurchases.length > 0 &&
+                              <tbody>
+                                { companyPurchases.map(purchase =>
+                                <React.Fragment key={purchase.purchase_code}>
+                                  <tr key={purchase.purchase_code}>
+                                      <td>{purchase.product_type} </td>
+                                      <td> <a href="#"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#purchase-details"
+                                            onClick={()=>{
+                                              console.log('showPurchaseDetail', purchase.purchase_code);
+                                              setCurrentPurchase(purchase.purchase_code);
+                                          }}>
+                                            {purchase.product_name}
+                                            <Edit fontSize="small"/>
+                                          </a>
+                                      </td>
+                                      <td>{purchase.serial_number} </td>
+                                      <td>{purchase.delivery_date && new Date(purchase.delivery_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
+                                      </td>
+                                      <td>{purchase.ma_contract_date && new Date(purchase.ma_contract_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}</td>
+                                      <td>{purchase.ma_finish_date && new Date(purchase.ma_finish_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}</td>
+                                      <td className="text-end">{purchase.quantity}</td>
+                                  </tr>
+                                  </React.Fragment>
+                                )}
+                              </tbody> 
+                              : 
+                              filteredQuotations.length > 0 &&
+                              <tbody>
+                                { filteredQuotations.map(quotation =>
+                                  <tr key={quotation.quotation_code}>
+                                    <td>{quotation.quotation_type}</td>
+                                    <td>{quotation.quotation_title}
+                                        <a href="#"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#quotations-details"
+                                            onClick={()=>{
+                                              console.log('showQuotationDetail', quotation.quotation_code);
+                                              setCurrentQuotation(quotation.quotation_code);
+                                          }}>
+                                            <Edit fontSize="small"/>
+                                          </a>
+                                      </td>
+                                      <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
+                                      </td>
+                                      <td>{quotation.lead_name}</td>
+                                      <td>{quotation.quotation_manager}</td>
+                                      <td className="text-end">{quotation.total_quotation_amount}</td>
+                                  </tr>
+                                )}
+                              </tbody> 
+                            }
+                          </table>
                         </div>
+
+
                       </div>
                     </div>
                   </div>
@@ -1238,6 +1315,7 @@ const [selectedRow, setSelectedRow] = useState(null);
       </div>
       <ConsultingsDetailsModel />
       <QuotationsDetailsModel  />
+      <PurchaseDetailsModel  />
     </>
   );
 };

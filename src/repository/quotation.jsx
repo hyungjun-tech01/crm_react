@@ -54,6 +54,24 @@ export const QuotationRepo = selector({
             };
         });
 
+        const filterCompanyQuotation = getCallback(({set, snapshot }) => async (filterText) => {
+            const allQuotationList = await snapshot.getPromise(atomCompanyQuotations);
+            
+            let allQuotation;
+            if (filterText === '') {
+                allQuotation = allQuotationList;
+            }
+            else {
+                allQuotation = 
+                allQuotationList.filter(item => ( item.quotation_title && item.quotation_title.includes(filterText)||
+                                                item.quotation_manager && item.quotation_manager.includes(filterText)||
+                                                item.lead_name && item.lead_name.includes(filterText)                        
+                ));
+            }
+            set(atomFilteredQuotation, allQuotation);
+            return true;
+        });
+
         const filterQuotations = getCallback(({set, snapshot }) => async (itemName, filterText) => {
             const allQuotationList = await snapshot.getPromise(atomAllQuotations);
             let  allQuotation ;
@@ -179,6 +197,7 @@ export const QuotationRepo = selector({
             setCurrentQuotation,
             filterQuotations,
             loadCompanyQuotations,
+            filterCompanyQuotation,
         };
     }
 });

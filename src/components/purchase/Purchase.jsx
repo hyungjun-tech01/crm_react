@@ -10,7 +10,7 @@ import PurchaseDetailsModel from "./PurchaseDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { PurchaseRepo } from "../../repository/purchase";
-import { atomAllCompanies, atomAllPurchases, defaultPurchase } from "../../atoms/atoms";
+import { atomAllCompanies, atomAllPurchases, defaultPurchase, atomFilteredPurchase } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
 import { compareText } from "../../constants/functions";
 import { useTranslation } from "react-i18next";
@@ -18,8 +18,9 @@ import { useTranslation } from "react-i18next";
 const Purchase = () => {
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const allPurchaseData = useRecoilValue(atomAllPurchases);
+  const filteredPurchase = useRecoilValue(atomFilteredPurchase);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
-  const { loadAllPurchases, modifyPurchase, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
+  const { loadAllPurchases, modifyPurchase, setCurrentPurchase, filterPurchases } = useRecoilValue(PurchaseRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName",  "myLationCrmUserId"]);
 
   const [ purchaseChange, setPurchaseChange ] = useState(null);
@@ -51,7 +52,7 @@ const Purchase = () => {
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
-    //filterQuotations(statusSearch, newValue);
+    filterPurchases(statusSearch, newValue);
   };
 
   // --- Functions used for Table ------------------------------
@@ -205,10 +206,10 @@ const Purchase = () => {
       sorter: (a, b) => a.price - b.price,
     },
     {
-      title: t('common.currency'),
-      dataIndex: "currency",
+      title: t('company.company_name'),
+      dataIndex: "company_name",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.currency - b.currency,
+      sorter: (a, b) => compareText(a.company_name, b.company_name),
     },
     {
       title: t('purchase.register'),
@@ -346,11 +347,7 @@ const Purchase = () => {
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.all')}>{t('common.all')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('purchase.product_type')}>{t('purchase.product_type')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('purchase.product_name')}>{t('purchase.product_name')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.title')}>{t('common.title')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.full_name')}>{t('lead.full_name')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.mobile')}>{t('lead.mobile')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.phone_no')}>{t('common.phone_no')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.email')}>{t('lead.email')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
                     </div>
                 </div>
               </div>
@@ -415,6 +412,7 @@ const Purchase = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive">
+                  {searchCondition === "" ? 
                     <Table
                       pagination={{
                         total: allPurchaseData.length,
@@ -429,6 +427,21 @@ const Purchase = () => {
                       dataSource={allPurchaseData}
                       rowKey={(record) => record.purchase_code}
                     />
+                    :
+                    <Table
+                      pagination={{
+                        total: filteredPurchase.length >0 ? filteredPurchase.length:0,
+                        showTotal: ShowTotal,
+                        showSizeChanger: true,
+                        onShowSizeChange: onShowSizeChange,
+                        ItemRender: ItemRender,
+                      }}
+                      style={{ overflowX: "auto" }}
+                      columns={columns}
+                      dataSource={filteredPurchase.length >0 ?  filteredPurchase:null}
+                      rowKey={(record) => record.lead_code}
+                    /> 
+                    }
                   </div>
                 </div>
               </div>
