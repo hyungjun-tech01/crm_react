@@ -70,7 +70,11 @@ const koResource = {
             position:'직위',
             quotation_history:'견적 이력',
             zip_code:'고객우편번호',
-            purchase_product:'구매 제품'
+            purchase_product:'구매 제품',
+            not_contacted:'잠정 고객',
+            attempted_contact:'시도 고객',
+            contact:'접촉 고객',
+            converted:'전환 고객',
         },
         consulting:{
             action_content: '상담 결과',

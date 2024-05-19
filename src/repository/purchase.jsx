@@ -55,7 +55,7 @@ export const PurchaseRepo = selector({
             else {
                 allPurchase = 
                 allPurchaseList.filter(item => ( item.product_type && item.product_type.includes(filterText)||
-                                                item.product_name && item.product_name.includes(filterText)             
+                                                item.product_name && item.product_name.includes(filterText)      
                 ));
             }
             set(atomFilteredPurchase, allPurchase);

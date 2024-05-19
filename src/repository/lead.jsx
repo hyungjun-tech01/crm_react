@@ -10,7 +10,6 @@ export const KeyManForSelection = [
     { value: '결제', label: 'Payer'},
     { value: 'User', label: 'User'},
     { value: '구매', label: 'Purchaser'},
-    { value: 'NULL', label: 'NULL'},
 ];
 
 export const LeadStatusSelection = [
@@ -18,7 +17,6 @@ export const LeadStatusSelection = [
     { value: 'Attempted Contact', label: 'Attempted Contact'},
     { value: 'Contact', label: 'Contact'},
     { value: 'Converted', label: 'Converted'},
-    { value: 'NULL', label: 'NULL'},
 ];
 
 export const LeadRepo = selector({

@@ -6,7 +6,7 @@ import { CircleImg } from "../imagepath";
 import { Collapse, Space, Switch } from "antd";
 import { atomCurrentLead, defaultLead, atomCurrentCompany, defaultCompany, 
          atomCompanyConsultings,atomFilteredConsulting, atomCompanyQuotations, atomFilteredQuotation,
-         atomCompanyPurchases } from "../../atoms/atoms";
+         atomCompanyPurchases, atomFilteredPurchase } from "../../atoms/atoms";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { CompanyRepo} from "../../repository/company";
 import DetailLabelItem from "../../constants/DetailLabelItem";
@@ -37,6 +37,7 @@ const LeadsDetailsModel = () => {
   const filteredQuotations = useRecoilValue(atomFilteredQuotation);
 
   const companyPurchases = useRecoilValue(atomCompanyPurchases);
+  const filteredPurchases = useRecoilValue(atomFilteredPurchase);
   
 
   const { t } = useTranslation();
@@ -58,7 +59,7 @@ const LeadsDetailsModel = () => {
   const [searchPurchaseCondition, setSearchPurchaseCondition] = useState("");
   const {  filterConsulting, setCurrentConsulting} = useRecoilValue(ConsultingRepo);
   const {  setCurrentQuotation, filterCompanyQuotation} = useRecoilValue(QuotationRepo);
-  const {  setCurrentPurchase } = useRecoilValue(PurchaseRepo);
+  const {  setCurrentPurchase , filterCompanyPurchase} = useRecoilValue(PurchaseRepo);
   const [ isFullScreen, setIsFullScreen ] = useState(false);
   
   
@@ -79,10 +80,10 @@ const [selectedRow, setSelectedRow] = useState(null);
     filterCompanyQuotation(newValue);  
   };
 
-  const handleSearchQPurchaseCondition = (newValue)=> {
-    setSearchQuotationCondition(newValue);
-    console.log("handleSearchCondition", searchQuotationCondition)
-    filterCompanyQuotation(newValue);  
+  const handleSearchPurchaseCondition = (newValue)=> {
+    setSearchPurchaseCondition(newValue);
+    console.log("handleSearchCondition", searchPurchaseCondition)
+    filterCompanyPurchase(newValue);  
   };
 
 
@@ -497,7 +498,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                         onClick={() => handleChangeStatus("Not Contacted")}
                       >
                         <span className="octicon octicon-light-bulb" />
-                        Not Contacted
+                        {t('lead.not_contacted')}
                       </Link>
                     </li>
                     <li role="presentation" className="">
@@ -511,7 +512,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                         onClick={() => handleChangeStatus("Attempted Contact")}
                       >
                         <span className="octicon octicon-diff-added" />
-                        Attempted Contact
+                        {t('lead.attempted_contact')}
                       </Link>
                     </li>
                     <li role="presentation" className="">
@@ -525,7 +526,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                         onClick={() => handleChangeStatus("Contact")}
                       >
                         <span className="octicon octicon-comment-discussion" />
-                        Contact
+                        {t('lead.contact')}
                       </Link>
                     </li>
                     <li role="presentation" className="">
@@ -539,7 +540,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                         onClick={() => handleChangeStatus("Converted")}
                       >
                         <span className="octicon octicon-comment-discussion" />
-                        Converted
+                        {t('lead.converted')}
                       </Link>
                     </li>
                     <li role="presentation" className="d-none">
@@ -561,7 +562,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                 <div
                   role="tabpanel"
                   className="tab-pane active p-0"
-                  id="not-contacted" >
+                  >
                   <div className="">
                     <div className="task-infos">
                       <ul className="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified">
@@ -1195,7 +1196,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                                       className="form-control" 
                                       type="text"
                                       value={searchPurchaseCondition}
-                                      onChange ={(e) => handleSearchQPurchaseCondition(e.target.value)}
+                                      onChange ={(e) => handleSearchPurchaseCondition(e.target.value)}
                                       style={{width:'300px', display: 'inline'}}
                                     />  
                                   </div>
@@ -1241,27 +1242,28 @@ const [selectedRow, setSelectedRow] = useState(null);
                                 )}
                               </tbody> 
                               : 
-                              filteredQuotations.length > 0 &&
+                              filteredPurchases.length > 0 &&
                               <tbody>
-                                { filteredQuotations.map(quotation =>
-                                  <tr key={quotation.quotation_code}>
-                                    <td>{quotation.quotation_type}</td>
-                                    <td>{quotation.quotation_title}
-                                        <a href="#"
+                                { filteredPurchases.map(purchase =>
+                                  <tr key={purchase.purchase_code}>
+                                    <td>{purchase.product_type} </td>
+                                      <td> <a href="#"
                                             data-bs-toggle="modal"
-                                            data-bs-target="#quotations-details"
+                                            data-bs-target="#purchase-details"
                                             onClick={()=>{
-                                              console.log('showQuotationDetail', quotation.quotation_code);
-                                              setCurrentQuotation(quotation.quotation_code);
+                                              console.log('showPurchaseDetail', purchase.purchase_code);
+                                              setCurrentPurchase(purchase.purchase_code);
                                           }}>
+                                            {purchase.product_name}
                                             <Edit fontSize="small"/>
                                           </a>
                                       </td>
-                                      <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
+                                      <td>{purchase.serial_number} </td>
+                                      <td>{purchase.delivery_date && new Date(purchase.delivery_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
                                       </td>
-                                      <td>{quotation.lead_name}</td>
-                                      <td>{quotation.quotation_manager}</td>
-                                      <td className="text-end">{quotation.total_quotation_amount}</td>
+                                      <td>{purchase.ma_contract_date && new Date(purchase.ma_contract_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}</td>
+                                      <td>{purchase.ma_finish_date && new Date(purchase.ma_finish_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}</td>
+                                      <td className="text-end">{purchase.quantity}</td>
                                   </tr>
                                 )}
                               </tbody> 
