@@ -20,6 +20,7 @@ import { ExpandMore } from "@mui/icons-material";
 import ConsultingsDetailsModel from "../consulting/ConsultingsDetailsModel";
 import QuotationsDetailsModel from "../quotations/QuotationsDetailsModel";
 import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
+import ConsultingAddModal from "../consulting/ConsultingAddModal";
 import {  Edit } from '@mui/icons-material';
 import { useTranslation } from "react-i18next";
 import DetailCardItem from "../../constants/DetailCardItem";
@@ -61,12 +62,27 @@ const LeadsDetailsModel = () => {
   const {  setCurrentQuotation, filterCompanyQuotation} = useRecoilValue(QuotationRepo);
   const {  setCurrentPurchase , filterCompanyPurchase} = useRecoilValue(PurchaseRepo);
   const [ isFullScreen, setIsFullScreen ] = useState(false);
+  const [ leadChange, setLeadChange ] = useState(null);
+  const [selectedOption, setSelectedOption] = useState([]);
+  const [selectedKeyMan, setSelectedKeyMan] = useState([]);
+  const [selectedLeadStatus, setSelectedLeadStatus] = useState([]);
   
   
   // 상태(state) 정의
 const [selectedRow, setSelectedRow] = useState(null);
 
   // --- Funtions for Editing ---------------------------------
+  const handleAddNewLeadClicked = useCallback(() => {
+    initializeLeadTemplate();
+  }, []);
+
+  const initializeLeadTemplate = useCallback(() => {
+    setLeadChange({ ...defaultLead });
+    setSelectedOption([]);
+    setSelectedKeyMan([]);
+    setSelectedLeadStatus([]);
+    document.querySelector("#add_new_lead_form").reset();
+  }, []);
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
@@ -1022,9 +1038,21 @@ const [selectedRow, setSelectedRow] = useState(null);
                                       className="form-control" 
                                       type="text"
                                       value={searchCondition}
+                                      placeholder= {t('common.search_here')}
                                       onChange ={(e) => handleSearchCondition(e.target.value)}
                                       style={{width:'300px', display: 'inline'}}
                                     />  
+                                  </div>
+                                  <div className="col text-end">
+                                    <button
+                                      className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
+                                      id="add-task"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#add_consulting"
+                                      onClick={handleAddNewLeadClicked}
+                                    >
+                                      {t('consulting.add_consulting')}
+                                    </button>
                                   </div>
                                 </div>
                               </tr>
@@ -1111,6 +1139,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                                       id = "searchQuotationCondition"
                                       className="form-control" 
                                       type="text"
+                                      placeholder= {t('common.search_here')}
                                       value={searchQuotationCondition}
                                       onChange ={(e) => handleSearchQuotationCondition(e.target.value)}
                                       style={{width:'300px', display: 'inline'}}
@@ -1196,6 +1225,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                                       className="form-control" 
                                       type="text"
                                       value={searchPurchaseCondition}
+                                      placeholder= {t('common.search_here')}
                                       onChange ={(e) => handleSearchPurchaseCondition(e.target.value)}
                                       style={{width:'300px', display: 'inline'}}
                                     />  
@@ -1324,6 +1354,7 @@ const [selectedRow, setSelectedRow] = useState(null);
       <ConsultingsDetailsModel />
       <QuotationsDetailsModel  />
       <PurchaseDetailsModel  />
+      <ConsultingAddModal  />
     </>
   );
 };

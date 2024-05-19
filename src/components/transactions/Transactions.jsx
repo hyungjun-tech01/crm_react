@@ -180,7 +180,7 @@ const Transactions = () => {
                       id = "searchCondition"
                       className="form-control" 
                       type="text"
-                      placeholder= ""
+                      placeholder= {t('common.search_here')}
                       style={{width:'300px', display: 'inline'}}
                       value={searchCondition}
                       onChange ={(e) => handleSearchCondition(e.target.value)}

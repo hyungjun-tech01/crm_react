@@ -71,6 +71,10 @@ const enResource = {
             quotation_history:'Quotation History',
             zip_code:'Lead Postal Code',
             purchase_product:'Purchase Product',
+            not_contacted:'Not Contacted',
+            attempted_contact:'Attempted Contact',
+            contact:'Contact',
+            converted:'Converted',
         },
         consulting:{
             action_content: 'Consulting Conclusion',
@@ -208,6 +212,7 @@ const enResource = {
             view: 'View',
             visible: 'Visible',
             zip_code: 'Postal Code',
+            search_here :'Search Here',
         },
     },
 }

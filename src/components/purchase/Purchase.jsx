@@ -354,9 +354,9 @@ const Purchase = () => {
               <div className="col text-start" style={{width:'400px'}}>
                 <input
                       id = "searchCondition"
-                      className="form-control form-control-sm" 
+                      className="form-control" 
                       type="text"
-                      placeholder= ""
+                      placeholder= {t('common.search_here')}
                       style={{width:'300px', display: 'inline'}}
                       value={searchCondition}
                       onChange ={(e) => handleSearchCondition(e.target.value)}

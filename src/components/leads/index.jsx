@@ -204,7 +204,9 @@ const Leads = () => {
     {
       title: t('lead.lead_modified'),
       dataIndex: "modify_date",
-      render: (text, record) => <>{text}</>,
+      render: (text, record) => <>
+        {new Date(text).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day: 'numeric'})}
+      </>,
       sorter: (a, b) => compareText(a.modify_date, b.modify_date),
     },
     {
@@ -336,9 +338,9 @@ const Leads = () => {
               <div className="col text-start" style={{width:'400px'}}>
                 <input
                       id = "searchCondition"
-                      className="form-control form-control-sm" 
+                      className="form-control" 
                       type="text"
-                      placeholder= ""
+                      placeholder= {t('common.search_here')}
                       style={{width:'300px', display: 'inline'}}
                       value={searchCondition}
                       onChange ={(e) => handleSearchCondition(e.target.value)}

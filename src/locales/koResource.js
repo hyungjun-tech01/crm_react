@@ -212,6 +212,7 @@ const koResource = {
             view: '보기',
             visible: '보기',
             zip_code: '우편번호',
+            search_here :'검색 키워드',
         },
     },
 }
