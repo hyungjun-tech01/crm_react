@@ -7815,21 +7815,21 @@ form .btn-gradient-primary {
 	right: 0;
 }
 
-@media (992px < width <= 1200px) {
+@media screen and (992px < width <= 1200px) {
 	.right .modal-dialog {
-		width: 805px;
+		min-width: 805px;
 	}
 }
 
-@media (1200px < width <= 1600px) {
+@media screen and (1200px < width <= 1600px) {
 	.right .modal-dialog {
-		width: 1175px;
+		min-width: 1175px;
 	}
 }
 
-@media (1600px < width) {
+@media screen and (1600px < width) {
 	.right .modal-dialog {
-		width: 1545px;
+		min-width: 1545px;
 	}
 }
 
