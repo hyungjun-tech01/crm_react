@@ -9,6 +9,7 @@ const koResource = {
             password:'패스워드',
         },
         dashboard: {
+            dashboard: '대시보드',
             completed_tasks: '완료 태스크',
             product_yearly_sales: '연 상품 매출',
             sales_overview: '매출 요약',

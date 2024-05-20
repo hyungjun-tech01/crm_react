@@ -47,24 +47,6 @@ const Dashboard = () => {
           <meta name="description" content="Reactify Blank Page" />
         </Helmet>
         <div className="content container-fluid">
-          <div className="crms-title row bg-white mb-4">
-            <div className="col">
-              <h3 className="page-title">
-                <span className="page-title-icon bg-gradient-primary text-white me-2">
-                  <i className="fas fa-table"></i>
-                </span>{" "}
-                <span>Deals Dashboard</span>
-              </h3>
-            </div>
-            <div className="col text-end">
-              <ul className="breadcrumb bg-white float-end m-0 pl-0 pr-0">
-                <li className="breadcrumb-item">
-                  <Link to="/">Dashboard</Link>
-                </li>
-                <li className="breadcrumb-item active">Deals Dashboard</li>
-              </ul>
-            </div>
-          </div>
           <div className="row graphs">
             <div className="col-md-6">
               <div className="card h-100">

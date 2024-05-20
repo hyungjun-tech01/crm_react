@@ -2,13 +2,11 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
-import { Link } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { BiBuildings } from "react-icons/bi";
 // import { MoreVert } from '@mui/icons-material';
 import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies, atomFilteredCompany, defaultCompany } from "../../atoms/atoms";
@@ -42,7 +40,7 @@ const Company = () => {
 
     setExpaned(false);
     setSearchCondition("");
-  }
+  };
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
@@ -146,7 +144,6 @@ const Company = () => {
       title: t('company.address'),
       dataIndex: "company_address",
       render: (text, record) => <>{text}</>,
-      // sorter: (a, b) => a.company_address.length - b.company_address.length,
       sorter: (a, b) => compareText(a.company_address , b.company_address),
     },
     {

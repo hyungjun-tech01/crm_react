@@ -9,6 +9,7 @@ const enResource = {
             password:'Password',
         },
         dashboard: {
+            dashboard: 'Dashboard',
             completed_tasks: 'Completed Tasks',
             product_yearly_sales: 'Product Yearly Sales',
             sales_overview: 'Sales Overview',
