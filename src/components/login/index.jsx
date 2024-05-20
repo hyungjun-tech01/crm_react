@@ -3,9 +3,11 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useCookies } from "react-cookie";
 import { Link, useHistory } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import IMG01 from "../../assets/images/logo.png";
+import LOGO from "../../assets/images/nodeData.png";
+import priorLOGO from "../../assets/images/priorNodeData.png"
 import { apiLoginValidate } from "../../repository/user.jsx";
 import {atomCurrentUser} from "../../atoms/atomsUser.jsx";
+import { useTranslation } from "react-i18next";
 
 const Login = () => {
   const [ cookies, setCookie ] = useCookies([
@@ -17,6 +19,7 @@ const Login = () => {
   const history = useHistory();
   const [loginUserId, setLoginUserId] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const { t } = useTranslation();
 
 
   // event.preventDefault() 주로 사용되는 경우는
@@ -65,19 +68,22 @@ const Login = () => {
                 {/* Account Logo */}
                 <div className="account-logo">
                   <Link to="/">
-                    <img src={IMG01} alt="Dreamguy's Technologies" />
+                    <span>
+                      <img src={priorLOGO} alt="" />
+                      <img src={LOGO} alt="NodeData Co., Ltd" />
+                    </span>
                   </Link>
                 </div>
                 {/* /Account Logo */}
                 <div className="account-box">
                   <div className="account-wrapper">
-                    <h3 className="account-title">Login</h3>
-                    <p className="account-subtitle">Access to our dashboard</p>
+                    <h3 className="account-title">{t('login.login')}</h3>
                     {/* Account Form */}
                     <form>
                       <div className="form-group">
-                        <label>User Id</label>
+                        <label>{t('login.userId')}</label>
                         <input
+                          tabIndex="1"
                           type="text"
                           className="form-control"
                           onChange={(e) => setLoginUserId(e.target.value)}
@@ -86,16 +92,17 @@ const Login = () => {
                       <div className="form-group">
                         <div className="row">
                           <div className="col">
-                            <label>Password</label>
+                            <label>{t('login.password')}</label>
                           </div>
                           <div className="col-auto">
                             <Link className="text-muted" to="/forgot-password">
-                              Forgot password?
+                              {t('login.forgotPassword')}
                             </Link>
                           </div>
                         </div>
                         <input
                           className="form-control"
+                          tabIndex="2"
                           type="password"
                           onChange={(e) => setLoginPassword(e.target.value)}
                         />
@@ -106,18 +113,18 @@ const Login = () => {
                           onClick={handleCheckLogin}
                           className="btn btn-primary account-btn"
                         >
-                          Login
+                          {t('login.login')}
                         </button>
                         {/* <Link onClick = {()=>handleCheckLogin()} to="/" className="btn btn-primary account-btn">
                           Login
                         </Link> */}
                       </div>
-                      <div className="account-footer">
+                      {/* <div className="account-footer">
                         <p>
                           Don't have an account yet?{" "}
                           <Link to="/register">Register</Link>
                         </p>
-                      </div>
+                      </div> */}
                     </form>
                     {/* /Account Form */}
                   </div>

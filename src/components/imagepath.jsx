@@ -1,5 +1,5 @@
 
-export {default as Logo} from 'Assets/images/logo.png';
+export {default as Logo} from 'Assets/images/nodeData.png';
 export {default as S_Logo} from 'Assets/images/s-logo.png';
 export {default as Flag_us} from 'Assets/images/flags/us.png';
 export {default as Flag_fr} from 'Assets/images/flags/fr.png';

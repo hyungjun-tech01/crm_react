@@ -5,8 +5,10 @@ const enResource = {
             en:'English'
         },
         login: {
+            login: 'Login',
             userId:'User Id',
             password:'Password',
+            forgotPassword: 'Forgot Password?',
         },
         dashboard: {
             dashboard: 'Dashboard',
