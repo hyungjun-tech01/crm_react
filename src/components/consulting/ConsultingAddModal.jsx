@@ -9,8 +9,11 @@ import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { ConsultingRepo, ConsultingTypes } from "../../repository/consulting";
 import { atomAllCompanies, atomAllLeads, defaultConsulting } from "../../atoms/atoms";
+import { formatDate } from "../../constants/functions";
 
-const ConsultingAddModal = () => {
+const ConsultingAddModal = ({currentLead}) => {
+
+  console.log('currentLead', currentLead);
   const { t } = useTranslation();
   const [ cookies ] = useCookies(["myLationCrmUserId","myLationCrmUserName"]);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
@@ -76,7 +79,10 @@ const ConsultingAddModal = () => {
 
 
   const initializeConsultingTemplate = useCallback(() => {
-    setConsultingChange({ ...defaultConsulting });
+    const localDate = formatDate(receiptDate);
+    const localTime = receiptDate.toLocaleTimeString('ko-KR');
+
+    setConsultingChange({ ...defaultConsulting, receipt_date:localDate, receipt_time:localTime });
     setSelectedLead(null);
     document.querySelector("#add_new_consulting_form").reset();
   }, []);

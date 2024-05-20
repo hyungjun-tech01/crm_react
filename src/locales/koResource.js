@@ -5,10 +5,13 @@ const koResource = {
             en:'English'
         },
         login: {
-            userId:'사용자아이디',
-            password:'패스워드',
+            login: '로그인',
+            userId:'사용자ID',
+            password:'암호',
+            forgotPassword: '암호 분실 시',
         },
         dashboard: {
+            dashboard: '대시보드',
             completed_tasks: '완료 태스크',
             product_yearly_sales: '연 상품 매출',
             sales_overview: '매출 요약',
