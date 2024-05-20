@@ -2,31 +2,13 @@ import React from "react";
 import { Link, useHistory } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { Logo, S_Logo, avatar02, avatar03, avatar05, avatar06, avatar08, avatar09, avatar13, avatar17, avatar21, Flag_kr, Flag_us } from "../imagepath";
-import { FiBell, FiSearch } from "react-icons/fi";
-import { BiMessageRounded } from "react-icons/bi";
 import { Avatar } from "@mui/material";
-import {atomCurrentUser} from "../../atoms/atomsUser.jsx";
-import {useRecoilValue} from "recoil";
+import { atomCurrentUser } from "../../atoms/atomsUser.jsx";
+import { useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
 
-import { BiBuildings, BiCalculator, BiClipboard, BiReceipt, BiShoppingBag, BiUser } from "react-icons/bi";
-
-const titleElementBase = (title, icon) => {
-  return (
-    <div className="crms-title row bg-white">
-      <div className="col">
-        <h3 className="page-title m-0">
-          <span className="page-title-icon bg-gradient-primary text-white me-2">
-            <i>
-              {icon}
-            </i>
-          </span>{" "}
-          {title}{" "}
-        </h3>
-      </div>
-    </div>
-  );
-};
+import { FiBell, FiTable } from "react-icons/fi";
+import { BiBuildings, BiCalculator, BiClipboard, BiMessageRounded, BiReceipt, BiShoppingBag, BiUser } from "react-icons/bi";
 
 const Header = (props) => {
   const [cookies, removeCookie ] = useCookies(["myLationCrmUserId", "myLationCrmUserName", "myLationCrmAuthToken"]);
@@ -35,16 +17,25 @@ const Header = (props) => {
   const currentUser = useRecoilValue(atomCurrentUser);
 
   const exclusionArray = [ "login", "register", "forgot-password", "error-404", "error-500", ];
-  const itemsArray = ["companies", "leads", "consultings", "quotations", "transactions", "purchases"];
-  
-  const titleElements = {
-    companies : titleElementBase(t('company.company'), <BiBuildings />),
-    leads : titleElementBase(t('lead.lead'), <BiUser />),
-    consultings : titleElementBase(t('consulting.consulting'), <BiClipboard />),
-    quotations : titleElementBase(t('quotation.quotation'), <BiCalculator />),
-    transactions : titleElementBase(t('transaction.transaction'), <BiReceipt />),
-    purchases : titleElementBase(t('purchase.purchase'), <BiShoppingBag />),
-  }
+  const itemsArray = ["dashboard", "companies", "leads", "consultings", "quotations", "transactions", "purchases"];
+  const headerIcons = {
+    dashboard: <FiTable />,
+    companies : <BiBuildings />,
+    leads : <BiUser />,
+    consultings : <BiClipboard />,
+    quotations : <BiCalculator />,
+    transactions : <BiReceipt />,
+    purchases : <BiShoppingBag />,
+  };
+  const headerTitles = {
+    dashboard: t('dashboard.dashboard'),
+    companies : t('company.company'),
+    leads : t('lead.lead'),
+    consultings : t('consulting.consulting'),
+    quotations : t('quotation.quotation'),
+    transactions : t('transaction.transaction'),
+    purchases : t('purchase.purchase'),
+  };
 
   const changeLanguage = (lng) => {   // 언어 변경  
     i18n.changeLanguage(lng);
@@ -66,7 +57,8 @@ const Header = (props) => {
     return "";
   };
 
-  const titleOnTop = (itemsArray.indexOf(addressValue) >= 0);
+  const headerTitle = itemsArray.indexOf(addressValue) > 0 ? headerTitles[addressValue] : headerTitles['dashboard'];
+  const headerIcon = itemsArray.indexOf(addressValue) > 0 ? headerIcons[addressValue] : headerIcons['dashboard'];
 
   return (
     <div className="header" id="heading">
@@ -86,31 +78,20 @@ const Header = (props) => {
         </span>
       </a>
       {/* Header Title */}
-      { titleOnTop ? 
-        <div className="page-title-box">
-          <div className="page-title">
-            { titleElements[addressValue] }
+      <div className="page-title-box">
+        <div className="page-title">
+          <div className="crms-title row bg-white">
+            <div className="col">
+              <h3 className="page-title m-0">
+                <span className="page-title-icon bg-gradient-primary text-white me-2">
+                  <i>{headerIcon}</i>
+                </span>{" "}
+                {headerTitle}{" "}
+              </h3>
+            </div>
           </div>
         </div>
-        :
-        <div className="page-title-box">
-          <div className="top-nav-search">
-            <a className="responsive-search">
-              <i className="fa fa-search" />
-            </a>
-            <form action="search.html">
-              <input
-                className="form-control"
-                type="text"
-                placeholder="Search here"
-              />
-              <button className="btn" type="submit">
-                <FiSearch />
-              </button>
-            </form>
-          </div>
-        </div>
-      }
+      </div>
       {/* /Header Title */}
       <a id="mobile_btn" className="mobile_btn" href="#sidebar">
         <i className="fa fa-bars" />
@@ -119,23 +100,6 @@ const Header = (props) => {
       <ul className="nav user-menu">
         {/* Search */}
         <li className="nav-item">
-          { titleOnTop && 
-            <div className="top-nav-search-right">
-              <a className="responsive-search active">
-                <i className="fa fa-search" />
-              </a>
-              <form action="search.html">
-                <input
-                  className="form-control"
-                  type="text"
-                  placeholder="Search here"
-                />
-                <button className="btn" type="submit">
-                  <FiSearch />
-                </button>
-              </form>
-            </div>
-          }
         </li>
         {/* /Search */}
         {/* Flag */}
