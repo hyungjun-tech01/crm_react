@@ -71,9 +71,9 @@ const LeadsDetailsModel = () => {
   // 상태(state) 정의
 const [selectedRow, setSelectedRow] = useState(null);
 
-  // --- Funtions for Editing ---------------------------------
-  const handleAddNewLeadClicked = useCallback(() => {
-    initializeLeadTemplate();
+// --- Funtions for Editing ---------------------------------
+  const handleAddNewConsultingClicked = useCallback(() => {
+    //initializeLeadTemplate();
   }, []);
 
   const initializeLeadTemplate = useCallback(() => {
@@ -1043,13 +1043,15 @@ const [selectedRow, setSelectedRow] = useState(null);
                                       style={{width:'300px', display: 'inline'}}
                                     />  
                                   </div>
+                                  
+                                  {/*data-bs-target="#add_consulting"*/}
                                   <div className="col text-end">
                                     <button
                                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                                       id="add-task"
                                       data-bs-toggle="modal"
                                       data-bs-target="#add_consulting"
-                                      onClick={handleAddNewLeadClicked}
+                                      onClick={handleAddNewConsultingClicked}
                                     >
                                       {t('consulting.add_consulting')}
                                     </button>
@@ -1354,7 +1356,7 @@ const [selectedRow, setSelectedRow] = useState(null);
       <ConsultingsDetailsModel />
       <QuotationsDetailsModel  />
       <PurchaseDetailsModel  />
-      <ConsultingAddModal  />
+      <ConsultingAddModal currentLead={selectedLead.lead_code} />
     </>
   );
 };
