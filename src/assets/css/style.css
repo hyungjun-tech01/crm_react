@@ -7817,19 +7817,19 @@ form .btn-gradient-primary {
 
 @media (992px < width <= 1200px) {
 	.right .modal-dialog {
-		max-width: 805px;
+		width: 805px;
 	}
 }
 
 @media (1200px < width <= 1600px) {
 	.right .modal-dialog {
-		max-width: 1175px;
+		width: 1175px;
 	}
 }
 
 @media (1600px < width) {
 	.right .modal-dialog {
-		max-width: 1580px;
+		width: 1545px;
 	}
 }
 
