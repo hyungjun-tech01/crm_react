@@ -163,7 +163,7 @@ const TransactionsDetailsModel = () => {
   }, []);
 
   const transaction_items_info = [
-    ['transaction_title','transaction.title',{ type:'label',extra:'long' }],
+    ['transaction_title','transaction.title',{ type:'label', extra:'long' }],
     ['transaction_type','transaction.type',{ type:'label' }],
     ['publish_type','transaction.publish_type',{ type:'label' }],
     ['payment_type','transaction.payment_type',{ type:'label' }],
@@ -174,9 +174,9 @@ const TransactionsDetailsModel = () => {
     ['supply_price','transaction.supply_price',{ type:'label' }],
     ['tax_price','transaction.tax_price',{ type:'label' }],
     ['total_price','transaction.total_price',{ type:'label' }],
-    ['company_address','company.address',{ type:'label',extra:'long' }],
+    ['company_address','company.address',{ type:'label', extra:'long' }],
     ['business_type','company.business_type',{ type:'label' }],
-    ['business_item','company.business_item',{ type:'label' }],
+    ['business_item','company.business_item',{ type:'label', extra:'long' }],
   ];
 
   useEffect(() => {

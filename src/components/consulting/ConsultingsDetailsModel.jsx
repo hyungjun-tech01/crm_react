@@ -180,7 +180,7 @@ const ConsultingsDetailsModel = () => {
     ['mobile_number','lead.mobile',{ type:'label' }],
     ['phone_number','common.phone_no',{ type:'label' }],
     ['email','lead.email',{ type:'label' }],
-    ['company_name','company.company_name',{ type:'label' }],
+    ['company_name','company.company_name',{ type:'label', extra:'long' }],
     ['request_content','consulting.request_content',{ type:'textarea', extra:'long' }],
     ['action_content','consulting.action_content',{ type:'textarea', extra:'long' }],
     ['memo','common.memo',{ type:'textarea', extra:'long' }],

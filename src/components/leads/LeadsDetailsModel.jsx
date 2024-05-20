@@ -409,7 +409,7 @@ const [selectedRow, setSelectedRow] = useState(null);
     ['mobile_number','lead.mobile',{ type:'label'}],
     ['company_name_en','company.eng_company_name',{ type:'label'}],
     ['company_zip_code','common.zip_code',{ type:'label'}],
-    ['company_address','company.address',{ type:'label'}],
+    ['company_address','company.address',{ type:'label', extra:'long'}],
     ['company_phone_number','common.phone_no',{ type:'label'}],
     ['company_fax_number','common.fax_no',{ type:'label'}],
   ];

@@ -455,7 +455,7 @@ const QuotationsDetailsModel = () => {
     ['phone_number','common.phone_no',{ type:'label' }],
     ['fax_number','lead.fax_number',{ type:'label' }],
     ['email','lead.email',{ type:'label' }],
-    ['company_name','company.company_name',{ type:'label' }],
+    ['company_name','company.company_name',{ type:'label', extra:'long' }],
   ];
 
   // --- useEffect ------------------------------------------------------
