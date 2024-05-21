@@ -11,9 +11,9 @@ import { ConsultingRepo, ConsultingTypes } from "../../repository/consulting";
 import { atomAllCompanies, atomAllLeads, defaultConsulting } from "../../atoms/atoms";
 import { formatDate } from "../../constants/functions";
 
-const ConsultingAddModal = ({currentLead}) => {
+const ConsultingAddModal = ({currentLead, previousModalId}) => {
 
-  console.log('currentLead', currentLead);
+  console.log('currentLead', currentLead, previousModalId);
   const { t } = useTranslation();
   const [ cookies ] = useCookies(["myLationCrmUserId","myLationCrmUserName"]);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
@@ -46,31 +46,54 @@ const ConsultingAddModal = ({currentLead}) => {
     };
     
     if(!leadsForSelection || (leadsForSelection.length !== allLeadData.length)){
-      const temp_data = allLeadData.map(lead => {
-        return {
-          label: lead.lead_name + " / " + lead.company_name,
-          value: {
-            code: lead.lead_code,
-            name: lead.lead_name,
-            department: lead.department,
-            position: lead.position,
-            mobile: lead.mobile_number,
-            phone: lead.phone_number,
-            email: lead.email,
-            company: lead.company_name
+      let temp_data;
+      console.log('currentLead code', currentLead);
+      if (currentLead === '' || currentLead === null) {
+        temp_data = allLeadData.map(lead => {
+          return {
+            label: lead.lead_name + " / " + lead.company_name,
+            value: {
+              code: lead.lead_code,
+              name: lead.lead_name,
+              department: lead.department,
+              position: lead.position,
+              mobile: lead.mobile_number,
+              phone: lead.phone_number,
+              email: lead.email,
+              company: lead.company_name
+            }
           }
-        }
-      });
-      temp_data.sort((a, b) => {
-        if (a.label > b.label) {
-          return 1;
-        }
-        if (a.label < b.label) {
-          return -1;
-        }
-        // a must be equal to b
-        return 0;
-      });
+        });
+        temp_data.sort((a, b) => {
+          if (a.label > b.label) {
+            return 1;
+          }
+          if (a.label < b.label) {
+            return -1;
+          }
+          // a must be equal to b
+          return 0;
+        });
+      }else{
+        const currLead = allLeadData.filter(item => (
+          item.lead_code && item.lead_code.includes(currentLead) )
+        );
+        temp_data = currLead.map(lead => {
+          return {
+            label: lead.lead_name + " / " + lead.company_name,
+            value: {
+              code: lead.lead_code,
+              name: lead.lead_name,
+              department: lead.department,
+              position: lead.position,
+              mobile: lead.mobile_number,
+              phone: lead.phone_number,
+              email: lead.email,
+              company: lead.company_name
+            }
+          }
+        });
+      }
       setLeadsForSelection(temp_data);
     };
     
@@ -339,14 +362,27 @@ const ConsultingAddModal = ({currentLead}) => {
                       <label htmlFor="mark-as-done">Mark as Done</label>
                     </div>
                   </div> */}
+                  
                   <div className="text-center">
+                  {currentLead === '' || currentLead === null ?
+                      <button
+                      type="button"
+                      className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                      onClick={handleAddNewConsulting}
+                      >
+                      {t('common.save')}
+                    </button>
+                    :
                     <button
                       type="button"
                       className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                      data-bs-toggle="modal"
+                      data-bs-target={previousModalId}
                       onClick={handleAddNewConsulting}
                     >
                       {t('common.save')}
                     </button>
+                  }
                     &nbsp;&nbsp;
                     <button
                       type="button"

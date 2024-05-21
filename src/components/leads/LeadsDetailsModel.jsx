@@ -1356,7 +1356,7 @@ const [selectedRow, setSelectedRow] = useState(null);
       <ConsultingsDetailsModel />
       <QuotationsDetailsModel  />
       <PurchaseDetailsModel  />
-      <ConsultingAddModal currentLead={selectedLead.lead_code} />
+      <ConsultingAddModal currentLead={selectedLead.lead_code} previousModalId='#leads-details'/>
     </>
   );
 };

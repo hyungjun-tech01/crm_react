@@ -386,7 +386,7 @@ const Consultings = () => {
         <CompanyDetailsModel />
         <LeadsDetailsModel />
         <ConsultingsDetailsModel />
-        <ConsultingAddModal />
+        <ConsultingAddModal currentLead='' previousModalId=''/>
       </div>
     </HelmetProvider>
   );
