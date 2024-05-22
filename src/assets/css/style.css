@@ -5782,21 +5782,18 @@ table.table-inbox tbody tr.checked {
 	border: 1px solid #e3e3e3;
 }
 
-.top-nav-search-right form,
 .top-nav-search form {
 	margin-top: 10px;
 	position: relative;
 	width: 230px;
 }
 
-.top-nav-search-right .form-control,
 .top-nav-search .form-control {
 	border-radius: 50px;
 	height: 40px;
 	padding: 10px 50px 10px 15px;
 }
 
-.top-nav-search-right .btn,
 .top-nav-search .btn {
 	background-color: transparent;
 	border-color: transparent;
@@ -5808,27 +5805,22 @@ table.table-inbox tbody tr.checked {
 	top: 0;
 }
 
-.top-nav-search-right .form-control::-webkit-input-placeholder,
 .top-nav-search .form-control::-webkit-input-placeholder {
 	color: #999;
 }
 
-.top-nav-search-right .form-control::-moz-placeholder,
 .top-nav-search .form-control::-moz-placeholder {
 	color: #999;
 }
 
-.top-nav-search-right .form-control:-ms-input-placeholder,
 .top-nav-search .form-control:-ms-input-placeholder {
 	color: #999;
 }
 
-.top-nav-search-right .form-control::-ms-input-placeholder,
 .top-nav-search .form-control::-ms-input-placeholder {
 	color: #999;
 }
 
-.top-nav-search-right .form-control::placeholder,
 .top-nav-search .form-control::placeholder {
 	color: #999;
 }

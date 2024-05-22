@@ -224,6 +224,9 @@ const enResource = {
             zip_code: 'Postal Code',
             search_here :'Search Here',
         },
+        comment: {
+            search_address_first: 'Please search address...',
+        }
     },
 }
 export default enResource;

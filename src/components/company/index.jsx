@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
+import ReactDom from 'react-dom';
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 // import { MoreVert } from '@mui/icons-material';
 import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies, atomFilteredCompany, defaultCompany } from "../../atoms/atoms";
@@ -18,7 +17,13 @@ import QuotationsDetailsModel from "../quotations/QuotationsDetailsModel";
 import TransactionsDetailsModel from "../transactions/TransactionsDetailsModel";
 import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
 import AddBasicItem from "../../constants/AddBasicItem";
+import PopupPostCode from "../../constants/PostCode";
+import { FiSearch } from "react-icons/fi";
 
+const PopupDom = ({ children }) => {
+  const el = document.getElementById('popupDom');
+  return ReactDom.createPortal(children, el);
+};
 
 const Company = () => {
   const { loadAllCompanies, filterCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
@@ -27,10 +32,9 @@ const Company = () => {
   const [ companyChange, setCompanyChange ] = useState(null);
   const [ cookies ] = useCookies(["myLationCrmUserName",  "myLationCrmUserId"]);
   const [ establishDate, setEstablishDate ] = useState(null);
-  const [ closeDate, setCloseDate ] = useState(null);
-
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
+  const [ isPopupOpen, setIsPopupOpen ] = useState(false);
 
   const { t } = useTranslation();
 
@@ -55,70 +59,6 @@ const Company = () => {
     console.log('[Company] set current company : ', id);
     setCurrentCompany(id);
   },[setCurrentCompany]);
-
-  // --- Functions used for Add New Company ------------------------------
-  const initializeCompanyTemplate = useCallback(() => {
-    setCompanyChange({...defaultCompany});
-    setEstablishDate(null);
-    setCloseDate(null);
-    document.querySelector("#add_new_company_form").reset();
-  }, []);
-
-  const handleAddNewCompanyClicked = useCallback(() => {
-    initializeCompanyTemplate();
-  // eslint-disable-next-line no-use-before-define
-  }, [initializeCompanyTemplate]);
-
-  const handleEstablishDateChange = useCallback((date) => {
-    setEstablishDate(date);
-    companyChange.establishment_date = date;
-  },[companyChange]);
-
-  const handleCloseDateChange = useCallback((date) => {
-    setCloseDate(date);
-    companyChange.closure_date = date;
-  },[companyChange]);
-
-  const handleCompanyChange = useCallback((e)=>{
-    let input_data = null;
-    if(e.target.name === 'establishment_date' || e.target.name === 'closure_date'){
-      const date_value = new Date(e.target.value);
-      if(!isNaN(date_value.valueOf())){
-        input_data = formatDate(date_value);
-      };
-    } else {
-      input_data = e.target.value;
-    }
-    const modifiedData = {
-      ...companyChange,
-      [e.target.name]: input_data,
-    };
-    setCompanyChange(modifiedData);
-  }, [companyChange]);
-
-  const handleAddNewCompany = useCallback((event)=>{
-    // Check data if they are available
-    if(companyChange.company_name === null
-      || companyChange.company_name === '')
-    {
-      console.log("Company Name must be available!");
-      return;
-    };
-
-    const newComData = {
-      ...companyChange,
-      action_type: 'ADD',
-      company_number: '99999',// Temporary
-      counter: 0,
-      modify_user: cookies.myLationCrmUserId,
-    };
-    console.log(`[ handleAddNewCompany ]`, newComData);
-    const result = modifyCompany(newComData);
-    if(result){
-      initializeCompanyTemplate();
-      //close modal ?
-    };
-  },[companyChange, cookies.myLationCrmUserId, initializeCompanyTemplate, modifyCompany]);
 
   const columns = [
     {
@@ -162,6 +102,64 @@ const Company = () => {
     },
   ];
 
+  // --- Functions used for Add New Company ------------------------------
+  const initializeCompanyTemplate = useCallback(() => {
+    setCompanyChange({...defaultCompany});
+    setEstablishDate(null);
+    document.querySelector("#add_new_company_form").reset();
+  }, []);
+
+  const handleAddNewCompanyClicked = useCallback(() => {
+    initializeCompanyTemplate();
+  // eslint-disable-next-line no-use-before-define
+  }, [initializeCompanyTemplate]);
+
+  const handleEstablishDateChange = useCallback((date) => {
+    setEstablishDate(date);
+    companyChange.establishment_date = date;
+  },[companyChange]);
+
+  const handleCompanyChange = useCallback((e)=>{
+    let input_data = null;
+    if(e.target.name === 'establishment_date' || e.target.name === 'closure_date'){
+      const date_value = new Date(e.target.value);
+      if(!isNaN(date_value.valueOf())){
+        input_data = formatDate(date_value);
+      };
+    } else {
+      input_data = e.target.value;
+    }
+    const modifiedData = {
+      ...companyChange,
+      [e.target.name]: input_data,
+    };
+    setCompanyChange(modifiedData);
+  }, [companyChange]);
+
+  const handleAddNewCompany = useCallback((event)=>{
+    // Check data if they are available
+    if(companyChange.company_name === null
+      || companyChange.company_name === '')
+    {
+      console.log("Company Name must be available!");
+      return;
+    };
+
+    const newComData = {
+      ...companyChange,
+      action_type: 'ADD',
+      company_number: '99999',// Temporary
+      counter: 0,
+      modify_user: cookies.myLationCrmUserId,
+    };
+    console.log(`[ handleAddNewCompany ]`, newComData);
+    const result = modifyCompany(newComData);
+    if(result){
+      initializeCompanyTemplate();
+      //close modal ?
+    };
+  },[companyChange, cookies.myLationCrmUserId, initializeCompanyTemplate, modifyCompany]);
+
   const option_deal_type = [
     {
       value: 'mixed', label: t('company.deal_type_mixed')
@@ -187,7 +185,32 @@ const Company = () => {
     {
       value: 'education', label: t('company.ind_type_education')
     },
-  ]
+  ];
+
+  const openPostCode = () => {
+    setIsPopupOpen(true)
+  };
+
+  const closePostCode = () => {
+      setIsPopupOpen(false)
+  };
+
+  const handleSetAddress = useCallback((address) => {
+    console.log('handleSetAddress :', address);
+    const modifiedData = {
+      ...companyChange,
+      company_address: address,
+    };
+    setCompanyChange(modifiedData);
+  }, [companyChange]);
+
+  const handleSetZipCode = useCallback((zip_code) => {
+    const modifiedData = {
+      ...companyChange,
+      company_zip_code: zip_code,
+    };
+    setCompanyChange(modifiedData);
+  }, [companyChange]);
 
   useEffect(() => {    
     if (allCompanyData.length === 0) {
@@ -459,12 +482,32 @@ const Company = () => {
                         />
                       </div>
                       <div className="form-group row">
-                        <AddBasicItem
-                          type='text'
-                          name="address"
-                          title={t('company.address')}
-                          onChange={handleCompanyChange}
-                        />
+                        <div className="col-sm-6" >
+                          <div className="add-basic-item">
+                            <div className="add-basic-title" >
+                                {t('company.address')}
+                            </div>
+                            <input
+                              className="add-basic-content"
+                              type="text"
+                              placeholder={t('company.address')}
+                            />
+                            <div className="add-basic-btn" onClick={openPostCode}>
+                              <FiSearch />
+                            </div>
+                            <div id="popupDom">
+                              {isPopupOpen && (
+                                <PopupDom>
+                                    <PopupPostCode
+                                      onSetAddress={handleSetAddress}
+                                      onSetPostCode={handleSetZipCode}
+                                      onClose={closePostCode}
+                                    />
+                                </PopupDom>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                         <AddBasicItem
                           type='text'
                           name="company_phone_number"
@@ -473,12 +516,20 @@ const Company = () => {
                         />
                       </div>
                       <div className="form-group row">
-                        <AddBasicItem
-                          type='text'
-                          name="zip_code"
-                          title={t('company.zip_code')}
-                          onChange={handleCompanyChange}
-                        />
+                        <div className="col-sm-6" >
+                          <div className="add-basic-item">
+                            <div className="add-basic-title" >
+                                {t('company.zip_code')}
+                            </div>
+                            <label
+                              className="add-basic-content label"
+                            >
+                              {companyChange && companyChange['company_zip_code']
+                                ? companyChange.company_zip_code
+                                : t('comment.search_address_first')}
+                            </label>
+                          </div>
+                        </div>
                         <AddBasicItem
                           type='text'
                           name="company_fax_number"

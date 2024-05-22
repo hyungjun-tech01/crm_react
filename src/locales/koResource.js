@@ -224,6 +224,9 @@ const koResource = {
             zip_code: '우편번호',
             search_here :'검색 키워드',
         },
+        comment: {
+            search_address_first: '먼저 주소 검색하시기 바랍니다.',
+        }
     },
 }
 export default koResource;
