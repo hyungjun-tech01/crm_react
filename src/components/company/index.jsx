@@ -17,6 +17,8 @@ import ConsultingsDetailsModel from "../consulting/ConsultingsDetailsModel";
 import QuotationsDetailsModel from "../quotations/QuotationsDetailsModel";
 import TransactionsDetailsModel from "../transactions/TransactionsDetailsModel";
 import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
+import AddBasicItem from "../../constants/AddBasicItem";
+
 
 const Company = () => {
   const { loadAllCompanies, filterCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
@@ -159,6 +161,33 @@ const Company = () => {
       sorter: (a, b) => compareText(a.application_engineer, b.application_engineer),
     },
   ];
+
+  const option_deal_type = [
+    {
+      value: 'mixed', label: t('company.deal_type_mixed')
+    },
+    {
+      value: 'sales', label: t('company.deal_type_sales')
+    },
+    {
+      value: 'purchase', label: t('company.deal_type_purchase')
+    },
+    {
+      value: 'etc', label: t('company.deal_type_etc')
+    },
+  ];
+
+  const option_industry_type = [
+    {
+      value: 'aerospace', label: t('company.ind_type_aerospace')
+    },
+    {
+      value: 'defence', label: t('company.ind_type_defence')
+    },
+    {
+      value: 'education', label: t('company.ind_type_education')
+    },
+  ]
 
   useEffect(() => {    
     if (allCompanyData.length === 0) {
@@ -400,286 +429,166 @@ const Company = () => {
                 <div className="row">
                   <div className="col-md-12">
                     <form id="add_new_company_form">
-                      <h4>{t('company.company_name')}</h4>
                       <div className="form-group row">
-                        {/* <div className="col-md-12">
-                          <label className="col-form-label">
-                            Organization Name{" "}
-                            <span className="text-danger">*</span>
-                          </label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder="Organization Name"
-                            name="organization"
+                        <AddBasicItem
+                          type='text'
+                          name="company_name"
+                          required
+                          title={t('company.company_name')}
+                          onChange={handleCompanyChange}
+                        />
+                        <AddBasicItem
+                          type='text'
+                          name="company_name_eng"
+                          title={t('company.eng_company_name')}
+                          onChange={handleCompanyChange}
                           />
-                        </div> */}
-                        <div className="col-sm-6">
-                          <label className="col-form-label">
-                            {t('company.company_name')}
-                            <span className="text-danger">*</span>
-                          </label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder={t('company.company_name')}
-                            name="company_name"
-                            onChange={handleCompanyChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.eng_company_name')}</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder={t('company.eng_company_name')}
-                            name="company_name_eng"
-                            onChange={handleCompanyChange}
-                          />
-                        </div>
-                      </div>
-                      <h4>{t('company.company_details')}</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.group')}</label>
-                          <select className="form-control"  name="group_" onChange={handleCompanyChange}>
-                            <option value="">choose proper group</option>
-                            <optgroup label="Shared Group">
-                              <option value="prospective">Prospective Customer</option>
-                              <option value="current">Current Customer</option>
-                              <option value="etc">Etc</option>
-                            </optgroup>
-                          </select>
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.company_scale')}</label>
-                            <input
-                              className="form-control"
-                              type="text"
-                              placeholder={t('company.company_scale')}
-                              name="company_scale"
-                              onChange={handleCompanyChange}
-                            />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.deal_type')}</label>
-                          <select className="form-control" name="deal_type" onChange={handleCompanyChange}>
-                            <option value="">choose proper deal type</option>
-                            <option value="buyer">Buyer</option>
-                            <option value="seller">Seller</option>
-                          </select>
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.business_registration_code')}</label>
-                            <input
-                              className="form-control"
-                              type="text"
-                              placeholder={t('company.business_registration_code')}
-                              name="business_registration_code"
-                              onChange={handleCompanyChange}
-                            />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.establishment_date')}</label>
-                          <div className="cal-icon">
-                            <DatePicker
-                              className="form-control"
-                              selected={establishDate}
-                              onChange={handleEstablishDateChange}
-                              dateFormat="yyyy.MM.dd"
-                              showDayMonthYearPicker
-                            />
-                          </div>
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.closure_date')}</label>
-                          <div className="cal-icon">
-                            <DatePicker
-                              className="form-control"
-                              selected={closeDate}
-                              onChange={handleCloseDateChange}
-                              dateFormat="yyyy.MM.dd"
-                              showDayMonthYearPicker
-                            />
-                          </div>
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.ceo_name')}</label>
-                            <input
-                              className="form-control"
-                              type="text"
-                              placeholder={t('company.ceo_name')}
-                              name="ceo_name"
-                              onChange={handleCompanyChange}
-                            />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.business_type')}</label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder={t('company.business_type')}
-                            name="business_type"
-                            onChange={handleCompanyChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.business_item')}</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder={t('company.business_item')}
-                            name="business_item"
-                            onChange={handleCompanyChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.industry_type')}</label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder={t('company.industry_type')}
-                            name="industry_type"
-                            onChange={handleCompanyChange}
-                          />
-                        </div>
-                      </div>
-                      <h4>{t('common.contact_details')}</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.phone_number')}</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder={t('company.phone_number')}
-                            name="company_phone_number"
-                            onChange={handleCompanyChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.fax_number')}</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder={t('company.fax_number')}
-                            name="company_fax_number"
-                            onChange={handleCompanyChange}
-                          />
-                        </div>
                       </div>
                       <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.homepage')}</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder={t('company.homepage')}
-                            name="homepage"
-                            onChange={handleCompanyChange}
-                          />
-                        </div>                       
+                        <AddBasicItem
+                          type='text'
+                          name="ceo_name"
+                          title={t('company.ceo_name')}
+                          onChange={handleCompanyChange}
+                        />
+                        <AddBasicItem
+                          type='text'
+                          name="business_registration_code"
+                          title={t('company.business_registration_code')}
+                          onChange={handleCompanyChange}
+                        />
                       </div>
-                      <h4>{t('company.address')}</h4>
                       <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.address')}</label>
-                          <textarea
-                            className="form-control"
-                            rows={3}
-                            placeholder={t('company.address')}
-                            defaultValue={""}
-                            name="company_address"
-                            onChange={handleCompanyChange}
-                          />
-                        </div>
-                        <div className="col-sm-6 mt-3">
-                          <label className="col-form-label" />
-                          <br />
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder={t('company.zip_code')}
-                            name="company_zip_code"
-                            onChange={handleCompanyChange}
-                          />
-                        </div>
+                        <AddBasicItem
+                          type='text'
+                          name="address"
+                          title={t('company.address')}
+                          onChange={handleCompanyChange}
+                        />
+                        <AddBasicItem
+                          type='text'
+                          name="company_phone_number"
+                          title={t('company.phone_number')}
+                          onChange={handleCompanyChange}
+                        />
                       </div>
-                      <h4>{t('common.additional_information')}</h4>
                       <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.account_code')}</label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder={t('company.account_code')}
-                            name="account_code"
-                            onChange={handleCompanyChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.bank_name')}</label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder={t('company.bank_name')}
-                            name="bank_name"
-                            onChange={handleCompanyChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.account_owner')}</label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder={t('company.account_owner')}
-                            name="account_owner"
-                            onChange={handleCompanyChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.salesman')}</label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder={t('company.salesman')}
-                            name="sales_resource"
-                            onChange={handleCompanyChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('company.engineer')}</label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder={t('company.engineer')}
-                            name="application_engineer"
-                            onChange={handleCompanyChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('common.region')}</label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            placeholder={t('common.region')}
-                            name="region"
-                            onChange={handleCompanyChange}
-                          />
-                        </div>
+                        <AddBasicItem
+                          type='text'
+                          name="zip_code"
+                          title={t('company.zip_code')}
+                          onChange={handleCompanyChange}
+                        />
+                        <AddBasicItem
+                          type='text'
+                          name="company_fax_number"
+                          title={t('company.fax_number')}
+                          onChange={handleCompanyChange}
+                        />
                       </div>
-                      <h4>Memo</h4>
                       <div className="form-group row">
-                        <div className="col-sm-12">
-                          <label className="col-form-label">{t('company.memo')}</label>
-                          <textarea
-                            className="form-control"
-                            rows={3}
-                            placeholder={t('company.memo')}
-                            defaultValue={""}
-                            name="memo"
-                            onChange={handleCompanyChange}
-                          />
-                        </div>
+                        <AddBasicItem
+                          type='text'
+                          name="homepage"
+                          title={t('company.homepage')}
+                          onChange={handleCompanyChange}
+                        />
+                        <AddBasicItem
+                          type='text'
+                          name="company_scale"
+                          title={t('company.company_scale')}
+                          onChange={handleCompanyChange}
+                        />
+                      </div>
+                      <div className="form-group row">
+                        <AddBasicItem
+                          type='select'
+                          name='deal_type'
+                          options={option_deal_type}
+                          title={t('company.deal_type')}
+                          onChange={handleCompanyChange}
+                        />
+                        <AddBasicItem
+                          type='select'
+                          name='industry_type'
+                          options={option_industry_type}
+                          title={t('company.industry_type')}
+                          onChange={handleCompanyChange}
+                        />
+                      </div>
+                      <div className="form-group row">
+                        <AddBasicItem
+                          type='text'
+                          name="business_type"
+                          title={t('company.business_type')}
+                          onChange={handleCompanyChange}
+                        />
+                        <AddBasicItem
+                          type='text'
+                          name="business_item"
+                          title={t('company.business_item')}
+                          onChange={handleCompanyChange}
+                        />
+                      </div>
+                      <div className="form-group row">
+                        <AddBasicItem
+                          type='text'
+                          name="establishment_date"
+                          title={t('company.establishment_date')}
+                          onChange={handleCompanyChange}
+                        />
+                      </div>
+                      <div className="form-group row">
+                        <AddBasicItem
+                          type='text'
+                          name="account_code"
+                          title={t('company.account_code')}
+                          onChange={handleCompanyChange}
+                        />
+                        <AddBasicItem
+                          type='text'
+                          name="bank_name"
+                          title={t('company.bank_name')}
+                          onChange={handleCompanyChange}
+                        />
+                      </div>
+                      <div className="form-group row">
+                        <AddBasicItem
+                          type='text'
+                          name="account_owner"
+                          title={t('company.account_owner')}
+                          onChange={handleCompanyChange}
+                        />
+                        <AddBasicItem
+                          type='text'
+                          name="sales_resource"
+                          title={t('company.salesman')}
+                          onChange={handleCompanyChange}
+                        />
+                      </div>
+                      <div className="form-group row">
+                        <AddBasicItem
+                          type='text'
+                          name="application_engineer"
+                          title={t('company.engineer')}
+                          onChange={handleCompanyChange}
+                        />
+                        <AddBasicItem
+                          type='text'
+                          name="region"
+                          title={t('common.location')}
+                          onChange={handleCompanyChange}
+                        />
+                      </div>
+                      <div className="form-group row">
+                        <AddBasicItem
+                          type='textarea'
+                          long
+                          row_no={3}
+                          name="memo"
+                          title={t('common.memo')}
+                          onChange={handleCompanyChange}
+                        />
                       </div>
                       <div className="text-center py-3">
                         <button
@@ -687,15 +596,16 @@ const Company = () => {
                           className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
                           onClick={handleAddNewCompany}
                         >
-                          Save
+                          {t('common.save')}
                         </button>
                         &nbsp;&nbsp;
                         <button
                           type="button"
                           className="btn btn-secondary btn-rounded"
                           data-bs-dismiss="modal"
+                          onClick={initializeCompanyTemplate}
                         >
-                          Cancel
+                          {t('common.cancel')}
                         </button>
                       </div>
                     </form>

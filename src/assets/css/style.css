@@ -7795,12 +7795,6 @@ form .btn-gradient-primary {
 }
 
 
-/*.modal.left .modal-body,
-.modal.right .modal-body {
-  padding: 15px 15px 80px;
-}*/
-
-
 /*Right*/
 
 .modal.right.fade .modal-dialog {
@@ -7834,8 +7828,10 @@ form .btn-gradient-primary {
 }
 
 .right form h4 {
+	margin: 10px 0;
 	padding: 10px 10px;
 	background: #f3f1f1;
+	font-size: 14px;
 }
 
 .User-name {
@@ -12390,9 +12386,6 @@ a.comment-btn:hover {
 	#pipeline-task-details .row {
 		margin: 0;
 	}
-	.right form h4 {
-		margin: 10px 0;
-	}
 	#leads-details .row {
 		margin: 0;
 	}
@@ -12560,8 +12553,7 @@ a.comment-btn:hover {
 	.btn-gradient-primary {
 		padding: 8px 9px;
 	}
-	.modal-title,
-	.right form h4 {
+	.modal-title {
 		font-size: 14px;
 	}
 	.col-form-label {
