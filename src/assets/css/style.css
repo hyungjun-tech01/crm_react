@@ -13434,6 +13434,7 @@ a.comment-btn:hover {
 
 .react-datepicker-wrapper {
 	display: block !important;
+	height: 100%;	
 }
 
 .backk-btn{

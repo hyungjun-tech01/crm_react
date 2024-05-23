@@ -53,14 +53,14 @@ const AddBasicItem = (props) => {
                         </div>
                         <Select
                             className="add-basic-select"
-                            name = {name}
+                            name={name}
                             options={options}
                             onChange={onChange}
                         />
                     </div>
                 </div>
             );
-        case 'time':
+        case 'date':
             return (
                 <div className={ long ? "col-sm-12" : "col-sm-6"} >
                     <div className="add-basic-item">
@@ -68,9 +68,10 @@ const AddBasicItem = (props) => {
                             {title}
                             {required && <span className="text-danger">*</span>}
                         </div>
+                        <div className='add-basic-date-wrapper'>
                         {time.time ? 
                             <DatePicker
-                                className="add-basic-select"
+                                className="add-basic-date"
                                 name = {name}
                                 selected={time.data}
                                 onChange={onChange}
@@ -78,13 +79,14 @@ const AddBasicItem = (props) => {
                                 showTimeSelect
                             /> : 
                             <DatePicker
-                                className="add-basic-select"
+                                className="add-basic-date"
                                 name = {name}
                                 selected={time.data}
                                 onChange={onChange}
                                 dateFormat="yyyy-MM-dd"
                             /> 
                         }
+                        </div>
                     </div>
                 </div>
             );

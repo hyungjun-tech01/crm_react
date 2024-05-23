@@ -117,7 +117,11 @@ const Company = () => {
 
   const handleEstablishDateChange = useCallback((date) => {
     setEstablishDate(date);
-    companyChange.establishment_date = date;
+    const modifiedData = {
+      ...companyChange,
+      establishment_date: date,
+    };
+    setCompanyChange(modifiedData);
   },[companyChange]);
 
   const handleCompanyChange = useCallback((e)=>{
@@ -187,6 +191,22 @@ const Company = () => {
       value: 'education', label: t('company.ind_type_education')
     },
   ];
+
+  const handleSelectDealType = useCallback(selected => {
+    const modifiedData = {
+      ...companyChange,
+      deal_type : selected.value,
+    };
+    setCompanyChange(modifiedData);
+  }, [companyChange]);
+
+  const handleSelectIndustryType = useCallback(selected => {
+    const modifiedData = {
+      ...companyChange,
+      industry_type : selected.value,
+    };
+    setCompanyChange(modifiedData);
+  }, [companyChange]);
 
   const handleSetAddress = useCallback((address) => {
     const modifiedData = {
@@ -550,17 +570,15 @@ const Company = () => {
                       <div className="form-group row">
                         <AddBasicItem
                           type='select'
-                          name='deal_type'
                           options={option_deal_type}
                           title={t('company.deal_type')}
-                          onChange={handleCompanyChange}
+                          onChange={handleSelectDealType}
                         />
                         <AddBasicItem
                           type='select'
-                          name='industry_type'
                           options={option_industry_type}
                           title={t('company.industry_type')}
-                          onChange={handleCompanyChange}
+                          onChange={handleSelectIndustryType}
                         />
                       </div>
                       <div className="form-group row">
@@ -579,10 +597,11 @@ const Company = () => {
                       </div>
                       <div className="form-group row">
                         <AddBasicItem
-                          type='text'
+                          type='date'
                           name="establishment_date"
                           title={t('company.establishment_date')}
-                          onChange={handleCompanyChange}
+                          time={{data: establishDate}}
+                          onChange={handleEstablishDateChange}
                         />
                       </div>
                       <div className="form-group row">
