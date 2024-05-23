@@ -29,7 +29,7 @@ const Company = () => {
   const { loadAllCompanies, filterCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const filteredCompany = useRecoilValue(atomFilteredCompany);
-  const [ companyChange, setCompanyChange ] = useState(null);
+  const [ companyChange, setCompanyChange ] = useState(defaultCompany);
   const [ cookies ] = useCookies(["myLationCrmUserName",  "myLationCrmUserId"]);
   const [ establishDate, setEstablishDate ] = useState(null);
   const [searchCondition, setSearchCondition] = useState("");
@@ -104,8 +104,9 @@ const Company = () => {
 
   // --- Functions used for Add New Company ------------------------------
   const initializeCompanyTemplate = useCallback(() => {
-    setCompanyChange({...defaultCompany});
+    setCompanyChange(defaultCompany);
     setEstablishDate(null);
+    setIsPopupOpen(false);
     document.querySelector("#add_new_company_form").reset();
   }, []);
 
@@ -121,7 +122,7 @@ const Company = () => {
 
   const handleCompanyChange = useCallback((e)=>{
     let input_data = null;
-    if(e.target.name === 'establishment_date' || e.target.name === 'closure_date'){
+    if(e.target.name === 'establishment_date'){
       const date_value = new Date(e.target.value);
       if(!isNaN(date_value.valueOf())){
         input_data = formatDate(date_value);
@@ -187,21 +188,13 @@ const Company = () => {
     },
   ];
 
-  const openPostCode = () => {
-    setIsPopupOpen(true)
-  };
-
-  const closePostCode = () => {
-      setIsPopupOpen(false)
-  };
-
   const handleSetAddress = useCallback((address) => {
-    console.log('handleSetAddress :', address);
     const modifiedData = {
       ...companyChange,
       company_address: address,
     };
     setCompanyChange(modifiedData);
+    document.getElementById('company_input_address').value = address;
   }, [companyChange]);
 
   const handleSetZipCode = useCallback((zip_code) => {
@@ -212,7 +205,8 @@ const Company = () => {
     setCompanyChange(modifiedData);
   }, [companyChange]);
 
-  useEffect(() => {    
+  useEffect(() => {   
+    console.log('Company called!');
     if (allCompanyData.length === 0) {
       loadAllCompanies();
     };
@@ -489,10 +483,12 @@ const Company = () => {
                             </div>
                             <input
                               className="add-basic-content"
+                              id="company_input_address"
                               type="text"
                               placeholder={t('company.address')}
+                              onChange={handleCompanyChange}
                             />
-                            <div className="add-basic-btn" onClick={openPostCode}>
+                            <div className="add-basic-btn" onClick={()=>setIsPopupOpen(!isPopupOpen)}>
                               <FiSearch />
                             </div>
                             <div id="popupDom">
@@ -501,7 +497,7 @@ const Company = () => {
                                     <PopupPostCode
                                       onSetAddress={handleSetAddress}
                                       onSetPostCode={handleSetZipCode}
-                                      onClose={closePostCode}
+                                      onClose={()=>setIsPopupOpen(false)}
                                     />
                                 </PopupDom>
                               )}
@@ -524,7 +520,7 @@ const Company = () => {
                             <label
                               className="add-basic-content label"
                             >
-                              {companyChange && companyChange['company_zip_code']
+                              {companyChange.company_zip_code
                                 ? companyChange.company_zip_code
                                 : t('comment.search_address_first')}
                             </label>

@@ -29,7 +29,6 @@ const ConsultingAddModal = ({currentLead, previousModalId}) => {
 
   const {  modifyConsulting, } = useRecoilValue(ConsultingRepo);
 
-
   useEffect(() => {
     if (allCompnayData.length === 0) {
       loadAllCompanies();

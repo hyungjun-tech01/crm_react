@@ -23,7 +23,7 @@ const PopupPostCode = (props) => {
         // console.log(data)
         onSetAddress(fullAddress);
         onSetPostCode(data.zonecode);
-        onClose()
+        onClose();
     }
  
     const postCodeStyle = {
