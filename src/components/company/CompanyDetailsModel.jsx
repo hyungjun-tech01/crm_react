@@ -14,6 +14,7 @@ import { TransactionRepo } from "../../repository/transaction";
 import { PurchaseRepo } from "../../repository/purchase";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
+import { option_locations, option_deal_type } from '../../constants/constans';
 import { MoreVert } from "@mui/icons-material";
 
 const CompanyDetailsModel = () => {
@@ -34,9 +35,7 @@ const CompanyDetailsModel = () => {
   const { t } = useTranslation();
 
   const [ editedValues, setEditedValues ] = useState(null);
-  const [ savedValues, setSavedValues ] = useState(null);
   const [ orgEstablishDate, setOrgEstablishDate ] = useState(null);
-  const [ orgCloseDate, setOrgCloseDate ] = useState(null);
 
   const [ leadsByCompany, setLeadsByCompany] = useState([]);
   const [ consultingByCompany, setConsultingByCompany] = useState([]);
@@ -47,18 +46,6 @@ const CompanyDetailsModel = () => {
   const [ isFullScreen, setIsFullScreen ] = useState(false);
 
   // --- Funtions for Editing ---------------------------------
-  const handleCheckEditState = useCallback((name) => {
-    return editedValues !== null && name in editedValues;
-  }, [editedValues]);
-
-  const handleStartEdit = useCallback((name) => {
-    const tempEdited = {
-      ...editedValues,
-      [name]: selectedCompany[name],
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues, selectedCompany]);
-
   const handleEditing = useCallback((e) => {
     const tempEdited = {
       ...editedValues,
@@ -67,59 +54,21 @@ const CompanyDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues]);
 
-  const handleEndEdit = useCallback((name) => {
-    if(editedValues[name] === selectedCompany[name]){
-      const tempEdited = {
-        ...editedValues,
-      };
-      delete tempEdited[name];
-      setEditedValues(tempEdited);
-      return;
-    };
-
-    const tempSaved = {
-      ...savedValues,
-      [name] : editedValues[name],
-    }
-    setSavedValues(tempSaved);  
-
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited[name];
-    setEditedValues(tempEdited);
-  }, [editedValues, savedValues, selectedCompany]);
-
-  const handleCheckSaved = useCallback((name) => {
-    return savedValues !== null && name in savedValues;
-  }, [savedValues]);
-
-  const handleCancelSaved = useCallback((name) => {
-    const tempSaved = {
-      ...savedValues,
-    };
-    delete tempSaved[name];
-    setSavedValues(tempSaved);
-  }, [savedValues]);
-
-  // --- Funtions for Saving ---------------------------------
+    // --- Funtions for Saving ---------------------------------
   const handleSaveAll = useCallback(() => {
-    if(savedValues !== null
+    if(editedValues !== null
       && selectedCompany !== defaultCompany)
     {
       const temp_all_saved = {
-        ...savedValues,
+        ...editedValues,
         action_type: "UPDATE",
         modify_user: cookies.myLationCrmUserId,
         company_code: selectedCompany.company_code,
       };
       if (modifyCompany(temp_all_saved)) {
         console.log(`Succeeded to modify company`);
-        if(savedValues.establishment_date){
-          setOrgEstablishDate(savedValues.establishment_date);
-        };
-        if(savedValues.closure_date){
-          setOrgCloseDate(savedValues.closure_date);
+        if(editedValues.establishment_date){
+          setOrgEstablishDate(editedValues.establishment_date);
         };
       } else {
         console.error('Failed to modify company')
@@ -128,23 +77,13 @@ const CompanyDetailsModel = () => {
       console.log("[ CompanyDetailModel ] No saved data");
     };
     setEditedValues(null);
-    setSavedValues(null);
-  }, [cookies.myLationCrmUserId, modifyCompany, savedValues, selectedCompany]);
+  }, [cookies.myLationCrmUserId, modifyCompany, editedValues, selectedCompany]);
 
   const handleCancelAll = useCallback(() => {
     setEditedValues(null);
-    setSavedValues(null);
   }, []);
 
-  // --- Funtions for Establishment Date ---------------------------------
-  const handleStartEstablishDateEdit = useCallback(() => {
-    const tempEdited = {
-      ...editedValues,
-      establishment_date: orgEstablishDate,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues, orgEstablishDate]);
-
+  // --- Funtions for Specific Changes ---------------------------------
   const handleEstablishDateChange = useCallback((date) => {
     const tempEdited = {
       ...editedValues,
@@ -153,54 +92,13 @@ const CompanyDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues]);
 
-  const handleEndEstablishDateEdit = useCallback(() => {
-    const establishDate = editedValues.establishment_date;
-    if(establishDate !== orgEstablishDate) {
-      const tempSaved = {
-        ...savedValues,
-        establishment_date : establishDate,
-      };
-      setSavedValues(tempSaved);
+  const handleSelectChange = useCallback((name, selected) => {
+    const tempEdited = {
+      ...editedValues,
+      [name]: selected.value,
     }
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited.establishment_date;
-    setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgEstablishDate]);
-
-  // --- Funtions for Closure Date ---------------------------------
-  const handleStartCloseDateEdit = useCallback(() => {
-    const tempEdited = {
-      ...editedValues,
-      closure_date: orgCloseDate,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues, orgCloseDate]);
-
-  const handleCloseDateChange = useCallback((date) => {
-    const tempEdited = {
-      ...editedValues,
-      closure_date: date,
-    };
-    setEditedValues(tempEdited);
   }, [editedValues]);
 
-  const handleEndCloseDateEdit = useCallback(() => {
-    const closeDate = editedValues.closure_date;
-    if(closeDate !== orgCloseDate) {
-      const tempSaved = {
-        ...savedValues,
-        closure_date : closeDate,
-      };
-      setSavedValues(tempSaved);
-    }
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited.closure_date;
-    setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgCloseDate]);
 
   // --- Funtions for Related Items ---------------------------------
   const handleCardClick = useCallback((card) => {
@@ -238,7 +136,6 @@ const CompanyDetailsModel = () => {
 
   const handleClose = useCallback(() => {
     setEditedValues(null);
-    setSavedValues(null);
     setCurrentCompany();
   }, []);
 
@@ -249,12 +146,12 @@ const CompanyDetailsModel = () => {
     ['company_fax_number','common.fax_no',{ type:'label' }],
     ['homepage','company.homepage',{ type:'label' }],
     ['company_scale','company.company_scale',{ type:'label' }],
-    ['deal_type','company.deal_type',{ type:'label' }],
+    ['deal_type','company.deal_type', { type:'select', options: option_deal_type.ko, selectChange: (selected) => handleSelectChange('deal_type', selected) }],
     ['industry_type','company.industry_type',{ type:'label' }],
     ['business_type','company.business_type',{ type:'label' }],
     ['business_item','company.business_item',{ type:'label' }],
     ['establishment_date','company.establishment_date',
-      { type:'date', orgTimeData: orgEstablishDate, timeDataChange: handleEstablishDateChange, startEditTime: handleStartEstablishDateEdit, endEditTime: handleEndEstablishDateEdit }
+      { type:'date', orgTimeData: orgEstablishDate, timeDataChange: handleEstablishDateChange }
     ],
     ['ceo_name','company.ceo_name',{ type:'label' }],
     ['account_code','company.account_code',{ type:'label' }],
@@ -262,7 +159,7 @@ const CompanyDetailsModel = () => {
     ['account_owner','company.account_owner',{ type:'label' }],
     ['sales_resource','company.salesman',{ type:'label' }],
     ['application_engineer','company.engineer',{ type:'label' }],
-    ['region','common.region',{ type:'label' }],
+    ['region','common.region', { type:'select', options: option_locations.ko, selectChange: (selected) => handleSelectChange('region', selected) }],
     ['memo','common.memo',{ type:'textarea', extra:'long' }],
   ];
 
@@ -270,7 +167,6 @@ const CompanyDetailsModel = () => {
     if(selectedCompany !== defaultCompany) {
       console.log('[CompanyDetailsModel] called!');
       setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
-      setOrgCloseDate(selectedCompany.closure_date ? new Date(selectedCompany.closure_date) : null);
       setExpandRelated([]);
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
@@ -342,27 +238,15 @@ const CompanyDetailsModel = () => {
               </div>
               <DetailTitleItem
                 defaultText={selectedCompany.company_name_eng}
-                saved={savedValues}
                 name='company_name_eng'
                 title={t('company.eng_company_name')}
-                checkEdit={handleCheckEditState}
-                startEdit={handleStartEdit}
-                endEdit={handleEndEdit}
                 editing={handleEditing}
-                checkSaved={handleCheckSaved}
-                cancelSaved={handleCancelSaved}
               />
               <DetailTitleItem
                 defaultText={selectedCompany.business_registration_code}
-                saved={savedValues}
                 name='business_registration_code'
                 title={t('company.business_registration_code')}
-                checkEdit={handleCheckEditState}
-                startEdit={handleStartEdit}
-                endEdit={handleEndEdit}
                 editing={handleEditing}
-                checkSaved={handleCheckSaved}
-                cancelSaved={handleCancelSaved}
               />
             </div>
             <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
@@ -379,7 +263,7 @@ const CompanyDetailsModel = () => {
                 <li className="nav-item">
                   <Link
                     className="nav-link active"
-                    to="#task-details"
+                    to="#company-details"
                     data-bs-toggle="tab"
                   >
                     {t('common.details')}
@@ -388,22 +272,31 @@ const CompanyDetailsModel = () => {
                 <li className="nav-item">
                   <Link
                     className="nav-link"
-                    to="#task-related"
+                    to="#company-product"
+                    data-bs-toggle="tab"
+                  >
+                    {t('common.related')}
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link"
+                    to="#company-transaction"
+                    data-bs-toggle="tab"
+                  >
+                    {t('common.related')}
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link"
+                    to="#company-tax_receipt"
                     data-bs-toggle="tab"
                   >
                     {t('common.related')}
                   </Link>
                 </li>
                 {/* <li className="nav-item">
-                  <Link
-                    className="nav-link"
-                    to="#task-activity"
-                    data-bs-toggle="tab"
-                  >
-                    Activity
-                  </Link>
-                </li>
-                <li className="nav-item">
                   <Link
                     className="nav-link"
                     to="#task-news"
@@ -414,7 +307,7 @@ const CompanyDetailsModel = () => {
                 </li> */}
               </ul>
               <div className="tab-content">
-                <div className="tab-pane show active" id="task-details">
+                <div className="tab-pane show active" id="company-details">
                   <div className="crms-tasks">
                     <div className="tasks__item crms-task-item">
                       <Space
@@ -429,23 +322,17 @@ const CompanyDetailsModel = () => {
                             key={index}
                             defaultText={selectedCompany[item.at(0)]}
                             edited={editedValues}
-                            saved={savedValues}
                             name={item.at(0)}
                             title={t(item.at(1))}
                             detail={item.at(2)}
-                            checkEdit={handleCheckEditState}
-                            startEdit={handleStartEdit}
                             editing={handleEditing}
-                            endEdit={handleEndEdit}
-                            checkSaved={handleCheckSaved}
-                            cancelSaved={handleCancelSaved}
                           />
                         )}
                       </Space>
                     </div>
                   </div>
                 </div>
-                <div className="tab-pane task-related" id="task-related">
+                <div className="tab-pane company-product" id="company-product">
                   <div className="row">
                     <div className="col-md-4">
                       <div className="card bg-gradient-danger card-img-holder text-white h-100">
@@ -845,7 +732,7 @@ const CompanyDetailsModel = () => {
                   </div>
                 </div>
               </div>
-              { savedValues !== null && Object.keys(savedValues).length !== 0 &&
+              { editedValues !== null && Object.keys(editedValues).length !== 0 &&
                 <div className="text-center py-3">
                   <button
                     type="button"

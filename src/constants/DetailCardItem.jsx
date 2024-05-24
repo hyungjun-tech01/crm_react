@@ -1,11 +1,11 @@
-import React, { useRef, forwardRef } from 'react';
-import { Input, Select } from 'antd';
-import { Cancel, Edit, SaveAlt } from '@mui/icons-material';
+import React from 'react';
+import { Input } from 'antd';
+import Select from 'react-select';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const DateInput = forwardRef((props, ref) => {
-    const { name, addonBefore, addonAfter, onChange, format, showTime, style, value, disabled } = props;
+const DateInput = (props) => {
+    const { name, addonBefore, onChange, format, showTime, style, value } = props;
     return (
         <div className="ant-space-item">
             <span className='ant-input-group-wrapper
@@ -20,35 +20,28 @@ const DateInput = forwardRef((props, ref) => {
                     {showTime ? 
                         <DatePicker
                             className="ant-input css-dev-only-do-not-override-1uweeqc ant-input-outlined"
-                            ref={ref}
                             name={ name }
                             selected={ value }
                             onChange={ onChange }
                             dateFormat={ format }
                             showTimeSelect
-                            disabled={disabled}
                         /> :
                         <DatePicker
                             className="ant-input css-dev-only-do-not-override-1uweeqc ant-input-outlined"
-                            ref={ref}
                             name={ name }
                             selected={ value }
                             onChange={ onChange }
                             dateFormat={ format }
-                            disabled={disabled}
                         />
                     }
-                    <span className='ant-input-group-addon'>
-                        {addonAfter}
-                    </span>
                 </span>
             </span>
         </div>
     );
-});
+};
 
-const TextareaInput = forwardRef((props, ref) => {
-    const { name, addonBefore, addonAfter, style, row_no, title, value, onChange, disabled } = props;
+const TextareaInput = (props) => {
+    const { name, addonBefore, style, row_no, title, value, onChange } = props;
     return (
         <div className="ant-space-item">
             <span className='ant-input-group-wrapper
@@ -62,26 +55,21 @@ const TextareaInput = forwardRef((props, ref) => {
                     </span>
                     <Input.TextArea
                         // className="ant-input detail-input-extra"
-                        ref={ref}
                         name={ name }
                         rows={ row_no }
                         placeholder={ title }
                         onChange={ onChange }
-                        disabled={ disabled }
                         style={{ backgroundColor: 'white' }}
                         value={ value }
                     />
-                    <span className='ant-input-group-addon'>
-                        { addonAfter }
-                    </span>
                 </span>
             </span>
         </div>
     );
-});
+};
 
-const SelectInput = forwardRef((props, ref) => {
-    const { addonBefore, addonAfter, style, value, onChange, disabled, options } = props;
+const SelectInput = (props) => {
+    const { addonBefore, style, value, onChange, options } = props;
     return (
         <div className="ant-space-item">
             <span className='ant-input-group-wrapper
@@ -94,94 +82,48 @@ const SelectInput = forwardRef((props, ref) => {
                         {addonBefore}
                     </span>
                     <Select
-                        className="ant-input css-dev-only-do-not-override-1uweeqc detail-input-extra"
-                        ref={ref}
+                        // className="css-dev-only-do-not-override-1uweeqc detail-input-extra"
                         defaultValue={value}
                         options={options}
                         onChange={onChange}
-                        disabled={ disabled ? true : false}
                     />
-                    <span className='ant-input-group-addon'>
-                        {addonAfter}
-                    </span>
                 </span>
             </span>
         </div>
     );
-});
+};
 
 const DetailCardItem = (props) => {
-    const { defaultText, edited, saved, name, title, detail,
-        checkEdit, startEdit, endEdit,
-        editing, checkSaved, cancelSaved
+    const { defaultText, edited, name, title, detail, editing
     } = props;
     
-    const inputRef = useRef(null);
-    const editChecked = edited && checkEdit(name);
-    const saveChecked = saved && checkSaved(name);
-
-    const startEditFunc = detail.type !== 'date'
-        ? () => {
-            startEdit(name);
-            if(detail.type === 'label' || detail.type === 'textarea'){
-                console.log('\tDetailCardItem / startEnditFunc :', inputRef.current);
-                inputRef.current.focus({cursor: 'end',});
-            }
-            else {
-                console.log('\tDetailCardItem / startEnditFunc :', inputRef.current);
-                inputRef.current.focus();
-            }
-        }
-        : () => {
-            detail.startEditTime();
-        };
-    
-    const endEditFunc = detail.type !== 'date'
-        ? () => { endEdit(name); }
-        : () => { detail.endEditTime(name); };
-    
-    const changeFunc = detail.type !== 'date'
-        ? editing : detail.timeDataChange;
-    
     const currentValue = detail.type === 'date'
-        ? detail.orgTimeData : (defaultText ? defaultText : '');
-
-    const editedValue = editChecked ? edited[name] : null;
-    const savedValue = saveChecked ? saved[name] : null;
-    const finalValue = editChecked ? editedValue : (saveChecked ? savedValue : currentValue);
+        ? detail.orgTimeData : (edited && edited[name] ? edited[name] : (defaultText ? defaultText : ''));
 
     const SharedProps = {
         name: name,
         addonBefore: <div className='detail-card-before'>{title}</div>,
-        addonAfter: editChecked
-            ? <SaveAlt onClick={ endEditFunc }/>
-            : (saveChecked
-                ? <Cancel onClick={() => { cancelSaved(name); }}/>
-                : <Edit onClick={ startEditFunc }/>
-            ),
         style: detail.extra === 'long' ? { width: 770 } : { width: 380},
-        value: finalValue,
-        onChange: editChecked ? changeFunc : e => e.preventDefault(),
-        onPressEnter: editChecked ? () => endEdit(name) : null,
+        value: currentValue,
     };
 
-    if(detail.type === 'label'){
-        return <Input {...SharedProps} ref={inputRef} />;
-    };
-
-    if(detail.type === 'date'){
-        // if(!editChecked){
-        //     return <Input {...SharedProps} ref={inputRef} />;
-        // };
-        const timeformat = detail.time ? "yyyy-MM-dd hh:mm:ss" : "yyyy-MM-dd";
-        return <DateInput {...SharedProps} ref={inputRef} format={ timeformat } showTime={ detail.time } disabled={!editChecked}/>;
-    };
-
-    if(detail.type === 'textarea'){
-        return <TextareaInput {...SharedProps} ref={inputRef} row_no={ detail.row_no ? detail.row_no : 2} />;
-    };
-
-    return <SelectInput {...SharedProps} ref={inputRef} options={detail.options} disabled={!editChecked} />;
+    switch(detail.type)
+    {
+        case 'label':
+            return <Input {...SharedProps} onChange={editing}/>;
+        case 'date':
+            // if(!editChecked){
+            //     return <Input {...SharedProps} ref={inputRef} />;
+            // };
+            const timeformat = detail.time ? "yyyy-MM-dd hh:mm:ss" : "yyyy-MM-dd";
+            return <DateInput {...SharedProps} format={ timeformat } showTime={ detail.time } onChange={detail.timeDateChange} />;
+        case 'textarea':
+            return <TextareaInput {...SharedProps} row_no={ detail.row_no ? detail.row_no : 2} onChange={editing} />;
+        case 'select':
+            return <SelectInput {...SharedProps} options={detail.options} onChange={detail.selectChange} />;
+        default:
+            return null;
+    }
 };
 
 export default DetailCardItem;

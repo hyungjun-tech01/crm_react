@@ -10,7 +10,7 @@ import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies, atomFilteredCompany, defaultCompany } from "../../atoms/atoms";
 import { compareCompanyName, compareText, formatDate } from "../../constants/functions";
-import { option_locations } from "../../constants/constans";
+import { option_locations, option_deal_type, option_industry_type } from "../../constants/constans";
 
 import CompanyDetailsModel from "./CompanyDetailsModel";
 import LeadsDetailsModel from "../leads/LeadsDetailsModel";
@@ -166,33 +166,6 @@ const Company = () => {
       //close modal ?
     };
   },[companyChange, cookies.myLationCrmUserId, initializeCompanyTemplate, modifyCompany]);
-
-  const option_deal_type = [
-    {
-      value: 'mixed', label: t('company.deal_type_mixed')
-    },
-    {
-      value: 'sales', label: t('company.deal_type_sales')
-    },
-    {
-      value: 'purchase', label: t('company.deal_type_purchase')
-    },
-    {
-      value: 'etc', label: t('company.deal_type_etc')
-    },
-  ];
-
-  const option_industry_type = [
-    {
-      value: 'aerospace', label: t('company.ind_type_aerospace')
-    },
-    {
-      value: 'defence', label: t('company.ind_type_defence')
-    },
-    {
-      value: 'education', label: t('company.ind_type_education')
-    },
-  ];
 
   const handleSelectChange = useCallback((name, selected) => {
     const modifiedData = {
@@ -564,13 +537,13 @@ const Company = () => {
                       <div className="form-group row">
                         <AddBasicItem
                           type='select'
-                          options={option_deal_type}
+                          options={option_deal_type.ko}
                           title={t('company.deal_type')}
                           onChange={(selected) => handleSelectChange('deal_type', selected)}
                         />
                         <AddBasicItem
                           type='select'
-                          options={option_industry_type}
+                          options={option_industry_type.ko}
                           title={t('company.industry_type')}
                           onChange={(selected) => handleSelectChange('industry_type', selected)}
                         />
