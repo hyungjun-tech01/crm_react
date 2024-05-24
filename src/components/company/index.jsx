@@ -5,11 +5,13 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
+
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
-// import { MoreVert } from '@mui/icons-material';
 import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies, atomFilteredCompany, defaultCompany } from "../../atoms/atoms";
 import { compareCompanyName, compareText, formatDate } from "../../constants/functions";
+import { option_locations } from "../../constants/constans";
+
 import CompanyDetailsModel from "./CompanyDetailsModel";
 import LeadsDetailsModel from "../leads/LeadsDetailsModel";
 import ConsultingsDetailsModel from "../consulting/ConsultingsDetailsModel";
@@ -18,7 +20,9 @@ import TransactionsDetailsModel from "../transactions/TransactionsDetailsModel";
 import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
 import AddBasicItem from "../../constants/AddBasicItem";
 import PopupPostCode from "../../constants/PostCode";
+
 import { FiSearch } from "react-icons/fi";
+// import { MoreVert } from '@mui/icons-material';
 
 const PopupDom = ({ children }) => {
   const el = document.getElementById('popupDom');
@@ -35,10 +39,8 @@ const Company = () => {
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
   const [ isPopupOpen, setIsPopupOpen ] = useState(false);
-
-  const { t } = useTranslation();
-
   const [statusSearch, setStatusSearch] = useState('common.all');
+  const { t } = useTranslation();
 
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
@@ -192,18 +194,10 @@ const Company = () => {
     },
   ];
 
-  const handleSelectDealType = useCallback(selected => {
+  const handleSelectChange = useCallback((name, selected) => {
     const modifiedData = {
       ...companyChange,
-      deal_type : selected.value,
-    };
-    setCompanyChange(modifiedData);
-  }, [companyChange]);
-
-  const handleSelectIndustryType = useCallback(selected => {
-    const modifiedData = {
-      ...companyChange,
-      industry_type : selected.value,
+      [name] : selected.value,
     };
     setCompanyChange(modifiedData);
   }, [companyChange]);
@@ -572,13 +566,13 @@ const Company = () => {
                           type='select'
                           options={option_deal_type}
                           title={t('company.deal_type')}
-                          onChange={handleSelectDealType}
+                          onChange={(selected) => handleSelectChange('deal_type', selected)}
                         />
                         <AddBasicItem
                           type='select'
                           options={option_industry_type}
                           title={t('company.industry_type')}
-                          onChange={handleSelectIndustryType}
+                          onChange={(selected) => handleSelectChange('industry_type', selected)}
                         />
                       </div>
                       <div className="form-group row">
@@ -640,10 +634,10 @@ const Company = () => {
                           onChange={handleCompanyChange}
                         />
                         <AddBasicItem
-                          type='text'
-                          name="region"
+                          type='select'
+                          options={option_locations.ko}
                           title={t('common.location')}
-                          onChange={handleCompanyChange}
+                          onChange={(selected) => handleSelectChange('region', selected)}
                         />
                       </div>
                       <div className="form-group row">
