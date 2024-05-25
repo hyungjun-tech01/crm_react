@@ -25,7 +25,7 @@ const state = {
 
 const BarChart = (props) => {
   return (
-    <div>
+    <div className="chartContainer">
       <Bar
         data={state}
         options={{

@@ -3,30 +3,21 @@ import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Collapse, Space, Switch } from "antd";
-import { C_logo, C_logo2, CircleImg } from "../imagepath";
-import { atomAllConsultings, atomAllLeads, atomAllPurchases, atomAllQuotations, atomAllTransactions, atomCurrentCompany, defaultCompany } from "../../atoms/atoms";
+import { Modal, Space, Switch, Table } from "antd";
+import { C_logo,  } from "../imagepath";
+import { atomAllPurchases, atomAllTransactions, atomCurrentCompany, defaultCompany } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
-import { LeadRepo } from "../../repository/lead";
-import { ConsultingRepo } from "../../repository/consulting";
-import { QuotationRepo } from "../../repository/quotation";
 import { TransactionRepo } from "../../repository/transaction";
 import { PurchaseRepo } from "../../repository/purchase";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import { option_locations, option_deal_type } from '../../constants/constans';
-import { MoreVert } from "@mui/icons-material";
+import { ItemRender, ShowTotal } from "../paginationfunction";
+// import { MoreVert } from "@mui/icons-material";
 
 const CompanyDetailsModel = () => {
-  const { Panel } = Collapse;
   const selectedCompany = useRecoilValue(atomCurrentCompany);
   const { modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
-  const allLeads = useRecoilValue(atomAllLeads);
-  const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
-  const allConsultings = useRecoilValue(atomAllConsultings);
-  const { loadAllConsultings, setCurrentConsulting } = useRecoilValue(ConsultingRepo);
-  const allQuotations = useRecoilValue(atomAllQuotations);
-  const { loadAllQuotations, setCurrentQuotation } = useRecoilValue(QuotationRepo);
   const allTransactions = useRecoilValue(atomAllTransactions);
   const { loadAllTransactions, setCurrentTransaction } = useRecoilValue(TransactionRepo);
   const allPurchases = useRecoilValue(atomAllPurchases);
@@ -37,13 +28,22 @@ const CompanyDetailsModel = () => {
   const [ editedValues, setEditedValues ] = useState(null);
   const [ orgEstablishDate, setOrgEstablishDate ] = useState(null);
 
-  const [ leadsByCompany, setLeadsByCompany] = useState([]);
-  const [ consultingByCompany, setConsultingByCompany] = useState([]);
-  const [ quotationByCompany, setQuotationByCompany] = useState([]);
+  const [ editedSubValues, setEditedSubValues ] = useState(null);
+  const [ orgRegisterDate, setOrgRegisterDate ] = useState(null);
+  const [ orgDelieveryDate, setOrgDeliveryDate ] = useState(null);
+  const [ orgMAFinishDate, setOrgMAFinishDate ] = useState(null);
+
   const [ transactionByCompany, setTransactionByCompany] = useState([]);
   const [ purchaseByCompany, setPurchaseByCompany] = useState([]);
-  const [ expandRelated, setExpandRelated ] = useState([]);
+  const [ noValidMA, setNoValidMA ] = useState(0);
+  const [ dataForSubView, setDataForSubView ] = useState([]);
+
   const [ isFullScreen, setIsFullScreen ] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const changeShowModal = () => {setIsModalOpen(!isModalOpen);};
+  const handleOk = () => {setIsModalOpen(false);};
+  const handleCancel = () => {setIsModalOpen(false);};
 
   // --- Funtions for Editing ---------------------------------
   const handleEditing = useCallback((e) => {
@@ -96,34 +96,9 @@ const CompanyDetailsModel = () => {
     const tempEdited = {
       ...editedValues,
       [name]: selected.value,
-    }
-  }, [editedValues]);
-
-
-  // --- Funtions for Related Items ---------------------------------
-  const handleCardClick = useCallback((card) => {
-    if(card === "lead" && leadsByCompany.length === 0) return;
-    if(card === "consulting" && consultingByCompany.length === 0) return;
-    if(card === "quotation" && quotationByCompany.length === 0) return;
-    if(card === "transaction" && transactionByCompany.length === 0) return;
-    if(card === "purchase" && purchaseByCompany.length === 0) return;
-
-    let tempExpanded = [];
-    const foundIdx = expandRelated.findIndex(item => item === card);
-    if(foundIdx === -1){
-      tempExpanded = [
-        ...expandRelated,
-        card
-      ];
-      setExpandRelated(tempExpanded);
-    } else {
-      tempExpanded = [
-        ...expandRelated.slice(0, foundIdx),
-        ...expandRelated.slice(foundIdx + 1, ),
-      ];
     };
-    setExpandRelated(tempExpanded);
-  }, [expandRelated, leadsByCompany, consultingByCompany, quotationByCompany, transactionByCompany, purchaseByCompany]);
+    setEditedValues(tempEdited);
+  }, [editedValues]);
 
   // --- Funtions for Control Windows ---------------------------------
   const handleWidthChange = useCallback((checked) => {
@@ -163,11 +138,71 @@ const CompanyDetailsModel = () => {
     ['memo','common.memo',{ type:'textarea', extra:'long' }],
   ];
 
+  const purchase_items_info = [
+    ['product_name','purchase.product_name',{ type:'label', extra:'long' }],
+    ['product_type','purchase.product_type',{ type:'label' }],
+    ['serial_number','purchase.serial',{ type:'label' }],
+    ['license','purchase.license',{ type:'label' }],
+    ['module','purchase.module',{ type:'label' }],
+    ['quantity','purchase.quantity',{ type:'label' }],
+    ['registration_date','purchase.registration_date',{ type:'date', orgTimeData: orgEstablishDate, timeDataChange: handleEstablishDateChange }],
+    ['delivery_date','purchase.delivery_date',{ type:'label' }],
+    ['expiry_date','purchase.expiry_date',{ type:'label' }],
+    ['ma_finish_date','purchase.ma_finish_date',{ type:'label' }],
+    ['ma_finish_date','purchase.ma_finish_date',{ type:'label' }],
+  ];
+
+  const columns_purchase = [
+    {
+      title: 'No',
+      dataIndex: 'key',
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: t('purchase.product_name'),
+      dataIndex: "product_name",
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: t('purchase.product_type'),
+      dataIndex: "product_type",
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: t('purchase.serial'),
+      dataIndex: "serial_number",
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: t('purchase.delivery_date'),
+      dataIndex: "delivery_date",
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: t('purchase.ma_finish_date'),
+      dataIndex: "MA_finish_date",
+      render: (text, record) => <>{text}</>,
+    },
+  ];
+
+  const selection_purchase_row = {
+    onChange: (selectedRowKeys, selectedRows) => {
+      console.log(
+        `selectedRowKeys: ${selectedRowKeys}`,
+        "selectedRows: ", selectedRows
+      );
+    },
+    getCheckboxProps: (record) => ({
+      disabled: record.name === "Disabled User", // Column configuration not to be checked
+      name: record.name,
+      className: "checkbox-red",
+    }),
+  };
+
   useEffect(() => {
     if(selectedCompany !== defaultCompany) {
       console.log('[CompanyDetailsModel] called!');
       setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
-      setExpandRelated([]);
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
 
@@ -180,24 +215,6 @@ const CompanyDetailsModel = () => {
         setIsFullScreen(true);
       };
 
-      if(allLeads.length === 0){
-        loadAllLeads();
-      } else {
-        const companyleads = allLeads.filter(lead => lead.company_code === selectedCompany.company_code);
-        setLeadsByCompany(companyleads);
-      };
-      if(allConsultings.length === 0){
-        loadAllConsultings();
-      } else {
-        const companyConsultings = allConsultings.filter(consult => consult.company_code === selectedCompany.company_code);
-        setConsultingByCompany(companyConsultings);
-      };
-      if(allQuotations.length === 0){
-        loadAllQuotations();
-      } else {
-        const companyQuotations = allQuotations.filter(quotation => quotation.company_code === selectedCompany.company_code);
-        setQuotationByCompany(companyQuotations);
-      };
       if(allTransactions.length === 0){
         loadAllTransactions();
       } else {
@@ -209,9 +226,14 @@ const CompanyDetailsModel = () => {
       } else {
         const companyPurchases = allPurchases.filter(purchase => purchase.company_code === selectedCompany.company_code);
         setPurchaseByCompany(companyPurchases);
+        let valid_count = 0;
+        companyPurchases.forEach(item => {
+          if(new Date(item.MA_finish_date) > new Date()) valid_count++;
+        });
+        setNoValidMA(valid_count);
       };
     };
-  }, [selectedCompany, allLeads, allConsultings, allQuotations, allTransactions, allPurchases, loadAllLeads, loadAllConsultings, loadAllQuotations, loadAllTransactions, loadAllPurchases]);
+  }, [selectedCompany, allTransactions, allPurchases, loadAllTransactions, loadAllPurchases]);
 
   return (
     <div
@@ -263,7 +285,7 @@ const CompanyDetailsModel = () => {
                 <li className="nav-item">
                   <Link
                     className="nav-link active"
-                    to="#company-details"
+                    to="#company-details-info"
                     data-bs-toggle="tab"
                   >
                     {t('common.details')}
@@ -272,28 +294,28 @@ const CompanyDetailsModel = () => {
                 <li className="nav-item">
                   <Link
                     className="nav-link"
-                    to="#company-product"
+                    to="#company-details-product"
                     data-bs-toggle="tab"
                   >
-                    {t('common.related')}
+                    {t('purchase.product_info') + "(" + noValidMA + "/" + purchaseByCompany.length + ")"}
                   </Link>
                 </li>
                 <li className="nav-item">
                   <Link
                     className="nav-link"
-                    to="#company-transaction"
+                    to="#company-detail-transaction"
                     data-bs-toggle="tab"
                   >
-                    {t('common.related')}
+                    {t('transaction.statement_of_account') + "(" + transactionByCompany.length + ")"}
                   </Link>
                 </li>
                 <li className="nav-item">
                   <Link
                     className="nav-link"
-                    to="#company-tax_receipt"
+                    to="#company-detail-tax-invoice"
                     data-bs-toggle="tab"
                   >
-                    {t('common.related')}
+                    {t('transaction.tax_invoice')}
                   </Link>
                 </li>
                 {/* <li className="nav-item">
@@ -307,7 +329,7 @@ const CompanyDetailsModel = () => {
                 </li> */}
               </ul>
               <div className="tab-content">
-                <div className="tab-pane show active" id="company-details">
+                <div className="tab-pane show active" id="company-details-info">
                   <div className="crms-tasks">
                     <div className="tasks__item crms-task-item">
                       <Space
@@ -332,401 +354,33 @@ const CompanyDetailsModel = () => {
                     </div>
                   </div>
                 </div>
-                <div className="tab-pane company-product" id="company-product">
+                <div className="tab-pane company-details-product" id="company-details-product">
                   <div className="row">
-                    <div className="col-md-4">
-                      <div className="card bg-gradient-danger card-img-holder text-white h-100">
-                        <div className="card-body" onClick={()=>handleCardClick('lead')}>
-                          <img
-                            src={CircleImg}
-                            className="card-img-absolute"
-                            alt="circle"
-                          />
-                          <h4 className="font-weight-normal mb-3">
-                            {t('lead.lead')}
-                          </h4>
-                          <span>{leadsByCompany.length}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="card bg-gradient-info card-img-holder text-white h-100">
-                      <div className="card-body" onClick={()=>handleCardClick('consulting')}>
-                          <img
-                            src={CircleImg}
-                            className="card-img-absolute"
-                            alt="circle"
-                          />
-                          <h4 className="font-weight-normal mb-3">{t('consulting.consulting')}</h4>
-                          <span>{consultingByCompany.length}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="card bg-gradient-success card-img-holder text-white h-100">
-                      <div className="card-body" onClick={()=>handleCardClick('quotation')}>
-                          <img
-                            src={CircleImg}
-                            className="card-img-absolute"
-                            alt="circle"
-                          />
-                          <h4 className="font-weight-normal mb-3">{t('quotation.quotation')}</h4>
-                          <span>{quotationByCompany.length}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row pt-3">
-                    <div className="col-md-4">
-                      <div className="card bg-gradient-success card-img-holder text-white h-100">
-                      <div className="card-body" onClick={()=>handleCardClick('transaction')}>
-                          <img
-                            src={CircleImg}
-                            className="card-img-absolute"
-                            alt="circle"
-                          />
-                          <h4 className="font-weight-normal mb-3">{t('transaction.transaction')}</h4>
-                          <span>{transactionByCompany.length}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="card bg-gradient-danger card-img-holder text-white h-100">
-                      <div className="card-body" onClick={()=>handleCardClick('purchase')}>
-                          <img
-                            src={CircleImg}
-                            className="card-img-absolute"
-                            alt="circle"
-                          />
-                          <h4 className="font-weight-normal mb-3">{t('purchase.purchase')}</h4>
-                          <span>{purchaseByCompany.length}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row">
-                    <div className="crms-tasks p-2">
-                      <div className="tasks__item crms-task-item active">
-                        <Collapse
-                          accordion expandIconPosition="end"
-                          activeKey={expandRelated}
-                        >
-                          <Panel
-                            collapsible={ leadsByCompany.length > 0 ? 'header' : 'disabled'}
-                            header={t('lead.lead')}
-                            key="lead"
-                            onClick={()=>handleCardClick('lead')}
-                          >
-                            <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                              <thead>
-                                <tr>
-                                  <th>{t('lead.lead_name')}</th>
-                                  <th>{t('lead.mobile')}</th>
-                                  <th>{t('lead.email')}</th>
-                                  <th className="text-end">{t('common.actions')}</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                { leadsByCompany.map((lead, index) => 
-                                  <tr key={index}>
-                                    <td>
-                                      <Link to="#" className="avatar">
-                                        <img alt="" src={C_logo2} />
-                                      </Link>
-                                      <Link
-                                        to="#"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#leads-details"
-                                        onClick={()=> setCurrentLead(lead.lead_code)}
-                                      >
-                                        {lead.lead_name}
-                                      </Link>
-                                    </td>
-                                    <td>{lead.mobile_number}</td>
-                                    <td>{lead.email}</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <MoreVert />
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                )}
-                              </tbody>
-                            </table>
-                          </Panel>
-                          <Panel
-                            collapsible={ consultingByCompany.length > 0 ? 'header' : 'disabled'}
-                            header={t('consulting.consulting')}
-                            key="consulting"
-                            onClick={()=>handleCardClick('consulting')}
-                          >
-                            <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                              <thead>
-                                <tr>
-                                  <th>{t('consulting.type')}</th>
-                                  <th>{t('consulting.receipt_time')}</th>
-                                  <th>{t('consulting.receiver')}</th>
-                                  <th>{t('consulting.request_type')}</th>
-                                  <th className="text-end">{t('common.actions')}</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                { consultingByCompany.map((consulting, index) =>
-                                  <tr key={index}>
-                                    <td>{consulting.consulting_type}</td>
-                                    <td>
-                                      <Link
-                                        to="#"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#consulting-details"
-                                        onClick={()=> setCurrentConsulting(consulting.consulting_code)}
-                                      >
-                                        {consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
-                                        {consulting.receipt_time && new Date(consulting.receipt_time).toLocaleDateString('ko-KR', {hour:'numeric',minute:'numeric',second:'numeric'})}
-                                      </Link>
-                                    </td>
-                                    <td>{consulting.receiver}</td>
-                                    <td>{consulting.request_type}</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <MoreVert />
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                )}
-                              </tbody>
-                            </table>
-                          </Panel>
-                          <Panel
-                            collapsible={ quotationByCompany.length > 0 ? 'header' : 'disabled'}
-                            header={t('quotation.quotation')}
-                            key="quotation"
-                            onClick={()=>handleCardClick('quotation')}
-                          >
-                            <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                              <thead>
-                                <tr>
-                                  <th>{t('common.title')}</th>
-                                  <th>{t('quotation.quotation_date')}</th>
-                                  <th className="text-end">{t('common.actions')}</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                { quotationByCompany.map((quotation, index) =>
-                                  <tr key={index}>
-                                    <td>
-                                      <Link
-                                        to="#"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#quotation-details"
-                                        onClick={()=> setCurrentQuotation(quotation.quotation_code)}
-                                      >
-                                        {quotation.quotation_title}
-                                      </Link>
-                                    </td>
-                                    <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <MoreVert />
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                )}
-                              </tbody>
-                            </table>
-                          </Panel>
-                          <Panel
-                            collapsible={ transactionByCompany.length > 0 ? 'header' : 'disabled'}
-                            header={t('transaction.transaction')}
-                            key="transaction"
-                            onClick={()=>handleCardClick('transaction')}
-                          >
-                            <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                              <thead>
-                                <tr>
-                                  <th>{t('common.title')}</th>
-                                  <th>{t('transaction.publish_date')}</th>
-                                  <th>{t('transaction.publish_type')}</th>
-                                  <th>{t('transaction.supply_price')}</th>
-                                  <th className="text-end">{t('common.actions')}</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                { transactionByCompany.map((trans, index) =>
-                                  <tr key={index}>
-                                    <td>
-                                      <Link
-                                        to="#"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#transaction-details"
-                                        onClick={()=> setCurrentTransaction(trans.transaction_code)}
-                                      >
-                                        {trans.transaction_title}
-                                      </Link>
-                                    </td>
-                                    <td>{trans.publish_date && new Date(trans.publish_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
-                                    <td>{trans.publish_type}</td>
-                                    <td>{trans.supply_price}</td>
-                                    <td className="text-center">
-                                      <div className="dropdown dropdown-action">
-                                        <Link
-                                          to="#"
-                                          className="action-icon dropdown-toggle"
-                                          data-bs-toggle="dropdown"
-                                          aria-expanded="false"
-                                        >
-                                          <MoreVert />
-                                        </Link>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Edit Link
-                                          </Link>
-                                          <Link
-                                            className="dropdown-item"
-                                            to="#"
-                                          >
-                                            Delete Link
-                                          </Link>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                )}
-                              </tbody>
-                            </table>
-                          </Panel>
-                          <Panel
-                            collapsible={ purchaseByCompany.length > 0 ? 'header' : 'disabled'}
-                            header={t('purchase.purchase')}
-                            key="purchase"
-                            onClick={()=>handleCardClick('purchase')}
-                          >
-                            <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                              <thead>
-                                <tr>
-                                  <th>{t('purchase.product_name')}</th>
-                                  <th>{t('common.title')}</th>
-                                  <th>{t('common.price')}</th>
-                                  <th>{t('purchase.delivery_date')}</th>
-                                  <th>{t('purchase.registration_date')}</th>
-                                  <th className="text-end">{t('common.actions')}</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                              { purchaseByCompany.map((purchase, index) =>
-                                <tr key={index}>
-                                  <td>
-                                    <Link
-                                      to="#"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#purchase-details"
-                                      onClick={()=> setCurrentPurchase(purchase.purchase_code)}
-                                    >
-                                      {purchase.product_name}
-                                    </Link>
-                                  </td>
-                                  <td>{purchase.quantity}</td>
-                                  <td>{purchase.price}</td>
-                                  <td>{purchase.delivery_date && new Date(purchase.delivery_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
-                                  <td>{purchase.registration_date && new Date(purchase.registration_date).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})}</td>
-                                  <td className="text-center">
-                                    <div className="dropdown dropdown-action">
-                                      <Link
-                                        to="#"
-                                        className="action-icon dropdown-toggle"
-                                        data-bs-toggle="dropdown"
-                                        aria-expanded="false"
-                                      >
-                                        <MoreVert />
-                                      </Link>
-                                      <div className="dropdown-menu dropdown-menu-right">
-                                        <Link
-                                          className="dropdown-item"
-                                          to="#"
-                                        >
-                                          Edit Link
-                                        </Link>
-                                        <Link
-                                          className="dropdown-item"
-                                          to="#"
-                                        >
-                                          Delete Link
-                                        </Link>
-                                      </div>
-                                    </div>
-                                  </td>
-                                </tr>
-                              )}
-                              </tbody>
-                            </table>
-                          </Panel>
-                        </Collapse>
+                    <div className="table-body">
+                      <div className="table-responsive">
+                        <Table
+                          rowSelection={selection_purchase_row}
+                          pagination={{
+                            total:  purchaseByCompany.length,
+                            showTotal: ShowTotal,
+                            showSizeChanger: true,
+                            ItemRender: ItemRender,
+                          }}
+                          className="table"
+                          style={{ overflowX: "auto" }}
+                          columns={columns_purchase}
+                          dataSource={purchaseByCompany}
+                          rowKey={(record) => record.purchase_code}
+                          onRow={(record, rowIndex) => {
+                            return {
+                              onDoubleClick: (event) => 
+                                {
+                                  console.log('\tDouble Clicked in Table~', event);
+                                  changeShowModal();
+                                }, // double click row
+                            };
+                          }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -755,10 +409,17 @@ const CompanyDetailsModel = () => {
           </div>
         </div>
         {/* modal-content */}
+        <Modal title="Basic Modal" open={isModalOpen}
+          onOk={handleOk} onCancel={handleCancel}
+          style={{ top: 120 }}
+        >
+          <p>Some contents...</p>
+          <p>Some contents...</p>
+          <p>Some contents...</p>
+        </Modal>
       </div>
     </div>
   );
 };
 
 export default CompanyDetailsModel;
-

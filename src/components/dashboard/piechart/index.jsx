@@ -17,7 +17,7 @@ const state = {
 
 const PieChart = () => {
   return (
-    <div>
+    <div className="chartContainer">
       <Pie
         data={state}
         options={{

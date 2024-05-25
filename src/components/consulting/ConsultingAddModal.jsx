@@ -189,8 +189,7 @@ const ConsultingAddModal = ({currentLead, previousModalId}) => {
           aria-modal="true"
         >
           <div
-            className="modal-dialog modal-dialog-centered modal-lg"
-            role="document"
+            className="modal-dialog" role="document"
           >
             <button
               type="button"

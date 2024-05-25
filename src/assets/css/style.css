@@ -7809,13 +7809,13 @@ form .btn-gradient-primary {
 
 @media screen and (1200px < width <= 1600px) {
 	.right .modal-dialog {
-		min-width: 1175px;
+		min-width: 1190px;
 	}
 }
 
 @media screen and (1600px < width) {
 	.right .modal-dialog {
-		min-width: 1545px;
+		min-width: 1580px;
 	}
 }
 
@@ -8572,7 +8572,7 @@ form .btn-gradient-primary {
 }
 
 .modal {
-	z-index: 99999;
+	z-index: 2001;
 }
 
 .right .btn-primary {
@@ -8601,6 +8601,7 @@ form .btn-gradient-primary {
 }
 
 .modal-body {
+	background-color: #ffefff;
 	overflow-y: auto;
 }
 
