@@ -103,7 +103,7 @@ const DetailCardItem = (props) => {
     const SharedProps = {
         name: name,
         addonBefore: <div className='detail-card-before'>{title}</div>,
-        style: detail.extra === 'long' ? { width: 770 } : { width: 380},
+        style: detail.extra === 'long' ? { width: 770 } : (detail.extra === 'modal' ? { width: 470} : { width: 380}),
         value: currentValue,
     };
 

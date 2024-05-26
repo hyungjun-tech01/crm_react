@@ -184,6 +184,7 @@ const enResource = {
         common:{
             actions: 'Actions',
             activity: 'Activity',
+            add: 'Add',
             additional_information:'Additional Information',
             address: 'Address',
             all: 'All',

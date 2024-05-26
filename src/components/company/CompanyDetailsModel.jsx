@@ -3,17 +3,26 @@ import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Modal, Space, Switch, Table } from "antd";
+import { Space, Switch, Table } from "antd";
 import { C_logo,  } from "../imagepath";
-import { atomAllPurchases, atomAllTransactions, atomCurrentCompany, defaultCompany } from "../../atoms/atoms";
+import { atomAllPurchases, atomAllTransactions, atomCurrentCompany, defaultCompany, defaultPurchase } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
 import { PurchaseRepo } from "../../repository/purchase";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
+import DetailSubModal from "../../constants/DetailSubModal";
 import { option_locations, option_deal_type } from '../../constants/constans';
 import { ItemRender, ShowTotal } from "../paginationfunction";
 // import { MoreVert } from "@mui/icons-material";
+
+const MODAL_NULL = 0;
+const MODAL_ADD_PRODUCT=1;
+const MODAL_MODIFY_PRODUCT=2;
+const MODAL_ADD_TRANSACTION=3;
+const MODAL_MODIFY_TRANSACTION=4;
+const MODAL_ADD_TAX_INVOICE=5;
+const MODAL_MODIFY_TAX_INVOICE=6;
 
 const CompanyDetailsModel = () => {
   const selectedCompany = useRecoilValue(atomCurrentCompany);
@@ -28,22 +37,15 @@ const CompanyDetailsModel = () => {
   const [ editedValues, setEditedValues ] = useState(null);
   const [ orgEstablishDate, setOrgEstablishDate ] = useState(null);
 
-  const [ editedSubValues, setEditedSubValues ] = useState(null);
-  const [ orgRegisterDate, setOrgRegisterDate ] = useState(null);
-  const [ orgDelieveryDate, setOrgDeliveryDate ] = useState(null);
-  const [ orgMAFinishDate, setOrgMAFinishDate ] = useState(null);
-
   const [ transactionByCompany, setTransactionByCompany] = useState([]);
   const [ purchaseByCompany, setPurchaseByCompany] = useState([]);
   const [ noValidMA, setNoValidMA ] = useState(0);
-  const [ dataForSubView, setDataForSubView ] = useState([]);
 
   const [ isFullScreen, setIsFullScreen ] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const changeShowModal = () => {setIsModalOpen(!isModalOpen);};
-  const handleOk = () => {setIsModalOpen(false);};
-  const handleCancel = () => {setIsModalOpen(false);};
+  const [ isSubModalOpen, setIsSubModalOpen ] = useState(false);
+  const [ subModalItems, setSubModalItems ] = useState([]);
+  const [ editedSubValues, setEditedSubValues ] = useState(null);
 
   // --- Funtions for Editing ---------------------------------
   const handleEditing = useCallback((e) => {
@@ -139,24 +141,59 @@ const CompanyDetailsModel = () => {
   ];
 
   const purchase_items_info = [
-    ['product_name','purchase.product_name',{ type:'label', extra:'long' }],
-    ['product_type','purchase.product_type',{ type:'label' }],
-    ['serial_number','purchase.serial',{ type:'label' }],
-    ['license','purchase.license',{ type:'label' }],
-    ['module','purchase.module',{ type:'label' }],
-    ['quantity','purchase.quantity',{ type:'label' }],
-    ['registration_date','purchase.registration_date',{ type:'date', orgTimeData: orgEstablishDate, timeDataChange: handleEstablishDateChange }],
-    ['delivery_date','purchase.delivery_date',{ type:'label' }],
-    ['expiry_date','purchase.expiry_date',{ type:'label' }],
-    ['ma_finish_date','purchase.ma_finish_date',{ type:'label' }],
-    ['ma_finish_date','purchase.ma_finish_date',{ type:'label' }],
+    ['product_name','purchase.product_name',{ type:'label', extra:'modal' }],
+    ['product_type','purchase.product_type',{ type:'label', extra:'modal' }],
+    ['serial_number','purchase.serial',{ type:'label', extra:'modal' }],
+    ['regcode','purchase.registration_code',{ type:'label', extra:'modal' }],
+    ['quantity','common.quantity',{ type:'label', extra:'modal' }],
+    ['registration_date','purchase.registration_date',{ type:'date', extra:'modal', orgTimeData: null, timeDataChange: null }],
+    ['delivery_date','purchase.delivery_date',{ type:'date', extra:'modal', orgTimeData: null, timeDataChange: null }],
+    ['MA_finish_date','purchase.ma_finish_date',{ type:'label', extra:'modal' }],
+    ['purchase_memo','common.memo',{ type:'textarea', extra:'modal' }],
   ];
+
+  // --- Funtions for Sub Modal ---------------------------------
+  const handleSubModalOk = () => {setIsSubModalOpen(false);};
+  const handleSubModalCancel = () => {setIsSubModalOpen(false);};
+  const handleSubValueEditing = useCallback((e) => {
+    const tempEdited = {
+      ...editedSubValues,
+      [e.target.name]: e.target.value,
+    };
+    setEditedSubValues(tempEdited);
+  }, [editedSubValues]);
+
+  const handleAddProduct = () => {
+    setIsSubModalOpen(true);
+  };
+
+  const handleModifyProduct = (code) => {
+    if(purchaseByCompany.length > 0) {
+      const foundIdx = purchaseByCompany.findIndex(item => item.purchase_code === code);
+      if(foundIdx !== -1) {
+        const foundItem = purchaseByCompany[foundIdx];
+        setEditedSubValues({...foundItem});
+        const generated = purchase_items_info.map(item => {
+          return {
+            defaultText: foundItem[item.at(0)],
+            edited: editedSubValues,
+            name: item.at(0),
+            title: t(item.at(1)),
+            detail: item.at(2),
+            editing: {handleSubValueEditing},
+          }
+        });
+        setSubModalItems(generated);
+        setIsSubModalOpen(true);
+      };
+    };
+  };
 
   const columns_purchase = [
     {
       title: 'No',
-      dataIndex: 'key',
-      render: (text, record) => <>{text}</>,
+      dataIndex: 'index',
+      render: (text, record) => <>{record.rowIndex}</>,
     },
     {
       title: t('purchase.product_name'),
@@ -184,20 +221,6 @@ const CompanyDetailsModel = () => {
       render: (text, record) => <>{text}</>,
     },
   ];
-
-  const selection_purchase_row = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ", selectedRows
-      );
-    },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
-      name: record.name,
-      className: "checkbox-red",
-    }),
-  };
 
   useEffect(() => {
     if(selectedCompany !== defaultCompany) {
@@ -359,7 +382,6 @@ const CompanyDetailsModel = () => {
                     <div className="table-body">
                       <div className="table-responsive">
                         <Table
-                          rowSelection={selection_purchase_row}
                           pagination={{
                             total:  purchaseByCompany.length,
                             showTotal: ShowTotal,
@@ -373,15 +395,22 @@ const CompanyDetailsModel = () => {
                           rowKey={(record) => record.purchase_code}
                           onRow={(record, rowIndex) => {
                             return {
-                              onDoubleClick: (event) => 
-                                {
-                                  console.log('\tDouble Clicked in Table~', event);
-                                  changeShowModal();
-                                }, // double click row
+                              onDoubleClick: (event) => {
+                                  handleModifyProduct(record.purchase_code);
+                              }, // double click row
                             };
                           }}
                         />
                       </div>
+                    </div>
+                    <div className="text-end py-3">
+                      <button
+                        type="button"
+                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                        onClick={handleAddProduct}
+                      >
+                        {t('common.add')}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -409,14 +438,13 @@ const CompanyDetailsModel = () => {
           </div>
         </div>
         {/* modal-content */}
-        <Modal title="Basic Modal" open={isModalOpen}
-          onOk={handleOk} onCancel={handleCancel}
-          style={{ top: 120 }}
-        >
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-        </Modal>
+        <DetailSubModal
+          title='Basic Modal'
+          items={subModalItems}
+          open={isSubModalOpen}
+          handleOk={handleSubModalOk}
+          handleCancel={handleSubModalCancel}
+        />
       </div>
     </div>
   );

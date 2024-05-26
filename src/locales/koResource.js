@@ -184,6 +184,7 @@ const koResource = {
         common:{
             actions: '',
             activity: '활동',
+            add: '추가',
             additional_information:'추가 정보',
             address: '주소',
             all:'전체',
