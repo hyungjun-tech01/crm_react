@@ -53,6 +53,7 @@ const CompanyDetailsModel = () => {
       ...editedValues,
       [e.target.name]: e.target.value,
     };
+    console.log('\t[handleEditing] value: ', tempEdited);
     setEditedValues(tempEdited);
   }, [editedValues]);
 
@@ -160,6 +161,7 @@ const CompanyDetailsModel = () => {
       ...editedSubValues,
       [e.target.name]: e.target.value,
     };
+    console.log('\t[handleSubValueEditing] value: ', tempEdited);
     setEditedSubValues(tempEdited);
   }, [editedSubValues]);
 
@@ -172,11 +174,9 @@ const CompanyDetailsModel = () => {
       const foundIdx = purchaseByCompany.findIndex(item => item.purchase_code === code);
       if(foundIdx !== -1) {
         const foundItem = purchaseByCompany[foundIdx];
-        setEditedSubValues({...foundItem});
         const generated = purchase_items_info.map(item => {
           return {
             defaultText: foundItem[item.at(0)],
-            edited: editedSubValues,
             name: item.at(0),
             title: t(item.at(1)),
             detail: item.at(2),
@@ -440,8 +440,10 @@ const CompanyDetailsModel = () => {
         {/* modal-content */}
         <DetailSubModal
           title='Basic Modal'
+          edited={editedSubValues}
           items={subModalItems}
           open={isSubModalOpen}
+          handleEditing={handleSubValueEditing}
           handleOk={handleSubModalOk}
           handleCancel={handleSubModalCancel}
         />

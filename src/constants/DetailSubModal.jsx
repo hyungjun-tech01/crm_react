@@ -1,9 +1,9 @@
 import React from 'react';
-import { Modal } from 'antd';
+import { Button, Modal } from 'antd';
 import DetailCardItem from './DetailCardItem';
 
 const DetailSubModal = (props) => {
-    const { items, open, title, handleOk, handleCancel } = props;
+    const { edited, items, open, title, handleEditing, handleOk, handleCancel } = props;
 
     return (
         <Modal
@@ -11,17 +11,29 @@ const DetailSubModal = (props) => {
             open={open}
             onOk={handleOk}
             onCancel={handleCancel}
+            footer={ edited ? [
+                <Button key="cancel" onClick={handleCancel}>
+                  Cancel
+                </Button>,
+                <Button key="submit" type="primary" onClick={handleOk}>
+                  Submit
+                </Button>,
+                ]:[
+                    <Button key="cancel" onClick={handleCancel}>
+                      Cancel
+                    </Button>,
+                ]}
             style={{ top: 120 }}
         >
             {items && items.map((item, index ) => 
                 <DetailCardItem
                     key={index}
                     defaultText={item.defaultText}
-                    edited={item.edited}
+                    edited={edited}
                     name={item.name}
                     title={item.title}
                     detail={item.detail}
-                    editing={item.editing}
+                    editing={handleEditing}
                 />
             )}
         </Modal>
