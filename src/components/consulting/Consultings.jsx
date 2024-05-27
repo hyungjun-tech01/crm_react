@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import { Link } from "react-router-dom";
-import Select from "react-select";
 import { useCookies } from "react-cookie";
+import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
 import { MoreVert } from '@mui/icons-material';
 import { Table } from "antd";
 import "antd/dist/reset.css";
@@ -21,6 +20,7 @@ import { LeadRepo } from "../../repository/lead";
 import { ConsultingRepo, ConsultingTypes } from "../../repository/consulting";
 import { atomAllCompanies, atomAllConsultings, atomAllLeads, defaultConsulting, atomFilteredConsulting } from "../../atoms/atoms";
 import { compareCompanyName, compareText, formatDate } from "../../constants/functions";
+
 
 import { useTranslation } from "react-i18next";
 
@@ -354,6 +354,18 @@ const Consultings = () => {
                       bordered
                       dataSource={allConsultingData}
                       rowKey={(record) => record.consulting_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onDoubleClick: (event) => {
+                            console.log("[Consulting] set current lead : ", record.lead_code);
+                            setCurrentLead(record.lead_code);
+                            let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
+                              keyboard: false
+                            })
+                            myModal.show();
+                          }, // double click row
+                        };
+                      }}
                     />
                     :
                     <Table
@@ -369,6 +381,18 @@ const Consultings = () => {
                     bordered
                     dataSource={filteredConsulting.length >0 ? filteredConsulting:null}
                     rowKey={(record) => record.consulting_code}
+                    onRow={(record, rowIndex) => {
+                      return {
+                        onDoubleClick: (event) => {
+                          console.log("[Consulting] set current lead : ", record.lead_code);
+                          setCurrentLead(record.lead_code);
+                          let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
+                            keyboard: false
+                          })
+                          myModal.show();
+                        }, // double click row
+                      };
+                    }}
                   />
                   }
                   </div>

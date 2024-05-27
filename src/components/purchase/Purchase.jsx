@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
-import { Link } from "react-router-dom";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
+import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import PurchaseDetailsModel from "./PurchaseDetailsModel";
 import DatePicker from "react-datepicker";
@@ -426,6 +426,17 @@ const Purchase = () => {
                       columns={columns}
                       dataSource={allPurchaseData}
                       rowKey={(record) => record.purchase_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onDoubleClick: (event) => {
+                            handleClickPurchase(record.purchase_code)
+                            let myModal = new bootstrap.Modal(document.getElementById('purchase-details'), {
+                              keyboard: false
+                            })
+                            myModal.show();
+                          }, // double click row
+                        };
+                      }}
                     />
                     :
                     <Table
@@ -440,6 +451,17 @@ const Purchase = () => {
                       columns={columns}
                       dataSource={filteredPurchase.length >0 ?  filteredPurchase:null}
                       rowKey={(record) => record.lead_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onDoubleClick: (event) => {
+                            handleClickPurchase(record.purchase_code)
+                            let myModal = new bootstrap.Modal(document.getElementById('purchase-details'), {
+                              keyboard: false
+                            })
+                            myModal.show();
+                          }, // double click row
+                        };
+                      }}
                     /> 
                     }
                   </div>

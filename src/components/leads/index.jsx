@@ -5,6 +5,7 @@ import { Table } from "antd";
 import { Link } from "react-router-dom";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
+import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import LeadsDetailsModel from "./LeadsDetailsModel";
@@ -35,13 +36,9 @@ const Leads = () => {
   const [selectedOption, setSelectedOption] = useState([]);
   const [selectedKeyMan, setSelectedKeyMan] = useState([]);
   const [selectedLeadStatus, setSelectedLeadStatus] = useState([]);
-  
-
-  const [searchCondition, setSearchCondition] = useState("");
-
-
   const { t } = useTranslation();
 
+  const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
 
   const handleSearchCondition =  (newValue)=> {
@@ -450,6 +447,22 @@ const Leads = () => {
                       columns={columns}
                       dataSource={allLeadData}
                       rowKey={(record) => record.lead_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onDoubleClick: (event) => {
+                              console.log("[Lead] set current lead : ", record.lead_code);
+                              setCurrentLead(record.lead_code);
+                              setCurrentCompany(record.company_code);   // 현재 company 세팅 
+                              loadCompanyConsultings(record.company_code);  // 현재 company에 해당하는 consulting 조회 
+                              loadCompanyQuotations(record.company_code);  // 현재 company에 해당하는 quotation 조회 
+                              loadCompanyPurchases(record.company_code);  // 현재 company에 해당하는 purchase 조회 
+                              let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
+                                keyboard: false
+                              })
+                              myModal.show();
+                          }, // double click row
+                        };
+                      }}
                     /> 
                     :
                     <Table
@@ -465,6 +478,22 @@ const Leads = () => {
                       columns={columns}
                       dataSource={filteredLead.length >0 ?  filteredLead:null}
                       rowKey={(record) => record.lead_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onDoubleClick: (event) => {
+                              console.log("[Lead] set current lead : ", record.lead_code);
+                              setCurrentLead(record.lead_code);
+                              setCurrentCompany(record.company_code);   // 현재 company 세팅 
+                              loadCompanyConsultings(record.company_code);  // 현재 company에 해당하는 consulting 조회 
+                              loadCompanyQuotations(record.company_code);  // 현재 company에 해당하는 quotation 조회 
+                              loadCompanyPurchases(record.company_code);  // 현재 company에 해당하는 purchase 조회 
+                              let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
+                                keyboard: false
+                              })
+                              myModal.show();
+                          }, // double click row
+                        };
+                      }}
                     /> 
                     }
                   </div>

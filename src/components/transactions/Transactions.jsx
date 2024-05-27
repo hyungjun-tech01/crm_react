@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import { Link } from "react-router-dom";
+import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
 import { Table } from "antd";
 import "antd/dist/reset.css";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
@@ -223,7 +223,17 @@ const Transactions = () => {
                         bordered
                         dataSource={allTransactionData}
                         rowKey={(record) => record.transaction_code}
-                        // onChange={handleTableChange}
+                        onRow={(record, rowIndex) => {
+                          return {
+                            onDoubleClick: (event) => {
+                              setCurrentTransaction(record.transaction_code)
+                              let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
+                                keyboard: false
+                              })
+                              myModal.show();
+                            }, // double click row
+                          };
+                        }}
                       />:
                       <Table
                       pagination={{
@@ -238,6 +248,17 @@ const Transactions = () => {
                       bordered
                       dataSource={filteredTransaction.length >0 ? filteredTransaction:null}
                       rowKey={(record) => record.transaction_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onDoubleClick: (event) => {
+                            setCurrentTransaction(record.transaction_code)
+                            let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
+                              keyboard: false
+                            })
+                            myModal.show();
+                          }, // double click row
+                        };
+                      }}
                     />
                   }
                   </div>

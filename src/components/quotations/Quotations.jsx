@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import { Link } from "react-router-dom";
 import { Table } from "antd";
+import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
 import "antd/dist/reset.css";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
@@ -273,6 +273,18 @@ const Quotations = () => {
                       bordered
                       dataSource={allQuotationData}
                       rowKey={(record) => record.quotation_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onDoubleClick: (event) => {
+                            console.log("[Quotation] set current quotation : ", record.quotation_codecode);
+                            setCurrentQuotation(record.quotation_codecode);
+                            let myModal = new bootstrap.Modal(document.getElementById('quotations-details'), {
+                              keyboard: false
+                            })
+                            myModal.show();
+                          }, // double click row
+                        };
+                      }}
                     />
                     :
                     <Table
@@ -288,6 +300,18 @@ const Quotations = () => {
                       bordered
                       dataSource={filteredQuotation.length >0 ? filteredQuotation:null}
                       rowKey={(record) => record.quotation_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onDoubleClick: (event) => {
+                            console.log("[Quotation] set current quotation : ", record.quotation_codecode);
+                            setCurrentQuotation(record.quotation_codecode);
+                            let myModal = new bootstrap.Modal(document.getElementById('quotations-details'), {
+                              keyboard: false
+                            })
+                            myModal.show();
+                          }, // double click row
+                        };
+                      }}
                     />
                   }
                   </div>
