@@ -212,7 +212,8 @@ const Company = () => {
           {/* Page Header */}
           <div className="page-header pt-3 mb-0 ">
             <div className="row">
-              <div className="text-start" style={{width:'120px'}}>
+              {/*
+               <div className="text-start" style={{width:'120px'}}>
                   <div className="dropdown">
                     <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.all'):t(statusSearch)}</button>
                       <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
@@ -224,9 +225,10 @@ const Company = () => {
                         <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.engineer')}>{t('company.engineer')}</button>
                       </div>
                   </div>
-              </div>
+                </div> 
+                */}
               
-              <div className="col text-start" style={{width:'400px'}}>
+              <div className="col text-start" style={{width:'300px'}}>
                 <input
                       id = "searchCondition"
                       className="form-control" 
@@ -236,6 +238,17 @@ const Company = () => {
                       value={searchCondition}
                       onChange ={(e) => handleSearchCondition(e.target.value)}
                 />  
+              </div>
+              <div className="col text-start" style={{margin:'0px 20px 5px 20px'}}>
+                  <button
+                      className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
+                      id="add-task"
+                      data-bs-toggle="modal"
+                      data-bs-target="#add_company"
+                      onClick={handleAddNewCompanyClicked}
+                  >
+                      업체다중검색
+                  </button>                
               </div>
               <div className="col text-end">
                 <ul className="list-inline-item pl-0">
