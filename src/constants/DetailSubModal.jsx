@@ -24,6 +24,7 @@ const DetailSubModal = (props) => {
                     </Button>,
                 ]}
             style={{ top: 120 }}
+            zIndex={2001}
         >
             {items && items.map((item, index ) => 
                 <DetailCardItem

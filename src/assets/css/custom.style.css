@@ -255,10 +255,6 @@
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
 }
-.ant-modal-mask, .ant-modal-wrap
-{
-    z-index: 2051 !important;
-}
 .table-body
 {
     padding: 10px;

@@ -170,6 +170,7 @@ const CompanyDetailsModel = () => {
   };
 
   const handleModifyProduct = (code) => {
+    setSubModalItems(null);
     if(purchaseByCompany.length > 0) {
       const foundIdx = purchaseByCompany.findIndex(item => item.purchase_code === code);
       if(foundIdx !== -1) {
@@ -396,6 +397,7 @@ const CompanyDetailsModel = () => {
                           onRow={(record, rowIndex) => {
                             return {
                               onDoubleClick: (event) => {
+                                  console.log('\tClick :', event);
                                   handleModifyProduct(record.purchase_code);
                               }, // double click row
                             };

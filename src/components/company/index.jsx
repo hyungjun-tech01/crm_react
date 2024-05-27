@@ -5,6 +5,7 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
+import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
 
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { CompanyRepo } from "../../repository/company";
@@ -300,6 +301,17 @@ const Company = () => {
                       columns={columns}
                       dataSource={allCompanyData}
                       rowKey={(record) => record.company_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onDoubleClick: (event) => {
+                              handleClickCompanyName(record.company_code);
+                              let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
+                                keyboard: false
+                              })
+                              myModal.show();
+                          }, // double click row
+                        };
+                      }}
                     />
                     :
                     <Table
@@ -315,6 +327,17 @@ const Company = () => {
                       columns={columns}
                       dataSource={filteredCompany.length > 0 ? filteredCompany:null}
                       rowKey={(record) => record.company_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onDoubleClick: (event) => {
+                              handleClickCompanyName(record.company_code)
+                              let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
+                                keyboard: false
+                              })
+                              myModal.show();
+                          }, // double click row
+                        };
+                      }}
                     />
                     }
                   </div>
