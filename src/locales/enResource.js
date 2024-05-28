@@ -55,6 +55,7 @@ const enResource = {
             phone_number : 'Company Phone Number',
             salesman:'SalesMan',
             zip_code : 'Company Postal Code',
+            company_multi_query:'Company MultiQuery',
         },
         lead:{
             actions:'Actions',

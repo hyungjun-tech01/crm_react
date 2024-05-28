@@ -21,6 +21,7 @@ import TransactionsDetailsModel from "../transactions/TransactionsDetailsModel";
 import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
 import AddBasicItem from "../../constants/AddBasicItem";
 import PopupPostCode from "../../constants/PostCode";
+import MultiQueryModal from "../../constants/MultiQueryModal";
 
 import { FiSearch } from "react-icons/fi";
 // import { MoreVert } from '@mui/icons-material';
@@ -41,7 +42,21 @@ const Company = () => {
   const [expanded, setExpaned] = useState(false);
   const [ isPopupOpen, setIsPopupOpen ] = useState(false);
   const [statusSearch, setStatusSearch] = useState('common.all');
+  const [multiQueryModal, setMultiQueryModal] = useState(false);
   const { t } = useTranslation();
+
+  
+
+  const handleMultiQueryModal = () => {
+    setMultiQueryModal(true);
+  }
+  const handleMultiQueryModalOk = () => {
+    setMultiQueryModal(false);
+  };
+  const handleMultiQueryModalCancel = () => {
+    setMultiQueryModal(false);}
+  ;
+
 
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
@@ -242,12 +257,10 @@ const Company = () => {
               <div className="col text-start" style={{margin:'0px 20px 5px 20px'}}>
                   <button
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
-                      id="add-task"
-                      data-bs-toggle="modal"
-                      data-bs-target="#add_company"
-                      onClick={handleAddNewCompanyClicked}
+                      id="multi-company-query"
+                      onClick={handleMultiQueryModal}
                   >
-                      업체다중검색
+                      {t('company.company_multi_query')}
                   </button>                
               </div>
               <div className="col text-end">
@@ -692,6 +705,13 @@ const Company = () => {
         <QuotationsDetailsModel />
         <TransactionsDetailsModel />
         <PurchaseDetailsModel />
+
+        <MultiQueryModal 
+          title= {t('company.company_multi_query')}
+          open={multiQueryModal}
+          handleOk={handleMultiQueryModalOk}
+          handleCancel={handleMultiQueryModalCancel}
+        />
       </div>
     </HelmetProvider>
   );

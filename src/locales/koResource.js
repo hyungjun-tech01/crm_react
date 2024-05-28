@@ -55,6 +55,7 @@ const koResource = {
             phone_number : '업체전화번호',
             salesman:'영업담당자',
             zip_code : '업체우편번호',
+            company_multi_query:'업체 다중검색'
         },
         lead: {
             actions:'액션',
