@@ -700,12 +700,6 @@ const Company = () => {
           {/* modal-dialog */}
         </div>
         <CompanyDetailsModel />
-        <LeadsDetailsModel />
-        <ConsultingsDetailsModel />
-        <QuotationsDetailsModel />
-        <TransactionsDetailsModel />
-        <PurchaseDetailsModel />
-
         <MultiQueryModal 
           title= {t('company.company_multi_query')}
           open={multiQueryModal}

@@ -42,7 +42,7 @@ const state = {
 
 const BarChart = () => {
   return (
-    <div>
+    <div className="chartContainer">
       <Bar
         data={state}
         options={{

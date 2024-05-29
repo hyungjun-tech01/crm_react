@@ -27,7 +27,7 @@ const data = {
 
 const LineChart =()=>{
       return (       
-        <div className="App">
+        <div className="App chartContainer">
           <Line data={data}         
               options={{
                 legend:{

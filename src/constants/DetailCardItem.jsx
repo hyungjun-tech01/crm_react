@@ -110,7 +110,7 @@ const DetailCardItem = (props) => {
     switch(detail.type)
     {
         case 'label':
-            return <Input {...SharedProps} autoFocus onChange={editing}/>;
+            return <Input {...SharedProps} onChange={editing}/>;
         case 'date':
             // if(!editChecked){
             //     return <Input {...SharedProps} ref={inputRef} />;

@@ -32,7 +32,7 @@ const state = {
 
 const HorizontalBarChart =()=> {
   return (
-    <div>
+    <div className="chartContainer">
       <Bar
         data={state}
         options={{
