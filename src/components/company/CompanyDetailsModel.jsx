@@ -266,6 +266,7 @@ const CompanyDetailsModel = () => {
       tabIndex={-1}
       role="dialog"
       aria-modal="true"
+      data-bs-focus="false"
     >
       <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
         <div className="modal-content">
