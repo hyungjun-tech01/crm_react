@@ -1,10 +1,16 @@
 import React from 'react';
 import { selector } from "recoil";
 import { atomCurrentCompany, atomAllCompanies,atomFilteredCompany, defaultCompany } from '../atoms/atoms';
-
 import Paths from "../constants/Paths";
+
 const BASE_PATH = Paths.BASE_PATH;
 
+// export const companyColumn = [
+//     { value: 'company_name', label: t('company.company_name')},
+//     { value: 'eng_company_name', label: t('company.eng_company_name')},
+//     { value: 'User', label: 'User'},
+//     { value: '구매', label: 'Purchaser'},
+// ];
 
 export const CompanyRepo = selector({
     key: "CompanyRepository",

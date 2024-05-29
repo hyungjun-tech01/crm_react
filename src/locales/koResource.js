@@ -31,7 +31,7 @@ const koResource = {
             closure_date :'폐업일',
             company:'업체',
             company_details:'업체 상세정보',
-            company_name:'업체명',
+            company_name:'회사명',
             company_scale:'기업 규모',
             counter:'카운터',
             deal_type:'거래 구분',
@@ -55,7 +55,7 @@ const koResource = {
             phone_number : '업체전화번호',
             salesman:'영업담당자',
             zip_code : '업체우편번호',
-            company_multi_query:'업체 다중검색'
+            company_multi_query:'업체 다중검색',
         },
         lead: {
             actions:'액션',
