@@ -166,6 +166,16 @@ const CompanyDetailsModel = () => {
   }, [editedSubValues]);
 
   const handleAddProduct = () => {
+    const generated = purchase_items_info.map(item => {
+      return {
+        defaultText: '',
+        name: item.at(0),
+        title: t(item.at(1)),
+        detail: item.at(2),
+        editing: {handleSubValueEditing},
+      }
+    });
+    setSubModalItems(generated);
     setIsSubModalOpen(true);
   };
 
@@ -398,7 +408,6 @@ const CompanyDetailsModel = () => {
                           onRow={(record, rowIndex) => {
                             return {
                               onDoubleClick: (event) => {
-                                  console.log('\tClick :', event);
                                   handleModifyProduct(record.purchase_code);
                               }, // double click row
                             };
