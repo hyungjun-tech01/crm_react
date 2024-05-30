@@ -3,7 +3,7 @@ import { Button, Modal } from 'antd';
 import DetailCardItem from './DetailCardItem';
 
 const DetailSubModal = (props) => {
-    const { edited, items, open, title, handleEditing, handleOk, handleCancel } = props;
+    const { title, edited, items, open, handleEditing, handleOk, handleCancel } = props;
 
     return (
         <Modal
@@ -12,18 +12,18 @@ const DetailSubModal = (props) => {
             onOk={handleOk}
             onCancel={handleCancel}
             footer={ edited ? [
-                <Button key="cancel" onClick={handleCancel}>
-                  Cancel
-                </Button>,
-                <Button key="submit" type="primary" onClick={handleOk}>
-                  Submit
-                </Button>,
+                    <Button key="cancel" onClick={handleCancel}>
+                    Cancel
+                    </Button>,
+                    <Button key="submit" type="primary" onClick={handleOk}>
+                    Submit
+                    </Button>,
                 ]:[
                     <Button key="cancel" onClick={handleCancel}>
                       Cancel
                     </Button>,
                 ]}
-            style={{ top: 120 }}
+            style={{ top: 120, width: 240 }}
             zIndex={2001}
         >
             {items && items.map((item, index ) => 
