@@ -14,11 +14,6 @@ import { compareCompanyName, compareText, formatDate } from "../../constants/fun
 import { option_locations, option_deal_type, option_industry_type } from "../../constants/constans";
 
 import CompanyDetailsModel from "./CompanyDetailsModel";
-import LeadsDetailsModel from "../leads/LeadsDetailsModel";
-import ConsultingsDetailsModel from "../consulting/ConsultingsDetailsModel";
-import QuotationsDetailsModel from "../quotations/QuotationsDetailsModel";
-import TransactionsDetailsModel from "../transactions/TransactionsDetailsModel";
-import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
 import AddBasicItem from "../../constants/AddBasicItem";
 import PopupPostCode from "../../constants/PostCode";
 import MultiQueryModal from "../../constants/MultiQueryModal";

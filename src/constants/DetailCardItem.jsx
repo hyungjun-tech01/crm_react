@@ -43,11 +43,10 @@ const DateInput = (props) => {
 const TextareaInput = (props) => {
     const { name, addonBefore, style, row_no, title, value, onChange } = props;
     return (
-        <div className="ant-space-item">
+        <div className="ant-space-item" style={style}>
             <span className='ant-input-group-wrapper
                 ant-input-group-wrapper-outlined
                 css-dev-only-do-not-override-1uweeqc'
-                style={style}
             >
                 <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-1uweeqc'>
                     <span className='ant-input-group-addon'>
@@ -71,11 +70,10 @@ const TextareaInput = (props) => {
 const SelectInput = (props) => {
     const { addonBefore, style, value, onChange, options } = props;
     return (
-        <div className="ant-space-item">
+        <div className="ant-space-item"  style={style}>
             <span className='ant-input-group-wrapper
                 ant-input-group-wrapper-outlined
                 css-dev-only-do-not-override-1uweeqc'
-                style={style}
             >
                 <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-1uweeqc'>
                     <span className='ant-input-group-addon'>
@@ -97,30 +95,31 @@ const DetailCardItem = (props) => {
     const { defaultText, edited, name, title, detail, editing
     } = props;
     
-    const currentValue = detail.type === 'date'
-        ? detail.orgTimeData
-        : (edited && edited[name]
+    const currentValue = (edited && edited[name]
             ? edited[name]
-            : (defaultText ? defaultText : ''));
+            : (detail.type === 'date'
+                ? (detail.orgTimeData ? detail.orgTimeData : '')
+                : (defaultText ? defaultText : '')));
+
+    const widthValue = detail.extra === 'long' ? 770 : (detail.extra === 'modal' ? 470 : 380);
 
     const SharedProps = {
         name: name,
         addonBefore: <div className='detail-card-before'>{title}</div>,
-        style: detail.extra === 'long' ? { width: 770 } : (detail.extra === 'modal' ? { width: 470} : { width: 380}),
         value: currentValue,
     };
 
     switch(detail.type)
     {
         case 'label':
-            return <Input {...SharedProps} onChange={editing}/>;
+            return <Input {...SharedProps} onChange={editing} style={{width: widthValue}}/>;
         case 'date':
             const timeformat = detail.time ? "yyyy-MM-dd hh:mm:ss" : "yyyy-MM-dd";
-            return <DateInput {...SharedProps} format={ timeformat } showTime={ detail.time } onChange={(date) =>detail.timeDateChange(name, date)} />;
+            return <DateInput {...SharedProps} format={ timeformat } showTime={ detail.time } onChange={(date) =>detail.timeDateChange(name, date)} style={{width: widthValue}}/>;
         case 'textarea':
-            return <TextareaInput {...SharedProps} row_no={ detail.row_no ? detail.row_no : 2} onChange={editing} />;
+            return <TextareaInput {...SharedProps} row_no={ detail.row_no ? detail.row_no : 2} onChange={editing} style={detail.extra === 'memo' ? {width: `calc(100% - 380px)`, flexGrow: 1} : {width: widthValue}}/>;
         case 'select':
-            return <SelectInput {...SharedProps} options={detail.options} onChange={detail.selectChange} />;
+            return <SelectInput {...SharedProps} options={detail.options} onChange={detail.selectChange} style={{width: widthValue}}/>;
         default:
             return null;
     }

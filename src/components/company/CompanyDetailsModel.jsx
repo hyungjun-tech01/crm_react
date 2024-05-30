@@ -39,6 +39,8 @@ const CompanyDetailsModel = () => {
   const [ editedSubValues, setEditedSubValues ] = useState([]);
   const [ orgTimeInSub, setOrgTimeInSub ] = useState([]);
 
+  const [ editedNewValues, setEditedNewValues ] = useState(null);
+
   const [ isSubModalOpen, setIsSubModalOpen ] = useState(false);
   const [ subModalSetting, setSubModalSetting ] = useState({title:''})
   const [ subModalItems, setSubModalItems ] = useState([]);
@@ -149,13 +151,9 @@ const CompanyDetailsModel = () => {
     ['delivery_date','purchase.delivery_date',{ type:'date' }],
     ['hq_finish_date','purchase.hq_finish_date',{ type:'date' }],
     ['MA_finish_date','purchase.ma_finish_date',{ type:'date' }],
-    ['purchase_memo','common.memo',{ type:'textarea', row_no: 3 }],
   ];
 
-  // --- Funtions for Sub Modal ---------------------------------
-  const handleSubModalOk = () => {setIsSubModalOpen(false);};
-  const handleSubModalCancel = () => {setIsSubModalOpen(false);};
-
+  // --- Functions for Editing Sub Detail ---------------------------------
   const handleSubValueChange = useCallback((idx, e) => {
     const tempEdited = {
       ...editedSubValues[idx],
@@ -247,6 +245,52 @@ const CompanyDetailsModel = () => {
       setEditedSubValues(tempSubValueArry);
     }
   }, [cookies.myLationCrmUserId, editedSubValues, orgTimeInSub]);
+
+  // --- Functions for Editing New item ---------------------------------
+  const handleNewItemChange = useCallback(e => {
+    const tempEdited = {
+      ...editedNewValues,
+      [e.target.name]: e.target.value,
+    };
+
+    setEditedNewValues(tempEdited);
+    console.log('handleNewItemChange : ', tempEdited);
+  }, [editedNewValues]);
+
+  const handleNewItemDateChange = useCallback((name, date) => {
+    const tempEdited = {
+      ...editedNewValues,
+      [name]: date,
+    };
+    setEditedNewValues(tempEdited);
+    console.log('handleNewItemDateChange : ', tempEdited);
+  }, [editedNewValues])
+
+  const handleCancelNewItemChange = useCallback(() => {
+    setEditedNewValues(null);
+  }, []);
+
+  const handleSaveNewItemChange = useCallback(() => {
+    if(editedNewValues){
+      const tempSubValues = {
+        ...editedNewValues,
+        action_type: "ADD",
+        recent_user: cookies.myLationCrmUserId,
+      };
+      
+      if (modifyPurchase(tempSubValues)) {
+        console.log(`Succeeded to modify purchase`);
+        
+      } else {
+        console.error('Failed to modify company')
+      };
+      setEditedNewValues(null);
+    }
+  }, [cookies.myLationCrmUserId, editedNewValues]);
+
+  // --- Funtions for Sub Modal ---------------------------------
+  const handleSubModalOk = () => {setIsSubModalOpen(false);};
+  const handleSubModalCancel = () => {setIsSubModalOpen(false);};
 
   const handleAddProduct = () => {
     const generated = purchase_items_info.map(item => {
@@ -344,6 +388,10 @@ const CompanyDetailsModel = () => {
         }
         setEditedSubValues(arryForEdit);
         setOrgTimeInSub(dateArrayForEdit);
+      } else {
+        setSubDetailItems([]);
+        setEditedSubValues([]);
+        setOrgTimeInSub([]);
       };
     },
     getCheckboxProps: (record) => ({
@@ -385,6 +433,8 @@ const CompanyDetailsModel = () => {
           if(new Date(item.MA_finish_date) > new Date()) valid_count++;
         });
         setValidMACount(valid_count);
+        setEditedSubValues([]);
+        setEditedNewValues(null);
       };
     };
   }, [selectedCompany, allTransactions, allPurchases, loadAllTransactions, loadAllPurchases]);
@@ -487,6 +537,7 @@ const CompanyDetailsModel = () => {
                 <div className="tab-pane show active" id="company-details-info">
                   <div className="crms-tasks">
                     <div className="tasks__item crms-task-item">
+                    <div className="row">
                       <Space
                         align="start"
                         direction="horizontal"
@@ -506,78 +557,141 @@ const CompanyDetailsModel = () => {
                           />
                         )}
                       </Space>
+                      </div>
                     </div>
                   </div>
                 </div>
                 <div className="tab-pane company-details-product" id="company-details-product">
                   <div className="row">
-                    <div className="table-body">
-                      <div className="table-responsive">
-                        <Table
-                          rowSelection={purchaseRowSelection}
-                          pagination={{
-                            total:  purchaseByCompany.length,
-                            showTotal: ShowTotal,
-                            showSizeChanger: true,
-                            ItemRender: ItemRender,
-                          }}
-                          className="table"
-                          style={{ overflowX: "auto" }}
-                          columns={columns_purchase}
-                          dataSource={purchaseByCompany}
-                          rowKey={(record) => record.purchase_code}
-                        />
+                    <div className="card mb-0">
+                      <div className="table-body">
+                        <div className="table-responsive">
+                          <Table
+                            rowSelection={purchaseRowSelection}
+                            pagination={{
+                              total:  purchaseByCompany.length,
+                              showTotal: ShowTotal,
+                              showSizeChanger: true,
+                              ItemRender: ItemRender,
+                            }}
+                            className="table"
+                            style={{ overflowX: "auto" }}
+                            columns={columns_purchase}
+                            dataSource={purchaseByCompany}
+                            rowKey={(record) => record.purchase_code}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
-                  { subDetailItems.length > 0 && 
-                    subDetailItems.map((dItem, dIndex) => 
-                      <div key={dIndex} 
-                        style={{display:'flex', flexWrap:'wrap', justifyContent:'space-between' ,margin: '0.5rem', padding:'0.5rem 1.5rem', border: 'solid 1px #993399', borderRadius: '5px', backgroundColor:'white'}}>
+                  <div className="row">
+                    <div className="card mb-0">
+                    { subDetailItems.length > 0 && 
+                      subDetailItems.map((dItem, dIndex) => 
+                        <div key={dIndex}>
+                          <div style={{fontSize: 15, fontWeight: 600, padding: '0.5rem 0 0 1.0rem'}}>{"No. " + (dIndex + 1)}</div>
+                          <div  
+                            style={{display:'flex', flexWrap:'wrap', justifyContent:'space-between' ,margin: 0, padding:'0.5rem 0', border: 0, backgroundColor:'white'}}>
+                            {
+                              purchase_items_info.map((item, index) => 
+                                <DetailCardItem
+                                  key={index}
+                                  defaultText={dItem[item.at(0)]}
+                                  edited={editedSubValues[dIndex]}
+                                  name={item.at(0)}
+                                  title={t(item.at(1))}
+                                  detail={item.at(2).type === 'date' 
+                                    ? {type:'date', orgTimeData: orgTimeInSub[dIndex][item.at(0)], 
+                                        timeDateChange: (name, date) => handleSubDateValueChange(dIndex, name, date) }
+                                    : item.at(2)}
+                                  editing={(event) => handleSubValueChange(dIndex, event)}
+                                />
+                            )}
+                            
+                          </div>
+                          <div style={{marginBottom: '0.5rem', display: 'flex'}}>
+                            <DetailCardItem
+                              defaultText={dItem["purchase_memo"]}
+                              edited={editedSubValues[dIndex]}
+                              name="purchase_memo"
+                              title={t('common.memo')}
+                              detail={{type:'textarea', extra: 'memo', row_no: 3}}
+                              editing={(event) => handleSubValueChange(dIndex, event)}
+                            />
+                            <div style={{width: 380, display: 'flex', flexDirection: 'column', alignItems:'center', justifyContent: 'space-evenly'}}>
+                              <Button
+                                type="primary" 
+                                style={{width: '120px'}} 
+                                disabled={!editedSubValues[dIndex]}
+                                onClick={()=>{handleSaveSubItemChange(dIndex)}}
+                              >
+                                {t('common.save')}
+                              </Button>
+                              <Button 
+                                type="primary" 
+                                style={{width: '120px'}} 
+                                disabled={!editedSubValues[dIndex]} 
+                                onClick={()=>{handleCancelSubItemChange(dIndex)}}
+                              >
+                                {t('common.cancel')}
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                    )}
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="card mb-0">
+                      <>
+                        <div style={{fontSize: 15, fontWeight: 600, padding: '0.5rem 0 0 1.0rem'}}>{t('purchase.add_purchase')}</div>
+                        <div style={{display:'flex', flexWrap:'wrap', justifyContent:'space-between' ,margin: 0, padding: '0.5rem 0', border: 0, backgroundColor:'white'}}>
                         {
                           purchase_items_info.map((item, index) => 
                             <DetailCardItem
                               key={index}
-                              defaultText={dItem[item.at(0)]}
-                              edited={editedSubValues[dIndex]}
+                              defaultText=''
+                              edited={editedNewValues}
                               name={item.at(0)}
                               title={t(item.at(1))}
                               detail={item.at(2).type === 'date' 
-                                ? {type:'date', orgTimeData: orgTimeInSub[dIndex][item.at(0)], 
-                                    timeDateChange: (name, date) => handleSubDateValueChange(dIndex, name, date) }
+                                ? {type:'date', orgTimeData: null,
+                                    timeDateChange: handleNewItemDateChange }
                                 : item.at(2)}
-                              editing={(event) => handleSubValueChange(dIndex, event)}
+                              editing={handleNewItemChange}
                             />
                         )}
-                        <div style={{width: 380, display: 'flex', flexDirection: 'column', alignItems:'center', justifyContent: 'space-around'}}>
-                          <Button
-                            type="primary" 
-                            style={{width: '120px'}} 
-                            disabled={!!editedSubValues[dIndex]}
-                            onClick={()=>{handleSaveSubItemChange(dIndex)}}
-                          >
-                            {t('common.save')}
-                          </Button>
-                          <Button 
-                            type="primary" 
-                            style={{width: '120px'}} 
-                            disabled={!!editedSubValues[dIndex]} 
-                            onClick={()=>{handleCancelSubItemChange(dIndex)}}
-                          >
-                            {t('common.cancel')}
-                          </Button>
                         </div>
-                      </div>
-                    )
-                  }
-                  <div className="text-center py-3">
-                    <button
-                      type="button"
-                      className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                      onClick={handleAddProduct}
-                    >
-                      {t('common.add')}
-                    </button>
+                        <div style={{marginBottom: '0.5rem', display: 'flex'}}>
+                          <DetailCardItem
+                            defaultText=''
+                            edited={editedNewValues}
+                            name="purchase_memo"
+                            title={t('common.memo')}
+                            detail={{type:'textarea', extra: 'memo', row_no: 3}}
+                            editing={handleNewItemChange}
+                          />
+                          <div style={{width: 380, display: 'flex', flexDirection: 'column', flewGrow: 0, alignItems:'center', justifyContent: 'space-evenly'}}>
+                            <Button
+                              type="primary" 
+                              style={{width: '120px'}} 
+                              disabled={!editedNewValues}
+                              onClick={handleSaveNewItemChange}
+                            >
+                              {t('common.add')}
+                            </Button>
+                            <Button 
+                              type="primary" 
+                              style={{width: '120px'}} 
+                              disabled={!editedNewValues} 
+                              onClick={handleCancelNewItemChange}
+                            >
+                              {t('common.cancel')}
+                            </Button>
+                          </div>
+                        </div>
+                      </>
+                    </div>
                   </div>
                 </div>
               </div>
