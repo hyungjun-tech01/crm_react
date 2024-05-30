@@ -98,7 +98,10 @@ const DetailCardItem = (props) => {
     } = props;
     
     const currentValue = detail.type === 'date'
-        ? detail.orgTimeData : (edited && edited[name] ? edited[name] : (defaultText ? defaultText : ''));
+        ? detail.orgTimeData
+        : (edited && edited[name]
+            ? edited[name]
+            : (defaultText ? defaultText : ''));
 
     const SharedProps = {
         name: name,
@@ -112,11 +115,8 @@ const DetailCardItem = (props) => {
         case 'label':
             return <Input {...SharedProps} onChange={editing}/>;
         case 'date':
-            // if(!editChecked){
-            //     return <Input {...SharedProps} ref={inputRef} />;
-            // };
             const timeformat = detail.time ? "yyyy-MM-dd hh:mm:ss" : "yyyy-MM-dd";
-            return <DateInput {...SharedProps} format={ timeformat } showTime={ detail.time } onChange={detail.timeDateChange} />;
+            return <DateInput {...SharedProps} format={ timeformat } showTime={ detail.time } onChange={(date) =>detail.timeDateChange(name, date)} />;
         case 'textarea':
             return <TextareaInput {...SharedProps} row_no={ detail.row_no ? detail.row_no : 2} onChange={editing} />;
         case 'select':
