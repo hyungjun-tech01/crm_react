@@ -1,16 +1,28 @@
 import React from 'react';
 import { selector } from "recoil";
+
 import { atomCurrentCompany, atomAllCompanies,atomFilteredCompany, defaultCompany } from '../atoms/atoms';
 import Paths from "../constants/Paths";
 
 const BASE_PATH = Paths.BASE_PATH;
 
-// export const companyColumn = [
-//     { value: 'company_name', label: t('company.company_name')},
-//     { value: 'eng_company_name', label: t('company.eng_company_name')},
-//     { value: 'User', label: 'User'},
-//     { value: '구매', label: 'Purchaser'},
-// ];
+export const companyColumn = [
+     { value: 'company_name', label: '회사명'},
+     { value: 'eng_company_name', label: '영문회사명'},
+     { value: 'ceo_name', label: '대표자명'},
+     { value: 'business_registration_code', label: '사업자번호'},
+ ];
+
+ export const ColumnQueryCondition = [
+    { value: 'include', label: '포함'},
+    { value: 'last_include', label: '~포함'},
+    { value: 'first_include', label: '포함~'},
+    { value: 'is_null', label: '값이없는'},
+    { value: 'is_not_null', label: '값이있는'},
+    { value: 'equeal', label: '='},
+    { value: 'greater_than', label: '>'},
+    { value: 'less_than', label: '<'},
+];
 
 export const CompanyRepo = selector({
     key: "CompanyRepository",
