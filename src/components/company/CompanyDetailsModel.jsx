@@ -27,119 +27,26 @@ const CompanyDetailsModel = () => {
   const { t } = useTranslation();
 
   const [ isFullScreen, setIsFullScreen ] = useState(false);
-
-  const [ editedValues, setEditedValues ] = useState(null);
-  const [ orgEstablishDate, setOrgEstablishDate ] = useState(null);
-
-  const [ transactionByCompany, setTransactionByCompany] = useState([]);
-  const [ purchaseByCompany, setPurchaseByCompany] = useState([]);
-  const [ validMACount, setValidMACount ] = useState(0);
-
-  const [ subDetailItems, setSubDetailItems ] = useState([]);
-  const [ editedSubValues, setEditedSubValues ] = useState([]);
-  const [ orgTimeInSub, setOrgTimeInSub ] = useState([]);
-
-  const [ editedNewValues, setEditedNewValues ] = useState(null);
-
   const [ isSubModalOpen, setIsSubModalOpen ] = useState(false);
   const [ subModalSetting, setSubModalSetting ] = useState({title:''})
   const [ subModalItems, setSubModalItems ] = useState([]);
 
-  // --- Funtions for Editing Detail ---------------------------------
-  const handleEditing = useCallback((e) => {
-    const tempEdited = {
-      ...editedValues,
-      [e.target.name]: e.target.value,
-    };
-    console.log('\t[handleEditing] value: ', tempEdited);
-    setEditedValues(tempEdited);
-  }, [editedValues]);
+  // --- Variables for Details ------------------------------------------------
+  const [ editedDetailValues, setEditedDetailValues ] = useState(null);
+  const [ orgEstablishDate, setOrgEstablishDate ] = useState(null);
 
-  const handleSaveAll = useCallback(() => {
-    if(editedValues !== null
-      && selectedCompany !== defaultCompany)
-    {
-      const temp_all_saved = {
-        ...editedValues,
-        action_type: "UPDATE",
-        modify_user: cookies.myLationCrmUserId,
-        company_code: selectedCompany.company_code,
-      };
-      if (modifyCompany(temp_all_saved)) {
-        console.log(`Succeeded to modify company`);
-        if(editedValues.establishment_date){
-          setOrgEstablishDate(editedValues.establishment_date);
-        };
-      } else {
-        console.error('Failed to modify company')
-      }
-    } else {
-      console.log("[ CompanyDetailModel ] No saved data");
-    };
-    setEditedValues(null);
-  }, [cookies.myLationCrmUserId, modifyCompany, editedValues, selectedCompany]);
+  // --- Variables for the others except Details -------------------------------
+  const [ otherItem, setOtherItem ] = useState(null);
+  const [ editedOtherValues, setEditedOtherValues ] = useState(null);
+  const [ orgTimeOther, setOrgTimeOther ] = useState(null);
+  const [ editedNewValues, setEditedNewValues ] = useState(null);
 
-  const handleCancelAll = useCallback(() => {
-    setEditedValues(null);
-  }, []);
+  // --- Variables for only Purchase ------------------------------------------------
+  const [ maContractByCompany, setMaContractByCompany] = useState([]);
+  const [ purchaseByCompany, setPurchaseByCompany] = useState([]);
+  const [ validMACount, setValidMACount ] = useState(0);
+  const [ selectedPurchaseRowKey, setSelectedPurchaseRowKey ] = useState([]);
 
-  // --- Funtions for Specific Changes in Detail ---------------------------------
-  const handleDateChange = useCallback((name, date) => {
-    const tempEdited = {
-      ...editedValues,
-      [name]: date,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues]);
-
-  const handleSelectChange = useCallback((name, selected) => {
-    const tempEdited = {
-      ...editedValues,
-      [name]: selected.value,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues]);
-
-  // --- Funtions for Control Windows ---------------------------------
-  const handleWidthChange = useCallback((checked) => {
-    setIsFullScreen(checked);
-    if(checked)
-      localStorage.setItem('isFullScreen', '1');
-    else
-      localStorage.setItem('isFullScreen', '0');
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setEditedValues(null);
-    setCurrentCompany();
-  }, []);
-
-  // --- Variables for Editing Detail ---------------------------------
-  const company_items_info = [
-    ['company_address','common.address',{ type:'label', extra:'long' }],
-    ['company_phone_number','common.phone_no',{ type:'label' }],
-    ['company_zip_code','common.zip_code',{ type:'label' }],
-    ['company_fax_number','common.fax_no',{ type:'label' }],
-    ['homepage','company.homepage',{ type:'label' }],
-    ['company_scale','company.company_scale',{ type:'label' }],
-    ['deal_type','company.deal_type', { type:'select', options: option_deal_type.ko, selectChange: (selected) => handleSelectChange('deal_type', selected) }],
-    ['industry_type','company.industry_type',{ type:'label' }],
-    ['business_type','company.business_type',{ type:'label' }],
-    ['business_item','company.business_item',{ type:'label' }],
-    ['establishment_date','company.establishment_date',
-      { type:'date', orgTimeData: orgEstablishDate, timeDataChange: handleDateChange }
-    ],
-    ['ceo_name','company.ceo_name',{ type:'label' }],
-    ['account_code','company.account_code',{ type:'label' }],
-    ['bank_name','company.bank_name',{ type:'label' }],
-    ['account_owner','company.account_owner',{ type:'label' }],
-    ['sales_resource','company.salesman',{ type:'label' }],
-    ['application_engineer','company.engineer',{ type:'label' }],
-    ['region','common.region', { type:'select', options: option_locations.ko, selectChange: (selected) => handleSelectChange('region', selected) }],
-    ['memo','common.memo',{ type:'textarea', extra:'long' }],
-  ];
-
-  // --- Variables for Editing Sub Detail ---------------------------------
   const purchase_items_info = [
     ['product_name','purchase.product_name',{ type:'label' }],
     ['product_type','purchase.product_type',{ type:'label' }],
@@ -149,102 +56,145 @@ const CompanyDetailsModel = () => {
     ['quantity','common.quantity',{ type:'label' }],
     ['receipt_date','purchase.receipt_date',{ type:'date' }],
     ['delivery_date','purchase.delivery_date',{ type:'date' }],
-    ['hq_finish_date','purchase.hq_finish_date',{ type:'date' }],
-    ['MA_finish_date','purchase.ma_finish_date',{ type:'date' }],
+    ['hq_finish_date','purchase.hq_finish_date',{ type:'date', disabled: true }],
+    ['MA_finish_date','purchase.ma_finish_date',{ type:'date', disabled: true }],
+  ];
+
+  // --- Variables for only Transaction ------------------------------------------------
+  const [ transactionByCompany, setTransactionByCompany] = useState([]);
+  
+
+  // --- Funtions for Editing Detail ---------------------------------
+  const handleDetailEdit = useCallback((e) => {
+    const tempEdited = {
+      ...editedDetailValues,
+      [e.target.name]: e.target.value,
+    };
+    console.log('\t[handleDetailEdit] value: ', tempEdited);
+    setEditedDetailValues(tempEdited);
+  }, [editedDetailValues]);
+
+  const handleDetailSave = useCallback(() => {
+    if(editedDetailValues !== null
+      && selectedCompany !== defaultCompany)
+    {
+      const temp_all_saved = {
+        ...editedDetailValues,
+        action_type: "UPDATE",
+        modify_user: cookies.myLationCrmUserId,
+        company_code: selectedCompany.company_code,
+      };
+      if (modifyCompany(temp_all_saved)) {
+        console.log(`Succeeded to modify company`);
+        if(editedDetailValues.establishment_date){
+          setOrgEstablishDate(editedDetailValues.establishment_date);
+        };
+      } else {
+        console.error('Failed to modify company')
+      }
+    } else {
+      console.log("[ CompanyDetailModel ] No saved data");
+    };
+    setEditedDetailValues(null);
+  }, [cookies.myLationCrmUserId, modifyCompany, editedDetailValues, selectedCompany]);
+
+  const handleDetailCancel = useCallback(() => {
+    setEditedDetailValues(null);
+  }, []);
+
+  // --- Funtions for Specific Changes in Detail ---------------------------------
+  const handleDetailDateChange = useCallback((name, date) => {
+    const tempEdited = {
+      ...editedDetailValues,
+      [name]: date,
+    };
+    setEditedDetailValues(tempEdited);
+  }, [editedDetailValues]);
+
+  const handleDetailSelectChange = useCallback((name, selected) => {
+    const tempEdited = {
+      ...editedDetailValues,
+      [name]: selected.value,
+    };
+    setEditedDetailValues(tempEdited);
+  }, [editedDetailValues]);
+
+  // --- Variables for Editing Detail ---------------------------------
+  const company_items_info = [
+    ['company_address','common.address',{ type:'label', extra:'long' }],
+    ['company_phone_number','common.phone_no',{ type:'label' }],
+    ['company_zip_code','common.zip_code',{ type:'label' }],
+    ['company_fax_number','common.fax_no',{ type:'label' }],
+    ['homepage','company.homepage',{ type:'label' }],
+    ['company_scale','company.company_scale',{ type:'label' }],
+    ['deal_type','company.deal_type', { type:'select', options: option_deal_type.ko, selectChange: (selected) => handleDetailSelectChange('deal_type', selected) }],
+    ['industry_type','company.industry_type',{ type:'label' }],
+    ['business_type','company.business_type',{ type:'label' }],
+    ['business_item','company.business_item',{ type:'label' }],
+    ['establishment_date','company.establishment_date',
+      { type:'date', orgTimeData: orgEstablishDate, timeDataChange: handleDetailDateChange }
+    ],
+    ['ceo_name','company.ceo_name',{ type:'label' }],
+    ['account_code','company.account_code',{ type:'label' }],
+    ['bank_name','company.bank_name',{ type:'label' }],
+    ['account_owner','company.account_owner',{ type:'label' }],
+    ['sales_resource','company.salesman',{ type:'label' }],
+    ['application_engineer','company.engineer',{ type:'label' }],
+    ['region','common.region', { type:'select', options: option_locations.ko, selectChange: (selected) => handleDetailSelectChange('region', selected) }],
+    ['memo','common.memo',{ type:'textarea', extra:'long' }],
   ];
 
   // --- Functions for Editing Sub Detail ---------------------------------
-  const handleSubValueChange = useCallback((idx, e) => {
+  const handleOtherValueChange = useCallback(e => {
     const tempEdited = {
-      ...editedSubValues[idx],
+      ...editedOtherValues,
       [e.target.name]: e.target.value,
     };
 
-    const tempEditedArry = [
-      ...editedSubValues.slice(0, idx),
-      tempEdited,
-      ...editedSubValues.slice(idx + 1,),
-    ];
-    setEditedSubValues(tempEditedArry);
-    console.log('handleSubValueChange : ', tempEditedArry);
-  }, [editedSubValues]);
+    setEditedOtherValues(tempEdited);
+    console.log('handleOtherValueChange : ', tempEdited);
+  }, [editedOtherValues]);
 
-  const handleSubDateValueChange = useCallback((idx, name, date) => {
+  const handleTimeOtherValueChange = useCallback((name, date) => {
     const tempEdited = {
-      ...editedSubValues[idx],
+      ...editedOtherValues,
       [name]: date,
     };
-    const tempEditedArry = [
-      ...editedSubValues.slice(0, idx),
-      tempEdited,
-      ...editedSubValues.slice(idx + 1,),
-    ];
-    setEditedSubValues(tempEditedArry);
-    console.log('handleSubDateValueChange : ', tempEditedArry);
-  }, [editedSubValues])
+    setEditedOtherValues(tempEdited);
+    console.log('handleTimeOtherValueChange : ', tempEdited);
+  }, [editedOtherValues])
 
-  const handleCancelSubItemChange = useCallback((idx) => {
-    if(editedSubValues[idx]){
-      const tempEditedArry = [
-        ...editedSubValues.slice(0, idx),
-        null,
-        ...editedSubValues.slice(idx + 1, ),
-      ];
-      setEditedSubValues(tempEditedArry);
-    }
-  }, [editedSubValues]);
+  const handleOtherItemChangeCancel = useCallback(() => {
+    setEditedOtherValues(null);
+  }, []);
 
-  const handleSaveSubItemChange = useCallback((idx) => {
-    if(editedSubValues[idx]){
-      let tempSubValues = null;
-      if(idx < purchaseByCompany.length) {
-        tempSubValues = {
-          ...editedSubValues[idx],
-          action_type: "UPDATE",
-          modify_user: cookies.myLationCrmUserId,
-          purchase_code: purchaseByCompany[idx].purchase_code,
-        };
-      } else {
-        tempSubValues = {
-          ...editedSubValues[idx],
-          action_type: "ADD",
-          modify_user: cookies.myLationCrmUserId,
-        };
-      }
-      
-      if (modifyPurchase(tempSubValues)) {
-        console.log(`Succeeded to modify purchase`);
-        let tempDateValues = {
-          ...orgTimeInSub[idx]
-        };
-        if(editedSubValues[idx].delivery_date){
-          tempDateValues.delivery_date = editedSubValues[idx].delivery_date;
-        };
-        if(editedSubValues[idx].hq_finish_date){
-          tempDateValues.hq_finish_date = editedSubValues[idx].hq_finish_date;
-        };
-        if(editedSubValues[idx].ma_finish_date){
-          tempDateValues.ma_finish_date = editedSubValues[idx].ma_finish_date;
-        };
-        if(editedSubValues[idx].receipt_date){
-          tempDateValues.receipt_date = editedSubValues[idx].receipt_date;
-        };
-        const tempDateArry = [
-          ...orgTimeInSub.slice(0, idx),
-          tempDateValues,
-          ...orgTimeInSub.slice(idx + 1, ),
-        ];
-        setOrgTimeInSub(tempDateArry);
-      } else {
-        console.error('Failed to modify company')
+  const handleOtherItemChangeSave = useCallback((code_name) => {
+    if(editedOtherValues){
+      const tempSubValues = {
+        ...editedOtherValues,
+        action_type: "UPDATE",
+        company_code: otherItem.company_code,
+        modify_user: cookies.myLationCrmUserId,
+        [code_name]: otherItem[code_name],
       };
-      const tempSubValueArry = [
-        ...editedSubValues.slice(0, idx),
-        ...editedSubValues.slice(idx + 1, ),
-      ];
-      setEditedSubValues(tempSubValueArry);
+      
+      switch(code_name)
+      {
+        case 'purchase_code':
+          if (modifyPurchase(tempSubValues)) {
+            console.log(`Succeeded to modify purchase`);
+          } else {
+            console.error('Failed to modify company')
+          };
+          break;
+        default:
+          console.log("handleOtherItemChangeSave / Impossible case!!!");
+          break;
+      };
+      setOrgTimeOther(null);
+      setEditedOtherValues(null);
     }
-  }, [cookies.myLationCrmUserId, editedSubValues, orgTimeInSub]);
+  }, [cookies.myLationCrmUserId, editedOtherValues, otherItem]);
 
   // --- Functions for Editing New item ---------------------------------
   const handleNewItemChange = useCallback(e => {
@@ -270,61 +220,35 @@ const CompanyDetailsModel = () => {
     setEditedNewValues(null);
   }, []);
 
-  const handleSaveNewItemChange = useCallback(() => {
+  const handleSaveNewItemChange = useCallback((code_name) => {
     if(editedNewValues){
       const tempSubValues = {
         ...editedNewValues,
         action_type: "ADD",
-        recent_user: cookies.myLationCrmUserId,
+        company_code: selectedCompany.company_code,
+        modify_user: cookies.myLationCrmUserId,
       };
       
-      if (modifyPurchase(tempSubValues)) {
-        console.log(`Succeeded to modify purchase`);
-        
-      } else {
-        console.error('Failed to modify company')
+      switch(code_name)
+      {
+        case 'purchase_code':
+          if (modifyPurchase(tempSubValues)) {
+            console.log(`Succeeded to add purchase`);
+          } else {
+            console.error('Failed to add company')
+          };
+          break;
+        default:
+          console.log("handleSaveNewItemChange / Impossible case!!!");
+          break;
       };
       setEditedNewValues(null);
     }
-  }, [cookies.myLationCrmUserId, editedNewValues]);
+  }, [cookies.myLationCrmUserId, editedNewValues, selectedCompany]);
 
   // --- Funtions for Sub Modal ---------------------------------
   const handleSubModalOk = () => {setIsSubModalOpen(false);};
   const handleSubModalCancel = () => {setIsSubModalOpen(false);};
-
-  const handleAddProduct = () => {
-    const generated = purchase_items_info.map(item => {
-      return {
-        defaultText: '',
-        name: item.at(0),
-        title: t(item.at(1)),
-        detail: item.at(2),
-        editing: {handleSubValueChange},
-      }
-    });
-  };
-
-  const handleModifyProduct = (code) => {
-    setSubModalItems(null);
-    if(purchaseByCompany.length > 0) {
-      const foundIdx = purchaseByCompany.findIndex(item => item.purchase_code === code);
-      if(foundIdx !== -1) {
-        const foundItem = purchaseByCompany[foundIdx];
-        const generated = purchase_items_info.map(item => {
-          return {
-            defaultText: foundItem[item.at(0)],
-            name: item.at(0),
-            title: t(item.at(1)),
-            detail: item.at(2),
-            editing: {handleSubValueChange},
-          }
-        });
-        setSubModalItems(generated);
-        setSubModalSetting({title: t('purchase.modify_purchase')})
-        setIsSubModalOpen(true);
-      };
-    };
-  };
 
   const columns_purchase = [
     {
@@ -360,38 +284,29 @@ const CompanyDetailsModel = () => {
   ];
 
   const purchaseRowSelection = {
+    selectedPurchaseRowKey,
     onChange: (selectedRowKeys, selectedRows) => {
       console.log(
         `selectedRowKeys: ${selectedRowKeys}`,
         "selectedRows: ", selectedRows
       );
       if(selectedRows.length > 0){
-        // set data of selected purchases into 'subDetailItems'.
-        const selectedSubItems = [
-          ...selectedRows
-        ];
-        setSubDetailItems(selectedSubItems);
+        const latestKey = selectedRowKeys.at(-1);
+        setOtherItem({...selectedRows.at(-1)});
+        setSelectedPurchaseRowKey([selectedRows.at(-1)]);
 
-        // prepare variable to be available when editing sub items.
-        let arryForEdit = [];
-        let dateArrayForEdit = [];
-
-        for(let i=0; i < selectedRows.length; i++) {
-          arryForEdit.push(null);
-          const tempDates = {
-            'delivery_date': purchaseByCompany[i].delivery_date,
-            'hq_finish_date': purchaseByCompany[i].hq_finish_date,
-            'ma_finish_date': purchaseByCompany[i].ma_finish_date,
-            'receipt_date': purchaseByCompany[i].receipt_date,
-          };
-          dateArrayForEdit.push(tempDates);
-        }
-        setEditedSubValues(arryForEdit);
-        setOrgTimeInSub(dateArrayForEdit);
+        const selectedPurchase = purchaseByCompany.filter(item => item.purchase_code === latestKey)[0];
+        setEditedOtherValues(null);
+        setOrgTimeOther({
+          receipt_date: selectedPurchase.receipt_date ? new Date(selectedPurchase.receipt_date) : null,
+          delivery_date: selectedPurchase.delivery_date ? new Date(selectedPurchase.delivery_date) : null,
+          MA_finish_date: selectedPurchase.MA_finish_date ? new Date(selectedPurchase.MA_finish_date) : null,
+          hq_finish_date: selectedPurchase.hq_finish_date ? new Date(selectedPurchase.hq_finish_date) : null,
+         });
       } else {
-        setSubDetailItems([]);
-        setEditedSubValues([]);
-        setOrgTimeInSub([]);
+        setOtherItem(null);
+        setEditedOtherValues(null);
+        setOrgTimeOther(null);
       };
     },
     getCheckboxProps: (record) => ({
@@ -400,6 +315,52 @@ const CompanyDetailsModel = () => {
       className: "checkbox-red",
     }),
   };
+
+  const handleSelecPurchaseRow = useCallback((record)=>{
+    setSelectedPurchaseRowKey([record.rowKey]);
+  }, []);
+
+  const columns_ma_contract = [
+    {
+      title: t('contract.contract_date'),
+      dataIndex: 'ma_contract_date',
+      render: (text, record) => <>{record.rowIndex}</>,
+    },
+    {
+      title: t('contract.end_date'),
+      dataIndex: "ma_finish_date",
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: t('contract.end_date'),
+      dataIndex: "ma_finish_date",
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: t('common.price_1'),
+      dataIndex: "ma_price",
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: t('purchase.serial'),
+      dataIndex: "ma_memo",
+      render: (text, record) => <>{text}</>,
+    },
+  ];
+
+  // --- Funtions for Control Windows ---------------------------------
+  const handleWindowWidthChange = useCallback((checked) => {
+    setIsFullScreen(checked);
+    if(checked)
+      localStorage.setItem('isFullScreen', '1');
+    else
+      localStorage.setItem('isFullScreen', '0');
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setEditedDetailValues(null);
+    setCurrentCompany();
+  }, []);
 
   useEffect(() => {
     if(selectedCompany !== defaultCompany) {
@@ -433,7 +394,7 @@ const CompanyDetailsModel = () => {
           if(new Date(item.MA_finish_date) > new Date()) valid_count++;
         });
         setValidMACount(valid_count);
-        setEditedSubValues([]);
+        setEditedOtherValues([]);
         setEditedNewValues(null);
       };
     };
@@ -467,16 +428,16 @@ const CompanyDetailsModel = () => {
                 defaultText={selectedCompany.company_name_eng}
                 name='company_name_eng'
                 title={t('company.eng_company_name')}
-                editing={handleEditing}
+                editing={handleDetailEdit}
               />
               <DetailTitleItem
                 defaultText={selectedCompany.business_registration_code}
                 name='business_registration_code'
                 title={t('company.business_registration_code')}
-                editing={handleEditing}
+                editing={handleDetailEdit}
               />
             </div>
-            <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
+            <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWindowWidthChange}/>
             <button
               type="button"
               className="btn-close xs-close"
@@ -549,11 +510,11 @@ const CompanyDetailsModel = () => {
                           <DetailCardItem
                             key={index}
                             defaultText={selectedCompany[item.at(0)]}
-                            edited={editedValues}
+                            edited={editedDetailValues}
                             name={item.at(0)}
                             title={t(item.at(1))}
                             detail={item.at(2)}
-                            editing={handleEditing}
+                            editing={handleDetailEdit}
                           />
                         )}
                       </Space>
@@ -579,6 +540,11 @@ const CompanyDetailsModel = () => {
                             columns={columns_purchase}
                             dataSource={purchaseByCompany}
                             rowKey={(record) => record.purchase_code}
+                            onRow={(record) => ({
+                              onClick: () => {
+                                handleSelecPurchaseRow(record);
+                              }
+                            })}
                           />
                         </div>
                       </div>
@@ -586,59 +552,61 @@ const CompanyDetailsModel = () => {
                   </div>
                   <div className="row">
                     <div className="card mb-0">
-                    { subDetailItems.length > 0 && 
-                      subDetailItems.map((dItem, dIndex) => 
-                        <div key={dIndex}>
-                          <div style={{fontSize: 15, fontWeight: 600, padding: '0.5rem 0 0 1.0rem'}}>{"No. " + (dIndex + 1)}</div>
+                    { otherItem && 
+                        <div>
+                          <div style={{fontSize: 15, fontWeight: 600, padding: '0.5rem 0 0 1.0rem'}}>Selected Item</div>
                           <div  
                             style={{display:'flex', flexWrap:'wrap', justifyContent:'space-between' ,margin: 0, padding:'0.5rem 0', border: 0, backgroundColor:'white'}}>
                             {
                               purchase_items_info.map((item, index) => 
                                 <DetailCardItem
                                   key={index}
-                                  defaultText={dItem[item.at(0)]}
-                                  edited={editedSubValues[dIndex]}
+                                  defaultText={otherItem[item.at(0)]}
+                                  edited={editedOtherValues}
                                   name={item.at(0)}
                                   title={t(item.at(1))}
                                   detail={item.at(2).type === 'date' 
-                                    ? {type:'date', orgTimeData: orgTimeInSub[dIndex][item.at(0)], 
-                                        timeDateChange: (name, date) => handleSubDateValueChange(dIndex, name, date) }
-                                    : item.at(2)}
-                                  editing={(event) => handleSubValueChange(dIndex, event)}
+                                    ? { type:'date',
+                                        disabled: item.at(2).disabled ? true : false,
+                                        orgTimeData: orgTimeOther[item.at(0)],
+                                        timeDateChange: handleTimeOtherValueChange,
+                                      }
+                                    : item.at(2)
+                                  }
+                                  editing={handleOtherValueChange}
                                 />
                             )}
-                            
                           </div>
                           <div style={{marginBottom: '0.5rem', display: 'flex'}}>
                             <DetailCardItem
-                              defaultText={dItem["purchase_memo"]}
-                              edited={editedSubValues[dIndex]}
+                              defaultText={otherItem["purchase_memo"]}
+                              edited={editedOtherValues}
                               name="purchase_memo"
                               title={t('common.memo')}
                               detail={{type:'textarea', extra: 'memo', row_no: 3}}
-                              editing={(event) => handleSubValueChange(dIndex, event)}
+                              editing={handleOtherValueChange}
                             />
                             <div style={{width: 380, display: 'flex', flexDirection: 'column', alignItems:'center', justifyContent: 'space-evenly'}}>
                               <Button
                                 type="primary" 
                                 style={{width: '120px'}} 
-                                disabled={!editedSubValues[dIndex]}
-                                onClick={()=>{handleSaveSubItemChange(dIndex)}}
+                                disabled={!editedOtherValues}
+                                onClick={()=>handleOtherItemChangeSave('purchase_code')}
                               >
                                 {t('common.save')}
                               </Button>
                               <Button 
                                 type="primary" 
                                 style={{width: '120px'}} 
-                                disabled={!editedSubValues[dIndex]} 
-                                onClick={()=>{handleCancelSubItemChange(dIndex)}}
+                                disabled={!editedOtherValues} 
+                                onClick={handleOtherItemChangeCancel}
                               >
                                 {t('common.cancel')}
                               </Button>
                             </div>
                           </div>
                         </div>
-                    )}
+                    }
                     </div>
                   </div>
                   <div className="row">
@@ -676,7 +644,7 @@ const CompanyDetailsModel = () => {
                               type="primary" 
                               style={{width: '120px'}} 
                               disabled={!editedNewValues}
-                              onClick={handleSaveNewItemChange}
+                              onClick={()=>handleSaveNewItemChange('purchase_code')}
                             >
                               {t('common.add')}
                             </Button>
@@ -693,14 +661,38 @@ const CompanyDetailsModel = () => {
                       </>
                     </div>
                   </div>
+                  {maContractByCompany.length > 0 && 
+                    <div className="row">
+                      <div className="card mb-0">
+                        <div className="table-body">
+                          <div className="table-responsive">
+                            <Table
+                              rowSelection={purchaseRowSelection}
+                              pagination={{
+                                total:  maContractByCompany.length,
+                                showTotal: ShowTotal,
+                                showSizeChanger: true,
+                                ItemRender: ItemRender,
+                              }}
+                              className="table"
+                              style={{ overflowX: "auto" }}
+                              columns={columns_ma_contract}
+                              dataSource={maContractByCompany}
+                              rowKey={(record) => record.guid}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  }
                 </div>
               </div>
-              { editedValues !== null && Object.keys(editedValues).length !== 0 &&
+              { editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&
                 <div className="text-center py-3">
                   <button
                     type="button"
                     className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                    onClick={handleSaveAll}
+                    onClick={handleDetailSave}
                   >
                     {t('common.save')}
                   </button>
@@ -708,7 +700,7 @@ const CompanyDetailsModel = () => {
                   <button
                     type="button"
                     className="btn btn-secondary btn-rounded"
-                    onClick={handleCancelAll}
+                    onClick={handleDetailCancel}
                   >
                     {t('common.cancel')}
                   </button>
@@ -720,10 +712,10 @@ const CompanyDetailsModel = () => {
         {/* modal-content */}
         <DetailSubModal
           title={subModalSetting.title}
-          edited={editedSubValues}
+          edited={editedOtherValues}
           items={subModalItems}
           open={isSubModalOpen}
-          handleEditing={handleSubValueChange}
+          handleDetailEdit={handleOtherValueChange}
           handleOk={handleSubModalOk}
           handleCancel={handleSubModalCancel}
         />

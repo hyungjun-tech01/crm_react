@@ -187,6 +187,11 @@ const enResource = {
             serial:'Serial Number',
             type:'Purchase Type',
         },
+        contract:{
+            contract_date:'Contract Date',
+            end_date:'End Date',
+            contract_type:'Contract Type',
+        },
         common:{
             actions: 'Actions',
             activity: 'Activity',
@@ -211,9 +216,11 @@ const enResource = {
             memo: 'Memo',
             name: 'Name',
             next: 'Next',
+            note: 'Note',
             phone_no: 'Phone No.',
             previous: 'Previous',
             price: 'Price',
+            price_1: 'Amount',
             product: 'Product',
             quantity: 'Quantity',
             region:'Region',

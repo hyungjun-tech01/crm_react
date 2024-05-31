@@ -302,7 +302,7 @@ export const defaultPurchase = {
     MA_contact_date: null,
     //----- Etc info --------------
     purchase_memo: null,
-    recent_user: null,
+    modify_user: null,
     modify_date: null,
     status: null,
 };

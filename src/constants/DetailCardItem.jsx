@@ -5,7 +5,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const DateInput = (props) => {
-    const { name, addonBefore, onChange, format, showTime, style, value } = props;
+    const { name, addonBefore, onChange, format, showTime, style, value, disabled } = props;
     return (
         <div className="ant-space-item">
             <span className='ant-input-group-wrapper
@@ -25,6 +25,7 @@ const DateInput = (props) => {
                             onChange={ onChange }
                             dateFormat={ format }
                             showTimeSelect
+                            disabled={disabled}
                         /> :
                         <DatePicker
                             className="ant-input css-dev-only-do-not-override-1uweeqc ant-input-outlined"
@@ -32,6 +33,7 @@ const DateInput = (props) => {
                             selected={ value }
                             onChange={ onChange }
                             dateFormat={ format }
+                            disabled={disabled}
                         />
                     }
                 </span>
@@ -41,7 +43,7 @@ const DateInput = (props) => {
 };
 
 const TextareaInput = (props) => {
-    const { name, addonBefore, style, row_no, title, value, onChange } = props;
+    const { name, addonBefore, style, row_no, title, value, onChange, disabled } = props;
     return (
         <div className="ant-space-item" style={style}>
             <span className='ant-input-group-wrapper
@@ -60,6 +62,7 @@ const TextareaInput = (props) => {
                         onChange={ onChange }
                         style={{ backgroundColor: 'white' }}
                         value={ value }
+                        disabled={disabled}
                     />
                 </span>
             </span>
@@ -68,7 +71,7 @@ const TextareaInput = (props) => {
 };
 
 const SelectInput = (props) => {
-    const { addonBefore, style, value, onChange, options } = props;
+    const { addonBefore, style, value, onChange, options, disabled } = props;
     return (
         <div className="ant-space-item"  style={style}>
             <span className='ant-input-group-wrapper
@@ -84,6 +87,7 @@ const SelectInput = (props) => {
                         defaultValue={value}
                         options={options}
                         onChange={onChange}
+                        disabled={disabled}
                     />
                 </span>
             </span>
@@ -92,7 +96,7 @@ const SelectInput = (props) => {
 };
 
 const DetailCardItem = (props) => {
-    const { defaultText, edited, name, title, detail, editing
+    const { defaultText, edited, name, title, detail, editing, disabled
     } = props;
     
     const currentValue = (edited && edited[name]
@@ -107,6 +111,7 @@ const DetailCardItem = (props) => {
         name: name,
         addonBefore: <div className='detail-card-before'>{title}</div>,
         value: currentValue,
+        disabled: disabled,
     };
 
     switch(detail.type)
