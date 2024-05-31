@@ -8,7 +8,7 @@ import { C_logo,  } from "../imagepath";
 import { atomAllPurchases, atomAllTransactions, atomCurrentCompany, defaultCompany, defaultPurchase } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
-import { PurchaseRepo } from "../../repository/purchase";
+import { ProductDataOptions, PurchaseRepo } from "../../repository/purchase";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import DetailSubModal from "../../constants/DetailSubModal";
@@ -48,8 +48,8 @@ const CompanyDetailsModel = () => {
   const [ selectedPurchaseRowKey, setSelectedPurchaseRowKey ] = useState([]);
 
   const purchase_items_info = [
-    ['product_name','purchase.product_name',{ type:'label' }],
-    ['product_type','purchase.product_type',{ type:'label' }],
+    ['product_name','purchase.product_name',{ type:'select', options: ProductDataOptions }],
+    ['product_type','purchase.product_type',{ type:'label', disabled: true }],
     ['serial_number','purchase.serial',{ type:'label' }],
     ['licence_info','purchase.licence_info',{ type:'label' }],
     ['module','purchase.module',{ type:'label' }],
@@ -145,24 +145,36 @@ const CompanyDetailsModel = () => {
   ];
 
   // --- Functions for Editing Sub Detail ---------------------------------
-  const handleOtherValueChange = useCallback(e => {
+  const handleOtherItemChange = useCallback(e => {
     const tempEdited = {
       ...editedOtherValues,
       [e.target.name]: e.target.value,
     };
 
     setEditedOtherValues(tempEdited);
-    console.log('handleOtherValueChange : ', tempEdited);
+    console.log('handleOtherItemChange : ', tempEdited);
   }, [editedOtherValues]);
 
-  const handleTimeOtherValueChange = useCallback((name, date) => {
+  const handleOtherItemTimeChange = useCallback((name, date) => {
     const tempEdited = {
       ...editedOtherValues,
       [name]: date,
     };
     setEditedOtherValues(tempEdited);
-    console.log('handleTimeOtherValueChange : ', tempEdited);
-  }, [editedOtherValues])
+    console.log('handleOtherItemTimeChange : ', tempEdited);
+  }, [editedOtherValues]);
+
+  const handleOtherItemSelectChange = useCallback((name, value) => {
+    if(name === 'product_name') {
+      const tempOther = {
+        ...editedOtherValues,
+        product_name: value.value.product_name,
+        product_type: value.value.product_class,
+        product_code: value.value.product_code,
+      };
+      setEditedOtherValues(tempOther);
+    };
+  }, [editedOtherValues]);
 
   const handleOtherItemChangeCancel = useCallback(() => {
     setEditedOtherValues(null);
@@ -213,8 +225,19 @@ const CompanyDetailsModel = () => {
       [name]: date,
     };
     setEditedNewValues(tempEdited);
-    console.log('handleNewItemDateChange : ', tempEdited);
-  }, [editedNewValues])
+  }, [editedNewValues]);
+
+  const handleNewItemSelectChange = useCallback((name, value) => {
+    if(name === 'product_name') {
+      const tempNew = {
+        ...editedNewValues,
+        product_name: value.value.product_name,
+        product_type: value.value.product_class,
+        product_code: value.value.product_code,
+      };
+      setEditedNewValues(tempNew);
+    };
+  }, [editedNewValues]);
 
   const handleCancelNewItemChange = useCallback(() => {
     setEditedNewValues(null);
@@ -552,11 +575,17 @@ const CompanyDetailsModel = () => {
                   </div>
                   <div className="row">
                     <div className="card mb-0">
+                      
                     { otherItem && 
                         <div>
                           <div style={{fontSize: 15, fontWeight: 600, padding: '0.5rem 0 0 1.0rem'}}>Selected Item</div>
-                          <div  
-                            style={{display:'flex', flexWrap:'wrap', justifyContent:'space-between' ,margin: 0, padding:'0.5rem 0', border: 0, backgroundColor:'white'}}>
+                          <Space
+                            align="start"
+                            direction="horizontal"
+                            size="small"
+                            style={{ display: 'flex', marginBottom: '0.5rem', margineTop: '0.5rem' }}
+                            wrap
+                          >
                             {
                               purchase_items_info.map((item, index) => 
                                 <DetailCardItem
@@ -569,14 +598,20 @@ const CompanyDetailsModel = () => {
                                     ? { type:'date',
                                         disabled: item.at(2).disabled ? true : false,
                                         orgTimeData: orgTimeOther[item.at(0)],
-                                        timeDateChange: handleTimeOtherValueChange,
+                                        timeDateChange: handleOtherItemTimeChange,
                                       }
-                                    : item.at(2)
+                                    : (item.at(2).type === 'select' 
+                                      ? { type:'select',
+                                          disabled: item.at(2).disabled ? true : false,
+                                          options: item.at(2).options,
+                                          selectChange: (value) => handleOtherItemSelectChange(item.at(0), value),
+                                        } 
+                                      : item.at(2))
                                   }
-                                  editing={handleOtherValueChange}
+                                  editing={handleOtherItemChange}
                                 />
                             )}
-                          </div>
+                          </Space>
                           <div style={{marginBottom: '0.5rem', display: 'flex'}}>
                             <DetailCardItem
                               defaultText={otherItem["purchase_memo"]}
@@ -584,7 +619,7 @@ const CompanyDetailsModel = () => {
                               name="purchase_memo"
                               title={t('common.memo')}
                               detail={{type:'textarea', extra: 'memo', row_no: 3}}
-                              editing={handleOtherValueChange}
+                              editing={handleOtherItemChange}
                             />
                             <div style={{width: 380, display: 'flex', flexDirection: 'column', alignItems:'center', justifyContent: 'space-evenly'}}>
                               <Button
@@ -613,7 +648,13 @@ const CompanyDetailsModel = () => {
                     <div className="card mb-0">
                       <>
                         <div style={{fontSize: 15, fontWeight: 600, padding: '0.5rem 0 0 1.0rem'}}>{t('purchase.add_purchase')}</div>
-                        <div style={{display:'flex', flexWrap:'wrap', justifyContent:'space-between' ,margin: 0, padding: '0.5rem 0', border: 0, backgroundColor:'white'}}>
+                        <Space
+                          align="start"
+                          direction="horizontal"
+                          size="small"
+                          style={{ display: 'flex', marginBottom: '0.5rem', margineTop: '0.5rem' }}
+                          wrap
+                        >
                         {
                           purchase_items_info.map((item, index) => 
                             <DetailCardItem
@@ -625,11 +666,18 @@ const CompanyDetailsModel = () => {
                               detail={item.at(2).type === 'date' 
                                 ? {type:'date', orgTimeData: null,
                                     timeDateChange: handleNewItemDateChange }
-                                : item.at(2)}
+                                : (item.at(2).type === 'select' 
+                                ? { type:'select',
+                                    disabled: item.at(2).disabled ? true : false,
+                                    options: item.at(2).options,
+                                    selectChange: (value) => handleNewItemSelectChange(item.at(0), value),
+                                  } 
+                                : item.at(2))
+                              }
                               editing={handleNewItemChange}
                             />
                         )}
-                        </div>
+                        </Space>
                         <div style={{marginBottom: '0.5rem', display: 'flex'}}>
                           <DetailCardItem
                             defaultText=''
@@ -715,7 +763,7 @@ const CompanyDetailsModel = () => {
           edited={editedOtherValues}
           items={subModalItems}
           open={isSubModalOpen}
-          handleDetailEdit={handleOtherValueChange}
+          handleDetailEdit={handleOtherItemChange}
           handleOk={handleSubModalOk}
           handleCancel={handleSubModalCancel}
         />

@@ -111,20 +111,20 @@ const DetailCardItem = (props) => {
         name: name,
         addonBefore: <div className='detail-card-before'>{title}</div>,
         value: currentValue,
-        disabled: disabled,
+        disabled: detail.disabled ? detail.disabled : (disabled ? disabled : false),
     };
 
     switch(detail.type)
     {
         case 'label':
-            return <Input {...SharedProps} onChange={editing} style={{width: widthValue}}/>;
+            return <Input {...SharedProps} onChange={editing} style={{width: widthValue, height: 38}}/>;
         case 'date':
             const timeformat = detail.time ? "yyyy-MM-dd hh:mm:ss" : "yyyy-MM-dd";
-            return <DateInput {...SharedProps} format={ timeformat } showTime={ detail.time } onChange={(date) =>detail.timeDateChange(name, date)} style={{width: widthValue}}/>;
+            return <DateInput {...SharedProps} format={ timeformat } showTime={ detail.time } onChange={(date) =>detail.timeDateChange(name, date)} style={{width: widthValue, height: 38}}/>;
         case 'textarea':
             return <TextareaInput {...SharedProps} row_no={ detail.row_no ? detail.row_no : 2} onChange={editing} style={detail.extra === 'memo' ? {width: `calc(100% - 380px)`, flexGrow: 1} : {width: widthValue}}/>;
         case 'select':
-            return <SelectInput {...SharedProps} options={detail.options} onChange={detail.selectChange} style={{width: widthValue}}/>;
+            return <SelectInput {...SharedProps} options={detail.options} onChange={detail.selectChange} style={{width: widthValue, height: 38}}/>;
         default:
             return null;
     }
