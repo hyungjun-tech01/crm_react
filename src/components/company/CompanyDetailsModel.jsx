@@ -257,6 +257,7 @@ const CompanyDetailsModel = () => {
         case 'purchase_code':
           if (modifyPurchase(tempSubValues)) {
             console.log(`Succeeded to add purchase`);
+            
           } else {
             console.error('Failed to add company')
           };
@@ -414,7 +415,8 @@ const CompanyDetailsModel = () => {
         setPurchaseByCompany(companyPurchases);
         let valid_count = 0;
         companyPurchases.forEach(item => {
-          if(new Date(item.MA_finish_date) > new Date()) valid_count++;
+          console.log('UseEffect / item.MA_finish_date :', item.MA_finish_date);
+          if(new Date(item.MA_finish_date) > Date.now()) valid_count++;
         });
         setValidMACount(valid_count);
         setEditedOtherValues([]);

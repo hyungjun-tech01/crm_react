@@ -1,6 +1,11 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentPurchase, atomAllPurchases, atomCompanyPurchases , atomFilteredPurchase} from '../atoms/atoms';
+import { atomCurrentPurchase,
+    atomAllPurchases,
+    atomCompanyPurchases,
+    atomFilteredPurchase,
+    defaultPurchase,
+} from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
