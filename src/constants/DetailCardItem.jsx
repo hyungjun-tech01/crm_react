@@ -72,6 +72,16 @@ const TextareaInput = (props) => {
 
 const SelectInput = (props) => {
     const { addonBefore, style, value, onChange, options, disabled } = props;
+    let realValue = null;
+    const foundIdx = options.findIndex(item => item.value === value);
+    if(foundIdx !== -1) {
+        realValue = value;
+    } else {
+        const foundLabel = options.findIndex(item => item.label === value);
+        if(foundLabel !== -1) {
+            realValue = options.at(foundLabel).value;
+        }
+    }
     return (
         <div className="ant-space-item"  style={style}>
             <span className='ant-input-group-wrapper
@@ -84,7 +94,7 @@ const SelectInput = (props) => {
                     </span>
                     <Select
                         // className="css-dev-only-do-not-override-1uweeqc detail-input-extra"
-                        defaultValue={value}
+                        defaultValue={realValue}
                         options={options}
                         onChange={onChange}
                         disabled={disabled}

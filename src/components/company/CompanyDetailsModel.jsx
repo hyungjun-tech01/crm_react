@@ -14,6 +14,7 @@ import DetailTitleItem from "../../constants/DetailTitleItem";
 import DetailSubModal from "../../constants/DetailSubModal";
 import { option_locations, option_deal_type } from '../../constants/constans';
 import { ItemRender, ShowTotal } from "../paginationfunction";
+import { formatDate } from "../../constants/functions";
 // import { MoreVert } from "@mui/icons-material";
 
 const CompanyDetailsModel = () => {
@@ -298,12 +299,12 @@ const CompanyDetailsModel = () => {
     {
       title: t('purchase.delivery_date'),
       dataIndex: "delivery_date",
-      render: (text, record) => <>{text}</>,
+      render: (text, record) => <>{formatDate(record.delivery_date)}</>,
     },
     {
       title: t('purchase.ma_finish_date'),
-      dataIndex: "MA_finish_date",
-      render: (text, record) => <>{text}</>,
+      dataIndex: "ma_finish_date",
+      render: (text, record) => <>{formatDate(record.ma_finish_date)}</>,
     },
   ];
 
@@ -415,8 +416,8 @@ const CompanyDetailsModel = () => {
         setPurchaseByCompany(companyPurchases);
         let valid_count = 0;
         companyPurchases.forEach(item => {
-          console.log('UseEffect / item.MA_finish_date :', item.MA_finish_date);
-          if(new Date(item.MA_finish_date) > Date.now()) valid_count++;
+          console.log('UseEffect / item.MA_finish_date :', item.ma_finish_date);
+          if(new Date(item.ma_finish_date) > Date.now()) valid_count++;
         });
         setValidMACount(valid_count);
         setEditedOtherValues([]);
