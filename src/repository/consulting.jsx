@@ -1,6 +1,12 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentConsulting, atomAllConsultings, defaultConsulting, atomCompanyConsultings, atomFilteredConsulting } from '../atoms/atoms';
+import { atomCurrentConsulting
+    , atomAllConsultings
+    , defaultConsulting
+    , atomCompanyConsultings
+    , atomFilteredConsulting
+    , atomConsultingState
+} from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
@@ -19,7 +25,7 @@ export const ConsultingTypes = [
 export const ConsultingRepo = selector({
     key: "ConsultingRepository",
     get: ({getCallback}) => {
-        const loadAllConsultings = getCallback(({set}) => async () => {
+        const loadAllConsultings = getCallback(({set, snapshot}) => async () => {
             try{
                 const response = await fetch(`${BASE_PATH}/consultings`);
                 const data = await response.json();
@@ -29,6 +35,10 @@ export const ConsultingRepo = selector({
                     return;
                 }
                 set(atomAllConsultings, data);
+
+                // Change loading state
+                const loadStates = snapshot.getPromise(atomConsultingState);
+                set(atomConsultingState, (loadStates | 1));
             }
             catch(err){
                 console.error(`loadAllCompanies / Error : ${err}`);

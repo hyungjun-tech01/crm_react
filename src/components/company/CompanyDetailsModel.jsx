@@ -5,10 +5,18 @@ import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Button, Space, Switch, Table } from "antd";
 import { C_logo,  } from "../imagepath";
-import { atomAllPurchases, atomAllTransactions, atomCurrentCompany, defaultCompany, defaultPurchase } from "../../atoms/atoms";
+import { atomAllPurchases,
+  atomAllTransactions,
+  atomCompanyMAContracts,
+  atomCurrentCompany,
+  defaultCompany,
+  atomPurchaseState,
+  atomTransationState,
+} from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
 import { ProductDataOptions, PurchaseRepo } from "../../repository/purchase";
+import { MAContractRepo } from "../../repository/ma_contract";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import DetailSubModal from "../../constants/DetailSubModal";
@@ -18,15 +26,20 @@ import { formatDate } from "../../constants/functions";
 // import { MoreVert } from "@mui/icons-material";
 
 const CompanyDetailsModel = () => {
+  const purchaseState = useRecoilValue(atomPurchaseState);
+  const transactionState = useRecoilValue(atomTransationState);
   const selectedCompany = useRecoilValue(atomCurrentCompany);
   const { modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allTransactions = useRecoilValue(atomAllTransactions);
   const { loadAllTransactions, modifyTransaction } = useRecoilValue(TransactionRepo);
   const allPurchases = useRecoilValue(atomAllPurchases);
   const { loadAllPurchases, modifyPurchase } = useRecoilValue(PurchaseRepo);
+  const companyMAContracts = useRecoilValue(atomCompanyMAContracts);
+  const { loadCompanyMAContracts, setCurrentMAContract, modifyMAContract } = useRecoilValue(MAContractRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
   const { t } = useTranslation();
 
+  const [ currentCompanyCode, setCurrentCompanyCode ] = useState('');
   const [ isFullScreen, setIsFullScreen ] = useState(false);
   const [ isSubModalOpen, setIsSubModalOpen ] = useState(false);
   const [ subModalSetting, setSubModalSetting ] = useState({title:''})
@@ -43,13 +56,11 @@ const CompanyDetailsModel = () => {
   const [ editedNewValues, setEditedNewValues ] = useState(null);
 
   // --- Variables for only Purchase ------------------------------------------------
-  const [ maContractByCompany, setMaContractByCompany] = useState([]);
   const [ purchaseByCompany, setPurchaseByCompany] = useState([]);
   const [ validMACount, setValidMACount ] = useState(0);
-  const [ selectedPurchaseRowKey, setSelectedPurchaseRowKey ] = useState([]);
 
   const purchase_items_info = [
-    ['product_name','purchase.product_name',{ type:'select', options: ProductDataOptions }],
+    ['product_name','purchase.product_name',{ type:'select', group: 'product_type', options: ProductDataOptions }],
     ['product_type','purchase.product_type',{ type:'label', disabled: true }],
     ['serial_number','purchase.serial',{ type:'label' }],
     ['licence_info','purchase.licence_info',{ type:'label' }],
@@ -58,7 +69,7 @@ const CompanyDetailsModel = () => {
     ['receipt_date','purchase.receipt_date',{ type:'date' }],
     ['delivery_date','purchase.delivery_date',{ type:'date' }],
     ['hq_finish_date','purchase.hq_finish_date',{ type:'date', disabled: true }],
-    ['MA_finish_date','purchase.ma_finish_date',{ type:'date', disabled: true }],
+    ['ma_finish_date','purchase.ma_finish_date',{ type:'date', disabled: true }],
   ];
 
   // --- Variables for only Transaction ------------------------------------------------
@@ -217,7 +228,6 @@ const CompanyDetailsModel = () => {
     };
 
     setEditedNewValues(tempEdited);
-    console.log('handleNewItemChange : ', tempEdited);
   }, [editedNewValues]);
 
   const handleNewItemDateChange = useCallback((name, date) => {
@@ -309,24 +319,21 @@ const CompanyDetailsModel = () => {
   ];
 
   const purchaseRowSelection = {
-    selectedPurchaseRowKey,
+    type:'radio',
     onChange: (selectedRowKeys, selectedRows) => {
       console.log(
         `selectedRowKeys: ${selectedRowKeys}`,
         "selectedRows: ", selectedRows
       );
-      if(selectedRows.length > 0){
-        const latestKey = selectedRowKeys.at(-1);
-        setOtherItem({...selectedRows.at(-1)});
-        setSelectedPurchaseRowKey([selectedRows.at(-1)]);
-
-        const selectedPurchase = purchaseByCompany.filter(item => item.purchase_code === latestKey)[0];
+      if(selectedRows.length > 0) {
+        const selectedValue = selectedRows.at(0);
+        setOtherItem(selectedValue);
         setEditedOtherValues(null);
         setOrgTimeOther({
-          receipt_date: selectedPurchase.receipt_date ? new Date(selectedPurchase.receipt_date) : null,
-          delivery_date: selectedPurchase.delivery_date ? new Date(selectedPurchase.delivery_date) : null,
-          MA_finish_date: selectedPurchase.MA_finish_date ? new Date(selectedPurchase.MA_finish_date) : null,
-          hq_finish_date: selectedPurchase.hq_finish_date ? new Date(selectedPurchase.hq_finish_date) : null,
+          receipt_date: selectedValue.receipt_date ? new Date(selectedValue.receipt_date) : null,
+          delivery_date: selectedValue.delivery_date ? new Date(selectedValue.delivery_date) : null,
+          ma_finish_date: selectedValue.ma_finish_date ? new Date(selectedValue.ma_finish_date) : null,
+          hq_finish_date: selectedValue.hq_finish_date ? new Date(selectedValue.hq_finish_date) : null,
          });
       } else {
         setOtherItem(null);
@@ -342,6 +349,7 @@ const CompanyDetailsModel = () => {
   };
 
   const handleSelecPurchaseRow = useCallback((record)=>{
+    console.log('handleSelecPurchaseRow : ', record);
     setSelectedPurchaseRowKey([record.rowKey]);
   }, []);
 
@@ -385,15 +393,24 @@ const CompanyDetailsModel = () => {
   const handleClose = useCallback(() => {
     setEditedDetailValues(null);
     setCurrentCompany();
+    setCurrentCompanyCode('');
   }, []);
 
   useEffect(() => {
-    if(selectedCompany !== defaultCompany) {
-      console.log('[CompanyDetailsModel] called!');
+    if((purchaseState & 1) === 0) {
+      loadAllPurchases();
+    };
+    if((transactionState & 1) === 0) {
+      loadAllTransactions();
+    };
+
+    if((selectedCompany !== defaultCompany)
+      && (selectedCompany.company_code !== currentCompanyCode))
+    {
+      console.log('[CompanyDetailsModel] new company is loaded!');
       setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
-
       if(detailViewStatus === null){
         localStorage.setItem("isFullScreen", '0');
         setIsFullScreen(false);
@@ -403,28 +420,25 @@ const CompanyDetailsModel = () => {
         setIsFullScreen(true);
       };
 
-      if(allTransactions.length === 0){
-        loadAllTransactions();
-      } else {
-        const companyTransactions = allTransactions.filter(transaction => transaction.company_name === selectedCompany.company_name);
-        setTransactionByCompany(companyTransactions);
-      };
-      if(allPurchases.length === 0){
-        loadAllPurchases();
-      } else {
-        const companyPurchases = allPurchases.filter(purchase => purchase.company_code === selectedCompany.company_code);
-        setPurchaseByCompany(companyPurchases);
-        let valid_count = 0;
-        companyPurchases.forEach(item => {
-          console.log('UseEffect / item.MA_finish_date :', item.ma_finish_date);
-          if(new Date(item.ma_finish_date) > Date.now()) valid_count++;
-        });
-        setValidMACount(valid_count);
-        setEditedOtherValues([]);
-        setEditedNewValues(null);
-      };
+      const companyTransactions = allTransactions.filter(transaction => transaction.company_name === selectedCompany.company_name);
+      setTransactionByCompany(companyTransactions);
+
+      const companyPurchases = allPurchases.filter(purchase => purchase.company_code === selectedCompany.company_code);
+      setPurchaseByCompany(companyPurchases);
+
+      loadCompanyMAContracts(selectedCompany.company_code);
+
+      let valid_count = 0;
+      companyPurchases.forEach(item => {
+        if(item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now())) valid_count++;
+      });
+      setValidMACount(valid_count);
+
+      setEditedOtherValues([]);
+      setEditedNewValues(null);
+      setCurrentCompanyCode(selectedCompany.company_code);
     };
-  }, [selectedCompany, allTransactions, allPurchases, loadAllTransactions, loadAllPurchases]);
+  }, [purchaseState, transactionState, selectedCompany, allTransactions, allPurchases, currentCompanyCode]);
 
   return (
     <div
@@ -579,7 +593,7 @@ const CompanyDetailsModel = () => {
                   <div className="row">
                     <div className="card mb-0">
                       
-                    { otherItem && 
+                    { otherItem &&
                         <div>
                           <div style={{fontSize: 15, fontWeight: 600, padding: '0.5rem 0 0 1.0rem'}}>Selected Item</div>
                           <Space
@@ -605,6 +619,7 @@ const CompanyDetailsModel = () => {
                                       }
                                     : (item.at(2).type === 'select' 
                                       ? { type:'select',
+                                          group: item.at(2).group ? otherItem[item.at(2).group] : null,
                                           disabled: item.at(2).disabled ? true : false,
                                           options: item.at(2).options,
                                           selectChange: (value) => handleOtherItemSelectChange(item.at(0), value),
@@ -712,30 +727,27 @@ const CompanyDetailsModel = () => {
                       </>
                     </div>
                   </div>
-                  {maContractByCompany.length > 0 && 
-                    <div className="row">
-                      <div className="card mb-0">
-                        <div className="table-body">
-                          <div className="table-responsive">
-                            <Table
-                              rowSelection={purchaseRowSelection}
-                              pagination={{
-                                total:  maContractByCompany.length,
-                                showTotal: ShowTotal,
-                                showSizeChanger: true,
-                                ItemRender: ItemRender,
-                              }}
-                              className="table"
-                              style={{ overflowX: "auto" }}
-                              columns={columns_ma_contract}
-                              dataSource={maContractByCompany}
-                              rowKey={(record) => record.guid}
-                            />
-                          </div>
+                  <div className="row">
+                    <div className="card mb-0">
+                      <div className="table-body">
+                        <div className="table-responsive">
+                          <Table
+                            pagination={{
+                              total:  companyMAContracts.length,
+                              showTotal: ShowTotal,
+                              showSizeChanger: true,
+                              ItemRender: ItemRender,
+                            }}
+                            className="table"
+                            style={{ overflowX: "auto" }}
+                            columns={columns_ma_contract}
+                            dataSource={companyMAContracts}
+                            rowKey={(record) => record.guid}
+                          />
                         </div>
                       </div>
                     </div>
-                  }
+                  </div>
                 </div>
               </div>
               { editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&

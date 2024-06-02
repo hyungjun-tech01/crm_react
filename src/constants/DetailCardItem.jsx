@@ -71,17 +71,23 @@ const TextareaInput = (props) => {
 };
 
 const SelectInput = (props) => {
-    const { addonBefore, style, value, onChange, options, disabled } = props;
-    let realValue = null;
-    const foundIdx = options.findIndex(item => item.value === value);
-    if(foundIdx !== -1) {
-        realValue = value;
+    const { addonBefore, style, value, onChange, options, disabled, group, keyVal } = props;
+
+    let defaultOption = null;
+    if(group) {
+        const groupOptions = options.filter(item => item.title === group);
+        if(groupOptions && groupOptions.length > 0) {
+            const foundValue = groupOptions[0].options.filter(item => item.value[keyVal] === value);
+            if(foundValue && foundValue.length > 0){
+                defaultOption = foundValue[0];
+            };
+        };
     } else {
-        const foundLabel = options.findIndex(item => item.label === value);
-        if(foundLabel !== -1) {
-            realValue = options.at(foundLabel).value;
-        }
-    }
+        const optionFiltered = options.filter(item => item.value === value);
+        if(optionFiltered && optionFiltered.length > 0) {
+            defaultOption = optionFiltered[0];
+        };
+    };
     return (
         <div className="ant-space-item"  style={style}>
             <span className='ant-input-group-wrapper
@@ -94,7 +100,7 @@ const SelectInput = (props) => {
                     </span>
                     <Select
                         // className="css-dev-only-do-not-override-1uweeqc detail-input-extra"
-                        defaultValue={realValue}
+                        value={defaultOption}
                         options={options}
                         onChange={onChange}
                         disabled={disabled}
@@ -134,7 +140,7 @@ const DetailCardItem = (props) => {
         case 'textarea':
             return <TextareaInput {...SharedProps} row_no={ detail.row_no ? detail.row_no : 2} onChange={editing} style={detail.extra === 'memo' ? {width: `calc(100% - 380px)`, flexGrow: 1} : {width: widthValue}}/>;
         case 'select':
-            return <SelectInput {...SharedProps} options={detail.options} onChange={detail.selectChange} style={{width: widthValue, height: 38}}/>;
+            return <SelectInput {...SharedProps} options={detail.options} group={detail.group} keyVal={name} onChange={detail.selectChange} style={{width: widthValue, height: 38}}/>;
         default:
             return null;
     }

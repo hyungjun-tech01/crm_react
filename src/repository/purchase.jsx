@@ -1,10 +1,11 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentPurchase,
-    atomAllPurchases,
-    atomCompanyPurchases,
-    atomFilteredPurchase,
-    defaultPurchase,
+import { atomCurrentPurchase
+    , atomAllPurchases
+    , atomCompanyPurchases
+    , atomFilteredPurchase
+    , defaultPurchase
+    , atomPurchaseState
 } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
@@ -136,7 +137,7 @@ export const ProductDataOptions = [
 export const PurchaseRepo = selector({
     key: "PurchaseRepository",
     get: ({getCallback}) => {
-        const loadAllPurchases = getCallback(({set}) => async () => {
+        const loadAllPurchases = getCallback(({set, snapshot}) => async () => {
             try{
                 const response = await fetch(`${BASE_PATH}/purchases`);
                 const data = await response.json();
@@ -146,6 +147,10 @@ export const PurchaseRepo = selector({
                     return;
                 }
                 set(atomAllPurchases, data);
+
+                // Change loading state
+                const loadStates = snapshot.getPromise(atomPurchaseState);
+                set(atomPurchaseState, (loadStates | 1));
             }
             catch(err){
                 console.error(`loadAllCompanies / Error : ${err}`);

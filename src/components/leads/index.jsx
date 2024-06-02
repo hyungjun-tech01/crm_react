@@ -15,11 +15,19 @@ import {ConsultingRepo} from "../../repository/consulting";
 import {QuotationRepo} from "../../repository/quotation";
 import {PurchaseRepo} from "../../repository/purchase";
 import { KeyManForSelection, LeadStatusSelection, LeadRepo } from "../../repository/lead";
-import { atomAllCompanies, atomAllLeads, atomFilteredLead, defaultLead } from "../../atoms/atoms";
+import { atomAllCompanies,
+  atomAllLeads,
+  atomFilteredLead,
+  defaultLead,
+  atomCompanyState,
+  atomLeadState,
+} from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 import { useTranslation } from "react-i18next";
 
 const Leads = () => {
+  const companyState = useRecoilValue(atomCompanyState);
+  const leadState = useRecoilValue(atomLeadState);
   const allCompnayData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
   const filteredLead = useRecoilValue(atomFilteredLead);
@@ -284,9 +292,11 @@ const Leads = () => {
   ];
 
   useEffect(() => {
-    if (allCompnayData.length === 0) {
+    console.log('lead called!');
+    if((companyState & 1) === 0) {
       loadAllCompanies();
-    } else {
+    };
+    if(companyData.length !== allCompnayData.length){
       const companySubSet = allCompnayData.map((data) => ({
         value: {
           company_code: data.company_code,
@@ -299,11 +309,13 @@ const Leads = () => {
       }));
       setCompanyData(companySubSet);
     };
-    if (allLeadData.length === 0) {
+
+    if((leadState & 1) === 0) {
       loadAllLeads();
     };
+
     initializeLeadTemplate();
-  }, [allCompnayData, allLeadData]);
+  }, [allCompnayData, allLeadData, companyData, companyState, leadState]);
 
   return (
     <HelmetProvider>

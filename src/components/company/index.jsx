@@ -9,7 +9,7 @@ import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
 
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { CompanyRepo } from "../../repository/company";
-import { atomAllCompanies, atomFilteredCompany, defaultCompany } from "../../atoms/atoms";
+import { atomAllCompanies, atomFilteredCompany, defaultCompany, atomCompanyState } from "../../atoms/atoms";
 import { compareCompanyName, compareText, formatDate } from "../../constants/functions";
 import { option_locations, option_deal_type, option_industry_type } from "../../constants/constans";
 
@@ -27,6 +27,7 @@ const PopupDom = ({ children }) => {
 };
 
 const Company = () => {
+  const companyState = useRecoilValue(atomCompanyState);
   const { loadAllCompanies, filterCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const filteredCompany = useRecoilValue(atomFilteredCompany);
@@ -40,7 +41,6 @@ const Company = () => {
   const [multiQueryModal, setMultiQueryModal] = useState(false);
   const { t } = useTranslation();
 
-  
 
   const handleMultiQueryModal = () => {
     setMultiQueryModal(true);
@@ -49,8 +49,8 @@ const Company = () => {
     setMultiQueryModal(false);
   };
   const handleMultiQueryModalCancel = () => {
-    setMultiQueryModal(false);}
-  ;
+    setMultiQueryModal(false);
+  };
 
 
   const handleStatusSearch = (newValue) => {
@@ -204,12 +204,12 @@ const Company = () => {
   }, [companyChange]);
 
   useEffect(() => {   
-    console.log('Company called!');
-    if (allCompanyData.length === 0) {
+    console.log('Company called!', companyState);
+    if((companyState & 1) === 0) {
       loadAllCompanies();
     };
     initializeCompanyTemplate();
-  }, [allCompanyData, initializeCompanyTemplate, loadAllCompanies]);
+  }, [allCompanyData, companyState]);
 
   return (
     <HelmetProvider>

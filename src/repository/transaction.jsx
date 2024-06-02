@@ -1,6 +1,10 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentTransaction, atomAllTransactions, atomFilteredTransaction } from '../atoms/atoms';
+import { atomCurrentTransaction
+    , atomAllTransactions
+    , atomFilteredTransaction
+    , atomTransationState
+} from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
@@ -8,7 +12,7 @@ const BASE_PATH = Paths.BASE_PATH;
 export const TransactionRepo = selector({
     key: "TransactionRepository",
     get: ({getCallback}) => {
-        const loadAllTransactions = getCallback(({set}) => async () => {
+        const loadAllTransactions = getCallback(({set, snapshot}) => async () => {
             try{
                 const response = await fetch(`${BASE_PATH}/transactions`);
                 const data = await response.json();
@@ -18,6 +22,10 @@ export const TransactionRepo = selector({
                     return;
                 }
                 set(atomAllTransactions, data);
+
+                // Change loading state
+                const loadStates = snapshot.getPromise(atomTransationState);
+                set(atomTransationState, (loadStates | 1));
             }
             catch(err){
                 console.error(`loadAllCompanies / Error : ${err}`);

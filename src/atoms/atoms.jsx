@@ -35,12 +35,10 @@ export const defaultCompany = {
     application_engineer: null,
     region: null,
 };
-
 export const atomCurrentCompany = atom({
     key: "currentCompany",
     default: defaultCompany,
 });
-
 export const atomAllCompanies = atom({
     key: "allCompanies",
     default: [],
@@ -49,6 +47,11 @@ export const atomFilteredCompany = atom({
     key: "filteredCompanies",
     default: [],
 });
+export const atomCompanyState = atom({
+    key: "companyState",
+    default: 0,
+});
+
 //----- Lead ------------------------
 export const defaultLead = {
     //-----Lead info --------------
@@ -83,20 +86,21 @@ export const defaultLead = {
     modify_date: null,
     recent_user: null,
 };
-
 export const atomCurrentLead = atom({
     key: "currentLead",
     default: defaultLead,
 });
-
 export const atomAllLeads = atom({
     key: "allLeads",
     default: [],
 });
-
 export const atomFilteredLead  = atom({
     key: "filteredLeads",
     default: [],
+});
+export const atomLeadState = atom({
+    key: "leadState",
+    default: 0,
 });
 //----- Consulting ------------------------
 export const defaultConsulting = {
@@ -130,17 +134,14 @@ export const defaultConsulting = {
     modify_date: null,
     recent_user: null,
 };
-
 export const atomCurrentConsulting = atom({
     key: "currentConsulting",
     default: defaultConsulting,
 });
-
 export const atomAllConsultings = atom({
     key: "allConsultings",
     default: [],
 });
-
 export const atomCompanyConsultings = atom({
     key: "companyConsultings",
     default: [],
@@ -149,7 +150,10 @@ export const atomFilteredConsulting = atom({
     key: "filteredConsultings",
     default: [],
 });
-
+export const atomConsultingState = atom({
+    key: "consultingState",
+    default: 0,
+});
 //----- Quotations ------------------------
 export const defaultQuotation = {
     //-----Quotation Main info -----------------
@@ -206,27 +210,26 @@ export const defaultQuotation = {
     modify_date: null,
     recent_user: null,
 };
-
 export const atomCurrentQuotation = atom({
     key: "currentQuotation",
     default: defaultQuotation,
 });
-
 export const atomAllQuotations = atom({
     key: "allQuotations",
     default: [],
 });
-
 export const atomCompanyQuotations = atom({
     key: "companyQuotations",
     default: [],
 });
-
 export const atomFilteredQuotation = atom({
     key: "filteredQuotations",
     default: [],
 });
-
+export const atomQuotationState = atom({
+    key: "quotationState",
+    default: 0,
+});
 
 //----- Transaction ------------------------
 export const defaultTransaction = {
@@ -256,22 +259,22 @@ export const defaultTransaction = {
     modify_date: null,
     recent_user: null,
 };
-
 export const atomCurrentTransaction = atom({
     key: "currentTransaction",
     default: defaultTransaction,
 });
-
 export const atomAllTransactions = atom({
     key: "allTransactions",
     default: [],
 });
-
 export const atomFilteredTransaction = atom({
     key: "allFilteredTransactions",
     default: [],
 });
-
+export const atomTransationState = atom({
+    key: "transactionState",
+    default: 0,
+});
 
 //----- Purchase ------------------------
 export const defaultPurchase = {
@@ -306,17 +309,14 @@ export const defaultPurchase = {
     modify_date: null,
     status: null,
 };
-
 export const atomCurrentPurchase = atom({
     key: "currentPurchase",
     default: defaultPurchase,
 });
-
 export const atomAllPurchases = atom({
     key: "allPurchases",
     default: [],
 });
-
 export const atomCompanyPurchases = atom({
     key: "companyPurchases",
     default: [],
@@ -324,4 +324,33 @@ export const atomCompanyPurchases = atom({
 export const atomFilteredPurchase = atom({
     key: "allFilteredPurchases",
     default: [],
+});
+export const atomPurchaseState = atom({
+    key: "purchaseState",
+    default: 0,
+});
+
+//----- MA Contract ------------------------
+export const defaultMAContract = {
+    action_type : null,                 
+    guid : null,                        
+    purchase_code : null,               
+    ma_company_code : null,             
+    ma_contract_date : null,            
+    ma_finish_date : null,              
+    ma_price : null,                    
+    ma_memo : null,                     
+    modify_user : null,  
+};
+export const atomCurrentMAContract = atom({
+    key: "currentMAContract",
+    default: defaultMAContract,
+});
+export const atomCompanyMAContracts = atom({
+    key: "companyMAcontracts",
+    default: [],
+});
+export const atomMAContractState = atom({
+    key: "MAContractState",
+    default: 0,
 });

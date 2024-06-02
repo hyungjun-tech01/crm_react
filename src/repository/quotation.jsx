@@ -1,7 +1,12 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentQuotation, atomAllQuotations, defaultQuotation, 
-        atomCompanyQuotations, atomFilteredQuotation } from '../atoms/atoms';
+import { atomCurrentQuotation
+    , atomAllQuotations
+    , defaultQuotation
+    , atomCompanyQuotations
+    , atomFilteredQuotation
+    , atomQuotationState
+} from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
@@ -15,7 +20,7 @@ export const QuotationSendTypes = [
 export const QuotationRepo = selector({
     key: "QuotationRepository",
     get: ({getCallback}) => {
-        const loadAllQuotations = getCallback(({set}) => async () => {
+        const loadAllQuotations = getCallback(({set, snapshot}) => async () => {
             try{
                 const response = await fetch(`${BASE_PATH}/quotations`);
                 const data = await response.json();
@@ -25,6 +30,10 @@ export const QuotationRepo = selector({
                     return;
                 }
                 set(atomAllQuotations, data);
+
+                // Change loading state
+                const loadStates = snapshot.getPromise(atomQuotationState);
+                set(atomQuotationState, (loadStates | 1));
             }
             catch(err){
                 console.error(`loadAllCompanies / Error : ${err}`);

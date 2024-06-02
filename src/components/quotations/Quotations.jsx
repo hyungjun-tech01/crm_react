@@ -17,12 +17,22 @@ import { MoreVert } from '@mui/icons-material';
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { QuotationRepo } from "../../repository/quotation";
-import { atomAllCompanies, atomAllQuotations, atomAllLeads, atomFilteredQuotation, } from "../../atoms/atoms";
+import { atomAllCompanies,
+  atomAllQuotations,
+  atomAllLeads,
+  atomFilteredQuotation,
+  atomCompanyState,
+  atomLeadState,
+  atomQuotationState,
+} from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 
 import { useTranslation } from "react-i18next";
 
 const Quotations = () => {
+  const companyState = useRecoilValue(atomCompanyState);
+  const leadState = useRecoilValue(atomLeadState);
+  const quotationState = useRecoilValue(atomQuotationState);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
   const allQuotationData = useRecoilValue(atomAllQuotations);
@@ -188,16 +198,17 @@ const Quotations = () => {
   }, [initAddNewQuotation]);
 
   useEffect(() => {
-    if (allCompanyData.length === 0) {
+    console.log('Quotation called!');
+    if((companyState & 1) === 0) {
       loadAllCompanies();
     };
-    if (allLeadData.length === 0) {
+    if((leadState & 1) === 0) {
       loadAllLeads();
     };
-    if (allQuotationData.length === 0) {
+    if((quotationState & 1) === 0) {
       loadAllQuotations();
     };
-  }, [allCompanyData, allLeadData, allQuotationData]);
+  }, [allCompanyData, allLeadData, allQuotationData, companyState, leadState, quotationState]);
 
   return (
     <HelmetProvider>

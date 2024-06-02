@@ -1,6 +1,11 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentLead, atomAllLeads, atomFilteredLead, defaultLead } from '../atoms/atoms';
+import { atomCurrentLead
+    , atomAllLeads
+    , atomFilteredLead
+    , defaultLead
+    , atomLeadState
+} from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
@@ -22,7 +27,7 @@ export const LeadStatusSelection = [
 export const LeadRepo = selector({
     key: "LeadRepository",
     get: ({getCallback}) => {
-        const loadAllLeads = getCallback(({set}) => async () => {
+        const loadAllLeads = getCallback(({set, snapshot}) => async () => {
             try{
                 const response = await fetch(`${BASE_PATH}/leads`);
                 const data = await response.json();
@@ -33,6 +38,10 @@ export const LeadRepo = selector({
                 }
                 set(atomAllLeads, data);
                 set(atomFilteredLead, atomAllLeads);
+
+                // Change loading state
+                const loadStates = snapshot.getPromise(atomLeadState);
+                set(atomLeadState, (loadStates | 1));
             }
             catch(err){
                 console.error(`loadAllCompanies / Error : ${err}`);
