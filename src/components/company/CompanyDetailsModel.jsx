@@ -154,6 +154,7 @@ const CompanyDetailsModel = () => {
   const [ otherItem, setOtherItem ] = useState(null);
   const [ editedOtherValues, setEditedOtherValues ] = useState(null);
   const [ orgTimeOther, setOrgTimeOther ] = useState(null);
+  const [ editedOtherSelectValues, setEditedOtherSelectValues ] = useState(null);
 
   const handleOtherItemChange = useCallback(e => {
     const tempEdited = {
@@ -176,13 +177,25 @@ const CompanyDetailsModel = () => {
 
   const handleOtherItemSelectChange = useCallback((name, value) => {
     if(name === 'product_name') {
-      const tempOther = {
+      const tempOtherSelect = {
+        ...editedNewSelectValues,
+        product_name: value.value,
+      };
+      setEditedOtherSelectValues(tempOtherSelect);
+
+      const tempNew = {
         ...editedOtherValues,
         product_name: value.value.product_name,
-        product_type: value.value.product_class,
+        product_class: value.value.product_class,
         product_code: value.value.product_code,
       };
-      setEditedOtherValues(tempOther);
+      setEditedOtherValues(tempNew);
+    } else if(name === 'product_type') {
+      const tempNew = {
+        ...editedOtherValues,
+        product_type: value.value,
+      };
+      setEditedOtherValues(tempNew);
     };
   }, [editedOtherValues]);
 
@@ -315,15 +328,31 @@ const CompanyDetailsModel = () => {
   const [ maContractByPurchase, setMaContractByPurchase ] = useState([]);
   const [ showContracts, setShowContracts ] = useState(false);
 
-  const purchase_items_info = [
-    ['product_name','purchase.product_name',{ type:'select', group: 'product_class', options: ProductDataOptions, value: editedNewSelectValues }],
-    ['product_type','purchase.product_type',{ type:'select', options: ProductTypeOptions}],
+  const add_purchase_items = [
+    ['product_name','purchase.product_name',
+      { type:'select', group: 'product_class', options: ProductDataOptions, value: editedNewSelectValues, selectChange: (value) => handleNewItemSelectChange('product_name', value) }],
+    ['product_type','purchase.product_type',
+      { type:'select', options: ProductTypeOptions, selectChange: (value) => handleNewItemSelectChange('product_type', value)}],
     ['serial_number','purchase.serial',{ type:'label' }],
     ['licence_info','purchase.licence_info',{ type:'label' }],
     ['module','purchase.module',{ type:'label' }],
     ['quantity','common.quantity',{ type:'label' }],
-    ['receipt_date','purchase.receipt_date',{ type:'date' }],
-    ['delivery_date','purchase.delivery_date',{ type:'date' }],
+    ['receipt_date','purchase.receipt_date',{ type:'date', orgTimeData: null, timeDateChange: (date) => handleNewItemDateChange('receipt_date', date) }],
+    ['delivery_date','purchase.delivery_date',{ type:'date', orgTimeData: null, timeDateChange: (date) => handleNewItemDateChange('delivery_date', date) }],
+    ['hq_finish_date','purchase.hq_finish_date',{ type:'date', orgTimeData: null, timeDateChange: (date) => handleNewItemDateChange('hq_finish_date', date) }],
+    ['ma_finish_date','purchase.ma_finish_date',{ type:'date', orgTimeData: null, timeDateChange: (date) => handleNewItemDateChange('ma_finish_date', date) }],
+  ];
+
+  const modify_purchase_items = [
+    ['product_name','purchase.product_name',
+      { type:'select', group: 'product_class', options: ProductDataOptions, value: editedOtherSelectValues, selectChange: (value) => handleOtherItemSelectChange('product_name', value) }],
+    ['product_type','purchase.product_type',{ type:'select', options: ProductTypeOptions, selectChange: (value) => handleOtherItemSelectChange('product_type', value) }],
+    ['serial_number','purchase.serial',{ type:'label' }],
+    ['licence_info','purchase.licence_info',{ type:'label' }],
+    ['module','purchase.module',{ type:'label' }],
+    ['quantity','common.quantity',{ type:'label' }],
+    ['receipt_date','purchase.receipt_date',{ type:'date', orgTimeData: null, timeDateChange: (date) => handleOtherItemTimeChange('receipt_date', date) }],
+    ['delivery_date','purchase.delivery_date',{ type:'date', orgTimeData: null, timeDateChange: (date) => handleOtherItemTimeChange('delivery_date', date) }],
     ['hq_finish_date','purchase.hq_finish_date',{ type:'date', disabled: true }],
     ['ma_finish_date','purchase.ma_finish_date',{ type:'date', disabled: true }],
   ];
@@ -378,6 +407,9 @@ const CompanyDetailsModel = () => {
           delivery_date: selectedValue.delivery_date ? new Date(selectedValue.delivery_date) : null,
           ma_finish_date: selectedValue.ma_finish_date ? new Date(selectedValue.ma_finish_date) : null,
           hq_finish_date: selectedValue.hq_finish_date ? new Date(selectedValue.hq_finish_date) : null,
+        });
+        setEditedOtherSelectValues({
+          product_class: selectedValue.product_class,
         });
 
         // Set data to edit selected purchase ----------------------
@@ -677,29 +709,14 @@ const CompanyDetailsModel = () => {
                             style={{ display: 'flex', marginBottom: '0.5rem', margineTop: '0.5rem' }}
                             wrap
                           >
-                            {
-                              purchase_items_info.map((item, index) => 
+                            { modify_purchase_items.map((item, index) => 
                                 <DetailCardItem
                                   key={index}
                                   defaultText={otherItem[item.at(0)]}
                                   edited={editedOtherValues}
                                   name={item.at(0)}
                                   title={t(item.at(1))}
-                                  detail={item.at(2).type === 'date' 
-                                    ? { type:'date',
-                                        disabled: item.at(2).disabled ? true : false,
-                                        orgTimeData: orgTimeOther[item.at(0)],
-                                        timeDateChange: handleOtherItemTimeChange,
-                                      }
-                                    : (item.at(2).type === 'select' 
-                                      ? { type:'select',
-                                          group: item.at(2).group ? item.at(2).group : null,
-                                          disabled: item.at(2).disabled ? true : false,
-                                          options: item.at(2).options,
-                                          selectChange: (value) => handleOtherItemSelectChange(item.at(0), value),
-                                        } 
-                                      : item.at(2))
-                                  }
+                                  detail={item.at(2)}
                                   editing={handleOtherItemChange}
                                 />
                             )}
@@ -736,7 +753,7 @@ const CompanyDetailsModel = () => {
                       </div>
                     </div>
                   }
-                  {addNewItem && 
+                  { addNewItem && 
                     <div className="row">
                       <div className="card mb-0">
                         <>
@@ -749,22 +766,22 @@ const CompanyDetailsModel = () => {
                             wrap
                           >
                           {
-                            purchase_items_info.map((item, index) => 
+                            add_purchase_items.map((item, index) => 
                               <DetailCardItem
                                 key={index}
                                 defaultText=''
                                 edited={editedNewValues}
                                 name={item.at(0)}
                                 title={t(item.at(1))}
-                                detail={item.at(2).type === 'date' 
+                                detail={item.at(2).type === 'date'
                                   ? {type:'date', orgTimeData: null,
                                       timeDateChange: handleNewItemDateChange }
-                                  : (item.at(2).type === 'select' 
+                                  : (item.at(2).type === 'select'
                                   ? { type:'select',
                                       group: item.at(2).group ? item.at(2).group : null,
                                       options: item.at(2).options,
                                       selectChange: (value) => handleNewItemSelectChange(item.at(0), value),
-                                    } 
+                                    }
                                   : item.at(2))
                                 }
                                 editing={handleNewItemChange}

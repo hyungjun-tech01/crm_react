@@ -140,7 +140,8 @@ const DetailCardItem = (props) => {
         case 'textarea':
             return <TextareaInput {...SharedProps} row_no={ detail.row_no ? detail.row_no : 2} onChange={editing} style={detail.extra === 'memo' ? {width: `calc(100% - 380px)`, flexGrow: 1} : {width: widthValue}}/>;
         case 'select':
-            const groupValue = (detail.group && edited && edited[detail.group]) ? edited[detail.group] : null;
+            const groupValue = detail.group ? (edited && edited[detail.group] ? edited[detail.group] : detail.value[name]) : null;
+            console.log('DetailCardItem / select : ', groupValue);
             return <SelectInput {...SharedProps} options={detail.options} group={groupValue} keyVal={name} onChange={detail.selectChange} style={{width: widthValue, height: 38}}/>;
         default:
             return null;
