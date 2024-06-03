@@ -3,11 +3,13 @@ import { Button, Modal } from 'antd';
 import Select from "react-select";
 import { KeyManForSelection } from "../repository/lead";
 import { companyColumn, ColumnQueryCondition } from "../repository/company";
+import { useTranslation } from "react-i18next";
 
 
 const MultiQueryModal = (props) => {
     const {  open, title, handleOk, handleCancel } = props;
 
+    const { t } = useTranslation();
     const [selectedKeyMan, setSelectedKeyMan] = useState([]);
     const [leadChange, setLeadChange ] = useState(null);
 
@@ -36,9 +38,9 @@ const MultiQueryModal = (props) => {
           <table className="table table-striped table-nowrap custom-table mb-0 datatable">
             <thead>
               <tr>
-                <th>항목</th>
-                <th>조건</th>
-                <th>값</th>
+                <th>{t('common.item')}</th>
+                <th>{t('common.condition')}</th>
+                <th>{t('common.value')}</th>
                 <th> </th>
               </tr>
             </thead>
@@ -46,11 +48,12 @@ const MultiQueryModal = (props) => {
               <tr>
                 <td><Select  options={companyColumn} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
                 <td><Select  options={ColumnQueryCondition} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><input
+                <td><div><input
                         autoFocus
                         type= "text"
+                        className="form-control form-control-sm"
                         name= "multiQueryInput1"
-                        defaultValue=""/>
+                        defaultValue=""/></div>
                 </td>
                 <td>
                   <Button key="and_or1" type="primary" onClick={handleOk}>
@@ -61,11 +64,12 @@ const MultiQueryModal = (props) => {
               <tr>
                 <td><Select  options={companyColumn} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
                 <td><Select  options={ColumnQueryCondition} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><input
+                <td><div><input
                         autoFocus
                         type= "text"
+                        className="form-control form-control-sm"
                         name= "multiQueryInput2"
-                        defaultValue=""/>
+                        defaultValue=""/></div>
                 </td>
                 <td>
                   <Button key="and_or2" type="primary" onClick={handleOk}>
@@ -76,11 +80,12 @@ const MultiQueryModal = (props) => {
               <tr>
                 <td><Select  options={companyColumn} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
                 <td><Select  options={ColumnQueryCondition} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><input
+                <td><div><input
                         autoFocus
                         type= "text"
+                        className="form-control form-control-sm"
                         name= "multiQueryInput3"
-                        defaultValue=""/>
+                        defaultValue=""/></div>
                 </td>
                 <td>
                   <Button key="and_or3" type="primary" onClick={handleOk}>
@@ -91,11 +96,12 @@ const MultiQueryModal = (props) => {
               <tr>
                 <td><Select  options={companyColumn} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
                 <td><Select  options={ColumnQueryCondition} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><input
+                <td><div><input
                         autoFocus
                         type= "text"
+                        className="form-control form-control-sm"
                         name= "multiQueryInput4"
-                        defaultValue=""/>
+                        defaultValue=""/></div>
                 </td>
                 <td>
                   <Button key="and_or4" type="primary" onClick={handleOk}>
@@ -106,11 +112,12 @@ const MultiQueryModal = (props) => {
               <tr>
                 <td><Select  options={companyColumn} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
                 <td><Select  options={ColumnQueryCondition} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><input
+                <td><div><input
                         autoFocus
                         type= "text"
+                        className="form-control form-control-sm"
                         name= "multiQueryInput4"
-                        defaultValue=""/>
+                        defaultValue=""/> </div>
                 </td>
                 <td>
                   <Button key="and_or4" type="primary" onClick={handleOk}>
@@ -121,11 +128,12 @@ const MultiQueryModal = (props) => {
               <tr>
                 <td><Select  options={companyColumn} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
                 <td><Select  options={ColumnQueryCondition} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><input
+                <td><div ><input
                         autoFocus
                         type= "text"
+                        className="form-control form-control-sm"
                         name= "multiQueryInput4"
-                        defaultValue=""/>
+                        defaultValue=""/> </div>
                 </td>
                 <td>
                   <Button key="and_or4" type="primary" onClick={handleOk}>

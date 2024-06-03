@@ -233,6 +233,9 @@ const koResource = {
             visible: '보기',
             zip_code: '우편번호',
             search_here :'검색 키워드',
+            item:'항목',
+            condition:'조건',
+            value:'값',
         },
         comment: {
             search_address_first: '먼저 주소 검색하시기 바랍니다.',

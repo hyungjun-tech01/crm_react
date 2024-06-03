@@ -233,6 +233,9 @@ const enResource = {
             visible: 'Visible',
             zip_code: 'Postal Code',
             search_here :'Search Here',
+            item:'Item',
+            condition:'Condition',
+            value:'Value',
         },
         comment: {
             search_address_first: 'Please search address...',
