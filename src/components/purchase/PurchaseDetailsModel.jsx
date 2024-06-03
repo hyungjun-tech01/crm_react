@@ -19,28 +19,16 @@ const PurchaseDetailsModel = () => {
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const { t } = useTranslation();
 
+  const [ isFullScreen, setIsFullScreen ] = useState(false);
+
   const [editedValues, setEditedValues] = useState(null);
-  const [savedValues, setSavedValues] = useState(null);
 
   const [orgDeliveryDate, setOrgDeliveryDate] = useState(null);
   const [orgContactDate, setOrgContactDate] = useState(null);
   const [orgFinishDate, setOrgFinishDate] = useState(null);
   const [orgRegisterDate, setOrgRegisterDate] = useState(null);
-  const [ isFullScreen, setIsFullScreen ] = useState(false);
 
   // --- Funtions for Editing ---------------------------------
-  const handleCheckEditState = useCallback((name) => {
-    return editedValues !== null && name in editedValues;
-  }, [editedValues]);
-
-  const handleStartEdit = useCallback((name) => {
-    const tempEdited = {
-      ...editedValues,
-      [name]: selectedPurchase[name],
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues, selectedPurchase]);
-
   const handleEditing = useCallback((e) => {
     const tempEdited = {
       ...editedValues,
@@ -49,67 +37,31 @@ const PurchaseDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues]);
 
-  const handleEndEdit = useCallback((name) => {
-    if (editedValues[name] === selectedPurchase[name]) {
-      const tempEdited = {
-        ...editedValues,
-      };
-      delete tempEdited[name];
-      setEditedValues(tempEdited);
-      return;
-    }
-
-    const tempSaved = {
-      ...savedValues,
-      [name]: editedValues[name],
-    };
-    setSavedValues(tempSaved);
-
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited[name];
-    setEditedValues(tempEdited);
-  }, [editedValues, savedValues, selectedPurchase]);
-
-  // --- Funtions for Saving ---------------------------------
-  const handleCheckSaved = useCallback((name) => {
-    return savedValues !== null && name in savedValues;
-  }, [savedValues]);
-
-  const handleCancelSaved = useCallback((name) => {
-    const tempSaved = {
-      ...savedValues,
-    };
-    delete tempSaved[name];
-    setSavedValues(tempSaved);
-  }, [savedValues]);
-
   const handleSaveAll = useCallback(() => {
     if (
-      savedValues !== null &&
+      editedValues !== null &&
       selectedPurchase &&
       selectedPurchase !== defaultPurchase
     ) {
       const temp_all_saved = {
-        ...savedValues,
+        ...editedValues,
         action_type: "UPDATE",
         modify_user: cookies.myLationCrmUserId,
         purchase_code: selectedPurchase.purchase_code,
       };
       if (modifyPurchase(temp_all_saved)) {
         console.log(`Succeeded to modify purchase`);
-        if(savedValues.delivery_date){
-          setOrgDeliveryDate(savedValues.delivery_date);
+        if(editedValues.delivery_date){
+          setOrgDeliveryDate(editedValues.delivery_date);
         };
-        if(savedValues.MA_contact_date){
-          setOrgContactDate(savedValues.MA_contact_date);
+        if(editedValues.MA_contact_date){
+          setOrgContactDate(editedValues.MA_contact_date);
         };
-        if(savedValues.MA_finish_date){
-          setOrgFinishDate(savedValues.MA_finish_date);
+        if(editedValues.MA_finish_date){
+          setOrgFinishDate(editedValues.MA_finish_date);
         };
-        if(savedValues.registration_date){
-          setOrgRegisterDate(savedValues.registration_date);
+        if(editedValues.registration_date){
+          setOrgRegisterDate(editedValues.registration_date);
         };
       } else {
         console.error("Failed to modify purchase");
@@ -118,143 +70,27 @@ const PurchaseDetailsModel = () => {
       console.log("[ PurchaseDetailModel ] No saved data");
     }
     setEditedValues(null);
-    setSavedValues(null);
   }, [
     cookies.myLationCrmUserId,
     modifyPurchase,
-    savedValues,
+    editedValues,
     selectedPurchase,
   ]);
 
   const handleCancelAll = useCallback(() => {
     setEditedValues(null);
-    setSavedValues(null);
   }, []);
 
-  // --- Funtions for Delivery Date ---------------------------------
-  const handleStartDeliveryDateEdit = useCallback(() => {
+  // --- Funtions for Specific Changes in Detail ---------------------------------
+  const handleDateChange = useCallback((name, date) => {
     const tempEdited = {
       ...editedValues,
-      delivery_date: orgDeliveryDate,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues, orgDeliveryDate]);
-  const handleDeliveryDateChange = useCallback((date) => {
-    const tempEdited = {
-      ...editedValues,
-      delivery_date: date,
+      [name]: date,
     };
     setEditedValues(tempEdited);
   }, [editedValues]);
-  const handleEndDeliveryDateEdit = useCallback(() => {
-    const deliveryDate = editedValues.delivery_date;
-    if (deliveryDate !== orgDeliveryDate) {
-      const tempSaved = {
-        ...savedValues,
-        delivery_date: deliveryDate,
-      };
-      setSavedValues(tempSaved);
-    }
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited.delivery_date;
-    setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgDeliveryDate]);
 
-  // --- Funtions for MA Contact Date ---------------------------------
-  const handleStartContactDateEdit = useCallback(() => {
-    const tempEdited = {
-      ...editedValues,
-      MA_contact_date: orgContactDate,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues, orgContactDate]);
-  const handleContactDateChange = useCallback((date) => {
-    const tempEdited = {
-      ...editedValues,
-      MA_contact_date: date,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues]);
-  const handleEndContactDateEdit = useCallback(() => {
-    const contactDate = editedValues.MA_contact_date;
-    if (contactDate !== orgContactDate) {
-      const tempSaved = {
-        ...savedValues,
-        MA_contact_date: contactDate,
-      };
-      setSavedValues(tempSaved);
-    };
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited.MA_contact_date;
-    setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgContactDate]);
-
-  // --- Funtions for Finishment Date ---------------------------------
-  const handleStartFinishDateEdit = useCallback(() => {
-    const tempEdited = {
-      ...editedValues,
-      MA_finish_date: orgFinishDate,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues, orgFinishDate]);
-  const handleFinishDateChange = useCallback((date) => {
-    const tempEdited = {
-      ...editedValues,
-      MA_finish_date: date,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues]);
-  const handleEndFinishDateEdit = useCallback(() => {
-    const finishDate = editedValues.MA_finish_date;
-    if(finishDate !== orgFinishDate) {
-      const tempSaved = {
-        ...savedValues,
-        MA_finish_date : finishDate,
-      };
-      setSavedValues(tempSaved);
-    }
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited.MA_finish_date;
-    setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgFinishDate]);
-
-  // --- Funtions for Registerment Date ---------------------------------
-  const handleStartRegisterDateEdit = useCallback(() => {
-    const tempEdited = {
-      ...editedValues,
-      registration_date: orgRegisterDate,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues, orgRegisterDate]);
-  const handleRegisterDateChange = useCallback((date) => {
-    const tempEdited = {
-      ...editedValues,
-      registration_date: date,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues]);
-  const handleEndRegisterDateEdit = useCallback(() => {
-    const registerDate = editedValues.registration_date;
-    if(registerDate !== orgRegisterDate) {
-      const tempSaved = {
-        ...savedValues,
-        registration_date : registerDate,
-      };
-      setSavedValues(tempSaved);
-    };
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited.registration_date;
-    setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgRegisterDate]);
-
+  // --- Funtions for Control Windows ---------------------------------
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
     if(checked)
@@ -265,7 +101,6 @@ const PurchaseDetailsModel = () => {
 
   const handleClose = useCallback(() => {
     setEditedValues(null);
-    setSavedValues(null);
     setCurrentPurchase();
   }, []);
 
@@ -275,17 +110,17 @@ const PurchaseDetailsModel = () => {
     ['price','common.price',{ type:'label' }],
     ['currency','common.currency',{ type:'label' }],
     ['delivery_date','purchase.delivery_date',
-      { type:'date', orgTimeData: orgDeliveryDate, timeDataChange: handleDeliveryDateChange, startEditTime: handleStartDeliveryDateEdit, endEditTime: handleEndDeliveryDateEdit }
+      { type:'date', orgTimeData: orgDeliveryDate, timeDataChange: handleDateChange }
     ],
     ['MA_contact_date','purchase.ma_contract_date',
-      { type:'date', orgTimeData: orgContactDate, timeDataChange: handleContactDateChange, startEditTime: handleStartContactDateEdit, endEditTime: handleEndContactDateEdit }
+      { type:'date', orgTimeData: orgContactDate, timeDataChange: handleDateChange }
     ],
     ['MA_finish_date','purchase.ma_finish_date',
-      { type:'date', orgTimeData: orgFinishDate, timeDataChange: handleFinishDateChange, startEditTime: handleStartFinishDateEdit, endEditTime: handleEndFinishDateEdit }
+      { type:'date', orgTimeData: orgFinishDate, timeDataChange: handleDateChange }
     ],
     ['register','purchase.register',{ type:'label' }],
     ['registration_date','purchase.registration_date',
-      { type:'date', orgTimeData: orgRegisterDate, timeDataChange: handleRegisterDateChange, startEditTime: handleStartRegisterDateEdit, endEditTime: handleEndRegisterDateEdit }
+      { type:'date', orgTimeData: orgRegisterDate, timeDataChange: handleDateChange }
     ],
     ['regcode','purchase.registration_code',{ type:'label' }],
     ['status','common.status',{ type:'label' }],
@@ -326,7 +161,7 @@ const PurchaseDetailsModel = () => {
         setIsFullScreen(true);
       };
     };
-  }, [selectedPurchase, savedValues]);
+  }, [selectedPurchase, editedValues]);
 
   return (
     <>
@@ -343,29 +178,17 @@ const PurchaseDetailsModel = () => {
               <div className="row w-100">
                 <DetailTitleItem
                   defaultText={selectedPurchase.product_type}
-                  saved={savedValues}
                   name='product_type'
                   title={t('purchase.type')}
                   type='col-md-4'
-                  checkEdit={handleCheckEditState}
-                  startEdit={handleStartEdit}
-                  endEdit={handleEndEdit}
                   editing={handleEditing}
-                  checkSaved={handleCheckSaved}
-                  cancelSaved={handleCancelSaved}
                 />
                 <DetailTitleItem
                   defaultText={selectedPurchase.product_name}
-                  saved={savedValues}
                   name='product_name'
                   title={t('purchase.product_name')}
                   type='col-md-6'
-                  checkEdit={handleCheckEditState}
-                  startEdit={handleStartEdit}
-                  endEdit={handleEndEdit}
                   editing={handleEditing}
-                  checkSaved={handleCheckSaved}
-                  cancelSaved={handleCancelSaved}
                 />
               </div>
               <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
@@ -432,16 +255,10 @@ const PurchaseDetailsModel = () => {
                               key={index}
                               defaultText={selectedPurchase[item.at(0)]}
                               edited={editedValues}
-                              saved={savedValues}
                               name={item.at(0)}
                               title={t(item.at(1))}
                               detail={item.at(2)}
-                              checkEdit={handleCheckEditState}
-                              startEdit={handleStartEdit}
                               editing={handleEditing}
-                              endEdit={handleEndEdit}
-                              checkSaved={handleCheckSaved}
-                              cancelSaved={handleCancelSaved}
                             />
                           )}
                         </Space>
@@ -1081,8 +898,8 @@ const PurchaseDetailsModel = () => {
                     </div>
                   </div>
                 </div>
-                {savedValues !== null &&
-                  Object.keys(savedValues).length !== 0 && (
+                {editedValues !== null &&
+                  Object.keys(editedValues).length !== 0 && (
                     <div className="text-center py-3">
                       <button
                         type="button"

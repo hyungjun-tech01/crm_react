@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useCookies } from "react-cookie";
+import { useTranslation } from "react-i18next";
 import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
 import { MoreVert } from '@mui/icons-material';
 import { Table } from "antd";
@@ -13,18 +14,27 @@ import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import LeadsDetailsModel from "../leads/LeadsDetailsModel";
 import ConsultingAddModal from "../consulting/ConsultingAddModal";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { ConsultingRepo, ConsultingTypes } from "../../repository/consulting";
-import { atomAllCompanies, atomAllConsultings, atomAllLeads, defaultConsulting, atomFilteredConsulting } from "../../atoms/atoms";
+import { atomAllCompanies,
+  atomAllConsultings,
+  atomAllLeads,
+  defaultConsulting,
+  atomFilteredConsulting,
+  atomCompanyState,
+  atomLeadState,
+  atomConsultingState,
+} from "../../atoms/atoms";
 import { compareCompanyName, compareText, formatDate } from "../../constants/functions";
 
-
-import { useTranslation } from "react-i18next";
+const COMPANY_SELECTION_LOADED = 0;
 
 const Consultings = () => {
+  const companyState = useRecoilValue(atomCompanyState);
+  const leadState = useRecoilValue(atomLeadState);
+  const consultingState = useRecoilValue(atomConsultingState);
   const allCompnayData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
   const allConsultingData = useRecoilValue(atomAllConsultings);
@@ -229,9 +239,11 @@ const Consultings = () => {
   ];
 
   useEffect(() => {
-    if (allCompnayData.length === 0) {
+    console.log('Consulting called!');
+    if((companyState & 1) === 0) {
       loadAllCompanies();
-    } else {
+    };
+    if(allCompnayData.length !== companiesForSelection.length) {
       let company_subset = {};
       allCompnayData.forEach((data) => {
         company_subset[data.company_name] = data.company_code;
@@ -239,11 +251,10 @@ const Consultings = () => {
       setCompaniesForSelection(company_subset);
     };
 
-    if (allLeadData.length === 0) {
+    if((leadState & 1) === 0) {
       loadAllLeads();
     };
-    
-    if(!leadsForSelection || (leadsForSelection.length !== allLeadData.length)){
+    if(leadsForSelection.length !== allLeadData.length){
       const temp_data = allLeadData.map(lead => {
         return {
           label: lead.lead_name + " / " + lead.company_name,
@@ -272,12 +283,12 @@ const Consultings = () => {
       setLeadsForSelection(temp_data);
     };
 
-    if (allConsultingData.length === 0) {
+    if((consultingState & 1) === 0) {
       loadAllConsultings();
     };
     
     initializeConsultingTemplate();
-  }, [allCompnayData, allLeadData, allConsultingData]);
+  }, [companyState, leadState, consultingState, allCompnayData, allLeadData, allConsultingData, leadsForSelection, companiesForSelection]);
 
   return (
     <HelmetProvider>

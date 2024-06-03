@@ -34,9 +34,17 @@ export const compareText = (text1, text2) => {
 };
 
 export const formatDate = (date_value) => {
-    const month = date_value.getMonth() + 1;
-    const date = date_value.getDate();
-    return date_value.getFullYear()
+    if(date_value === null) return "";
+    
+    let  converted = null;
+    if(typeof date_value === 'string') {
+        converted = new Date(date_value);
+    } else {
+        converted = date_value;
+    }
+    const month = converted.getMonth() + 1;
+    const date = converted.getDate();
+    return converted.getFullYear()
           + "." + (month < 10 ? "0" + month.toString() : month.toString())
           + "." + (date < 10 ? "0" + date.toString() : date.toString());
 };

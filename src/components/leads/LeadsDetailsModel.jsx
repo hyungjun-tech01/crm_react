@@ -47,11 +47,10 @@ const LeadsDetailsModel = () => {
   const { modifyCompany } = useRecoilValue(CompanyRepo);
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
-  const [ editedValues, setEditedValues ] = useState(null);
-  const [ savedValues, setSavedValues ] = useState(null);
+  const [ isFullScreen, setIsFullScreen ] = useState(false);
 
+  const [ editedValues, setEditedValues ] = useState(null);
   const [ editedValuesCompany, setEditedValuesCompany ] = useState(null);
-  const [ savedValuesCompany, setSavedValuesCompany ] = useState(null);
 
   const [activeTab, setActiveTab] = useState(""); // 상태 관리를 위한 useState
   
@@ -61,7 +60,6 @@ const LeadsDetailsModel = () => {
   const {  filterConsulting, setCurrentConsulting} = useRecoilValue(ConsultingRepo);
   const {  setCurrentQuotation, filterCompanyQuotation} = useRecoilValue(QuotationRepo);
   const {  setCurrentPurchase , filterCompanyPurchase} = useRecoilValue(PurchaseRepo);
-  const [ isFullScreen, setIsFullScreen ] = useState(false);
   const [ leadChange, setLeadChange ] = useState(null);
   const [selectedOption, setSelectedOption] = useState([]);
   const [selectedKeyMan, setSelectedKeyMan] = useState([]);
@@ -102,19 +100,7 @@ const [selectedRow, setSelectedRow] = useState(null);
     filterCompanyPurchase(newValue);  
   };
 
-
-  const handleCheckEditState = useCallback((name) => {
-    return editedValues !== null && name in editedValues;
-  }, [editedValues]);
-
-  const handleStartEdit = useCallback((name) => {
-    const tempEdited = {
-      ...editedValues,
-      [name]: selectedLead[name],
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues, selectedLead]);
-
+  // --- Funtions for Editing Detail ---------------------------------
   const handleEditing = useCallback((e) => {
     const tempEdited = {
       ...editedValues,
@@ -123,48 +109,12 @@ const [selectedRow, setSelectedRow] = useState(null);
     setEditedValues(tempEdited);
   }, [editedValues]);
 
-  const handleEndEdit = useCallback((name) => {
-    if(editedValues[name] === selectedLead[name]){
-      const tempEdited = {
-        ...editedValues,
-      };
-      delete tempEdited[name];
-      setEditedValues(tempEdited);
-      return;
-    };
-
-    const tempSaved = {
-      ...savedValues,
-      [name] : editedValues[name],
-    }
-    setSavedValues(tempSaved);  
-
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited[name];
-    setEditedValues(tempEdited);
-  }, [editedValues, selectedLead]);
-
-  // --- Funtions for Saving ---------------------------------
-  const handleCheckSaved = useCallback((name) => {
-    return savedValues !== null && name in savedValues;
-  }, [savedValues]);
-
-  const handleCancelSaved = useCallback((name) => {
-    const tempSaved = {
-      ...savedValues,
-    };
-    delete tempSaved[name];
-    setSavedValues(tempSaved);
-  }, [savedValues]);
-
   const handleSaveAll = useCallback(() => {
-    if(savedValues !== null
+    if(editedValues !== null
       && selectedLead !== defaultLead)
     {
       const temp_all_saved = {
-        ...savedValues,
+        ...editedValues,
         action_type: "UPDATE",
         modify_user: cookies.myLationCrmUserId,
         lead_code: selectedLead.lead_code,
@@ -178,55 +128,22 @@ const [selectedRow, setSelectedRow] = useState(null);
       console.log("[ LeadDetailModel ] No saved data");
     };
     setEditedValues(null);
-    setSavedValues(null);
-  }, [savedValues, selectedLead]);
+  }, [editedValues, selectedLead]);
 
   const handleCancelAll = useCallback(() => {
     setEditedValues(null);
-    setSavedValues(null);
   }, []);
 
   // --- Funtions for Select ---------------------------------
-  const handleEndEditKeyMan = useCallback((value) => {
-    console.log('handleEndEditKeyMan called! : ', value);
-    const selected = value.value;
-
-    if(editedValues.is_keyman === selected){
-      const tempEdited = {
-        ...editedValues,
-      };
-      delete tempEdited.is_keyman;
-      setEditedValues(tempEdited);
-      return;
-    };
-
-    console.log('handleEndEditKeyMan edited : ', editedValues.is_keyman);
-    const tempSaved = {
-      ...savedValues,
-      is_keyman : selected,
-    }
-    setSavedValues(tempSaved); 
-
+  const handleSelectChange = useCallback((name, selected) => {
     const tempEdited = {
       ...editedValues,
+      [name]: selected.value,
     };
-    delete tempEdited.is_keyman;
     setEditedValues(tempEdited);
-  }, [editedValues, savedValues, selectedLead.is_keyman]);
+  }, [editedValues]);
 
   // -- Company Modify 
-  const handleCheckEditStateCompany = useCallback((name) => {
-    return editedValuesCompany !== null && name in editedValuesCompany;
-  }, [editedValuesCompany]);  
-
-  const handleStartEditCompany = useCallback((name) => {
-    const tempEdited = {
-      ...editedValuesCompany,
-      [name]: selectedCompany[name],
-    };
-    setEditedValuesCompany(tempEdited);
-  }, [editedValuesCompany, selectedCompany]);
-
   const handleEditingCompany = useCallback((e) => {
     const tempEdited = {
       ...editedValuesCompany,
@@ -235,48 +152,13 @@ const [selectedRow, setSelectedRow] = useState(null);
     setEditedValuesCompany(tempEdited);
   }, [editedValuesCompany]);
 
-  const handleEndEditCompany = useCallback((name) => {
-    if(editedValuesCompany[name] === selectedCompany[name]){
-      const tempEdited = {
-        ...editedValuesCompany,
-      };
-      delete tempEdited[name];
-      setEditedValuesCompany(tempEdited);
-      return;
-    };
-
-    const tempSaved = {
-      ...savedValuesCompany,
-      [name] : editedValuesCompany[name],
-    }
-    setSavedValuesCompany(tempSaved);  
-
-    const tempEdited = {
-      ...editedValuesCompany,
-    };
-    delete tempEdited[name];
-    setEditedValuesCompany(tempEdited);
-  }, [editedValuesCompany, savedValuesCompany, selectedCompany]);
-
-  const handleCheckSavedCompany = useCallback((name) => {
-      return savedValuesCompany !== null && name in savedValuesCompany;
-  }, [savedValuesCompany]);    
-
-  const handleCancelSavedCompany = useCallback((name) => {
-    const tempSaved = {
-      ...savedValuesCompany,
-    };
-    delete tempSaved[name];
-    setSavedValuesCompany(tempSaved);
-  }, [savedValuesCompany]);  
-
   const handleSaveAllCompany = useCallback(() => {
-    if(savedValuesCompany !== null
+    if(editedValuesCompany !== null
       && selectedCompany
       && selectedCompany !== defaultCompany)
     {
       const temp_all_saved = {
-        ...savedValuesCompany,
+        ...editedValuesCompany,
         action_type: "UPDATE",
         modify_user: cookies.myLationCrmUserId,
         company_code: selectedCompany.company_code,
@@ -290,12 +172,10 @@ const [selectedRow, setSelectedRow] = useState(null);
       console.log("[ LeadDetailModel ] No saved data");
     };
     setEditedValuesCompany(null);
-    setSavedValuesCompany(null);
-  }, [savedValuesCompany, selectedCompany]);  
+  }, [editedValuesCompany, selectedCompany]);  
 
   const handleCancelAllCompany = useCallback(() => {
     setEditedValuesCompany(null);
-    setSavedValuesCompany(null);
   }, []);  
 
   //change status chage 
@@ -314,62 +194,17 @@ const [selectedRow, setSelectedRow] = useState(null);
     }
   };
 
-  // --- Funtions for Establishment Date ---------------------------------
+  // --- Funtions for Specific Changes in Detail ---------------------------------
   const [ orgEstablishDate, setOrgEstablishDate ] = useState(null);
-  const [ establishDate, setEstablishDate ] = useState(new Date());
   const [ orgCloseDate, setOrgCloseDate ] = useState(null);
-  const [ closeDate, setCloseDate ] = useState(new Date());
 
-  const handleStartEstablishDateEdit = useCallback(() => {
+  const handleCompanyDateChange = useCallback((name, date) => {
     const tempEdited = {
-      ...editedValues,
-      establishment_date: orgEstablishDate,
+      ...editedValuesCompany,
+      [name]: date,
     };
-    setEditedValues(tempEdited);
-  }, [editedValues, orgEstablishDate]);
-  const handleEstablishDateChange = useCallback((date) => {
-    setEstablishDate(date);
-  }, []);
-  const handleEndEstablishDateEdit = useCallback(() => {
-    if(establishDate !== orgEstablishDate) {
-      const tempSaved = {
-        ...savedValues,
-        establishment_date : establishDate,
-      };
-      setSavedValues(tempSaved);
-    }
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited.establishment_date;
-    setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgEstablishDate, establishDate]);
-
-  // --- Funtions for Closure Date ---------------------------------
-  const handleStartCloseDateEdit = useCallback(() => {
-    const tempEdited = {
-      ...editedValues,
-      closure_date: orgCloseDate,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues, orgCloseDate]);
-  const handleCloseDateChange = useCallback((date) => {
-    setCloseDate(date);
-  }, []);
-  const handleEndCloseDateEdit = useCallback(() => {
-    if(closeDate !== orgCloseDate) {
-      const tempSaved = {
-        ...savedValues,
-        closure_date : closeDate,
-      };
-      setSavedValues(tempSaved);
-    }
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited.closure_date;
-    setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgCloseDate, closeDate]);
+    setEditedValuesCompany(tempEdited);
+  }, [editedValuesCompany]);
 
   // 각 행 클릭 시 호출되는 함수
   const handleRowClick = (row) => {
@@ -392,7 +227,6 @@ const [selectedRow, setSelectedRow] = useState(null);
 
   const handleClose = useCallback(() => {
     setEditedValues(null);
-    setSavedValues(null);
     setCurrentLead();
   }, []);
 
@@ -430,7 +264,7 @@ const [selectedRow, setSelectedRow] = useState(null);
         setIsFullScreen(true);
       };
     };
-  }, [selectedLead, savedValues, selectedCompany.establishment_date, selectedCompany.closure_date]);
+  }, [selectedLead, editedValues, selectedCompany.establishment_date, selectedCompany.closure_date]);
 
   return (
     <>
@@ -453,39 +287,21 @@ const [selectedRow, setSelectedRow] = useState(null);
                 
                 <DetailTitleItem
                   defaultText={ selectedLead.lead_name }
-                  saved={savedValues}
                   name='status'
                   title={t('lead.lead_name')}
-                  checkEdit={handleCheckEditState}
-                  startEdit={handleStartEdit}
-                  endEdit={handleEndEdit}
                   editing={handleEditing}
-                  checkSaved={handleCheckSaved}
-                  cancelSaved={handleCancelSaved}
                 />
                 <DetailTitleItem
                   defaultText={ selectedLead.company_name }
-                  saved={savedValues}
                   name='status'
                   title={t('company.company_name')}
-                  checkEdit={handleCheckEditState}
-                  startEdit={handleStartEdit}
-                  endEdit={handleEndEdit}
                   editing={handleEditing}
-                  checkSaved={handleCheckSaved}
-                  cancelSaved={handleCancelSaved}
                 />
                 <DetailTitleItem
                   defaultText={ selectedLead.status ? selectedLead.status : "Not Contacted" }
-                  saved={savedValues}
                   name='status'
                   title={t('common.status')}
-                  checkEdit={handleCheckEditState}
-                  startEdit={handleStartEdit}
-                  endEdit={handleEndEdit}
                   editing={handleEditing}
-                  checkSaved={handleCheckSaved}
-                  cancelSaved={handleCancelSaved}
                 />
               </div>
               <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
@@ -646,16 +462,10 @@ const [selectedRow, setSelectedRow] = useState(null);
                                     key={index}
                                     defaultText={selectedLead[item.at(0)]}
                                     edited={editedValues}
-                                    saved={savedValues}
                                     name={item.at(0)}
                                     title={t(item.at(1))}
                                     detail={item.at(2)}
-                                    checkEdit={handleCheckEditState}
-                                    startEdit={handleStartEdit}
                                     editing={handleEditing}
-                                    endEdit={handleEndEdit}
-                                    checkSaved={handleCheckSaved}
-                                    cancelSaved={handleCancelSaved}
                                   />
                                 )}
                               </Space>
@@ -673,28 +483,16 @@ const [selectedRow, setSelectedRow] = useState(null);
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedCompany.company_name}
-                                        saved={savedValuesCompany}
                                         name="company_name"
                                         title={t('company.company_name')}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
                                         defaultText={selectedCompany.company_name_eng}
-                                        saved={savedValuesCompany}
                                         name="company_name_eng"
                                         title={t('company.eng_company_name')}
                                         no_border={true}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                     </tbody>
                                   </table>
@@ -708,127 +506,63 @@ const [selectedRow, setSelectedRow] = useState(null);
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedCompany.group_}
-                                        saved={savedValuesCompany}
                                         name="group_"
                                         title={t('company.group')}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
                                         defaultText={selectedCompany.company_scale}
-                                        saved={savedValuesCompany}
                                         name="company_scale"
                                         title={t('company.company_scale')}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
                                         defaultText={selectedCompany.deal_type}
-                                        saved={savedValuesCompany}
                                         name="deal_type"
                                         title={t('company.deal_type')}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
                                         defaultText={selectedCompany.business_registration_code}
-                                        saved={savedValuesCompany}
                                         name="business_registration_code"
                                         title={t('company.business_registration_code')}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailDateItem
-                                        saved={savedValuesCompany}
-                                        name="establishment_date"
                                         title={t('company.establishment_date')}
-                                        orgTimeData={orgEstablishDate}
-                                        timeData={establishDate}
-                                        timeDataChange={handleEstablishDateChange}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEstablishDateEdit}
-                                        endEdit={handleEndEstablishDateEdit}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
+                                        timeData={orgEstablishDate}
+                                        timeDataChange={(date) => handleCompanyDateChange('establishment_date', date)}
                                       />
                                       <DetailDateItem
-                                        saved={savedValuesCompany}
                                         name="closure_date"
                                         title={t('company.closure_date')}
-                                        orgTimeData={orgCloseDate}
-                                        timeData={closeDate}
-                                        timeDataChange={handleCloseDateChange}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartCloseDateEdit}
-                                        editing={handleEditingCompany}
-                                        endEdit={handleEndCloseDateEdit}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
+                                        timeData={orgCloseDate}
+                                        timeDataChange={(date) => handleCompanyDateChange('closure_date', date)}
                                       />
                                       <DetailLabelItem
                                         defaultText={selectedCompany.ceo_name}
-                                        saved={savedValuesCompany}
                                         name="ceo_name"
                                         title={t('company.ceo_name')}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
                                         defaultText={selectedCompany.business_type}
-                                        saved={savedValuesCompany}
                                         name="business_type"
                                         title={t('company.business_type')}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
                                         defaultText={selectedCompany.business_item}
-                                        saved={savedValuesCompany}
                                         name="business_item"
                                         title={t('company.business_item')}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
                                         defaultText={selectedCompany.industry_type}
-                                        saved={savedValuesCompany}
                                         name="industry_type"
                                         title={t('company.industry_type')}
                                         no_border={true}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                     </tbody>
                                   </table>
@@ -842,40 +576,22 @@ const [selectedRow, setSelectedRow] = useState(null);
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedCompany.company_phone_number}
-                                        saved={savedValuesCompany}
                                         name="company_phone_number"
                                         title={t('company.phone_number')} 
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
                                         defaultText={selectedCompany.company_fax_number}
-                                        saved={savedValuesCompany}
                                         name="company_fax_number"
                                         title={t('company.fax_number')}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
                                         defaultText={selectedCompany.homepage}
-                                        saved={savedValuesCompany}
                                         name="homepage"
                                         title= {t('company.homepage')}
                                         no_border={true}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                     </tbody>
                                   </table>
@@ -889,28 +605,16 @@ const [selectedRow, setSelectedRow] = useState(null);
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedCompany.company_address}
-                                        saved={savedValuesCompany}
                                         name="company_address"
                                         title= {t('company.address')}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
                                         defaultText={selectedCompany.company_zip_code}
-                                        saved={savedValuesCompany}
                                         name="company_zip_code"
                                         title= {t('company.zip_code')}
                                         no_border={true}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                     </tbody>
                                   </table>
@@ -924,76 +628,40 @@ const [selectedRow, setSelectedRow] = useState(null);
                                     <tbody>
                                       <DetailLabelItem
                                         defaultText={selectedCompany.account_code}
-                                        saved={savedValuesCompany}
                                         name="account_code"
                                         title= {t('company.account_code')}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
                                         defaultText={selectedCompany.bank_name}
-                                        saved={savedValuesCompany}
                                         name="bank_name"
                                         title= {t('company.bank_name')} 
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
                                         defaultText={selectedCompany.account_owner}
-                                        saved={savedValuesCompany}
                                         name="account_owner"
                                         title= {t('company.account_owner')}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
                                         defaultText={selectedCompany.sales_resource}
-                                        saved={savedValuesCompany}
                                         name="sales_resource"
                                         title= {t('company.salesman')}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
                                         defaultText={selectedCompany.application_engineer}
-                                        saved={savedValuesCompany}
                                         name="application_engineer"
                                         title= {t('company.engineer')}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                       <DetailLabelItem
                                         defaultText={selectedCompany.region}
-                                        saved={savedValuesCompany}
                                         name="region"
                                         title= {t('common.region')}
                                         no_border={true}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                     </tbody>
                                   </table>
@@ -1007,17 +675,11 @@ const [selectedRow, setSelectedRow] = useState(null);
                                     <tbody>
                                       <DetailTextareaItem
                                         defaultText={selectedCompany.memo}
-                                        saved={savedValuesCompany}
                                         name="memo"
                                         title= {t('company.memo')}
                                         row_no={3}
                                         no_border={true}
-                                        checkEdit={handleCheckEditStateCompany}
-                                        startEdit={handleStartEditCompany}
                                         editing={handleEditingCompany}
-                                        endEdit={handleEndEditCompany}
-                                        checkSaved={handleCheckSavedCompany}
-                                        cancelSaved={handleCancelSavedCompany}
                                       />
                                     </tbody>
                                   </table>
@@ -1309,7 +971,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                   </div>
                 </div>
               </div>
-              { savedValues !== null && Object.keys(savedValues).length !== 0 &&
+              { editedValues !== null && Object.keys(editedValues).length !== 0 &&
                   <div className="text-center py-3">
                     <button
                       type="button"
@@ -1328,7 +990,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                     </button>
                   </div>
                 }
-                { savedValuesCompany !== null && Object.keys(savedValuesCompany).length !== 0 &&
+                { editedValuesCompany !== null && Object.keys(editedValuesCompany).length !== 0 &&
                   <div className="text-center py-3">
                     <button
                       type="button"

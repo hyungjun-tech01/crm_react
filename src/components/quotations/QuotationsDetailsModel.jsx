@@ -22,8 +22,9 @@ const QuotationsDetailsModel = () => {
   const [ cookies ] = useCookies(["myLationCrmUserId"]);
   const [ t ] = useTranslation();
 
+  const [ isFullScreen, setIsFullScreen ] = useState(false);
+
   const [ editedValues, setEditedValues ] = useState(null);
-  const [ savedValues, setSavedValues ] = useState(null);
 
   const [ orgQuotationDate, setOrgQuotationDate ] = useState(null);
   const [ orgConfirmDate, setOrgConfirmDate ] = useState(null);
@@ -37,83 +38,8 @@ const QuotationsDetailsModel = () => {
 
   const [ checkContentState, setCheckContentState ] = useState(null);
   const [ isNewlyAdded, setIsNewlyAdded ] = useState(false);
-  const [ isFullScreen, setIsFullScreen ] = useState(false);
-
-  // --- Funtions for Quotation Date ----------------------------------------------------
-  const handleStartQuotationDateEdit = useCallback(() => {
-    const tempEdited = {
-      ...editedValues,
-      quotation_date: orgQuotationDate,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues, orgQuotationDate]);
-  const handleQuotationDateChange = useCallback((date) => {
-    const tempEdited = {
-      ...editedValues,
-      quotation_date: date,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues]);
-  const handleEndQuotationDateEdit = useCallback(() => {
-    const quotationDate = editedValues.quotation_date;
-    if (quotationDate !== orgQuotationDate) {
-      const tempSaved = {
-        ...savedValues,
-        quotation_date: quotationDate,
-      };
-      setSavedValues(tempSaved);
-    }
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited.quotation_date;
-    setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgQuotationDate]);
-
-  // --- Funtions for Confirm Date ------------------------------------------------------
-  const handleStartConfirmDateEdit = useCallback(() => {
-    const tempEdited = {
-      ...editedValues,
-      comfirm_date: orgConfirmDate,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues, orgConfirmDate]);
-  const handleConfirmDateChange = useCallback((date) => {
-    const tempEdited = {
-      ...editedValues,
-      comfirm_date: date,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues])
-  const handleEndConfirmDateEdit = useCallback(() => {
-    const confirmDate = editedValues.comfirm_date;
-    if (confirmDate !== orgConfirmDate) {
-      const tempSaved = {
-        ...savedValues,
-        comfirm_date: confirmDate,
-      };
-      setSavedValues(tempSaved);
-    }
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited.comfirm_date;
-    setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgConfirmDate]);
 
   // --- Funtions for Editing ----------------------------------------------------------
-  const handleCheckEditState = useCallback((name) => {
-    return editedValues !== null && name in editedValues;
-  }, [editedValues]);
-
-  const handleStartEdit = useCallback((name) => {
-    const tempEdited = {
-      ...editedValues,
-      [name]: selectedQuotation[name],
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues, selectedQuotation]);
-
   const handleEditing = useCallback((e) => {
     const tempEdited = {
       ...editedValues,
@@ -122,61 +48,24 @@ const QuotationsDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues]);
 
-  const handleEndEdit = useCallback((name) => {
-    if (editedValues[name] === selectedQuotation[name]) {
-      const tempEdited = {
-        ...editedValues,
-      };
-      delete tempEdited[name];
-      setEditedValues(tempEdited);
-      return;
-    }
-
-    const tempSaved = {
-      ...savedValues,
-      [name]: editedValues[name],
-    };
-    setSavedValues(tempSaved);
-
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited[name];
-    setEditedValues(tempEdited);
-  }, [editedValues, savedValues, selectedQuotation]);
-
-  // --- Funtions for Saving -----------------------------------------------------------
-  const handleCheckSaved = useCallback((name) => {
-    return savedValues !== null && name in savedValues;
-  }, [savedValues]);
-
-  const handleCancelSaved = useCallback((name) => {
-    const tempSaved = {
-      ...savedValues,
-    };
-    delete tempSaved[name];
-    setSavedValues(tempSaved);
-  }, [savedValues]);
-
   const handleSaveAll = useCallback(() => {
-    if (
-      savedValues !== null &&
+    if (editedValues !== null &&
       selectedQuotation &&
       selectedQuotation !== defaultQuotation
     ) {
       const temp_all_saved = {
-        ...savedValues,
+        ...editedValues,
         action_type: "UPDATE",
         modify_user: cookies.myLationCrmUserId,
         quotation_code: selectedQuotation.quotation_code,
       };
       if (modifyQuotation(temp_all_saved)) {
         console.log(`Succeeded to modify Quotation`);
-        if(savedValues.quotation_date){
-          setOrgQuotationDate(savedValues.quotation_date);
+        if(editedValues.quotation_date){
+          setOrgQuotationDate(editedValues.quotation_date);
         };
-        if(savedValues.confirm_date){
-          setOrgConfirmDate(savedValues.confirm_date);
+        if(editedValues.confirm_date){
+          setOrgConfirmDate(editedValues.confirm_date);
         };
       } else {
         console.error("Failed to modify Quotation");
@@ -185,18 +74,20 @@ const QuotationsDetailsModel = () => {
       console.log("[ QuotationDetailModel ] No saved data");
     }
     setEditedValues(null);
-    setSavedValues(null);
-  }, [
-    cookies.myLationCrmUserId,
-    modifyQuotation,
-    savedValues,
-    selectedQuotation,
-  ]);
+  }, [cookies.myLationCrmUserId, modifyQuotation, editedValues, selectedQuotation]);
 
   const handleCancelAll = useCallback(() => {
     setEditedValues(null);
-    setSavedValues(null);
   }, []);
+
+  // --- Funtions for Specific Changes in Detail ---------------------------------
+  const handleDateChange = useCallback((name, date) => {
+    const tempEdited = {
+      ...editedValues,
+      [name]: date,
+    };
+    setEditedValues(tempEdited);
+  }, [editedValues]);
 
   // --- Funtions for Content Editing --------------------------------------------------
   const handleCheckContentEditState = useCallback((key) => {
@@ -406,6 +297,7 @@ const QuotationsDetailsModel = () => {
     setQuotationContents(tempContents);
   }, []);
 
+  // --- Funtions for Control Windows ---------------------------------
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
     if(checked)
@@ -416,7 +308,6 @@ const QuotationsDetailsModel = () => {
 
   const handleClose = useCallback(() => {
     setEditedValues(null);
-    setSavedValues(null);
     setCurrentQuotation();
   }, []);
 
@@ -425,11 +316,11 @@ const QuotationsDetailsModel = () => {
     ['quotation_manager','quotation.quotation_manager',{ type:'label'}],
     ['quotation_send_type','quotation.send_type',{ type:'label' }],
     ['quotation_date','quotation.quotation_date',
-      { type:'date', orgTimeData: orgQuotationDate, timeDataChange: handleQuotationDateChange, startEditTime: handleStartQuotationDateEdit, endEditTime: handleEndQuotationDateEdit }
+      { type:'date', orgTimeData: orgQuotationDate, timeDataChange: handleDateChange}
     ],
     ['quotation_expiration_date','quotation.expiry_date',{ type:'label' }],
     ['comfirm_date','quotation.confirm_date',
-      { type:'date', orgTimeData: orgConfirmDate, timeDataChange: handleConfirmDateChange, startEditTime: handleStartConfirmDateEdit, endEditTime: handleEndConfirmDateEdit }
+      { type:'date', orgTimeData: orgConfirmDate, timeDataChange: handleDateChange}
     ],
     ['delivery_location','quotation.delivery_location',{ type:'label' }],
     ['delivery_period','quotation.delivery_period',{ type:'label' }],
@@ -506,7 +397,7 @@ const QuotationsDetailsModel = () => {
         setIsFullScreen(true);
       };
     };
-  }, [ selectedQuotation, savedValues ]);
+  }, [ selectedQuotation, editedValues ]);
 
   return (
     <>
@@ -523,39 +414,21 @@ const QuotationsDetailsModel = () => {
               <div className="row w-100">
                 <DetailTitleItem
                   defaultText={selectedQuotation.quotation_title}
-                  saved={savedValues}
                   name='title'
                   title={t('common.title')}
-                  checkEdit={handleCheckEditState}
-                  startEdit={handleStartEdit}
-                  endEdit={handleEndEdit}
                   editing={handleEditing}
-                  checkSaved={handleCheckSaved}
-                  cancelSaved={handleCancelSaved}
                 />
                 <DetailTitleItem
                   defaultText={selectedQuotation.quotation_number}
-                  saved={savedValues}
                   name='quotation_number'
                   title={t('quotation.doc_no')}
-                  checkEdit={handleCheckEditState}
-                  startEdit={handleStartEdit}
-                  endEdit={handleEndEdit}
                   editing={handleEditing}
-                  checkSaved={handleCheckSaved}
-                  cancelSaved={handleCancelSaved}
                 />
                 <DetailTitleItem
                   defaultText={selectedQuotation.status}
-                  saved={savedValues}
                   name='status'
                   title={t('common.status')}
-                  checkEdit={handleCheckEditState}
-                  startEdit={handleStartEdit}
-                  endEdit={handleEndEdit}
                   editing={handleEditing}
-                  checkSaved={handleCheckSaved}
-                  cancelSaved={handleCancelSaved}
                 />
               </div>
               <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
@@ -621,23 +494,17 @@ const QuotationsDetailsModel = () => {
                                     key={index}
                                     defaultText={selectedQuotation[item.at(0)]}
                                     edited={editedValues}
-                                    saved={savedValues}
                                     name={item.at(0)}
                                     title={t(item.at(1))}
                                     detail={item.at(2)}
-                                    checkEdit={handleCheckEditState}
-                                    startEdit={handleStartEdit}
                                     editing={handleEditing}
-                                    endEdit={handleEndEdit}
-                                    checkSaved={handleCheckSaved}
-                                    cancelSaved={handleCancelSaved}
                                   />
                                 )}
                               </Space>
                             </div>
                           </div>
-                          { savedValues !== null &&
-                            Object.keys(savedValues).length !== 0 && (
+                          { editedValues !== null &&
+                            Object.keys(editedValues).length !== 0 && (
                               <div className="text-center py-3">
                                 <button
                                   type="button"

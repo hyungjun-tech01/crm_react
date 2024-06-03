@@ -187,6 +187,11 @@ const koResource = {
             serial:'기번',
             type:'구매유형',
         },
+        contract:{
+            contract_date:'계약일',
+            end_date:'종료일',
+            contract_type:'계약종류',
+        },
         common:{
             actions: '',
             activity: '활동',
@@ -211,9 +216,11 @@ const koResource = {
             memo:'메모',
             name: '이름',
             next: '다음',
+            note: '비고',
             phone_no: '전화번호',
             previous: '이전',
             price: '가격',
+            price_1: '금액',
             product: '품목',
             quantity: '수량',
             region:'지역',

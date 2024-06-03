@@ -10,12 +10,20 @@ import PurchaseDetailsModel from "./PurchaseDetailsModel";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { PurchaseRepo } from "../../repository/purchase";
-import { atomAllCompanies, atomAllPurchases, defaultPurchase, atomFilteredPurchase } from "../../atoms/atoms";
+import { atomAllCompanies,
+  atomAllPurchases,
+  defaultPurchase,
+  atomFilteredPurchase,
+  atomCompanyState,
+  atomPurchaseState,
+} from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
 import { compareText } from "../../constants/functions";
 import { useTranslation } from "react-i18next";
 
 const Purchase = () => {
+  const companyState = useRecoilValue(atomCompanyState);
+  const purchaseState = useRecoilValue(atomPurchaseState);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const allPurchaseData = useRecoilValue(atomAllPurchases);
   const filteredPurchase = useRecoilValue(atomFilteredPurchase);
@@ -300,34 +308,34 @@ const Purchase = () => {
   ];
 
   useEffect(() => {
-    if(allCompanyData.length === 0) {
+    console.log('Purchase called!');
+    if((companyState & 1) === 0) {
       loadAllCompanies();
-    } else {
-      if(!companiesForSelection || (companiesForSelection.length !== allCompanyData.length)){
-        const company_subset = allCompanyData.map((data) => {
-          return {
-            label: data.company_name,
-            value: data.company_code,
-          }
-        });
-        company_subset.sort((a, b) => {
-          if (a.label > b.label) {
-            return 1;
-          }
-          if (a.label < b.label) {
-            return -1;
-          }
-          // a must be equal to b
-          return 0;
-        });
-        setCompaniesForSelection(company_subset);
-      };
     };
-    if (allPurchaseData.length === 0) {
+    if(companiesForSelection.length !== allCompanyData.length){
+      const company_subset = allCompanyData.map((data) => {
+        return {
+          label: data.company_name,
+          value: data.company_code,
+        }
+      });
+      company_subset.sort((a, b) => {
+        if (a.label > b.label) {
+          return 1;
+        }
+        if (a.label < b.label) {
+          return -1;
+        }
+        // a must be equal to b
+        return 0;
+      });
+      setCompaniesForSelection(company_subset);
+    };
+    if((purchaseState & 1) === 0) {
       loadAllPurchases();
     };
     if(initAddNewPurchase) initializePurchaseTemplate();
-  }, [allCompanyData, allPurchaseData, initAddNewPurchase, initializePurchaseTemplate, loadAllPurchases]);
+  }, [allCompanyData, allPurchaseData, initAddNewPurchase, companyState, purchaseState]);
 
   return (
     <HelmetProvider>

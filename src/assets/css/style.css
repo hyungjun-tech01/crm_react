@@ -13477,6 +13477,9 @@ a.comment-btn:hover {
     font-size: 15px !important;
     height: 32px !important;
 }
+.ant-input{
+	height: 38px;
+}
 
 .title-icon-page{
 	margin-top: 9px;

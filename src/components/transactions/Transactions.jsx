@@ -14,12 +14,19 @@ import "react-datepicker/dist/react-datepicker.css";
 import { MoreVert } from '@mui/icons-material';
 import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
-import { atomAllCompanies, atomAllTransactions, atomFilteredTransaction} from "../../atoms/atoms";
+import { atomAllCompanies,
+  atomAllTransactions,
+  atomFilteredTransaction,
+  atomCompanyState,
+  atomTransationState,
+} from "../../atoms/atoms";
 import { compareCompanyName , compareText } from "../../constants/functions";
 import TransactionAddNewModal from "./TransactionAddNewModal";
 import { useTranslation } from "react-i18next";
 
 const Transactions = () => {
+  const companyState = useRecoilValue(atomCompanyState);
+  const transactionState = useRecoilValue(atomTransationState);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const allTransactionData = useRecoilValue(atomAllTransactions);
   const filteredTransaction= useRecoilValue(atomFilteredTransaction);
@@ -143,13 +150,14 @@ const Transactions = () => {
   }, [initAddNewTransaction]);
 
   useEffect(() => {
-    if (allCompanyData.length === 0) {
+    console.log('Transaction called!');
+    if((companyState & 1) === 0) {
       loadAllCompanies();
     };
-    if (allTransactionData.length === 0) {
+    if((transactionState & 1) === 0) {
       loadAllTransactions();
     };
-  }, [allCompanyData, allTransactionData]);
+  }, [allCompanyData, allTransactionData, companyState, transactionState]);
 
   return (
     <HelmetProvider>

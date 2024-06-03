@@ -1,7 +1,11 @@
 import React from 'react';
 import { selector } from "recoil";
-
-import { atomCurrentCompany, atomAllCompanies,atomFilteredCompany, defaultCompany } from '../atoms/atoms';
+import { atomCurrentCompany
+    , atomAllCompanies
+    , atomFilteredCompany
+    , defaultCompany
+    , atomCompanyState
+} from '../atoms/atoms';
 import Paths from "../constants/Paths";
 
 const BASE_PATH = Paths.BASE_PATH;
@@ -27,19 +31,28 @@ export const companyColumn = [
 export const CompanyRepo = selector({
     key: "CompanyRepository",
     get: ({getCallback}) => {
-        const loadAllCompanies = getCallback(({set}) => async () => {
+        const loadAllCompanies = getCallback(({set, snapshot}) => async () => {
             try{
                 const response = await fetch(`${BASE_PATH}/companies`);
                 const data = await response.json();
                 if(data.message){
                     console.log('\t[ loadAllCompanies ] message:', data.message);
                     set(atomAllCompanies, []);
+
+                    const loadStates = snapshot.getPromise(atomCompanyState);
+                    set(atomCompanyState, (loadStates & ~1));
                     return;
                 }
                 set(atomAllCompanies, data);
+
+                // Change loading state
+                const loadStates = snapshot.getPromise(atomCompanyState);
+                set(atomCompanyState, (loadStates | 1));
             }
             catch(err){
                 console.error(`\t[ loadAllCompanies ] Error : ${err}`);
+                const loadStates = snapshot.getPromise(atomCompanyState);
+                set(atomCompanyState, (loadStates & ~1));
             };
         });
 

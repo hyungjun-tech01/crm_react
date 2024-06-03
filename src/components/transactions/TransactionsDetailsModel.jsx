@@ -9,7 +9,6 @@ import { TransactionRepo } from "../../repository/transaction";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import TransactionView from "./TransactionView";
-import { ConverTextAmount } from "../../constants/functions";
 
 const TransactionsDetailsModel = () => {
   const selectedTransaction = useRecoilValue(atomCurrentTransaction);
@@ -17,25 +16,12 @@ const TransactionsDetailsModel = () => {
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const { t } = useTranslation();
 
-  const [editedValues, setEditedValues] = useState(null);
-  const [savedValues, setSavedValues] = useState(null);
-  
-  const [ orgPublishDate, setOrgPublishDate ] = useState(null);
   const [ isFullScreen, setIsFullScreen ] = useState(false);
 
+  const [editedValues, setEditedValues] = useState(null);
+  const [ orgPublishDate, setOrgPublishDate ] = useState(null);
+
   // --- Funtions for Editing ---------------------------------
-  const handleCheckEditState = useCallback((name) => {
-    return editedValues !== null && name in editedValues;
-  }, [editedValues]);
-
-  const handleStartEdit = useCallback((name) => {
-    const tempEdited = {
-      ...editedValues,
-      [name]: selectedTransaction[name],
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues, selectedTransaction]);
-
   const handleEditing = useCallback((e) => {
     const tempEdited = {
       ...editedValues,
@@ -44,58 +30,22 @@ const TransactionsDetailsModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues]);
 
-  const handleEndEdit = useCallback((name) => {
-    if (editedValues[name] === selectedTransaction[name]) {
-      const tempEdited = {
-        ...editedValues,
-      };
-      delete tempEdited[name];
-      setEditedValues(tempEdited);
-      return;
-    }
-
-    const tempSaved = {
-      ...savedValues,
-      [name]: editedValues[name],
-    };
-    setSavedValues(tempSaved);
-
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited[name];
-    setEditedValues(tempEdited);
-  }, [editedValues, savedValues, selectedTransaction]);
-
-  // --- Funtions for Saving ---------------------------------
-  const handleCheckSaved = useCallback((name) => {
-    return savedValues !== null && name in savedValues;
-  }, [savedValues]);
-
-  const handleCancelSaved = useCallback((name) => {
-    const tempSaved = {
-      ...savedValues,
-    };
-    delete tempSaved[name];
-    setSavedValues(tempSaved);
-  }, [savedValues]);
-
   const handleSaveAll = useCallback(() => {
     if (
-      savedValues !== null &&
+      editedValues !== null &&
       selectedTransaction &&
       selectedTransaction !== defaultTransaction
     ) {
       const temp_all_saved = {
-        ...savedValues,
+        ...editedValues,
         action_type: "UPDATE",
         modify_user: cookies.myLationCrmUserId,
         transaction_code: selectedTransaction.transaction_code,
       };
       if (modifyTransaction(temp_all_saved)) {
         console.log(`Succeeded to modify transaction`);
-        if(savedValues.publish_date){
-          setOrgPublishDate(savedValues.publish_date);
+        if(editedValues.publish_date){
+          setOrgPublishDate(editedValues.publish_date);
         };
       } else {
         console.error("Failed to modify transaction");
@@ -104,50 +54,27 @@ const TransactionsDetailsModel = () => {
       console.log("[ TransactionDetailModel ] No saved data");
     }
     setEditedValues(null);
-    setSavedValues(null);
   }, [
     cookies.myLationCrmUserId,
     modifyTransaction,
-    savedValues,
+    editedValues,
     selectedTransaction,
   ]);
 
   const handleCancelAll = useCallback(() => {
     setEditedValues(null);
-    setSavedValues(null);
   }, []);
 
-  // --- Funtions for Publish Date ---------------------------------
-  const handleStartPublishDateEdit = useCallback(() => {
+  // --- Funtions for Specific Changes in Detail ---------------------------------
+  const handleDateChange = useCallback((name, date) => {
     const tempEdited = {
       ...editedValues,
-      publish_date: orgPublishDate,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues, orgPublishDate]);
-  const handlePublishDateChange = useCallback((time) => {
-    const tempEdited = {
-      ...editedValues,
-      publish_date: time,
+      [name]: date,
     };
     setEditedValues(tempEdited);
   }, [editedValues]);
-  const handleEndPublishDateEdit = useCallback(() => {
-    const publishDate = editedValues.publish_date;
-    if (publishDate !== orgPublishDate) {
-      const tempSaved = {
-        ...savedValues,
-        publish_date: publishDate,
-      };
-      setSavedValues(tempSaved);
-    }
-    const tempEdited = {
-      ...editedValues,
-    };
-    delete tempEdited.publish_date;
-    setEditedValues(tempEdited);
-  }, [editedValues, savedValues, orgPublishDate]);
 
+  // --- Funtions for Control Windows ---------------------------------
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
     if(checked)
@@ -158,7 +85,6 @@ const TransactionsDetailsModel = () => {
 
   const handleClose = useCallback(() => {
     setEditedValues(null);
-    setSavedValues(null);
     setCurrentTransaction();
   }, []);
 
@@ -169,7 +95,7 @@ const TransactionsDetailsModel = () => {
     ['payment_type','transaction.payment_type',{ type:'label' }],
     ['currency','common.currency',{ type:'label' }],
     ['publish_date','transaction.publish_date',
-      { type:'date', orgTimeData: orgPublishDate, timeDataChange: handlePublishDateChange, startEditTime: handleStartPublishDateEdit, endEditTime: handleEndPublishDateEdit }
+      { type:'date', orgTimeData: orgPublishDate, timeDataChange: handleDateChange }
     ],
     ['supply_price','transaction.supply_price',{ type:'label' }],
     ['tax_price','transaction.tax_price',{ type:'label' }],
@@ -198,7 +124,7 @@ const TransactionsDetailsModel = () => {
         setIsFullScreen(true);
       };
     };
-  }, [selectedTransaction, savedValues]);
+  }, [selectedTransaction, editedValues]);
 
   return (
     <div
@@ -214,40 +140,22 @@ const TransactionsDetailsModel = () => {
             <div className="row w-100">
               <DetailTitleItem
                 defaultText={selectedTransaction.company_name}
-                saved={savedValues}
                 name='company_name'
                 title={t('company.company_name')}
                 type='col-md-4'
-                checkEdit={handleCheckEditState}
-                startEdit={handleStartEdit}
-                endEdit={handleEndEdit}
                 editing={handleEditing}
-                checkSaved={handleCheckSaved}
-                cancelSaved={handleCancelSaved}
               />
               <DetailTitleItem
                 defaultText={selectedTransaction.ceo_name}
-                saved={savedValues}
                 name='ceo_name'
                 title={t('company.ceo_name')}
-                checkEdit={handleCheckEditState}
-                startEdit={handleStartEdit}
-                endEdit={handleEndEdit}
                 editing={handleEditing}
-                checkSaved={handleCheckSaved}
-                cancelSaved={handleCancelSaved}
               />
               <DetailTitleItem
                 defaultText={selectedTransaction.business_registration_code}
-                saved={savedValues}
                 name='business_registration_code'
                 title={t('company.business_registration_code')}
-                checkEdit={handleCheckEditState}
-                startEdit={handleStartEdit}
-                endEdit={handleEndEdit}
                 editing={handleEditing}
-                checkSaved={handleCheckSaved}
-                cancelSaved={handleCancelSaved}
               />
             </div>
             <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
@@ -301,16 +209,10 @@ const TransactionsDetailsModel = () => {
                                 key={index}
                                 defaultText={selectedTransaction[item.at(0)]}
                                 edited={editedValues}
-                                saved={savedValues}
                                 name={item.at(0)}
                                 title={t(item.at(1))}
                                 detail={item.at(2)}
-                                checkEdit={handleCheckEditState}
-                                startEdit={handleStartEdit}
                                 editing={handleEditing}
-                                endEdit={handleEndEdit}
-                                checkSaved={handleCheckSaved}
-                                cancelSaved={handleCancelSaved}
                               />
                             )}
                           </Space>
@@ -324,7 +226,7 @@ const TransactionsDetailsModel = () => {
                       <TransactionView />
                     </div>
                   </div>
-                  { savedValues !== null && Object.keys(savedValues).length !== 0 &&
+                  { editedValues !== null && Object.keys(editedValues).length !== 0 &&
                     <div className="text-center py-3">
                       <button
                         type="button"
