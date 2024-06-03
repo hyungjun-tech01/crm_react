@@ -134,6 +134,16 @@ export const ProductDataOptions = [
     },
 ];
 
+export const ProductTypeOptions = [
+    {value:null, label: 'N/A'},
+    {value:'N(Act)', label: 'N(Act)'},
+    {value:'ST(Act)', label: 'ST(Act)'},
+    {value:'D(USB)', label: 'D(USB)'},
+    {value:'N(Pareller)', label: 'N(Pareller)'},
+    {value:'N(USB)', label: 'N(USB)'},
+    {value:'D(Pareller)', label: 'D(Pareller)'},
+]
+
 export const PurchaseRepo = selector({
     key: "PurchaseRepository",
     get: ({getCallback}) => {

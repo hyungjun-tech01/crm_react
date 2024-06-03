@@ -188,9 +188,11 @@ const enResource = {
             type:'Purchase Type',
         },
         contract:{
+            add_contract: 'Add Contract',
             contract_date:'Contract Date',
-            end_date:'End Date',
+            contract_info: 'Contract Info.',
             contract_type:'Contract Type',
+            end_date:'End Date',
         },
         common:{
             actions: 'Actions',

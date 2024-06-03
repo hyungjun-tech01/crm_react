@@ -115,11 +115,11 @@ const DetailCardItem = (props) => {
     const { defaultText, edited, name, title, detail, editing, disabled
     } = props;
     
-    const currentValue = (edited && edited[name]
+    const currentValue = (edited && edited[name])
             ? edited[name]
             : (detail.type === 'date'
                 ? (detail.orgTimeData ? detail.orgTimeData : '')
-                : (defaultText ? defaultText : '')));
+                : (defaultText ? defaultText : ''));
 
     const widthValue = detail.extra === 'long' ? 770 : (detail.extra === 'modal' ? 470 : 380);
 
@@ -127,7 +127,7 @@ const DetailCardItem = (props) => {
         name: name,
         addonBefore: <div className='detail-card-before'>{title}</div>,
         value: currentValue,
-        disabled: detail.disabled ? detail.disabled : (disabled ? disabled : false),
+        disabled: disabled ? disabled : false,
     };
 
     switch(detail.type)
@@ -140,7 +140,8 @@ const DetailCardItem = (props) => {
         case 'textarea':
             return <TextareaInput {...SharedProps} row_no={ detail.row_no ? detail.row_no : 2} onChange={editing} style={detail.extra === 'memo' ? {width: `calc(100% - 380px)`, flexGrow: 1} : {width: widthValue}}/>;
         case 'select':
-            return <SelectInput {...SharedProps} options={detail.options} group={detail.group} keyVal={name} onChange={detail.selectChange} style={{width: widthValue, height: 38}}/>;
+            const groupValue = (detail.group && edited && edited[detail.group]) ? edited[detail.group] : null;
+            return <SelectInput {...SharedProps} options={detail.options} group={groupValue} keyVal={name} onChange={detail.selectChange} style={{width: widthValue, height: 38}}/>;
         default:
             return null;
     }

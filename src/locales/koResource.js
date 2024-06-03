@@ -188,9 +188,11 @@ const koResource = {
             type:'구매유형',
         },
         contract:{
+            add_contract: '계약 추가',
             contract_date:'계약일',
-            end_date:'종료일',
+            contract_info: '계약 정보',
             contract_type:'계약종류',
+            end_date:'종료일',
         },
         common:{
             actions: '',
