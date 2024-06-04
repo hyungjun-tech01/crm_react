@@ -482,11 +482,12 @@ const CompanyDetailsModel = () => {
   const [ editedSubModalValues, setEditedSubModalValues ] = useState(null);
 
   const handleSubModalValuesTimeChange = useCallback((name, date) => {
+    console.log('handleSubModalValuesTimeChange / before: ', editedSubModalValues);
     const tempEdited = {
       ...editedSubModalValues,
       [name]: date,
     };
-    console.log('handleSubModalValuesTimeChange : ', tempEdited);
+    console.log('handleSubModalValuesTimeChange / after : ', tempEdited);
     setEditedSubModalValues(tempEdited);
   }, [editedSubModalValues]);
 
@@ -607,6 +608,7 @@ const CompanyDetailsModel = () => {
     transactionByCompany,
     currentPurchase,
     isOtherItemSelected,
+    editedSubModalValues,
   ]);
 
   return (
