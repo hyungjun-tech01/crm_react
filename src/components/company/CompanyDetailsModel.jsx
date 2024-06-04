@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useMemo, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
@@ -373,7 +373,7 @@ const CompanyDetailsModel = () => {
     // Set data to edit selected purchase ----------------------
     const contractPurchase = companyMAContracts.filter(item => item.purchase_code === purchase.purchase_code);
     setMaContractByPurchase(contractPurchase);
-  }, []);
+  }, [companyMAContracts]);
 
   const add_purchase_items = [
     ['product_name','purchase.product_name',
@@ -489,31 +489,28 @@ const CompanyDetailsModel = () => {
     };
     console.log('handleSubModalValuesTimeChange / after : ', tempEdited);
     setEditedSubModalValues(tempEdited);
-  }, [editedSubModalValues]);
+  }, [editedSubModalValues, setEditedSubModalValues]);
 
-  const handleAddMAContract = (company_code, purchase_code) => {
-    setEditedSubModalValues({
-      purchase_code: purchase_code,
-      ma_company_code: company_code,
-      modify_user: cookies.myLationCrmUserId,
-    });
+  const ma_contract_new_items = useMemo(() =>[
+    { name: 'ma_contract_date', title: t('contract.contract_date'), defaultText: '',
+      detail:{type: 'date', orgTimeData: orgTimeSubModalValues, timeDateChange: handleSubModalValuesTimeChange } },
+    { name: 'ma_finish_date', title: t('contract.end_date'), defaultText: '',
+      detail:{type: 'date', orgTimeData: orgTimeSubModalValues, timeDateChange: handleSubModalValuesTimeChange } },
+    { name: 'ma_price', title: t('common.price_1'), defaultText: '', detail:{type: 'label' } },
+    { name: 'ma_memo', title: t('common.memo'), defaultText: '', detail:{type: 'textarea', row_no:4 } },
+  ], [handleSubModalValuesTimeChange, orgTimeSubModalValues]);
+
+  const handleAddMAContract = useCallback((company_code, purchase_code) => {
+    setEditedSubModalValues(null);
     setOrgTimeSubModalValues({
       ma_contract_date: null,
       ma_finish_date: null,
     });
-    const ma_contract_new_items = [
-      { name: 'ma_contract_date', title: t('contract.contract_date'), defaultText: '',
-        detail:{type: 'date', orgTimeData: orgTimeSubModalValues, timeDateChange: handleSubModalValuesTimeChange } },
-      { name: 'ma_finish_date', title: t('contract.end_date'), defaultText: '',
-        detail:{type: 'date', orgTimeData: orgTimeSubModalValues, timeDateChange: handleSubModalValuesTimeChange } },
-      { name: 'ma_price', title: t('common.price_1'), defaultText: '', detail:{type: 'label' } },
-      { name: 'ma_memo', title: t('common.memo'), defaultText: '', detail:{type: 'textarea' } },
-    ];
 
     setSubModalItems(ma_contract_new_items);
-    setSubModalSetting({title: t('contract.add_contract')})
+    setSubModalSetting({title: t('contract.add_contract'), company_code: company_code, purchase_code: purchase_code})
     setIsSubModalOpen(true);
-  };
+  }, [ma_contract_new_items]);
 
   const handleSubModalItemChange = useCallback(e => {
     const tempEdited = {
@@ -588,7 +585,6 @@ const CompanyDetailsModel = () => {
 
       let valid_count = 0;
       tempCompanyPurchases.forEach(item => {
-        console.log('MA Finish Date :', item.ma_finish_date);
         if(item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now())) valid_count++;
       });
       setValidMACount(valid_count);
@@ -608,7 +604,6 @@ const CompanyDetailsModel = () => {
     transactionByCompany,
     currentPurchase,
     isOtherItemSelected,
-    editedSubModalValues,
   ]);
 
   return (
@@ -734,7 +729,7 @@ const CompanyDetailsModel = () => {
                   </div>
                 </div>
                 <div className="tab-pane company-details-product" id="company-details-product">
-                  <div className="row">
+                  <div className="row"> ``    
                     <div className="card mb-0">
                       <div className="table-body">
                         <div className="table-responsive">
@@ -956,10 +951,10 @@ const CompanyDetailsModel = () => {
         {/* modal-content */}
         <DetailSubModal
           title={subModalSetting.title}
-          edited={editedSubModalValues}
           items={subModalItems}
+          edited={editedSubModalValues}
           open={isSubModalOpen}
-          handleDetailEdit={handleSubModalItemChange}
+          handleEditing={handleSubModalItemChange}
           handleOk={handleSubModalOk}
           handleCancel={handleSubModalCancel}
         />
