@@ -71,11 +71,11 @@ const TextareaInput = (props) => {
 };
 
 const SelectInput = (props) => {
-    const { addonBefore, style, value, onChange, options, disabled, group, keyVal } = props;
+    const { addonBefore, style, value, onChange, options, disabled, groupVal, keyVal } = props;
 
     let defaultOption = null;
-    if(group) {
-        const groupOptions = options.filter(item => item.title === group);
+    if(groupVal) {
+        const groupOptions = options.filter(item => item.title === groupVal);
         if(groupOptions && groupOptions.length > 0) {
             const foundValue = groupOptions[0].options.filter(item => item.value[keyVal] === value);
             if(foundValue && foundValue.length > 0){
@@ -118,7 +118,7 @@ const DetailCardItem = (props) => {
     const currentValue = (edited && edited[name])
             ? edited[name]
             : (detail.type === 'date'
-                ? (detail.orgTimeData ? detail.orgTimeData : '')
+                ? (detail.orgTimeData && detail.orgTimeData[name] ? detail.orgTimeData[name] : '')
                 : (defaultText ? defaultText : ''));
 
     const widthValue = detail.extra === 'long' ? 770 : (detail.extra === 'modal' ? 470 : 380);
@@ -140,12 +140,11 @@ const DetailCardItem = (props) => {
         case 'textarea':
             return <TextareaInput {...SharedProps} row_no={ detail.row_no ? detail.row_no : 2} onChange={editing} style={detail.extra === 'memo' ? {width: `calc(100% - 380px)`, flexGrow: 1} : {width: widthValue}}/>;
         case 'select':
-            const groupValue = detail.group ? (edited && edited[detail.group] ? edited[detail.group] : detail.value[name]) : null;
-            console.log('DetailCardItem / select : ', groupValue);
-            return <SelectInput {...SharedProps} options={detail.options} group={groupValue} keyVal={name} onChange={detail.selectChange} style={{width: widthValue, height: 38}}/>;
+            const groupValue = (detail.group && detail.value && detail.value[detail.group]) ? detail.value[detail.group] : null;
+            return <SelectInput {...SharedProps} options={detail.options} groupVal={groupValue} keyVal={name} onChange={detail.selectChange} style={{width: widthValue, height: 38}}/>;
         default:
             return null;
-    }
+    };
 };
 
 export default DetailCardItem;

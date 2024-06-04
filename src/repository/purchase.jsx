@@ -288,20 +288,23 @@ export const PurchaseRepo = selector({
                 return false;
             };
         });
-        const setCurrentPurchase = getCallback(({set, snapshot}) => async (purchase_code) => {
+        const setCurrentPurchase = getCallback(({set, snapshot}) => async (code) => {
             try{
-                if(purchase_code === undefined || purchase_code === null) {
+                if(code === undefined || code === null) {
                     set(atomCurrentPurchase, defaultPurchase);
                     return;
                 };
+
                 let queriedPurchases = await snapshot.getPromise(atomAllPurchases);
 
                 if(queriedPurchases.length === 0){
                     queriedPurchases = await snapshot.getPromise(atomCompanyPurchases);
                 };
-                const selected_arrary = queriedPurchases.filter(purchase => purchase.purchase_code === purchase_code);
+                const selected_arrary = queriedPurchases.filter(purchase => purchase.purchase_code === code);
                 if(selected_arrary.length > 0){
                     set(atomCurrentPurchase, selected_arrary[0]);
+                } else {
+                    set(atomCurrentPurchase, defaultPurchase);
                 }
             }
             catch(err){

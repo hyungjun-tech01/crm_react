@@ -13,6 +13,8 @@ import { atomAllPurchases,
   atomPurchaseState,
   atomTransationState,
   defaultMAContract,
+  defaultPurchase,
+  atomCurrentPurchase,
 } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
@@ -34,9 +36,10 @@ const CompanyDetailsModel = () => {
   const allTransactions = useRecoilValue(atomAllTransactions);
   const { loadAllTransactions, modifyTransaction } = useRecoilValue(TransactionRepo);
   const allPurchases = useRecoilValue(atomAllPurchases);
-  const { loadAllPurchases, modifyPurchase } = useRecoilValue(PurchaseRepo);
+  const { loadAllPurchases, modifyPurchase, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
+  const currentPurchase = useRecoilValue(atomCurrentPurchase);
   const companyMAContracts = useRecoilValue(atomCompanyMAContracts);
-  const { loadCompanyMAContracts, setCurrentMAContract, modifyMAContract } = useRecoilValue(MAContractRepo);
+  const { loadCompanyMAContracts, modifyMAContract, setCurrentMAContract } = useRecoilValue(MAContractRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
   const { t } = useTranslation();
 
@@ -151,10 +154,15 @@ const CompanyDetailsModel = () => {
 
 
   // --- Handles to edit 'Related with Company Detail' ---------------------------------
-  const [ otherItem, setOtherItem ] = useState(null);
   const [ editedOtherValues, setEditedOtherValues ] = useState(null);
   const [ orgTimeOther, setOrgTimeOther ] = useState(null);
   const [ editedOtherSelectValues, setEditedOtherSelectValues ] = useState(null);
+  const [ isOtherItemSelected, setIsOtherItemSelected ] = useState(false);
+
+  const [ purchaseByCompany, setPurchaseByCompany] = useState([]);
+  const [ validMACount, setValidMACount ] = useState(0);
+  const [selectedPurchaseRowKeys, setSelectedPurchaseRowKeys] = useState([]);
+
 
   const handleOtherItemChange = useCallback(e => {
     const tempEdited = {
@@ -178,8 +186,8 @@ const CompanyDetailsModel = () => {
   const handleOtherItemSelectChange = useCallback((name, value) => {
     if(name === 'product_name') {
       const tempOtherSelect = {
-        ...editedNewSelectValues,
-        product_name: value.value,
+        ...editedOtherSelectValues,
+        product_class: value.value.product_class,
       };
       setEditedOtherSelectValues(tempOtherSelect);
 
@@ -197,20 +205,25 @@ const CompanyDetailsModel = () => {
       };
       setEditedOtherValues(tempNew);
     };
-  }, [editedOtherValues]);
+  }, [editedOtherValues, editedOtherSelectValues]);
 
   const handleOtherItemChangeCancel = useCallback(() => {
+    setCurrentPurchase();
     setEditedOtherValues(null);
+    setOrgTimeOther(null);
+    setSelectedPurchaseRowKeys([]);
+    setIsOtherItemSelected(false);
   }, []);
 
   const handleOtherItemChangeSave = useCallback((code_name) => {
+    console.log(`handleOtherItemChangeSave is called!`);
     if(editedOtherValues){
       const tempSubValues = {
         ...editedOtherValues,
         action_type: "UPDATE",
-        company_code: otherItem.company_code,
+        company_code: currentPurchase.company_code,
         modify_user: cookies.myLationCrmUserId,
-        [code_name]: otherItem[code_name],
+        [code_name]: currentPurchase[code_name],
       };
       
       switch(code_name)
@@ -218,6 +231,24 @@ const CompanyDetailsModel = () => {
         case 'purchase_code':
           if (modifyPurchase(tempSubValues)) {
             console.log(`Succeeded to modify purchase`);
+            const modfiedPurchase = {
+              ...currentPurchase,
+              ...editedOtherValues,
+            };
+            const foundIdx = purchaseByCompany.findIndex(item => item.purchase_code === currentPurchase.purchase_code);
+            if(foundIdx !== -1) {
+              const updatedPurchases = [
+                ...purchaseByCompany.slice(0, foundIdx),
+                modfiedPurchase,
+                ...purchaseByCompany.slice(foundIdx + 1, ),
+              ];
+              setPurchaseByCompany(updatedPurchases);
+            } else {
+              console.error("handleOtherItemChangeSave / Purchase : Impossible case!!!");
+            };
+            setCurrentPurchase();
+            setSelectedPurchaseRowKeys([]);
+            setIsOtherItemSelected(false);
           } else {
             console.error('Failed to modify company')
           };
@@ -226,10 +257,11 @@ const CompanyDetailsModel = () => {
           console.log("handleOtherItemChangeSave / Impossible case!!!");
           break;
       };
-      setOrgTimeOther(null);
+      
       setEditedOtherValues(null);
+      setOrgTimeOther(null);
     }
-  }, [cookies.myLationCrmUserId, editedOtherValues, otherItem]);
+  }, [cookies.myLationCrmUserId, currentPurchase, editedOtherValues]);
 
 
   // --- Functions for Editing New item ---------------------------------
@@ -263,11 +295,10 @@ const CompanyDetailsModel = () => {
   }, [editedNewValues]);
 
   const handleNewItemSelectChange = useCallback((name, value) => {
-    console.log('handleNewItemSelectChange :', name, value);
     if(name === 'product_name') {
       const tempNewSelect = {
         ...editedNewSelectValues,
-        product_name: value.value,
+        product_class: value.value.product_class,
       };
       setEditedNewSelectValues(tempNewSelect);
 
@@ -285,7 +316,7 @@ const CompanyDetailsModel = () => {
       };
       setEditedNewValues(tempNew);
     };
-  }, [editedNewValues]);
+  }, [editedNewSelectValues, editedNewValues]);
 
   const handleCancelNewItemChange = useCallback(() => {
     setEditedNewValues(null);
@@ -323,38 +354,47 @@ const CompanyDetailsModel = () => {
 
 
   // --- Variables for only Purchase ------------------------------------------------
-  const [ purchaseByCompany, setPurchaseByCompany] = useState([]);
-  const [ validMACount, setValidMACount ] = useState(0);
   const [ maContractByPurchase, setMaContractByPurchase ] = useState([]);
   const [ showContracts, setShowContracts ] = useState(false);
 
   const add_purchase_items = [
     ['product_name','purchase.product_name',
-      { type:'select', group: 'product_class', options: ProductDataOptions, value: editedNewSelectValues, selectChange: (value) => handleNewItemSelectChange('product_name', value) }],
+      { type:'select', group: 'product_class', options: ProductDataOptions, value: editedNewSelectValues,
+        selectChange: (value) => handleNewItemSelectChange('product_name', value) }],
     ['product_type','purchase.product_type',
-      { type:'select', options: ProductTypeOptions, selectChange: (value) => handleNewItemSelectChange('product_type', value)}],
+      { type:'select', options: ProductTypeOptions,
+        selectChange: (value) => handleNewItemSelectChange('product_type', value)}],
     ['serial_number','purchase.serial',{ type:'label' }],
     ['licence_info','purchase.licence_info',{ type:'label' }],
     ['module','purchase.module',{ type:'label' }],
     ['quantity','common.quantity',{ type:'label' }],
-    ['receipt_date','purchase.receipt_date',{ type:'date', orgTimeData: null, timeDateChange: (date) => handleNewItemDateChange('receipt_date', date) }],
-    ['delivery_date','purchase.delivery_date',{ type:'date', orgTimeData: null, timeDateChange: (date) => handleNewItemDateChange('delivery_date', date) }],
-    ['hq_finish_date','purchase.hq_finish_date',{ type:'date', orgTimeData: null, timeDateChange: (date) => handleNewItemDateChange('hq_finish_date', date) }],
-    ['ma_finish_date','purchase.ma_finish_date',{ type:'date', orgTimeData: null, timeDateChange: (date) => handleNewItemDateChange('ma_finish_date', date) }],
+    ['receipt_date','purchase.receipt_date',
+      { type:'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
+    ['delivery_date','purchase.delivery_date',
+      { type:'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
+    ['hq_finish_date','purchase.hq_finish_date',
+      { type:'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
+    ['ma_finish_date','purchase.ma_finish_date',
+      { type:'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
   ];
 
   const modify_purchase_items = [
     ['product_name','purchase.product_name',
-      { type:'select', group: 'product_class', options: ProductDataOptions, value: editedOtherSelectValues, selectChange: (value) => handleOtherItemSelectChange('product_name', value) }],
-    ['product_type','purchase.product_type',{ type:'select', options: ProductTypeOptions, selectChange: (value) => handleOtherItemSelectChange('product_type', value) }],
+      { type:'select', group: 'product_class', options: ProductDataOptions, value: editedOtherSelectValues,
+        selectChange: (value) => handleOtherItemSelectChange('product_name', value) }],
+    ['product_type','purchase.product_type',
+      { type:'select', options: ProductTypeOptions,
+        selectChange: (value) => handleOtherItemSelectChange('product_type', value) }],
     ['serial_number','purchase.serial',{ type:'label' }],
     ['licence_info','purchase.licence_info',{ type:'label' }],
     ['module','purchase.module',{ type:'label' }],
     ['quantity','common.quantity',{ type:'label' }],
-    ['receipt_date','purchase.receipt_date',{ type:'date', orgTimeData: null, timeDateChange: (date) => handleOtherItemTimeChange('receipt_date', date) }],
-    ['delivery_date','purchase.delivery_date',{ type:'date', orgTimeData: null, timeDateChange: (date) => handleOtherItemTimeChange('delivery_date', date) }],
-    ['hq_finish_date','purchase.hq_finish_date',{ type:'date', disabled: true }],
-    ['ma_finish_date','purchase.ma_finish_date',{ type:'date', disabled: true }],
+    ['receipt_date','purchase.receipt_date',
+      { type:'date', orgTimeData: orgTimeOther, timeDateChange: handleOtherItemTimeChange }],
+    ['delivery_date','purchase.delivery_date',
+      { type:'date', orgTimeData: orgTimeOther, timeDateChange: handleOtherItemTimeChange }],
+    ['hq_finish_date','purchase.hq_finish_date',{ type:'date', orgTimeData: orgTimeOther, disabled: true }],
+    ['ma_finish_date','purchase.ma_finish_date',{ type:'date', orgTimeData: orgTimeOther, disabled: true }],
   ];
 
   const columns_purchase = [
@@ -391,16 +431,21 @@ const CompanyDetailsModel = () => {
   ];
 
   const purchaseRowSelection = {
+    selectedRowKeys: selectedPurchaseRowKeys,
     type:'radio',
     onChange: (selectedRowKeys, selectedRows) => {
       console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
+        "selectedRowKeys: ", selectedRowKeys,
         "selectedRows: ", selectedRows
       );
+      setSelectedPurchaseRowKeys(selectedRowKeys);
+
       if(selectedRows.length > 0) {
         // Set data to edit selected purchase ----------------------
         const selectedValue = selectedRows.at(0);
-        setOtherItem(selectedValue);
+        setCurrentPurchase(selectedValue.purchase_code);
+        setIsOtherItemSelected(true);
+
         setEditedOtherValues(null);
         setOrgTimeOther({
           receipt_date: selectedValue.receipt_date ? new Date(selectedValue.receipt_date) : null,
@@ -416,7 +461,7 @@ const CompanyDetailsModel = () => {
         const contractPurchase = companyMAContracts.filter(item => item.purchase_code === selectedValue.purchase_code);
         setMaContractByPurchase(contractPurchase);
       } else {
-        setOtherItem(null);
+        setCurrentPurchase(defaultPurchase);
         setEditedOtherValues(null);
         setOrgTimeOther(null);
       };
@@ -504,8 +549,10 @@ const CompanyDetailsModel = () => {
       };
 
       setEditedOtherValues(null);
+      setEditedOtherSelectValues({product_class: null});
       setAddNewItem(false);
       setEditedNewValues(null);
+      setEditedNewSelectValues({product_class: null});
       setShowContracts(false);
       setEditedSubModalValues(null);
       setCurrentCompanyCode(selectedCompany.company_code);
@@ -535,6 +582,8 @@ const CompanyDetailsModel = () => {
     currentCompanyCode,
     purchaseByCompany,
     transactionByCompany,
+    currentPurchase,
+    isOtherItemSelected,
   ]);
 
   return (
@@ -697,7 +746,7 @@ const CompanyDetailsModel = () => {
                       </div>
                     </div>
                   </div>
-                  { otherItem &&
+                  { isOtherItemSelected &&
                     <div className="row">
                       <div className="card mb-0">
                         <div>
@@ -712,18 +761,19 @@ const CompanyDetailsModel = () => {
                             { modify_purchase_items.map((item, index) => 
                                 <DetailCardItem
                                   key={index}
-                                  defaultText={otherItem[item.at(0)]}
+                                  defaultText={currentPurchase[item.at(0)]}
                                   edited={editedOtherValues}
                                   name={item.at(0)}
                                   title={t(item.at(1))}
                                   detail={item.at(2)}
+                                  disabled={item.at(2).disabled ? item.at(2).disabled : false}
                                   editing={handleOtherItemChange}
                                 />
                             )}
                           </Space>
                           <div style={{marginBottom: '0.5rem', display: 'flex'}}>
                             <DetailCardItem
-                              defaultText={otherItem["purchase_memo"]}
+                              defaultText={currentPurchase["purchase_memo"]}
                               edited={editedOtherValues}
                               name="purchase_memo"
                               title={t('common.memo')}
@@ -742,7 +792,6 @@ const CompanyDetailsModel = () => {
                               <Button 
                                 type="primary" 
                                 style={{width: '120px'}} 
-                                disabled={!editedOtherValues} 
                                 onClick={handleOtherItemChangeCancel}
                               >
                                 {t('common.cancel')}
@@ -773,17 +822,8 @@ const CompanyDetailsModel = () => {
                                 edited={editedNewValues}
                                 name={item.at(0)}
                                 title={t(item.at(1))}
-                                detail={item.at(2).type === 'date'
-                                  ? {type:'date', orgTimeData: null,
-                                      timeDateChange: handleNewItemDateChange }
-                                  : (item.at(2).type === 'select'
-                                  ? { type:'select',
-                                      group: item.at(2).group ? item.at(2).group : null,
-                                      options: item.at(2).options,
-                                      selectChange: (value) => handleNewItemSelectChange(item.at(0), value),
-                                    }
-                                  : item.at(2))
-                                }
+                                detail={item.at(2)}
+                                disabled={item.at(2).disabled ? item.at(2).disabled : false}
                                 editing={handleNewItemChange}
                               />
                           )}
