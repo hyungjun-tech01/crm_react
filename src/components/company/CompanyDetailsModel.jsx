@@ -180,7 +180,6 @@ const CompanyDetailsModel = () => {
       [name]: date,
     };
     setEditedOtherValues(tempEdited);
-    console.log('handleOtherItemTimeChange : ', tempEdited);
   }, [editedOtherValues]);
 
   const handleOtherItemSelectChange = useCallback((name, value) => {
@@ -355,7 +354,26 @@ const CompanyDetailsModel = () => {
 
   // --- Variables for only Purchase ------------------------------------------------
   const [ maContractByPurchase, setMaContractByPurchase ] = useState([]);
-  const [ showContracts, setShowContracts ] = useState(false);
+
+  const handleSelectPurchase = useCallback((purchase) =>{
+    setCurrentPurchase(purchase.purchase_code);
+    setIsOtherItemSelected(true);
+
+    setEditedOtherValues(null);
+    setOrgTimeOther({
+      receipt_date: purchase.receipt_date ? new Date(purchase.receipt_date) : null,
+      delivery_date: purchase.delivery_date ? new Date(purchase.delivery_date) : null,
+      ma_finish_date: purchase.ma_finish_date ? new Date(purchase.ma_finish_date) : null,
+      hq_finish_date: purchase.hq_finish_date ? new Date(purchase.hq_finish_date) : null,
+    });
+    setEditedOtherSelectValues({
+      product_class: purchase.product_class,
+    });
+
+    // Set data to edit selected purchase ----------------------
+    const contractPurchase = companyMAContracts.filter(item => item.purchase_code === purchase.purchase_code);
+    setMaContractByPurchase(contractPurchase);
+  }, []);
 
   const add_purchase_items = [
     ['product_name','purchase.product_name',
@@ -443,23 +461,7 @@ const CompanyDetailsModel = () => {
       if(selectedRows.length > 0) {
         // Set data to edit selected purchase ----------------------
         const selectedValue = selectedRows.at(0);
-        setCurrentPurchase(selectedValue.purchase_code);
-        setIsOtherItemSelected(true);
-
-        setEditedOtherValues(null);
-        setOrgTimeOther({
-          receipt_date: selectedValue.receipt_date ? new Date(selectedValue.receipt_date) : null,
-          delivery_date: selectedValue.delivery_date ? new Date(selectedValue.delivery_date) : null,
-          ma_finish_date: selectedValue.ma_finish_date ? new Date(selectedValue.ma_finish_date) : null,
-          hq_finish_date: selectedValue.hq_finish_date ? new Date(selectedValue.hq_finish_date) : null,
-        });
-        setEditedOtherSelectValues({
-          product_class: selectedValue.product_class,
-        });
-
-        // Set data to edit selected purchase ----------------------
-        const contractPurchase = companyMAContracts.filter(item => item.purchase_code === selectedValue.purchase_code);
-        setMaContractByPurchase(contractPurchase);
+        handleSelectPurchase(selectedValue);
       } else {
         setCurrentPurchase(defaultPurchase);
         setEditedOtherValues(null);
@@ -476,16 +478,38 @@ const CompanyDetailsModel = () => {
 
   // --- Functions for Editing MA Contract ---------------------------------
   const [ subModalItems, setSubModalItems ] = useState([]);
+  const [ orgTimeSubModalValues, setOrgTimeSubModalValues ] = useState(null);
   const [ editedSubModalValues, setEditedSubModalValues ] = useState(null);
 
-  const handleAddMAContract = (company_code, purchase_code) => {
-    const temp_ma_contract = {
-      ...defaultMAContract,
-      ma_company_code: company_code,
-      purchase_code: purchase_code,
-      modify_user: cookies.myLationCrmUserId,
+  const handleSubModalValuesTimeChange = useCallback((name, date) => {
+    const tempEdited = {
+      ...editedSubModalValues,
+      [name]: date,
     };
-    setSubModalItems([temp_ma_contract]);
+    console.log('handleSubModalValuesTimeChange : ', tempEdited);
+    setEditedSubModalValues(tempEdited);
+  }, [editedSubModalValues]);
+
+  const handleAddMAContract = (company_code, purchase_code) => {
+    setEditedSubModalValues({
+      purchase_code: purchase_code,
+      ma_company_code: company_code,
+      modify_user: cookies.myLationCrmUserId,
+    });
+    setOrgTimeSubModalValues({
+      ma_contract_date: null,
+      ma_finish_date: null,
+    });
+    const ma_contract_new_items = [
+      { name: 'ma_contract_date', title: t('contract.contract_date'), defaultText: '',
+        detail:{type: 'date', orgTimeData: orgTimeSubModalValues, timeDateChange: handleSubModalValuesTimeChange } },
+      { name: 'ma_finish_date', title: t('contract.end_date'), defaultText: '',
+        detail:{type: 'date', orgTimeData: orgTimeSubModalValues, timeDateChange: handleSubModalValuesTimeChange } },
+      { name: 'ma_price', title: t('common.price_1'), defaultText: '', detail:{type: 'label' } },
+      { name: 'ma_memo', title: t('common.memo'), defaultText: '', detail:{type: 'textarea' } },
+    ];
+
+    setSubModalItems(ma_contract_new_items);
     setSubModalSetting({title: t('contract.add_contract')})
     setIsSubModalOpen(true);
   };
@@ -517,7 +541,7 @@ const CompanyDetailsModel = () => {
       render: (text, record) => <>{text}</>,
     },
     {
-      title: t('purchase.serial'),
+      title: t('common.memo'),
       dataIndex: "ma_memo",
       render: (text, record) => <>{text}</>,
     },
@@ -553,7 +577,6 @@ const CompanyDetailsModel = () => {
       setAddNewItem(false);
       setEditedNewValues(null);
       setEditedNewSelectValues({product_class: null});
-      setShowContracts(false);
       setEditedSubModalValues(null);
       setCurrentCompanyCode(selectedCompany.company_code);
     };
@@ -740,67 +763,113 @@ const CompanyDetailsModel = () => {
                                 <div>{t('purchase.information')}</div>
                                 <Add onClick={()=>handleAddNewItem(selectedCompany.company_code)}/>
                               </div>
-                          }
+                            }
+                            onRow={(record, rowIndex) => {
+                              return {
+                                onClick: (event) => {
+                                  setSelectedPurchaseRowKeys([record.purchase_code]);
+                                  handleSelectPurchase(record);
+                                }, // click row
+                              };
+                            }}
                           />
                         </div>
                       </div>
                     </div>
                   </div>
                   { isOtherItemSelected &&
-                    <div className="row">
-                      <div className="card mb-0">
-                        <div>
-                          <div style={{fontSize: 15, fontWeight: 600, padding: '0.5rem 0 0 1.0rem'}}>Selected Item</div>
-                          <Space
-                            align="start"
-                            direction="horizontal"
-                            size="small"
-                            style={{ display: 'flex', marginBottom: '0.5rem', margineTop: '0.5rem' }}
-                            wrap
-                          >
-                            { modify_purchase_items.map((item, index) => 
-                                <DetailCardItem
-                                  key={index}
-                                  defaultText={currentPurchase[item.at(0)]}
-                                  edited={editedOtherValues}
-                                  name={item.at(0)}
-                                  title={t(item.at(1))}
-                                  detail={item.at(2)}
-                                  disabled={item.at(2).disabled ? item.at(2).disabled : false}
-                                  editing={handleOtherItemChange}
-                                />
-                            )}
-                          </Space>
-                          <div style={{marginBottom: '0.5rem', display: 'flex'}}>
-                            <DetailCardItem
-                              defaultText={currentPurchase["purchase_memo"]}
-                              edited={editedOtherValues}
-                              name="purchase_memo"
-                              title={t('common.memo')}
-                              detail={{type:'textarea', extra: 'memo', row_no: 3}}
-                              editing={handleOtherItemChange}
-                            />
-                            <div style={{width: 380, display: 'flex', flexDirection: 'column', alignItems:'center', justifyContent: 'space-evenly'}}>
-                              <Button
-                                type="primary" 
-                                style={{width: '120px'}} 
-                                disabled={!editedOtherValues}
-                                onClick={()=>handleOtherItemChangeSave('purchase_code')}
-                              >
-                                {t('common.save')}
-                              </Button>
-                              <Button 
-                                type="primary" 
-                                style={{width: '120px'}} 
-                                onClick={handleOtherItemChangeCancel}
-                              >
-                                {t('common.cancel')}
-                              </Button>
+                    <>
+                      <div className="row">
+                        <div className="card mb-0">
+                          <div>
+                            <div style={{fontSize: 15, fontWeight: 600, padding: '0.5rem 0 0 1.0rem'}}>Selected Item</div>
+                            <Space
+                              align="start"
+                              direction="horizontal"
+                              size="small"
+                              style={{ display: 'flex', marginBottom: '0.5rem', margineTop: '0.5rem' }}
+                              wrap
+                            >
+                              { modify_purchase_items.map((item, index) => 
+                                  <DetailCardItem
+                                    key={index}
+                                    defaultText={currentPurchase[item.at(0)]}
+                                    edited={editedOtherValues}
+                                    name={item.at(0)}
+                                    title={t(item.at(1))}
+                                    detail={item.at(2)}
+                                    disabled={item.at(2).disabled ? item.at(2).disabled : false}
+                                    editing={handleOtherItemChange}
+                                  />
+                              )}
+                            </Space>
+                            <div style={{marginBottom: '0.5rem', display: 'flex'}}>
+                              <DetailCardItem
+                                defaultText={currentPurchase["purchase_memo"]}
+                                edited={editedOtherValues}
+                                name="purchase_memo"
+                                title={t('common.memo')}
+                                detail={{type:'textarea', extra: 'memo', row_no: 3}}
+                                editing={handleOtherItemChange}
+                              />
+                              <div style={{width: 380, display: 'flex', flexDirection: 'column', alignItems:'center', justifyContent: 'space-evenly'}}>
+                                <Button
+                                  type="primary" 
+                                  style={{width: '120px'}} 
+                                  disabled={!editedOtherValues}
+                                  onClick={()=>handleOtherItemChangeSave('purchase_code')}
+                                >
+                                  {t('common.save')}
+                                </Button>
+                                <Button 
+                                  type="primary" 
+                                  style={{width: '120px'}} 
+                                  onClick={handleOtherItemChangeCancel}
+                                >
+                                  {t('common.cancel')}
+                                </Button>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                      <div className="row">
+                        <div className="card mb-0">
+                          <div className="table-body">
+                            <div className="table-responsive">
+                              <Table
+                                pagination={{
+                                  total:  maContractByPurchase.length,
+                                  showTotal: ShowTotal,
+                                  showSizeChanger: true,
+                                  ItemRender: ItemRender,
+                                }}
+                                className="table"
+                                style={{ overflowX: "auto" }}
+                                columns={columns_ma_contract}
+                                dataSource={maContractByPurchase}
+                                rowKey={(record) => record.guid}
+                                title={()=>
+                                    <div style={{display: 'flex',
+                                        justifyContent: 'space-between',
+                                        backgroundColor: '#cccccc',
+                                        fontWeight: 600,
+                                        lineHeight: 1.5,
+                                        height: '2.5rem',
+                                        padding: '0.5rem 0.8rem',
+                                        borderRadius: '5px',
+                                      }}
+                                    >
+                                      <div>{t('contract.contract_info')}</div>
+                                      <Add onClick={()=>handleAddMAContract(selectedCompany.company_code, currentPurchase.purchase_code)}/>
+                                    </div>
+                                }
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
                   }
                   { addNewItem && 
                     <div className="row">
@@ -855,44 +924,6 @@ const CompanyDetailsModel = () => {
                             </div>
                           </div>
                         </>
-                      </div>
-                    </div>
-                  }
-                  {showContracts && 
-                    <div className="row">
-                      <div className="card mb-0">
-                        <div className="table-body">
-                          <div className="table-responsive">
-                            <Table
-                              pagination={{
-                                total:  maContractByPurchase.length,
-                                showTotal: ShowTotal,
-                                showSizeChanger: true,
-                                ItemRender: ItemRender,
-                              }}
-                              className="table"
-                              style={{ overflowX: "auto" }}
-                              columns={columns_ma_contract}
-                              dataSource={maContractByPurchase}
-                              rowKey={(record) => record.guid}
-                              title={()=>
-                                  <div style={{display: 'flex',
-                                      justifyContent: 'space-between',
-                                      backgroundColor: '#cccccc',
-                                      fontWeight: 600,
-                                      lineHeight: 1.5,
-                                      height: '2.5rem',
-                                      padding: '0.5rem 0.8rem',
-                                      borderRadius: '5px',
-                                    }}
-                                  >
-                                    <div>{t('contract.contract_info')}</div>
-                                    <Add onClick={()=>handleAddMAContract(selectedCompany.company_code, otherItem.purchase_code)}/>
-                                  </div>
-                              }
-                            />
-                          </div>
-                        </div>
                       </div>
                     </div>
                   }

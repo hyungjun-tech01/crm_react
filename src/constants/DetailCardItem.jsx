@@ -135,6 +135,7 @@ const DetailCardItem = (props) => {
         case 'label':
             return <Input {...SharedProps} onChange={editing} style={{width: widthValue, height: 38}}/>;
         case 'date':
+            console.log('DetailCardItem / date :', currentValue);
             const timeformat = detail.time ? "yyyy-MM-dd hh:mm:ss" : "yyyy-MM-dd";
             return <DateInput {...SharedProps} format={ timeformat } showTime={ detail.time } onChange={(date) =>detail.timeDateChange(name, date)} style={{width: widthValue, height: 38}}/>;
         case 'textarea':
