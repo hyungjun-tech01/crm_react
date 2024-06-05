@@ -49,9 +49,6 @@ const CompanyDetailsModel = () => {
   const [ subModalSetting, setSubModalSetting ] = useState({title:''})
   const [ currentCompanyCode, setCurrentCompanyCode ] = useState('');
 
-  const handleSubModalOk = () => {setIsSubModalOpen(false);};
-  const handleSubModalCancel = () => {setIsSubModalOpen(false);};
-
   const handleWindowWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
     if(checked)
@@ -80,7 +77,6 @@ const CompanyDetailsModel = () => {
       ...editedDetailValues,
       [e.target.name]: e.target.value,
     };
-    console.log('\t[handleDetailEdit] value: ', tempEdited);
     setEditedDetailValues(tempEdited);
   }, [editedDetailValues]);
 
@@ -171,7 +167,6 @@ const CompanyDetailsModel = () => {
     };
 
     setEditedOtherValues(tempEdited);
-    console.log('handleOtherItemChange : ', tempEdited);
   }, [editedOtherValues]);
 
   const handleOtherItemTimeChange = useCallback((name, date) => {
@@ -215,7 +210,6 @@ const CompanyDetailsModel = () => {
   }, []);
 
   const handleOtherItemChangeSave = useCallback((code_name) => {
-    console.log(`handleOtherItemChangeSave is called!`);
     if(editedOtherValues){
       const tempSubValues = {
         ...editedOtherValues,
@@ -373,7 +367,7 @@ const CompanyDetailsModel = () => {
     // Set data to edit selected purchase ----------------------
     const contractPurchase = companyMAContracts.filter(item => item.purchase_code === purchase.purchase_code);
     setMaContractByPurchase(contractPurchase);
-  }, [companyMAContracts]);
+  }, [companyMAContracts, setCurrentPurchase]);
 
   const add_purchase_items = [
     ['product_name','purchase.product_name',
@@ -452,16 +446,13 @@ const CompanyDetailsModel = () => {
     selectedRowKeys: selectedPurchaseRowKeys,
     type:'radio',
     onChange: (selectedRowKeys, selectedRows) => {
-      console.log(
-        "selectedRowKeys: ", selectedRowKeys,
-        "selectedRows: ", selectedRows
-      );
       setSelectedPurchaseRowKeys(selectedRowKeys);
 
       if(selectedRows.length > 0) {
         // Set data to edit selected purchase ----------------------
         const selectedValue = selectedRows.at(0);
         handleSelectPurchase(selectedValue);
+        setSelectedContractRowKeys([]);   //initialize the selected list about contract
       } else {
         setCurrentPurchase(defaultPurchase);
         setEditedOtherValues(null);
@@ -478,49 +469,83 @@ const CompanyDetailsModel = () => {
 
   // --- Functions for Editing MA Contract ---------------------------------
   const [ subModalItems, setSubModalItems ] = useState([]);
-  const [ orgTimeSubModalValues, setOrgTimeSubModalValues ] = useState(null);
+  const [ orgSubModalValues, setOrgSubModalValues ] = useState(null);
   const [ editedSubModalValues, setEditedSubModalValues ] = useState(null);
+  const [ selectedContractRowKeys, setSelectedContractRowKeys ] = useState([]);
 
-  const handleSubModalValuesTimeChange = useCallback((name, date) => {
-    console.log('handleSubModalValuesTimeChange / before: ', editedSubModalValues);
-    const tempEdited = {
+  const handleSubModalOk = useCallback(() => {
+    const finalData = {
+      ...orgSubModalValues,
       ...editedSubModalValues,
-      [name]: date,
     };
-    console.log('handleSubModalValuesTimeChange / after : ', tempEdited);
-    setEditedSubModalValues(tempEdited);
-  }, [editedSubModalValues, setEditedSubModalValues]);
+    const resp = modifyMAContract(finalData);
+    resp.then(result => {
+      if(result){
+        const updatedContracts = maContractByPurchase.concat(result);
+        setMaContractByPurchase(updatedContracts);
+      } else {
+        console.error('Failed to add/modify ma contract');
+      }
+    });
 
-  const ma_contract_new_items = useMemo(() =>[
-    { name: 'ma_contract_date', title: t('contract.contract_date'), defaultText: '',
-      detail:{type: 'date', orgTimeData: orgTimeSubModalValues, timeDateChange: handleSubModalValuesTimeChange } },
-    { name: 'ma_finish_date', title: t('contract.end_date'), defaultText: '',
-      detail:{type: 'date', orgTimeData: orgTimeSubModalValues, timeDateChange: handleSubModalValuesTimeChange } },
-    { name: 'ma_price', title: t('common.price_1'), defaultText: '', detail:{type: 'label' } },
-    { name: 'ma_memo', title: t('common.memo'), defaultText: '', detail:{type: 'textarea', row_no:4 } },
-  ], [handleSubModalValuesTimeChange, orgTimeSubModalValues]);
+    setSelectedContractRowKeys([]);
+    setIsSubModalOpen(false);
+  }, [orgSubModalValues, editedSubModalValues, modifyMAContract, maContractByPurchase]);
+
+  const handleSubModalCancel = () => {
+    setSubModalItems([]);
+    setOrgSubModalValues(null);
+    setSelectedContractRowKeys([]);
+    setIsSubModalOpen(false);
+  };
+
+  const handleSubModalItemChange = useCallback(data => {
+    setEditedSubModalValues(data);
+  }, []);
 
   const handleAddMAContract = useCallback((company_code, purchase_code) => {
     setEditedSubModalValues(null);
-    setOrgTimeSubModalValues({
-      ma_contract_date: null,
-      ma_finish_date: null,
+    setOrgSubModalValues({
+      ...defaultMAContract,
+      action_type : 'ADD',
+      ma_company_code: company_code,
+      purchase_code: purchase_code,
+      modify_user: cookies.myLationCrmUserId,
     });
-
-    setSubModalItems(ma_contract_new_items);
-    setSubModalSetting({title: t('contract.add_contract'), company_code: company_code, purchase_code: purchase_code})
+    setSubModalItems([
+      { name: 'ma_contract_date', title: t('contract.contract_date'), detail:{type: 'date' } },
+      { name: 'ma_finish_date', title: t('contract.end_date'), detail:{type: 'date' } },
+      { name: 'ma_price', title: t('common.price_1'), detail:{type: 'label' } },
+      { name: 'ma_memo', title: t('common.memo'), detail:{type: 'textarea', row_no:4 } },
+    ]);
+    setSubModalSetting({title: t('contract.add_contract')})
     setIsSubModalOpen(true);
-  }, [ma_contract_new_items]);
+  }, [cookies.myLationCrmUserId]);
 
-  const handleSubModalItemChange = useCallback(e => {
-    const tempEdited = {
-      ...editedSubModalValues,
-      [e.target.name]: e.target.value,
+  const handleModifyMAContract = useCallback((code) => {
+    setEditedSubModalValues(null);
+    const foundMAContract = maContractByPurchase.filter(item => item.guid === code);
+    if(foundMAContract.length > 0){
+      const selectedContract = foundMAContract[0];
+      setOrgSubModalValues({
+        ...selectedContract,
+        ma_contract_date: new Date(selectedContract.ma_contract_date),
+        ma_finish_date: new Date(selectedContract.ma_finish_date),
+        action_type : 'UPDATE',
+        modify_user: cookies.myLationCrmUserId,
+      });
+      setSubModalItems([
+        { name: 'ma_contract_date', title: t('contract.contract_date'), detail:{type: 'date' } },
+        { name: 'ma_finish_date', title: t('contract.end_date'), detail:{type: 'date' } },
+        { name: 'ma_price', title: t('common.price_1'), detail:{type: 'label' } },
+        { name: 'ma_memo', title: t('common.memo'), detail:{type: 'textarea', row_no:4 } },
+      ]);
+      setSubModalSetting({title: t('contract.add_contract')})
+      setIsSubModalOpen(true);
+    } else {
+      console.error("Impossible Case~");
     };
-
-    setEditedSubModalValues(tempEdited);
-    console.log('handleSubModalItemChange : ', tempEdited);
-  }, [editedSubModalValues]);
+  }, [maContractByPurchase]);
 
   const columns_ma_contract = [
     {
@@ -545,6 +570,29 @@ const CompanyDetailsModel = () => {
     },
   ];
 
+  const contractRowSelection = {
+    selectedRowKeys: selectedContractRowKeys,
+    type:'radio',
+    onChange: (selectedRowKeys, selectedRows) => {
+      setSelectedContractRowKeys(selectedRowKeys);
+
+      if(selectedRows.length > 0) {
+        // Set data to edit selected purchase ----------------------
+        const selectedValue = selectedRows.at(0);
+        handleModifyMAContract(selectedValue.guid);
+      } else {
+        setCurrentPurchase(defaultPurchase);
+        setEditedOtherValues(null);
+        setOrgTimeOther(null);
+      };
+    },
+    getCheckboxProps: (record) => ({
+      disabled: record.name === "Disabled User", // Column configuration not to be checked
+      name: record.name,
+      className: "checkbox-red",
+    }),
+  };
+
 
   useEffect(() => {
     if((purchaseState & 1) === 0) {
@@ -558,8 +606,6 @@ const CompanyDetailsModel = () => {
       && (selectedCompany.company_code !== currentCompanyCode))
     {
       console.log('[CompanyDetailsModel] new company is loaded!');
-      setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
-
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if(detailViewStatus === null){
         localStorage.setItem("isFullScreen", '0');
@@ -570,18 +616,19 @@ const CompanyDetailsModel = () => {
         setIsFullScreen(true);
       };
 
+      loadCompanyMAContracts(selectedCompany.company_code);
+
+      setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
       setEditedOtherValues(null);
       setEditedOtherSelectValues({product_class: null});
       setAddNewItem(false);
       setEditedNewValues(null);
       setEditedNewSelectValues({product_class: null});
-      setEditedSubModalValues(null);
       setCurrentCompanyCode(selectedCompany.company_code);
     };
     const tempCompanyPurchases = allPurchases.filter(purchase => purchase.company_code === selectedCompany.company_code);
     if(purchaseByCompany.length !== tempCompanyPurchases.length) {
       setPurchaseByCompany(tempCompanyPurchases);
-      loadCompanyMAContracts(selectedCompany.company_code);
 
       let valid_count = 0;
       tempCompanyPurchases.forEach(item => {
@@ -604,6 +651,7 @@ const CompanyDetailsModel = () => {
     transactionByCompany,
     currentPurchase,
     isOtherItemSelected,
+    companyMAContracts,
   ]);
 
   return (
@@ -766,6 +814,7 @@ const CompanyDetailsModel = () => {
                                 onClick: (event) => {
                                   setSelectedPurchaseRowKeys([record.purchase_code]);
                                   handleSelectPurchase(record);
+                                  setSelectedContractRowKeys([]);   //initialize the selected list about contract
                                 }, // click row
                               };
                             }}
@@ -835,6 +884,7 @@ const CompanyDetailsModel = () => {
                           <div className="table-body">
                             <div className="table-responsive">
                               <Table
+                                rowSelection={contractRowSelection}
                                 pagination={{
                                   total:  maContractByPurchase.length,
                                   showTotal: ShowTotal,
@@ -861,6 +911,14 @@ const CompanyDetailsModel = () => {
                                       <Add onClick={()=>handleAddMAContract(selectedCompany.company_code, currentPurchase.purchase_code)}/>
                                     </div>
                                 }
+                                onRow={(record, rowIndex) => {
+                                  return {
+                                    onClick: (event) => {
+                                      setSelectedContractRowKeys([record.guid]);
+                                      handleModifyMAContract(record.guid);
+                                    }, // click row
+                                  };
+                                }}
                               />
                             </div>
                           </div>
@@ -951,10 +1009,11 @@ const CompanyDetailsModel = () => {
         {/* modal-content */}
         <DetailSubModal
           title={subModalSetting.title}
-          items={subModalItems}
-          edited={editedSubModalValues}
           open={isSubModalOpen}
-          handleEditing={handleSubModalItemChange}
+          item={subModalItems}
+          original={orgSubModalValues}
+          edited={editedSubModalValues}
+          handleEdited={handleSubModalItemChange}
           handleOk={handleSubModalOk}
           handleCancel={handleSubModalCancel}
         />
