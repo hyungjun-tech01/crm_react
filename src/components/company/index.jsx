@@ -204,7 +204,7 @@ const Company = () => {
   }, [companyChange]);
 
   useEffect(() => {   
-    console.log('Company called!', companyState);
+    console.log('Company called!');
     if((companyState & 1) === 0) {
       loadAllCompanies();
     };

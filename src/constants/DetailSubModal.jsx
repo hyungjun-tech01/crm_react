@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Modal } from 'antd';
 import DetailCardItem from './DetailCardItem';
 
 const DetailSubModal = (props) => {
-    const { title, edited, items, open, handleEditing, handleOk, handleCancel } = props;
+    const { title, items, edited, open, handleEditing, handleOk, handleCancel } = props;
+
+    useEffect(()=>{
+        console.log('DeailSubModal updated : ', edited);
+    }, [edited]);
 
     return (
         <Modal
