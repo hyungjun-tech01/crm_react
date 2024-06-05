@@ -65,7 +65,7 @@ export const MAContractRepo = selector({
                 const data = await response.json();
                 if(data.message){
                     console.log('\t[ modifyMAContract ] message:', data.message);
-                    return false;
+                    return null;
                 };
 
                 const companyMAContracts = await snapshot.getPromise(atomCompanyMAContracts);
@@ -80,7 +80,7 @@ export const MAContractRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCompanyMAContracts, companyMAContracts.concat(updatedNewMAContract));
-                    return true;
+                    return updatedNewMAContract;
                 } else if(newContract.action_type === 'UPDATE'){
                     const currentMAContract = await snapshot.getPromise(atomCurrentMAContract);
                     delete newContract.action_type;
@@ -102,10 +102,10 @@ export const MAContractRepo = selector({
                             ...atomCompanyMAContracts.slice(foundIdx + 1,),
                         ];
                         set(atomCompanyMAContracts, updatedCompanyContracts);
-                        return true;
+                        return modifiedMAContract;
                     } else {
                         console.log('\t[ modifyMAContract ] No specified MA contract is found');
-                        return false;
+                        return null;
                     }
                 }
             }

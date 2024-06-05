@@ -1,13 +1,31 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Button, Modal } from 'antd';
 import DetailCardItem from './DetailCardItem';
 
 const DetailSubModal = (props) => {
-    const { title, items, edited, open, handleEditing, handleOk, handleCancel } = props;
+    const { title, open, item, original, edited, handleEdited, handleOk, handleCancel } = props;
 
-    useEffect(()=>{
-        console.log('DeailSubModal updated : ', edited);
-    }, [edited]);
+    const handleTime = (name, time) => {
+        const tempData = {
+            ...edited,
+            [name]: time,
+        };
+        handleEdited(tempData)
+    };
+    const handleSelect = (name, value) => {
+        const tempData = {
+            ...edited,
+            [name]: value.value,
+        };
+        handleEdited(tempData);
+    };
+    const handleValue = (event) => {
+        const tempData = {
+            ...edited,
+            [event.target.name]: event.target.value,
+        };
+        handleEdited(tempData);
+    };
 
     return (
         <Modal
@@ -30,17 +48,24 @@ const DetailSubModal = (props) => {
             style={{ top: 120, width: 240 }}
             zIndex={2001}
         >
-            {items && items.map((item, index ) => 
-                <DetailCardItem
+            {item && item.map((item, index ) => {
+                let modifiedDetail = {...item.detail};
+                if(item.detail.type === 'date') {
+                    modifiedDetail['orgTimeData'] = {[item.name] : original[item.name]};
+                    modifiedDetail['timeDateChange'] = handleTime;
+                } else if(item.detail.type === 'select') {
+                    modifiedDetail['selectChange'] = (selected) => handleSelect(item.name, selected);
+                };
+                return (<DetailCardItem
                     key={index}
-                    defaultText={item.defaultText}
+                    defaultText={original[item.name]}
                     edited={edited}
                     name={item.name}
                     title={item.title}
-                    detail={item.detail}
-                    editing={handleEditing}
+                    detail={modifiedDetail}
+                    editing={handleValue}
                 />
-            )}
+            )})}
         </Modal>
     );
 
