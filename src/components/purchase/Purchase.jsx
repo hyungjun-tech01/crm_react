@@ -312,7 +312,7 @@ const Purchase = () => {
     if((companyState & 1) === 0) {
       loadAllCompanies();
     };
-    if(companiesForSelection.length !== allCompanyData.length){
+    if( (companiesForSelection !== null &&  allCompanyData !== null ) &&  companiesForSelection.length !== allCompanyData.length){
       const company_subset = allCompanyData.map((data) => {
         return {
           label: data.company_name,

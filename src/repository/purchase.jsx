@@ -149,6 +149,7 @@ export const PurchaseRepo = selector({
     get: ({getCallback}) => {
         const loadAllPurchases = getCallback(({set, snapshot}) => async () => {
             try{
+                console.log('purchase repostigory');
                 const response = await fetch(`${BASE_PATH}/purchases`);
                 const data = await response.json();
                 if(data.message){
