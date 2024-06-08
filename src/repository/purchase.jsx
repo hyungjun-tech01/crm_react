@@ -21,7 +21,7 @@ export const ProductDataOptions = [
                 value: {
                     product_code: '652C63E3291FF44FA30097E2FC1A336C',
                     product_name: 'SOLIDWORKS Standard',
-                    product_class: '01.SolidWorks 관련',
+                    product_class_name: '01.SolidWorks 관련',
                 }
             },
             {
@@ -29,7 +29,7 @@ export const ProductDataOptions = [
                 value: {
                     product_code: '6FCBFE8D9ADAD248841762C8ED709ACB',
                     product_name: 'SOLIDWORKS Professional',
-                    product_class: '01.SolidWorks 관련',
+                    product_class_name: '01.SolidWorks 관련',
                 }
             },
             {
@@ -37,7 +37,7 @@ export const ProductDataOptions = [
                 value: {
                     product_code: '38F93398BD44704598C2D168EC1005E8',
                     product_name: 'SOLIDWORKS Professional - 1year',
-                    product_class: '01.SolidWorks 관련',
+                    product_class_name: '01.SolidWorks 관련',
                 }
             },
             {
@@ -45,7 +45,7 @@ export const ProductDataOptions = [
                 value: {
                     product_code: 'D299E69F097F1E4897CEABB644F15A82',
                     product_name: 'SOLIDWORKS Professional Term License',
-                    product_class: '01.SolidWorks 관련',
+                    product_class_name: '01.SolidWorks 관련',
                 },
             },
             {
@@ -53,7 +53,7 @@ export const ProductDataOptions = [
                 value: {
                     product_code: '314443004EF76E458A4655352D7731A9',
                     product_name: 'SOLIDWORKS Premium',
-                    product_class: '01.SolidWorks 관련',
+                    product_class_name: '01.SolidWorks 관련',
                 },
             },
             {
@@ -61,7 +61,7 @@ export const ProductDataOptions = [
                 value: {
                     product_code: '2E4A5064FB618248AAFA6D8AFC90314D',
                     product_name: 'SOLIDWORKS Premium Term 1year',
-                    product_class: '01.SolidWorks 관련',
+                    product_class_name: '01.SolidWorks 관련',
                 },
             },
             {
@@ -69,7 +69,7 @@ export const ProductDataOptions = [
                 value: {
                     product_code: 'C41FE762DAC93D478EB903E59FEF31BA',
                     product_name: 'DraftSight Enterprise',
-                    product_class: '01.SolidWorks 관련',
+                    product_class_name: '01.SolidWorks 관련',
                 },
             },
         ],
@@ -83,7 +83,7 @@ export const ProductDataOptions = [
                 value: {
                     product_code: 'E093C7511E80AC42984774DF2CC3543E',
                     product_name: 'SOLIDWORKS PDM Professional CAD Editor',
-                    product_class: '05.PDMWorks Enterprise 관련',
+                    product_class_name: '05.PDMWorks Enterprise 관련',
                 },
             },
         ],
@@ -97,7 +97,7 @@ export const ProductDataOptions = [
                 value: {
                     product_code: '3B66D7F737A3B34297B4D877FE4905F9',
                     product_name: 'SOLIDWORKS Premium',
-                    product_class: '09.제품관리',
+                    product_class_name: '09.제품관리',
                 },
             },
         ],
@@ -111,7 +111,7 @@ export const ProductDataOptions = [
                 value: {
                     product_code: '3ED434AE1590CD40B0E2A904E359A61D',
                     product_name: 'Collaborative Business Innovator',
-                    product_class: '13. 3DEXPERIENCE Platform',
+                    product_class_name: '13. 3DEXPERIENCE Platform',
                 },
             },
             {
@@ -119,7 +119,7 @@ export const ProductDataOptions = [
                 value: {
                     product_code: '8EB5C5B2DC207943A06346292290799A',
                     product_name: 'Collaborative Industry Innovator',
-                    product_class: '13. 3DEXPERIENCE Platform',
+                    product_class_name: '13. 3DEXPERIENCE Platform',
                 },
             },
             {
@@ -127,7 +127,7 @@ export const ProductDataOptions = [
                 value: {
                     product_code: 'AAD4BC6AF5CB664887DF592631AF5364',
                     product_name: 'Platform Extended Storage',
-                    product_class: '13. 3DEXPERIENCE Platform',
+                    product_class_name: '13. 3DEXPERIENCE Platform',
                 },
             },
         ],

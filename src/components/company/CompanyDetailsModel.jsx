@@ -181,14 +181,14 @@ const CompanyDetailsModel = () => {
     if(name === 'product_name') {
       const tempOtherSelect = {
         ...editedOtherSelectValues,
-        product_class: value.value.product_class,
+        product_class_name: value.value.product_class_name,
       };
       setEditedOtherSelectValues(tempOtherSelect);
 
       const tempNew = {
         ...editedOtherValues,
         product_name: value.value.product_name,
-        product_class: value.value.product_class,
+        product_class_name: value.value.product_class_name,
         product_code: value.value.product_code,
       };
       setEditedOtherValues(tempNew);
@@ -291,14 +291,14 @@ const CompanyDetailsModel = () => {
     if(name === 'product_name') {
       const tempNewSelect = {
         ...editedNewSelectValues,
-        product_class: value.value.product_class,
+        product_class_name: value.value.product_class_name,
       };
       setEditedNewSelectValues(tempNewSelect);
 
       const tempNew = {
         ...editedNewValues,
         product_name: value.value.product_name,
-        product_class: value.value.product_class,
+        product_class_name: value.value.product_class_name,
         product_code: value.value.product_code,
       };
       setEditedNewValues(tempNew);
@@ -361,7 +361,7 @@ const CompanyDetailsModel = () => {
       hq_finish_date: purchase.hq_finish_date ? new Date(purchase.hq_finish_date) : null,
     });
     setEditedOtherSelectValues({
-      product_class: purchase.product_class,
+      product_class_name: purchase.product_class_name,
     });
 
     // Set data to edit selected purchase ----------------------
@@ -371,7 +371,7 @@ const CompanyDetailsModel = () => {
 
   const add_purchase_items = [
     ['product_name','purchase.product_name',
-      { type:'select', group: 'product_class', options: ProductDataOptions, value: editedNewSelectValues,
+      { type:'select', group: 'product_class_name', options: ProductDataOptions, value: editedNewSelectValues,
         selectChange: (value) => handleNewItemSelectChange('product_name', value) }],
     ['product_type','purchase.product_type',
       { type:'select', options: ProductTypeOptions,
@@ -392,7 +392,7 @@ const CompanyDetailsModel = () => {
 
   const modify_purchase_items = [
     ['product_name','purchase.product_name',
-      { type:'select', group: 'product_class', options: ProductDataOptions, value: editedOtherSelectValues,
+      { type:'select', group: 'product_class_name', options: ProductDataOptions, value: editedOtherSelectValues,
         selectChange: (value) => handleOtherItemSelectChange('product_name', value) }],
     ['product_type','purchase.product_type',
       { type:'select', options: ProductTypeOptions,
@@ -620,10 +620,10 @@ const CompanyDetailsModel = () => {
 
       setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
       setEditedOtherValues(null);
-      setEditedOtherSelectValues({product_class: null});
+      setEditedOtherSelectValues({product_class_name: null});
       setAddNewItem(false);
       setEditedNewValues(null);
-      setEditedNewSelectValues({product_class: null});
+      setEditedNewSelectValues({product_class_name: null});
       setCurrentCompanyCode(selectedCompany.company_code);
     };
     const tempCompanyPurchases = allPurchases.filter(purchase => purchase.company_code === selectedCompany.company_code);

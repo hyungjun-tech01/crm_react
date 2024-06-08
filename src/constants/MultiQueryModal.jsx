@@ -1,34 +1,85 @@
 import React, {  useState , useCallback} from "react";
 import { Button, Modal } from 'antd';
 import Select from "react-select";
-import { KeyManForSelection } from "../repository/lead";
 import { companyColumn, ColumnQueryCondition } from "../repository/company";
 import { useTranslation } from "react-i18next";
+
+const QueryRow = ({ index, companyColumn, columnQueryCondition, companyColumnValue, columnQueryConditionValue, multiQueryInputValue, andOrValue, onCompanyColumnChange, onColumnQueryConditionChange, onMultiQueryInputChange, onAndOrChange }) => (
+  <tr>
+    <td>
+      <Select options={companyColumn} value={companyColumnValue} onChange={(value) => onCompanyColumnChange(index, value)} />
+    </td>
+    <td>
+      <Select options={columnQueryCondition} value={columnQueryConditionValue} onChange={(value) => onColumnQueryConditionChange(index, value)} />
+    </td>
+    <td>
+      <input
+        autoFocus
+        type="text"
+        className="form-control form-control-sm"
+        value={multiQueryInputValue}
+        onChange={(e) => onMultiQueryInputChange(index, e.target.value)}
+      />
+    </td>
+    <td>
+      <Button type="primary" onClick={() => onAndOrChange(index)}>
+        {andOrValue}
+      </Button>
+    </td>
+  </tr>
+);
 
 
 const MultiQueryModal = (props) => {
     const {  open, title, handleOk, handleCancel } = props;
 
     const { t } = useTranslation();
-    const [selectedKeyMan, setSelectedKeyMan] = useState([]);
-    const [leadChange, setLeadChange ] = useState(null);
 
-    const handleSelectKeyMan = useCallback((value) => {
-        const selected = value.value;
-      },[leadChange]);
+    const [queryConditions, setQueryConditions] = useState([
+      { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+      { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    ]);
 
+    const handleSelectCompanyColumn = (index, value) => {
+      const newConditions = [...queryConditions];
+      newConditions[index].companyColumn = value;
+      setQueryConditions(newConditions);
+    };
+  
+    const handleSelectColumnQueryCondition = (index, value) => {
+      const newConditions = [...queryConditions];
+      newConditions[index].columnQueryCondition = value;
+      setQueryConditions(newConditions);
+    };
+  
+    const handleMultiQueryInput = (index, value) => {
+      const newConditions = [...queryConditions];
+      newConditions[index].multiQueryInput = value;
+      setQueryConditions(newConditions);
+    };
+  
+    const handleAndOr = (index) => {
+      const newConditions = [...queryConditions];
+      newConditions[index].andOr = newConditions[index].andOr === 'And' ? 'Or' : 'And';
+      setQueryConditions(newConditions);
+    };  
+
+    const handleSubmit = () => {
+      console.log(queryConditions);
+    }
+  
     return (
         <Modal
             title={title}
             open={open}
             onOk={handleOk}
             onCancel={handleCancel}
-            width={600}
+            width={800}
             footer={  [
                 <Button key="cancel" onClick={handleCancel}>
                   Cancel
                 </Button>,
-                <Button key="submit" type="primary" onPress={handleOk}>
+                <Button key="submit" type="primary" onClick={handleSubmit}>
                   Submit
                 </Button>,
                 ] }
@@ -45,118 +96,27 @@ const MultiQueryModal = (props) => {
               </tr>
             </thead>
             <tbody>
+              {queryConditions.map((condition, index) => (
+              <QueryRow
+                key={index}
+                index={index}
+                companyColumn={companyColumn}
+                columnQueryCondition={ColumnQueryCondition}
+                companyColumnValue={condition.companyColumn}
+                columnQueryConditionValue={condition.columnQueryCondition}
+                multiQueryInputValue={condition.multiQueryInput}
+                andOrValue={condition.andOr}
+                onCompanyColumnChange={handleSelectCompanyColumn}
+                onColumnQueryConditionChange={handleSelectColumnQueryCondition}
+                onMultiQueryInputChange={handleMultiQueryInput}
+                onAndOrChange={handleAndOr}
+              />
+              ))}       
               <tr>
-                <td><Select  options={companyColumn} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><Select  options={ColumnQueryCondition} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><div><input
-                        autoFocus
-                        type= "text"
-                        className="form-control form-control-sm"
-                        name= "multiQueryInput1"
-                        defaultValue=""/></div>
-                </td>
-                <td>
-                  <Button key="and_or1" type="primary" onClick={handleOk}>
-                  And
-                  </Button>
-                </td>
-              </tr>
-              <tr>
-                <td><Select  options={companyColumn} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><Select  options={ColumnQueryCondition} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><div><input
-                        autoFocus
-                        type= "text"
-                        className="form-control form-control-sm"
-                        name= "multiQueryInput2"
-                        defaultValue=""/></div>
-                </td>
-                <td>
-                  <Button key="and_or2" type="primary" onClick={handleOk}>
-                  And
-                  </Button>
-                </td>
-              </tr>
-              <tr>
-                <td><Select  options={companyColumn} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><Select  options={ColumnQueryCondition} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><div><input
-                        autoFocus
-                        type= "text"
-                        className="form-control form-control-sm"
-                        name= "multiQueryInput3"
-                        defaultValue=""/></div>
-                </td>
-                <td>
-                  <Button key="and_or3" type="primary" onClick={handleOk}>
-                  And
-                  </Button>
-                </td>
-              </tr>
-              <tr>
-                <td><Select  options={companyColumn} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><Select  options={ColumnQueryCondition} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><div><input
-                        autoFocus
-                        type= "text"
-                        className="form-control form-control-sm"
-                        name= "multiQueryInput4"
-                        defaultValue=""/></div>
-                </td>
-                <td>
-                  <Button key="and_or4" type="primary" onClick={handleOk}>
-                  And
-                  </Button>
-                </td>
-              </tr>
-              <tr>
-                <td><Select  options={companyColumn} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><Select  options={ColumnQueryCondition} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><div><input
-                        autoFocus
-                        type= "text"
-                        className="form-control form-control-sm"
-                        name= "multiQueryInput4"
-                        defaultValue=""/> </div>
-                </td>
-                <td>
-                  <Button key="and_or4" type="primary" onClick={handleOk}>
-                  And
-                  </Button>
-                </td>
-              </tr>
-              <tr>
-                <td><Select  options={companyColumn} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><Select  options={ColumnQueryCondition} value={selectedKeyMan}  onChange={handleSelectKeyMan} /></td>
-                <td><div ><input
-                        autoFocus
-                        type= "text"
-                        className="form-control form-control-sm"
-                        name= "multiQueryInput4"
-                        defaultValue=""/> </div>
-                </td>
-                <td>
-                  <Button key="and_or4" type="primary" onClick={handleOk}>
-                  And
-                  </Button>
-                </td>
-              </tr>
+                등록일 : 날짜 ~ 날짜 
+              </tr>                  
             </tbody>
           </table>
-          <div className="col-sm-8  d-flex">
-               <Select className = "col-sm-4" options={companyColumn} value={selectedKeyMan}  onChange={handleSelectKeyMan} />
-               <Select className = "col-sm-4" options={ColumnQueryCondition} value={selectedKeyMan}  onChange={handleSelectKeyMan} />
-               <input
-                        autoFocus
-                        className="col-sm-4"
-                        type= "text"
-                        name= "multiQueryInput1"
-                        defaultValue=""
-               />
-                <Button className = "col-sm-4" key="and_or" type="primary" onClick={handleOk}>
-                  And
-                </Button>
-            </div>
         </Modal>
     );
 

@@ -15,17 +15,19 @@ export const companyColumn = [
      { value: 'eng_company_name', label: '영문회사명'},
      { value: 'ceo_name', label: '대표자명'},
      { value: 'business_registration_code', label: '사업자번호'},
+     { value: 'business_type', label: '업태'},
+     { value: 'business_item', label: '종목'},
+     { value: 'company_phone_number', label: '회사전화'},
+     { value: 'company_fax_number', label: '회사팩스'},
  ];
 
  export const ColumnQueryCondition = [
     { value: 'include', label: '포함'},
-    { value: 'last_include', label: '~포함'},
-    { value: 'first_include', label: '포함~'},
     { value: 'is_null', label: '값이없는'},
     { value: 'is_not_null', label: '값이있는'},
     { value: 'equeal', label: '='},
-    { value: 'greater_than', label: '>'},
-    { value: 'less_than', label: '<'},
+    { value: 'greater_than', label: '>='},
+    { value: 'less_than', label: '<='},
 ];
 
 export const CompanyRepo = selector({
