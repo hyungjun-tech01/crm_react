@@ -3,7 +3,8 @@ import { selector } from "recoil";
 import { atomCurrentTransaction
     , atomAllTransactions
     , atomFilteredTransaction
-    , atomTransationState
+    , atomTransationState,
+    defaultTransaction
 } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
@@ -24,7 +25,7 @@ export const TransactionRepo = selector({
                 set(atomAllTransactions, data);
 
                 // Change loading state
-                const loadStates = snapshot.getPromise(atomTransationState);
+                const loadStates = await snapshot.getPromise(atomTransationState);
                 set(atomTransationState, (loadStates | 1));
             }
             catch(err){
@@ -127,6 +128,8 @@ export const TransactionRepo = selector({
                 const selected_arrary = allTransactions.filter(transaction => transaction.transaction_code === transaction_code);
                 if(selected_arrary.length > 0){
                     set(atomCurrentTransaction, selected_arrary[0]);
+                } else {
+                    set(atomCurrentTransaction, defaultTransaction);
                 }
             }
             catch(err){

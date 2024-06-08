@@ -32,7 +32,7 @@ export const QuotationRepo = selector({
                 set(atomAllQuotations, data);
 
                 // Change loading state
-                const loadStates = snapshot.getPromise(atomQuotationState);
+                const loadStates = await snapshot.getPromise(atomQuotationState);
                 set(atomQuotationState, (loadStates | 1));
             }
             catch(err){

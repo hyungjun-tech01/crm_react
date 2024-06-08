@@ -413,22 +413,22 @@ const QuotationsDetailsModel = () => {
             <div className="modal-header">
               <div className="row w-100">
                 <DetailTitleItem
-                  defaultText={selectedQuotation.quotation_title}
+                  original={selectedQuotation.quotation_title}
                   name='title'
                   title={t('common.title')}
-                  editing={handleEditing}
+                  onEditing={handleEditing}
                 />
                 <DetailTitleItem
-                  defaultText={selectedQuotation.quotation_number}
+                  original={selectedQuotation.quotation_number}
                   name='quotation_number'
                   title={t('quotation.doc_no')}
-                  editing={handleEditing}
+                  onEditing={handleEditing}
                 />
                 <DetailTitleItem
-                  defaultText={selectedQuotation.status}
+                  original={selectedQuotation.status}
                   name='status'
                   title={t('common.status')}
-                  editing={handleEditing}
+                  onEditing={handleEditing}
                 />
               </div>
               <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>

@@ -139,23 +139,23 @@ const TransactionsDetailsModel = () => {
           <div className="modal-header">
             <div className="row w-100">
               <DetailTitleItem
-                defaultText={selectedTransaction.company_name}
+                original={selectedTransaction.company_name}
                 name='company_name'
                 title={t('company.company_name')}
                 type='col-md-4'
-                editing={handleEditing}
+                onEditing={handleEditing}
               />
               <DetailTitleItem
-                defaultText={selectedTransaction.ceo_name}
+                original={selectedTransaction.ceo_name}
                 name='ceo_name'
                 title={t('company.ceo_name')}
-                editing={handleEditing}
+                onEditing={handleEditing}
               />
               <DetailTitleItem
-                defaultText={selectedTransaction.business_registration_code}
+                original={selectedTransaction.business_registration_code}
                 name='business_registration_code'
                 title={t('company.business_registration_code')}
-                editing={handleEditing}
+                onEditing={handleEditing}
               />
             </div>
             <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>

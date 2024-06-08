@@ -39,19 +39,19 @@ export const CompanyRepo = selector({
                     console.log('\t[ loadAllCompanies ] message:', data.message);
                     set(atomAllCompanies, []);
 
-                    const loadStates = snapshot.getPromise(atomCompanyState);
+                    const loadStates = await snapshot.getPromise(atomCompanyState);
                     set(atomCompanyState, (loadStates & ~1));
                     return;
                 }
                 set(atomAllCompanies, data);
 
                 // Change loading state
-                const loadStates = snapshot.getPromise(atomCompanyState);
+                const loadStates = await snapshot.getPromise(atomCompanyState);
                 set(atomCompanyState, (loadStates | 1));
             }
             catch(err){
                 console.error(`\t[ loadAllCompanies ] Error : ${err}`);
-                const loadStates = snapshot.getPromise(atomCompanyState);
+                const loadStates = await snapshot.getPromise(atomCompanyState);
                 set(atomCompanyState, (loadStates & ~1));
             };
         });

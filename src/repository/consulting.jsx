@@ -37,7 +37,7 @@ export const ConsultingRepo = selector({
                 set(atomAllConsultings, data);
 
                 // Change loading state
-                const loadStates = snapshot.getPromise(atomConsultingState);
+                const loadStates = await snapshot.getPromise(atomConsultingState);
                 set(atomConsultingState, (loadStates | 1));
             }
             catch(err){

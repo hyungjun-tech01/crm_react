@@ -29,7 +29,7 @@ export const MAContractRepo = selector({
                 set(atomCompanyMAContracts, data);
 
                 // Change loading state
-                const loadStates = snapshot.getPromise(atomMAContractState);
+                const loadStates = await snapshot.getPromise(atomMAContractState);
                 set(atomMAContractState, (loadStates | 1));
             }
             catch(err){

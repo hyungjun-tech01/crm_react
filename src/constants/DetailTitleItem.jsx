@@ -1,7 +1,7 @@
 import React from 'react';
 
 const DetailTitleItem = (props) => {
-    const { defaultText, name, title, type, editing } = props;
+    const { original, name, title, type, onEditing } = props;
 
     const classSize = type ? type : "col-md-3";
 
@@ -14,8 +14,8 @@ const DetailTitleItem = (props) => {
                     type="text"
                     placeholder={title}
                     name={name}
-                    defaultValue={defaultText}
-                    onChange={editing}
+                    defaultValue={original}
+                    onChange={onEditing}
                 />
             </div>
         </div>

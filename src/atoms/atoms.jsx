@@ -354,3 +354,49 @@ export const atomMAContractState = atom({
     key: "MAContractState",
     default: 0,
 });
+
+//----- Product class ------------------------
+export const defaultProductClass = {
+    product_class_code : null,
+    product_class_name : null,
+    product_class_order : null,
+    product_class_memo : null,
+};
+export const atomProductClassList = atom({
+    key: "allProductClassList",
+    default: [],
+});
+export const atomProductClassListState = atom({
+    key: "ProductClassListState",
+    default: 0,
+});
+
+//----- Product  -----------------------------
+export const defaultProduct = {
+    product_code : null,
+    product_class : null,
+    manufacturer : null,
+    model_name : null,
+    product_name : null,
+    unit : null,
+    cost_price : null,
+    reseller_price : null,
+    list_price : null,
+    detail_desc : null,
+    memo : null,
+    modify_user : null,
+};
+export const atomAllProducts = atom({
+    key: "loadedProducts",
+    default: [],
+});
+export const atomProductsState = atom({
+    key: "ProductsState",
+    default: 0,
+});
+
+//----- Product Options for Select  -----------------------------
+export const atomProductOptions = atom({
+    key: "productOptions",
+    default: [],
+});

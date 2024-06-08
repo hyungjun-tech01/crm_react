@@ -1,52 +1,46 @@
-import React, { useCallback, useMemo, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Button, Space, Switch, Table } from "antd";
+import { Space, Switch } from "antd";
 import { C_logo,  } from "../imagepath";
-import { atomAllPurchases,
-  atomAllTransactions,
-  atomCompanyMAContracts,
+import { option_locations, option_deal_type } from '../../constants/constans';
+
+import { 
   atomCurrentCompany,
   defaultCompany,
+  atomAllPurchases,
   atomPurchaseState,
+  atomAllTransactions,
   atomTransationState,
-  defaultMAContract,
-  defaultPurchase,
-  atomCurrentPurchase,
 } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
-import { ProductDataOptions, ProductTypeOptions, PurchaseRepo } from "../../repository/purchase";
+import { PurchaseRepo } from "../../repository/purchase";
 import { MAContractRepo } from "../../repository/ma_contract";
+
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
-import DetailSubModal from "../../constants/DetailSubModal";
-import { option_locations, option_deal_type } from '../../constants/constans';
-import { ItemRender, ShowTotal } from "../paginationfunction";
-import { formatDate } from "../../constants/functions";
-import { Add } from "@mui/icons-material";
+import CompanyPurchaseModel from "./CompanyPurchaseModel";
+import CompanyTransactionModel from "./CompanyTransactionModel";
 
 const CompanyDetailsModel = () => {
   const purchaseState = useRecoilValue(atomPurchaseState);
   const transactionState = useRecoilValue(atomTransationState);
+
   const selectedCompany = useRecoilValue(atomCurrentCompany);
   const { modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
-  const allTransactions = useRecoilValue(atomAllTransactions);
-  const { loadAllTransactions, modifyTransaction } = useRecoilValue(TransactionRepo);
   const allPurchases = useRecoilValue(atomAllPurchases);
-  const { loadAllPurchases, modifyPurchase, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
-  const currentPurchase = useRecoilValue(atomCurrentPurchase);
-  const companyMAContracts = useRecoilValue(atomCompanyMAContracts);
-  const { loadCompanyMAContracts, modifyMAContract, setCurrentMAContract } = useRecoilValue(MAContractRepo);
+  const { loadAllPurchases} = useRecoilValue(PurchaseRepo);
+  const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
+  const allTransactions = useRecoilValue(atomAllTransactions);
+  const { loadAllTransactions } = useRecoilValue(TransactionRepo);
   const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
   const { t } = useTranslation();
 
   // --- Handles to deal this component ---------------------------------------
   const [ isFullScreen, setIsFullScreen ] = useState(false);
-  const [ isSubModalOpen, setIsSubModalOpen ] = useState(false);
-  const [ subModalSetting, setSubModalSetting ] = useState({title:''})
   const [ currentCompanyCode, setCurrentCompanyCode ] = useState('');
 
   const handleWindowWidthChange = useCallback((checked) => {
@@ -64,13 +58,12 @@ const CompanyDetailsModel = () => {
   }, []);
   
 
-  // --- Variables for only Transaction ------------------------------------------------
-  const [ transactionByCompany, setTransactionByCompany] = useState([]);
-  
-
   // --- Handles to edit 'Company Details' ---------------------------------
+  const [ validMACount, setValidMACount ] = useState(0);
   const [ editedDetailValues, setEditedDetailValues ] = useState(null);
   const [ orgEstablishDate, setOrgEstablishDate ] = useState(null);
+  const [ purchasesByCompany, setPurchasesByCompany] = useState([]);
+  const [ transactionByCompany, setTransactionByCompany] = useState([]);
 
   const handleDetailEdit = useCallback((e) => {
     const tempEdited = {
@@ -117,6 +110,7 @@ const CompanyDetailsModel = () => {
   }, [editedDetailValues]);
 
   const handleDetailSelectChange = useCallback((name, selected) => {
+    console.log('hnadleDetialSelectChange :', name, selected);
     const tempEdited = {
       ...editedDetailValues,
       [name]: selected.value,
@@ -149,459 +143,9 @@ const CompanyDetailsModel = () => {
   ];
 
 
-  // --- Handles to edit 'Related with Company Detail' ---------------------------------
-  const [ editedOtherValues, setEditedOtherValues ] = useState(null);
-  const [ orgTimeOther, setOrgTimeOther ] = useState(null);
-  const [ editedOtherSelectValues, setEditedOtherSelectValues ] = useState(null);
-  const [ isOtherItemSelected, setIsOtherItemSelected ] = useState(false);
-
-  const [ purchaseByCompany, setPurchaseByCompany] = useState([]);
-  const [ validMACount, setValidMACount ] = useState(0);
-  const [selectedPurchaseRowKeys, setSelectedPurchaseRowKeys] = useState([]);
-
-
-  const handleOtherItemChange = useCallback(e => {
-    const tempEdited = {
-      ...editedOtherValues,
-      [e.target.name]: e.target.value,
-    };
-
-    setEditedOtherValues(tempEdited);
-  }, [editedOtherValues]);
-
-  const handleOtherItemTimeChange = useCallback((name, date) => {
-    const tempEdited = {
-      ...editedOtherValues,
-      [name]: date,
-    };
-    setEditedOtherValues(tempEdited);
-  }, [editedOtherValues]);
-
-  const handleOtherItemSelectChange = useCallback((name, value) => {
-    if(name === 'product_name') {
-      const tempOtherSelect = {
-        ...editedOtherSelectValues,
-        product_class: value.value.product_class,
-      };
-      setEditedOtherSelectValues(tempOtherSelect);
-
-      const tempNew = {
-        ...editedOtherValues,
-        product_name: value.value.product_name,
-        product_class: value.value.product_class,
-        product_code: value.value.product_code,
-      };
-      setEditedOtherValues(tempNew);
-    } else if(name === 'product_type') {
-      const tempNew = {
-        ...editedOtherValues,
-        product_type: value.value,
-      };
-      setEditedOtherValues(tempNew);
-    };
-  }, [editedOtherValues, editedOtherSelectValues]);
-
-  const handleOtherItemChangeCancel = useCallback(() => {
-    setCurrentPurchase();
-    setEditedOtherValues(null);
-    setOrgTimeOther(null);
-    setSelectedPurchaseRowKeys([]);
-    setIsOtherItemSelected(false);
-  }, []);
-
-  const handleOtherItemChangeSave = useCallback((code_name) => {
-    if(editedOtherValues){
-      const tempSubValues = {
-        ...editedOtherValues,
-        action_type: "UPDATE",
-        company_code: currentPurchase.company_code,
-        modify_user: cookies.myLationCrmUserId,
-        [code_name]: currentPurchase[code_name],
-      };
-      
-      switch(code_name)
-      {
-        case 'purchase_code':
-          if (modifyPurchase(tempSubValues)) {
-            console.log(`Succeeded to modify purchase`);
-            const modfiedPurchase = {
-              ...currentPurchase,
-              ...editedOtherValues,
-            };
-            const foundIdx = purchaseByCompany.findIndex(item => item.purchase_code === currentPurchase.purchase_code);
-            if(foundIdx !== -1) {
-              const updatedPurchases = [
-                ...purchaseByCompany.slice(0, foundIdx),
-                modfiedPurchase,
-                ...purchaseByCompany.slice(foundIdx + 1, ),
-              ];
-              setPurchaseByCompany(updatedPurchases);
-            } else {
-              console.error("handleOtherItemChangeSave / Purchase : Impossible case!!!");
-            };
-            setCurrentPurchase();
-            setSelectedPurchaseRowKeys([]);
-            setIsOtherItemSelected(false);
-          } else {
-            console.error('Failed to modify company')
-          };
-          break;
-        default:
-          console.log("handleOtherItemChangeSave / Impossible case!!!");
-          break;
-      };
-      
-      setEditedOtherValues(null);
-      setOrgTimeOther(null);
-    }
-  }, [cookies.myLationCrmUserId, currentPurchase, editedOtherValues]);
-
-
-  // --- Functions for Editing New item ---------------------------------
-  const [ addNewItem, setAddNewItem ] = useState(false);
-  const [ editedNewValues, setEditedNewValues ] = useState(null);
-  const [ editedNewSelectValues, setEditedNewSelectValues ] = useState(null);
-
-  const handleAddNewItem = () =>{
-    setAddNewItem(true);
-    const tempEditSelect = {
-      product_name: null,
-    };
-    setEditedNewSelectValues(tempEditSelect);
-  };
-
-  const handleNewItemChange = useCallback(e => {
-    const tempEdited = {
-      ...editedNewValues,
-      [e.target.name]: e.target.value,
-    };
-
-    setEditedNewValues(tempEdited);
-  }, [editedNewValues]);
-
-  const handleNewItemDateChange = useCallback((name, date) => {
-    const tempEdited = {
-      ...editedNewValues,
-      [name]: date,
-    };
-    setEditedNewValues(tempEdited);
-  }, [editedNewValues]);
-
-  const handleNewItemSelectChange = useCallback((name, value) => {
-    if(name === 'product_name') {
-      const tempNewSelect = {
-        ...editedNewSelectValues,
-        product_class: value.value.product_class,
-      };
-      setEditedNewSelectValues(tempNewSelect);
-
-      const tempNew = {
-        ...editedNewValues,
-        product_name: value.value.product_name,
-        product_class: value.value.product_class,
-        product_code: value.value.product_code,
-      };
-      setEditedNewValues(tempNew);
-    } else if(name === 'product_type') {
-      const tempNew = {
-        ...editedNewValues,
-        product_type: value.value,
-      };
-      setEditedNewValues(tempNew);
-    };
-  }, [editedNewSelectValues, editedNewValues]);
-
-  const handleCancelNewItemChange = useCallback(() => {
-    setEditedNewValues(null);
-    setAddNewItem(false)
-  }, []);
-
-  const handleSaveNewItemChange = useCallback((code_name) => {
-    if(editedNewValues){
-      const tempSubValues = {
-        ...editedNewValues,
-        action_type: "ADD",
-        company_code: selectedCompany.company_code,
-        modify_user: cookies.myLationCrmUserId,
-      };
-      
-      switch(code_name)
-      {
-        case 'purchase_code':
-          if (modifyPurchase(tempSubValues)) {
-            console.log(`Succeeded to add purchase`);
-            
-          } else {
-            console.error('Failed to add company')
-          };
-          break;
-        default:
-          console.log("handleSaveNewItemChange / Impossible case!!!");
-          break;
-      };
-      setEditedNewValues(null);
-      setEditedNewSelectValues(null);
-      setAddNewItem(false);
-    }
-  }, [cookies.myLationCrmUserId, editedNewValues, selectedCompany]);
-
-
-  // --- Variables for only Purchase ------------------------------------------------
-  const [ maContractByPurchase, setMaContractByPurchase ] = useState([]);
-
-  const handleSelectPurchase = useCallback((purchase) =>{
-    setCurrentPurchase(purchase.purchase_code);
-    setIsOtherItemSelected(true);
-
-    setEditedOtherValues(null);
-    setOrgTimeOther({
-      receipt_date: purchase.receipt_date ? new Date(purchase.receipt_date) : null,
-      delivery_date: purchase.delivery_date ? new Date(purchase.delivery_date) : null,
-      ma_finish_date: purchase.ma_finish_date ? new Date(purchase.ma_finish_date) : null,
-      hq_finish_date: purchase.hq_finish_date ? new Date(purchase.hq_finish_date) : null,
-    });
-    setEditedOtherSelectValues({
-      product_class: purchase.product_class,
-    });
-
-    // Set data to edit selected purchase ----------------------
-    const contractPurchase = companyMAContracts.filter(item => item.purchase_code === purchase.purchase_code);
-    setMaContractByPurchase(contractPurchase);
-  }, [companyMAContracts, setCurrentPurchase]);
-
-  const add_purchase_items = [
-    ['product_name','purchase.product_name',
-      { type:'select', group: 'product_class', options: ProductDataOptions, value: editedNewSelectValues,
-        selectChange: (value) => handleNewItemSelectChange('product_name', value) }],
-    ['product_type','purchase.product_type',
-      { type:'select', options: ProductTypeOptions,
-        selectChange: (value) => handleNewItemSelectChange('product_type', value)}],
-    ['serial_number','purchase.serial',{ type:'label' }],
-    ['licence_info','purchase.licence_info',{ type:'label' }],
-    ['module','purchase.module',{ type:'label' }],
-    ['quantity','common.quantity',{ type:'label' }],
-    ['receipt_date','purchase.receipt_date',
-      { type:'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
-    ['delivery_date','purchase.delivery_date',
-      { type:'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
-    ['hq_finish_date','purchase.hq_finish_date',
-      { type:'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
-    ['ma_finish_date','purchase.ma_finish_date',
-      { type:'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
-  ];
-
-  const modify_purchase_items = [
-    ['product_name','purchase.product_name',
-      { type:'select', group: 'product_class', options: ProductDataOptions, value: editedOtherSelectValues,
-        selectChange: (value) => handleOtherItemSelectChange('product_name', value) }],
-    ['product_type','purchase.product_type',
-      { type:'select', options: ProductTypeOptions,
-        selectChange: (value) => handleOtherItemSelectChange('product_type', value) }],
-    ['serial_number','purchase.serial',{ type:'label' }],
-    ['licence_info','purchase.licence_info',{ type:'label' }],
-    ['module','purchase.module',{ type:'label' }],
-    ['quantity','common.quantity',{ type:'label' }],
-    ['receipt_date','purchase.receipt_date',
-      { type:'date', orgTimeData: orgTimeOther, timeDateChange: handleOtherItemTimeChange }],
-    ['delivery_date','purchase.delivery_date',
-      { type:'date', orgTimeData: orgTimeOther, timeDateChange: handleOtherItemTimeChange }],
-    ['hq_finish_date','purchase.hq_finish_date',{ type:'date', orgTimeData: orgTimeOther, disabled: true }],
-    ['ma_finish_date','purchase.ma_finish_date',{ type:'date', orgTimeData: orgTimeOther, disabled: true }],
-  ];
-
-  const columns_purchase = [
-    {
-      title: 'No',
-      dataIndex: 'index',
-      render: (text, record) => <>{record.rowIndex}</>,
-    },
-    {
-      title: t('purchase.product_name'),
-      dataIndex: "product_name",
-      render: (text, record) => <>{text}</>,
-    },
-    {
-      title: t('purchase.product_type'),
-      dataIndex: "product_type",
-      render: (text, record) => <>{text}</>,
-    },
-    {
-      title: t('purchase.serial'),
-      dataIndex: "serial_number",
-      render: (text, record) => <>{text}</>,
-    },
-    {
-      title: t('purchase.delivery_date'),
-      dataIndex: "delivery_date",
-      render: (text, record) => <>{formatDate(record.delivery_date)}</>,
-    },
-    {
-      title: t('purchase.ma_finish_date'),
-      dataIndex: "ma_finish_date",
-      render: (text, record) => <>{formatDate(record.ma_finish_date)}</>,
-    },
-  ];
-
-  const purchaseRowSelection = {
-    selectedRowKeys: selectedPurchaseRowKeys,
-    type:'radio',
-    onChange: (selectedRowKeys, selectedRows) => {
-      setSelectedPurchaseRowKeys(selectedRowKeys);
-
-      if(selectedRows.length > 0) {
-        // Set data to edit selected purchase ----------------------
-        const selectedValue = selectedRows.at(0);
-        handleSelectPurchase(selectedValue);
-        setSelectedContractRowKeys([]);   //initialize the selected list about contract
-      } else {
-        setCurrentPurchase(defaultPurchase);
-        setEditedOtherValues(null);
-        setOrgTimeOther(null);
-      };
-    },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
-      name: record.name,
-      className: "checkbox-red",
-    }),
-  };
-
-
-  // --- Functions for Editing MA Contract ---------------------------------
-  const [ subModalItems, setSubModalItems ] = useState([]);
-  const [ orgSubModalValues, setOrgSubModalValues ] = useState(null);
-  const [ editedSubModalValues, setEditedSubModalValues ] = useState(null);
-  const [ selectedContractRowKeys, setSelectedContractRowKeys ] = useState([]);
-
-  const handleSubModalOk = useCallback(() => {
-    const finalData = {
-      ...orgSubModalValues,
-      ...editedSubModalValues,
-    };
-    const resp = modifyMAContract(finalData);
-    resp.then(result => {
-      if(result){
-        const updatedContracts = maContractByPurchase.concat(result);
-        setMaContractByPurchase(updatedContracts);
-      } else {
-        console.error('Failed to add/modify ma contract');
-      }
-    });
-
-    setSelectedContractRowKeys([]);
-    setIsSubModalOpen(false);
-  }, [orgSubModalValues, editedSubModalValues, modifyMAContract, maContractByPurchase]);
-
-  const handleSubModalCancel = () => {
-    setSubModalItems([]);
-    setOrgSubModalValues(null);
-    setSelectedContractRowKeys([]);
-    setIsSubModalOpen(false);
-  };
-
-  const handleSubModalItemChange = useCallback(data => {
-    setEditedSubModalValues(data);
-  }, []);
-
-  const handleAddMAContract = useCallback((company_code, purchase_code) => {
-    setEditedSubModalValues(null);
-    setOrgSubModalValues({
-      ...defaultMAContract,
-      action_type : 'ADD',
-      ma_company_code: company_code,
-      purchase_code: purchase_code,
-      modify_user: cookies.myLationCrmUserId,
-    });
-    setSubModalItems([
-      { name: 'ma_contract_date', title: t('contract.contract_date'), detail:{type: 'date' } },
-      { name: 'ma_finish_date', title: t('contract.end_date'), detail:{type: 'date' } },
-      { name: 'ma_price', title: t('common.price_1'), detail:{type: 'label' } },
-      { name: 'ma_memo', title: t('common.memo'), detail:{type: 'textarea', row_no:4 } },
-    ]);
-    setSubModalSetting({title: t('contract.add_contract')})
-    setIsSubModalOpen(true);
-  }, [cookies.myLationCrmUserId]);
-
-  const handleModifyMAContract = useCallback((code) => {
-    setEditedSubModalValues(null);
-    const foundMAContract = maContractByPurchase.filter(item => item.guid === code);
-    if(foundMAContract.length > 0){
-      const selectedContract = foundMAContract[0];
-      setOrgSubModalValues({
-        ...selectedContract,
-        ma_contract_date: new Date(selectedContract.ma_contract_date),
-        ma_finish_date: new Date(selectedContract.ma_finish_date),
-        action_type : 'UPDATE',
-        modify_user: cookies.myLationCrmUserId,
-      });
-      setSubModalItems([
-        { name: 'ma_contract_date', title: t('contract.contract_date'), detail:{type: 'date' } },
-        { name: 'ma_finish_date', title: t('contract.end_date'), detail:{type: 'date' } },
-        { name: 'ma_price', title: t('common.price_1'), detail:{type: 'label' } },
-        { name: 'ma_memo', title: t('common.memo'), detail:{type: 'textarea', row_no:4 } },
-      ]);
-      setSubModalSetting({title: t('contract.add_contract')})
-      setIsSubModalOpen(true);
-    } else {
-      console.error("Impossible Case~");
-    };
-  }, [maContractByPurchase]);
-
-  const columns_ma_contract = [
-    {
-      title: t('contract.contract_date'),
-      dataIndex: 'ma_contract_date',
-      render: (text, record) => <>{formatDate(record.ma_contract_date)}</>,
-    },
-    {
-      title: t('contract.end_date'),
-      dataIndex: "ma_finish_date",
-      render: (text, record) => <>{formatDate(record.ma_finish_date)}</>,
-    },
-    {
-      title: t('common.price_1'),
-      dataIndex: "ma_price",
-      render: (text, record) => <>{text}</>,
-    },
-    {
-      title: t('common.memo'),
-      dataIndex: "ma_memo",
-      render: (text, record) => <>{text}</>,
-    },
-  ];
-
-  const contractRowSelection = {
-    selectedRowKeys: selectedContractRowKeys,
-    type:'radio',
-    onChange: (selectedRowKeys, selectedRows) => {
-      setSelectedContractRowKeys(selectedRowKeys);
-
-      if(selectedRows.length > 0) {
-        // Set data to edit selected purchase ----------------------
-        const selectedValue = selectedRows.at(0);
-        handleModifyMAContract(selectedValue.guid);
-      } else {
-        setCurrentPurchase(defaultPurchase);
-        setEditedOtherValues(null);
-        setOrgTimeOther(null);
-      };
-    },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
-      name: record.name,
-      className: "checkbox-red",
-    }),
-  };
-
-
+  // ----- useEffect for Company -----------------------------------
   useEffect(() => {
-    if((purchaseState & 1) === 0) {
-      loadAllPurchases();
-    };
-    if((transactionState & 1) === 0) {
-      loadAllTransactions();
-    };
-
+    console.log('[CompanyDetailModel] useEffect / Company');
     if((selectedCompany !== defaultCompany)
       && (selectedCompany.company_code !== currentCompanyCode))
     {
@@ -618,41 +162,44 @@ const CompanyDetailsModel = () => {
 
       loadCompanyMAContracts(selectedCompany.company_code);
 
-      setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
-      setEditedOtherValues(null);
-      setEditedOtherSelectValues({product_class: null});
-      setAddNewItem(false);
-      setEditedNewValues(null);
-      setEditedNewSelectValues({product_class: null});
       setCurrentCompanyCode(selectedCompany.company_code);
     };
-    const tempCompanyPurchases = allPurchases.filter(purchase => purchase.company_code === selectedCompany.company_code);
-    if(purchaseByCompany.length !== tempCompanyPurchases.length) {
-      setPurchaseByCompany(tempCompanyPurchases);
+  }, [selectedCompany, currentCompanyCode, loadCompanyMAContracts]);
 
-      let valid_count = 0;
-      tempCompanyPurchases.forEach(item => {
-        if(item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now())) valid_count++;
-      });
-      setValidMACount(valid_count);
+  // ----- useEffect for Purchase -----------------------------------
+  useEffect(() => {
+    console.log('[CompanyDetailModel] useEffect / Purchase');
+    if((purchaseState & 1) === 0) {
+      console.log('[CompanyDetailsModel] loadAllPurchases');
+      loadAllPurchases();
+    } else {
+      const tempCompanyPurchases = allPurchases.filter(purchase => purchase.company_code === selectedCompany.company_code);
+      if(purchasesByCompany.length !== tempCompanyPurchases.length) {
+        console.log('[CompanyDetailsModel] set purchasesBycompany / set MA Count');
+        setPurchasesByCompany(tempCompanyPurchases);
+
+        let valid_count = 0;
+        tempCompanyPurchases.forEach(item => {
+          if(item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now())) valid_count++;
+        });
+        setValidMACount(valid_count);
+      };
     };
-    const tempCompanyTransactions = allTransactions.filter(transaction => transaction.company_name === selectedCompany.company_name);
-    if(transactionByCompany.length !== tempCompanyTransactions.length) {
-      setTransactionByCompany(tempCompanyTransactions);
-    };
-  }, [
-    purchaseState,
-    transactionState,
-    selectedCompany,
-    allTransactions,
-    allPurchases,
-    currentCompanyCode,
-    purchaseByCompany,
-    transactionByCompany,
-    currentPurchase,
-    isOtherItemSelected,
-    companyMAContracts,
-  ]);
+  }, [purchaseState, allPurchases, purchasesByCompany, loadAllPurchases, selectedCompany.company_code]);
+
+  // ----- useEffect for Transaction -----------------------------------
+  useEffect(() => {
+    if((transactionState & 1) === 0) {
+      console.log('CompanyDetailsModel / loadAllTransactions');
+      loadAllTransactions();
+    } else {
+      const tempCompanyTransactions = allTransactions.filter(transaction => transaction.company_name === selectedCompany.company_name);
+      if(transactionByCompany.length !== tempCompanyTransactions.length) {
+        console.log('CompanyDetailsModel / update setTransactionByCompany');
+        setTransactionByCompany(tempCompanyTransactions);
+      };
+    }
+  }, [transactionState, allTransactions, loadAllTransactions, transactionByCompany.length, selectedCompany.company_name]);
 
   return (
     <div
@@ -682,13 +229,13 @@ const CompanyDetailsModel = () => {
                 defaultText={selectedCompany.company_name_eng}
                 name='company_name_eng'
                 title={t('company.eng_company_name')}
-                editing={handleDetailEdit}
+                onEditing={handleDetailEdit}
               />
               <DetailTitleItem
                 defaultText={selectedCompany.business_registration_code}
                 name='business_registration_code'
                 title={t('company.business_registration_code')}
-                editing={handleDetailEdit}
+                onEditing={handleDetailEdit}
               />
             </div>
             <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWindowWidthChange}/>
@@ -717,13 +264,13 @@ const CompanyDetailsModel = () => {
                     to="#company-details-product"
                     data-bs-toggle="tab"
                   >
-                    {t('purchase.product_info') + "(" + validMACount + "/" + purchaseByCompany.length + ")"}
+                    {t('purchase.product_info') + "(" + validMACount + "/" + purchasesByCompany.length + ")"}
                   </Link>
                 </li>
                 <li className="nav-item">
                   <Link
                     className="nav-link"
-                    to="#company-detail-transaction"
+                    to="#company-details-transaction"
                     data-bs-toggle="tab"
                   >
                     {t('transaction.statement_of_account') + "(" + transactionByCompany.length + ")"}
@@ -732,7 +279,7 @@ const CompanyDetailsModel = () => {
                 <li className="nav-item">
                   <Link
                     className="nav-link"
-                    to="#company-detail-tax-invoice"
+                    to="#company-details-tax-invoice"
                     data-bs-toggle="tab"
                   >
                     {t('transaction.tax_invoice')}
@@ -752,236 +299,35 @@ const CompanyDetailsModel = () => {
                 <div className="tab-pane show active" id="company-details-info">
                   <div className="crms-tasks">
                     <div className="tasks__item crms-task-item">
-                    <div className="row">
-                      <Space
-                        align="start"
-                        direction="horizontal"
-                        size="small"
-                        style={{ display: 'flex', marginBottom: '0.5rem' }}
-                        wrap
-                      >
-                        { company_items_info.map((item, index) => 
-                          <DetailCardItem
-                            key={index}
-                            defaultText={selectedCompany[item.at(0)]}
-                            edited={editedDetailValues}
-                            name={item.at(0)}
-                            title={t(item.at(1))}
-                            detail={item.at(2)}
-                            editing={handleDetailEdit}
-                          />
-                        )}
-                      </Space>
+                      <div className="row">
+                        <Space
+                          align="start"
+                          direction="horizontal"
+                          size="small"
+                          style={{ display: 'flex', marginBottom: '0.5rem' }}
+                          wrap
+                        >
+                          { company_items_info.map((item, index) => 
+                            <DetailCardItem
+                              key={index}
+                              defaultText={selectedCompany[item.at(0)]}
+                              edited={editedDetailValues}
+                              name={item.at(0)}
+                              title={t(item.at(1))}
+                              detail={item.at(2)}
+                              editing={handleDetailEdit}
+                            />
+                          )}
+                        </Space>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="tab-pane company-details-product" id="company-details-product">
-                  <div className="row"> ``    
-                    <div className="card mb-0">
-                      <div className="table-body">
-                        <div className="table-responsive">
-                          <Table
-                            rowSelection={purchaseRowSelection}
-                            pagination={{
-                              total:  purchaseByCompany.length,
-                              showTotal: ShowTotal,
-                              showSizeChanger: true,
-                              ItemRender: ItemRender,
-                            }}
-                            className="table"
-                            style={{ overflowX: "auto" }}
-                            columns={columns_purchase}
-                            dataSource={purchaseByCompany}
-                            rowKey={(record) => record.purchase_code}
-                            title={()=>
-                              <div style={{display: 'flex',
-                                  justifyContent: 'space-between',
-                                  backgroundColor: '#cccccc',
-                                  fontWeight: 600,
-                                  lineHeight: 1.5,
-                                  height: '2.5rem',
-                                  padding: '0.5rem 0.8rem',
-                                  borderRadius: '5px',
-                                }}
-                              >
-                                <div>{t('purchase.information')}</div>
-                                <Add onClick={()=>handleAddNewItem(selectedCompany.company_code)}/>
-                              </div>
-                            }
-                            onRow={(record, rowIndex) => {
-                              return {
-                                onClick: (event) => {
-                                  setSelectedPurchaseRowKeys([record.purchase_code]);
-                                  handleSelectPurchase(record);
-                                  setSelectedContractRowKeys([]);   //initialize the selected list about contract
-                                }, // click row
-                              };
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  { isOtherItemSelected &&
-                    <>
-                      <div className="row">
-                        <div className="card mb-0">
-                          <div>
-                            <div style={{fontSize: 15, fontWeight: 600, padding: '0.5rem 0 0 1.0rem'}}>Selected Item</div>
-                            <Space
-                              align="start"
-                              direction="horizontal"
-                              size="small"
-                              style={{ display: 'flex', marginBottom: '0.5rem', margineTop: '0.5rem' }}
-                              wrap
-                            >
-                              { modify_purchase_items.map((item, index) => 
-                                  <DetailCardItem
-                                    key={index}
-                                    defaultText={currentPurchase[item.at(0)]}
-                                    edited={editedOtherValues}
-                                    name={item.at(0)}
-                                    title={t(item.at(1))}
-                                    detail={item.at(2)}
-                                    disabled={item.at(2).disabled ? item.at(2).disabled : false}
-                                    editing={handleOtherItemChange}
-                                  />
-                              )}
-                            </Space>
-                            <div style={{marginBottom: '0.5rem', display: 'flex'}}>
-                              <DetailCardItem
-                                defaultText={currentPurchase["purchase_memo"]}
-                                edited={editedOtherValues}
-                                name="purchase_memo"
-                                title={t('common.memo')}
-                                detail={{type:'textarea', extra: 'memo', row_no: 3}}
-                                editing={handleOtherItemChange}
-                              />
-                              <div style={{width: 380, display: 'flex', flexDirection: 'column', alignItems:'center', justifyContent: 'space-evenly'}}>
-                                <Button
-                                  type="primary" 
-                                  style={{width: '120px'}} 
-                                  disabled={!editedOtherValues}
-                                  onClick={()=>handleOtherItemChangeSave('purchase_code')}
-                                >
-                                  {t('common.save')}
-                                </Button>
-                                <Button 
-                                  type="primary" 
-                                  style={{width: '120px'}} 
-                                  onClick={handleOtherItemChangeCancel}
-                                >
-                                  {t('common.cancel')}
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="card mb-0">
-                          <div className="table-body">
-                            <div className="table-responsive">
-                              <Table
-                                rowSelection={contractRowSelection}
-                                pagination={{
-                                  total:  maContractByPurchase.length,
-                                  showTotal: ShowTotal,
-                                  showSizeChanger: true,
-                                  ItemRender: ItemRender,
-                                }}
-                                className="table"
-                                style={{ overflowX: "auto" }}
-                                columns={columns_ma_contract}
-                                dataSource={maContractByPurchase}
-                                rowKey={(record) => record.guid}
-                                title={()=>
-                                    <div style={{display: 'flex',
-                                        justifyContent: 'space-between',
-                                        backgroundColor: '#cccccc',
-                                        fontWeight: 600,
-                                        lineHeight: 1.5,
-                                        height: '2.5rem',
-                                        padding: '0.5rem 0.8rem',
-                                        borderRadius: '5px',
-                                      }}
-                                    >
-                                      <div>{t('contract.contract_info')}</div>
-                                      <Add onClick={()=>handleAddMAContract(selectedCompany.company_code, currentPurchase.purchase_code)}/>
-                                    </div>
-                                }
-                                onRow={(record, rowIndex) => {
-                                  return {
-                                    onClick: (event) => {
-                                      setSelectedContractRowKeys([record.guid]);
-                                      handleModifyMAContract(record.guid);
-                                    }, // click row
-                                  };
-                                }}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  }
-                  { addNewItem && 
-                    <div className="row">
-                      <div className="card mb-0">
-                        <>
-                          <div style={{fontSize: 15, fontWeight: 600, padding: '0.5rem 0 0 1.0rem'}}>{t('purchase.add_purchase')}</div>
-                          <Space
-                            align="start"
-                            direction="horizontal"
-                            size="small"
-                            style={{ display: 'flex', marginBottom: '0.5rem', margineTop: '0.5rem' }}
-                            wrap
-                          >
-                          {
-                            add_purchase_items.map((item, index) => 
-                              <DetailCardItem
-                                key={index}
-                                defaultText=''
-                                edited={editedNewValues}
-                                name={item.at(0)}
-                                title={t(item.at(1))}
-                                detail={item.at(2)}
-                                disabled={item.at(2).disabled ? item.at(2).disabled : false}
-                                editing={handleNewItemChange}
-                              />
-                          )}
-                          </Space>
-                          <div style={{marginBottom: '0.5rem', display: 'flex'}}>
-                            <DetailCardItem
-                              defaultText=''
-                              edited={editedNewValues}
-                              name="purchase_memo"
-                              title={t('common.memo')}
-                              detail={{type:'textarea', extra: 'memo', row_no: 3}}
-                              editing={handleNewItemChange}
-                            />
-                            <div style={{width: 380, display: 'flex', flexDirection: 'column', flewGrow: 0, alignItems:'center', justifyContent: 'space-evenly'}}>
-                              <Button
-                                type="primary" 
-                                style={{width: '120px'}} 
-                                onClick={()=>handleSaveNewItemChange('purchase_code')}
-                              >
-                                {t('common.add')}
-                              </Button>
-                              <Button 
-                                type="primary" 
-                                style={{width: '120px'}} 
-                                onClick={handleCancelNewItemChange}
-                              >
-                                {t('common.cancel')}
-                              </Button>
-                            </div>
-                          </div>
-                        </>
-                      </div>
-                    </div>
-                  }
+                  <CompanyPurchaseModel company={selectedCompany} purchases={purchasesByCompany} />
+                </div>
+                <div className="tab-pane company-details-transaction" id="company-details-transaction">
+                  <CompanyTransactionModel transactions={transactionByCompany} />
                 </div>
               </div>
               { editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&
@@ -1007,16 +353,6 @@ const CompanyDetailsModel = () => {
           </div>
         </div>
         {/* modal-content */}
-        <DetailSubModal
-          title={subModalSetting.title}
-          open={isSubModalOpen}
-          item={subModalItems}
-          original={orgSubModalValues}
-          edited={editedSubModalValues}
-          handleEdited={handleSubModalItemChange}
-          handleOk={handleSubModalOk}
-          handleCancel={handleSubModalCancel}
-        />
       </div>
     </div>
   );

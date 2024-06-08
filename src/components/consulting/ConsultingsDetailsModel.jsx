@@ -172,22 +172,22 @@ const ConsultingsDetailsModel = () => {
           <div className="modal-header">
             <div className="row w-100">
               <DetailTitleItem
-                defaultText={selectedConsulting.status}
+                original={selectedConsulting.status}
                 name='status'
                 title={t('consulting.status')}
-                editing={handleEditing}
+                onEditing={handleEditing}
               />
               <DetailTitleItem
-                defaultText={selectedConsulting.lead_name}
+                original={selectedConsulting.lead_name}
                 name='status'
                 title={t('lead.lead_name')}
-                editing={handleEditing}
+                onEditing={handleEditing}
               />
               <DetailTitleItem
-                defaultText={selectedConsulting.receiver}
+                original={selectedConsulting.receiver}
                 name='status'
                 title={t('consulting.receiver')}
-                editing={handleEditing}
+                onEditing={handleEditing}
               />
             </div>
             <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>

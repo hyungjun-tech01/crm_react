@@ -40,7 +40,7 @@ export const LeadRepo = selector({
                 set(atomFilteredLead, atomAllLeads);
 
                 // Change loading state
-                const loadStates = snapshot.getPromise(atomLeadState);
+                const loadStates = await snapshot.getPromise(atomLeadState);
                 set(atomLeadState, (loadStates | 1));
             }
             catch(err){

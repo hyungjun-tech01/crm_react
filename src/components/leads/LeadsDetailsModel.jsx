@@ -286,22 +286,22 @@ const [selectedRow, setSelectedRow] = useState(null);
                 </div>
                 
                 <DetailTitleItem
-                  defaultText={ selectedLead.lead_name }
+                  original={ selectedLead.lead_name }
                   name='status'
                   title={t('lead.lead_name')}
-                  editing={handleEditing}
+                  onEditing={handleEditing}
                 />
                 <DetailTitleItem
-                  defaultText={ selectedLead.company_name }
+                  original={ selectedLead.company_name }
                   name='status'
                   title={t('company.company_name')}
-                  editing={handleEditing}
+                  onEditing={handleEditing}
                 />
                 <DetailTitleItem
-                  defaultText={ selectedLead.status ? selectedLead.status : "Not Contacted" }
+                  original={ selectedLead.status ? selectedLead.status : "Not Contacted" }
                   name='status'
                   title={t('common.status')}
-                  editing={handleEditing}
+                  onEditing={handleEditing}
                 />
               </div>
               <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>

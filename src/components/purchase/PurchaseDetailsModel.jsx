@@ -177,18 +177,18 @@ const PurchaseDetailsModel = () => {
             <div className="modal-header">
               <div className="row w-100">
                 <DetailTitleItem
-                  defaultText={selectedPurchase.product_type}
+                  original={selectedPurchase.product_type}
                   name='product_type'
                   title={t('purchase.type')}
                   type='col-md-4'
-                  editing={handleEditing}
+                  onEditing={handleEditing}
                 />
                 <DetailTitleItem
-                  defaultText={selectedPurchase.product_name}
+                  original={selectedPurchase.product_name}
                   name='product_name'
                   title={t('purchase.product_name')}
                   type='col-md-6'
-                  editing={handleEditing}
+                  onEditing={handleEditing}
                 />
               </div>
               <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
