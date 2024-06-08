@@ -508,7 +508,7 @@ const CompanyPurchaseModel = (props) => {
         if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
             console.log("Check Product Options\n - ", productOptions);
             const productOptionsValue = allProductClassList.map(proClass => {
-                const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name_name);
+                const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
                 const subOptions = foundProducts.map(item => {
                     return {
                         label: <span>{item.product_name}</span>,
@@ -516,8 +516,8 @@ const CompanyPurchaseModel = (props) => {
                     }
                 });
                 return {
-                    label: <span>{proClass.product_class_name_name}</span>,
-                    title: proClass.product_class_name_name,
+                    label: <span>{proClass.product_class_name}</span>,
+                    title: proClass.product_class_name,
                     options: subOptions,
                 };
             });
