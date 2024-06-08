@@ -284,7 +284,7 @@ export const defaultPurchase = {
     company_code: null,
     //----- Product info --------------
     product_code: null,
-    product_class: null,
+    product_class_name: null,
     product_name: null,
     serial_number: null,
     licence_info: null,

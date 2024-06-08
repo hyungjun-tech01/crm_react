@@ -76,14 +76,14 @@ const CompanyPurchaseModel = (props) => {
         if (name === 'product_name') {
             const tempOtherSelect = {
                 ...editedOtherSelectValues,
-                product_class: value.value.product_class,
+                product_class_name: value.value.product_class_name,
             };
             setEditedOtherSelectValues(tempOtherSelect);
 
             const tempNew = {
                 ...editedOtherValues,
                 product_name: value.value.product_name,
-                product_class: value.value.product_class,
+                product_class_name: value.value.product_class_name,
                 product_code: value.value.product_code,
             };
             setEditedOtherValues(tempNew);
@@ -185,14 +185,14 @@ const CompanyPurchaseModel = (props) => {
         if (name === 'product_name') {
             const tempNewSelect = {
                 ...editedNewSelectValues,
-                product_class: value.value.product_class,
+                product_class_name: value.value.product_class_name,
             };
             setEditedNewSelectValues(tempNewSelect);
 
             const tempNew = {
                 ...editedNewValues,
                 product_name: value.value.product_name,
-                product_class: value.value.product_class,
+                product_class_name: value.value.product_class_name,
                 product_code: value.value.product_code,
             };
             setEditedNewValues(tempNew);
@@ -254,7 +254,7 @@ const CompanyPurchaseModel = (props) => {
             hq_finish_date: purchase.hq_finish_date ? new Date(purchase.hq_finish_date) : null,
         });
         setEditedOtherSelectValues({
-            product_class: purchase.product_class,
+            product_class_name: purchase.product_class_name,
         });
 
         // Set data to edit selected purchase ----------------------
@@ -265,7 +265,7 @@ const CompanyPurchaseModel = (props) => {
     const add_purchase_items = [
         ['product_name', 'purchase.product_name',
             {
-                type: 'select', group: 'product_class', options: productOptions, value: editedNewSelectValues,
+                type: 'select', group: 'product_class_name', options: productOptions, value: editedNewSelectValues,
                 selectChange: (value) => handleNewItemSelectChange('product_name', value)
             }],
         ['product_type', 'purchase.product_type',
@@ -290,7 +290,7 @@ const CompanyPurchaseModel = (props) => {
     const modify_purchase_items = [
         ['product_name', 'purchase.product_name',
             {
-                type: 'select', group: 'product_class', options: productOptions, value: editedOtherSelectValues,
+                type: 'select', group: 'product_class_name', options: productOptions, value: editedOtherSelectValues,
                 selectChange: (value) => handleOtherItemSelectChange('product_name', value)
             }],
         ['product_type', 'purchase.product_type',
@@ -508,16 +508,16 @@ const CompanyPurchaseModel = (props) => {
         if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
             console.log("Check Product Options\n - ", productOptions);
             const productOptionsValue = allProductClassList.map(proClass => {
-                const foundProducts = allProducts.filter(product => product.product_class === proClass.product_class_name);
+                const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name_name);
                 const subOptions = foundProducts.map(item => {
                     return {
                         label: <span>{item.product_name}</span>,
-                        value: { product_code: item.product_code, product_name: item.product_name, product_class: item.product_class }
+                        value: { product_code: item.product_code, product_name: item.product_name, product_class_name: item.product_class_name }
                     }
                 });
                 return {
-                    label: <span>{proClass.product_class_name}</span>,
-                    title: proClass.product_class_name,
+                    label: <span>{proClass.product_class_name_name}</span>,
+                    title: proClass.product_class_name_name,
                     options: subOptions,
                 };
             });
