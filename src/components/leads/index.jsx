@@ -3,8 +3,6 @@ import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
-import Select from "react-select";
-import { useCookies } from "react-cookie";
 import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
@@ -14,36 +12,31 @@ import { CompanyRepo } from "../../repository/company";
 import {ConsultingRepo} from "../../repository/consulting";
 import {QuotationRepo} from "../../repository/quotation";
 import {PurchaseRepo} from "../../repository/purchase";
-import { KeyManForSelection, LeadStatusSelection, LeadRepo } from "../../repository/lead";
-import { atomAllCompanies,
+import { LeadRepo } from "../../repository/lead";
+import { 
   atomAllLeads,
   atomFilteredLead,
-  defaultLead,
   atomCompanyState,
   atomLeadState,
 } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 import { useTranslation } from "react-i18next";
+import LeadAddModel from "./LeadAddMdel";
 
 const Leads = () => {
   const companyState = useRecoilValue(atomCompanyState);
   const leadState = useRecoilValue(atomLeadState);
-  const allCompnayData = useRecoilValue(atomAllCompanies);
+  
   const allLeadData = useRecoilValue(atomAllLeads);
   const filteredLead = useRecoilValue(atomFilteredLead);
   const { loadAllCompanies , setCurrentCompany} = useRecoilValue(CompanyRepo);
   const { loadCompanyConsultings} = useRecoilValue(ConsultingRepo);
   const { loadCompanyQuotations} = useRecoilValue(QuotationRepo);
-  const {loadCompanyPurchases}  = useRecoilValue(PurchaseRepo);
+  const { loadCompanyPurchases }  = useRecoilValue(PurchaseRepo);
 
-  const { loadAllLeads, modifyLead, setCurrentLead, filterLeads } = useRecoilValue(LeadRepo);
-  const [ cookies ] = useCookies(["myLationCrmUserName",  "myLationCrmUserId",]);
+  const { loadAllLeads, setCurrentLead, filterLeads } = useRecoilValue(LeadRepo);
 
-  const [ leadChange, setLeadChange ] = useState(null);
-  const [ companyData, setCompanyData ] = useState([]);
-  const [selectedOption, setSelectedOption] = useState([]);
-  const [selectedKeyMan, setSelectedKeyMan] = useState([]);
-  const [selectedLeadStatus, setSelectedLeadStatus] = useState([]);
+  const [ initToAddLead, setInitToAddLead ] = useState(false);
   const { t } = useTranslation();
 
   const [searchCondition, setSearchCondition] = useState("");
@@ -63,86 +56,11 @@ const Leads = () => {
   }
   // --- Functions used for Add New Lead ------------------------------
   const handleAddNewLeadClicked = useCallback(() => {
-    initializeLeadTemplate();
-  }, []);
+    setInitToAddLead(true);
+  }, [setInitToAddLead]);
 
-  const initializeLeadTemplate = useCallback(() => {
-    setLeadChange({ ...defaultLead });
-    setSelectedOption([]);
-    setSelectedKeyMan([]);
-    setSelectedLeadStatus([]);
-    document.querySelector("#add_new_lead_form").reset();
-  }, []);
 
-  const handleLeadChange = useCallback((e) => {
-    const modifiedData = {
-      ...leadChange,
-      [e.target.name]: e.target.value,
-    };
-    setLeadChange(modifiedData);
-  }, [leadChange]);
-
-  const handleAddNewLead = useCallback((event)=>{
-    // Check data if they are available
-    if(leadChange.lead_name === null
-      || leadChange.lead_name === ''
-      || leadChange.company_code === null)
-    {
-      console.log("Company Name must be available!");
-      return;
-    };
-
-    const newLeadData = {
-      ...leadChange,
-      action_type: 'ADD',
-      lead_number: '99999',// Temporary
-      counter: 0,
-      modify_user: cookies.myLationCrmUserId,
-    };
-    console.log(`[ handleAddNewLead ]`, newLeadData);
-    const result = modifyLead(newLeadData);
-    if(result){
-      initializeLeadTemplate();
-      //close modal ?
-    };
-  },[cookies.myLationCrmUserName, initializeLeadTemplate, leadChange, modifyLead]);
-
-  // --- Funtions for Select ---------------------------------
-  const handleSelectCompany = useCallback((value)=>{
-    const selected = value.value;
-    setSelectedOption(value);
-    const tempLeadChange = {
-      ...leadChange,
-      company_code: selected.company_code,
-      company_name: selected.company_name,
-      company_name_en: selected.company_name_en,
-      company_zip_code: (leadChange.company_zip_code !== null ? leadChange.company_zip_code : selected.company_zip_code),
-      company_address: (leadChange.company_address !== null ? leadChange.company_address : selected.company_address),
-    };
-    setLeadChange(tempLeadChange);
-  }, [leadChange]);
-
-  const handleSelectKeyMan = useCallback((value) => {
-    const selected = value.value;
-    setSelectedKeyMan(value);
-    const tempLeadChange = {
-      ...leadChange,
-      is_keyman : selected
-    };
-    setLeadChange(tempLeadChange);
-  },[leadChange]);
-
-  const handleSelectedLeadStatus = useCallback((value) => {
-    const selected = value.value;
-    setSelectedLeadStatus(value);
-    const tempLeadChange = {
-      ...leadChange,
-      status : selected
-    };
-    setLeadChange(tempLeadChange);
-  },[leadChange]);
-
-  const [expanded, setExpaned] = useState(false);
+  const [ expanded, setExpaned ] = useState(false);
 
   const columns = [
     {
@@ -296,26 +214,10 @@ const Leads = () => {
     if((companyState & 1) === 0) {
       loadAllCompanies();
     };
-    if(companyData.length !== allCompnayData.length){
-      const companySubSet = allCompnayData.map((data) => ({
-        value: {
-          company_code: data.company_code,
-          company_name: data.company_name,
-          company_name_en: data.company_name_en,
-          company_zip_code: data.company_zip_code,
-          company_address: data.company_address,
-        },
-        label: data.company_name,
-      }));
-      setCompanyData(companySubSet);
-    };
-
     if((leadState & 1) === 0) {
       loadAllLeads();
     };
-
-    initializeLeadTemplate();
-  }, [allCompnayData, allLeadData, companyData, companyState, leadState]);
+  }, [allLeadData, companyState, leadState, loadAllCompanies, loadAllLeads]);
 
   return (
     <HelmetProvider>
@@ -528,228 +430,7 @@ const Leads = () => {
             </div>
           </div>
         </div>
-        {/* Modal */}
-        <div
-          className="modal right fade"
-          id="add_lead"
-          tabIndex={-1}
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="modal-dialog" role="document">
-            <button
-              type="button"
-              className="close md-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
-            <div className="modal-content">
-              <div className="modal-header">
-                <h4 className="modal-title text-center">
-                  <b>{t('lead.add_lead')}</b>
-                </h4>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                ></button>
-              </div>
-              <div className="modal-body">
-                <div className="row">
-                  <div className="col-md-12">
-                    <form id="add_new_lead_form">
-                      <div className="form-group row">
-                        <div className="col-sm-6  d-flex" >
-                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('common.name')} <span className="text-danger">*</span></label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder="Name"
-                            name="lead_name"
-                            onChange={handleLeadChange}
-                          />
-                        </div>
-                        <div className="col-sm-6  d-flex">
-                          <label className="col-form-label  col-sm-4" style={{fontWeight:'bold'}}>{t('lead.is_keyman')}</label>
-                          <Select className = "col-sm-8" options={KeyManForSelection} value={selectedKeyMan}  onChange={handleSelectKeyMan} />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-6 d-flex">
-                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('lead.lead_status')}</label>
-                          <Select className= "col-sm-8" options={LeadStatusSelection} value={selectedLeadStatus}  onChange={handleSelectedLeadStatus} />
-                        </div>
-                      </div>
-                      {/* <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">Lead Rating</label>
-                          <input
-                            type="number"
-                            className="form-control form-control-sm"
-                            name="rating"
-                            placeholder="Rating"
-                          />
-                        </div>
-                      </div> */}
-                      <div className="form-group row" >
-                        <div className="col-sm-6 d-flex " >
-                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('company.company_name')}</label>
-                          <Select  className="col-sm-8" options={companyData} value={selectedOption} onChange={handleSelectCompany} />
-                        </div>
-                        <div className="col-sm-6 d-flex" >
-                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold' }}>{t('lead.position')}</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder={t('lead.position')}
-                            name="position"
-                            onChange={handleLeadChange}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-6 d-flex">
-                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('lead.department')}</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder={t('lead.department')}
-                            name="department"
-                            onChange={handleLeadChange}
-                          />
-                        </div>
-                        <div className="col-sm-6 d-flex">
-                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('company.group')}</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder={t('company.group')}
-                            name="group_"
-                            onChange={handleLeadChange}
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="form-group row">
-                        <div className="col-sm-6 d-flex">
-                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('common.region')}</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder={t('common.region')}
-                            name="region"
-                            onChange={handleLeadChange}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-6 d-flex">
-                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('lead.mobile')}</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder={t('lead.mobile')}
-                            name="mobile_number"
-                            onChange={handleLeadChange}
-                          />
-                        </div>
-                        <div className="col-sm-6 d-flex">
-                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('lead.email')}</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder={t('lead.email')}
-                            name="email"
-                            onChange={handleLeadChange}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-6 d-flex">
-                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('company.phone_number')}</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder={t('company.phone_number')}
-                            name="company_phone_number"
-                            onChange={handleLeadChange}
-                          />
-                        </div>
-                        <div className="col-sm-6 d-flex">
-                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('company.fax_number')}</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder={t('company.fax_number')}
-                            name="company_fax_number"
-                            onChange={handleLeadChange}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-6 d-flex">
-                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('company.homepage')}</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder={t('company.homepage')}
-                            name="homepage"
-                            onChange={handleLeadChange}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-6 d-flex">
-                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('company.salesman')}</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder={t('company.salesman')}
-                            name="sales_resource"
-                            onChange={handleLeadChange}
-                          />
-                        </div>
-                        <div className="col-sm-6 d-flex">
-                          <label className="col-form-label col-sm-4" style={{fontWeight:'bold'}}>{t('company.engineer')}</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder={t('company.engineer')}
-                            name="application_engineer"
-                            onChange={handleLeadChange}
-                          />
-                        </div>
-                      </div>
-                      <div className="text-center py-3">
-                        <button
-                          type="button"
-                          className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                          data-bs-dismiss="modal"
-                          onClick={handleAddNewLead}
-                        >
-                          {t('common.save')}
-                        </button>
-                        &nbsp;&nbsp;
-                        <button
-                          type="button"
-                          className="btn btn-secondary btn-rounded"
-                          data-bs-dismiss="modal"
-                        >
-                          {t('common.cancel')}
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* modal-content */}
-          </div>
-          {/* modal-dialog */}
-        </div>
-        {/* modal */}
+        <LeadAddModel init={initToAddLead} handleInit={setInitToAddLead} />
         <LeadsDetailsModel />
       </div>
     </HelmetProvider>
