@@ -1,5 +1,5 @@
 import React, {  useState , useCallback} from "react";
-import { Button, Modal } from 'antd';
+import { Button, Modal, Checkbox, CheckboxProps } from 'antd';
 import Select from "react-select";
 import { companyColumn, ColumnQueryCondition } from "../repository/company";
 import { useTranslation } from "react-i18next";
@@ -40,6 +40,19 @@ const MultiQueryModal = (props) => {
       { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
     ]);
 
+  //   const add_purchase_items = [
+  //     ['registration_date', 'purchase.registration_date',
+  //         { type: 'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
+  //     ['delivery_date', 'purchase.delivery_date',
+  //         { type: 'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
+  //     ['hq_finish_date', 'purchase.hq_finish_date',
+  //         { type: 'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
+  //     ['ma_finish_date', 'purchase.ma_finish_date',
+  //         { type: 'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
+  //     ['ma_non_extended', 'purchase.ma_non_extended',
+  //         { type: 'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],    
+  // ];
+
     const handleSelectCompanyColumn = (index, value) => {
       const newConditions = [...queryConditions];
       newConditions[index].companyColumn = value;
@@ -67,6 +80,26 @@ const MultiQueryModal = (props) => {
     const handleSubmit = () => {
       console.log(queryConditions);
     }
+
+    //check box 
+    const [checked, setChecked] = useState(true);
+    const [disabled, setDisabled] = useState(false);
+  
+    const toggleChecked = () => {
+      setChecked(!checked);
+    };
+  
+    const toggleDisable = () => {
+      setDisabled(!disabled);
+    };
+  
+    const onChange = (e) => {
+      console.log('checked = ', e.target.checked);
+      setChecked(e.target.checked);
+    };
+  
+    const label = `${checked ? 'Checked' : 'Unchecked'}-${disabled ? 'Disabled' : 'Enabled'}`;
+  
   
     return (
         <Modal
@@ -113,8 +146,22 @@ const MultiQueryModal = (props) => {
               />
               ))}       
               <tr>
-                등록일 : 날짜 ~ 날짜 
-              </tr>                  
+                <Checkbox checked={checked} disabled={disabled} onChange={onChange}>
+                  {t('purchase.registration_date')}
+                </Checkbox> : 날짜 ~ 날짜 
+              </tr>      
+              <tr>
+                {t('purchase.delivery_date')} : 날짜 ~ 날짜 
+              </tr>  
+              <tr>
+                {t('purchase.hq_finish_date')} : 날짜 ~ 날짜 
+              </tr>        
+              <tr>
+                {t('purchase.ma_finish_date')} : 날짜 ~ 날짜 
+              </tr>   
+              <tr>
+                {t('purchase.ma_non_extended')} : 날짜 ~ 날짜 
+              </tr>                                                                 
             </tbody>
           </table>
         </Modal>

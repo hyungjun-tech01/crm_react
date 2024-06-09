@@ -56,6 +56,7 @@ const koResource = {
             salesman:'영업담당자',
             zip_code : '업체우편번호',
             company_multi_query:'업체 다중검색',
+            ma_non_extended: '유지보수 계약 미연장',
         },
         lead: {
             actions:'액션',
