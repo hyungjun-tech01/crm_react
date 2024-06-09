@@ -57,6 +57,7 @@ const enResource = {
             salesman:'SalesMan',
             zip_code : 'Company Postal Code',
             company_multi_query:'Company MultiQuery',
+            ma_non_extended: 'MA Non Extended',
         },
         lead:{
             actions:'Actions',

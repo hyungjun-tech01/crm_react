@@ -10,7 +10,9 @@ export const defaultUser = {
     position: "", 
     email: "", 
     group_: "", 
-    memo: ""
+    memo: "",
+    jobType:"",
+    isWork:""
 }
 
 export const atomCurrentUser= atom({
