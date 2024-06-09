@@ -1,6 +1,6 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentUser, defaultUser } from '../atoms/atomsUser';
+import { atomCurrentUser, defaultUser , atomAllUsers} from '../atoms/atomsUser';
 import { data_user } from './test_data';
 
 
@@ -59,6 +59,22 @@ export async function  apiLoginValidate(userId, password) {
  export const UserRepo = selector({
     key: "UserRepository",
     get: ({getCallback}) => {
+        /////////////////////load all Users /////////////////////////////
+        const loadAllUsers = getCallback(({set}) => async () => {
+            try{
+                const response = await fetch(`${BASE_PATH}/getallusers`);
+                const data = await response.json();
+                if(data.message){
+                    console.log('loadUsers message:', data.message);
+                    set(atomAllUsers, []);
+                    return;
+                }
+                set(atomAllUsers, data);
+            }
+            catch(err){
+                console.error(`loadUsers / Error : ${err}`);
+            };
+        });        
         /////////////////////load Users /////////////////////////////
         const loadUsers = getCallback(({set}) => async (userId) => {
             try{
@@ -113,22 +129,7 @@ export async function  apiLoginValidate(userId, password) {
 
                     return(true);
 
-                    // const foundIdx = allCompany.findIndex(company => 
-                    //     company.company_code === modifiedCompany.company_code);
-
-                    // if(foundIdx !== -1){
-                    //     const updatedAllCompanies = [
-                    //         ...allCompany.slice(0, foundIdx),
-                    //         modifiedCompany,
-                    //         ...allCompany.slice(foundIdx + 1,),
-                    //     ];
-                    //     set(atomAllCompanies, updatedAllCompanies);
-                    //     return true;
-                    // } else {
-                    //     console.log('\t[ modifyCompany ] No specified company is found');
-                    //     return false;
-                    // }
-                }
+                 }
             } catch(err){
                 console.error(`\t[ modifyUser ] Error : ${err}`);
                 return false;
@@ -156,55 +157,9 @@ export async function  apiLoginValidate(userId, password) {
         return {
             loadUsers,
             modifyUser,
-            setCurrentUser
+            setCurrentUser,
+            loadAllUsers
         };
     }
 });
 
-// export const UserRepo = selector({
-//     key: "UserRepo",
-//     get: ({getCallback}) => {
-//         const loadUser = getCallback(({set}) => async (email, password) => {
-//         try{
-//             console.log("loadUser ~~~~ ", email, password, `${BASE_PATH}/login`);
-//             // from friday subscription 
-//             const input_data = {
-//                 email: email,
-//                 password: password,
-//             };
-//              const response = await fetch(`${BASE_PATH}/login`, {
-//                  method: 'POST',
-//                  headers: {'Content-Type':'application/json'},
-//                  body: JSON.stringify(input_data)
-//              });
-
-//              const data = await response.json();
-
-//              if(data.message) {
-//                 console.log(data.message);
-//                  set(atomCurrentUser, []);
-//              }
-//              else {
-//                  set(atomCurrentUser, data);
-//              }
-
-//                 // const response = await fetch(`${BASE_PATH}/company/all`);
-//                 // const data = await response.json();
-//                 // if(data.message){
-//                 //     console.log('loadCurrentCompany message:', data.message);
-//                 //     set(atomAllCompanies, []);
-//                 //     return;
-//                 // }
-//                 // set(atomAllCompanies, data);
-
-//             }
-//             catch(err){
-//                 console.error(`loadUser / Error : ${err}`);
-//             };
-//         });
-        
-//         return {
-//             loadUser
-//         };
-//     }
-// });

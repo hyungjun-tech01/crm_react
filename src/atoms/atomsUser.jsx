@@ -20,4 +20,7 @@ export const atomCurrentUser= atom({
     default: defaultUser
 });
 
-
+export const atomAllUsers = atom({
+    key: "allUsers",
+    default: [],
+});
