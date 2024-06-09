@@ -66,6 +66,7 @@ const enResource = {
             consulting_history:'Consulting History',
             department: 'Department',
             detail_information:'Lead Detail',
+            DMexist:'DM',
             email:'Email Address',
             fax_number: 'Fax No.',
             full_name:'Full Name',
