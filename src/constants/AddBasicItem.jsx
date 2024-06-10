@@ -4,7 +4,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const AddBasicItem = (props) => {
-    const { long, name, options, required, row_no, time, title, type, onChange } = props;
+    const { title, name, defaultValue, options, required, row_no, time , type, long, disabled, onChange } = props;
 
     switch(type){
         case 'text':
@@ -20,6 +20,8 @@ const AddBasicItem = (props) => {
                             name = {name}
                             type="text"
                             placeholder={title}
+                            value={defaultValue}
+                            disabled={disabled ? disabled : false}
                             onChange={onChange}
                         />
                     </div>
@@ -38,12 +40,20 @@ const AddBasicItem = (props) => {
                             name = {name}
                             placeholder={title}
                             rows={row_no}
+                            value={defaultValue}
+                            disabled={disabled ? disabled : false}
                             onChange={onChange}
                         />
                     </div>
                 </div>
             );
         case 'select':
+            const selected = defaultValue ? (options.filter(item => {
+                if(typeof item.value !== 'object'){
+                  return item.value === defaultValue;  
+                } else {
+                    return item.value[name] === defaultValue;
+                }})[0]) : null;
             return (
                 <div className={ long ? "col-sm-12" : "col-sm-6"} >
                     <div className="add-basic-item">
@@ -55,6 +65,8 @@ const AddBasicItem = (props) => {
                             className="add-basic-select"
                             name={name}
                             options={options}
+                            value={selected}
+                            isDisabled={disabled ? disabled : false}
                             onChange={onChange}
                         />
                     </div>
@@ -74,6 +86,7 @@ const AddBasicItem = (props) => {
                                 className="add-basic-date"
                                 name = {name}
                                 selected={time.data}
+                                disabled={disabled ? disabled : false}
                                 onChange={onChange}
                                 dateFormat="yyyy-MM-dd hh:mm:ss"
                                 showTimeSelect

@@ -9,9 +9,9 @@ import "../antdstyle.css";
 import LeadsDetailsModel from "./LeadsDetailsModel";
 import { MoreVert } from '@mui/icons-material';
 import { CompanyRepo } from "../../repository/company";
-import {ConsultingRepo} from "../../repository/consulting";
-import {QuotationRepo} from "../../repository/quotation";
-import {PurchaseRepo} from "../../repository/purchase";
+import { ConsultingRepo } from "../../repository/consulting";
+import { QuotationRepo } from "../../repository/quotation";
+import { PurchaseRepo } from "../../repository/purchase";
 import { LeadRepo } from "../../repository/lead";
 import { 
   atomAllLeads,
