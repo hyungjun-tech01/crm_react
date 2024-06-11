@@ -28,7 +28,6 @@ import CompanyTransactionModel from "./CompanyTransactionModel";
 const CompanyDetailsModel = () => {
   const purchaseState = useRecoilValue(atomPurchaseState);
   const transactionState = useRecoilValue(atomTransationState);
-
   const selectedCompany = useRecoilValue(atomCurrentCompany);
   const { modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allPurchases = useRecoilValue(atomAllPurchases);
@@ -150,6 +149,7 @@ const CompanyDetailsModel = () => {
       && (selectedCompany.company_code !== currentCompanyCode))
     {
       console.log('[CompanyDetailsModel] new company is loaded!');
+
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if(detailViewStatus === null){
         localStorage.setItem("isFullScreen", '0');
@@ -161,7 +161,6 @@ const CompanyDetailsModel = () => {
       };
 
       loadCompanyMAContracts(selectedCompany.company_code);
-
       setCurrentCompanyCode(selectedCompany.company_code);
     };
   }, [selectedCompany, currentCompanyCode, loadCompanyMAContracts]);
@@ -310,10 +309,11 @@ const CompanyDetailsModel = () => {
                           { company_items_info.map((item, index) => 
                             <DetailCardItem
                               key={index}
-                              defaultText={selectedCompany[item.at(0)]}
+                              title={t(item.at(1))}
+
+                              defaultValue={selectedCompany[item.at(0)]}
                               edited={editedDetailValues}
                               name={item.at(0)}
-                              title={t(item.at(1))}
                               detail={item.at(2)}
                               editing={handleDetailEdit}
                             />
@@ -324,7 +324,10 @@ const CompanyDetailsModel = () => {
                   </div>
                 </div>
                 <div className="tab-pane company-details-product" id="company-details-product">
-                  <CompanyPurchaseModel company={selectedCompany} purchases={purchasesByCompany} />
+                  <CompanyPurchaseModel 
+                    company={selectedCompany}
+                    purchases={purchasesByCompany}
+                    handlePurchase={setPurchasesByCompany} />
                 </div>
                 <div className="tab-pane company-details-transaction" id="company-details-transaction">
                   <CompanyTransactionModel transactions={transactionByCompany} />

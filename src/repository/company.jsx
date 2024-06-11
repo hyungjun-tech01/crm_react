@@ -4,7 +4,8 @@ import { atomCurrentCompany
     , atomAllCompanies
     , atomFilteredCompany
     , defaultCompany
-    , atomCompanyState
+    , atomCompanyState,
+    atomCompanyForSelection
 } from '../atoms/atoms';
 import Paths from "../constants/Paths";
 
@@ -40,12 +41,25 @@ export const CompanyRepo = selector({
                 if(data.message){
                     console.log('\t[ loadAllCompanies ] message:', data.message);
                     set(atomAllCompanies, []);
+                    set(atomCompanyForSelection, []);
 
                     const loadStates = await snapshot.getPromise(atomCompanyState);
                     set(atomCompanyState, (loadStates & ~1));
                     return;
                 }
                 set(atomAllCompanies, data);
+                const tempCompanySelection = data.map(item => ({
+                    value: {
+                        company_code: item.company_code,
+                        company_name: item.company_name,
+                        company_name_en: item.company_name_en,
+                        company_zip_code: item.company_zip_code,
+                        company_address: item.company_address,
+                        region: item.region,
+                    },
+                    label: item.company_name,
+                }));
+                set(atomCompanyForSelection, tempCompanySelection);
 
                 // Change loading state
                 const loadStates = await snapshot.getPromise(atomCompanyState);
@@ -53,6 +67,9 @@ export const CompanyRepo = selector({
             }
             catch(err){
                 console.error(`\t[ loadAllCompanies ] Error : ${err}`);
+                set(atomAllCompanies, []);
+                set(atomCompanyForSelection, []);
+
                 const loadStates = await snapshot.getPromise(atomCompanyState);
                 set(atomCompanyState, (loadStates & ~1));
             };
@@ -105,6 +122,7 @@ export const CompanyRepo = selector({
                 };
 
                 const allCompany = await snapshot.getPromise(atomAllCompanies);
+                const allCompanySelection = await snapshot.getPromise(atomCompanyForSelection);
                 if(newCompany.action_type === 'ADD'){
                     delete newCompany.action_type;
                     const updatedNewCompany = {
@@ -116,6 +134,17 @@ export const CompanyRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomAllCompanies, allCompany.concat(updatedNewCompany));
+                    set(atomCompanyForSelection, allCompanySelection.concat({
+                        value: {
+                            company_code: updatedNewCompany.company_code,
+                            company_name: updatedNewCompany.company_name,
+                            company_name_en: updatedNewCompany.company_name_en,
+                            company_zip_code: updatedNewCompany.company_zip_code,
+                            company_address: updatedNewCompany.company_address,
+                            region: updatedNewCompany.region,
+                        },
+                        label: updatedNewCompany.company_name,
+                    }));
                     return true;
                 } else if(newCompany.action_type === 'UPDATE'){
                     const currentCompany = await snapshot.getPromise(atomCurrentCompany);
@@ -138,11 +167,33 @@ export const CompanyRepo = selector({
                             ...allCompany.slice(foundIdx + 1,),
                         ];
                         set(atomAllCompanies, updatedAllCompanies);
+                        const foundSelIdx = allCompanySelection.findIndex(item => 
+                            item.value.company_code === modifiedCompany.company_code);
+                        if(foundSelIdx !== -1){
+                            const updatedCompanySelection = [
+                                ...allCompanySelection.slice(0, foundSelIdx),
+                                {
+                                    value: {
+                                        company_code: modifiedCompany.company_code,
+                                        company_name: modifiedCompany.company_name,
+                                        company_name_en: modifiedCompany.company_name_en,
+                                        company_zip_code: modifiedCompany.company_zip_code,
+                                        company_address: modifiedCompany.company_address,
+                                        region: modifiedCompany.region,
+                                    },
+                                    label: modifiedCompany.company_name,
+                                },
+                                ...allCompanySelection.slice(foundSelIdx + 1, ),
+                            ]
+                            set(atomCompanyForSelection, updatedCompanySelection);
+                        } else {
+                            console.log('\t[ modifyCompany / modify selection ] Impossible case~~!!');    
+                        }
                         return true;
                     } else {
                         console.log('\t[ modifyCompany ] No specified company is found');
                         return false;
-                    }
+                    };
                 }
             }
             catch(err){

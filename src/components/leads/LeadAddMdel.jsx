@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
-import { atomAllCompanies, atomCompanyState, defaultLead } from "../../atoms/atoms";
+import { atomCompanyState, atomCompanyForSelection, defaultLead } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo } from "../../repository/company";
 import { UserRepo } from '../../repository/user';
@@ -15,15 +15,14 @@ import AddAddressItem from '../../constants/AddAddressItem';
 const LeadAddModel = (props) => {
     const { init, handleInit } = props;
     const companyState = useRecoilValue(atomCompanyState);
-    const allCompnayData = useRecoilValue(atomAllCompanies);
     const { loadAllCompanies } = useRecoilValue(CompanyRepo);
+    const companyForSelection = useRecoilValue(atomCompanyForSelection);
     const userState = useRecoilValue(atomUserState);
     const engineersForSelection = useRecoilValue(atomEngineersForSelection);
     const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
     const { loadAllUsers } = useRecoilValue(UserRepo)
     const { modifyLead } = useRecoilValue(LeadRepo);
     const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
-    const [ companySelection, setCompanySelection ] = useState([]);
     const [ leadChange, setLeadChange ] = useState(defaultLead);
     const [ disabledItems, setDisabledItems ] = useState({});
 
@@ -130,24 +129,9 @@ const LeadAddModel = (props) => {
         console.log('[LeadAddModel] loading company data!');
         if ((companyState & 1) === 0) {
             loadAllCompanies();
-        } else {
-            if (companySelection.length !== allCompnayData.length) {
-                const companySubSet = allCompnayData.map((data) => ({
-                    value: {
-                        company_code: data.company_code,
-                        company_name: data.company_name,
-                        company_name_en: data.company_name_en,
-                        company_zip_code: data.company_zip_code,
-                        company_address: data.company_address,
-                        region: data.region,
-                    },
-                    label: data.company_name,
-                }));
-                setCompanySelection(companySubSet);
-            };
         };
 
-    }, [allCompnayData, companySelection.length, companyState, loadAllCompanies]);
+    }, [companyState, loadAllCompanies]);
 
     useEffect(() => {
         console.log('[LeadAddModel] loading user data!');
@@ -225,7 +209,7 @@ const LeadAddModel = (props) => {
                                             title={t('company.company_name')}
                                             type='select'
                                             defaultValue={leadChange.company_name}
-                                            options={companySelection}
+                                            options={companyForSelection}
                                             onChange={handleSelectCompany}
                                         />
                                         <AddBasicItem

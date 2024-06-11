@@ -232,6 +232,7 @@ const enResource = {
             product: 'Product',
             quantity: 'Quantity',
             region:'Region',
+            regist_date:'Registration Date',
             related: 'Related',
             revenue: 'Revenue',
             sales: 'Sales',

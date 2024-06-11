@@ -109,7 +109,7 @@ const Company = () => {
     if((companyState & 1) === 0) {
       loadAllCompanies();
     };
-  }, [allCompanyData, companyState]);
+  }, [companyState, loadAllCompanies]);
 
   return (
     <HelmetProvider>
