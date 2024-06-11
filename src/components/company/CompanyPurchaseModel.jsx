@@ -27,7 +27,7 @@ import DetailSubModal from '../../constants/DetailSubModal';
 
 
 const CompanyPurchaseModel = (props) => {
-    const { company, purchases } = props;
+    const { company, purchases, handlePurchase } = props;
     const productClassState = useRecoilValue(atomProductClassListState);
     const productState = useRecoilValue(atomProductsState);
     const currentPurchase = useRecoilValue(atomCurrentPurchase);
@@ -122,14 +122,14 @@ const CompanyPurchaseModel = (props) => {
                             ...currentPurchase,
                             ...editedOtherValues,
                         };
-                        const foundIdx = purchaseByCompany.findIndex(item => item.purchase_code === currentPurchase.purchase_code);
+                        const foundIdx = purchases.findIndex(item => item.purchase_code === currentPurchase.purchase_code);
                         if (foundIdx !== -1) {
                             const updatedPurchases = [
-                                ...purchaseByCompany.slice(0, foundIdx),
+                                ...purchases.slice(0, foundIdx),
                                 modfiedPurchase,
-                                ...purchaseByCompany.slice(foundIdx + 1,),
+                                ...purchases.slice(foundIdx + 1,),
                             ];
-                            setPurchaseByCompany(updatedPurchases);
+                            handlePurchase(updatedPurchases);
                         } else {
                             console.error("handleOtherItemChangeSave / Purchase : Impossible case!!!");
                         };
@@ -148,7 +148,7 @@ const CompanyPurchaseModel = (props) => {
             setEditedOtherValues(null);
             setOrgTimeOther(null);
         }
-    }, [cookies.myLationCrmUserId, currentPurchase, editedOtherValues, modifyPurchase, setCurrentPurchase]);
+    }, [cookies.myLationCrmUserId, currentPurchase, editedOtherValues, handlePurchase, modifyPurchase, purchases, setCurrentPurchase]);
 
 
     // --- Functions for Editing New item ---------------------------------
@@ -591,7 +591,7 @@ const CompanyPurchaseModel = (props) => {
                                     {modify_purchase_items.map((item, index) =>
                                         <DetailCardItem
                                             key={index}
-                                            defaultText={currentPurchase[item.at(0)]}
+                                            defaultValue={currentPurchase[item.at(0)]}
                                             edited={editedOtherValues}
                                             name={item.at(0)}
                                             title={t(item.at(1))}

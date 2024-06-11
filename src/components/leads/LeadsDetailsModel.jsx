@@ -2,13 +2,14 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
-import { CircleImg } from "../imagepath";
 import { Collapse, Space, Switch } from "antd";
 import { atomCurrentLead, defaultLead, atomCurrentCompany, defaultCompany, 
          atomCompanyConsultings,atomFilteredConsulting, atomCompanyQuotations, atomFilteredQuotation,
-         atomCompanyPurchases, atomFilteredPurchase } from "../../atoms/atoms";
-import { KeyManForSelection, LeadRepo } from "../../repository/lead";
+         atomCompanyPurchases, atomFilteredPurchase, atomCompanyState, atomCompanyForSelection } from "../../atoms/atoms";
+import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo} from "../../repository/company";
+import { KeyManForSelection, LeadRepo } from "../../repository/lead";
+import { UserRepo } from '../../repository/user';
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
 import { Avatar } from "@mui/material";
@@ -29,30 +30,74 @@ import DetailTitleItem from "../../constants/DetailTitleItem";
 
 const LeadsDetailsModel = () => {
   const { Panel } = Collapse;
+  const { t } = useTranslation();
+  const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+
+  //===== [RecoilState] Related with Lead ==========================================
   const selectedLead = useRecoilValue(atomCurrentLead);
-  const selectedCompany = useRecoilValue(atomCurrentCompany);
-  const companyConsultings = useRecoilValue(atomCompanyConsultings);
+  const { modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
   const filteredConsultings = useRecoilValue(atomFilteredConsulting);
 
+  //===== [RecoilState] Related with Company =======================================
+  const companyState = useRecoilValue(atomCompanyState);
+  const selectedCompany = useRecoilValue(atomCurrentCompany);
+  const { loadAllCompanies, modifyCompany } = useRecoilValue(CompanyRepo);
+  const companyForSelection = useRecoilValue(atomCompanyForSelection);
+
+  const companyConsultings = useRecoilValue(atomCompanyConsultings);
+  
   const companyQuotations = useRecoilValue(atomCompanyQuotations);
   const filteredQuotations = useRecoilValue(atomFilteredQuotation);
 
   const companyPurchases = useRecoilValue(atomCompanyPurchases);
   const filteredPurchases = useRecoilValue(atomFilteredPurchase);
+
+  //===== [RecoilState] Related with Users ==========================================
+  const userState = useRecoilValue(atomUserState);
+  const { loadAllUsers } = useRecoilValue(UserRepo)
+  const engineersForSelection = useRecoilValue(atomEngineersForSelection);
+  const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
   
 
-  const { t } = useTranslation();
-
-  const { modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
-  const { modifyCompany } = useRecoilValue(CompanyRepo);
-  const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
-
+  //===== Handles to deal this component ============================================
   const [ isFullScreen, setIsFullScreen ] = useState(false);
+  const [ currentLeadCode, setCurrentLeadCode ] = useState('');
 
-  const [ editedValues, setEditedValues ] = useState(null);
-  const [ editedValuesCompany, setEditedValuesCompany ] = useState(null);
+  const handleWidthChange = useCallback((checked) => {
+    setIsFullScreen(checked);
+    if(checked)
+      localStorage.setItem('isFullScreen', '1');
+    else
+      localStorage.setItem('isFullScreen', '0');
+  }, []);
+
+  //===== Handles to edit 'Lead Details' ===============================================
+  const [ editedDetailValues, setEditedDetailValues ] = useState(null);
+
+  const initializeLeadTemplate = useCallback(() => {
+    document.querySelector("#add_new_lead_form").reset();
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setEditedDetailValues(null);
+    setCurrentLead();
+  }, [setCurrentLead]);
+
+  //===== Handles to edit 'Purchase Details' ===============================================
+  const [ validMACount, setValidMACount ] = useState(0);
+  const [ purchasesByCompany, setPurchasesByCompany] = useState([]);
+
+  //===== Handles to edit 'Consulting Details' ===============================================
+  const [ consultingsByLead, setConsultingsByLead] = useState([]);
+
+  //===== Handles to edit 'Quotation Details' ===============================================
+  const [ quotationsByLead, setQuotationsByLead] = useState([]);
+
+  const [ leadChange, setLeadChange ] = useState(null);
 
   const [activeTab, setActiveTab] = useState(""); // 상태 관리를 위한 useState
+  
+  
   
   const [searchCondition, setSearchCondition] = useState("");
   const [searchQuotationCondition, setSearchQuotationCondition] = useState("");
@@ -60,11 +105,6 @@ const LeadsDetailsModel = () => {
   const {  filterConsulting, setCurrentConsulting} = useRecoilValue(ConsultingRepo);
   const {  setCurrentQuotation, filterCompanyQuotation} = useRecoilValue(QuotationRepo);
   const {  setCurrentPurchase , filterCompanyPurchase} = useRecoilValue(PurchaseRepo);
-  const [ leadChange, setLeadChange ] = useState(null);
-  const [selectedOption, setSelectedOption] = useState([]);
-  const [selectedKeyMan, setSelectedKeyMan] = useState([]);
-  const [selectedLeadStatus, setSelectedLeadStatus] = useState([]);
-  
   
   // 상태(state) 정의
 const [selectedRow, setSelectedRow] = useState(null);
@@ -74,13 +114,7 @@ const [selectedRow, setSelectedRow] = useState(null);
     //initializeLeadTemplate();
   }, []);
 
-  const initializeLeadTemplate = useCallback(() => {
-    setLeadChange({ ...defaultLead });
-    setSelectedOption([]);
-    setSelectedKeyMan([]);
-    setSelectedLeadStatus([]);
-    document.querySelector("#add_new_lead_form").reset();
-  }, []);
+  
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
@@ -103,18 +137,18 @@ const [selectedRow, setSelectedRow] = useState(null);
   // --- Funtions for Editing Detail ---------------------------------
   const handleEditing = useCallback((e) => {
     const tempEdited = {
-      ...editedValues,
+      ...editedDetailValues,
       [e.target.name]: e.target.value,
     };
-    setEditedValues(tempEdited);
-  }, [editedValues]);
+    setEditedDetailValues(tempEdited);
+  }, [editedDetailValues]);
 
   const handleSaveAll = useCallback(() => {
-    if(editedValues !== null
+    if(editedDetailValues !== null
       && selectedLead !== defaultLead)
     {
       const temp_all_saved = {
-        ...editedValues,
+        ...editedDetailValues,
         action_type: "UPDATE",
         modify_user: cookies.myLationCrmUserId,
         lead_code: selectedLead.lead_code,
@@ -127,57 +161,23 @@ const [selectedRow, setSelectedRow] = useState(null);
     } else {
       console.log("[ LeadDetailModel ] No saved data");
     };
-    setEditedValues(null);
-  }, [editedValues, selectedLead]);
+    setEditedDetailValues(null);
+  }, [editedDetailValues, selectedLead]);
 
   const handleCancelAll = useCallback(() => {
-    setEditedValues(null);
+    setEditedDetailValues(null);
   }, []);
 
   // --- Funtions for Select ---------------------------------
   const handleSelectChange = useCallback((name, selected) => {
     const tempEdited = {
-      ...editedValues,
+      ...editedDetailValues,
       [name]: selected.value,
     };
-    setEditedValues(tempEdited);
-  }, [editedValues]);
+    setEditedDetailValues(tempEdited);
+  }, [editedDetailValues]);
 
-  // -- Company Modify 
-  const handleEditingCompany = useCallback((e) => {
-    const tempEdited = {
-      ...editedValuesCompany,
-      [e.target.name]: e.target.value,
-    };
-    setEditedValuesCompany(tempEdited);
-  }, [editedValuesCompany]);
-
-  const handleSaveAllCompany = useCallback(() => {
-    if(editedValuesCompany !== null
-      && selectedCompany
-      && selectedCompany !== defaultCompany)
-    {
-      const temp_all_saved = {
-        ...editedValuesCompany,
-        action_type: "UPDATE",
-        modify_user: cookies.myLationCrmUserId,
-        company_code: selectedCompany.company_code,
-      };
-      if (modifyCompany(temp_all_saved)) {
-        console.log(`Succeeded to modify lead`);
-      } else {
-        console.error('Failed to modify lead')
-      }
-    } else {
-      console.log("[ LeadDetailModel ] No saved data");
-    };
-    setEditedValuesCompany(null);
-  }, [editedValuesCompany, selectedCompany]);  
-
-  const handleCancelAllCompany = useCallback(() => {
-    setEditedValuesCompany(null);
-  }, []);  
-
+  
   //change status chage 
   const handleChangeStatus = (newStatus)=>{
     const tempEdited = {
@@ -195,16 +195,6 @@ const [selectedRow, setSelectedRow] = useState(null);
   };
 
   // --- Funtions for Specific Changes in Detail ---------------------------------
-  const [ orgEstablishDate, setOrgEstablishDate ] = useState(null);
-  const [ orgCloseDate, setOrgCloseDate ] = useState(null);
-
-  const handleCompanyDateChange = useCallback((name, date) => {
-    const tempEdited = {
-      ...editedValuesCompany,
-      [name]: date,
-    };
-    setEditedValuesCompany(tempEdited);
-  }, [editedValuesCompany]);
 
   // 각 행 클릭 시 호출되는 함수
   const handleRowClick = (row) => {
@@ -216,43 +206,33 @@ const [selectedRow, setSelectedRow] = useState(null);
       setSelectedRow(row);
     }
   };
-
-  const handleWidthChange = useCallback((checked) => {
-    setIsFullScreen(checked);
-    if(checked)
-      localStorage.setItem('isFullScreen', '1');
-    else
-      localStorage.setItem('isFullScreen', '0');
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setEditedValues(null);
-    setCurrentLead();
-  }, []);
+  
 
   const lead_items_info = [
-    ['is_keyman','lead.is_keyman',{ type:'label'}],
-    ['department','lead.department',{ type:'label'}],
-    ['position','lead.position',{ type:'label'}],
-    ['email','lead.email',{ type:'label'}],
-    ['homepage','lead.homepage',{ type:'label'}],
-    ['group_','lead.lead_group',{ type:'label', extra:'long'}],
-    ['region','common.region',{ type:'label'}],
-    ['sales_resource','quotation.sales_rep',{ type:'label'}],
-    ['application_engineer','company.engineer',{ type:'label'}],
-    ['mobile_number','lead.mobile',{ type:'label'}],
-    ['company_name_en','company.eng_company_name',{ type:'label'}],
-    ['company_zip_code','common.zip_code',{ type:'label'}],
-    ['company_address','company.address',{ type:'label', extra:'long'}],
-    ['company_phone_number','common.phone_no',{ type:'label'}],
-    ['company_fax_number','common.fax_no',{ type:'label'}],
+    { key:'lead_name',title:'lead.lead_name',type:'label'},
+    { key:'position',title:'lead.position',type:'label'},
+    { key:'is_keyman',title:'lead.is_keyman',type:'select',options: KeyManForSelection},
+    { key:'region',title:'common.region',type:'label'},
+    { key:'company_name',title:'company.company_name',type:'select',options: companyForSelection},
+    { key:'company_name_en',title:'company.eng_company_name',type:'label'},
+    { key:'department',title:'lead.department',type:'label'},
+    { key:'position',title:'lead.position',type:'label'},
+    { key:'mobile_number',title:'lead.mobile',type:'label'},
+    { key:'company_phone_number',title:'company.phone_number',type:'label'},
+    { key:'company_fax_number',title:'company.fax_number',type:'label'},
+    { key:'email',title:'lead.email',type:'label'},
+    { key:'homepage',title:'lead.homepage',type:'label'},
+    { key:'company_zip_code',title:'company.company_zip_code',type:'label'},
+    { key:'company_address',title:'company.address',type:'label', extra:'long'},
+    { key:'sales_resource',title:'lead.lead_sales',type:'select',options:salespersonsForSelection},
+    { key:'application_engineer',title:'company.engineer',type:'select',options:engineersForSelection},
   ];
 
   useEffect(() => {
-    if(selectedLead !== defaultLead) {
+    console.log('[LeadDetailModel] useEffect / lead');
+    if((selectedLead !== defaultLead) 
+      && (selectedLead.lead_code !== currentLeadCode)) {
       console.log('[LeadsDetailsModel] called!');
-      setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
-      setOrgCloseDate(selectedCompany.closure_date ? new Date(selectedCompany.closure_date) : null);
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if(detailViewStatus === null){
@@ -263,8 +243,24 @@ const [selectedRow, setSelectedRow] = useState(null);
       } else {
         setIsFullScreen(true);
       };
+
+      setCurrentLeadCode(selectedLead.company_code);
     };
-  }, [selectedLead, editedValues, selectedCompany.establishment_date, selectedCompany.closure_date]);
+  }, [selectedLead, currentLeadCode]);
+
+  useEffect(() => {   
+    console.log('[LeadsDetailsModel] useEffect / company');
+    if((companyState & 1) === 0) {
+      loadAllCompanies();
+    };
+  }, [companyState, loadAllCompanies]);
+
+  useEffect(() => {
+    console.log('[CompanyAddModel] loading user data!');
+    if((userState & 1) === 0) {
+        loadAllUsers();
+    }
+  }, [userState, loadAllUsers ])
 
   return (
     <>
@@ -408,12 +404,12 @@ const [selectedRow, setSelectedRow] = useState(null);
                           </Link>
                         </li>
                         <li className="nav-item">
-                          <Link
+                        <Link
                             className="nav-link"
-                            to="#not-contact-task-related"
+                            to="#not-contact-task-purchase"
                             data-bs-toggle="tab"
                           >
-                             {t('lead.company_information')}
+                            {t('lead.purchase_product')+'('} { companyPurchases.length === undefined ? 0:companyPurchases.length }{')'}
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -434,15 +430,6 @@ const [selectedRow, setSelectedRow] = useState(null);
                             {t('lead.quotation_history')+'('} { companyQuotations.length === undefined ? 0:companyQuotations.length }{')'}
                           </Link>
                         </li>   
-                        <li className="nav-item">
-                          <Link
-                            className="nav-link"
-                            to="#not-contact-task-purchase"
-                            data-bs-toggle="tab"
-                          >
-                            {t('lead.purchase_product')+'('} { companyPurchases.length === undefined ? 0:companyPurchases.length }{')'}
-                          </Link>
-                        </li>                                                  
                       </ul>
                       <div className="tab-content">
                         <div
@@ -460,8 +447,8 @@ const [selectedRow, setSelectedRow] = useState(null);
                                 { lead_items_info.map((item, index) => 
                                   <DetailCardItem
                                     key={index}
-                                    defaultText={selectedLead[item.at(0)]}
-                                    edited={editedValues}
+                                    defaultValue={selectedLead[item.at(0)]}
+                                    edited={editedDetailValues}
                                     name={item.at(0)}
                                     title={t(item.at(1))}
                                     detail={item.at(2)}
@@ -469,222 +456,6 @@ const [selectedRow, setSelectedRow] = useState(null);
                                   />
                                 )}
                               </Space>
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          className="tab-pane task-related p-0"
-                          id="not-contact-task-related" >
-                          <div className="crms-tasks">
-                            <div className="tasks__item crms-task-item active">
-                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                                <Panel header={t('company.company_name')} key="1">
-                                  <table className="table">
-                                    <tbody>
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.company_name}
-                                        name="company_name"
-                                        title={t('company.company_name')}
-                                        editing={handleEditingCompany}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.company_name_eng}
-                                        name="company_name_eng"
-                                        title={t('company.eng_company_name')}
-                                        no_border={true}
-                                        editing={handleEditingCompany}
-                                      />
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
-                            </div>
-                            <div className="tasks__item crms-task-item active">
-                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                                <Panel header= {t('company.company_details')}  key="1">
-                                  <table className="table">
-                                    <tbody>
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.group_}
-                                        name="group_"
-                                        title={t('company.group')}
-                                        editing={handleEditingCompany}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.company_scale}
-                                        name="company_scale"
-                                        title={t('company.company_scale')}
-                                        editing={handleEditingCompany}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.deal_type}
-                                        name="deal_type"
-                                        title={t('company.deal_type')}
-                                        editing={handleEditingCompany}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.business_registration_code}
-                                        name="business_registration_code"
-                                        title={t('company.business_registration_code')}
-                                        editing={handleEditingCompany}
-                                      />
-                                      <DetailDateItem
-                                        title={t('company.establishment_date')}
-                                        timeData={orgEstablishDate}
-                                        timeDataChange={(date) => handleCompanyDateChange('establishment_date', date)}
-                                      />
-                                      <DetailDateItem
-                                        name="closure_date"
-                                        title={t('company.closure_date')}
-                                        timeData={orgCloseDate}
-                                        timeDataChange={(date) => handleCompanyDateChange('closure_date', date)}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.ceo_name}
-                                        name="ceo_name"
-                                        title={t('company.ceo_name')}
-                                        editing={handleEditingCompany}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.business_type}
-                                        name="business_type"
-                                        title={t('company.business_type')}
-                                        editing={handleEditingCompany}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.business_item}
-                                        name="business_item"
-                                        title={t('company.business_item')}
-                                        editing={handleEditingCompany}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.industry_type}
-                                        name="industry_type"
-                                        title={t('company.industry_type')}
-                                        no_border={true}
-                                        editing={handleEditingCompany}
-                                      />
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
-                            </div>
-                            <div className="tasks__item crms-task-item">
-                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                                <Panel header= {t('common.contact_details')}  key="1">
-                                  <table className="table">
-                                    <tbody>
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.company_phone_number}
-                                        name="company_phone_number"
-                                        title={t('company.phone_number')} 
-                                        editing={handleEditingCompany}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.company_fax_number}
-                                        name="company_fax_number"
-                                        title={t('company.fax_number')}
-                                        editing={handleEditingCompany}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.homepage}
-                                        name="homepage"
-                                        title= {t('company.homepage')}
-                                        no_border={true}
-                                        editing={handleEditingCompany}
-                                      />
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
-                            </div>
-                            <div className="tasks__item crms-task-item">
-                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                                <Panel header= {t('company.address')} key="1">
-                                  <table className="table">
-                                    <tbody>
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.company_address}
-                                        name="company_address"
-                                        title= {t('company.address')}
-                                        editing={handleEditingCompany}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.company_zip_code}
-                                        name="company_zip_code"
-                                        title= {t('company.zip_code')}
-                                        no_border={true}
-                                        editing={handleEditingCompany}
-                                      />
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
-                            </div>
-                            <div className="tasks__item crms-task-item">
-                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                                <Panel header= {t('common.additional_information')} key="1">
-                                  <table className="table">
-                                    <tbody>
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.account_code}
-                                        name="account_code"
-                                        title= {t('company.account_code')}
-                                        editing={handleEditingCompany}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.bank_name}
-                                        name="bank_name"
-                                        title= {t('company.bank_name')} 
-                                        editing={handleEditingCompany}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.account_owner}
-                                        name="account_owner"
-                                        title= {t('company.account_owner')}
-                                        editing={handleEditingCompany}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.sales_resource}
-                                        name="sales_resource"
-                                        title= {t('company.salesman')}
-                                        editing={handleEditingCompany}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.application_engineer}
-                                        name="application_engineer"
-                                        title= {t('company.engineer')}
-                                        editing={handleEditingCompany}
-                                      />
-                                      <DetailLabelItem
-                                        defaultText={selectedCompany.region}
-                                        name="region"
-                                        title= {t('common.region')}
-                                        no_border={true}
-                                        editing={handleEditingCompany}
-                                      />
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
-                            </div>
-                            <div className="tasks__item crms-task-item">
-                              <Collapse defaultActiveKey={['1']} accordion expandIconPosition="end">
-                                <Panel header= {t('common.memo')} key="1">
-                                  <table className="table">
-                                    <tbody>
-                                      <DetailTextareaItem
-                                        defaultText={selectedCompany.memo}
-                                        name="memo"
-                                        title= {t('company.memo')}
-                                        row_no={3}
-                                        no_border={true}
-                                        editing={handleEditingCompany}
-                                      />
-                                    </tbody>
-                                  </table>
-                                </Panel>
-                              </Collapse>
                             </div>
                           </div>
                         </div>
@@ -971,7 +742,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                   </div>
                 </div>
               </div>
-              { editedValues !== null && Object.keys(editedValues).length !== 0 &&
+              { editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&
                   <div className="text-center py-3">
                     <button
                       type="button"
@@ -985,25 +756,6 @@ const [selectedRow, setSelectedRow] = useState(null);
                       type="button"
                       className="btn btn-secondary btn-rounded"
                       onClick={handleCancelAll}
-                    >
-                      {t('common.cancel')}
-                    </button>
-                  </div>
-                }
-                { editedValuesCompany !== null && Object.keys(editedValuesCompany).length !== 0 &&
-                  <div className="text-center py-3">
-                    <button
-                      type="button"
-                      className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                      onClick={handleSaveAllCompany}
-                    >
-                      {t('common.save')}
-                    </button>
-                    &nbsp;&nbsp;
-                    <button
-                      type="button"
-                      className="btn btn-secondary btn-rounded"
-                      onClick={handleCancelAllCompany}
                     >
                       {t('common.cancel')}
                     </button>

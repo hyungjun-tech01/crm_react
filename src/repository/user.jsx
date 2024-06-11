@@ -79,9 +79,16 @@ export async function  apiLoginValidate(userId, password) {
 
                 //----- Store SR, AE data -----------------------------------
                 const workingUsers = data.filter(user => user.isWork === 'Y');
-                const salespersons = workingUsers.filter(user => user.jobType === 'SR').map(user => {return {label: user.userName, value: user.userName}});
+                workingUsers.sort((a, b)=>{
+                    if(a.userName > b.userName) return 1;
+                    if(a.userName < b.userName) return -1;
+                    return 0;
+                });
+                const salespersons = workingUsers.filter(user => user.jobType === 'SR')
+                    .map(user => ({label: user.userName, value: user.userName}));
                 set(atomSalespersonsForSelection, salespersons)
-                const engineers = workingUsers.filter(user => user.jobType === 'AE').map(user => {return {label: user.userName, value: user.userName}});
+                const engineers = workingUsers.filter(user => user.jobType === 'AE')
+                    .map(user => ({label: user.userName, value: user.userName}));
                 set(atomEngineersForSelection, engineers);
             }
             catch(err){
@@ -140,10 +147,63 @@ export async function  apiLoginValidate(userId, password) {
                     };
                     set(atomCurrentUser, modifiedUser);
 
+                    // update all users
+                    const allUsers = await snapshot.getPromise(atomAllUsers);
+                    const foundIdx = allUsers.findIndex(user => user.userId === modifiedUser.userId);
+                    if(foundIdx !== -1){
+                        const updatedAllUsers = [
+                            ...allUsers.slice(0, foundIdx),
+                            modifiedUser,
+                            ...allUsers.slice(foundIdx + 1, ),
+                        ];
+                        set(atomAllUsers, updatedAllUsers);
+                    };
+
+                    if(modifiedUser.isWork === 'N'){
+                        if(modifiedUser.jobType === 'SR'){
+                            //update salespersons selection
+                            const allSalesPersons = await snapshot.getPromise(atomSalespersonsForSelection);
+                            const foundSalesIdx = allSalesPersons.findIndex(user => user.userId === modifiedUser.userId);
+                            if(foundSalesIdx !== -1){
+                                const updatedSalesPersons = [
+                                    ...allSalesPersons.slice(0, foundSalesIdx),
+                                    ...allSalesPersons.slice(foundSalesIdx + 1, )
+                                ];
+                                set(atomSalespersonsForSelection, updatedSalesPersons);
+                            };
+                        } else if(modifiedUser.jobType === 'AE'){
+                            //update engineers selection
+                            const allEngineers = await snapshot.getPromise(atomEngineersForSelection);
+                            const foundEngIdx = allEngineers.findIndex(user => user.userId === modifiedUser.userId);
+                            if(foundEngIdx !== -1){
+                                const udpatedEngineers = [
+                                    ...allEngineers.slice(0, foundEngIdx),
+                                    ...allEngineers.slice(foundEngIdx + 1, ),
+                                ];
+                                set(atomEngineersForSelection, udpatedEngineers);
+                            };
+                        };
+                    } else {
+                        if(modifiedUser.jobType === 'SR'){
+                            //update salespersons selection
+                            const allSalesPersons = await snapshot.getPromise(atomSalespersonsForSelection);
+                            const foundSalesIdx = allSalesPersons.findIndex(user => user.userId === modifiedUser.userId);
+                            if(foundSalesIdx === -1){
+                                set(atomSalespersonsForSelection, allSalesPersons.concat({label:modifiedUser.userName, value:modifiedUser.userName}));
+                            };
+                        } else if(modifiedUser.jobType === 'AE'){
+                            //update engineers selection
+                            const allEngineers = await snapshot.getPromise(atomEngineersForSelection);
+                            const foundEngIdx = allEngineers.findIndex(user => user.userId === modifiedUser.userId);
+                            if(foundEngIdx === -1){
+                                set(atomEngineersForSelection, allEngineers.concat({label:modifiedUser.userName, value:modifiedUser.userName}));
+                            };
+                        };
+                    };
+
                     console.log('modifiedUser', atomCurrentUser, modifiedUser);
 
                     return(true);
-
                  }
             } catch(err){
                 console.error(`\t[ modifyUser ] Error : ${err}`);

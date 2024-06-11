@@ -51,6 +51,10 @@ export const atomCompanyState = atom({
     key: "companyState",
     default: 0,
 });
+export const atomCompanyForSelection = atom({
+    key: "companySelection",
+    default: [],
+});
 
 //----- Lead ------------------------
 export const defaultLead = {

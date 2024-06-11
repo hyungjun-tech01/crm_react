@@ -112,14 +112,14 @@ const SelectInput = (props) => {
 };
 
 const DetailCardItem = (props) => {
-    const { defaultText, edited, name, title, detail, editing, disabled
+    const { title, name, defaultValue, edited, detail, editing, disabled
     } = props;
     
     const currentValue = (edited && edited[name])
             ? edited[name]
             : (detail.type === 'date'
                 ? (detail.orgTimeData && detail.orgTimeData[name] ? detail.orgTimeData[name] : '')
-                : (defaultText ? defaultText : ''));
+                : (defaultValue ? defaultValue : ''));
 
     const widthValue = detail.extra === 'long' ? 770 : (detail.extra === 'modal' ? 470 : 380);
 
