@@ -12,7 +12,7 @@ import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { UserRepo } from '../../repository/user';
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
-import { Avatar } from "@mui/material";
+import { Avatar, selectClasses } from "@mui/material";
 import DetailDateItem from "../../constants/DetailDateItem";
 import { ConsultingRepo } from "../../repository/consulting";
 import { QuotationRepo } from "../../repository/quotation";
@@ -26,6 +26,7 @@ import {  Edit } from '@mui/icons-material';
 import { useTranslation } from "react-i18next";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
+import { option_locations } from "../../constants/constans";
 
 
 const LeadsDetailsModel = () => {
@@ -74,74 +75,66 @@ const LeadsDetailsModel = () => {
   //===== Handles to edit 'Lead Details' ===============================================
   const [ editedDetailValues, setEditedDetailValues ] = useState(null);
 
-  const initializeLeadTemplate = useCallback(() => {
-    document.querySelector("#add_new_lead_form").reset();
-  }, []);
+  const handleDetailEditing = useCallback((e) => {
+    if(e.target.value !== selectedLead[e.target.name]){
+      const tempEdited = {
+        ...editedDetailValues,
+        [e.target.name]: e.target.value,
+      };
+      console.log('handleDetailEditing : ', tempEdited);
+      setEditedDetailValues(tempEdited);
+    } else {
+      if(editedDetailValues[e.target.name]){
+        delete editedDetailValues[e.target.name];
+      };
+    };
+  }, [editedDetailValues, selectedLead]);
+
+  const handleDetailDateChange = useCallback((name, date) => {
+    if(date !== new Date(selectedLead[name])){
+      const tempEdited = {
+        ...editedDetailValues,
+        [name]: date,
+      };
+      setEditedDetailValues(tempEdited);
+    }
+  }, [editedDetailValues, selectedLead]);
+
+  const handleDetailSelectChange = useCallback((name, selected) => {
+    console.log('handleDetailSelectChange / start : ', selected);
+    let tempEdited = null;
+    let isChanged = false;
+    if(name === 'company_name') {
+      if(selectedLead.company_name !== selected.value.company_name){
+        isChanged = true;
+        tempEdited = {
+          ...editedDetailValues,
+          company_name: selected.value.company_name,
+          company_name_en: selected.value.company_name_en,
+          company_zip_code: selected.value.company_zip_code,
+          company_address: selected.value.company_address,
+          region: selected.value.region,
+        };
+      };
+    } else {
+      if(selectedLead[name] !== selected.value){
+        isChanged = true;
+        tempEdited = {
+          ...editedDetailValues,
+          [name]: selected.value,
+        };
+      };
+    };
+    if(isChanged){
+      console.log('handleDetailSelectChange : ', tempEdited);
+      setEditedDetailValues(tempEdited);
+    };
+  }, [editedDetailValues, selectedLead]);
 
   const handleClose = useCallback(() => {
     setEditedDetailValues(null);
     setCurrentLead();
   }, [setCurrentLead]);
-
-  //===== Handles to edit 'Purchase Details' ===============================================
-  const [ validMACount, setValidMACount ] = useState(0);
-  const [ purchasesByCompany, setPurchasesByCompany] = useState([]);
-
-  //===== Handles to edit 'Consulting Details' ===============================================
-  const [ consultingsByLead, setConsultingsByLead] = useState([]);
-
-  //===== Handles to edit 'Quotation Details' ===============================================
-  const [ quotationsByLead, setQuotationsByLead] = useState([]);
-
-  const [ leadChange, setLeadChange ] = useState(null);
-
-  const [activeTab, setActiveTab] = useState(""); // 상태 관리를 위한 useState
-  
-  
-  
-  const [searchCondition, setSearchCondition] = useState("");
-  const [searchQuotationCondition, setSearchQuotationCondition] = useState("");
-  const [searchPurchaseCondition, setSearchPurchaseCondition] = useState("");
-  const {  filterConsulting, setCurrentConsulting} = useRecoilValue(ConsultingRepo);
-  const {  setCurrentQuotation, filterCompanyQuotation} = useRecoilValue(QuotationRepo);
-  const {  setCurrentPurchase , filterCompanyPurchase} = useRecoilValue(PurchaseRepo);
-  
-  // 상태(state) 정의
-const [selectedRow, setSelectedRow] = useState(null);
-
-// --- Funtions for Editing ---------------------------------
-  const handleAddNewConsultingClicked = useCallback(() => {
-    //initializeLeadTemplate();
-  }, []);
-
-  
-
-  const handleSearchCondition =  (newValue)=> {
-    setSearchCondition(newValue);
-    console.log("handleSearchCondition", searchCondition)
-    filterConsulting(newValue);  
-  };
-
-  const handleSearchQuotationCondition = (newValue)=> {
-    setSearchQuotationCondition(newValue);
-    console.log("handleSearchCondition", searchQuotationCondition)
-    filterCompanyQuotation(newValue);  
-  };
-
-  const handleSearchPurchaseCondition = (newValue)=> {
-    setSearchPurchaseCondition(newValue);
-    console.log("handleSearchCondition", searchPurchaseCondition)
-    filterCompanyPurchase(newValue);  
-  };
-
-  // --- Funtions for Editing Detail ---------------------------------
-  const handleEditing = useCallback((e) => {
-    const tempEdited = {
-      ...editedDetailValues,
-      [e.target.name]: e.target.value,
-    };
-    setEditedDetailValues(tempEdited);
-  }, [editedDetailValues]);
 
   const handleSaveAll = useCallback(() => {
     if(editedDetailValues !== null
@@ -162,20 +155,57 @@ const [selectedRow, setSelectedRow] = useState(null);
       console.log("[ LeadDetailModel ] No saved data");
     };
     setEditedDetailValues(null);
-  }, [editedDetailValues, selectedLead]);
+  }, [cookies.myLationCrmUserId, editedDetailValues, modifyLead, selectedLead]);
 
   const handleCancelAll = useCallback(() => {
     setEditedDetailValues(null);
   }, []);
 
-  // --- Funtions for Select ---------------------------------
-  const handleSelectChange = useCallback((name, selected) => {
-    const tempEdited = {
-      ...editedDetailValues,
-      [name]: selected.value,
-    };
-    setEditedDetailValues(tempEdited);
-  }, [editedDetailValues]);
+
+  //===== Handles to edit 'Purchase Details' ===============================================
+  const [ validMACount, setValidMACount ] = useState(0);
+  const [ purchasesByCompany, setPurchasesByCompany] = useState([]);
+
+  //===== Handles to edit 'Consulting Details' ===============================================
+  const [ consultingsByLead, setConsultingsByLead] = useState([]);
+
+  //===== Handles to edit 'Quotation Details' ===============================================
+  const [ quotationsByLead, setQuotationsByLead] = useState([]);
+
+  
+//===== Handles related with Search ===============================================  
+  const [searchCondition, setSearchCondition] = useState("");
+  const [searchQuotationCondition, setSearchQuotationCondition] = useState("");
+  const [searchPurchaseCondition, setSearchPurchaseCondition] = useState("");
+  const {  filterConsulting, setCurrentConsulting} = useRecoilValue(ConsultingRepo);
+  const {  setCurrentQuotation, filterCompanyQuotation} = useRecoilValue(QuotationRepo);
+  const {  setCurrentPurchase , filterCompanyPurchase} = useRecoilValue(PurchaseRepo);
+
+  const handleSearchCondition =  (newValue)=> {
+    setSearchCondition(newValue);
+    console.log("handleSearchCondition", searchCondition)
+    filterConsulting(newValue);  
+  };
+
+  const handleSearchQuotationCondition = (newValue)=> {
+    setSearchQuotationCondition(newValue);
+    console.log("handleSearchCondition", searchQuotationCondition)
+    filterCompanyQuotation(newValue);  
+  };
+
+  const handleSearchPurchaseCondition = (newValue)=> {
+    setSearchPurchaseCondition(newValue);
+    console.log("handleSearchCondition", searchPurchaseCondition)
+    filterCompanyPurchase(newValue);  
+  };
+  
+  // 상태(state) 정의
+const [selectedRow, setSelectedRow] = useState(null);
+
+// --- Funtions for Editing ---------------------------------
+  const handleAddNewConsultingClicked = useCallback(() => {
+    //initializeLeadTemplate();
+  }, []);
 
   
   //change status chage 
@@ -209,23 +239,24 @@ const [selectedRow, setSelectedRow] = useState(null);
   
 
   const lead_items_info = [
-    { key:'lead_name',title:'lead.lead_name',type:'label'},
-    { key:'position',title:'lead.position',type:'label'},
-    { key:'is_keyman',title:'lead.is_keyman',type:'select',options: KeyManForSelection},
-    { key:'region',title:'common.region',type:'label'},
-    { key:'company_name',title:'company.company_name',type:'select',options: companyForSelection},
-    { key:'company_name_en',title:'company.eng_company_name',type:'label'},
-    { key:'department',title:'lead.department',type:'label'},
-    { key:'position',title:'lead.position',type:'label'},
-    { key:'mobile_number',title:'lead.mobile',type:'label'},
-    { key:'company_phone_number',title:'company.phone_number',type:'label'},
-    { key:'company_fax_number',title:'company.fax_number',type:'label'},
-    { key:'email',title:'lead.email',type:'label'},
-    { key:'homepage',title:'lead.homepage',type:'label'},
-    { key:'company_zip_code',title:'company.company_zip_code',type:'label'},
-    { key:'company_address',title:'company.address',type:'label', extra:'long'},
-    { key:'sales_resource',title:'lead.lead_sales',type:'select',options:salespersonsForSelection},
-    { key:'application_engineer',title:'company.engineer',type:'select',options:engineersForSelection},
+    { key:'lead_name',title:'lead.lead_name',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'position',title:'lead.position',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'is_keyman',title:'lead.is_keyman',detail:{type:'select',options:KeyManForSelection,editing:handleDetailSelectChange}},
+    { key:'region',title:'common.region',detail:{type:'select',options:option_locations.ko,editing:handleDetailSelectChange}},
+    { key:'company_name',title:'company.company_name',detail:{type:'select',options:companyForSelection,key:'company_name',editing:handleDetailSelectChange}},
+    { key:'company_name_en',title:'company.eng_company_name',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'department',title:'lead.department',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'position',title:'lead.position',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'mobile_number',title:'lead.mobile',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'company_phone_number',title:'company.phone_number',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'company_fax_number',title:'company.fax_number',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'email',title:'lead.email',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'homepage',title:'lead.homepage',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'company_zip_code',title:'company.zip_code',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'company_address',title:'company.address',detail:{type:'label', extra:'long',editing:handleDetailEditing}},
+    { key:'sales_resource',title:'lead.lead_sales',detail:{type:'select',options:salespersonsForSelection,editing:handleDetailSelectChange}},
+    { key:'application_engineer',title:'company.engineer',detail:{type:'select',options:engineersForSelection,editing:handleDetailSelectChange}},
+    { key:'create_date',title:'common.regist_date',detail:{type:'date',editing:handleDetailDateChange}},
   ];
 
   useEffect(() => {
@@ -280,24 +311,23 @@ const [selectedRow, setSelectedRow] = useState(null);
                     <Avatar>{selectedLead.lead_name === null ? "":(selectedLead.lead_name).substring(0,1)}</Avatar>
                   </div>
                 </div>
-                
                 <DetailTitleItem
                   original={ selectedLead.lead_name }
                   name='status'
                   title={t('lead.lead_name')}
-                  onEditing={handleEditing}
+                  onEditing={handleDetailEditing}
                 />
                 <DetailTitleItem
                   original={ selectedLead.company_name }
                   name='status'
                   title={t('company.company_name')}
-                  onEditing={handleEditing}
+                  onEditing={handleDetailEditing}
                 />
                 <DetailTitleItem
                   original={ selectedLead.status ? selectedLead.status : "Not Contacted" }
                   name='status'
                   title={t('common.status')}
-                  onEditing={handleEditing}
+                  onEditing={handleDetailEditing}
                 />
               </div>
               <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
@@ -447,12 +477,11 @@ const [selectedRow, setSelectedRow] = useState(null);
                                 { lead_items_info.map((item, index) => 
                                   <DetailCardItem
                                     key={index}
-                                    defaultValue={selectedLead[item.at(0)]}
+                                    defaultValue={selectedLead[item.key]}
                                     edited={editedDetailValues}
-                                    name={item.at(0)}
-                                    title={t(item.at(1))}
-                                    detail={item.at(2)}
-                                    editing={handleEditing}
+                                    name={item.key}
+                                    title={t(item.title)}
+                                    detail={item.detail}
                                   />
                                 )}
                               </Space>

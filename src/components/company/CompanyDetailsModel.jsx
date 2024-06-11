@@ -109,7 +109,6 @@ const CompanyDetailsModel = () => {
   }, [editedDetailValues]);
 
   const handleDetailSelectChange = useCallback((name, selected) => {
-    console.log('hnadleDetialSelectChange :', name, selected);
     const tempEdited = {
       ...editedDetailValues,
       [name]: selected.value,

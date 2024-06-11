@@ -82,12 +82,18 @@ const SelectInput = (props) => {
                 defaultOption = foundValue[0];
             };
         };
+    } else if(keyVal){
+        const optionFiltered = options.filter(item => item.value[keyVal] === value);
+        if(optionFiltered && optionFiltered.length > 0) {
+            defaultOption = optionFiltered[0];
+        };
     } else {
         const optionFiltered = options.filter(item => item.value === value);
         if(optionFiltered && optionFiltered.length > 0) {
             defaultOption = optionFiltered[0];
         };
     };
+    console.log('SelectInput : ', defaultOption);
     return (
         <div className="ant-space-item"  style={style}>
             <span className='ant-input-group-wrapper
@@ -112,7 +118,7 @@ const SelectInput = (props) => {
 };
 
 const DetailCardItem = (props) => {
-    const { title, name, defaultValue, edited, detail, editing, disabled
+    const { title, name, defaultValue, edited, detail, disabled
     } = props;
     
     const currentValue = (edited && edited[name])
@@ -133,15 +139,15 @@ const DetailCardItem = (props) => {
     switch(detail.type)
     {
         case 'label':
-            return <Input {...SharedProps} onChange={editing} style={{width: widthValue, height: 38}}/>;
+            return <Input {...SharedProps} onChange={detail.editing} style={{width: widthValue, height: 38}}/>;
         case 'date':
             const timeformat = detail.time ? "yyyy-MM-dd hh:mm:ss" : "yyyy-MM-dd";
-            return <DateInput {...SharedProps} format={ timeformat } showTime={ detail.time } onChange={(date) =>detail.timeDateChange(name, date)} style={{width: widthValue, height: 38}}/>;
+            return <DateInput {...SharedProps} format={ timeformat } showTime={ detail.time } onChange={(date) =>detail.editing(name, date)} style={{width: widthValue, height: 38}}/>;
         case 'textarea':
-            return <TextareaInput {...SharedProps} row_no={ detail.row_no ? detail.row_no : 2} onChange={editing} style={detail.extra === 'memo' ? {width: `calc(100% - 380px)`, flexGrow: 1} : {width: widthValue}}/>;
+            return <TextareaInput {...SharedProps} row_no={ detail.row_no ? detail.row_no : 2} onChange={detail.editing} style={detail.extra === 'memo' ? {width: `calc(100% - 380px)`, flexGrow: 1} : {width: widthValue}}/>;
         case 'select':
             const groupValue = (detail.group && detail.value && detail.value[detail.group]) ? detail.value[detail.group] : null;
-            return <SelectInput {...SharedProps} options={detail.options} groupVal={groupValue} keyVal={name} onChange={detail.selectChange} style={{width: widthValue, height: 38}}/>;
+            return <SelectInput {...SharedProps} options={detail.options} groupVal={groupValue} keyVal={detail.key ? detail.key : null} onChange={(selected)=>detail.editing(name, selected)} style={{width: widthValue, height: 38}}/>;
         default:
             return null;
     };
