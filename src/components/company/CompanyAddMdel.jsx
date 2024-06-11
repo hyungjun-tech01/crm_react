@@ -1,35 +1,33 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import ReactDom from 'react-dom';
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
 import { defaultCompany } from "../../atoms/atoms";
+import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo } from "../../repository/company";
-import { FiSearch } from "react-icons/fi";
+import { UserRepo } from '../../repository/user';
 import { formatDate } from '../../constants/functions';
 import { option_locations, option_deal_type, option_industry_type } from "../../constants/constans";
 
 import AddBasicItem from "../../constants/AddBasicItem";
-import PopupPostCode from "../../constants/PostCode";
+import AddAddressItem from '../../constants/AddAddressItem';
 
-const PopupDom = ({ children }) => {
-    const el = document.getElementById('popupDom');
-    return ReactDom.createPortal(children, el);
-};
 
 const CompanyAddModel = (props) => {
     const { init, handleInit } = props;
     const { modifyCompany } = useRecoilValue(CompanyRepo);
+    const userState = useRecoilValue(atomUserState);
+    const engineersForSelection = useRecoilValue(atomEngineersForSelection);
+    const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
+    const { loadAllUsers } = useRecoilValue(UserRepo)
     const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
     const { t } = useTranslation();
     const [companyChange, setCompanyChange] = useState(defaultCompany);
     const [establishDate, setEstablishDate] = useState(null);
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
 
     const initializeCompanyTemplate = useCallback(() => {
         setCompanyChange(defaultCompany);
         setEstablishDate(null);
-        setIsPopupOpen(false);
         document.querySelector("#add_new_company_form").reset();
     }, []);
 
@@ -90,30 +88,20 @@ const CompanyAddModel = (props) => {
         setCompanyChange(modifiedData);
     }, [companyChange]);
 
-    const handleSetAddress = useCallback((address) => {
-        const modifiedData = {
-            ...companyChange,
-            company_address: address,
-        };
-        setCompanyChange(modifiedData);
-        document.getElementById('company_input_address').value = address;
-    }, [companyChange]);
-
-    const handleSetZipCode = useCallback((zip_code) => {
-        const modifiedData = {
-            ...companyChange,
-            company_zip_code: zip_code,
-        };
-        setCompanyChange(modifiedData);
-    }, [companyChange]);
-
     useEffect(() => {
-        console.log('CompanyAddModel called!');
+        console.log('[CompanyAddModel] called!');
         if(init) {
             initializeCompanyTemplate();
             handleInit(!init);
         }
     }, [handleInit, init, initializeCompanyTemplate]);
+
+    useEffect(() => {
+        console.log('[CompanyAddModel] loading user data!');
+        if((userState & 1) === 0) {
+            loadAllUsers();
+        }
+    }, [userState, loadAllUsers ])
 
     return (
         <div
@@ -147,191 +135,183 @@ const CompanyAddModel = (props) => {
                                 <form id="add_new_company_form">
                                     <div className="form-group row">
                                         <AddBasicItem
+                                            title={t('company.company_name')}
                                             type='text'
                                             name="company_name"
+                                            defaultValue={companyChange.company_name}
                                             required
-                                            title={t('company.company_name')}
                                             onChange={handleCompanyChange}
                                         />
                                         <AddBasicItem
+                                            title={t('company.eng_company_name')}
                                             type='text'
                                             name="company_name_eng"
-                                            title={t('company.eng_company_name')}
+                                            defaultValue={companyChange.company_name_eng}
                                             onChange={handleCompanyChange}
                                         />
                                     </div>
                                     <div className="form-group row">
                                         <AddBasicItem
+                                            title={t('company.ceo_name')}
                                             type='text'
                                             name="ceo_name"
-                                            title={t('company.ceo_name')}
+                                            defaultValue={companyChange.ceo_name}
                                             onChange={handleCompanyChange}
                                         />
                                         <AddBasicItem
+                                            title={t('company.business_registration_code')}
                                             type='text'
                                             name="business_registration_code"
-                                            title={t('company.business_registration_code')}
+                                            defaultValue={companyChange.business_registration_code}
                                             onChange={handleCompanyChange}
                                         />
                                     </div>
                                     <div className="form-group row">
-                                        <div className="col-sm-6" >
-                                            <div className="add-basic-item">
-                                                <div className="add-basic-title" >
-                                                    {t('company.address')}
-                                                </div>
-                                                <input
-                                                    className="add-basic-content"
-                                                    id="company_input_address"
-                                                    type="text"
-                                                    placeholder={t('company.address')}
-                                                    onChange={handleCompanyChange}
-                                                />
-                                                <div className="add-basic-btn" onClick={() => setIsPopupOpen(!isPopupOpen)}>
-                                                    <FiSearch />
-                                                </div>
-                                                <div id="popupDom">
-                                                    {isPopupOpen && (
-                                                        <PopupDom>
-                                                            <PopupPostCode
-                                                                onSetAddress={handleSetAddress}
-                                                                onSetPostCode={handleSetZipCode}
-                                                                onClose={() => setIsPopupOpen(false)}
-                                                            />
-                                                        </PopupDom>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <AddAddressItem
+                                            title={t('company.address')}
+                                            key_address='company_address'
+                                            key_zip='company_zip_code'
+                                            edited={companyChange}
+                                            setEdited={setCompanyChange}
+                                        />
                                         <AddBasicItem
+                                            title={t('company.phone_number')}
                                             type='text'
                                             name="company_phone_number"
-                                            title={t('company.phone_number')}
+                                            defaultValue={companyChange.company_phone_number}
                                             onChange={handleCompanyChange}
                                         />
                                     </div>
                                     <div className="form-group row">
-                                        <div className="col-sm-6" >
-                                            <div className="add-basic-item">
-                                                <div className="add-basic-title" >
-                                                    {t('company.zip_code')}
-                                                </div>
-                                                <label
-                                                    className="add-basic-content label"
-                                                >
-                                                    {companyChange.company_zip_code
-                                                        ? companyChange.company_zip_code
-                                                        : t('comment.search_address_first')}
-                                                </label>
-                                            </div>
-                                        </div>
                                         <AddBasicItem
+                                            title={t('lead.zip_code')}
+                                            type='text'
+                                            name="company_zip_code"
+                                            defaultValue={companyChange.company_zip_code}
+                                            disabled={true}
+                                            onChange={handleCompanyChange}
+                                        />
+                                        <AddBasicItem
+                                            title={t('company.fax_number')}
                                             type='text'
                                             name="company_fax_number"
-                                            title={t('company.fax_number')}
+                                            defaultValue={companyChange.company_fax_number}
                                             onChange={handleCompanyChange}
                                         />
                                     </div>
                                     <div className="form-group row">
                                         <AddBasicItem
+                                            title={t('company.homepage')}
                                             type='text'
                                             name="homepage"
-                                            title={t('company.homepage')}
+                                            defaultValue={companyChange.homepage}
                                             onChange={handleCompanyChange}
                                         />
                                         <AddBasicItem
+                                            title={t('company.company_scale')}
                                             type='text'
                                             name="company_scale"
-                                            title={t('company.company_scale')}
+                                            defaultValue={companyChange.company_scale}
                                             onChange={handleCompanyChange}
                                         />
                                     </div>
                                     <div className="form-group row">
                                         <AddBasicItem
-                                            type='select'
-                                            options={option_deal_type.ko}
                                             title={t('company.deal_type')}
+                                            type='select'
+                                            defaultValue={companyChange.deal_type}
+                                            options={option_deal_type.ko}
                                             onChange={(selected) => handleSelectChange('deal_type', selected)}
                                         />
                                         <AddBasicItem
-                                            type='select'
-                                            options={option_industry_type.ko}
                                             title={t('company.industry_type')}
+                                            type='select'
+                                            defaultValue={companyChange.industry_type}
+                                            options={option_industry_type.ko}
                                             onChange={(selected) => handleSelectChange('industry_type', selected)}
                                         />
                                     </div>
                                     <div className="form-group row">
                                         <AddBasicItem
+                                            title={t('company.business_type')}
                                             type='text'
                                             name="business_type"
-                                            title={t('company.business_type')}
+                                            defaultValue={companyChange.business_type}
                                             onChange={handleCompanyChange}
                                         />
                                         <AddBasicItem
+                                            title={t('company.business_item')}
                                             type='text'
                                             name="business_item"
-                                            title={t('company.business_item')}
+                                            defaultValue={companyChange.business_item}
                                             onChange={handleCompanyChange}
                                         />
                                     </div>
                                     <div className="form-group row">
                                         <AddBasicItem
+                                            title={t('company.establishment_date')}
                                             type='date'
                                             name="establishment_date"
-                                            title={t('company.establishment_date')}
                                             time={{ data: establishDate }}
                                             onChange={handleEstablishDateChange}
                                         />
                                     </div>
                                     <div className="form-group row">
                                         <AddBasicItem
+                                            title={t('company.account_code')}
                                             type='text'
                                             name="account_code"
-                                            title={t('company.account_code')}
+                                            defaultValue={companyChange.account_code}
                                             onChange={handleCompanyChange}
                                         />
                                         <AddBasicItem
+                                            title={t('company.bank_name')}
                                             type='text'
                                             name="bank_name"
-                                            title={t('company.bank_name')}
+                                            defaultValue={companyChange.bank_name}
                                             onChange={handleCompanyChange}
                                         />
                                     </div>
                                     <div className="form-group row">
                                         <AddBasicItem
+                                            title={t('company.account_owner')}
                                             type='text'
                                             name="account_owner"
-                                            title={t('company.account_owner')}
+                                            defaultValue={companyChange.account_owner}
                                             onChange={handleCompanyChange}
                                         />
                                         <AddBasicItem
-                                            type='text'
-                                            name="sales_resource"
                                             title={t('company.salesman')}
-                                            onChange={handleCompanyChange}
+                                            type='select'
+                                            defaultValue={companyChange.sales_resource}
+                                            options={salespersonsForSelection}
+                                            onChange={(selected) => handleSelectChange('sales_resource', selected)}
                                         />
                                     </div>
                                     <div className="form-group row">
                                         <AddBasicItem
-                                            type='text'
-                                            name="application_engineer"
                                             title={t('company.engineer')}
-                                            onChange={handleCompanyChange}
+                                            type='select'
+                                            defaultValue={companyChange.application_engineer}
+                                            options={engineersForSelection}
+                                            onChange={(selected) => handleSelectChange('application_engineer', selected)}
                                         />
                                         <AddBasicItem
                                             type='select'
                                             options={option_locations.ko}
                                             title={t('common.location')}
+                                            defaultValue={companyChange.region}
                                             onChange={(selected) => handleSelectChange('region', selected)}
                                         />
                                     </div>
                                     <div className="form-group row">
                                         <AddBasicItem
+                                            title={t('common.memo')}
                                             type='textarea'
                                             long
                                             row_no={3}
                                             name="memo"
-                                            title={t('common.memo')}
+                                            defaultValue={companyChange.memo}
                                             onChange={handleCompanyChange}
                                         />
                                     </div>

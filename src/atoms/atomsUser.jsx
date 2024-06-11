@@ -29,3 +29,13 @@ export const atomUserState = atom({
     key: "userState",
     default: 0,
 });
+
+export const atomSalespersonsForSelection = atom({
+    key: "salespersonUsers",
+    default: [],
+});
+
+export const atomEngineersForSelection = atom({
+    key: "engineerUsers",
+    default: [],
+});

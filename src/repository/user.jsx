@@ -1,6 +1,6 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentUser, defaultUser , atomAllUsers, atomUserState} from '../atoms/atomsUser';
+import { atomCurrentUser, defaultUser , atomAllUsers, atomUserState, atomSalespersonsForSelection, atomEngineersForSelection} from '../atoms/atomsUser';
 import { data_user } from './test_data';
 
 
@@ -73,9 +73,16 @@ export async function  apiLoginValidate(userId, password) {
                 }
                 set(atomAllUsers, data);
 
-                // Change loading state
+                //----- Change loading state -----------------------------------
                 const loadStates = await snapshot.getPromise(atomUserState);
                 set(atomUserState, (loadStates | 1));
+
+                //----- Store SR, AE data -----------------------------------
+                const workingUsers = data.filter(user => user.isWork === 'Y');
+                const salespersons = workingUsers.filter(user => user.jobType === 'SR').map(user => {return {label: user.userName, value: user.userName}});
+                set(atomSalespersonsForSelection, salespersons)
+                const engineers = workingUsers.filter(user => user.jobType === 'AE').map(user => {return {label: user.userName, value: user.userName}});
+                set(atomEngineersForSelection, engineers);
             }
             catch(err){
                 console.error(`loadUsers / Error : ${err}`);

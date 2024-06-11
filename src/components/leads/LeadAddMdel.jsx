@@ -3,7 +3,7 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
 import { atomAllCompanies, atomCompanyState, defaultLead } from "../../atoms/atoms";
-import { atomAllUsers, atomUserState } from '../../atoms/atomsUser';
+import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo } from "../../repository/company";
 import { UserRepo } from '../../repository/user';
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
@@ -18,15 +18,14 @@ const LeadAddModel = (props) => {
     const allCompnayData = useRecoilValue(atomAllCompanies);
     const { loadAllCompanies } = useRecoilValue(CompanyRepo);
     const userState = useRecoilValue(atomUserState);
-    const allUserData = useRecoilValue(atomAllUsers);
+    const engineersForSelection = useRecoilValue(atomEngineersForSelection);
+    const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
     const { loadAllUsers } = useRecoilValue(UserRepo)
     const { modifyLead } = useRecoilValue(LeadRepo);
     const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
     const [ companySelection, setCompanySelection ] = useState([]);
     const [ leadChange, setLeadChange ] = useState(defaultLead);
     const [ disabledItems, setDisabledItems ] = useState({});
-    const [ salesmanSelection, setSalesmanSelection ] = useState([]);
-    const [ engineerSelection, setEngineerSelection ] = useState([]);
 
     const { t } = useTranslation();
 
@@ -154,20 +153,8 @@ const LeadAddModel = (props) => {
         console.log('[LeadAddModel] loading user data!');
         if((userState & 1) === 0) {
             loadAllUsers();
-        } else {
-            const tempIsWork = allUserData.filter(user => user.isWork === 'Y');
-            const tempSalesman = tempIsWork.filter(user =>  user.jobType === 'SR')
-                .map(item => {return {label: item.userName, value: item.userName}});
-            if(tempSalesman.length !== salesmanSelection.length){
-                setSalesmanSelection(tempSalesman);
-            };
-            const tempEngineer = tempIsWork.filter(user => user.jobType === 'AE')
-                .map(item => {return {label: item.userName, value: item.userName}});
-            if(tempEngineer.length !== engineerSelection.length){
-                setEngineerSelection(tempEngineer);
-            };
         }
-    }, [userState, allUserData, salesmanSelection.length, engineerSelection.length, loadAllUsers ])
+    }, [userState, loadAllUsers ])
 
     return (
         <div
@@ -321,14 +308,14 @@ const LeadAddModel = (props) => {
                                             title={t('lead.lead_sales')}
                                             type='select'
                                             defaultValue={leadChange.sales_resource}
-                                            options={salesmanSelection}
+                                            options={salespersonsForSelection}
                                             onChange={(selected) => handleSelectChange('sales_resource', selected)}
                                         />
                                         <AddBasicItem
                                             title={t('company.engineer')}
                                             type='select'
                                             defaultValue={leadChange.application_engineer}
-                                            options={engineerSelection}
+                                            options={engineersForSelection}
                                             onChange={(selected) => handleSelectChange('application_engineer', selected)}
                                         />
                                     </div>
