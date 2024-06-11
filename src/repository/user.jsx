@@ -79,9 +79,16 @@ export async function  apiLoginValidate(userId, password) {
 
                 //----- Store SR, AE data -----------------------------------
                 const workingUsers = data.filter(user => user.isWork === 'Y');
-                const salespersons = workingUsers.filter(user => user.jobType === 'SR').map(user => ({label: user.userName, value: user.userName}));
+                workingUsers.sort((a, b)=>{
+                    if(a.userName > b.userName) return 1;
+                    if(a.userName < b.userName) return -1;
+                    return 0;
+                });
+                const salespersons = workingUsers.filter(user => user.jobType === 'SR')
+                    .map(user => ({label: user.userName, value: user.userName}));
                 set(atomSalespersonsForSelection, salespersons)
-                const engineers = workingUsers.filter(user => user.jobType === 'AE').map(user => ({label: user.userName, value: user.userName}));
+                const engineers = workingUsers.filter(user => user.jobType === 'AE')
+                    .map(user => ({label: user.userName, value: user.userName}));
                 set(atomEngineersForSelection, engineers);
             }
             catch(err){
