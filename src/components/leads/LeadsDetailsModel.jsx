@@ -2,18 +2,16 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
-import { Collapse, Space, Switch } from "antd";
+import { Space, Switch } from "antd";
 import { atomCurrentLead, defaultLead, atomCurrentCompany, defaultCompany, 
          atomCompanyConsultings,atomFilteredConsulting, atomCompanyQuotations, atomFilteredQuotation,
-         atomCompanyPurchases, atomFilteredPurchase, atomCompanyState, atomCompanyForSelection } from "../../atoms/atoms";
+         atomCompanyPurchases, atomFilteredPurchase, atomCompanyState, atomCompanyForSelection, 
+         atomAllCompanies} from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo} from "../../repository/company";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { UserRepo } from '../../repository/user';
-import DetailLabelItem from "../../constants/DetailLabelItem";
-import DetailTextareaItem from "../../constants/DetailTextareaItem";
 import { Avatar, selectClasses } from "@mui/material";
-import DetailDateItem from "../../constants/DetailDateItem";
 import { ConsultingRepo } from "../../repository/consulting";
 import { QuotationRepo } from "../../repository/quotation";
 import { PurchaseRepo } from "../../repository/purchase";
@@ -30,7 +28,6 @@ import { option_locations } from "../../constants/constans";
 
 
 const LeadsDetailsModel = () => {
-  const { Panel } = Collapse;
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
@@ -41,8 +38,9 @@ const LeadsDetailsModel = () => {
 
   //===== [RecoilState] Related with Company =======================================
   const companyState = useRecoilValue(atomCompanyState);
-  const selectedCompany = useRecoilValue(atomCurrentCompany);
-  const { loadAllCompanies, modifyCompany } = useRecoilValue(CompanyRepo);
+  const allCompanies = useRecoilValue(atomAllCompanies);
+  const currentCompany = useRecoilValue(atomCurrentCompany);
+  const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
   const companyConsultings = useRecoilValue(atomCompanyConsultings);
@@ -131,6 +129,21 @@ const LeadsDetailsModel = () => {
     };
   }, [editedDetailValues, selectedLead]);
 
+  const handleChangeStatus = (newStatus)=>{
+    const tempEdited = {
+      status:newStatus,
+      action_type: "UPDATE",
+      modify_user: cookies.myLationCrmUserId,
+      lead_code: selectedLead.lead_code,
+    };
+
+    if (modifyLead(tempEdited)) {
+      console.log(`Succeeded to lead change status`);
+    } else {
+      console.error('Failed to modify lead')
+    }
+  };
+
   const handleClose = useCallback(() => {
     setEditedDetailValues(null);
     setCurrentLead();
@@ -148,9 +161,35 @@ const LeadsDetailsModel = () => {
       };
       if (modifyLead(temp_all_saved)) {
         console.log(`Succeeded to modify lead`);
+        let temp_update_company = null;
+        if(editedDetailValues['company_name'])
+          temp_update_company['company_name'] = editedDetailValues['company_name'];
+        if(editedDetailValues['company_name_en'])
+          temp_update_company['company_name_eng'] = editedDetailValues['company_name_en'];
+        if(editedDetailValues['company_phone_number'])
+          temp_update_company['company_phone_number'] = editedDetailValues['company_phone_number'];
+        if(editedDetailValues['company_fax_number'])
+          temp_update_company['company_fax_number'] = editedDetailValues['company_fax_number'];
+        if(editedDetailValues['company_address'])
+          temp_update_company['company_address'] = editedDetailValues['company_address'];
+        if(editedDetailValues['company_zip_code'])
+            temp_update_company['company_zip_code'] = editedDetailValues['company_zip_code'];
+        if(editedDetailValues['region'])
+          temp_update_company['region'] = editedDetailValues['region'];
+          
+        if(temp_update_company !== null){
+          temp_update_company['action_type']='UPDATE';
+          temp_update_company['modify_user']=cookies.myLationCrmUserId;
+          temp_update_company['company_code']=currentCompany.company_code;
+          if(modifyCompany(temp_update_company)) {
+            console.log(`Succeeded to modify company`);
+          } else {
+            console.error('Failed to modify company');
+          };
+        };
       } else {
         console.error('Failed to modify lead')
-      }
+      };
     } else {
       console.log("[ LeadDetailModel ] No saved data");
     };
@@ -160,6 +199,27 @@ const LeadsDetailsModel = () => {
   const handleCancelAll = useCallback(() => {
     setEditedDetailValues(null);
   }, []);
+
+  const lead_items_info = [
+    { key:'lead_name',title:'lead.lead_name',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'position',title:'lead.position',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'is_keyman',title:'lead.is_keyman',detail:{type:'select',options:KeyManForSelection,editing:handleDetailSelectChange}},
+    { key:'region',title:'common.region',detail:{type:'select',options:option_locations.ko,editing:handleDetailSelectChange}},
+    { key:'company_name',title:'company.company_name',detail:{type:'select',options:companyForSelection,key:'company_name',editing:handleDetailSelectChange}},
+    { key:'company_name_en',title:'company.eng_company_name',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'department',title:'lead.department',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'position',title:'lead.position',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'mobile_number',title:'lead.mobile',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'company_phone_number',title:'company.phone_number',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'company_fax_number',title:'company.fax_number',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'email',title:'lead.email',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'homepage',title:'lead.homepage',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'company_zip_code',title:'company.zip_code',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'company_address',title:'company.address',detail:{type:'label', extra:'long',editing:handleDetailEditing}},
+    { key:'sales_resource',title:'lead.lead_sales',detail:{type:'select',options:salespersonsForSelection,editing:handleDetailSelectChange}},
+    { key:'application_engineer',title:'company.engineer',detail:{type:'select',options:engineersForSelection,editing:handleDetailSelectChange}},
+    { key:'create_date',title:'common.regist_date',detail:{type:'date',editing:handleDetailDateChange}},
+  ];
 
 
   //===== Handles to edit 'Purchase Details' ===============================================
@@ -208,21 +268,7 @@ const [selectedRow, setSelectedRow] = useState(null);
   }, []);
 
   
-  //change status chage 
-  const handleChangeStatus = (newStatus)=>{
-    const tempEdited = {
-      status:newStatus,
-      action_type: "UPDATE",
-      modify_user: cookies.myLationCrmUserId,
-      lead_code: selectedLead.lead_code,
-    };
-
-    if (modifyLead(tempEdited)) {
-      console.log(`Succeeded to lead change status`);
-    } else {
-      console.error('Failed to modify lead')
-    }
-  };
+  
 
   // --- Funtions for Specific Changes in Detail ---------------------------------
 
@@ -238,31 +284,14 @@ const [selectedRow, setSelectedRow] = useState(null);
   };
   
 
-  const lead_items_info = [
-    { key:'lead_name',title:'lead.lead_name',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'position',title:'lead.position',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'is_keyman',title:'lead.is_keyman',detail:{type:'select',options:KeyManForSelection,editing:handleDetailSelectChange}},
-    { key:'region',title:'common.region',detail:{type:'select',options:option_locations.ko,editing:handleDetailSelectChange}},
-    { key:'company_name',title:'company.company_name',detail:{type:'select',options:companyForSelection,key:'company_name',editing:handleDetailSelectChange}},
-    { key:'company_name_en',title:'company.eng_company_name',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'department',title:'lead.department',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'position',title:'lead.position',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'mobile_number',title:'lead.mobile',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'company_phone_number',title:'company.phone_number',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'company_fax_number',title:'company.fax_number',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'email',title:'lead.email',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'homepage',title:'lead.homepage',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'company_zip_code',title:'company.zip_code',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'company_address',title:'company.address',detail:{type:'label', extra:'long',editing:handleDetailEditing}},
-    { key:'sales_resource',title:'lead.lead_sales',detail:{type:'select',options:salespersonsForSelection,editing:handleDetailSelectChange}},
-    { key:'application_engineer',title:'company.engineer',detail:{type:'select',options:engineersForSelection,editing:handleDetailSelectChange}},
-    { key:'create_date',title:'common.regist_date',detail:{type:'date',editing:handleDetailDateChange}},
-  ];
-
+  
+  //===== useEffect functions ===============================================  
   useEffect(() => {
     console.log('[LeadDetailModel] useEffect / lead');
     if((selectedLead !== defaultLead) 
-      && (selectedLead.lead_code !== currentLeadCode)) {
+      && (selectedLead.lead_code !== currentLeadCode)
+      && ((companyState & 1) === 1)
+    ) {
       console.log('[LeadsDetailsModel] called!');
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
@@ -276,8 +305,12 @@ const [selectedRow, setSelectedRow] = useState(null);
       };
 
       setCurrentLeadCode(selectedLead.company_code);
+      const companyByLeadArray = allCompanies.filter(company => company.company_code === selectedLead.company_code);
+      if(companyByLeadArray.length > 0){
+        setCurrentCompany(companyByLeadArray[0]);
+      };
     };
-  }, [selectedLead, currentLeadCode]);
+  }, [selectedLead, currentLeadCode, companyState, allCompanies, setCurrentCompany]);
 
   useEffect(() => {   
     console.log('[LeadsDetailsModel] useEffect / company');
