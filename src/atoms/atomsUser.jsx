@@ -24,3 +24,8 @@ export const atomAllUsers = atom({
     key: "allUsers",
     default: [],
 });
+
+export const atomUserState = atom({
+    key: "userState",
+    default: 0,
+});

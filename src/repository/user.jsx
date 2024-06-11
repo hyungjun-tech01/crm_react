@@ -1,6 +1,6 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentUser, defaultUser , atomAllUsers} from '../atoms/atomsUser';
+import { atomCurrentUser, defaultUser , atomAllUsers, atomUserState} from '../atoms/atomsUser';
 import { data_user } from './test_data';
 
 
@@ -60,19 +60,27 @@ export async function  apiLoginValidate(userId, password) {
     key: "UserRepository",
     get: ({getCallback}) => {
         /////////////////////load all Users /////////////////////////////
-        const loadAllUsers = getCallback(({set}) => async () => {
+        const loadAllUsers = getCallback(({set, snapshot}) => async () => {
             try{
                 const response = await fetch(`${BASE_PATH}/getallusers`);
                 const data = await response.json();
                 if(data.message){
                     console.log('loadUsers message:', data.message);
                     set(atomAllUsers, []);
+                    const loadStates = await snapshot.getPromise(atomUserState);
+                    set(atomUserState, (loadStates & ~1));
                     return;
                 }
                 set(atomAllUsers, data);
+
+                // Change loading state
+                const loadStates = await snapshot.getPromise(atomUserState);
+                set(atomUserState, (loadStates | 1));
             }
             catch(err){
                 console.error(`loadUsers / Error : ${err}`);
+                const loadStates = await snapshot.getPromise(atomUserState);
+                set(atomUserState, (loadStates & ~1));
             };
         });        
         /////////////////////load Users /////////////////////////////

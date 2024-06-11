@@ -3,9 +3,10 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
 import { atomAllCompanies, atomCompanyState, defaultLead } from "../../atoms/atoms";
+import { atomAllUsers, atomUserState } from '../../atoms/atomsUser';
 import { CompanyRepo } from "../../repository/company";
+import { UserRepo } from '../../repository/user';
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
-import { formatDate } from '../../constants/functions';
 import { option_locations } from "../../constants/constans";
 
 import AddBasicItem from "../../constants/AddBasicItem";
@@ -16,19 +17,22 @@ const LeadAddModel = (props) => {
     const companyState = useRecoilValue(atomCompanyState);
     const allCompnayData = useRecoilValue(atomAllCompanies);
     const { loadAllCompanies } = useRecoilValue(CompanyRepo);
+    const userState = useRecoilValue(atomUserState);
+    const allUserData = useRecoilValue(atomAllUsers);
+    const { loadAllUsers } = useRecoilValue(UserRepo)
     const { modifyLead } = useRecoilValue(LeadRepo);
     const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
     const [ companySelection, setCompanySelection ] = useState([]);
-    const [ selectedOptions, setSelectedOptions ] = useState(null);
     const [ leadChange, setLeadChange ] = useState(defaultLead);
     const [ disabledItems, setDisabledItems ] = useState({});
+    const [ salesmanSelection, setSalesmanSelection ] = useState([]);
+    const [ engineerSelection, setEngineerSelection ] = useState([]);
 
     const { t } = useTranslation();
 
 
     const initializeLeadTemplate = useCallback(() => {
         setLeadChange(defaultLead);
-        setSelectedOptions({});
         setDisabledItems({});
         document.querySelector("#add_new_lead_form").reset();
     }, []);
@@ -67,26 +71,16 @@ const LeadAddModel = (props) => {
 
     const handleSelectChange = useCallback((name, selected) => {
         console.log(`handleSelectChange / name : ${name} / selected : ${selected.value}`);
-        setSelectedOptions({
-            ...selectedOptions,
-            [name]: selected
-        });
         const modifiedData = {
             ...leadChange,
             [name]: selected.value,
         };
         console.log('handleSelectChange / leadChange : ', modifiedData);
         setLeadChange(modifiedData);
-    }, [leadChange, selectedOptions]);
+    }, [leadChange]);
 
     const handleSelectCompany = useCallback((value) => {
         const selected = value.value;
-        const tempSelected = {
-            ...selectedOptions,
-            company_name: value
-        };
-        console.log('handleSelectCompany / selected options: ', tempSelected);
-        setSelectedOptions(tempSelected);
         let tempLeadChange = {
             ...leadChange,
             company_code: selected.company_code,
@@ -123,23 +117,18 @@ const LeadAddModel = (props) => {
         setLeadChange(tempLeadChange);
         setDisabledItems(tempDisabled);
 
-        if(tempLeadChange.region){
-            const foundIdx = option_locations.ko.findIndex(item => item.value === tempLeadChange.region);
-            if(foundIdx !== -1){
-                setSelectedOptions({
-                    ...selectedOptions,
-                    region: option_locations.ko.at(foundIdx),
-                });
-            };
-        };
-    }, [leadChange, selectedOptions]);
+    }, [disabledItems, leadChange]);
 
     useEffect(() => {
-        console.log('LeadAddModel called!');
+        console.log('[LeadAddModel] initialize!');
         if (init) {
             initializeLeadTemplate();
             handleInit(!init);
         };
+    }, [init, handleInit, initializeLeadTemplate]);
+
+    useEffect(() => {
+        console.log('[LeadAddModel] loading company data!');
         if ((companyState & 1) === 0) {
             loadAllCompanies();
         } else {
@@ -159,7 +148,26 @@ const LeadAddModel = (props) => {
             };
         };
 
-    }, [allCompnayData, companySelection.length, companyState, handleInit, init, initializeLeadTemplate, loadAllCompanies]);
+    }, [allCompnayData, companySelection.length, companyState, loadAllCompanies]);
+
+    useEffect(() => {
+        console.log('[LeadAddModel] loading user data!');
+        if((userState & 1) === 0) {
+            loadAllUsers();
+        } else {
+            const tempIsWork = allUserData.filter(user => user.isWork === 'Y');
+            const tempSalesman = tempIsWork.filter(user =>  user.jobType === 'SR')
+                .map(item => {return {label: item.userName, value: item.userName}});
+            if(tempSalesman.length !== salesmanSelection.length){
+                setSalesmanSelection(tempSalesman);
+            };
+            const tempEngineer = tempIsWork.filter(user => user.jobType === 'AE')
+                .map(item => {return {label: item.userName, value: item.userName}});
+            if(tempEngineer.length !== engineerSelection.length){
+                setEngineerSelection(tempEngineer);
+            };
+        }
+    }, [userState, allUserData, salesmanSelection.length, engineerSelection.length, loadAllUsers ])
 
     return (
         <div
@@ -311,17 +319,17 @@ const LeadAddModel = (props) => {
                                     <div className="form-group row">
                                         <AddBasicItem
                                             title={t('lead.lead_sales')}
-                                            type='text'
-                                            name="sales_resource"
+                                            type='select'
                                             defaultValue={leadChange.sales_resource}
-                                            onChange={handleLeadChange}
+                                            options={salesmanSelection}
+                                            onChange={(selected) => handleSelectChange('sales_resource', selected)}
                                         />
                                         <AddBasicItem
                                             title={t('company.engineer')}
-                                            type='text'
-                                            name="application_engineer"
+                                            type='select'
                                             defaultValue={leadChange.application_engineer}
-                                            onChange={handleLeadChange}
+                                            options={engineerSelection}
+                                            onChange={(selected) => handleSelectChange('application_engineer', selected)}
                                         />
                                     </div>
                                     <div className="form-group row">
