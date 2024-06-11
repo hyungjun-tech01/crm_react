@@ -3,6 +3,9 @@ import { Button, Modal, Checkbox, CheckboxProps } from 'antd';
 import Select from "react-select";
 import { companyColumn, ColumnQueryCondition } from "../repository/company";
 import { useTranslation } from "react-i18next";
+import AddBasicItem from "./AddBasicItem";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const QueryRow = ({ index, companyColumn, columnQueryCondition, companyColumnValue, columnQueryConditionValue, multiQueryInputValue, andOrValue, onCompanyColumnChange, onColumnQueryConditionChange, onMultiQueryInputChange, onAndOrChange }) => (
   <tr>
@@ -39,6 +42,7 @@ const MultiQueryModal = (props) => {
       { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
       { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
     ]);
+
 
   //   const add_purchase_items = [
   //     ['registration_date', 'purchase.registration_date',
@@ -99,8 +103,23 @@ const MultiQueryModal = (props) => {
     };
   
     const label = `${checked ? 'Checked' : 'Unchecked'}-${disabled ? 'Disabled' : 'Enabled'}`;
+
+    const today = new Date();
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(today.getMonth() - 1);
   
-  
+    const [registrationFromDate, setRegistrationFromDate] = useState(oneMonthAgo);
+
+    const handleRegistrationDateFromChange = useCallback((date) => {
+      setRegistrationFromDate(date);
+    }, []);
+
+    const [registrationToDate, setRegistrationToDate] = useState(today);
+
+    const handleRegistrationDateToChange = useCallback((date) => {
+      setRegistrationToDate(date);
+    }, []);
+
     return (
         <Modal
             title={title}
@@ -145,13 +164,35 @@ const MultiQueryModal = (props) => {
                 onAndOrChange={handleAndOr}
               />
               ))}       
-              <tr>
-                <Checkbox checked={checked} disabled={disabled} onChange={onChange}>
+              <tr style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ width: '100px' }}>
+                <Checkbox checked={checked} disabled={disabled} onChange={onChange} style={{width:'100px'}}>
                   {t('purchase.registration_date')}
-                </Checkbox> : 날짜 ~ 날짜 
-              </tr>      
+                </Checkbox>
+                </div>
+                <div style={{ width: '150px',}}>
+                  <DatePicker
+                      className="basic-date"
+                      name = 'registrationFromDate'           
+                      selected={registrationFromDate}
+                      onChange={handleRegistrationDateFromChange}
+                      dateFormat="yyyy-MM-dd"
+                  /> 
+                </div>
+                ~
+                <div style={{ width: '150px', }}>
+                  <DatePicker
+                        className="basic-date"
+                        name = 'registrationToDate'
+                        selected={registrationToDate}
+                        onChange={handleRegistrationDateToChange}
+                        dateFormat="yyyy-MM-dd"
+                    /> 
+                  </div>
+                  <div style={{ flex: '1x'}}></div>              
+                </tr>      
               <tr>
-                {t('purchase.delivery_date')} : 날짜 ~ 날짜 
+                {t('purchase.delivery_date')} : 
               </tr>  
               <tr>
                 {t('purchase.hq_finish_date')} : 날짜 ~ 날짜 

@@ -255,6 +255,18 @@
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
 }
+.basic-date{
+    width: 100%;
+    height: 40px;
+    margin: 0;
+    padding: 8px 10px;
+    font-size: inherit;
+    border-top: solid 1px #777777;
+    border-bottom: solid 1px #777777;
+    border-right: solid 1px #777777;
+    border-left: solid 1px #777777;
+    border-radius: 5px;
+}
 .table-body
 {
     padding: 10px;
