@@ -3,10 +3,15 @@ import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { Space, Switch } from "antd";
-import { atomCurrentLead, defaultLead, atomCurrentCompany, defaultCompany, 
-         atomCompanyConsultings,atomFilteredConsulting, atomCompanyQuotations, atomFilteredQuotation,
-         atomCompanyPurchases, atomFilteredPurchase, atomCompanyState, atomCompanyForSelection, 
-         atomAllCompanies} from "../../atoms/atoms";
+import { 
+  atomCurrentLead,
+  defaultLead, atomCurrentCompany,
+  atomCompanyConsultings,atomFilteredConsulting, atomCompanyQuotations, atomFilteredQuotation,
+  atomCompanyPurchases, atomFilteredPurchase, atomCompanyState, atomCompanyForSelection, 
+  atomAllCompanies,
+  atomPurchaseState,
+  atomAllPurchases,
+} from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo} from "../../repository/company";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
@@ -15,6 +20,7 @@ import { Avatar, selectClasses } from "@mui/material";
 import { ConsultingRepo } from "../../repository/consulting";
 import { QuotationRepo } from "../../repository/quotation";
 import { PurchaseRepo } from "../../repository/purchase";
+import { MAContractRepo } from "../../repository/ma_contract";
 import { ExpandMore } from "@mui/icons-material";
 import ConsultingsDetailsModel from "../consulting/ConsultingsDetailsModel";
 import QuotationsDetailsModel from "../quotations/QuotationsDetailsModel";
@@ -31,10 +37,12 @@ const LeadsDetailsModel = () => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
+
   //===== [RecoilState] Related with Lead ==========================================
   const selectedLead = useRecoilValue(atomCurrentLead);
   const { modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
   const filteredConsultings = useRecoilValue(atomFilteredConsulting);
+
 
   //===== [RecoilState] Related with Company =======================================
   const companyState = useRecoilValue(atomCompanyState);
@@ -42,14 +50,18 @@ const LeadsDetailsModel = () => {
   const currentCompany = useRecoilValue(atomCurrentCompany);
   const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
-
   const companyConsultings = useRecoilValue(atomCompanyConsultings);
-  
   const companyQuotations = useRecoilValue(atomCompanyQuotations);
   const filteredQuotations = useRecoilValue(atomFilteredQuotation);
-
   const companyPurchases = useRecoilValue(atomCompanyPurchases);
   const filteredPurchases = useRecoilValue(atomFilteredPurchase);
+
+
+  //===== [RecoilState] Related with Purchase =======================================
+  const purchaseState = useRecoilValue(atomPurchaseState);
+  const allPurchases = useRecoilValue(atomAllPurchases);
+  const { loadAllPurchases} = useRecoilValue(PurchaseRepo);
+  const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
   //===== [RecoilState] Related with Users ==========================================
   const userState = useRecoilValue(atomUserState);
@@ -70,16 +82,17 @@ const LeadsDetailsModel = () => {
       localStorage.setItem('isFullScreen', '0');
   }, []);
 
+  
   //===== Handles to edit 'Lead Details' ===============================================
   const [ editedDetailValues, setEditedDetailValues ] = useState(null);
 
-  const handleDetailEditing = useCallback((e) => {
+  const handleDetailChange = useCallback((e) => {
     if(e.target.value !== selectedLead[e.target.name]){
       const tempEdited = {
         ...editedDetailValues,
         [e.target.name]: e.target.value,
       };
-      console.log('handleDetailEditing : ', tempEdited);
+      console.log('handleDetailChange : ', tempEdited);
       setEditedDetailValues(tempEdited);
     } else {
       if(editedDetailValues[e.target.name]){
@@ -147,6 +160,7 @@ const LeadsDetailsModel = () => {
   const handleClose = useCallback(() => {
     setEditedDetailValues(null);
     setCurrentLead();
+    setCurrentLeadCode('');
   }, [setCurrentLead]);
 
   const handleSaveAll = useCallback(() => {
@@ -194,28 +208,28 @@ const LeadsDetailsModel = () => {
       console.log("[ LeadDetailModel ] No saved data");
     };
     setEditedDetailValues(null);
-  }, [cookies.myLationCrmUserId, editedDetailValues, modifyLead, selectedLead]);
+  }, [cookies.myLationCrmUserId, currentCompany.company_code, editedDetailValues, modifyCompany, modifyLead, selectedLead]);
 
   const handleCancelAll = useCallback(() => {
     setEditedDetailValues(null);
   }, []);
 
   const lead_items_info = [
-    { key:'lead_name',title:'lead.lead_name',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'position',title:'lead.position',detail:{type:'label',editing:handleDetailEditing}},
+    { key:'lead_name',title:'lead.lead_name',detail:{type:'label',editing:handleDetailChange}},
+    { key:'position',title:'lead.position',detail:{type:'label',editing:handleDetailChange}},
     { key:'is_keyman',title:'lead.is_keyman',detail:{type:'select',options:KeyManForSelection,editing:handleDetailSelectChange}},
     { key:'region',title:'common.region',detail:{type:'select',options:option_locations.ko,editing:handleDetailSelectChange}},
     { key:'company_name',title:'company.company_name',detail:{type:'select',options:companyForSelection,key:'company_name',editing:handleDetailSelectChange}},
-    { key:'company_name_en',title:'company.eng_company_name',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'department',title:'lead.department',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'position',title:'lead.position',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'mobile_number',title:'lead.mobile',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'company_phone_number',title:'company.phone_number',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'company_fax_number',title:'company.fax_number',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'email',title:'lead.email',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'homepage',title:'lead.homepage',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'company_zip_code',title:'company.zip_code',detail:{type:'label',editing:handleDetailEditing}},
-    { key:'company_address',title:'company.address',detail:{type:'label', extra:'long',editing:handleDetailEditing}},
+    { key:'company_name_en',title:'company.eng_company_name',detail:{type:'label',editing:handleDetailChange}},
+    { key:'department',title:'lead.department',detail:{type:'label',editing:handleDetailChange}},
+    { key:'position',title:'lead.position',detail:{type:'label',editing:handleDetailChange}},
+    { key:'mobile_number',title:'lead.mobile',detail:{type:'label',editing:handleDetailChange}},
+    { key:'company_phone_number',title:'company.phone_number',detail:{type:'label',editing:handleDetailChange}},
+    { key:'company_fax_number',title:'company.fax_number',detail:{type:'label',editing:handleDetailChange}},
+    { key:'email',title:'lead.email',detail:{type:'label',editing:handleDetailChange}},
+    { key:'homepage',title:'lead.homepage',detail:{type:'label',editing:handleDetailChange}},
+    { key:'company_zip_code',title:'company.zip_code',detail:{type:'label',editing:handleDetailChange}},
+    { key:'company_address',title:'company.address',detail:{type:'label', extra:'long',editing:handleDetailChange}},
     { key:'sales_resource',title:'lead.lead_sales',detail:{type:'select',options:salespersonsForSelection,editing:handleDetailSelectChange}},
     { key:'application_engineer',title:'company.engineer',detail:{type:'select',options:engineersForSelection,editing:handleDetailSelectChange}},
     { key:'create_date',title:'common.regist_date',detail:{type:'date',editing:handleDetailDateChange}},
@@ -308,9 +322,10 @@ const [selectedRow, setSelectedRow] = useState(null);
       const companyByLeadArray = allCompanies.filter(company => company.company_code === selectedLead.company_code);
       if(companyByLeadArray.length > 0){
         setCurrentCompany(companyByLeadArray[0]);
+        loadCompanyMAContracts(companyByLeadArray[0].company_code);
       };
     };
-  }, [selectedLead, currentLeadCode, companyState, allCompanies, setCurrentCompany]);
+  }, [selectedLead, currentLeadCode, companyState, allCompanies, setCurrentCompany, loadCompanyMAContracts]);
 
   useEffect(() => {   
     console.log('[LeadsDetailsModel] useEffect / company');
@@ -318,6 +333,27 @@ const [selectedRow, setSelectedRow] = useState(null);
       loadAllCompanies();
     };
   }, [companyState, loadAllCompanies]);
+
+  // ----- useEffect for Purchase -----------------------------------
+  useEffect(() => {
+    console.log('[LeadDetailModel] useEffect / Purchase');
+    if((purchaseState & 1) === 0) {
+      console.log('[LeadDetailModel] loadAllPurchases');
+      loadAllPurchases();
+    } else {
+      const tempCompanyPurchases = allPurchases.filter(purchase => purchase.company_code === currentCompany.company_code);
+      if(purchasesByCompany.length !== tempCompanyPurchases.length) {
+        console.log('[CompanyDetailsModel] set purchasesBycompany / set MA Count');
+        setPurchasesByCompany(tempCompanyPurchases);
+
+        let valid_count = 0;
+        tempCompanyPurchases.forEach(item => {
+          if(item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now())) valid_count++;
+        });
+        setValidMACount(valid_count);
+      };
+    };
+  }, [purchaseState, allPurchases, purchasesByCompany, loadAllPurchases, currentCompany.company_code]);
 
   useEffect(() => {
     console.log('[CompanyAddModel] loading user data!');
@@ -348,19 +384,19 @@ const [selectedRow, setSelectedRow] = useState(null);
                   original={ selectedLead.lead_name }
                   name='status'
                   title={t('lead.lead_name')}
-                  onEditing={handleDetailEditing}
+                  onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
                   original={ selectedLead.company_name }
                   name='status'
                   title={t('company.company_name')}
-                  onEditing={handleDetailEditing}
+                  onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
                   original={ selectedLead.status ? selectedLead.status : "Not Contacted" }
                   name='status'
                   title={t('common.status')}
-                  onEditing={handleDetailEditing}
+                  onEditing={handleDetailChange}
                 />
               </div>
               <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
@@ -472,7 +508,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                             to="#not-contact-task-purchase"
                             data-bs-toggle="tab"
                           >
-                            {t('lead.purchase_product')+'('} { companyPurchases.length === undefined ? 0:companyPurchases.length }{')'}
+                            {t('purchase.product_info') + "(" + validMACount + "/" + purchasesByCompany.length + ")"}
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -510,10 +546,10 @@ const [selectedRow, setSelectedRow] = useState(null);
                                 { lead_items_info.map((item, index) => 
                                   <DetailCardItem
                                     key={index}
+                                    title={t(item.title)}
                                     defaultValue={selectedLead[item.key]}
                                     edited={editedDetailValues}
                                     name={item.key}
-                                    title={t(item.title)}
                                     detail={item.detail}
                                   />
                                 )}

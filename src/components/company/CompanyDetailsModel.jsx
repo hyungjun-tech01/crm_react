@@ -26,19 +26,31 @@ import CompanyPurchaseModel from "./CompanyPurchaseModel";
 import CompanyTransactionModel from "./CompanyTransactionModel";
 
 const CompanyDetailsModel = () => {
-  const purchaseState = useRecoilValue(atomPurchaseState);
-  const transactionState = useRecoilValue(atomTransationState);
+  const { t } = useTranslation();
+  const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+
+  //===== [RecoilState] Related with Company =======================================
   const selectedCompany = useRecoilValue(atomCurrentCompany);
   const { modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
+
+
+  //===== [RecoilState] Related with Purchase =======================================
+  const purchaseState = useRecoilValue(atomPurchaseState);
   const allPurchases = useRecoilValue(atomAllPurchases);
   const { loadAllPurchases} = useRecoilValue(PurchaseRepo);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
+
+
+  //===== [RecoilState] Related with Transaction =======================================
+  const transactionState = useRecoilValue(atomTransationState);
   const allTransactions = useRecoilValue(atomAllTransactions);
   const { loadAllTransactions } = useRecoilValue(TransactionRepo);
-  const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
-  const { t } = useTranslation();
 
-  // --- Handles to deal this component ---------------------------------------
+
+  //===== [RecoilState] Related with Users ==========================================
+
+
+  //===== Handles to deal this component ============================================
   const [ isFullScreen, setIsFullScreen ] = useState(false);
   const [ currentCompanyCode, setCurrentCompanyCode ] = useState('');
 
@@ -50,27 +62,46 @@ const CompanyDetailsModel = () => {
       localStorage.setItem('isFullScreen', '0');
   }, []);
 
-  const handleClose = useCallback(() => {
-    setEditedDetailValues(null);
-    setCurrentCompany();
-    setCurrentCompanyCode('');
-  }, []);
-  
 
-  // --- Handles to edit 'Company Details' ---------------------------------
-  const [ validMACount, setValidMACount ] = useState(0);
+  //===== Handles to edit 'Company Details' ===============================================
   const [ editedDetailValues, setEditedDetailValues ] = useState(null);
-  const [ orgEstablishDate, setOrgEstablishDate ] = useState(null);
   const [ purchasesByCompany, setPurchasesByCompany] = useState([]);
   const [ transactionByCompany, setTransactionByCompany] = useState([]);
+  const [ validMACount, setValidMACount ] = useState(0);
 
-  const handleDetailEdit = useCallback((e) => {
-    const tempEdited = {
-      ...editedDetailValues,
-      [e.target.name]: e.target.value,
+  const handleDetailChange = useCallback((e) => {
+    if(e.target.value !== selectedCompany[e.target.name]){
+      const tempEdited = {
+        ...editedDetailValues,
+        [e.target.name]: e.target.value,
+      };
+      setEditedDetailValues(tempEdited);
+    } else {
+      if(editedDetailValues[e.target.name]){
+        delete editedDetailValues[e.target.name];
+      };
+    }
+  }, [editedDetailValues, selectedCompany]);
+
+  const handleDetailDateChange = useCallback((name, date) => {
+    if(date !== new Date(selectedCompany[name])){
+      const tempEdited = {
+        ...editedDetailValues,
+        [name]: date,
+      };
+      setEditedDetailValues(tempEdited);
+    }
+  }, [editedDetailValues, selectedCompany]);
+
+  const handleDetailSelectChange = useCallback((name, selected) => {
+    if(selected.value !== selectedCompany[name]){
+      const tempEdited = {
+        ...editedDetailValues,
+        [name]: selected.value,
+      };
+      setEditedDetailValues(tempEdited);
     };
-    setEditedDetailValues(tempEdited);
-  }, [editedDetailValues]);
+  }, [editedDetailValues, selectedCompany]);
 
   const handleDetailSave = useCallback(() => {
     if(editedDetailValues !== null
@@ -84,9 +115,6 @@ const CompanyDetailsModel = () => {
       };
       if (modifyCompany(temp_all_saved)) {
         console.log(`Succeeded to modify company`);
-        if(editedDetailValues.establishment_date){
-          setOrgEstablishDate(editedDetailValues.establishment_date);
-        };
       } else {
         console.error('Failed to modify company')
       }
@@ -100,44 +128,33 @@ const CompanyDetailsModel = () => {
     setEditedDetailValues(null);
   }, []);
 
-  const handleDetailDateChange = useCallback((name, date) => {
-    const tempEdited = {
-      ...editedDetailValues,
-      [name]: date,
-    };
-    setEditedDetailValues(tempEdited);
-  }, [editedDetailValues]);
-
-  const handleDetailSelectChange = useCallback((name, selected) => {
-    const tempEdited = {
-      ...editedDetailValues,
-      [name]: selected.value,
-    };
-    setEditedDetailValues(tempEdited);
-  }, [editedDetailValues]);
+  const handleClose = useCallback(() => {
+    setEditedDetailValues(null);
+    setCurrentCompany();
+    setCurrentCompanyCode('');
+  }, [setCurrentCompany]);
+  
 
   const company_items_info = [
-    ['company_address','common.address',{ type:'label', extra:'long' }],
-    ['company_phone_number','common.phone_no',{ type:'label' }],
-    ['company_zip_code','common.zip_code',{ type:'label' }],
-    ['company_fax_number','common.fax_no',{ type:'label' }],
-    ['homepage','company.homepage',{ type:'label' }],
-    ['company_scale','company.company_scale',{ type:'label' }],
-    ['deal_type','company.deal_type', { type:'select', options: option_deal_type.ko, selectChange: (selected) => handleDetailSelectChange('deal_type', selected) }],
-    ['industry_type','company.industry_type',{ type:'label' }],
-    ['business_type','company.business_type',{ type:'label' }],
-    ['business_item','company.business_item',{ type:'label' }],
-    ['establishment_date','company.establishment_date',
-      { type:'date', orgTimeData: orgEstablishDate, timeDataChange: handleDetailDateChange }
-    ],
-    ['ceo_name','company.ceo_name',{ type:'label' }],
-    ['account_code','company.account_code',{ type:'label' }],
-    ['bank_name','company.bank_name',{ type:'label' }],
-    ['account_owner','company.account_owner',{ type:'label' }],
-    ['sales_resource','company.salesman',{ type:'label' }],
-    ['application_engineer','company.engineer',{ type:'label' }],
-    ['region','common.region', { type:'select', options: option_locations.ko, selectChange: (selected) => handleDetailSelectChange('region', selected) }],
-    ['memo','common.memo',{ type:'textarea', extra:'long' }],
+    {key:'company_address',title:'common.address',detail:{type:'label',extra:'long',editing:handleDetailChange}},
+    {key:'company_phone_number',title:'common.phone_no',detail:{ type:'label',editing:handleDetailChange}},
+    {key:'company_zip_code',title:'common.zip_code',detail:{ type:'label',editing:handleDetailChange}},
+    {key:'company_fax_number',title:'common.fax_no',detail:{ type:'label',editing:handleDetailChange}},
+    {key:'homepage',title:'company.homepage',detail:{ type:'label',editing:handleDetailChange}},
+    {key:'company_scale',title:'company.company_scale',detail:{ type:'label',editing:handleDetailChange}},
+    {key:'deal_type',title:'company.deal_type',detail: { type:'select',options: option_deal_type.ko,editing:handleDetailSelectChange}},
+    {key:'industry_type',title:'company.industry_type',detail:{ type:'label',editing:handleDetailChange}},
+    {key:'business_type',title:'company.business_type',detail:{ type:'label',editing:handleDetailChange}},
+    {key:'business_item',title:'company.business_item',detail:{ type:'label',editing:handleDetailChange}},
+    {key:'establishment_date',title:'company.establishment_date',detail:{ type:'date',editing:handleDetailDateChange }},
+    {key:'ceo_name',title:'company.ceo_name',detail:{ type:'label',editing:handleDetailChange}},
+    {key:'account_code',title:'company.account_code',detail:{ type:'label',editing:handleDetailChange}},
+    {key:'bank_name',title:'company.bank_name',detail:{ type:'label',editing:handleDetailChange}},
+    {key:'account_owner',title:'company.account_owner',detail:{ type:'label',editing:handleDetailChange}},
+    {key:'sales_resource',title:'company.salesman',detail:{ type:'label',editing:handleDetailChange}},
+    {key:'application_engineer',title:'company.engineer',detail:{ type:'label',editing:handleDetailChange}},
+    {key:'region',title:'common.region',detail: { type:'select', options: option_locations.ko,editing:handleDetailSelectChange}},
+    {key:'memo',title:'common.memo',detail:{ type:'textarea', extra:'long',editing:handleDetailChange}},
   ];
 
 
@@ -227,13 +244,13 @@ const CompanyDetailsModel = () => {
                 defaultText={selectedCompany.company_name_eng}
                 name='company_name_eng'
                 title={t('company.eng_company_name')}
-                onEditing={handleDetailEdit}
+                onEditing={handleDetailChange}
               />
               <DetailTitleItem
                 defaultText={selectedCompany.business_registration_code}
                 name='business_registration_code'
                 title={t('company.business_registration_code')}
-                onEditing={handleDetailEdit}
+                onEditing={handleDetailChange}
               />
             </div>
             <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWindowWidthChange}/>
@@ -308,13 +325,11 @@ const CompanyDetailsModel = () => {
                           { company_items_info.map((item, index) => 
                             <DetailCardItem
                               key={index}
-                              title={t(item.at(1))}
-
-                              defaultValue={selectedCompany[item.at(0)]}
+                              title={t(item.title)}
+                              defaultValue={selectedCompany[item.key]}
                               edited={editedDetailValues}
-                              name={item.at(0)}
-                              detail={item.at(2)}
-                              editing={handleDetailEdit}
+                              name={item.key}
+                              detail={item.detail}
                             />
                           )}
                         </Space>
