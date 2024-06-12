@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
 import { ItemRender, ShowTotal } from "../paginationfunction";
-import { ConverTextAmount, formatDate } from "../../constants/functions";
+import { formatDate } from "../../constants/functions";
 import { Add } from "@mui/icons-material";
 
 import { ConsultingRepo } from "../../repository/consulting";
@@ -21,13 +21,14 @@ const LeadConsultingModel = (props) => {
 
     //===== Handles to deal this component ============================================
     const [selectedKeys, setSelectedRowKeys] = useState([]);
-    const handleAddConsulting = (code) => {
-        let myModal = new bootstrap.Modal(document.getElementById('add_consulting'), {
+    
+    const transferToOtherModal = (id) => {
+        let myModal = new bootstrap.Modal(document.getElementById(id), {
             keyboard: false
         });
         myModal.show();
     };
-
+    
     const columns_consulting = [
         {
             title: t('consulting.receipt_date'),
@@ -129,14 +130,14 @@ const LeadConsultingModel = (props) => {
                                 }}
                                 >
                                     <div>{t('consulting.information')}</div>
-                                    <Add onClick={() => handleAddConsulting('')} />
+                                    <Add onClick={() => transferToOtherModal('add_consulting')} />
                                 </div>
                             }
                             onRow={(record, rowIndex) => {
                                 return {
                                     onClick: (event) => {
                                         setSelectedRowKeys([record.consulting_code]);
-                                        // handleSelectConsulting(record);
+                                        transferToOtherModal('consulting-details');
                                         setSelectedRowKeys([]);   //initialize the selected list about contract
                                     }, // click row
                                 };

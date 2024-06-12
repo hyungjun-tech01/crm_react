@@ -8,98 +8,31 @@ import "react-datepicker/dist/react-datepicker.css";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { ConsultingRepo, ConsultingTypes } from "../../repository/consulting";
-import { atomAllCompanies, atomAllLeads, defaultConsulting } from "../../atoms/atoms";
+import { atomCurrentLead, defaultConsulting, atomLeadsForSelection, atomLeadState } from "../../atoms/atoms";
 import { formatDate } from "../../constants/functions";
 
-const ConsultingAddModel = ({currentLead, previousModalId}) => {
-
-  console.log('currentLead', currentLead, previousModalId);
+const ConsultingAddModel = ({init, handleInit, previousModalId}) => {
   const { t } = useTranslation();
   const [ cookies ] = useCookies(["myLationCrmUserId","myLationCrmUserName"]);
-  const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
-  const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
+  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
+  const { loadAllLeads } = useRecoilValue(LeadRepo);
 
-  const [ companiesForSelection, setCompaniesForSelection ] = useState([]);
-  const [ leadsForSelection, setLeadsForSelection] = useState([]);
   const [ consultingChange, setConsultingChange ] = useState(null);
   const [ selectedLead, setSelectedLead ] = useState(null);
   const [ receiptDate, setReceiptDate ] = useState(new Date());
-  const allCompnayData = useRecoilValue(atomAllCompanies);
-  const allLeadData = useRecoilValue(atomAllLeads);
+  
 
-  const {  modifyConsulting, } = useRecoilValue(ConsultingRepo);
-
-  useEffect(() => {
-    if (allCompnayData.length === 0) {
-      loadAllCompanies();
-    } else {
-      let company_subset = {};
-      allCompnayData.forEach((data) => {
-        company_subset[data.company_name] = data.company_code;
-      });
-      setCompaniesForSelection(company_subset);
-    };
-
-    if (allLeadData.length === 0) {
-      loadAllLeads();
-    };
-    
-    if(!leadsForSelection || (leadsForSelection.length !== allLeadData.length)){
-      let temp_data;
-      console.log('currentLead code', currentLead);
-      if (currentLead === '' || currentLead === null) {
-        temp_data = allLeadData.map(lead => {
-          return {
-            label: lead.lead_name + " / " + lead.company_name,
-            value: {
-              code: lead.lead_code,
-              name: lead.lead_name,
-              department: lead.department,
-              position: lead.position,
-              mobile: lead.mobile_number,
-              phone: lead.phone_number,
-              email: lead.email,
-              company: lead.company_name
-            }
-          }
-        });
-        temp_data.sort((a, b) => {
-          if (a.label > b.label) {
-            return 1;
-          }
-          if (a.label < b.label) {
-            return -1;
-          }
-          // a must be equal to b
-          return 0;
-        });
-      }else{
-        const currLead = allLeadData.filter(item => (
-          item.lead_code && item.lead_code.includes(currentLead) )
-        );
-        temp_data = currLead.map(lead => {
-          return {
-            label: lead.lead_name + " / " + lead.company_name,
-            value: {
-              code: lead.lead_code,
-              name: lead.lead_name,
-              department: lead.department,
-              position: lead.position,
-              mobile: lead.mobile_number,
-              phone: lead.phone_number,
-              email: lead.email,
-              company: lead.company_name
-            }
-          }
-        });
-      }
-      setLeadsForSelection(temp_data);
-    };
-    
-    initializeConsultingTemplate();
-  }, [allCompnayData, allLeadData]);
+  //===== [RecoilState] Related with Consulting =======================================
+  const { modifyConsulting } = useRecoilValue(ConsultingRepo);
 
 
+  //===== [RecoilState] Related with Lead ==========================================
+  const leadsState = useRecoilValue(atomLeadState);
+  const currentLead = useRecoilValue(atomCurrentLead);
+  const leadsForSelection = useRecoilValue(atomLeadsForSelection);
+
+
+  //===== Handles to edit 'ConsultingAddModel' ===============================================
   const initializeConsultingTemplate = useCallback(() => {
     const localDate = formatDate(receiptDate);
     const localTime = receiptDate.toLocaleTimeString('ko-KR');
@@ -141,18 +74,18 @@ const ConsultingAddModel = ({currentLead, previousModalId}) => {
   const handleSelectLead = useCallback((value) => {
     const tempChanges = {
       ...consultingChange,
-      lead_code: value.code,
-      lead_name: value.name,
+      lead_code: value.lead_code,
+      lead_name: value.lead_name,
       department: value.department,
       position: value.position,
-      mobile_number: value.mobile,
-      phone_number: value.phone,
+      mobile_number: value.mobile_number,
+      phone_number: value.phone_number,
       email: value.email,
-      company_name: value.company,
-      company_code: companiesForSelection[value.company],
+      company_name: value.company_name,
+      company_code: value.company_code,
     };
     setConsultingChange(tempChanges);
-  }, [companiesForSelection, consultingChange]);  
+  }, [consultingChange]);
     
   const handleAddNewConsulting = useCallback((event)=>{
     // Check data if they are available
@@ -179,6 +112,21 @@ const ConsultingAddModel = ({currentLead, previousModalId}) => {
       };
   }, [cookies.myLationCrmUserId, initializeConsultingTemplate, consultingChange, modifyConsulting]);
     
+
+  //===== useEffect functions ==========================================
+  useEffect(() => {
+    if ((leadsState & 1) === 0) {
+      loadAllLeads();
+    };
+  }, [leadsState, loadAllLeads]);
+
+  useEffect(() => {
+    if(init){
+      initializeConsultingTemplate();
+      if(handleInit) handleInit(!init);
+    };
+  }, [handleInit, init, initializeConsultingTemplate]);
+
 
   return (
         <div

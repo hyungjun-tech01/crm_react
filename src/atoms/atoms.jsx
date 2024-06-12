@@ -106,6 +106,11 @@ export const atomLeadState = atom({
     key: "leadState",
     default: 0,
 });
+export const atomLeadsForSelection = atom({
+    key: "leadsForSelection",
+    default: [],
+});
+
 //----- Consulting ------------------------
 export const defaultConsulting = {
     //-----Consulting info --------------

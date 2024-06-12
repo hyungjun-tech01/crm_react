@@ -691,7 +691,7 @@ const [selectedRow, setSelectedRow] = useState(null);
         {/* modal-dialog */}
       </div>
       <ConsultingDetailsModel previousModalId='#leads-details' />
-      <ConsultingAddModel currentLead={selectedLead.lead_code} previousModalId='#leads-details' />
+      <ConsultingAddModel previousModalId='#leads-details' />
     </>
   );
 };

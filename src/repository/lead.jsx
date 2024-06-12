@@ -5,6 +5,7 @@ import { atomCurrentLead
     , atomFilteredLead
     , defaultLead
     , atomLeadState
+    , atomLeadsForSelection
 } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
@@ -34,10 +35,36 @@ export const LeadRepo = selector({
                 if(data.message){
                     console.log('loadAllLeads message:', data.message);
                     set(atomAllLeads, []);
+                    set(atomLeadsForSelection, []);
                     return;
                 }
                 set(atomAllLeads, data);
-                set(atomFilteredLead, atomAllLeads);
+                // set(atomFilteredLead, atomAllLeads); <-- Temporary not use
+                const tempLeadsForSelection = data.map(lead => ({
+                    label: lead.lead_name + " / " + lead.company_name,
+                    value: {
+                        lead_code: lead.lead_code,
+                        lead_name: lead.lead_name,
+                        department: lead.department,
+                        position: lead.position,
+                        mobile_number: lead.mobile_number,
+                        phone_number: lead.phone_number,
+                        email: lead.email,
+                        company_name: lead.company_name,
+                        company_code: lead.company_code,
+                    }
+                }));
+                tempLeadsForSelection.sort((a, b) => {
+                    if (a.label > b.label) {
+                      return 1;
+                    }
+                    if (a.label < b.label) {
+                      return -1;
+                    }
+                    // a must be equal to b
+                    return 0;
+                  });
+                set(atomLeadsForSelection, tempLeadsForSelection);
 
                 // Change loading state
                 const loadStates = await snapshot.getPromise(atomLeadState);
