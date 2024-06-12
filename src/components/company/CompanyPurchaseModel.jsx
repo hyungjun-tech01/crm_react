@@ -263,51 +263,59 @@ const CompanyPurchaseModel = (props) => {
     }, [companyMAContracts, setCurrentPurchase]);
 
     const add_purchase_items = [
-        ['product_name', 'purchase.product_name',
-            {
-                type: 'select', group: 'product_class_name', options: productOptions, value: editedNewSelectValues,
-                selectChange: (value) => handleNewItemSelectChange('product_name', value)
-            }],
-        ['product_type', 'purchase.product_type',
-            {
+        { key:'product_name', title:'purchase.product_name',
+            detail:{
+                type: 'select',
+                group: 'product_class_name',
+                key: 'product_name',
+                options: productOptions,
+                value: editedNewSelectValues,
+                editing: handleNewItemSelectChange
+        }},
+        { key:'product_type', title:'purchase.product_type',
+            detail:{
                 type: 'select', options: ProductTypeOptions,
-                selectChange: (value) => handleNewItemSelectChange('product_type', value)
-            }],
-        ['serial_number', 'purchase.serial', { type: 'label' }],
-        ['licence_info', 'purchase.licence_info', { type: 'label' }],
-        ['module', 'purchase.module', { type: 'label' }],
-        ['quantity', 'common.quantity', { type: 'label' }],
-        ['receipt_date', 'purchase.receipt_date',
-            { type: 'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
-        ['delivery_date', 'purchase.delivery_date',
-            { type: 'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
-        ['hq_finish_date', 'purchase.hq_finish_date',
-            { type: 'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
-        ['ma_finish_date', 'purchase.ma_finish_date',
-            { type: 'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
+                editing:handleNewItemSelectChange
+        }},
+        { key:'serial_number', title:'purchase.serial', detail:{ type: 'label', editing: handleNewItemChange }},
+        { key:'licence_info', title:'purchase.licence_info', detail:{ type: 'label', editing: handleNewItemChange }},
+        { key:'module', title:'purchase.module', detail:{ type: 'label', editing: handleNewItemChange }},
+        { key:'quantity', title:'common.quantity', detail:{ type: 'label', editing: handleNewItemChange }},
+        { key:'receipt_date', title:'purchase.receipt_date',
+            detail:{ type: 'date', editing: handleNewItemDateChange }},
+        { key:'delivery_date', title:'purchase.delivery_date',
+            detail:{ type: 'date', editing: handleNewItemDateChange }},
+        { key:'hq_finish_date', title:'purchase.hq_finish_date',
+            detail:{ type: 'date', editing: handleNewItemDateChange }},
+        { key:'ma_finish_date', title:'purchase.ma_finish_date',
+            detail:{ type: 'date', editing: handleNewItemDateChange }},
     ];
 
     const modify_purchase_items = [
-        ['product_name', 'purchase.product_name',
-            {
-                type: 'select', group: 'product_class_name', options: productOptions, value: editedOtherSelectValues,
-                selectChange: (value) => handleOtherItemSelectChange('product_name', value)
-            }],
-        ['product_type', 'purchase.product_type',
-            {
+        { key:'product_name', title:'purchase.product_name',
+            detail:{
+                type: 'select',
+                group: 'product_class_name',
+                key: 'product_name',
+                options: productOptions,
+                value: editedOtherSelectValues,
+                editing:handleOtherItemSelectChange
+        }},
+        { key:'product_type', title:'purchase.product_type',
+            detail:{
                 type: 'select', options: ProductTypeOptions,
-                selectChange: (value) => handleOtherItemSelectChange('product_type', value)
-            }],
-        ['serial_number', 'purchase.serial', { type: 'label' }],
-        ['licence_info', 'purchase.licence_info', { type: 'label' }],
-        ['module', 'purchase.module', { type: 'label' }],
-        ['quantity', 'common.quantity', { type: 'label' }],
-        ['receipt_date', 'purchase.receipt_date',
-            { type: 'date', orgTimeData: orgTimeOther, timeDateChange: handleOtherItemTimeChange }],
-        ['delivery_date', 'purchase.delivery_date',
-            { type: 'date', orgTimeData: orgTimeOther, timeDateChange: handleOtherItemTimeChange }],
-        ['hq_finish_date', 'purchase.hq_finish_date', { type: 'date', orgTimeData: orgTimeOther, disabled: true }],
-        ['ma_finish_date', 'purchase.ma_finish_date', { type: 'date', orgTimeData: orgTimeOther, disabled: true }],
+                editing:handleOtherItemSelectChange
+        }},
+        { key:'serial_number', title:'purchase.serial', detail:{ type: 'label', editing: handleOtherItemChange }},
+        { key:'licence_info', title:'purchase.licence_info', detail:{ type: 'label', editing: handleOtherItemChange }},
+        { key:'module', title:'purchase.module', detail:{ type: 'label', editing: handleOtherItemChange }},
+        { key:'quantity', title:'common.quantity', detail:{ type: 'label', editing: handleOtherItemChange }},
+        { key:'receipt_date', title:'purchase.receipt_date',
+            detail:{ type: 'date', editing: handleOtherItemTimeChange }},
+        { key:'delivery_date', title:'purchase.delivery_date',
+            detail:{ type: 'date', orgTimeData: orgTimeOther, timeDateChange: handleOtherItemTimeChange }},
+        { key:'hq_finish_date', title:'purchase.hq_finish_date', detail:{ type: 'date', disabled: true }},
+        { key:'ma_finish_date', title:'purchase.ma_finish_date', detail:{ type: 'date', disabled: true }},
     ];
 
     const columns_purchase = [
@@ -421,7 +429,7 @@ const CompanyPurchaseModel = (props) => {
         ]);
         setSubModalSetting({ title: t('contract.add_contract') })
         setIsSubModalOpen(true);
-    }, [cookies.myLationCrmUserId]);
+    }, [cookies.myLationCrmUserId, t]);
 
     const handleModifyMAContract = useCallback((code) => {
         setEditedSubModalValues(null);
@@ -446,7 +454,7 @@ const CompanyPurchaseModel = (props) => {
         } else {
             console.error("Impossible Case~");
         };
-    }, [maContractByPurchase]);
+    }, [cookies.myLationCrmUserId, maContractByPurchase, t]);
 
     const columns_ma_contract = [
         {
@@ -591,24 +599,21 @@ const CompanyPurchaseModel = (props) => {
                                     {modify_purchase_items.map((item, index) =>
                                         <DetailCardItem
                                             key={index}
-                                            defaultValue={currentPurchase[item.at(0)]}
+                                            title={t(item.title)}
+                                            defaultValue={currentPurchase[item.key]}
+                                            name={item.key}
                                             edited={editedOtherValues}
-                                            name={item.at(0)}
-                                            title={t(item.at(1))}
-                                            detail={item.at(2)}
-                                            disabled={item.at(2).disabled ? item.at(2).disabled : false}
-                                            editing={handleOtherItemChange}
+                                            detail={item.detail}
                                         />
                                     )}
                                 </Space>
                                 <div style={{ marginBottom: '0.5rem', display: 'flex' }}>
                                     <DetailCardItem
-                                        defaultText={currentPurchase["purchase_memo"]}
-                                        edited={editedOtherValues}
-                                        name="purchase_memo"
                                         title={t('common.memo')}
-                                        detail={{ type: 'textarea', extra: 'memo', row_no: 3 }}
-                                        editing={handleOtherItemChange}
+                                        defaultValue={currentPurchase["purchase_memo"]}
+                                        name="purchase_memo"
+                                        edited={editedOtherValues}
+                                        detail={{ type: 'textarea', extra: 'memo', row_no: 3, editing:handleOtherItemChange }}
                                     />
                                     <div style={{ width: 380, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-evenly' }}>
                                         <Button
@@ -695,24 +700,21 @@ const CompanyPurchaseModel = (props) => {
                                     add_purchase_items.map((item, index) =>
                                         <DetailCardItem
                                             key={index}
-                                            defaultText=''
+                                            title={t(item.title)}
+                                            defaultValue={null}
+                                            name={item.key}
                                             edited={editedNewValues}
-                                            name={item.at(0)}
-                                            title={t(item.at(1))}
-                                            detail={item.at(2)}
-                                            disabled={item.at(2).disabled ? item.at(2).disabled : false}
-                                            editing={handleNewItemChange}
+                                            detail={item.detail}
                                         />
                                     )}
                             </Space>
                             <div style={{ marginBottom: '0.5rem', display: 'flex' }}>
                                 <DetailCardItem
-                                    defaultText=''
-                                    edited={editedNewValues}
-                                    name="purchase_memo"
                                     title={t('common.memo')}
-                                    detail={{ type: 'textarea', extra: 'memo', row_no: 3 }}
-                                    editing={handleNewItemChange}
+                                    defaultValue=''
+                                    name="purchase_memo"
+                                    edited={editedNewValues}
+                                    detail={{ type: 'textarea', extra: 'memo', row_no: 3, editing:handleNewItemChange }}
                                 />
                                 <div style={{ width: 380, display: 'flex', flexDirection: 'column', flewGrow: 0, alignItems: 'center', justifyContent: 'space-evenly' }}>
                                     <Button

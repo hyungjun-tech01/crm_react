@@ -51,19 +51,19 @@ const DetailSubModal = (props) => {
             {item && item.map((item, index ) => {
                 let modifiedDetail = {...item.detail};
                 if(item.detail.type === 'date') {
-                    modifiedDetail['orgTimeData'] = {[item.name] : original[item.name]};
-                    modifiedDetail['timeDateChange'] = handleTime;
+                    modifiedDetail['editing'] = handleTime;
                 } else if(item.detail.type === 'select') {
-                    modifiedDetail['selectChange'] = (selected) => handleSelect(item.name, selected);
+                    modifiedDetail['editing'] = handleSelect;
+                } else {
+                    modifiedDetail['editing'] = handleValue;
                 };
                 return (<DetailCardItem
                     key={index}
-                    defaultText={original[item.name]}
+                    title={item.title}
+                    defaultValue={original[item.name]}
                     edited={edited}
                     name={item.name}
-                    title={item.title}
                     detail={modifiedDetail}
-                    editing={handleValue}
                 />
             )})}
         </Modal>

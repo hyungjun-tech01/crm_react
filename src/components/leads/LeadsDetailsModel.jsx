@@ -22,11 +22,11 @@ import { QuotationRepo } from "../../repository/quotation";
 import { PurchaseRepo } from "../../repository/purchase";
 import { MAContractRepo } from "../../repository/ma_contract";
 import { ExpandMore } from "@mui/icons-material";
+import CompanyPurchaseModel from "../company/CompanyPurchaseModel";
 import ConsultingsDetailsModel from "../consulting/ConsultingsDetailsModel";
 import QuotationsDetailsModel from "../quotations/QuotationsDetailsModel";
-import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
 import ConsultingAddModal from "../consulting/ConsultingAddModal";
-import {  Edit } from '@mui/icons-material';
+import { Edit } from '@mui/icons-material';
 import { useTranslation } from "react-i18next";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
@@ -73,6 +73,7 @@ const LeadsDetailsModel = () => {
   //===== Handles to deal this component ============================================
   const [ isFullScreen, setIsFullScreen ] = useState(false);
   const [ currentLeadCode, setCurrentLeadCode ] = useState('');
+  const [ validMACount, setValidMACount ] = useState(0);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -233,15 +234,17 @@ const LeadsDetailsModel = () => {
     { key:'sales_resource',title:'lead.lead_sales',detail:{type:'select',options:salespersonsForSelection,editing:handleDetailSelectChange}},
     { key:'application_engineer',title:'company.engineer',detail:{type:'select',options:engineersForSelection,editing:handleDetailSelectChange}},
     { key:'create_date',title:'common.regist_date',detail:{type:'date',editing:handleDetailDateChange}},
+    { key:'memo',title:'common.memo',detail:{type:'textarea',extra:'long',editing:handleDetailChange}},
   ];
 
 
   //===== Handles to edit 'Purchase Details' ===============================================
-  const [ validMACount, setValidMACount ] = useState(0);
   const [ purchasesByCompany, setPurchasesByCompany] = useState([]);
+
 
   //===== Handles to edit 'Consulting Details' ===============================================
   const [ consultingsByLead, setConsultingsByLead] = useState([]);
+
 
   //===== Handles to edit 'Quotation Details' ===============================================
   const [ quotationsByLead, setQuotationsByLead] = useState([]);
@@ -276,15 +279,6 @@ const LeadsDetailsModel = () => {
   // 상태(state) 정의
 const [selectedRow, setSelectedRow] = useState(null);
 
-// --- Funtions for Editing ---------------------------------
-  const handleAddNewConsultingClicked = useCallback(() => {
-    //initializeLeadTemplate();
-  }, []);
-
-  
-  
-
-  // --- Funtions for Specific Changes in Detail ---------------------------------
 
   // 각 행 클릭 시 호출되는 함수
   const handleRowClick = (row) => {
@@ -370,6 +364,7 @@ const [selectedRow, setSelectedRow] = useState(null);
         tabIndex={-1}
         role="dialog"
         aria-modal="true"
+        data-bs-focus="false"
       >
         <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
           <div className="modal-content">
@@ -582,7 +577,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                                       id="add-task"
                                       data-bs-toggle="modal"
                                       data-bs-target="#add_consulting"
-                                      onClick={handleAddNewConsultingClicked}
+                                      onClick={()=>console.log('Not yet')}
                                     >
                                       {t('consulting.add_consulting')}
                                     </button>
@@ -748,90 +743,10 @@ const [selectedRow, setSelectedRow] = useState(null);
 
                         <div className="tab-pane task-related p-0"
                           id="not-contact-task-purchase" >
-                          <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                            <thead>
-                              <tr>
-                                <div className="row">
-                                  <div className="col text-start" style={{width:'200px'}}>
-                                    <input
-                                      id = "searchPurchaseCondition"
-                                      className="form-control" 
-                                      type="text"
-                                      value={searchPurchaseCondition}
-                                      placeholder= {t('common.search_here')}
-                                      onChange ={(e) => handleSearchPurchaseCondition(e.target.value)}
-                                      style={{width:'300px', display: 'inline'}}
-                                    />  
-                                  </div>
-                                </div>
-                              </tr>
-                              <tr>
-                                <th style={{ width: '80px' }}>{t('purchase.product_type')}</th>
-                                <th style={{ width: '300px' }}>{t('purchase.product_name')}</th>
-                                <th>{t('purchase.serial')}</th>
-                                <th>{t('purchase.delivery_date')}</th>
-                                <th>{t('purchase.ma_contract_date')}</th>
-                                <th>{t('purchase.ma_finish_date')}</th>
-                                <th>{t('common.quantity')}</th>
-                              </tr>
-                            </thead>
-                            {
-                              searchPurchaseCondition === "" ? 
-                              companyPurchases.length > 0 &&
-                              <tbody>
-                                { companyPurchases.map(purchase =>
-                                <React.Fragment key={purchase.purchase_code}>
-                                  <tr key={purchase.purchase_code}>
-                                      <td>{purchase.product_type} </td>
-                                      <td> <a href="#"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#purchase-details"
-                                            onClick={()=>{
-                                              console.log('showPurchaseDetail', purchase.purchase_code);
-                                              setCurrentPurchase(purchase.purchase_code);
-                                          }}>
-                                            {purchase.product_name}
-                                            <Edit fontSize="small"/>
-                                          </a>
-                                      </td>
-                                      <td>{purchase.serial_number} </td>
-                                      <td>{purchase.delivery_date && new Date(purchase.delivery_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
-                                      </td>
-                                      <td>{purchase.ma_contract_date && new Date(purchase.ma_contract_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}</td>
-                                      <td>{purchase.ma_finish_date && new Date(purchase.ma_finish_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}</td>
-                                      <td className="text-end">{purchase.quantity}</td>
-                                  </tr>
-                                  </React.Fragment>
-                                )}
-                              </tbody> 
-                              : 
-                              filteredPurchases.length > 0 &&
-                              <tbody>
-                                { filteredPurchases.map(purchase =>
-                                  <tr key={purchase.purchase_code}>
-                                    <td>{purchase.product_type} </td>
-                                      <td> <a href="#"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#purchase-details"
-                                            onClick={()=>{
-                                              console.log('showPurchaseDetail', purchase.purchase_code);
-                                              setCurrentPurchase(purchase.purchase_code);
-                                          }}>
-                                            {purchase.product_name}
-                                            <Edit fontSize="small"/>
-                                          </a>
-                                      </td>
-                                      <td>{purchase.serial_number} </td>
-                                      <td>{purchase.delivery_date && new Date(purchase.delivery_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
-                                      </td>
-                                      <td>{purchase.ma_contract_date && new Date(purchase.ma_contract_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}</td>
-                                      <td>{purchase.ma_finish_date && new Date(purchase.ma_finish_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}</td>
-                                      <td className="text-end">{purchase.quantity}</td>
-                                  </tr>
-                                )}
-                              </tbody> 
-                            }
-                          </table>
+                          <CompanyPurchaseModel 
+                            company={currentCompany}
+                            purchases={purchasesByCompany}
+                            handlePurchase={setPurchasesByCompany} />
                         </div>
 
 
@@ -867,7 +782,6 @@ const [selectedRow, setSelectedRow] = useState(null);
       </div>
       <ConsultingsDetailsModel />
       <QuotationsDetailsModel  />
-      <PurchaseDetailsModel  />
       <ConsultingAddModal currentLead={selectedLead.lead_code} previousModalId='#leads-details'/>
     </>
   );

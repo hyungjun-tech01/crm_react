@@ -59,7 +59,6 @@ const LeadAddModel = (props) => {
             counter: 0,
             modify_user: cookies.myLationCrmUserId,
         };
-        console.log(`[ handleAddNewLead ]`, newLeadData);
         const result = modifyLead(newLeadData);
         if (result) {
             initializeLeadTemplate();
@@ -68,12 +67,10 @@ const LeadAddModel = (props) => {
     }, [cookies.myLationCrmUserId, initializeLeadTemplate, leadChange, modifyLead]);
 
     const handleSelectChange = useCallback((name, selected) => {
-        console.log(`handleSelectChange / name : ${name} / selected : ${selected.value}`);
         const modifiedData = {
             ...leadChange,
             [name]: selected.value,
         };
-        console.log('handleSelectChange / leadChange : ', modifiedData);
         setLeadChange(modifiedData);
     }, [leadChange]);
 
@@ -111,31 +108,30 @@ const LeadAddModel = (props) => {
             tempLeadChange['region'] = leadChange.region;
         };
 
-        console.log('handleSelectCompany / leadChange : ', tempLeadChange);
         setLeadChange(tempLeadChange);
         setDisabledItems(tempDisabled);
 
     }, [disabledItems, leadChange]);
 
     useEffect(() => {
-        console.log('[LeadAddModel] initialize!');
         if (init) {
+            console.log('[LeadAddModel] initialize!');
             initializeLeadTemplate();
             handleInit(!init);
         };
     }, [init, handleInit, initializeLeadTemplate]);
 
     useEffect(() => {
-        console.log('[LeadAddModel] loading company data!');
         if ((companyState & 1) === 0) {
+            console.log('[LeadAddModel] loading company data!');
             loadAllCompanies();
         };
 
     }, [companyState, loadAllCompanies]);
 
     useEffect(() => {
-        console.log('[LeadAddModel] loading user data!');
         if((userState & 1) === 0) {
+            console.log('[LeadAddModel] loading user data!');
             loadAllUsers();
         }
     }, [userState, loadAllUsers ])

@@ -74,26 +74,28 @@ const SelectInput = (props) => {
     const { addonBefore, style, value, onChange, options, disabled, groupVal, keyVal } = props;
 
     let defaultOption = null;
-    if(groupVal) {
-        const groupOptions = options.filter(item => item.title === groupVal);
-        if(groupOptions && groupOptions.length > 0) {
-            const foundValue = groupOptions[0].options.filter(item => item.value[keyVal] === value);
-            if(foundValue && foundValue.length > 0){
-                defaultOption = foundValue[0];
+    if(value) {
+        if(groupVal) {
+            const groupOptions = options.filter(item => item.title === groupVal);
+            if(groupOptions && groupOptions.length > 0) {
+                const foundValue = groupOptions[0].options.filter(item => item.value[keyVal] === value);
+                if(foundValue && foundValue.length > 0){
+                    defaultOption = foundValue[0];
+                };
+            };
+        } else if(keyVal){
+            const optionFiltered = options.filter(item => item.value[keyVal] === value);
+            if(optionFiltered && optionFiltered.length > 0) {
+                defaultOption = optionFiltered[0];
+            };
+        } else {
+            const optionFiltered = options.filter(item => item.value === value);
+            if(optionFiltered && optionFiltered.length > 0) {
+                defaultOption = optionFiltered[0];
             };
         };
-    } else if(keyVal){
-        const optionFiltered = options.filter(item => item.value[keyVal] === value);
-        if(optionFiltered && optionFiltered.length > 0) {
-            defaultOption = optionFiltered[0];
-        };
-    } else {
-        const optionFiltered = options.filter(item => item.value === value);
-        if(optionFiltered && optionFiltered.length > 0) {
-            defaultOption = optionFiltered[0];
-        };
     };
-    console.log('SelectInput : ', defaultOption);
+    
     return (
         <div className="ant-space-item"  style={style}>
             <span className='ant-input-group-wrapper
@@ -118,7 +120,7 @@ const SelectInput = (props) => {
 };
 
 const DetailCardItem = (props) => {
-    const { title, name, defaultValue, edited, detail, disabled
+    const { title, name, defaultValue, edited, detail
     } = props;
     
     const currentValue = (edited && edited[name])
@@ -129,13 +131,13 @@ const DetailCardItem = (props) => {
                     : defaultValue
                 ));
 
-    const widthValue = detail.extra === 'long' ? 770 : (detail.extra === 'modal' ? 470 : 380);
+    const widthValue = detail['extra'] ? ( detail.extra === 'long' ? 770 : (detail.extra === 'modal' ? 470 : 380)) : 380;
 
     const SharedProps = {
         name: name,
         addonBefore: <div className='detail-card-before'>{title}</div>,
         value: currentValue,
-        disabled: disabled ? disabled : false,
+        disabled: detail.disabled ? detail.disabled : false,
     };
 
     switch(detail.type)
