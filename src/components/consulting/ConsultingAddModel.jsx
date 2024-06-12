@@ -11,7 +11,7 @@ import { ConsultingRepo, ConsultingTypes } from "../../repository/consulting";
 import { atomAllCompanies, atomAllLeads, defaultConsulting } from "../../atoms/atoms";
 import { formatDate } from "../../constants/functions";
 
-const ConsultingAddModal = ({currentLead, previousModalId}) => {
+const ConsultingAddModel = ({currentLead, previousModalId}) => {
 
   console.log('currentLead', currentLead, previousModalId);
   const { t } = useTranslation();
@@ -362,33 +362,44 @@ const ConsultingAddModal = ({currentLead, previousModalId}) => {
                   </div> */}
                   
                   <div className="text-center">
-                  {currentLead === '' || currentLead === null ?
+                    {currentLead === '' || currentLead === null ?
                       <button
-                      type="button"
-                      className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                      onClick={handleAddNewConsulting}
+                        type="button"
+                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                        onClick={handleAddNewConsulting}
+                        >
+                        {t('common.save')}
+                      </button>
+                      :
+                      <button
+                        type="button"
+                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                        data-bs-toggle="modal"
+                        data-bs-target={previousModalId}
+                        onClick={handleAddNewConsulting}
                       >
-                      {t('common.save')}
-                    </button>
-                    :
-                    <button
-                      type="button"
-                      className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                      data-bs-toggle="modal"
-                      data-bs-target={previousModalId}
-                      onClick={handleAddNewConsulting}
-                    >
-                      {t('common.save')}
-                    </button>
-                  }
+                        {t('common.save')}
+                      </button>
+                    }
                     &nbsp;&nbsp;
-                    <button
-                      type="button"
-                      className="btn btn-secondary btn-rounded"
-                      data-bs-dismiss="modal"
-                    >
-                      {t('common.cancel')}
-                    </button>
+                    {currentLead === '' || currentLead === null ?
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-rounded"
+                        data-bs-dismiss="modal"
+                      >
+                        {t('common.cancel')}
+                      </button>
+                      :
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-rounded"
+                        data-bs-toggle="modal"
+                        data-bs-target={previousModalId}
+                      >
+                        {t('common.cancel')}
+                      </button>
+                    }
                   </div>
                 </form>
               </div>
@@ -398,4 +409,4 @@ const ConsultingAddModal = ({currentLead, previousModalId}) => {
   );
 };
 
-export default ConsultingAddModal;
+export default ConsultingAddModel;

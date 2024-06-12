@@ -11,7 +11,7 @@ import DetailTitleItem from "../../constants/DetailTitleItem";
 import { formatDate, formatTime } from "../../constants/functions";
 
 
-const ConsultingsDetailsModel = () => {
+const ConsultingDetailsModel = ({previousModalId}) => {
   const selectedConsulting = useRecoilValue(atomCurrentConsulting);
   const { modifyConsulting, setCurrentConsulting } = useRecoilValue(ConsultingRepo);
   const [ cookies ] = useCookies(["myLationCrmUserId"]);
@@ -113,7 +113,7 @@ const ConsultingsDetailsModel = () => {
 
   useEffect(() => {
     if(selectedConsulting !== defaultConsulting) {
-      console.log('[ConsultingsDetailsModel] called!');
+      console.log('[ConsultingDetailsModel] called!');
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if(detailViewStatus === null){
@@ -289,4 +289,4 @@ const ConsultingsDetailsModel = () => {
   );
 };
 
-export default ConsultingsDetailsModel;
+export default ConsultingDetailsModel;

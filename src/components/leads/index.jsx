@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
-import LeadsDetailsModel from "./LeadsDetailsModel";
+import LeadDetailsModel from "./LeadDetailsModel";
 import { MoreVert } from '@mui/icons-material';
 import { CompanyRepo } from "../../repository/company";
 import { ConsultingRepo } from "../../repository/consulting";
@@ -372,7 +372,7 @@ const Leads = () => {
                               loadCompanyPurchases(record.company_code);  // 현재 company에 해당하는 purchase 조회 
                               let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
                                 keyboard: false
-                              })
+                              });
                               myModal.show();
                           }, // double click row
                         };
@@ -431,7 +431,7 @@ const Leads = () => {
           </div>
         </div>
         <LeadAddModel init={initToAddLead} handleInit={setInitToAddLead} />
-        <LeadsDetailsModel />
+        <LeadDetailsModel />
       </div>
     </HelmetProvider>
   );

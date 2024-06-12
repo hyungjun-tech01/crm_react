@@ -9,11 +9,11 @@ import { Table } from "antd";
 import "antd/dist/reset.css";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
-import ConsultingsDetailsModel from "./ConsultingsDetailsModel";
+import ConsultingDetailsModel from "./ConsultingDetailsModel";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
-import LeadsDetailsModel from "../leads/LeadsDetailsModel";
-import ConsultingAddModal from "../consulting/ConsultingAddModal";
+import LeadDetailsModel from "../leads/LeadDetailsModel";
+import ConsultingAddModal from "./ConsultingAddModel";
 import "react-datepicker/dist/react-datepicker.css";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
@@ -419,8 +419,8 @@ const Consultings = () => {
         {/* modal */}
         <SystemUserModel />
         <CompanyDetailsModel />
-        <LeadsDetailsModel />
-        <ConsultingsDetailsModel />
+        <LeadDetailsModel />
+        <ConsultingDetailsModel />
         <ConsultingAddModal currentLead='' previousModalId=''/>
       </div>
     </HelmetProvider>

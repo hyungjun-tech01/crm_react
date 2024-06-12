@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useHistory } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { Logo, S_Logo, avatar02, avatar03, avatar05, avatar06, avatar08, avatar09, avatar13, avatar17, avatar21, Flag_kr, Flag_us } from "../imagepath";
-import { Avatar } from "@mui/material";
+import { Avatar } from "antd";
 import { atomCurrentUser } from "../../atoms/atomsUser.jsx";
 import { useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";

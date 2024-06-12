@@ -141,7 +141,7 @@ import "./assets/css/custom.style.css";
 import SystemUserModel from "./components/task/SystemUserModel";
 import TaskDetailModel from "./components/task/TaskDetailModel";
 import CompanyDetailsModel from "./components/company/CompanyDetailsModel";
-import LeadsDetailsModel from "./components/leads/LeadsDetailsModel.jsx";
+import LeadDetailsModel from "./components/leads/LeadDetailsModel";
 import Leadskanbanview from "./components/leads/kanbanview.jsx";
 import DealDetailsModel from "./components/deals/DealDetailsModel";
 import CompanyDetails from "./components/deals/CompanyDetails";
@@ -229,7 +229,7 @@ const AppUniversal = (props) => {
           <Route path="/companies" exact component={Company} />
           <Route path="/CompanyDetailsModel" exact component={CompanyDetailsModel} />
           <Route path="/leads" exact component={Leads} />
-          <Route path="/LeadsDetailsModel" exact component={LeadsDetailsModel} />
+          <Route path="/LeadDetailModel" exact component={LeadDetailsModel} />
           <Route path="/leads-kanban-view" exact component={Leadskanbanview} />
           <Route path="/deals" exact component={Deals} />
           <Route path="/DealDetailsModel" exact component={DealDetailsModel} />

@@ -2,38 +2,37 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
-import { Space, Switch } from "antd";
+import { useTranslation } from "react-i18next";
+import { Avatar, Space, Switch } from "antd";
+import { ExpandMore, Edit } from "@mui/icons-material";
+
 import { 
-  atomCurrentLead,
-  defaultLead, atomCurrentCompany,
+  atomCurrentLead, defaultLead,
+  atomAllCompanies, atomCurrentCompany, atomCompanyState, atomCompanyForSelection,
+  atomPurchaseState, atomAllPurchases,
+  atomConsultingState, atomAllConsultings,
+
   atomCompanyConsultings,atomFilteredConsulting, atomCompanyQuotations, atomFilteredQuotation,
-  atomCompanyPurchases, atomFilteredPurchase, atomCompanyState, atomCompanyForSelection, 
-  atomAllCompanies,
-  atomPurchaseState,
-  atomAllPurchases,
 } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo} from "../../repository/company";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { UserRepo } from '../../repository/user';
-import { Avatar, selectClasses } from "@mui/material";
 import { ConsultingRepo } from "../../repository/consulting";
 import { QuotationRepo } from "../../repository/quotation";
 import { PurchaseRepo } from "../../repository/purchase";
 import { MAContractRepo } from "../../repository/ma_contract";
-import { ExpandMore } from "@mui/icons-material";
+
 import CompanyPurchaseModel from "../company/CompanyPurchaseModel";
-import ConsultingsDetailsModel from "../consulting/ConsultingsDetailsModel";
-import QuotationsDetailsModel from "../quotations/QuotationsDetailsModel";
-import ConsultingAddModal from "../consulting/ConsultingAddModal";
-import { Edit } from '@mui/icons-material';
-import { useTranslation } from "react-i18next";
+import ConsultingAddModel from "../consulting/ConsultingAddModel";
+import ConsultingDetailsModel from "../consulting/ConsultingDetailsModel";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import { option_locations } from "../../constants/constans";
+import LeadConsultingModel from "./LeadConsultingModel";
 
 
-const LeadsDetailsModel = () => {
+const LeadDetailsModel = () => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
@@ -53,8 +52,6 @@ const LeadsDetailsModel = () => {
   const companyConsultings = useRecoilValue(atomCompanyConsultings);
   const companyQuotations = useRecoilValue(atomCompanyQuotations);
   const filteredQuotations = useRecoilValue(atomFilteredQuotation);
-  const companyPurchases = useRecoilValue(atomCompanyPurchases);
-  const filteredPurchases = useRecoilValue(atomFilteredPurchase);
 
 
   //===== [RecoilState] Related with Purchase =======================================
@@ -62,6 +59,13 @@ const LeadsDetailsModel = () => {
   const allPurchases = useRecoilValue(atomAllPurchases);
   const { loadAllPurchases} = useRecoilValue(PurchaseRepo);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
+
+
+  //===== [RecoilState] Related with Consulting =======================================
+  const consultingState = useRecoilValue(atomConsultingState);
+  const allConsultings = useRecoilValue(atomAllConsultings);
+  const { loadAllConsultings } = useRecoilValue(ConsultingRepo);
+
 
   //===== [RecoilState] Related with Users ==========================================
   const userState = useRecoilValue(atomUserState);
@@ -254,15 +258,9 @@ const LeadsDetailsModel = () => {
   const [searchCondition, setSearchCondition] = useState("");
   const [searchQuotationCondition, setSearchQuotationCondition] = useState("");
   const [searchPurchaseCondition, setSearchPurchaseCondition] = useState("");
-  const {  filterConsulting, setCurrentConsulting} = useRecoilValue(ConsultingRepo);
   const {  setCurrentQuotation, filterCompanyQuotation} = useRecoilValue(QuotationRepo);
   const {  setCurrentPurchase , filterCompanyPurchase} = useRecoilValue(PurchaseRepo);
 
-  const handleSearchCondition =  (newValue)=> {
-    setSearchCondition(newValue);
-    console.log("handleSearchCondition", searchCondition)
-    filterConsulting(newValue);  
-  };
 
   const handleSearchQuotationCondition = (newValue)=> {
     setSearchQuotationCondition(newValue);
@@ -295,12 +293,11 @@ const [selectedRow, setSelectedRow] = useState(null);
   
   //===== useEffect functions ===============================================  
   useEffect(() => {
-    console.log('[LeadDetailModel] useEffect / lead');
     if((selectedLead !== defaultLead) 
       && (selectedLead.lead_code !== currentLeadCode)
       && ((companyState & 1) === 1)
     ) {
-      console.log('[LeadsDetailsModel] called!');
+      console.log('[LeadDetailsModel] useEffect / lead');
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if(detailViewStatus === null){
@@ -322,15 +319,13 @@ const [selectedRow, setSelectedRow] = useState(null);
   }, [selectedLead, currentLeadCode, companyState, allCompanies, setCurrentCompany, loadCompanyMAContracts]);
 
   useEffect(() => {   
-    console.log('[LeadsDetailsModel] useEffect / company');
     if((companyState & 1) === 0) {
+      console.log('[LeadDetailsModel] loadAllCompanies');
       loadAllCompanies();
     };
   }, [companyState, loadAllCompanies]);
 
-  // ----- useEffect for Purchase -----------------------------------
   useEffect(() => {
-    console.log('[LeadDetailModel] useEffect / Purchase');
     if((purchaseState & 1) === 0) {
       console.log('[LeadDetailModel] loadAllPurchases');
       loadAllPurchases();
@@ -348,6 +343,19 @@ const [selectedRow, setSelectedRow] = useState(null);
       };
     };
   }, [purchaseState, allPurchases, purchasesByCompany, loadAllPurchases, currentCompany.company_code]);
+
+  useEffect(() => {
+    if((consultingState & 1) === 0) {
+      console.log('[LeadDetailModel] loadAllConsultings');
+      loadAllConsultings();
+    } else {
+      const tempConsultingByLead = allConsultings.filter(consulting => consulting.lead_code === selectedLead.lead_code);
+      if(consultingsByLead.length !== tempConsultingByLead.length) {
+        console.log('[CompanyDetailsModel] set purchasesBycompany / set MA Count');
+        setConsultingsByLead(tempConsultingByLead);
+      };
+    };
+  }, [allConsultings, consultingState, consultingsByLead.length, loadAllConsultings, selectedLead.lead_code]);
 
   useEffect(() => {
     console.log('[CompanyAddModel] loading user data!');
@@ -372,25 +380,25 @@ const [selectedRow, setSelectedRow] = useState(null);
               <div className="row w-100">
                 <div className="col-md-1 account d-flex">
                   <div className="company_img">
-                    <Avatar>{selectedLead.lead_name === null ? "":(selectedLead.lead_name).substring(0,1)}</Avatar>
+                    <Avatar size={48}>{selectedLead.lead_name === null ? "":(selectedLead.lead_name).substring(0,1)}</Avatar>
                   </div>
                 </div>
                 <DetailTitleItem
                   original={ selectedLead.lead_name }
-                  name='status'
+                  name='lead_name'
                   title={t('lead.lead_name')}
                   onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
                   original={ selectedLead.company_name }
-                  name='status'
+                  name='company_name'
                   title={t('company.company_name')}
                   onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
-                  original={ selectedLead.status ? selectedLead.status : "Not Contacted" }
-                  name='status'
-                  title={t('common.status')}
+                  original={ selectedLead.position }
+                  name='position'
+                  title={t('lead.position')}
                   onEditing={handleDetailChange}
                 />
               </div>
@@ -465,7 +473,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                         {t('lead.converted')}
                       </Link>
                     </li>
-                    <li role="presentation" className="d-none">
+                    {/* <li role="presentation" className="d-none">
                       <Link
                         to="#converted"
                         aria-controls="converted"
@@ -476,7 +484,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                         <span className="octicon octicon-verified" />
                         Converted
                       </Link>
-                    </li>
+                    </li> */}
                   </ul>
                 </div>
               </div>
@@ -553,106 +561,18 @@ const [selectedRow, setSelectedRow] = useState(null);
                           </div>
                         </div>
                         <div className="tab-pane task-related p-0"
+                          id="not-contact-task-purchase" >
+                          <CompanyPurchaseModel 
+                            company={currentCompany}
+                            purchases={purchasesByCompany}
+                            handlePurchase={setPurchasesByCompany}
+                          />
+                        </div>
+                        <div className="tab-pane task-related p-0"
                           id="not-contact-task-consult" >
-                          <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                            <thead>
-                              <tr>
-                                <div className="row">
-                                  <div className="col text-start" style={{width:'200px'}}>
-                                    <input
-                                      id = "searchCondition"
-                                      className="form-control" 
-                                      type="text"
-                                      value={searchCondition}
-                                      placeholder= {t('common.search_here')}
-                                      onChange ={(e) => handleSearchCondition(e.target.value)}
-                                      style={{width:'300px', display: 'inline'}}
-                                    />  
-                                  </div>
-                                  
-                                  {/*data-bs-target="#add_consulting"*/}
-                                  <div className="col text-end">
-                                    <button
-                                      className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
-                                      id="add-task"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#add_consulting"
-                                      onClick={()=>console.log('Not yet')}
-                                    >
-                                      {t('consulting.add_consulting')}
-                                    </button>
-                                  </div>
-                                </div>
-                              </tr>
-                              <tr>
-                                <th>{t('consulting.type')}</th>
-                                <th>{t('consulting.receipt_date')}</th>
-                                <th>{t('common.status')}</th>
-                                <th>{t('consulting.receiver')}</th>
-                                <th className="text-end">{t('lead.lead_name')}</th>
-                              </tr>
-                            </thead>
-                            {
-                              searchCondition === "" ? 
-                              companyConsultings.length > 0 &&
-                              <tbody>
-                                { companyConsultings.map(consulting =>
-                                <React.Fragment key={consulting.consulting_code}>
-                                  <tr key={consulting.consulting_code}>
-                                      <td>{consulting.consulting_type}
-                                        <ExpandMore  onClick={() => handleRowClick(consulting)}/>
-                                        <a href="#"
-                                          data-bs-toggle="modal"
-                                          data-bs-target="#consulting-details"
-                                          onClick={()=>{
-                                            console.log('showConsultingDetail', consulting.consulting_code);
-                                            setCurrentConsulting(consulting.consulting_code);
-                                        }}>
-                                          <Edit fontSize="small"/>
-                                        </a>
-                                      </td>
-                                      <td>{consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
-                                      {consulting.receipt_time === null ? "":consulting.receipt_time }
-                                      </td>
-                                      <td>{consulting.satatus}</td>
-                                      <td>{consulting.receiver}</td>
-                                      <td className="text-end">{consulting.lead_name}</td>
-                                  </tr>
-                                  {selectedRow === consulting && (
-                                  <tr>
-                                      <td colSpan="5" >
-                                        <tr>Request: {consulting.request_content && 
-                                                        consulting.request_content.split('\n').map((line, index) => (
-                                                        <div key={index}>{line}</div>))
-                                                      }
-                                        </tr>
-                                        <tr>Actions: {consulting.action_content && 
-                                                      consulting.action_content.split('\n').map((line, index) => (
-                                                      <div key={index}>{line}</div>))
-                                                    }
-                                        </tr>
-                                      </td>
-                                  </tr>)}
-                                  </React.Fragment>
-                                )}
-                              </tbody> 
-                              : 
-                              filteredConsultings.length > 0 &&
-                              <tbody>
-                                { filteredConsultings.map(consulting =>
-                                  <tr key={consulting.consulting_code}>
-                                    <td>{consulting.consulting_type}</td>
-                                    <td>{consulting.receipt_date && new Date(consulting.receipt_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
-                                    {consulting.receipt_time === null ? "":consulting.receipt_time }
-                                    </td>
-                                    <td>{consulting.satatus}</td>
-                                    <td>{consulting.receiver}</td>
-                                    <td className="text-end">{consulting.lead_name}</td>
-                                  </tr>
-                                )}
-                              </tbody> 
-                            }
-                          </table>
+                          <LeadConsultingModel
+                            consultings={consultingsByLead}
+                          />
                         </div>
 
 
@@ -740,16 +660,6 @@ const [selectedRow, setSelectedRow] = useState(null);
                             }
                           </table>
                         </div>
-
-                        <div className="tab-pane task-related p-0"
-                          id="not-contact-task-purchase" >
-                          <CompanyPurchaseModel 
-                            company={currentCompany}
-                            purchases={purchasesByCompany}
-                            handlePurchase={setPurchasesByCompany} />
-                        </div>
-
-
                       </div>
                     </div>
                   </div>
@@ -780,11 +690,10 @@ const [selectedRow, setSelectedRow] = useState(null);
         </div>
         {/* modal-dialog */}
       </div>
-      <ConsultingsDetailsModel />
-      <QuotationsDetailsModel  />
-      <ConsultingAddModal currentLead={selectedLead.lead_code} previousModalId='#leads-details'/>
+      <ConsultingDetailsModel previousModalId='#leads-details' />
+      <ConsultingAddModel currentLead={selectedLead.lead_code} previousModalId='#leads-details' />
     </>
   );
 };
 
-export default LeadsDetailsModel;
+export default LeadDetailsModel;

@@ -10,7 +10,7 @@ import QuotationsDetailsModel from "./QuotationsDetailsModel";
 import QuotationAddNewModal from "./QuotationAddNewModal";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
-import LeadsDetailsModel from "../leads/LeadsDetailsModel";
+import LeadDetailsModel from "../leads/LeadDetailsModel";
 import "react-datepicker/dist/react-datepicker.css";
 
 import { MoreVert } from '@mui/icons-material';
@@ -381,7 +381,7 @@ const Quotations = () => {
         </div>
         <SystemUserModel />
         <CompanyDetailsModel />
-        <LeadsDetailsModel />
+        <LeadDetailsModel />
         <QuotationsDetailsModel />
       </div>
     </HelmetProvider>

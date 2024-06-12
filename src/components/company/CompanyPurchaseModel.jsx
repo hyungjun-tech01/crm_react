@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilValue, useRecoilState } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Button, Space, Switch, Table } from "antd";
+import { Button, Space, Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { ConverTextAmount, formatDate } from "../../constants/functions";
 import { Add } from "@mui/icons-material";
@@ -536,7 +536,7 @@ const CompanyPurchaseModel = (props) => {
 
     return (
         <>
-            <div className="row"> ``
+            <div className="row">
                 <div className="card mb-0">
                     <div className="table-body">
                         <div className="table-responsive">

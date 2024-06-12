@@ -12,13 +12,13 @@ import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
 export const ConsultingTypes = [
-    { value: '전화지원', label: 'Call'},
-    { value: '원격지원', label: 'Remote'},
-    { value: '교육지원', label: 'Education'},
-    { value: '방문', label: 'Visit'},
-    { value: '상담', label: 'Consult'},
-    { value: '내근', label: 'InDoor'},
-    { value: '기타', label: 'Etc'},
+    { value: '전화지원', label: '전화지원'},
+    { value: '원격지원', label: '원격지원'},
+    { value: '교육지원', label: '교육지원'},
+    { value: '방문', label: '방문'},
+    { value: '상담', label: '상담'},
+    { value: '내근', label: '내근'},
+    { value: '기타', label: '기타'},
     { value: 'NULL', label: 'NULL'},
 ];
 
