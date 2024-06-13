@@ -12,14 +12,49 @@ import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
 export const ConsultingTypes = [
-    { value: '전화지원', label: '전화지원'},
-    { value: '원격지원', label: '원격지원'},
-    { value: '교육지원', label: '교육지원'},
     { value: '방문', label: '방문'},
     { value: '상담', label: '상담'},
     { value: '내근', label: '내근'},
-    { value: '기타', label: '기타'},
-    { value: 'NULL', label: 'NULL'},
+    { value: '행사', label: '행사'},
+    { value: '전화', label: '전화'},
+    { value: '교육', label: '교육'},
+    { value: '납품', label: '납품'},
+    { value: 'Mail', label: 'Mail'},
+    { value: '원격', label: '원격'},
+    { value: 'ChatBot', label: 'ChatBot'},
+];
+
+export const ProductTypes = [
+    { value: 'SolidWorks', label: 'SolidWorks'},
+    { value: 'Simulation', label: 'Simulation'},
+    { value: 'PDM', label: 'PDM'},
+    { value: 'Flow', label: 'Flow'},
+    { value: 'Composer', label: 'Composer'},
+    { value: 'SS', label: 'SS'},
+    { value: 'API', label: 'API'},
+    { value: 'SMAP 3D', label: 'SMAP '},
+    { value: 'Electrical', label: 'Electrical'},
+    { value: 'DX Tool', label: 'DX '},
+    { value: '3DEXPERIENCE', label: '3DEXPERIENCE'},
+    { value: 'Draftsight', label: 'Draftsight'},
+];
+
+export const ConsultingStatusTypes = [
+    { value: '초기', label: '초기',},
+    { value: '진행중', label: '진행중',},
+    { value: '보류', label: '보류',},
+    { value: '취소', label: '취소',},
+    { value: '완료', label: '완료',},
+    { value: '기타', label: '기타',},
+];
+
+export const ConsultingTimeTypes = [
+    { value: '5분 이내', label: '5분 이내'},
+    { value: '10분', label: '10분', },
+    { value: '30분', label: '30분', },
+    { value: '1시간', label: '1시간', },
+    { value: '2시간', label: '2시간', },
+    { value: '2시간 이상', label: '2시간 이상'},
 ];
 
 export const ConsultingRepo = selector({

@@ -31,7 +31,7 @@ const AddBasicItem = (props) => {
             return (
                 <div className={ long ? "col-sm-12" : "col-sm-6"} >
                     <div className="add-basic-item">
-                    <div className={ long ? "add-long-title" : "add-basic-title"} >
+                        <div className={ long ? "add-long-title" : "add-basic-title"} >
                             {title}
                             {required && <span className="text-danger">*</span>}
                         </div>
@@ -54,6 +54,7 @@ const AddBasicItem = (props) => {
                 } else {
                     return item.value[name] === defaultValue;
                 }})[0]) : null;
+            console.log('[AddBasicItem] selected: ', selected);
             return (
                 <div className={ long ? "col-sm-12" : "col-sm-6"} >
                     <div className="add-basic-item">
@@ -81,7 +82,7 @@ const AddBasicItem = (props) => {
                             {required && <span className="text-danger">*</span>}
                         </div>
                         <div className='add-basic-date-wrapper'>
-                        {time.time ? 
+                        {time[time] ? 
                             <DatePicker
                                 className="add-basic-date"
                                 name = {name}

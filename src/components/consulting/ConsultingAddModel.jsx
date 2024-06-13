@@ -2,45 +2,73 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import Select from "react-select";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
-import { ConsultingRepo, ConsultingTypes } from "../../repository/consulting";
-import { atomCurrentLead, defaultConsulting, atomLeadsForSelection, atomLeadState } from "../../atoms/atoms";
+import { ConsultingRepo, ConsultingTypes, ConsultingStatusTypes, ConsultingTimeTypes, ProductTypes } from "../../repository/consulting";
+import { 
+  atomCurrentLead,
+  defaultConsulting,
+  atomLeadsForSelection,
+  atomLeadState,
+  defaultLead
+} from "../../atoms/atoms";
+import { atomSalespersonsForSelection, atomEngineersForSelection } from "../../atoms/atomsUser";
+
 import { formatDate } from "../../constants/functions";
+import AddBasicItem from "../../constants/AddBasicItem";
 
 const ConsultingAddModel = ({init, handleInit, previousModalId}) => {
   const { t } = useTranslation();
   const [ cookies ] = useCookies(["myLationCrmUserId","myLationCrmUserName"]);
-  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
-  const { loadAllLeads } = useRecoilValue(LeadRepo);
-
-  const [ consultingChange, setConsultingChange ] = useState(null);
-  const [ selectedLead, setSelectedLead ] = useState(null);
-  const [ receiptDate, setReceiptDate ] = useState(new Date());
   
 
   //===== [RecoilState] Related with Consulting =======================================
   const { modifyConsulting } = useRecoilValue(ConsultingRepo);
 
 
-  //===== [RecoilState] Related with Lead ==========================================
+  //===== [RecoilState] Related with Company ==========================================
+  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
+
+
+  //===== [RecoilState] Related with Lead =============================================
   const leadsState = useRecoilValue(atomLeadState);
   const currentLead = useRecoilValue(atomCurrentLead);
   const leadsForSelection = useRecoilValue(atomLeadsForSelection);
+  const { loadAllLeads } = useRecoilValue(LeadRepo);
 
 
-  //===== Handles to edit 'ConsultingAddModel' ===============================================
+  //===== Handles to edit 'ConsultingAddModel' ========================================
+  const [ consultingChange, setConsultingChange ] = useState({...defaultConsulting});
+  const [ receiptDate, setReceiptDate ] = useState(null);
+
   const initializeConsultingTemplate = useCallback(() => {
-    const localDate = formatDate(receiptDate);
-    const localTime = receiptDate.toLocaleTimeString('ko-KR');
-
-    setConsultingChange({ ...defaultConsulting, receipt_date:localDate, receipt_time:localTime });
-    setSelectedLead(null);
     document.querySelector("#add_new_consulting_form").reset();
-  }, []);
+    const tempDate = new Date();
+    setReceiptDate(tempDate);
+    const localDate = formatDate(tempDate);
+    const localTime = tempDate.toLocaleTimeString('ko-KR');
+    
+    if(currentLead !== defaultLead) {
+      console.log('[ConsultingAddModel] initializeConsultingTemplate / try to set Lead');
+      const foundIdx = leadsForSelection.findIndex(item => item.value.lead_code === currentLead.lead_code);
+      if(foundIdx !== -1) {
+        const found_lead_info = leadsForSelection.at(foundIdx);
+        console.log('[ConsultingAddModel] initializeConsultingTemplate / set Lead : ', found_lead_info);
+        setConsultingChange({
+          ...found_lead_info.value,
+          receipt_date:localDate,
+          receipt_time:localTime,
+        });
+      };
+    } else {
+      setConsultingChange({
+        receipt_date:localDate,
+        receipt_time:localTime,
+      });
+    };
+  }, [currentLead, leadsForSelection]);
 
   const handleReceiptDateChange = (date) => {
     setReceiptDate(date);
@@ -53,15 +81,6 @@ const ConsultingAddModel = ({init, handleInit, previousModalId}) => {
     };
     setConsultingChange(tempChanges);
   };
-
-  const handleSelectConsultingType = useCallback((value) => {
-        const tempChanges = {
-          ...consultingChange,
-          consulting_type: value.value,
-        };
-        setConsultingChange(tempChanges);
-      }, [consultingChange]);
-
   
   const handleConsultingChange = useCallback((e) => {
         const modifiedData = {
@@ -71,21 +90,30 @@ const ConsultingAddModel = ({init, handleInit, previousModalId}) => {
         setConsultingChange(modifiedData);
       }, [consultingChange]);
         
-  const handleSelectLead = useCallback((value) => {
-    const tempChanges = {
-      ...consultingChange,
-      lead_code: value.lead_code,
-      lead_name: value.lead_name,
-      department: value.department,
-      position: value.position,
-      mobile_number: value.mobile_number,
-      phone_number: value.phone_number,
-      email: value.email,
-      company_name: value.company_name,
-      company_code: value.company_code,
-    };
-    setConsultingChange(tempChanges);
-  }, [consultingChange]);
+  const handleSelectChange = useCallback((name, selected) => {
+    let modifiedData = null;
+    if(name === 'lead_name'){
+      modifiedData = {
+        ...consultingChange,
+      lead_code: selected.value.lead_code,
+      lead_name: selected.value.lead_name,
+      department: selected.value.department,
+      position: selected.value.position,
+      mobile_number: selected.value.mobile_number,
+      phone_number: selected.value.phone_number,
+      email: selected.value.email,
+      company_name: selected.value.company_name,
+      company_code: selected.value.company_code,
+      };
+    } else {
+      modifiedData = {
+        ...consultingChange,
+        [name]: selected.value,
+      };
+    }
+    
+    setConsultingChange(modifiedData);
+}, [consultingChange]);
     
   const handleAddNewConsulting = useCallback((event)=>{
     // Check data if they are available
@@ -122,6 +150,7 @@ const ConsultingAddModel = ({init, handleInit, previousModalId}) => {
 
   useEffect(() => {
     if(init){
+      console.log('[ConsultingAddModel] init');
       initializeConsultingTemplate();
       if(handleInit) handleInit(!init);
     };
@@ -158,159 +187,140 @@ const ConsultingAddModel = ({init, handleInit, previousModalId}) => {
               </div>
               <div className="modal-body">
                 <form className="forms-sampme" id="add_new_consulting_form">
-                  <h4>{t('lead.lead')} {t('common.information')}</h4>
                   <div className="form-group row">
-                    <div className="col-sm-4">
-                      <label>{t('common.name')}</label>
-                    </div>
-                    <div className="col-sm-8">
-                      <Select options={leadsForSelection} onChange={(value) => { 
-                        handleSelectLead(value.value);
-                        setSelectedLead({...value.value}); }}/>
-                    </div>
+                    <AddBasicItem
+                      title={t('consulting.receipt_date')}
+                      type='date'
+                      time={{ data: receiptDate, time: true }}
+                      required
+                      onChange={handleReceiptDateChange}
+                    />
+                    <AddBasicItem
+                      title={t('consulting.receiver')}
+                      type='text'
+                      defaultValue={consultingChange.receiver}
+                      name="receiver"
+                      required
+                      onChange={handleSelectChange}
+                    />
                   </div>
-                  { (selectedLead !== null) &&
-                    <div className="form-group row">
-                      <div className="col-sm-12">
-                          <table className="table">
-                            <tbody>
-                              <tr>
-                                <td>{t('lead.department')}</td>
-                                <td>{selectedLead.department}</td>
-                              </tr>
-                              <tr>
-                                <td>{t('lead.position')}</td>
-                                <td>{selectedLead.position}</td>
-                              </tr>
-                              <tr>
-                                <td>{t('lead.mobile')}</td>
-                                <td>{selectedLead.mobile}</td>
-                              </tr>
-                              <tr>
-                              <td>{t('common.phone_no')}</td>
-                                <td>{selectedLead.phone}</td>
-                              </tr>
-                              <tr>
-                              <td>{t('lead.email')}</td>
-                                <td>{selectedLead.email}</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                      </div>
-                    </div>
-                  }
                   <div className="form-group row">
-                    <div className="col-sm-4">
-                      <label className="col-form-label">{t('lead.lead_sales')}</label>
-                    </div>
-                    <div className="col-sm-8">
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder={t('lead.lead_sales')}
-                        name="sales_representati"
-                        onChange={handleConsultingChange}
-                      />
-                    </div>
+                    <AddBasicItem
+                      title={t('consulting.type')}
+                      type='select'
+                      name='consulting_type'
+                      defaultValue={consultingChange.consulting_type}
+                      options={ConsultingTypes}
+                      onChange={(selected) => handleSelectChange('consulting_type', selected)}
+                    />
+                    <AddBasicItem
+                      title={t('consulting.product_type')}
+                      type='select'
+                      name='product_type'
+                      defaultValue={consultingChange.product_type}
+                      options={ProductTypes}
+                      onChange={(selected) => handleSelectChange('product_type', selected)}
+                    />
                   </div>
-                  <h4>{t('consulting.consulting')} {t('common.information')}</h4>
                   <div className="form-group row">
-                    <div className="col-sm-4">
-                      <label className="col-form-label">{t('consulting.type')}</label>
-                      <Select options={ConsultingTypes} onChange={handleSelectConsultingType} />
-                    </div>
-                    <div className="col-sm-4">
-                      <label className="col-form-label">{t('consulting.receipt_time')}</label>
-                        <div className="cal-icon">
-                          <DatePicker
-                            className="form-control"
-                            selected={receiptDate}
-                            onChange={handleReceiptDateChange}
-                            dateFormat="yyyy.MM.dd hh:mm:ss"
-                            showTimeSelect
-                          />
+                    <AddBasicItem
+                      title={t('lead.lead_name')}
+                      type='select'
+                      name='lead_name'
+                      defaultValue={consultingChange.lead_name}
+                      options={leadsForSelection}
+                      required
+                      onChange={(selected) => handleSelectChange('lead_name', selected)}
+                    />
+                    { (consultingChange.lead_name !== null) &&
+                      <div className="form-group row">
+                        <div className="col-sm-12">
+                            <table className="table">
+                              <tbody>
+                                <tr>
+                                  <td>{t('lead.department')}</td>
+                                  <td>{consultingChange.department}</td>
+                                </tr>
+                                <tr>
+                                  <td>{t('lead.position')}</td>
+                                  <td>{consultingChange.position}</td>
+                                </tr>
+                                <tr>
+                                  <td>{t('lead.mobile')}</td>
+                                  <td>{consultingChange.mobile}</td>
+                                </tr>
+                                <tr>
+                                <td>{t('common.phone_no')}</td>
+                                  <td>{consultingChange.phone}</td>
+                                </tr>
+                                <tr>
+                                <td>{t('lead.email')}</td>
+                                  <td>{consultingChange.email}</td>
+                                </tr>
+                              </tbody>
+                            </table>
                         </div>
-                    </div>
-                    <div className="col-sm-4">
-                      <label className="col-form-label">{t('consulting.receiver')}</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder={t('consulting.receiver')}
-                        name="receiver"
-                        onChange={handleConsultingChange}
-                      />
-                    </div>
+                      </div>
+                    }
                   </div>
                   <div className="form-group row">
-                    <div className="col-sm-6">
-                      <label className="col-form-label">{t('consulting.lead_time')}</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder={t('consulting.lead_time')}
-                        name="lead_time"
-                        onChange={handleConsultingChange}
-                      />
-                    </div>
-                    <div className="col-sm-6">
-                      <label className="col-form-label">{t('consulting.request_type')}</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder={t('consulting.request_type')}
-                        name="request_type"
-                        onChange={handleConsultingChange}
-                      />
-                    </div>
+                    <AddBasicItem
+                      title={t('company.salesman')}
+                      type='select'
+                      defaultValue={consultingChange.sales_representati}
+                      options={atomSalespersonsForSelection}
+                      onChange={(selected) => handleSelectChange('sales_representati', selected)}
+                    />
+                    <AddBasicItem
+                      title={t('company.engineer')}
+                      type='select'
+                      defaultValue={null}
+                      options={atomEngineersForSelection}
+                      onChange={(selected) => console.log("[ConsultingAddModel] No varaible for this!", selected)}
+                    />
                   </div>
                   <div className="form-group row">
-                    <div className="col-sm-12">
-                      <label className="col-form-label">{t('consulting.request_content')}</label>
-                      <textarea
-                        className="form-control"
-                        rows={2}
-                        placeholder={t('consulting.request_content')}
-                        name="request_content"
-                        defaultValue={""}
-                        onChange={handleConsultingChange}
-                      />
-                    </div>
+                    <AddBasicItem
+                      title={t('consulting.request_content')}
+                      type='textarea'
+                      long
+                      name='request_content'
+                      defaultValue={consultingChange.request_content}
+                      onChange={handleConsultingChange}
+                    />
                   </div>
                   <div className="form-group row">
-                    <div className="col-sm-12">
-                      <label className="col-form-label">{t('consulting.action_content')}</label>
-                      <textarea
-                        className="form-control"
-                        rows={2}
-                        placeholder={t('consulting.action_content')}
-                        name="action_content"
-                        defaultValue={""}
-                        onChange={handleConsultingChange}
-                      />
-                    </div>
+                    <AddBasicItem
+                      title={t('consulting.status')}
+                      type='select'
+                      name='status'
+                      defaultValue={consultingChange.status}
+                      options={ConsultingStatusTypes}
+                      onChange={(selected) => handleSelectChange('status', selected)}
+                    />
+                    <AddBasicItem
+                      title={t('consulting.lead_time')}
+                      type='select'
+                      name='lead_time'
+                      defaultValue={consultingChange.lead_time}
+                      options={ConsultingTimeTypes}
+                      onChange={(selected) => handleSelectChange('lead_time', selected)}
+                    />
                   </div>
                   <div className="form-group row">
-                    <div className="col-sm-12">
-                      <label className="col-form-label">{t('common.status')}</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder={t('common.status')}
-                        name="status"
-                        onChange={handleConsultingChange}
-                      />
-                    </div>
+                    <AddBasicItem
+                      title={t('consulting.action_content')}
+                      type='textarea'
+                      name='action_content'
+                      defaultValue={consultingChange.action_content}
+                      onChange={handleConsultingChange}
+                    />
                   </div>
-                  {/* <div className="submit-section mt-0">
-                    <div className="custom-check mb-4">
-                      <input type="checkbox" id="mark-as-done" />
-                      <label htmlFor="mark-as-done">Mark as Done</label>
-                    </div>
-                  </div> */}
+
+                  
                   
                   <div className="text-center">
-                    {currentLead === '' || currentLead === null ?
+                    {currentLead === defaultLead ?
                       <button
                         type="button"
                         className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
@@ -330,7 +340,7 @@ const ConsultingAddModel = ({init, handleInit, previousModalId}) => {
                       </button>
                     }
                     &nbsp;&nbsp;
-                    {currentLead === '' || currentLead === null ?
+                    {currentLead === defaultLead ?
                       <button
                         type="button"
                         className="btn btn-secondary btn-rounded"

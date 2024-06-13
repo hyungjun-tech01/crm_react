@@ -11,7 +11,7 @@ import { ConsultingRepo } from "../../repository/consulting";
 
 
 const LeadConsultingModel = (props) => {
-    const { consultings } = props;
+    const { consultings, handleAddConsulting } = props;
     const { t } = useTranslation();
 
 
@@ -23,6 +23,7 @@ const LeadConsultingModel = (props) => {
     const [selectedKeys, setSelectedRowKeys] = useState([]);
     
     const transferToOtherModal = (id) => {
+        handleAddConsulting(true);
         let myModal = new bootstrap.Modal(document.getElementById(id), {
             keyboard: false
         });

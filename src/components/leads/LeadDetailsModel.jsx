@@ -248,6 +248,7 @@ const LeadDetailsModel = () => {
 
   //===== Handles to edit 'Consulting Details' ===============================================
   const [ consultingsByLead, setConsultingsByLead] = useState([]);
+  const [ initAddConsulting, setInitAddConsulting ] = useState(false);
 
 
   //===== Handles to edit 'Quotation Details' ===============================================
@@ -572,6 +573,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                           id="not-contact-task-consult" >
                           <LeadConsultingModel
                             consultings={consultingsByLead}
+                            handleAddConsulting={setInitAddConsulting}
                           />
                         </div>
 
@@ -691,7 +693,7 @@ const [selectedRow, setSelectedRow] = useState(null);
         {/* modal-dialog */}
       </div>
       <ConsultingDetailsModel previousModalId='#leads-details' />
-      <ConsultingAddModel previousModalId='#leads-details' />
+      <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} previousModalId='#leads-details' />
     </>
   );
 };
