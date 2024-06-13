@@ -4,7 +4,6 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
-import { MoreVert } from '@mui/icons-material';
 import { Table } from "antd";
 import "antd/dist/reset.css";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
@@ -17,44 +16,42 @@ import ConsultingAddModal from "./ConsultingAddModel";
 import "react-datepicker/dist/react-datepicker.css";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
-import { ConsultingRepo, ConsultingTypes } from "../../repository/consulting";
-import { atomAllCompanies,
+import { ConsultingRepo } from "../../repository/consulting";
+import { 
   atomAllConsultings,
-  atomAllLeads,
-  defaultConsulting,
   atomFilteredConsulting,
   atomCompanyState,
   atomLeadState,
   atomConsultingState,
 } from "../../atoms/atoms";
-import { compareCompanyName, compareText, formatDate } from "../../constants/functions";
+import { compareCompanyName, compareText } from "../../constants/functions";
 
-const COMPANY_SELECTION_LOADED = 0;
 
 const Consultings = () => {
-  const companyState = useRecoilValue(atomCompanyState);
-  const leadState = useRecoilValue(atomLeadState);
-  const consultingState = useRecoilValue(atomConsultingState);
-  const allCompnayData = useRecoilValue(atomAllCompanies);
-  const allLeadData = useRecoilValue(atomAllLeads);
-  const allConsultingData = useRecoilValue(atomAllConsultings);
-  const filteredConsulting = useRecoilValue(atomFilteredConsulting);
-  const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
-  const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
-  const { loadAllConsultings, modifyConsulting, setCurrentConsulting, filterConsultingOri } = useRecoilValue(ConsultingRepo);
-  const [ cookies ] = useCookies(["myLationCrmUserName"]);
-
-  const [ companiesForSelection, setCompaniesForSelection ] = useState([]);
-  const [ leadsForSelection, setLeadsForSelection] = useState([]);
-  const [ consultingChange, setConsultingChange ] = useState(null);
-  const [ selectedLead, setSelectedLead ] = useState(null);
-  const [ receiptDate, setReceiptDate ] = useState(new Date());
-  const [searchCondition, setSearchCondition] = useState("");
-
-  const [expanded, setExpaned] = useState(false);
-
   const { t } = useTranslation();
 
+  
+  //===== [RecoilState] Related with Consulting =======================================
+  const consultingState = useRecoilValue(atomConsultingState);
+  const allConsultingData = useRecoilValue(atomAllConsultings);
+  const filteredConsulting = useRecoilValue(atomFilteredConsulting);
+  const { loadAllConsultings, setCurrentConsulting, filterConsultingOri } = useRecoilValue(ConsultingRepo);
+
+
+  //===== [RecoilState] Related with Company ==========================================
+  const companyState = useRecoilValue(atomCompanyState);
+  const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
+
+
+  //===== [RecoilState] Related with Lead =============================================
+  const leadState = useRecoilValue(atomLeadState);
+  const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
+
+
+  //===== Handles to deal 'Consultings' ========================================
+  const [ initConsultingTemplate, setInitConsultingTemplate ] = useState(false);
+  const [searchCondition, setSearchCondition] = useState("");
+  const [expanded, setExpaned] = useState(false);
   const [statusSearch, setStatusSearch] = useState('common.all');
 
   const handleSearchCondition =  (newValue)=> {
@@ -67,87 +64,12 @@ const Consultings = () => {
     loadAllConsultings();
     setExpaned(false);
     setSearchCondition("");
-  }
-
-  const handleReceiptDateChange = (date) => {
-    setReceiptDate(date);
-    const localDate = formatDate(date);
-    const localTime = date.toLocaleTimeString('ko-KR');
-    const tempChanges = {
-      ...consultingChange,
-      receipt_date: localDate,
-      receipt_time: localTime,
-    };
-    setConsultingChange(tempChanges);
   };
 
   // --- Functions used for Add New Consulting ------------------------------
   const handleAddNewConsultingClicked = useCallback(() => {
-    initializeConsultingTemplate();
+    setInitConsultingTemplate(true);
   }, []);
-
-  const initializeConsultingTemplate = useCallback(() => {
-    setConsultingChange({ ...defaultConsulting });
-    setSelectedLead(null);
-    document.querySelector("#add_new_consulting_form").reset();
-  }, []);
-
-  const handleConsultingChange = useCallback((e) => {
-    const modifiedData = {
-      ...consultingChange,
-      [e.target.name]: e.target.value,
-    };
-    setConsultingChange(modifiedData);
-  }, [consultingChange]);
-
-  const handleSelectLead = useCallback((value) => {
-    const tempChanges = {
-      ...consultingChange,
-      lead_code: value.code,
-      lead_name: value.name,
-      department: value.department,
-      position: value.position,
-      mobile_number: value.mobile,
-      phone_number: value.phone,
-      email: value.email,
-      company_name: value.company,
-      company_code: companiesForSelection[value.company],
-    };
-    setConsultingChange(tempChanges);
-  }, [companiesForSelection, consultingChange]);
-
-  const handleSelectConsultingType = useCallback((value) => {
-    const tempChanges = {
-      ...consultingChange,
-      consulting_type: value.value,
-    };
-    setConsultingChange(tempChanges);
-  }, [consultingChange]);
-
-  const handleAddNewConsulting = useCallback((event)=>{
-    // Check data if they are available
-    if(consultingChange.lead_name === null
-      || consultingChange.lead_name === ''
-      || consultingChange.consulting_type === null
-    ) {
-      console.log("Necessary information isn't submitted!");
-      return;
-    };
-
-    const newConsultingData = {
-      ...consultingChange,
-      action_type: 'ADD',
-      lead_number: '99999',// Temporary
-      counter: 0,
-      modify_user: cookies.myLationCrmUserName,
-    };
-    console.log(`[ handleAddNewConsulting ]`, newConsultingData);
-    const result = modifyConsulting(newConsultingData);
-    if(result){
-      initializeConsultingTemplate();
-      //close modal ?
-    };
-  }, [cookies.myLationCrmUserName, initializeConsultingTemplate, consultingChange, modifyConsulting]);
 
   // --- Section for Table ------------------------------
   const columns = [
@@ -217,78 +139,28 @@ const Consultings = () => {
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.phone_number, b.phone_number),
     },
-    {
-      title: t('lead.actions'),
-      render: (text, record) => (
-        <div className="dropdown dropdown-action text-center">
-          <a
-            className="action-icon dropdown-toggle"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            <MoreVert />
-          </a>
-          <div className="dropdown-menu dropdown-menu-right h-100">
-            <a style={{ display: "initial" }} className="dropdown-item">
-              Edit
-            </a>
-          </div>
-        </div>
-      ),
-    },
   ];
 
+  //===== useEffect functions ==========================================
   useEffect(() => {
-    console.log('Consulting called!');
     if((companyState & 1) === 0) {
+      console.log('[Consulting] load all companies!');
       loadAllCompanies();
     };
-    if(allCompnayData.length !== companiesForSelection.length) {
-      let company_subset = {};
-      allCompnayData.forEach((data) => {
-        company_subset[data.company_name] = data.company_code;
-      });
-      setCompaniesForSelection(company_subset);
-    };
+  }, [companyState, loadAllCompanies]);
 
+  useEffect(() => {
     if((leadState & 1) === 0) {
       loadAllLeads();
     };
-    if(leadsForSelection.length !== allLeadData.length){
-      const temp_data = allLeadData.map(lead => {
-        return {
-          label: lead.lead_name + " / " + lead.company_name,
-          value: {
-            code: lead.lead_code,
-            name: lead.lead_name,
-            department: lead.department,
-            position: lead.position,
-            mobile: lead.mobile_number,
-            phone: lead.phone_number,
-            email: lead.email,
-            company: lead.company_name
-          }
-        }
-      });
-      temp_data.sort((a, b) => {
-        if (a.label > b.label) {
-          return 1;
-        }
-        if (a.label < b.label) {
-          return -1;
-        }
-        // a must be equal to b
-        return 0;
-      });
-      setLeadsForSelection(temp_data);
-    };
-
+  }, [leadState, loadAllLeads]);
+    
+  useEffect(() => {
     if((consultingState & 1) === 0) {
       loadAllConsultings();
     };
-    
-    initializeConsultingTemplate();
-  }, [companyState, leadState, consultingState, allCompnayData, allLeadData, allConsultingData, leadsForSelection, companiesForSelection]);
+  }, [consultingState, loadAllConsultings]);
+      
 
   return (
     <HelmetProvider>
@@ -421,7 +293,11 @@ const Consultings = () => {
         <CompanyDetailsModel />
         <LeadDetailsModel />
         <ConsultingDetailsModel />
-        <ConsultingAddModal currentLead='' previousModalId=''/>
+        <ConsultingAddModal
+          init={initConsultingTemplate}
+          handleInit={setInitConsultingTemplate}
+          previousModalId=''
+        />
       </div>
     </HelmetProvider>
   );
