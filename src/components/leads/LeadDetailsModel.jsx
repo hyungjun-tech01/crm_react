@@ -6,16 +6,16 @@ import { useTranslation } from "react-i18next";
 import { Avatar, Space, Switch } from "antd";
 import { ExpandMore, Edit } from "@mui/icons-material";
 
-import { 
+import {
   atomCurrentLead, defaultLead,
   atomAllCompanies, atomCurrentCompany, atomCompanyState, atomCompanyForSelection,
   atomPurchaseState, atomAllPurchases,
   atomConsultingState, atomAllConsultings,
 
-  atomCompanyConsultings,atomFilteredConsulting, atomCompanyQuotations, atomFilteredQuotation,
+  atomCompanyConsultings, atomFilteredConsulting, atomCompanyQuotations, atomFilteredQuotation,
 } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
-import { CompanyRepo} from "../../repository/company";
+import { CompanyRepo } from "../../repository/company";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { UserRepo } from '../../repository/user';
 import { ConsultingRepo } from "../../repository/consulting";
@@ -57,7 +57,7 @@ const LeadDetailsModel = () => {
   //===== [RecoilState] Related with Purchase =======================================
   const purchaseState = useRecoilValue(atomPurchaseState);
   const allPurchases = useRecoilValue(atomAllPurchases);
-  const { loadAllPurchases} = useRecoilValue(PurchaseRepo);
+  const { loadAllPurchases } = useRecoilValue(PurchaseRepo);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
 
@@ -72,27 +72,27 @@ const LeadDetailsModel = () => {
   const { loadAllUsers } = useRecoilValue(UserRepo)
   const engineersForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
-  
+
 
   //===== Handles to deal this component ============================================
-  const [ isFullScreen, setIsFullScreen ] = useState(false);
-  const [ currentLeadCode, setCurrentLeadCode ] = useState('');
-  const [ validMACount, setValidMACount ] = useState(0);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [currentLeadCode, setCurrentLeadCode] = useState('');
+  const [validMACount, setValidMACount] = useState(0);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
-    if(checked)
+    if (checked)
       localStorage.setItem('isFullScreen', '1');
     else
       localStorage.setItem('isFullScreen', '0');
   }, []);
 
-  
+
   //===== Handles to edit 'Lead Details' ===============================================
-  const [ editedDetailValues, setEditedDetailValues ] = useState(null);
+  const [editedDetailValues, setEditedDetailValues] = useState(null);
 
   const handleDetailChange = useCallback((e) => {
-    if(e.target.value !== selectedLead[e.target.name]){
+    if (e.target.value !== selectedLead[e.target.name]) {
       const tempEdited = {
         ...editedDetailValues,
         [e.target.name]: e.target.value,
@@ -100,14 +100,14 @@ const LeadDetailsModel = () => {
       console.log('handleDetailChange : ', tempEdited);
       setEditedDetailValues(tempEdited);
     } else {
-      if(editedDetailValues[e.target.name]){
+      if (editedDetailValues[e.target.name]) {
         delete editedDetailValues[e.target.name];
       };
     };
   }, [editedDetailValues, selectedLead]);
 
   const handleDetailDateChange = useCallback((name, date) => {
-    if(date !== new Date(selectedLead[name])){
+    if (date !== new Date(selectedLead[name])) {
       const tempEdited = {
         ...editedDetailValues,
         [name]: date,
@@ -120,8 +120,8 @@ const LeadDetailsModel = () => {
     console.log('handleDetailSelectChange / start : ', selected);
     let tempEdited = null;
     let isChanged = false;
-    if(name === 'company_name') {
-      if(selectedLead.company_name !== selected.value.company_name){
+    if (name === 'company_name') {
+      if (selectedLead.company_name !== selected.value.company_name) {
         isChanged = true;
         tempEdited = {
           ...editedDetailValues,
@@ -133,7 +133,7 @@ const LeadDetailsModel = () => {
         };
       };
     } else {
-      if(selectedLead[name] !== selected.value){
+      if (selectedLead[name] !== selected.value) {
         isChanged = true;
         tempEdited = {
           ...editedDetailValues,
@@ -141,15 +141,15 @@ const LeadDetailsModel = () => {
         };
       };
     };
-    if(isChanged){
+    if (isChanged) {
       console.log('handleDetailSelectChange : ', tempEdited);
       setEditedDetailValues(tempEdited);
     };
   }, [editedDetailValues, selectedLead]);
 
-  const handleChangeStatus = (newStatus)=>{
+  const handleChangeStatus = (newStatus) => {
     const tempEdited = {
-      status:newStatus,
+      status: newStatus,
       action_type: "UPDATE",
       modify_user: cookies.myLationCrmUserId,
       lead_code: selectedLead.lead_code,
@@ -169,9 +169,8 @@ const LeadDetailsModel = () => {
   }, [setCurrentLead]);
 
   const handleSaveAll = useCallback(() => {
-    if(editedDetailValues !== null
-      && selectedLead !== defaultLead)
-    {
+    if (editedDetailValues !== null
+      && selectedLead !== defaultLead) {
       const temp_all_saved = {
         ...editedDetailValues,
         action_type: "UPDATE",
@@ -181,26 +180,26 @@ const LeadDetailsModel = () => {
       if (modifyLead(temp_all_saved)) {
         console.log(`Succeeded to modify lead`);
         let temp_update_company = null;
-        if(editedDetailValues['company_name'])
+        if (editedDetailValues['company_name'])
           temp_update_company['company_name'] = editedDetailValues['company_name'];
-        if(editedDetailValues['company_name_en'])
+        if (editedDetailValues['company_name_en'])
           temp_update_company['company_name_eng'] = editedDetailValues['company_name_en'];
-        if(editedDetailValues['company_phone_number'])
+        if (editedDetailValues['company_phone_number'])
           temp_update_company['company_phone_number'] = editedDetailValues['company_phone_number'];
-        if(editedDetailValues['company_fax_number'])
+        if (editedDetailValues['company_fax_number'])
           temp_update_company['company_fax_number'] = editedDetailValues['company_fax_number'];
-        if(editedDetailValues['company_address'])
+        if (editedDetailValues['company_address'])
           temp_update_company['company_address'] = editedDetailValues['company_address'];
-        if(editedDetailValues['company_zip_code'])
-            temp_update_company['company_zip_code'] = editedDetailValues['company_zip_code'];
-        if(editedDetailValues['region'])
+        if (editedDetailValues['company_zip_code'])
+          temp_update_company['company_zip_code'] = editedDetailValues['company_zip_code'];
+        if (editedDetailValues['region'])
           temp_update_company['region'] = editedDetailValues['region'];
-          
-        if(temp_update_company !== null){
-          temp_update_company['action_type']='UPDATE';
-          temp_update_company['modify_user']=cookies.myLationCrmUserId;
-          temp_update_company['company_code']=currentCompany.company_code;
-          if(modifyCompany(temp_update_company)) {
+
+        if (temp_update_company !== null) {
+          temp_update_company['action_type'] = 'UPDATE';
+          temp_update_company['modify_user'] = cookies.myLationCrmUserId;
+          temp_update_company['company_code'] = currentCompany.company_code;
+          if (modifyCompany(temp_update_company)) {
             console.log(`Succeeded to modify company`);
           } else {
             console.error('Failed to modify company');
@@ -220,63 +219,62 @@ const LeadDetailsModel = () => {
   }, []);
 
   const lead_items_info = [
-    { key:'lead_name',title:'lead.lead_name',detail:{type:'label',editing:handleDetailChange}},
-    { key:'position',title:'lead.position',detail:{type:'label',editing:handleDetailChange}},
-    { key:'is_keyman',title:'lead.is_keyman',detail:{type:'select',options:KeyManForSelection,editing:handleDetailSelectChange}},
-    { key:'region',title:'common.region',detail:{type:'select',options:option_locations.ko,editing:handleDetailSelectChange}},
-    { key:'company_name',title:'company.company_name',detail:{type:'select',options:companyForSelection,key:'company_name',editing:handleDetailSelectChange}},
-    { key:'company_name_en',title:'company.eng_company_name',detail:{type:'label',editing:handleDetailChange}},
-    { key:'department',title:'lead.department',detail:{type:'label',editing:handleDetailChange}},
-    { key:'position',title:'lead.position',detail:{type:'label',editing:handleDetailChange}},
-    { key:'mobile_number',title:'lead.mobile',detail:{type:'label',editing:handleDetailChange}},
-    { key:'company_phone_number',title:'company.phone_number',detail:{type:'label',editing:handleDetailChange}},
-    { key:'company_fax_number',title:'company.fax_number',detail:{type:'label',editing:handleDetailChange}},
-    { key:'email',title:'lead.email',detail:{type:'label',editing:handleDetailChange}},
-    { key:'homepage',title:'lead.homepage',detail:{type:'label',editing:handleDetailChange}},
-    { key:'company_zip_code',title:'company.zip_code',detail:{type:'label',editing:handleDetailChange}},
-    { key:'company_address',title:'company.address',detail:{type:'label', extra:'long',editing:handleDetailChange}},
-    { key:'sales_resource',title:'lead.lead_sales',detail:{type:'select',options:salespersonsForSelection,editing:handleDetailSelectChange}},
-    { key:'application_engineer',title:'company.engineer',detail:{type:'select',options:engineersForSelection,editing:handleDetailSelectChange}},
-    { key:'create_date',title:'common.regist_date',detail:{type:'date',editing:handleDetailDateChange}},
-    { key:'memo',title:'common.memo',detail:{type:'textarea',extra:'long',editing:handleDetailChange}},
+    { key: 'lead_name', title: 'lead.lead_name', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'is_keyman', title: 'lead.is_keyman', detail: { type: 'select', options: KeyManForSelection, editing: handleDetailSelectChange } },
+    { key: 'region', title: 'common.region', detail: { type: 'select', options: option_locations.ko, editing: handleDetailSelectChange } },
+    { key: 'company_name', title: 'company.company_name', detail: { type: 'select', options: companyForSelection, key: 'company_name', editing: handleDetailSelectChange } },
+    { key: 'company_name_en', title: 'company.eng_company_name', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'department', title: 'lead.department', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'mobile_number', title: 'lead.mobile', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'company_phone_number', title: 'company.phone_number', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'company_fax_number', title: 'company.fax_number', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'email', title: 'lead.email', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'homepage', title: 'lead.homepage', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'company_zip_code', title: 'company.zip_code', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'company_address', title: 'company.address', detail: { type: 'label', extra: 'long', editing: handleDetailChange } },
+    { key: 'sales_resource', title: 'lead.lead_sales', detail: { type: 'select', options: salespersonsForSelection, editing: handleDetailSelectChange } },
+    { key: 'application_engineer', title: 'company.engineer', detail: { type: 'select', options: engineersForSelection, editing: handleDetailSelectChange } },
+    { key: 'create_date', title: 'common.regist_date', detail: { type: 'date', editing: handleDetailDateChange } },
+    { key: 'memo', title: 'common.memo', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
   ];
 
 
   //===== Handles to edit 'Purchase Details' ===============================================
-  const [ purchasesByCompany, setPurchasesByCompany] = useState([]);
+  const [purchasesByCompany, setPurchasesByCompany] = useState([]);
 
 
   //===== Handles to edit 'Consulting Details' ===============================================
-  const [ consultingsByLead, setConsultingsByLead] = useState([]);
-  const [ initAddConsulting, setInitAddConsulting ] = useState(false);
+  const [consultingsByLead, setConsultingsByLead] = useState([]);
+  const [initAddConsulting, setInitAddConsulting] = useState(false);
 
 
   //===== Handles to edit 'Quotation Details' ===============================================
-  const [ quotationsByLead, setQuotationsByLead] = useState([]);
+  const [quotationsByLead, setQuotationsByLead] = useState([]);
 
-  
-//===== Handles related with Search ===============================================  
+
+  //===== Handles related with Search ===============================================  
   const [searchCondition, setSearchCondition] = useState("");
   const [searchQuotationCondition, setSearchQuotationCondition] = useState("");
   const [searchPurchaseCondition, setSearchPurchaseCondition] = useState("");
-  const {  setCurrentQuotation, filterCompanyQuotation} = useRecoilValue(QuotationRepo);
-  const {  setCurrentPurchase , filterCompanyPurchase} = useRecoilValue(PurchaseRepo);
+  const { setCurrentQuotation, filterCompanyQuotation } = useRecoilValue(QuotationRepo);
+  const { setCurrentPurchase, filterCompanyPurchase } = useRecoilValue(PurchaseRepo);
 
-
-  const handleSearchQuotationCondition = (newValue)=> {
+  const handleSearchQuotationCondition = (newValue) => {
     setSearchQuotationCondition(newValue);
     console.log("handleSearchCondition", searchQuotationCondition)
-    filterCompanyQuotation(newValue);  
+    filterCompanyQuotation(newValue);
   };
 
-  const handleSearchPurchaseCondition = (newValue)=> {
+  const handleSearchPurchaseCondition = (newValue) => {
     setSearchPurchaseCondition(newValue);
     console.log("handleSearchCondition", searchPurchaseCondition)
-    filterCompanyPurchase(newValue);  
+    filterCompanyPurchase(newValue);
   };
-  
+
   // 상태(state) 정의
-const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedRow, setSelectedRow] = useState(null);
 
 
   // 각 행 클릭 시 호출되는 함수
@@ -289,22 +287,21 @@ const [selectedRow, setSelectedRow] = useState(null);
       setSelectedRow(row);
     }
   };
-  
 
-  
+
   //===== useEffect functions ===============================================  
   useEffect(() => {
-    if((selectedLead !== defaultLead) 
+    if ((selectedLead !== defaultLead)
       && (selectedLead.lead_code !== currentLeadCode)
       && ((companyState & 1) === 1)
     ) {
       console.log('[LeadDetailsModel] useEffect / lead');
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
-      if(detailViewStatus === null){
+      if (detailViewStatus === null) {
         localStorage.setItem("isFullScreen", '0');
         setIsFullScreen(false);
-      } else if(detailViewStatus === '0'){
+      } else if (detailViewStatus === '0') {
         setIsFullScreen(false);
       } else {
         setIsFullScreen(true);
@@ -312,33 +309,33 @@ const [selectedRow, setSelectedRow] = useState(null);
 
       setCurrentLeadCode(selectedLead.company_code);
       const companyByLeadArray = allCompanies.filter(company => company.company_code === selectedLead.company_code);
-      if(companyByLeadArray.length > 0){
+      if (companyByLeadArray.length > 0) {
         setCurrentCompany(companyByLeadArray[0]);
         loadCompanyMAContracts(companyByLeadArray[0].company_code);
       };
     };
   }, [selectedLead, currentLeadCode, companyState, allCompanies, setCurrentCompany, loadCompanyMAContracts]);
 
-  useEffect(() => {   
-    if((companyState & 1) === 0) {
+  useEffect(() => {
+    if ((companyState & 1) === 0) {
       console.log('[LeadDetailsModel] loadAllCompanies');
       loadAllCompanies();
     };
   }, [companyState, loadAllCompanies]);
 
   useEffect(() => {
-    if((purchaseState & 1) === 0) {
+    if ((purchaseState & 1) === 0) {
       console.log('[LeadDetailModel] loadAllPurchases');
       loadAllPurchases();
     } else {
       const tempCompanyPurchases = allPurchases.filter(purchase => purchase.company_code === currentCompany.company_code);
-      if(purchasesByCompany.length !== tempCompanyPurchases.length) {
+      if (purchasesByCompany.length !== tempCompanyPurchases.length) {
         console.log('[CompanyDetailsModel] set purchasesBycompany / set MA Count');
         setPurchasesByCompany(tempCompanyPurchases);
 
         let valid_count = 0;
         tempCompanyPurchases.forEach(item => {
-          if(item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now())) valid_count++;
+          if (item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now())) valid_count++;
         });
         setValidMACount(valid_count);
       };
@@ -346,12 +343,12 @@ const [selectedRow, setSelectedRow] = useState(null);
   }, [purchaseState, allPurchases, purchasesByCompany, loadAllPurchases, currentCompany.company_code]);
 
   useEffect(() => {
-    if((consultingState & 1) === 0) {
+    if ((consultingState & 1) === 0) {
       console.log('[LeadDetailModel] loadAllConsultings');
       loadAllConsultings();
     } else {
       const tempConsultingByLead = allConsultings.filter(consulting => consulting.lead_code === selectedLead.lead_code);
-      if(consultingsByLead.length !== tempConsultingByLead.length) {
+      if (consultingsByLead.length !== tempConsultingByLead.length) {
         console.log('[CompanyDetailsModel] set purchasesBycompany / set MA Count');
         setConsultingsByLead(tempConsultingByLead);
       };
@@ -360,10 +357,10 @@ const [selectedRow, setSelectedRow] = useState(null);
 
   useEffect(() => {
     console.log('[CompanyAddModel] loading user data!');
-    if((userState & 1) === 0) {
-        loadAllUsers();
+    if ((userState & 1) === 0) {
+      loadAllUsers();
     }
-  }, [userState, loadAllUsers ])
+  }, [userState, loadAllUsers])
 
   return (
     <>
@@ -381,34 +378,34 @@ const [selectedRow, setSelectedRow] = useState(null);
               <div className="row w-100">
                 <div className="col-md-1 account d-flex">
                   <div className="company_img">
-                    <Avatar size={48}>{selectedLead.lead_name === null ? "":(selectedLead.lead_name).substring(0,1)}</Avatar>
+                    <Avatar size={48}>{selectedLead.lead_name === null ? "" : (selectedLead.lead_name).substring(0, 1)}</Avatar>
                   </div>
                 </div>
                 <DetailTitleItem
-                  original={ selectedLead.lead_name }
+                  original={selectedLead.lead_name}
                   name='lead_name'
                   title={t('lead.lead_name')}
                   onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
-                  original={ selectedLead.company_name }
+                  original={selectedLead.company_name}
                   name='company_name'
                   title={t('company.company_name')}
                   onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
-                  original={ selectedLead.position }
+                  original={selectedLead.position}
                   name='position'
                   title={t('lead.position')}
                   onEditing={handleDetailChange}
                 />
               </div>
-              <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
+              <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange} />
               <button
                 type="button"
                 className="btn-close xs-close"
                 data-bs-dismiss="modal"
-                onClick={ handleClose }
+                onClick={handleClose}
               />
             </div>
             <div className="modal-body">
@@ -421,11 +418,11 @@ const [selectedRow, setSelectedRow] = useState(null);
                     <li role="presentation">
                       <Link
                         to="#not-contacted"
-                        className={selectedLead.status === "Not Contacted" || selectedLead.status === null ? "active":"" }
+                        className={selectedLead.status === "Not Contacted" || selectedLead.status === null ? "active" : ""}
                         aria-controls="not-contacted"
                         role="tab"
                         data-bs-toggle="tab"
-                        aria-expanded={selectedLead.status === "Not Contacted" ? "true":"false" }
+                        aria-expanded={selectedLead.status === "Not Contacted" ? "true" : "false"}
                         onClick={() => handleChangeStatus("Not Contacted")}
                       >
                         <span className="octicon octicon-light-bulb" />
@@ -435,11 +432,11 @@ const [selectedRow, setSelectedRow] = useState(null);
                     <li role="presentation" className="">
                       <Link
                         to="#attempted-contact"
-                        className={selectedLead.status === "Attempted Contact" ? "active":"inactive" }
+                        className={selectedLead.status === "Attempted Contact" ? "active" : "inactive"}
                         aria-controls="attempted-contact"
                         role="tab"
                         data-bs-toggle="tab"
-                        aria-expanded={selectedLead.status === "Attempted Contact" ? "true":"false" }
+                        aria-expanded={selectedLead.status === "Attempted Contact" ? "true" : "false"}
                         onClick={() => handleChangeStatus("Attempted Contact")}
                       >
                         <span className="octicon octicon-diff-added" />
@@ -449,11 +446,11 @@ const [selectedRow, setSelectedRow] = useState(null);
                     <li role="presentation" className="">
                       <Link
                         to="#contact"
-                        className={selectedLead.status === "Contact" ? "active":"inactive" }
+                        className={selectedLead.status === "Contact" ? "active" : "inactive"}
                         aria-controls="contact"
                         role="tab"
                         data-bs-toggle="tab"
-                        aria-expanded={selectedLead.status === "Contact" ? "true":"false" }
+                        aria-expanded={selectedLead.status === "Contact" ? "true" : "false"}
                         onClick={() => handleChangeStatus("Contact")}
                       >
                         <span className="octicon octicon-comment-discussion" />
@@ -463,11 +460,11 @@ const [selectedRow, setSelectedRow] = useState(null);
                     <li role="presentation" className="">
                       <Link
                         to="#converted"
-                        className={selectedLead.status === "Converted" ? "active":"inactive" }
+                        className={selectedLead.status === "Converted" ? "active" : "inactive"}
                         aria-controls="contact"
                         role="tab"
                         data-bs-toggle="tab"
-                        aria-expanded={selectedLead.status === "Converted" ? "true":"false" }
+                        aria-expanded={selectedLead.status === "Converted" ? "true" : "false"}
                         onClick={() => handleChangeStatus("Converted")}
                       >
                         <span className="octicon octicon-comment-discussion" />
@@ -493,7 +490,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                 <div
                   role="tabpanel"
                   className="tab-pane active p-0"
-                  >
+                >
                   <div className="">
                     <div className="task-infos">
                       <ul className="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified">
@@ -507,7 +504,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                           </Link>
                         </li>
                         <li className="nav-item">
-                        <Link
+                          <Link
                             className="nav-link"
                             to="#not-contact-task-purchase"
                             data-bs-toggle="tab"
@@ -521,7 +518,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                             to="#not-contact-task-consult"
                             data-bs-toggle="tab"
                           >
-                            {t('lead.consulting_history')+'('} { companyConsultings.length === undefined ? 0:companyConsultings.length }{')'}
+                            {t('lead.consulting_history') + '('} {companyConsultings.length === undefined ? 0 : companyConsultings.length}{')'}
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -530,9 +527,9 @@ const [selectedRow, setSelectedRow] = useState(null);
                             to="#not-contact-task-quotation"
                             data-bs-toggle="tab"
                           >
-                            {t('lead.quotation_history')+'('} { companyQuotations.length === undefined ? 0:companyQuotations.length }{')'}
+                            {t('lead.quotation_history') + '('} {companyQuotations.length === undefined ? 0 : companyQuotations.length}{')'}
                           </Link>
-                        </li>   
+                        </li>
                       </ul>
                       <div className="tab-content">
                         <div
@@ -547,7 +544,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                                 style={{ display: 'flex', marginBottom: '0.5rem' }}
                                 wrap
                               >
-                                { lead_items_info.map((item, index) => 
+                                {lead_items_info.map((item, index) =>
                                   <DetailCardItem
                                     key={index}
                                     title={t(item.title)}
@@ -563,7 +560,7 @@ const [selectedRow, setSelectedRow] = useState(null);
                         </div>
                         <div className="tab-pane task-related p-0"
                           id="not-contact-task-purchase" >
-                          <CompanyPurchaseModel 
+                          <CompanyPurchaseModel
                             company={currentCompany}
                             purchases={purchasesByCompany}
                             handlePurchase={setPurchasesByCompany}
@@ -584,16 +581,16 @@ const [selectedRow, setSelectedRow] = useState(null);
                             <thead>
                               <tr>
                                 <div className="row">
-                                  <div className="col text-start" style={{width:'200px'}}>
+                                  <div className="col text-start" style={{ width: '200px' }}>
                                     <input
-                                      id = "searchQuotationCondition"
-                                      className="form-control" 
+                                      id="searchQuotationCondition"
+                                      className="form-control"
                                       type="text"
-                                      placeholder= {t('common.search_here')}
+                                      placeholder={t('common.search_here')}
                                       value={searchQuotationCondition}
-                                      onChange ={(e) => handleSearchQuotationCondition(e.target.value)}
-                                      style={{width:'300px', display: 'inline'}}
-                                    />  
+                                      onChange={(e) => handleSearchQuotationCondition(e.target.value)}
+                                      style={{ width: '300px', display: 'inline' }}
+                                    />
                                   </div>
                                 </div>
                               </tr>
@@ -607,58 +604,58 @@ const [selectedRow, setSelectedRow] = useState(null);
                               </tr>
                             </thead>
                             {
-                              searchQuotationCondition === "" ? 
-                              companyQuotations.length > 0 &&
-                              <tbody>
-                                { companyQuotations.map(quotation =>
-                                <React.Fragment key={quotation.quotation_code}>
-                                  <tr key={quotation.quotation_code}>
-                                      <td>{quotation.quotation_type} </td>
+                              searchQuotationCondition === "" ?
+                                companyQuotations.length > 0 &&
+                                <tbody>
+                                  {companyQuotations.map(quotation =>
+                                    <React.Fragment key={quotation.quotation_code}>
+                                      <tr key={quotation.quotation_code}>
+                                        <td>{quotation.quotation_type} </td>
+                                        <td>{quotation.quotation_title}
+                                          <a href="#"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#quotations-details"
+                                            onClick={() => {
+                                              console.log('showQuotationDetail', quotation.quotation_code);
+                                              setCurrentQuotation(quotation.quotation_code);
+                                            }}>
+                                            <Edit fontSize="small" />
+                                          </a>
+                                        </td>
+                                        <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' })}
+                                        </td>
+                                        <td>{quotation.lead_name}</td>
+                                        <td>{quotation.quotation_manager}</td>
+                                        <td className="text-end">{quotation.total_quotation_amount}</td>
+                                      </tr>
+                                    </React.Fragment>
+                                  )}
+                                </tbody>
+                                :
+                                filteredQuotations.length > 0 &&
+                                <tbody>
+                                  {filteredQuotations.map(quotation =>
+                                    <tr key={quotation.quotation_code}>
+                                      <td>{quotation.quotation_type}</td>
                                       <td>{quotation.quotation_title}
                                         <a href="#"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#quotations-details"
-                                            onClick={()=>{
-                                              console.log('showQuotationDetail', quotation.quotation_code);
-                                              setCurrentQuotation(quotation.quotation_code);
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#quotations-details"
+                                          onClick={() => {
+                                            console.log('showQuotationDetail', quotation.quotation_code);
+                                            setCurrentQuotation(quotation.quotation_code);
                                           }}>
-                                            <Edit fontSize="small"/>
-                                          </a>
+                                          <Edit fontSize="small" />
+                                        </a>
                                       </td>
-                                      <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
+                                      <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' })}
                                       </td>
                                       <td>{quotation.lead_name}</td>
                                       <td>{quotation.quotation_manager}</td>
                                       <td className="text-end">{quotation.total_quotation_amount}</td>
-                                  </tr>
-                                  </React.Fragment>
-                                )}
-                              </tbody> 
-                              : 
-                              filteredQuotations.length > 0 &&
-                              <tbody>
-                                { filteredQuotations.map(quotation =>
-                                  <tr key={quotation.quotation_code}>
-                                    <td>{quotation.quotation_type}</td>
-                                    <td>{quotation.quotation_title}
-                                        <a href="#"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#quotations-details"
-                                            onClick={()=>{
-                                              console.log('showQuotationDetail', quotation.quotation_code);
-                                              setCurrentQuotation(quotation.quotation_code);
-                                          }}>
-                                            <Edit fontSize="small"/>
-                                          </a>
-                                      </td>
-                                      <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric',month:'short',day:'numeric'})}
-                                      </td>
-                                      <td>{quotation.lead_name}</td>
-                                      <td>{quotation.quotation_manager}</td>
-                                      <td className="text-end">{quotation.total_quotation_amount}</td>
-                                  </tr>
-                                )}
-                              </tbody> 
+                                    </tr>
+                                  )}
+                                </tbody>
                             }
                           </table>
                         </div>
@@ -667,25 +664,25 @@ const [selectedRow, setSelectedRow] = useState(null);
                   </div>
                 </div>
               </div>
-              { editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&
-                  <div className="text-center py-3">
-                    <button
-                      type="button"
-                      className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                      onClick={handleSaveAll}
-                    >
-                      {t('common.save')}
-                    </button>
-                    &nbsp;&nbsp;
-                    <button
-                      type="button"
-                      className="btn btn-secondary btn-rounded"
-                      onClick={handleCancelAll}
-                    >
-                      {t('common.cancel')}
-                    </button>
-                  </div>
-                }
+              {editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&
+                <div className="text-center py-3">
+                  <button
+                    type="button"
+                    className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                    onClick={handleSaveAll}
+                  >
+                    {t('common.save')}
+                  </button>
+                  &nbsp;&nbsp;
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-rounded"
+                    onClick={handleCancelAll}
+                  >
+                    {t('common.cancel')}
+                  </button>
+                </div>
+              }
             </div>
           </div>
           {/* modal-content */}
@@ -693,7 +690,7 @@ const [selectedRow, setSelectedRow] = useState(null);
         {/* modal-dialog */}
       </div>
       <ConsultingDetailsModel previousModalId='#leads-details' />
-      <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} previousModalId='#leads-details' />
+      <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} />
     </>
   );
 };

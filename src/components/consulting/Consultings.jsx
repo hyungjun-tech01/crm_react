@@ -17,7 +17,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { ConsultingRepo } from "../../repository/consulting";
-import { 
+import {
   atomAllConsultings,
   atomFilteredConsulting,
   atomCompanyState,
@@ -30,7 +30,7 @@ import { compareCompanyName, compareText } from "../../constants/functions";
 const Consultings = () => {
   const { t } = useTranslation();
 
-  
+
   //===== [RecoilState] Related with Consulting =======================================
   const consultingState = useRecoilValue(atomConsultingState);
   const allConsultingData = useRecoilValue(atomAllConsultings);
@@ -49,12 +49,12 @@ const Consultings = () => {
 
 
   //===== Handles to deal 'Consultings' ========================================
-  const [ initConsultingTemplate, setInitConsultingTemplate ] = useState(false);
+  const [initConsultingTemplate, setInitConsultingTemplate] = useState(false);
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
   const [statusSearch, setStatusSearch] = useState('common.all');
 
-  const handleSearchCondition =  (newValue)=> {
+  const handleSearchCondition = (newValue) => {
     setSearchCondition(newValue);
     filterConsultingOri(statusSearch, newValue);
   };
@@ -80,7 +80,7 @@ const Consultings = () => {
         <>
           <a href="#" data-bs-toggle="modal"
             data-bs-target="#company-details"
-            onClick={(event)=>{
+            onClick={(event) => {
               console.log("[Consulting] set current company : ", record.company_code);
               setCurrentCompany(record.company_code);
             }}
@@ -99,10 +99,10 @@ const Consultings = () => {
           <a href="#"
             data-bs-toggle="modal"
             data-bs-target="#consulting-details"
-            onClick={()=>{
+            onClick={() => {
               console.log("[Consulting] set current consulting : ", record.consulting_code);
               setCurrentConsulting(record.consulting_code);
-          }}>
+            }}>
             {text}
           </a>
         </>
@@ -117,9 +117,10 @@ const Consultings = () => {
           <a href="#"
             data-bs-toggle="modal"
             data-bs-target="#leads-details"
-            onClick={()=>{
+            onClick={() => {
               console.log("[Consulting] set current lead : ", record.lead_code);
-              setCurrentLead(record.lead_code);}}
+              setCurrentLead(record.lead_code);
+            }}
           >
             {text}
           </a>
@@ -143,24 +144,24 @@ const Consultings = () => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    if((companyState & 1) === 0) {
+    if ((companyState & 1) === 0) {
       console.log('[Consulting] load all companies!');
       loadAllCompanies();
     };
   }, [companyState, loadAllCompanies]);
 
   useEffect(() => {
-    if((leadState & 1) === 0) {
+    if ((leadState & 1) === 0) {
       loadAllLeads();
     };
   }, [leadState, loadAllLeads]);
-    
+
   useEffect(() => {
-    if((consultingState & 1) === 0) {
+    if ((consultingState & 1) === 0) {
       loadAllConsultings();
     };
   }, [consultingState, loadAllConsultings]);
-      
+
 
   return (
     <HelmetProvider>
@@ -173,32 +174,32 @@ const Consultings = () => {
         <div className="content container-fluid">
           <div className="page-header pt-3 mb-0 ">
             <div className="row">
-              <div className="text-start" style={{width:'120px'}}>
+              <div className="text-start" style={{ width: '120px' }}>
                 <div className="dropdown">
-                  <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.all'):t(statusSearch)}</button>
-                    <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.all')}>{t('common.all')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('consulting.type')}>{t('consulting.type')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.full_name')}>{t('lead.full_name')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('lead.mobile')}>{t('lead.mobile')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.phone_no')}>{t('common.phone_no')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('consulting.request_content')}>{t('consulting.request_content')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('consulting.action_content')}>{t('consulting.action_content')}</button>
-                    </div>
+                  <button className="dropdown-toggle recently-viewed" type="button" onClick={() => setExpaned(!expanded)} data-bs-toggle="dropdown" aria-expanded={expanded} style={{ backgroundColor: 'transparent', border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.all') : t(statusSearch)}</button>
+                  <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('common.all')}>{t('common.all')}</button>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('consulting.type')}>{t('consulting.type')}</button>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('lead.full_name')}>{t('lead.full_name')}</button>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('lead.mobile')}>{t('lead.mobile')}</button>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('common.phone_no')}>{t('common.phone_no')}</button>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('consulting.request_content')}>{t('consulting.request_content')}</button>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('consulting.action_content')}>{t('consulting.action_content')}</button>
+                  </div>
                 </div>
               </div>
 
-              <div className="col text-start" style={{width:'400px'}}>
+              <div className="col text-start" style={{ width: '400px' }}>
                 <input
-                      id = "searchCondition"
-                      className="form-control" 
-                      type="text"
-                      placeholder= {t('common.search_here')}
-                      style={{width:'300px', display: 'inline'}}
-                      value={searchCondition}
-                      onChange ={(e) => handleSearchCondition(e.target.value)}
-                />  
+                  id="searchCondition"
+                  className="form-control"
+                  type="text"
+                  placeholder={t('common.search_here')}
+                  style={{ width: '300px', display: 'inline' }}
+                  value={searchCondition}
+                  onChange={(e) => handleSearchCondition(e.target.value)}
+                />
               </div>
               <div className="col text-end">
                 <ul className="list-inline-item pl-0">
@@ -223,61 +224,61 @@ const Consultings = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive activity-tables">
-                    {searchCondition=== "" ? 
-                    <Table
-                      pagination={{
-                        total: allConsultingData.length,
-                        showTotal: ShowTotal,
-                        showSizeChanger: true,
-                        onShowSizeChange: onShowSizeChange,
-                        ItemRender: ItemRender,
-                      }}
-                      style={{ overflowX: "auto" }}
-                      columns={columns}
-                      bordered
-                      dataSource={allConsultingData}
-                      rowKey={(record) => record.consulting_code}
-                      onRow={(record, rowIndex) => {
-                        return {
-                          onDoubleClick: (event) => {
-                            console.log("[Consulting] set current lead : ", record.lead_code);
-                            setCurrentLead(record.lead_code);
-                            let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
-                              keyboard: false
-                            })
-                            myModal.show();
-                          }, // double click row
-                        };
-                      }}
-                    />
-                    :
-                    <Table
-                    pagination={{
-                      total: filteredConsulting.length >0 ? filteredConsulting.length:0,
-                      showTotal: ShowTotal,
-                      showSizeChanger: true,
-                      onShowSizeChange: onShowSizeChange,
-                      ItemRender: ItemRender,
-                    }}
-                    style={{ overflowX: "auto" }}
-                    columns={columns}
-                    bordered
-                    dataSource={filteredConsulting.length >0 ? filteredConsulting:null}
-                    rowKey={(record) => record.consulting_code}
-                    onRow={(record, rowIndex) => {
-                      return {
-                        onDoubleClick: (event) => {
-                          console.log("[Consulting] set current lead : ", record.lead_code);
-                          setCurrentLead(record.lead_code);
-                          let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
-                            keyboard: false
-                          })
-                          myModal.show();
-                        }, // double click row
-                      };
-                    }}
-                  />
-                  }
+                    {searchCondition === "" ?
+                      <Table
+                        pagination={{
+                          total: allConsultingData.length,
+                          showTotal: ShowTotal,
+                          showSizeChanger: true,
+                          onShowSizeChange: onShowSizeChange,
+                          ItemRender: ItemRender,
+                        }}
+                        style={{ overflowX: "auto" }}
+                        columns={columns}
+                        bordered
+                        dataSource={allConsultingData}
+                        rowKey={(record) => record.consulting_code}
+                        onRow={(record, rowIndex) => {
+                          return {
+                            onDoubleClick: (event) => {
+                              console.log("[Consulting] set current lead : ", record.lead_code);
+                              setCurrentLead(record.lead_code);
+                              let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
+                                keyboard: false
+                              })
+                              myModal.show();
+                            }, // double click row
+                          };
+                        }}
+                      />
+                      :
+                      <Table
+                        pagination={{
+                          total: filteredConsulting.length > 0 ? filteredConsulting.length : 0,
+                          showTotal: ShowTotal,
+                          showSizeChanger: true,
+                          onShowSizeChange: onShowSizeChange,
+                          ItemRender: ItemRender,
+                        }}
+                        style={{ overflowX: "auto" }}
+                        columns={columns}
+                        bordered
+                        dataSource={filteredConsulting.length > 0 ? filteredConsulting : null}
+                        rowKey={(record) => record.consulting_code}
+                        onRow={(record, rowIndex) => {
+                          return {
+                            onDoubleClick: (event) => {
+                              console.log("[Consulting] set current lead : ", record.lead_code);
+                              setCurrentLead(record.lead_code);
+                              let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
+                                keyboard: false
+                              })
+                              myModal.show();
+                            }, // double click row
+                          };
+                        }}
+                      />
+                    }
                   </div>
                 </div>
               </div>
@@ -287,7 +288,6 @@ const Consultings = () => {
         </div>
         {/* /Page Content */}
 
-
         {/* modal */}
         <SystemUserModel />
         <CompanyDetailsModel />
@@ -296,7 +296,6 @@ const Consultings = () => {
         <ConsultingAddModal
           init={initConsultingTemplate}
           handleInit={setInitConsultingTemplate}
-          previousModalId=''
         />
       </div>
     </HelmetProvider>

@@ -216,6 +216,7 @@ const CompanyDetailsModel = () => {
     }
   }, [transactionState, allTransactions, loadAllTransactions, transactionByCompany.length, selectedCompany.company_name]);
 
+  
   return (
     <div
       className="modal right fade"

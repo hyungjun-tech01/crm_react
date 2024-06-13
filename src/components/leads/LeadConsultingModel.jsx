@@ -120,15 +120,15 @@ const LeadConsultingModel = (props) => {
                             rowKey={(record) => record.consulting_code}
                             title={() =>
                                 <div style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    backgroundColor: '#cccccc',
-                                    fontWeight: 600,
-                                    lineHeight: 1.5,
-                                    height: '2.5rem',
-                                    padding: '0.5rem 0.8rem',
-                                    borderRadius: '5px',
-                                }}
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        backgroundColor: '#cccccc',
+                                        fontWeight: 600,
+                                        lineHeight: 1.5,
+                                        height: '2.5rem',
+                                        padding: '0.5rem 0.8rem',
+                                        borderRadius: '5px',
+                                    }}
                                 >
                                     <div>{t('consulting.information')}</div>
                                     <Add onClick={() => transferToOtherModal('add_consulting')} />
