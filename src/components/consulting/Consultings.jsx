@@ -24,7 +24,7 @@ import {
   atomLeadState,
   atomConsultingState,
 } from "../../atoms/atoms";
-import { compareCompanyName, compareText } from "../../constants/functions";
+import { compareCompanyName, compareText, formatDate } from "../../constants/functions";
 
 
 const Consultings = () => {
@@ -74,22 +74,14 @@ const Consultings = () => {
   // --- Section for Table ------------------------------
   const columns = [
     {
-      title: t('company.company_name'),
-      dataIndex: "company_name",
-      render: (text, record) => (
-        <>
-          <a href="#" data-bs-toggle="modal"
-            data-bs-target="#company-details"
-            onClick={(event) => {
-              console.log("[Consulting] set current company : ", record.company_code);
-              setCurrentCompany(record.company_code);
-            }}
-          >
-            {text}
-          </a>
-        </>
-      ),
-      sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
+      title: t('consulting.receipt_date'),
+      dataIndex: 'receipt_date',
+      render: (text, record) => <>{formatDate(record.receipt_date) + record.receipt_time}</>,
+    },
+    {
+      title: t('consulting.receiver'),
+      dataIndex: "receiver",
+      render: (text, record) => <>{text}</>,
     },
     {
       title: t('consulting.type'),
@@ -108,6 +100,24 @@ const Consultings = () => {
         </>
       ),
       sorter: (a, b) => compareText(a.consulting_type, b.consulting_type),
+    },
+    {
+      title: t('company.company_name'),
+      dataIndex: "company_name",
+      render: (text, record) => (
+        <>
+          <a href="#" data-bs-toggle="modal"
+            data-bs-target="#company-details"
+            onClick={(event) => {
+              console.log("[Consulting] set current company : ", record.company_code);
+              setCurrentCompany(record.company_code);
+            }}
+          >
+            {text}
+          </a>
+        </>
+      ),
+      sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
     {
       title: t('lead.full_name'),
@@ -241,8 +251,8 @@ const Consultings = () => {
                         onRow={(record, rowIndex) => {
                           return {
                             onDoubleClick: (event) => {
-                              console.log("[Consulting] set current lead : ", record.lead_code);
-                              setCurrentLead(record.lead_code);
+                              console.log("[Consulting] set current consulting : ", record.consulting_code);
+                              setCurrentConsulting(record.consulting_code);
                               let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
                                 keyboard: false
                               })
@@ -268,8 +278,8 @@ const Consultings = () => {
                         onRow={(record, rowIndex) => {
                           return {
                             onDoubleClick: (event) => {
-                              console.log("[Consulting] set current lead : ", record.lead_code);
-                              setCurrentLead(record.lead_code);
+                              console.log("[Consulting] set current consulting : ", record.consulting_code);
+                              setCurrentConsulting(record.consulting_code);
                               let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
                                 keyboard: false
                               })

@@ -10,7 +10,7 @@ import { atomUserState,
   atomEngineersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
-import { atomCurrentConsulting, defaultConsulting } from "../../atoms/atoms";
+import { atomConsultingState, atomCurrentConsulting, defaultConsulting } from "../../atoms/atoms";
 import {
   ConsultingRepo,
   ConsultingTypes,
@@ -31,6 +31,7 @@ const ConsultingDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Consulting =======================================
+  const consultingState = useRecoilValue(atomConsultingState);
   const selectedConsulting = useRecoilValue(atomCurrentConsulting);
   const { modifyConsulting, setCurrentConsulting } = useRecoilValue(ConsultingRepo);
 
@@ -117,9 +118,7 @@ const ConsultingDetailsModel = () => {
 
       if (modifyConsulting(temp_all_saved)) {
         console.log(`Succeeded to modify company`);
-        if(editedDetailValues.receipt_time){
-          setOrgReceiptTime(editedDetailValues.receipt_time);
-        };
+        
       } else {
         console.error('Failed to modify company')
       }
@@ -136,21 +135,23 @@ const ConsultingDetailsModel = () => {
   const handleClose = useCallback(() => {
     setEditedDetailValues(null);
     setCurrentConsulting();
-  }, []);
+  }, [setCurrentConsulting]);
 
   const consulting_items_info = [
-    { key: 'consulting_type', title:'consulting.type', detail:{ type:'select', options:ConsultingTypes, editing: handleDetailSelectChange}},
+    { key: 'department', title:'lead.department', detail:{ type:'label', editing: handleDetailChange}},
+    { key: 'position', title:'lead.position', detail:{ type:'label', editing: handleDetailChange}},
+    { key: 'mobile_number', title:'lead.mobile', detail:{ type:'label', editing: handleDetailChange}},
+    { key: 'phone_number', title:'common.phone_no', detail:{ type:'label', editing: handleDetailChange}},
+    { key: 'email', title:'lead.email', detail:{ type:'label', editing: handleDetailChange}},
+    { key: 'status', title:'common.status', detail:{ type:'select', options:ConsultingStatusTypes, editing: handleDetailSelectChange}},
     { key: 'receipt_time', title:'consulting.receipt_time', detail:{ type:'date', editing: handleDetailDateChange }},
-    { key: 'product_type', title:'consulting.product_type', detail:{ type:'select', options:ProductTypes, editing: handleDetailSelectChange}},
+    { key: 'consulting_type', title:'consulting.type', detail:{ type:'select', options:ConsultingTypes, editing: handleDetailSelectChange}},
     { key: 'lead_time', title:'consulting.lead_time', detail:{ type:'select', options:ConsultingTimeTypes, editing: handleDetailSelectChange}},
-    { key: 'request_type', title:'consulting.request_type', detail:{ type:'label' , editing: handleDetailChange}},
+    { key: 'product_type', title:'consulting.product_type', detail:{ type:'select', options:ProductTypes, editing: handleDetailSelectChange}},
+    { key: 'request_type', title:'consulting.request_type', detail:{ type:'label', editing: handleDetailChange}},
     { key: 'lead_sales', title:'lead.lead_sales', detail:{ type:'select', options: salespersonsForSelection, editing: handleDetailSelectChange}},
-    { key: 'department', title:'lead.department', detail:{ type:'label' , editing: handleDetailChange}},
-    { key: 'position', title:'lead.position', detail:{ type:'label' , editing: handleDetailChange}},
-    { key: 'mobile_number', title:'lead.mobile', detail:{ type:'label' , editing: handleDetailChange}},
-    { key: 'phone_number', title:'common.phone_no', detail:{ type:'label' , editing: handleDetailChange}},
-    { key: 'email', title:'lead.email', detail:{ type:'label' , editing: handleDetailChange}},
-    { key: 'company_name', title:'company.company_name', detail:{ type:'label', extra:'long' , editing: handleDetailChange}},
+    { key: 'application_engineer', title:'company.engineer', detail:{ type:'select', options: engineersForSelection, editing: handleDetailSelectChange}},
+    { key: 'receiver', title:'consulting.receiver', detail:{ type:'select', options: usersForSelection, editing: handleDetailSelectChange}},
     { key: 'request_content', title:'consulting.request_content', detail:{ type:'textarea', extra:'long' , editing: handleDetailChange}},
     { key: 'action_content', title:'consulting.action_content', detail:{ type:'textarea', extra:'long' , editing: handleDetailChange}},
     { key: 'memo', title:'common.memo', detail:{ type:'textarea', extra:'long' , editing: handleDetailChange}},
@@ -161,6 +162,7 @@ const ConsultingDetailsModel = () => {
   useEffect(() => {
     if((selectedConsulting !== defaultConsulting)
       && (selectedConsulting.consulting_code !== currentConsultingCode)
+      && ((consultingState & 1) === 1)
     ){
       console.log('[ConsultingDetailsModel] useEffect / consulting! :', selectedConsulting);
 
@@ -175,39 +177,15 @@ const ConsultingDetailsModel = () => {
       };
 
       setCurrentConsultingCode(selectedConsulting.consulting_code);
-
-      // Set time from selected consulting data
-      let input_time = new Date();
-      if(selectedConsulting.receipt_date !== null
-        && selectedConsulting.receipt_date !== '' && selectedConsulting.receipt_date !== undefined)
-      {
-        input_time.setTime(Date.parse(selectedConsulting.receipt_date));
-
-        if(selectedConsulting.receipt_time !== null
-          && selectedConsulting.receipt_time !== '' && selectedConsulting.receipt_time !== undefined)
-        {
-          let converted_time = '';
-          const splitted = selectedConsulting.receipt_time.split(' ');
-          if(splitted.length === 2) {
-            if(splitted[0] === '오전'){
-              converted_time = splitted[1] + ' AM';
-            } else if(splitted[0] === '오후'){
-              converted_time = splitted[1] + ' PM';
-            }
-          } else {
-            converted_time = selectedConsulting.receipt_time;
-          };
-
-          if(converted_time !==''){
-            const str_ymd = input_time.toLocaleDateString('ko-KR', {year: 'numeric', month: 'numeric', day: 'numeric'})
-              + ' ' + converted_time;
-
-            input_time.setTime(Date.parse(str_ymd));
-          };
-        };
-      };
     };
-  }, [cookies.myLationCrmUserName, selectedConsulting]);
+  }, [consultingState, cookies.myLationCrmUserId, currentConsultingCode, selectedConsulting]);
+
+  useEffect(() => {
+    console.log('[CompanyAddModel] loading user data!');
+    if ((userState & 1) === 0) {
+      loadAllUsers();
+    }
+  }, [userState, loadAllUsers])
 
   return (
     <div
@@ -222,21 +200,21 @@ const ConsultingDetailsModel = () => {
           <div className="modal-header">
             <div className="row w-100">
               <DetailTitleItem
-                original={selectedConsulting.status}
-                name='status'
-                title={t('consulting.status')}
-                onEditing={handleDetailChange}
-              />
-              <DetailTitleItem
                 original={selectedConsulting.lead_name}
-                name='status'
+                name='lead_name'
                 title={t('lead.lead_name')}
                 onEditing={handleDetailChange}
               />
               <DetailTitleItem
-                original={selectedConsulting.receiver}
-                name='status'
-                title={t('consulting.receiver')}
+                original={selectedConsulting.company_name}
+                name='company_name'
+                title={t('company.company_name')}
+                onEditing={handleDetailChange}
+              />
+              <DetailTitleItem
+                original={selectedConsulting.position}
+                name='position'
+                title={t('lead.position')}
                 onEditing={handleDetailChange}
               />
             </div>
@@ -295,7 +273,7 @@ const ConsultingDetailsModel = () => {
                                 <DetailCardItem
                                   key={index}
                                   title={t(item.title)}
-                                  defaultText={selectedConsulting[item.key]}
+                                  defaultValue={selectedConsulting[item.key]}
                                   edited={editedDetailValues}
                                   name={item.key}
                                   detail={item.detail}

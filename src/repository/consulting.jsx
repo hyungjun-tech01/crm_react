@@ -225,7 +225,6 @@ export const ConsultingRepo = selector({
                     return;
                 };
                 const allConsultings = await snapshot.getPromise(atomAllConsultings);
-                console.log('setConsulting', consulting_code,allConsultings.length  );
                
                 if(allConsultings.length === 0 ){
                     // consulting이 없다면 쿼리 

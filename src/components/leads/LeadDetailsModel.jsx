@@ -11,8 +11,7 @@ import {
   atomAllCompanies, atomCurrentCompany, atomCompanyState, atomCompanyForSelection,
   atomPurchaseState, atomAllPurchases,
   atomConsultingState, atomAllConsultings,
-
-  atomCompanyQuotations, atomFilteredQuotation,
+  atomQuotationState, atomAllQuotations,
 } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo } from "../../repository/company";
@@ -30,6 +29,7 @@ import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import { option_locations } from "../../constants/constans";
 import LeadConsultingModel from "./LeadConsultingModel";
+import LeadQuotationModel from "./LeadQutotationModel"
 
 
 const LeadDetailsModel = () => {
@@ -48,8 +48,6 @@ const LeadDetailsModel = () => {
   const currentCompany = useRecoilValue(atomCurrentCompany);
   const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
-  const companyQuotations = useRecoilValue(atomCompanyQuotations);
-  const filteredQuotations = useRecoilValue(atomFilteredQuotation);
 
 
   //===== [RecoilState] Related with Purchase =======================================
@@ -63,6 +61,12 @@ const LeadDetailsModel = () => {
   const consultingState = useRecoilValue(atomConsultingState);
   const allConsultings = useRecoilValue(atomAllConsultings);
   const { loadAllConsultings } = useRecoilValue(ConsultingRepo);
+
+
+  //===== [RecoilState] Related with Quotation ========================================
+  const quotationState = useRecoilValue(atomQuotationState);
+  const allQuotations = useRecoilValue(atomAllQuotations);
+  const { loadAllQuotations } = useRecoilValue(QuotationRepo);
 
 
   //===== [RecoilState] Related with Users ==========================================
@@ -250,6 +254,7 @@ const LeadDetailsModel = () => {
 
   //===== Handles to edit 'Quotation Details' ===============================================
   const [quotationsByLead, setQuotationsByLead] = useState([]);
+  const [initAddQuotation, setInitAddQuotation] = useState(false);
 
 
   //===== Handles related with Search ===============================================  
@@ -341,11 +346,22 @@ const LeadDetailsModel = () => {
     } else {
       const tempConsultingByLead = allConsultings.filter(consulting => consulting.lead_code === selectedLead.lead_code);
       if (consultingsByLead.length !== tempConsultingByLead.length) {
-        console.log('[CompanyDetailsModel] set purchasesBycompany / set MA Count');
         setConsultingsByLead(tempConsultingByLead);
       };
     };
   }, [allConsultings, consultingState, consultingsByLead.length, loadAllConsultings, selectedLead.lead_code]);
+
+  useEffect(() => {
+    if ((quotationState & 1) === 0) {
+      console.log('[LeadDetailModel] loadAllQuotations');
+      loadAllQuotations();
+    } else {
+      const tempQuotationsByLead = allQuotations.filter(item => item.lead_code === selectedLead.lead_code);
+      if(quotationsByLead.length !== tempQuotationsByLead.length) {
+        setQuotationsByLead(tempQuotationsByLead);
+      };
+    };
+  }, [allQuotations, loadAllQuotations, quotationState, quotationsByLead.length, selectedLead.lead_code]);
 
   useEffect(() => {
     console.log('[CompanyAddModel] loading user data!');
@@ -489,7 +505,7 @@ const LeadDetailsModel = () => {
                         <li className="nav-item">
                           <Link
                             className="nav-link active"
-                            to="#not-contact-task-details"
+                            to="#sub-lead-details"
                             data-bs-toggle="tab"
                           >
                             {t('lead.detail_information')}
@@ -498,7 +514,7 @@ const LeadDetailsModel = () => {
                         <li className="nav-item">
                           <Link
                             className="nav-link"
-                            to="#not-contact-task-purchase"
+                            to="#sub-lead-purchases"
                             data-bs-toggle="tab"
                           >
                             {t('purchase.product_info') + "(" + validMACount + "/" + purchasesByCompany.length + ")"}
@@ -507,7 +523,7 @@ const LeadDetailsModel = () => {
                         <li className="nav-item">
                           <Link
                             className="nav-link"
-                            to="#not-contact-task-consult"
+                            to="#sub-lead-consultings"
                             data-bs-toggle="tab"
                           >
                             {t('lead.consulting_history') + '('} {consultingsByLead.length}{')'}
@@ -516,17 +532,17 @@ const LeadDetailsModel = () => {
                         <li className="nav-item">
                           <Link
                             className="nav-link"
-                            to="#not-contact-task-quotation"
+                            to="#sub-lead-quotation"
                             data-bs-toggle="tab"
                           >
-                            {t('lead.quotation_history') + '('} {companyQuotations.length === undefined ? 0 : companyQuotations.length}{')'}
+                            {t('lead.quotation_history') + '('} {quotationsByLead.length}{')'}
                           </Link>
                         </li>
                       </ul>
                       <div className="tab-content">
                         <div
                           className="tab-pane show active p-0"
-                          id="not-contact-task-details" >
+                          id="sub-lead-details" >
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item">
                               <Space
@@ -551,7 +567,7 @@ const LeadDetailsModel = () => {
                           </div>
                         </div>
                         <div className="tab-pane task-related p-0"
-                          id="not-contact-task-purchase" >
+                          id="sub-lead-purchases" >
                           <CompanyPurchaseModel
                             company={currentCompany}
                             purchases={purchasesByCompany}
@@ -559,97 +575,18 @@ const LeadDetailsModel = () => {
                           />
                         </div>
                         <div className="tab-pane task-related p-0"
-                          id="not-contact-task-consult" >
+                          id="sub-lead-consultings" >
                           <LeadConsultingModel
                             consultings={consultingsByLead}
                             handleAddConsulting={setInitAddConsulting}
                           />
                         </div>
-
-
                         <div className="tab-pane task-related p-0"
-                          id="not-contact-task-quotation" >
-                          <table className="table table-striped table-nowrap custom-table mb-0 datatable">
-                            <thead>
-                              <tr>
-                                <div className="row">
-                                  <div className="col text-start" style={{ width: '200px' }}>
-                                    <input
-                                      id="searchQuotationCondition"
-                                      className="form-control"
-                                      type="text"
-                                      placeholder={t('common.search_here')}
-                                      value={searchQuotationCondition}
-                                      onChange={(e) => handleSearchQuotationCondition(e.target.value)}
-                                      style={{ width: '300px', display: 'inline' }}
-                                    />
-                                  </div>
-                                </div>
-                              </tr>
-                              <tr>
-                                <th style={{ width: '80px' }}>{t('quotation.quotation_type')}</th>
-                                <th style={{ width: '300px' }}>{t('common.title')}</th>
-                                <th>{t('quotation.quotation_date')}</th>
-                                <th>{t('lead.full_name')}</th>
-                                <th>{t('quotation.quotation_manager')}</th>
-                                <th>{t('quotation.total_quotation_amount')}</th>
-                              </tr>
-                            </thead>
-                            {
-                              searchQuotationCondition === "" ?
-                                companyQuotations.length > 0 &&
-                                <tbody>
-                                  {companyQuotations.map(quotation =>
-                                    <React.Fragment key={quotation.quotation_code}>
-                                      <tr key={quotation.quotation_code}>
-                                        <td>{quotation.quotation_type} </td>
-                                        <td>{quotation.quotation_title}
-                                          <a href="#"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#quotations-details"
-                                            onClick={() => {
-                                              console.log('showQuotationDetail', quotation.quotation_code);
-                                              setCurrentQuotation(quotation.quotation_code);
-                                            }}>
-                                            <Edit fontSize="small" />
-                                          </a>
-                                        </td>
-                                        <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' })}
-                                        </td>
-                                        <td>{quotation.lead_name}</td>
-                                        <td>{quotation.quotation_manager}</td>
-                                        <td className="text-end">{quotation.total_quotation_amount}</td>
-                                      </tr>
-                                    </React.Fragment>
-                                  )}
-                                </tbody>
-                                :
-                                filteredQuotations.length > 0 &&
-                                <tbody>
-                                  {filteredQuotations.map(quotation =>
-                                    <tr key={quotation.quotation_code}>
-                                      <td>{quotation.quotation_type}</td>
-                                      <td>{quotation.quotation_title}
-                                        <a href="#"
-                                          data-bs-toggle="modal"
-                                          data-bs-target="#quotations-details"
-                                          onClick={() => {
-                                            console.log('showQuotationDetail', quotation.quotation_code);
-                                            setCurrentQuotation(quotation.quotation_code);
-                                          }}>
-                                          <Edit fontSize="small" />
-                                        </a>
-                                      </td>
-                                      <td>{quotation.quotation_date && new Date(quotation.quotation_date).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' })}
-                                      </td>
-                                      <td>{quotation.lead_name}</td>
-                                      <td>{quotation.quotation_manager}</td>
-                                      <td className="text-end">{quotation.total_quotation_amount}</td>
-                                    </tr>
-                                  )}
-                                </tbody>
-                            }
-                          </table>
+                          id="sub-lead-quotation" >
+                          <LeadQuotationModel
+                            quotations={quotationsByLead}
+                            handleAddQuotation={setInitAddQuotation}
+                          />
                         </div>
                       </div>
                     </div>
