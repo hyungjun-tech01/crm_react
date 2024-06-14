@@ -31,8 +31,8 @@ const default_prices = {
   'profit': 0,
 };
 
-const QuotationAddNewModal = (props) => {
-  const { init, handleInit } = props;
+const QuotationAddModel = (props) => {
+  const { init, handleInit, leadCode } = props;
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
   const { modifyQuotation } = useRecoilValue(QuotationRepo);
@@ -948,4 +948,4 @@ const QuotationAddNewModal = (props) => {
   );
 };
 
-export default QuotationAddNewModal;
+export default QuotationAddModel;

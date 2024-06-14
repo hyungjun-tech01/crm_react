@@ -15,7 +15,7 @@ import { Add, Remove } from '@mui/icons-material';
 
 const content_indices = ['3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18'];
 
-const QuotationsDetailsModel = () => {
+const QuotationDetailsModel = () => {
   const { Panel } = Collapse;
   const selectedQuotation = useRecoilValue(atomCurrentQuotation);
   const { modifyQuotation, setCurrentQuotation } = useRecoilValue(QuotationRepo);
@@ -352,7 +352,7 @@ const QuotationsDetailsModel = () => {
   // --- useEffect ------------------------------------------------------
   useEffect(() => {
     if(selectedQuotation !== defaultQuotation) {
-      console.log('[QuotationsDetailsModel] called!');
+      console.log('[QuotationDetailsModel] called!');
       setOrgQuotationDate(
         selectedQuotation.quotation_date
           ? new Date(selectedQuotation.quotation_date)
@@ -660,4 +660,4 @@ const QuotationsDetailsModel = () => {
   );
 };
 
-export default QuotationsDetailsModel;
+export default QuotationDetailsModel;

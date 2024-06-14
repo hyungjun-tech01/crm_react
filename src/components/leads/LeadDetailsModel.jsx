@@ -28,8 +28,11 @@ import ConsultingDetailsModel from "../consulting/ConsultingDetailsModel";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import { option_locations } from "../../constants/constans";
+
 import LeadConsultingModel from "./LeadConsultingModel";
 import LeadQuotationModel from "./LeadQutotationModel"
+import QuotationAddModel from "../quotations/QuotationAddModel";
+import QuotationDetailsModel from "../quotations/QuotationDetailsModel";
 
 
 const LeadDetailsModel = () => {
@@ -479,18 +482,6 @@ const LeadDetailsModel = () => {
                         {t('lead.converted')}
                       </Link>
                     </li>
-                    {/* <li role="presentation" className="d-none">
-                      <Link
-                        to="#converted"
-                        aria-controls="converted"
-                        role="tab"
-                        data-bs-toggle="tab"
-                        aria-expanded="false"
-                      >
-                        <span className="octicon octicon-verified" />
-                        Converted
-                      </Link>
-                    </li> */}
                   </ul>
                 </div>
               </div>
@@ -618,8 +609,10 @@ const LeadDetailsModel = () => {
         </div>
         {/* modal-dialog */}
       </div>
+      <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} leadCode={selectedLead.lead_code} />
       <ConsultingDetailsModel />
-      <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} leadCode={selectedLead.lead_code}/>
+      <QuotationAddModel init={initAddQuotation} handleInit={setInitAddQuotation}  leadCode={selectedLead.lead_code} />
+      <QuotationDetailsModel />
     </>
   );
 };

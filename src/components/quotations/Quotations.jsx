@@ -6,8 +6,8 @@ import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
 import "antd/dist/reset.css";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
-import QuotationsDetailsModel from "./QuotationsDetailsModel";
-import QuotationAddNewModal from "./QuotationAddNewModal";
+import QuotationDetailsModel from "./QuotationDetailsModel";
+import QuotationAddModel from "./QuotationAddModel";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import LeadDetailsModel from "../leads/LeadDetailsModel";
@@ -333,7 +333,7 @@ const Quotations = () => {
           {/* /Content End */}
         </div>
         {/* /Page Content */}
-        <QuotationAddNewModal init={initAddNewQuotation} handleInit={setInitAddNewQuotation}/>
+        <QuotationAddModel init={initAddNewQuotation} handleInit={setInitAddNewQuotation}/>
         {/* modal */}
         {/* cchange pipeline stage Modal */}
         <div className="modal" id="pipeline-stage">
@@ -382,7 +382,7 @@ const Quotations = () => {
         <SystemUserModel />
         <CompanyDetailsModel />
         <LeadDetailsModel />
-        <QuotationsDetailsModel />
+        <QuotationDetailsModel />
       </div>
     </HelmetProvider>
   );
