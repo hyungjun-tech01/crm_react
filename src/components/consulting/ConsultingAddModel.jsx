@@ -95,7 +95,7 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
     setConsultingChange(tempChanges);
   };
 
-  const handleConsultingChange = useCallback((e) => {
+  const handleItemChange = useCallback((e) => {
     const modifiedData = {
       ...consultingChange,
       [e.target.name]: e.target.value,
@@ -291,9 +291,9 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
                   title={t('company.engineer')}
                   type='select'
                   name='application_engineer'
-                  defaultValue={null}
+                  defaultValue={consultingChange.application_engineer}
                   options={engineersForSelection}
-                  onChange={(selected) => console.log("[ConsultingAddModel] No varaible for this!", selected)}
+                  onChange={handleSelectChange}
                 />
               </div>
               <div className="form-group row">
@@ -303,7 +303,7 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
                   long
                   name='request_content'
                   defaultValue={consultingChange.request_content}
-                  onChange={handleConsultingChange}
+                  onChange={handleItemChange}
                 />
               </div>
               <div className="form-group row">
@@ -330,7 +330,7 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
                   type='textarea'
                   name='action_content'
                   defaultValue={consultingChange.action_content}
-                  onChange={handleConsultingChange}
+                  onChange={handleItemChange}
                 />
               </div>
               <div className="text-center">
