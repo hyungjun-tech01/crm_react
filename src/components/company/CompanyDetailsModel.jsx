@@ -29,28 +29,25 @@ const CompanyDetailsModel = () => {
   const { t } = useTranslation();
   const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
-  //===== [RecoilState] Related with Company =======================================
+  //===== [RecoilState] Related with Company ==========================================
   const selectedCompany = useRecoilValue(atomCurrentCompany);
   const { modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
-  //===== [RecoilState] Related with Purchase =======================================
+  //===== [RecoilState] Related with Purchase =========================================
   const purchaseState = useRecoilValue(atomPurchaseState);
   const allPurchases = useRecoilValue(atomAllPurchases);
   const { loadAllPurchases} = useRecoilValue(PurchaseRepo);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
 
-  //===== [RecoilState] Related with Transaction =======================================
+  //===== [RecoilState] Related with Transaction ======================================
   const transactionState = useRecoilValue(atomTransationState);
   const allTransactions = useRecoilValue(atomAllTransactions);
   const { loadAllTransactions } = useRecoilValue(TransactionRepo);
 
 
-  //===== [RecoilState] Related with Users ==========================================
-
-
-  //===== Handles to deal this component ============================================
+  //===== Handles to deal this component ==============================================
   const [ isFullScreen, setIsFullScreen ] = useState(false);
   const [ currentCompanyCode, setCurrentCompanyCode ] = useState('');
 
@@ -63,7 +60,7 @@ const CompanyDetailsModel = () => {
   }, []);
 
 
-  //===== Handles to edit 'Company Details' ===============================================
+  //===== Handles to edit 'Company Details' ============================================
   const [ editedDetailValues, setEditedDetailValues ] = useState(null);
   const [ purchasesByCompany, setPurchasesByCompany] = useState([]);
   const [ transactionByCompany, setTransactionByCompany] = useState([]);
@@ -133,7 +130,6 @@ const CompanyDetailsModel = () => {
     setCurrentCompany();
     setCurrentCompanyCode('');
   }, [setCurrentCompany]);
-  
 
   const company_items_info = [
     {key:'company_address',title:'common.address',detail:{type:'label',extra:'long',editing:handleDetailChange}},
@@ -158,7 +154,7 @@ const CompanyDetailsModel = () => {
   ];
 
 
-  // ----- useEffect for Company -----------------------------------
+  //===== useEffect for Company ========================================================
   useEffect(() => {
     console.log('[CompanyDetailModel] useEffect / Company');
     if((selectedCompany !== defaultCompany)
@@ -181,7 +177,8 @@ const CompanyDetailsModel = () => {
     };
   }, [selectedCompany, currentCompanyCode, loadCompanyMAContracts]);
 
-  // ----- useEffect for Purchase -----------------------------------
+
+  //===== useEffect for Purchase =======================================================
   useEffect(() => {
     console.log('[CompanyDetailModel] useEffect / Purchase');
     if((purchaseState & 1) === 0) {
@@ -202,7 +199,8 @@ const CompanyDetailsModel = () => {
     };
   }, [purchaseState, allPurchases, purchasesByCompany, loadAllPurchases, selectedCompany.company_code]);
 
-  // ----- useEffect for Transaction -----------------------------------
+
+  //===== useEffect for Transaction ====================================================
   useEffect(() => {
     if((transactionState & 1) === 0) {
       console.log('CompanyDetailsModel / loadAllTransactions');

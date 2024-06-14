@@ -66,7 +66,7 @@ const AddBasicItem = (props) => {
                             options={options}
                             value={selected}
                             isDisabled={disabled ? disabled : false}
-                            onChange={onChange}
+                            onChange={(selected) => onChange(name, selected)}
                         />
                     </div>
                 </div>

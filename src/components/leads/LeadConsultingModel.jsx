@@ -87,7 +87,7 @@ const LeadConsultingModel = (props) => {
             if (selectedRows.length > 0) {
                 // Set data to edit selected consulting ----------------------
                 const selectedValue = selectedRows.at(0);
-                //handleSelectConsulting(selectedValue);
+                setCurrentConsulting(selectedValue);
                 setSelectedRowKeys([]);   //initialize the selected list about contract
             } else {
                 setCurrentConsulting();
@@ -136,8 +136,9 @@ const LeadConsultingModel = (props) => {
                             }
                             onRow={(record, rowIndex) => {
                                 return {
-                                    onClick: (event) => {
+                                    onDoubleClick: (event) => {
                                         setSelectedRowKeys([record.consulting_code]);
+                                        setCurrentConsulting(record);
                                         transferToOtherModal('consulting-details');
                                         setSelectedRowKeys([]);   //initialize the selected list about contract
                                     }, // click row

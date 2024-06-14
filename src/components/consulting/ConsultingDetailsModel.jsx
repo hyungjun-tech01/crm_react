@@ -4,45 +4,110 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
+
+import { atomUserState,
+  atomUsersForSelection,
+  atomEngineersForSelection,
+  atomSalespersonsForSelection,
+} from '../../atoms/atomsUser';
 import { atomCurrentConsulting, defaultConsulting } from "../../atoms/atoms";
-import { ConsultingRepo } from "../../repository/consulting";
+import {
+  ConsultingRepo,
+  ConsultingTypes,
+  ConsultingStatusTypes,
+  ConsultingTimeTypes,
+  ProductTypes
+} from "../../repository/consulting";
+import { UserRepo } from "../../repository/user";
+
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import { formatDate, formatTime } from "../../constants/functions";
 
 
-const ConsultingDetailsModel = ({previousModalId}) => {
+const ConsultingDetailsModel = () => {
+  const [ t ] = useTranslation();
+  const [ cookies ] = useCookies(["myLationCrmUserId"]);
+
+
+  //===== [RecoilState] Related with Consulting =======================================
   const selectedConsulting = useRecoilValue(atomCurrentConsulting);
   const { modifyConsulting, setCurrentConsulting } = useRecoilValue(ConsultingRepo);
-  const [ cookies ] = useCookies(["myLationCrmUserId"]);
-  const [ t ] = useTranslation();
 
+
+  //===== [RecoilState] Related with Users ==========================================
+  const userState = useRecoilValue(atomUserState);
+  const { loadAllUsers } = useRecoilValue(UserRepo)
+  const usersForSelection = useRecoilValue(atomUsersForSelection);
+  const engineersForSelection = useRecoilValue(atomEngineersForSelection);
+  const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
+
+
+  //===== Handles to deal this component ==============================================
   const [ isFullScreen, setIsFullScreen ] = useState(false);
+  const [currentConsultingCode, setCurrentConsultingCode] = useState('');
 
-  const [ editedValues, setEditedValues ] = useState(null);
-  const [ orgReceiptTime, setOrgReceiptTime ] = useState(new Date());
+  const handleWidthChange = useCallback((checked) => {
+    setIsFullScreen(checked);
+    if(checked)
+      localStorage.setItem('isFullScreen', '1');
+    else
+      localStorage.setItem('isFullScreen', '0');
+  }, []);
 
-  // --- Funtions for Editing ---------------------------------
-  const handleEditing = useCallback((e) => {
-    const tempEdited = {
-      ...editedValues,
-      [e.target.name]: e.target.value,
+
+  //===== Handles to edit 'Consulting Details' ========================================
+  const [ editedDetailValues, setEditedDetailValues ] = useState(null);
+
+  const handleDetailChange = useCallback((e) => {
+    if (e.target.value !== selectedConsulting[e.target.name]) {
+      const tempEdited = {
+        ...editedDetailValues,
+        [e.target.name]: e.target.value,
+      };
+      console.log('handleDetailChange : ', tempEdited);
+      setEditedDetailValues(tempEdited);
+    } else {
+      if (editedDetailValues[e.target.name]) {
+        delete editedDetailValues[e.target.name];
+      };
     };
-    console.log('handleEditing : ', tempEdited);
-    setEditedValues(tempEdited);
-  }, [editedValues]);
+  }, [editedDetailValues, selectedConsulting]);
+
+  const handleDetailDateChange = useCallback((name, date) => {
+    if (date !== new Date(selectedConsulting[name])) {
+      const tempEdited = {
+        ...editedDetailValues,
+        [name]: date,
+      };
+      setEditedDetailValues(tempEdited);
+    }
+  }, [editedDetailValues, selectedConsulting]);
+
+  const handleDetailSelectChange = useCallback((name, selected) => {
+    console.log('handleDetailSelectChange / start : ', selected);
+    
+    if (selectedConsulting[name] !== selected.value) {
+      const tempEdited = {
+        ...editedDetailValues,
+        [name]: selected.value,
+      };
+      console.log('handleDetailSelectChange : ', tempEdited);
+      setEditedDetailValues(tempEdited);
+    };
+  }, [editedDetailValues, selectedConsulting]);
 
   const handleSaveAll = useCallback(() => {
-    if(editedValues !== null
+    if(editedDetailValues !== null
       && selectedConsulting
       && selectedConsulting !== defaultConsulting)
     {
       let temp_all_saved = {
-        ...editedValues
+        ...editedDetailValues
       };
-      if(editedValues.receipt_time) {
-        const date_string = formatDate(editedValues.receipt_time);
-        const time_string = formatTime(editedValues.receipt_time);
+      if(editedDetailValues.receipt_time) {
+        const date_string = formatDate(editedDetailValues.receipt_time);
+        const time_string = formatTime(editedDetailValues.receipt_time);
         temp_all_saved['receipt_date'] = date_string;
         temp_all_saved['receipt_time'] = time_string;
       };
@@ -52,8 +117,8 @@ const ConsultingDetailsModel = ({previousModalId}) => {
 
       if (modifyConsulting(temp_all_saved)) {
         console.log(`Succeeded to modify company`);
-        if(editedValues.receipt_time){
-          setOrgReceiptTime(editedValues.receipt_time);
+        if(editedDetailValues.receipt_time){
+          setOrgReceiptTime(editedDetailValues.receipt_time);
         };
       } else {
         console.error('Failed to modify company')
@@ -61,59 +126,43 @@ const ConsultingDetailsModel = ({previousModalId}) => {
     } else {
       console.log("[ ConsultingDetailModel ] No saved data");
     };
-    setEditedValues(null);
-  }, [cookies.myLationCrmUserId, modifyConsulting, editedValues, selectedConsulting]);
+    setEditedDetailValues(null);
+  }, [cookies.myLationCrmUserId, modifyConsulting, editedDetailValues, selectedConsulting]);
 
   const handleCancelAll = useCallback(() => {
-    setEditedValues(null);
-  }, []);
-
-  // --- Funtions for Receipt time ---------------------------------
-  const handleDateChange = useCallback((name, date) => {
-    const tempEdited = {
-      ...editedValues,
-      [name]: date,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues]);
-
-  // --- Funtions for Control Windows ---------------------------------
-  const handleWidthChange = useCallback((checked) => {
-    setIsFullScreen(checked);
-    if(checked)
-      localStorage.setItem('isFullScreen', '1');
-    else
-      localStorage.setItem('isFullScreen', '0');
+    setEditedDetailValues(null);
   }, []);
 
   const handleClose = useCallback(() => {
-    setEditedValues(null);
+    setEditedDetailValues(null);
     setCurrentConsulting();
   }, []);
 
   const consulting_items_info = [
-    ['consulting_type','consulting.type',{ type:'label'}],
-    ['receipt_time','consulting.receipt_time',
-      { type:'date', time: true, orgTimeData: orgReceiptTime, timeDataChange: handleDateChange }
-    ],
-    ['product_type','consulting.product_type',{ type:'label' }],
-    ['lead_time','consulting.lead_time',{ type:'label' }],
-    ['request_type','consulting.request_type',{ type:'label' }],
-    ['lead_sales','lead.lead_sales',{ type:'label' }],
-    ['department','lead.department',{ type:'label' }],
-    ['position','lead.position',{ type:'label' }],
-    ['mobile_number','lead.mobile',{ type:'label' }],
-    ['phone_number','common.phone_no',{ type:'label' }],
-    ['email','lead.email',{ type:'label' }],
-    ['company_name','company.company_name',{ type:'label', extra:'long' }],
-    ['request_content','consulting.request_content',{ type:'textarea', extra:'long' }],
-    ['action_content','consulting.action_content',{ type:'textarea', extra:'long' }],
-    ['memo','common.memo',{ type:'textarea', extra:'long' }],
+    { key: 'consulting_type', title:'consulting.type', detail:{ type:'select', options:ConsultingTypes, editing: handleDetailSelectChange}},
+    { key: 'receipt_time', title:'consulting.receipt_time', detail:{ type:'date', editing: handleDetailDateChange }},
+    { key: 'product_type', title:'consulting.product_type', detail:{ type:'select', options:ProductTypes, editing: handleDetailSelectChange}},
+    { key: 'lead_time', title:'consulting.lead_time', detail:{ type:'select', options:ConsultingTimeTypes, editing: handleDetailSelectChange}},
+    { key: 'request_type', title:'consulting.request_type', detail:{ type:'label' , editing: handleDetailChange}},
+    { key: 'lead_sales', title:'lead.lead_sales', detail:{ type:'select', options: salespersonsForSelection, editing: handleDetailSelectChange}},
+    { key: 'department', title:'lead.department', detail:{ type:'label' , editing: handleDetailChange}},
+    { key: 'position', title:'lead.position', detail:{ type:'label' , editing: handleDetailChange}},
+    { key: 'mobile_number', title:'lead.mobile', detail:{ type:'label' , editing: handleDetailChange}},
+    { key: 'phone_number', title:'common.phone_no', detail:{ type:'label' , editing: handleDetailChange}},
+    { key: 'email', title:'lead.email', detail:{ type:'label' , editing: handleDetailChange}},
+    { key: 'company_name', title:'company.company_name', detail:{ type:'label', extra:'long' , editing: handleDetailChange}},
+    { key: 'request_content', title:'consulting.request_content', detail:{ type:'textarea', extra:'long' , editing: handleDetailChange}},
+    { key: 'action_content', title:'consulting.action_content', detail:{ type:'textarea', extra:'long' , editing: handleDetailChange}},
+    { key: 'memo', title:'common.memo', detail:{ type:'textarea', extra:'long' , editing: handleDetailChange}},
   ];
 
+
+  //===== useEffect functions =============================================== 
   useEffect(() => {
-    if(selectedConsulting !== defaultConsulting) {
-      console.log('[ConsultingDetailsModel] called!');
+    if((selectedConsulting !== defaultConsulting)
+      && (selectedConsulting.consulting_code !== currentConsultingCode)
+    ){
+      console.log('[ConsultingDetailsModel] useEffect / consulting! :', selectedConsulting);
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if(detailViewStatus === null){
@@ -124,6 +173,8 @@ const ConsultingDetailsModel = ({previousModalId}) => {
       } else {
         setIsFullScreen(true);
       };
+
+      setCurrentConsultingCode(selectedConsulting.consulting_code);
 
       // Set time from selected consulting data
       let input_time = new Date();
@@ -154,7 +205,6 @@ const ConsultingDetailsModel = ({previousModalId}) => {
             input_time.setTime(Date.parse(str_ymd));
           };
         };
-        setOrgReceiptTime(input_time);
       };
     };
   }, [cookies.myLationCrmUserName, selectedConsulting]);
@@ -175,19 +225,19 @@ const ConsultingDetailsModel = ({previousModalId}) => {
                 original={selectedConsulting.status}
                 name='status'
                 title={t('consulting.status')}
-                onEditing={handleEditing}
+                onEditing={handleDetailChange}
               />
               <DetailTitleItem
                 original={selectedConsulting.lead_name}
                 name='status'
                 title={t('lead.lead_name')}
-                onEditing={handleEditing}
+                onEditing={handleDetailChange}
               />
               <DetailTitleItem
                 original={selectedConsulting.receiver}
                 name='status'
                 title={t('consulting.receiver')}
-                onEditing={handleEditing}
+                onEditing={handleDetailChange}
               />
             </div>
             <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
@@ -244,12 +294,11 @@ const ConsultingDetailsModel = ({previousModalId}) => {
                               { consulting_items_info.map((item, index) => 
                                 <DetailCardItem
                                   key={index}
-                                  defaultText={selectedConsulting[item.at(0)]}
-                                  edited={editedValues}
-                                  name={item.at(0)}
-                                  title={t(item.at(1))}
-                                  detail={item.at(2)}
-                                  editing={handleEditing}
+                                  title={t(item.title)}
+                                  defaultText={selectedConsulting[item.key]}
+                                  edited={editedDetailValues}
+                                  name={item.key}
+                                  detail={item.detail}
                                 />
                               )}
                             </Space>
@@ -257,7 +306,7 @@ const ConsultingDetailsModel = ({previousModalId}) => {
                         </div>
                       </div>
                     </div>
-                    { editedValues !== null && Object.keys(editedValues).length !== 0 &&
+                    { editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&
                       <div className="text-center py-3">
                         <button
                           type="button"

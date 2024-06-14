@@ -4,7 +4,7 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Avatar, Space, Switch } from "antd";
-import { ExpandMore, Edit } from "@mui/icons-material";
+import { Edit } from "@mui/icons-material";
 
 import {
   atomCurrentLead, defaultLead,
@@ -12,7 +12,7 @@ import {
   atomPurchaseState, atomAllPurchases,
   atomConsultingState, atomAllConsultings,
 
-  atomCompanyConsultings, atomFilteredConsulting, atomCompanyQuotations, atomFilteredQuotation,
+  atomCompanyQuotations, atomFilteredQuotation,
 } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo } from "../../repository/company";
@@ -40,7 +40,6 @@ const LeadDetailsModel = () => {
   //===== [RecoilState] Related with Lead ==========================================
   const selectedLead = useRecoilValue(atomCurrentLead);
   const { modifyLead, setCurrentLead } = useRecoilValue(LeadRepo);
-  const filteredConsultings = useRecoilValue(atomFilteredConsulting);
 
 
   //===== [RecoilState] Related with Company =======================================
@@ -49,7 +48,6 @@ const LeadDetailsModel = () => {
   const currentCompany = useRecoilValue(atomCurrentCompany);
   const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
-  const companyConsultings = useRecoilValue(atomCompanyConsultings);
   const companyQuotations = useRecoilValue(atomCompanyQuotations);
   const filteredQuotations = useRecoilValue(atomFilteredQuotation);
 
@@ -255,7 +253,6 @@ const LeadDetailsModel = () => {
 
 
   //===== Handles related with Search ===============================================  
-  const [searchCondition, setSearchCondition] = useState("");
   const [searchQuotationCondition, setSearchQuotationCondition] = useState("");
   const [searchPurchaseCondition, setSearchPurchaseCondition] = useState("");
   const { setCurrentQuotation, filterCompanyQuotation } = useRecoilValue(QuotationRepo);
@@ -267,11 +264,6 @@ const LeadDetailsModel = () => {
     filterCompanyQuotation(newValue);
   };
 
-  const handleSearchPurchaseCondition = (newValue) => {
-    setSearchPurchaseCondition(newValue);
-    console.log("handleSearchCondition", searchPurchaseCondition)
-    filterCompanyPurchase(newValue);
-  };
 
   // 상태(state) 정의
   const [selectedRow, setSelectedRow] = useState(null);
@@ -518,7 +510,7 @@ const LeadDetailsModel = () => {
                             to="#not-contact-task-consult"
                             data-bs-toggle="tab"
                           >
-                            {t('lead.consulting_history') + '('} {companyConsultings.length === undefined ? 0 : companyConsultings.length}{')'}
+                            {t('lead.consulting_history') + '('} {consultingsByLead.length}{')'}
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -689,8 +681,8 @@ const LeadDetailsModel = () => {
         </div>
         {/* modal-dialog */}
       </div>
-      <ConsultingDetailsModel previousModalId='#leads-details' />
-      <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} />
+      <ConsultingDetailsModel />
+      <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} leadCode={selectedLead.lead_code}/>
     </>
   );
 };

@@ -1,70 +1,77 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCurrentUser, defaultUser , atomAllUsers, atomUserState, atomSalespersonsForSelection, atomEngineersForSelection} from '../atoms/atomsUser';
+import { atomCurrentUser,
+    defaultUser,
+    atomAllUsers,
+    atomUserState,
+    atomUsersForSelection,
+    atomSalespersonsForSelection,
+    atomEngineersForSelection
+} from '../atoms/atomsUser';
 import { data_user } from './test_data';
 
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
-export async function  apiLoginValidate(userId, password) {
-    try{
+export async function apiLoginValidate(userId, password) {
+    try {
         const input_data = {
             userId: userId,
             password: password,
         };
-        const response = await fetch(`${BASE_PATH}/login`,{
-            method: "POST", 
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify(input_data)
-           }); 
+        const response = await fetch(`${BASE_PATH}/login`, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(input_data)
+        });
         let responseMessage = await response.json();
-        responseMessage  ={...responseMessage};
-           console.log('responseMessage', responseMessage);
-           return(responseMessage);
-    }catch(err){
+        responseMessage = { ...responseMessage };
+        console.log('responseMessage', responseMessage);
+        return (responseMessage);
+    } catch (err) {
         console.error(err);
-        return(err);
+        return (err);
     }
- }
- export async function  apiRegister(userId, userName, Email, password) {
-    try{
+}
+export async function apiRegister(userId, userName, Email, password) {
+    try {
         const input_data = {
-            action_type:'ADD',
+            action_type: 'ADD',
             userId: userId,
             userName: userName,
             password: password,
-            email:Email
+            email: Email
         };
-        const response = await fetch(`${BASE_PATH}/modifyUser`,{
-            method: "POST", 
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify(input_data)
-           }); 
-        
-           const responseData = await response.json();
-           if (responseData.message) {
-            console.log('responseMessage', responseData.message );
+        const response = await fetch(`${BASE_PATH}/modifyUser`, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(input_data)
+        });
+
+        const responseData = await response.json();
+        if (responseData.message) {
+            console.log('responseMessage', responseData.message);
             return responseData;
         }
 
-        
-    }catch(err){
-        console.error(err);
-        return(err);
-    }
- }
- 
 
- export const UserRepo = selector({
+    } catch (err) {
+        console.error(err);
+        return (err);
+    }
+}
+
+
+export const UserRepo = selector({
     key: "UserRepository",
-    get: ({getCallback}) => {
+    get: ({ getCallback }) => {
         /////////////////////load all Users /////////////////////////////
-        const loadAllUsers = getCallback(({set, snapshot}) => async () => {
-            try{
+        const loadAllUsers = getCallback(({ set, snapshot }) => async () => {
+            try {
                 const response = await fetch(`${BASE_PATH}/getallusers`);
                 const data = await response.json();
-                if(data.message){
+                if (data.message) {
                     console.log('loadUsers message:', data.message);
                     set(atomAllUsers, []);
                     const loadStates = await snapshot.getPromise(atomUserState);
@@ -79,65 +86,66 @@ export async function  apiLoginValidate(userId, password) {
 
                 //----- Store SR, AE data -----------------------------------
                 const workingUsers = data.filter(user => user.isWork === 'Y');
-                workingUsers.sort((a, b)=>{
-                    if(a.userName > b.userName) return 1;
-                    if(a.userName < b.userName) return -1;
+                workingUsers.sort((a, b) => {
+                    if (a.userName > b.userName) return 1;
+                    if (a.userName < b.userName) return -1;
                     return 0;
                 });
+                set(atomUsersForSelection, workingUsers.map(user => ({ label: user.userName, value: user.userName })));
                 const salespersons = workingUsers.filter(user => user.jobType === 'SR')
-                    .map(user => ({label: user.userName, value: user.userName}));
+                    .map(user => ({ label: user.userName, value: user.userName }));
                 set(atomSalespersonsForSelection, salespersons)
                 const engineers = workingUsers.filter(user => user.jobType === 'AE')
-                    .map(user => ({label: user.userName, value: user.userName}));
+                    .map(user => ({ label: user.userName, value: user.userName }));
                 set(atomEngineersForSelection, engineers);
             }
-            catch(err){
+            catch (err) {
                 console.error(`loadUsers / Error : ${err}`);
                 const loadStates = await snapshot.getPromise(atomUserState);
                 set(atomUserState, (loadStates & ~1));
             };
-        });        
+        });
         /////////////////////load Users /////////////////////////////
-        const loadUsers = getCallback(({set}) => async (userId) => {
-            try{
+        const loadUsers = getCallback(({ set }) => async (userId) => {
+            try {
                 const input_data = {
                     userId: userId,
                 };
                 const response = await fetch(`${BASE_PATH}/getuser`, {
-                 method: 'POST',
-                 headers: {'Content-Type':'application/json'},
-                 body: JSON.stringify(input_data)
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(input_data)
                 });
 
                 const data = await response.json();
-                if(data.message){
+                if (data.message) {
                     console.log('loadUsers message:', data.message);
                     set(atomCurrentUser, []);
                     return;
                 }
                 set(atomCurrentUser, data);
             }
-            catch(err){
+            catch (err) {
                 console.error(`loadUsers / Error : ${err}`);
             };
         });
         /////////////////////modify User /////////////////////////////
-        const modifyUser = getCallback(({set, snapshot}) => async (newUser) => {
+        const modifyUser = getCallback(({ set, snapshot }) => async (newUser) => {
             const input_json = JSON.stringify(newUser);
             console.log(`[ modifyCompany ] input : `, input_json);
-            try{
+            try {
                 const response = await fetch(`${BASE_PATH}/modifyUser`, {
                     method: "POST",
-                    headers:{'Content-Type':'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: input_json,
                 });
                 const data = await response.json();
-                if(data.message !== "success"){
+                if (data.message !== "success") {
                     console.log('\t[ modifyUser ] message:', data.message);
                     return false;
                 };
 
-                if(newUser.action_type === 'UPDATE'){
+                if (newUser.action_type === 'UPDATE') {
                     const currentUser = await snapshot.getPromise(atomCurrentUser);
                     delete newUser.action_type;
                     delete newUser.modify_user;
@@ -150,70 +158,70 @@ export async function  apiLoginValidate(userId, password) {
                     // update all users
                     const allUsers = await snapshot.getPromise(atomAllUsers);
                     const foundIdx = allUsers.findIndex(user => user.userId === modifiedUser.userId);
-                    if(foundIdx !== -1){
+                    if (foundIdx !== -1) {
                         const updatedAllUsers = [
                             ...allUsers.slice(0, foundIdx),
                             modifiedUser,
-                            ...allUsers.slice(foundIdx + 1, ),
+                            ...allUsers.slice(foundIdx + 1,),
                         ];
                         set(atomAllUsers, updatedAllUsers);
                     };
 
-                    if(modifiedUser.isWork === 'N'){
-                        if(modifiedUser.jobType === 'SR'){
+                    if (modifiedUser.isWork === 'N') {
+                        if (modifiedUser.jobType === 'SR') {
                             //update salespersons selection
                             const allSalesPersons = await snapshot.getPromise(atomSalespersonsForSelection);
                             const foundSalesIdx = allSalesPersons.findIndex(user => user.userId === modifiedUser.userId);
-                            if(foundSalesIdx !== -1){
+                            if (foundSalesIdx !== -1) {
                                 const updatedSalesPersons = [
                                     ...allSalesPersons.slice(0, foundSalesIdx),
-                                    ...allSalesPersons.slice(foundSalesIdx + 1, )
+                                    ...allSalesPersons.slice(foundSalesIdx + 1,)
                                 ];
                                 set(atomSalespersonsForSelection, updatedSalesPersons);
                             };
-                        } else if(modifiedUser.jobType === 'AE'){
+                        } else if (modifiedUser.jobType === 'AE') {
                             //update engineers selection
                             const allEngineers = await snapshot.getPromise(atomEngineersForSelection);
                             const foundEngIdx = allEngineers.findIndex(user => user.userId === modifiedUser.userId);
-                            if(foundEngIdx !== -1){
+                            if (foundEngIdx !== -1) {
                                 const udpatedEngineers = [
                                     ...allEngineers.slice(0, foundEngIdx),
-                                    ...allEngineers.slice(foundEngIdx + 1, ),
+                                    ...allEngineers.slice(foundEngIdx + 1,),
                                 ];
                                 set(atomEngineersForSelection, udpatedEngineers);
                             };
                         };
                     } else {
-                        if(modifiedUser.jobType === 'SR'){
+                        if (modifiedUser.jobType === 'SR') {
                             //update salespersons selection
                             const allSalesPersons = await snapshot.getPromise(atomSalespersonsForSelection);
                             const foundSalesIdx = allSalesPersons.findIndex(user => user.userId === modifiedUser.userId);
-                            if(foundSalesIdx === -1){
-                                set(atomSalespersonsForSelection, allSalesPersons.concat({label:modifiedUser.userName, value:modifiedUser.userName}));
+                            if (foundSalesIdx === -1) {
+                                set(atomSalespersonsForSelection, allSalesPersons.concat({ label: modifiedUser.userName, value: modifiedUser.userName }));
                             };
-                        } else if(modifiedUser.jobType === 'AE'){
+                        } else if (modifiedUser.jobType === 'AE') {
                             //update engineers selection
                             const allEngineers = await snapshot.getPromise(atomEngineersForSelection);
                             const foundEngIdx = allEngineers.findIndex(user => user.userId === modifiedUser.userId);
-                            if(foundEngIdx === -1){
-                                set(atomEngineersForSelection, allEngineers.concat({label:modifiedUser.userName, value:modifiedUser.userName}));
+                            if (foundEngIdx === -1) {
+                                set(atomEngineersForSelection, allEngineers.concat({ label: modifiedUser.userName, value: modifiedUser.userName }));
                             };
                         };
                     };
 
                     console.log('modifiedUser', atomCurrentUser, modifiedUser);
 
-                    return(true);
-                 }
-            } catch(err){
+                    return (true);
+                }
+            } catch (err) {
                 console.error(`\t[ modifyUser ] Error : ${err}`);
                 return false;
             };
         });
         /////////////////////modify User /////////////////////////////
-        const setCurrentUser = getCallback(({set, snapshot}) => async (userId) => {
-            try{
-                if(userId === undefined || userId === null) {
+        const setCurrentUser = getCallback(({ set, snapshot }) => async (userId) => {
+            try {
+                if (userId === undefined || userId === null) {
                     set(atomCurrentUser, defaultUser);
                     return;
                 };
@@ -223,9 +231,9 @@ export async function  apiLoginValidate(userId, password) {
                 //const selected_array = allUser.filter(user => user.userId === userId);
                 //if(selected_array.length > 0){
                 //    set(atomCurrentUser, selected_array[0]);
-               // }
+                // }
             }
-            catch(err){
+            catch (err) {
                 console.error(`\t[ setCurrentUser ] Error : ${err}`);
             };
         });

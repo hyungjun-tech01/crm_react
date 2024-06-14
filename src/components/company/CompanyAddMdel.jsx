@@ -219,16 +219,18 @@ const CompanyAddModel = (props) => {
                                         <AddBasicItem
                                             title={t('company.deal_type')}
                                             type='select'
+                                            name='deal_type'
                                             defaultValue={companyChange.deal_type}
                                             options={option_deal_type.ko}
-                                            onChange={(selected) => handleSelectChange('deal_type', selected)}
+                                            onChange={handleSelectChange}
                                         />
                                         <AddBasicItem
                                             title={t('company.industry_type')}
                                             type='select'
+                                            name='industry_type'
                                             defaultValue={companyChange.industry_type}
                                             options={option_industry_type.ko}
-                                            onChange={(selected) => handleSelectChange('industry_type', selected)}
+                                            onChange={handleSelectChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -283,25 +285,28 @@ const CompanyAddModel = (props) => {
                                         <AddBasicItem
                                             title={t('company.salesman')}
                                             type='select'
+                                            name='sales_resource'
                                             defaultValue={companyChange.sales_resource}
                                             options={salespersonsForSelection}
-                                            onChange={(selected) => handleSelectChange('sales_resource', selected)}
+                                            onChange={handleSelectChange}
                                         />
                                     </div>
                                     <div className="form-group row">
                                         <AddBasicItem
                                             title={t('company.engineer')}
                                             type='select'
+                                            name='application_engineer'
                                             defaultValue={companyChange.application_engineer}
                                             options={engineersForSelection}
-                                            onChange={(selected) => handleSelectChange('application_engineer', selected)}
+                                            onChange={handleSelectChange}
                                         />
                                         <AddBasicItem
-                                            type='select'
-                                            options={option_locations.ko}
                                             title={t('common.location')}
+                                            type='select'
+                                            name='region'
+                                            options={option_locations.ko}
                                             defaultValue={companyChange.region}
-                                            onChange={(selected) => handleSelectChange('region', selected)}
+                                            onChange={handleSelectChange}
                                         />
                                     </div>
                                     <div className="form-group row">

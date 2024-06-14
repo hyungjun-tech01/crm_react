@@ -1,21 +1,21 @@
-import {atom} from "recoil";
+import { atom } from "recoil";
 
 export const defaultUser = {
-    userId: "", 
-    userName: "", 
-    password: "", 
+    userId: "",
+    userName: "",
+    password: "",
     mobileNumber: "",
-    phoneNumber : "",
-    department: "", 
-    position: "", 
-    email: "", 
-    group_: "", 
+    phoneNumber: "",
+    department: "",
+    position: "",
+    email: "",
+    group_: "",
     memo: "",
-    jobType:"",
-    isWork:""
+    jobType: "",
+    isWork: ""
 }
 
-export const atomCurrentUser= atom({
+export const atomCurrentUser = atom({
     key: "currentUser",
     default: defaultUser
 });
@@ -37,5 +37,10 @@ export const atomSalespersonsForSelection = atom({
 
 export const atomEngineersForSelection = atom({
     key: "engineerUsers",
+    default: [],
+});
+
+export const atomUsersForSelection = atom({
+    key: "userSelection",
     default: [],
 });

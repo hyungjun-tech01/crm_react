@@ -4,14 +4,15 @@ import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "react-datepicker/dist/react-datepicker.css";
 
-import {
-  atomCurrentLead,
-  defaultConsulting,
+import { defaultConsulting,
   atomLeadsForSelection,
   atomLeadState,
-  defaultLead
 } from "../../atoms/atoms";
-import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
+import { atomUserState,
+  atomUsersForSelection,
+  atomEngineersForSelection,
+  atomSalespersonsForSelection,
+} from '../../atoms/atomsUser';
 import { LeadRepo } from "../../repository/lead";
 import {
   ConsultingRepo,
@@ -26,7 +27,7 @@ import { formatDate } from "../../constants/functions";
 import AddBasicItem from "../../constants/AddBasicItem";
 
 
-const ConsultingAddModel = ({ init, handleInit }) => {
+const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId", "myLationCrmUserName"]);
 
@@ -37,7 +38,6 @@ const ConsultingAddModel = ({ init, handleInit }) => {
 
   //===== [RecoilState] Related with Lead =============================================
   const leadsState = useRecoilValue(atomLeadState);
-  const currentLead = useRecoilValue(atomCurrentLead);
   const leadsForSelection = useRecoilValue(atomLeadsForSelection);
   const { loadAllLeads } = useRecoilValue(LeadRepo);
 
@@ -45,6 +45,7 @@ const ConsultingAddModel = ({ init, handleInit }) => {
   //===== [RecoilState] Related with Users ==========================================
   const userState = useRecoilValue(atomUserState);
   const { loadAllUsers } = useRecoilValue(UserRepo)
+  const usersForSelection = useRecoilValue(atomUsersForSelection);
   const engineersForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
@@ -55,28 +56,32 @@ const ConsultingAddModel = ({ init, handleInit }) => {
 
   const initializeConsultingTemplate = useCallback(() => {
     document.querySelector("#add_new_consulting_form").reset();
+
+    // set Receipt date -------------
     const tempDate = new Date();
     setReceiptDate(tempDate);
     const localDate = formatDate(tempDate);
     const localTime = tempDate.toLocaleTimeString('ko-KR');
 
-    if (currentLead !== defaultLead) {
-      const foundIdx = leadsForSelection.findIndex(item => item.value.lead_code === currentLead.lead_code);
+    if (leadCode && leadCode !=='') {
+      const foundIdx = leadsForSelection.findIndex(item => item.value.lead_code === leadCode);
       if (foundIdx !== -1) {
         const found_lead_info = leadsForSelection.at(foundIdx);
         setConsultingChange({
           ...found_lead_info.value,
+          receiver: cookies.myLationCrmUserName,
           receipt_date: localDate,
           receipt_time: localTime,
         });
       };
     } else {
       setConsultingChange({
+        receiver: cookies.myLationCrmUserName,
         receipt_date: localDate,
         receipt_time: localTime,
       });
     };
-  }, [currentLead, leadsForSelection]);
+  }, [cookies.myLationCrmUserName, leadCode, leadsForSelection]);
 
   const handleReceiptDateChange = (date) => {
     setReceiptDate(date);
@@ -157,21 +162,18 @@ const ConsultingAddModel = ({ init, handleInit }) => {
   }, [leadsState, loadAllLeads]);
 
   useEffect(() => {
-    if (init) {
-      console.log('[ConsultingAddModel] init');
-      initializeConsultingTemplate();
-      if (handleInit) handleInit(!init);
-    };
-  }, [handleInit, init, initializeConsultingTemplate]);
-
-  useEffect(() => {
-    console.log('[CompanyAddModel] loading user data!');
     if ((userState & 1) === 0) {
       loadAllUsers();
-    }
-  }, [userState, loadAllUsers])
+    } else {
+      if (init) {
+        console.log('[ConsultingAddModel] init');
+        initializeConsultingTemplate();
+        if (handleInit) handleInit(!init);
+      };
+    };
+  }, [handleInit, init, initializeConsultingTemplate, loadAllUsers, userState]);
 
-
+  
   return (
     <div
       className="modal right fade"
@@ -212,10 +214,10 @@ const ConsultingAddModel = ({ init, handleInit }) => {
                 />
                 <AddBasicItem
                   title={t('consulting.receiver')}
-                  type='text'
-                  defaultValue={consultingChange.receiver}
+                  type='select'
                   name="receiver"
-                  required
+                  defaultValue={consultingChange.receiver}
+                  options={usersForSelection}
                   onChange={handleSelectChange}
                 />
               </div>
@@ -226,7 +228,7 @@ const ConsultingAddModel = ({ init, handleInit }) => {
                   name='consulting_type'
                   defaultValue={consultingChange.consulting_type}
                   options={ConsultingTypes}
-                  onChange={(selected) => handleSelectChange('consulting_type', selected)}
+                  onChange={handleSelectChange}
                 />
                 <AddBasicItem
                   title={t('consulting.product_type')}
@@ -234,7 +236,7 @@ const ConsultingAddModel = ({ init, handleInit }) => {
                   name='product_type'
                   defaultValue={consultingChange.product_type}
                   options={ProductTypes}
-                  onChange={(selected) => handleSelectChange('product_type', selected)}
+                  onChange={handleSelectChange}
                 />
               </div>
               <div className="form-group row">
@@ -245,7 +247,7 @@ const ConsultingAddModel = ({ init, handleInit }) => {
                   defaultValue={consultingChange.lead_name}
                   options={leadsForSelection}
                   required
-                  onChange={(selected) => handleSelectChange('lead_name', selected)}
+                  onChange={handleSelectChange}
                 />
               </div>
               {(consultingChange.lead_name !== null) &&
@@ -280,13 +282,15 @@ const ConsultingAddModel = ({ init, handleInit }) => {
                 <AddBasicItem
                   title={t('company.salesman')}
                   type='select'
+                  name='sales_representati'
                   defaultValue={consultingChange.sales_representati}
                   options={salespersonsForSelection}
-                  onChange={(selected) => handleSelectChange('sales_representati', selected)}
+                  onChange={handleSelectChange}
                 />
                 <AddBasicItem
                   title={t('company.engineer')}
                   type='select'
+                  name='application_engineer'
                   defaultValue={null}
                   options={engineersForSelection}
                   onChange={(selected) => console.log("[ConsultingAddModel] No varaible for this!", selected)}
@@ -309,7 +313,7 @@ const ConsultingAddModel = ({ init, handleInit }) => {
                   name='status'
                   defaultValue={consultingChange.status}
                   options={ConsultingStatusTypes}
-                  onChange={(selected) => handleSelectChange('status', selected)}
+                  onChange={handleSelectChange}
                 />
                 <AddBasicItem
                   title={t('consulting.lead_time')}
@@ -317,7 +321,7 @@ const ConsultingAddModel = ({ init, handleInit }) => {
                   name='lead_time'
                   defaultValue={consultingChange.lead_time}
                   options={ConsultingTimeTypes}
-                  onChange={(selected) => handleSelectChange('lead_time', selected)}
+                  onChange={handleSelectChange}
                 />
               </div>
               <div className="form-group row">
@@ -330,7 +334,7 @@ const ConsultingAddModel = ({ init, handleInit }) => {
                 />
               </div>
               <div className="text-center">
-                {currentLead === defaultLead ?
+                {(leadCode && leadCode !=='') ?
                   <button
                     type="button"
                     className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
@@ -349,7 +353,7 @@ const ConsultingAddModel = ({ init, handleInit }) => {
                   </button>
                 }
                 &nbsp;&nbsp;
-                {currentLead === defaultLead ?
+                {(leadCode && leadCode !=='') ?
                   <button
                     type="button"
                     className="btn btn-secondary btn-rounded"
