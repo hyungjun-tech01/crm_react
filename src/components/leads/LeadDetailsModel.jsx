@@ -94,7 +94,7 @@ const LeadDetailsModel = () => {
 
 
   //===== Handles to edit 'Lead Details' ===============================================
-  const [editedDetailValues, setEditedDetailValues] = useState(null);
+  const [editedDetailValues, setEditedDetailValues] = useState({});
 
   const handleDetailChange = useCallback((e) => {
     if (e.target.value !== selectedLead[e.target.name]) {

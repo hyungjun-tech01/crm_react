@@ -22,7 +22,6 @@ import { UserRepo } from "../../repository/user";
 
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
-import { formatDate, formatTime } from "../../constants/functions";
 
 
 const ConsultingDetailsModel = () => {
@@ -158,8 +157,6 @@ const ConsultingDetailsModel = () => {
       && (selectedConsulting.consulting_code !== currentConsultingCode)
       && ((consultingState & 1) === 1)
     ){
-      console.log('[ConsultingDetailsModel] useEffect / consulting! :', selectedConsulting);
-
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if(detailViewStatus === null){
         localStorage.setItem("isFullScreen", '0');

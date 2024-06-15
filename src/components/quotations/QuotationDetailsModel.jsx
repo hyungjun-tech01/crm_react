@@ -4,8 +4,17 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Collapse, Space, Switch } from "antd";
-import { atomCurrentQuotation, defaultQuotation } from "../../atoms/atoms";
-import { QuotationRepo } from "../../repository/quotation";
+import { atomCurrentQuotation,
+  defaultQuotation,
+  atomQuotationState,
+} from "../../atoms/atoms";
+import { atomUserState,
+  atomUsersForSelection,
+  atomSalespersonsForSelection,
+} from '../../atoms/atomsUser';
+import { QuotationRepo, QuotationTypes } from "../../repository/quotation";
+import { UserRepo } from '../../repository/user';
+
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
 import DetailCardItem from "../../constants/DetailCardItem";
@@ -16,18 +25,22 @@ import { Add, Remove } from '@mui/icons-material';
 const content_indices = ['3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18'];
 
 const QuotationDetailsModel = () => {
+  const [ t ] = useTranslation();
+  const [ cookies ] = useCookies(["myLationCrmUserId"]);
   const { Panel } = Collapse;
+
+
+  //===== [RecoilState] Related with Quotation ========================================
+  const quotationState = useRecoilValue(atomQuotationState);
   const selectedQuotation = useRecoilValue(atomCurrentQuotation);
   const { modifyQuotation, setCurrentQuotation } = useRecoilValue(QuotationRepo);
-  const [ cookies ] = useCookies(["myLationCrmUserId"]);
-  const [ t ] = useTranslation();
 
-  const [ isFullScreen, setIsFullScreen ] = useState(false);
 
-  const [ editedValues, setEditedValues ] = useState(null);
-
-  const [ orgQuotationDate, setOrgQuotationDate ] = useState(null);
-  const [ orgConfirmDate, setOrgConfirmDate ] = useState(null);
+  //===== [RecoilState] Related with Users ==========================================
+  const userState = useRecoilValue(atomUserState);
+  const { loadAllUsers } = useRecoilValue(UserRepo)
+  const usersForSelection = useRecoilValue(atomUsersForSelection);
+  const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
   const [ orgQuotationContents, setOrgQuotationContents ] = useState([]);
   const [ quotationContents, setQuotationContents ] = useState([]);
@@ -39,33 +52,75 @@ const QuotationDetailsModel = () => {
   const [ checkContentState, setCheckContentState ] = useState(null);
   const [ isNewlyAdded, setIsNewlyAdded ] = useState(false);
 
-  // --- Funtions for Editing ----------------------------------------------------------
-  const handleEditing = useCallback((e) => {
-    const tempEdited = {
-      ...editedValues,
-      [e.target.name]: e.target.value,
+
+  //===== Handles to deal this component ==============================================
+  const [ isFullScreen, setIsFullScreen ] = useState(false);
+  const [ currentQuotationCode, setCurrentQuotationCode ] = useState('');
+
+  const handleWidthChange = useCallback((checked) => {
+    setIsFullScreen(checked);
+    if(checked)
+      localStorage.setItem('isFullScreen', '1');
+    else
+      localStorage.setItem('isFullScreen', '0');
+  }, []);
+
+
+  //===== Handles to edit 'Quotation Details' =========================================
+  const [editedDetailValues, setEditedDetailValues] = useState({});
+
+  const handleDetailChange = useCallback((e) => {
+    if (e.target.value !== selectedQuotation[e.target.name]) {
+      const tempEdited = {
+        ...editedDetailValues,
+        [e.target.name]: e.target.value,
+      };
+      setEditedDetailValues(tempEdited);
+    } else {
+      if(editedDetailValues[e.target.name]){
+        delete editedDetailValues[e.target.name];
+      };
     };
-    setEditedValues(tempEdited);
-  }, [editedValues]);
+  }, [editedDetailValues, selectedQuotation]);
+
+  const handleDetailDateChange = useCallback((name, date) => {
+    if (date !== new Date(selectedQuotation[name])) {
+      const tempEdited = {
+        ...editedDetailValues,
+        [name]: date,
+      };
+      setEditedDetailValues(tempEdited);
+    };
+  }, [editedDetailValues, selectedQuotation]);
+
+  const handleDetailSelectChange = useCallback((name, selected) => {
+    if(selected.value !== selectedQuotation[name]){
+      const tempEdited = {
+        ...editedDetailValues,
+        [name]: selected.value,
+      }
+      setEditedDetailValues(tempEdited);
+    }
+  }, [editedDetailValues, selectedQuotation]);
 
   const handleSaveAll = useCallback(() => {
-    if (editedValues !== null &&
+    if (editedDetailValues !== null &&
       selectedQuotation &&
       selectedQuotation !== defaultQuotation
     ) {
       const temp_all_saved = {
-        ...editedValues,
+        ...editedDetailValues,
         action_type: "UPDATE",
         modify_user: cookies.myLationCrmUserId,
         quotation_code: selectedQuotation.quotation_code,
       };
       if (modifyQuotation(temp_all_saved)) {
         console.log(`Succeeded to modify Quotation`);
-        if(editedValues.quotation_date){
-          setOrgQuotationDate(editedValues.quotation_date);
+        if(editedDetailValues.quotation_date){
+          setOrgQuotationDate(editedDetailValues.quotation_date);
         };
-        if(editedValues.confirm_date){
-          setOrgConfirmDate(editedValues.confirm_date);
+        if(editedDetailValues.confirm_date){
+          setOrgConfirmDate(editedDetailValues.confirm_date);
         };
       } else {
         console.error("Failed to modify Quotation");
@@ -73,21 +128,13 @@ const QuotationDetailsModel = () => {
     } else {
       console.log("[ QuotationDetailModel ] No saved data");
     }
-    setEditedValues(null);
-  }, [cookies.myLationCrmUserId, modifyQuotation, editedValues, selectedQuotation]);
+    setEditedDetailValues(null);
+  }, [cookies.myLationCrmUserId, modifyQuotation, editedDetailValues, selectedQuotation]);
 
   const handleCancelAll = useCallback(() => {
-    setEditedValues(null);
+    setEditedDetailValues(null);
   }, []);
 
-  // --- Funtions for Specific Changes in Detail ---------------------------------
-  const handleDateChange = useCallback((name, date) => {
-    const tempEdited = {
-      ...editedValues,
-      [name]: date,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues]);
 
   // --- Funtions for Content Editing --------------------------------------------------
   const handleCheckContentEditState = useCallback((key) => {
@@ -149,7 +196,7 @@ const QuotationDetailsModel = () => {
     };
     delete tempSaved[input];
     setSavedContentValues(tempSaved);
-  }, [savedContentValues, selectedQuotation]);
+  }, [savedContentValues]);
 
   // --- Funtions for Dealing Content ------------------------------------------------------
   const handleAddContent = useCallback(() => {
@@ -225,7 +272,7 @@ const QuotationDetailsModel = () => {
       };
     };
     setIsNewlyAdded(isThereNewlyAdded);
-  }, [checkContentState, isNewlyAdded, quotationContents, savedContentValues]);
+  }, [checkContentState, editedContentValues, quotationContents, savedContentValues]);
 
   const handleSaveContentAll = useCallback(() => {
     if (
@@ -298,72 +345,52 @@ const QuotationDetailsModel = () => {
   }, []);
 
   // --- Funtions for Control Windows ---------------------------------
-  const handleWidthChange = useCallback((checked) => {
-    setIsFullScreen(checked);
-    if(checked)
-      localStorage.setItem('isFullScreen', '1');
-    else
-      localStorage.setItem('isFullScreen', '0');
-  }, []);
+  
 
   const handleClose = useCallback(() => {
-    setEditedValues(null);
+    setEditedDetailValues(null);
     setCurrentQuotation();
-  }, []);
+  }, [setCurrentQuotation]);
 
   const qotation_items_info = [
-    ['quotation_type','quotation.quotation_type',{ type:'label'}],
-    ['quotation_manager','quotation.quotation_manager',{ type:'label'}],
-    ['quotation_send_type','quotation.send_type',{ type:'label' }],
-    ['quotation_date','quotation.quotation_date',
-      { type:'date', orgTimeData: orgQuotationDate, timeDataChange: handleDateChange}
-    ],
-    ['quotation_expiration_date','quotation.expiry_date',{ type:'label' }],
-    ['comfirm_date','quotation.confirm_date',
-      { type:'date', orgTimeData: orgConfirmDate, timeDataChange: handleDateChange}
-    ],
-    ['delivery_location','quotation.delivery_location',{ type:'label' }],
-    ['delivery_period','quotation.delivery_period',{ type:'label' }],
-    ['warranty_period','quotation.warranty',{ type:'label' }],
-    ['sales_representative','quotation.sales_rep',{ type:'label' }],
-    ['payment_type','quotation.payment_type',{ type:'label' }],
-    ['list_price','quotation.list_price',{ type:'label' }],
-    ['list_price_dc','quotation.list_price_dc',{ type:'label' }],
-    ['sub_total_amount','quotation.sub_total_amount',{ type:'label' }],
-    ['dc_rate','quotation.dc_rate',{ type:'label' }],
-    ['cutoff_amount','quotation.cutoff_amount',{ type:'label' }],
-    ['total_quotation_amount','quotation.total_quotation_amount',{ type:'label' }],
-    ['profit','quotation.profit_amount',{ type:'label' }],
-    ['profit_rate','quotation.profit_rate',{ type:'label' }],
-
-    ['upper_memo','quotation.upper_memo',{ type:'textarea', extra:'long' }],
-    ['lower_memo','quotation.lower_memo',{ type:'textarea', extra:'long' }],
-
-    ['lead_name','lead.lead_name',{ type:'label' }],
-    ['department','lead.department',{ type:'label' }],
-    ['position','lead.position',{ type:'label' }],
-    ['mobile_number','lead.mobile',{ type:'label' }],
-    ['phone_number','common.phone_no',{ type:'label' }],
-    ['fax_number','lead.fax_number',{ type:'label' }],
-    ['email','lead.email',{ type:'label' }],
-    ['company_name','company.company_name',{ type:'label', extra:'long' }],
+    { key:'quotation_type', title:'quotation.quotation_type', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'quotation_manager', title:'quotation.quotation_manager', detail:{ type:'select', options:usersForSelection, editing:handleDetailChange }},
+    { key:'quotation_send_type', title:'quotation.send_type', detail:{ type:'select', options:QuotationTypes, editing:handleDetailChange }},
+    { key:'quotation_date', title:'quotation.quotation_date', detail:{ type:'date', editing:handleDetailDateChange}},
+    { key:'quotation_expiration_date', title:'quotation.expiry_date', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'comfirm_date', title:'quotation.confirm_date', detail:{ type:'date', editing:handleDetailDateChange}},
+    { key:'delivery_location', title:'quotation.delivery_location', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'delivery_period', title:'quotation.delivery_period', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'warranty_period', title:'quotation.warranty', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'sales_representative', title:'quotation.sales_rep', detail:{ type:'select', options:salespersonsForSelection, editing:handleDetailSelectChange }},
+    { key:'payment_type', title:'quotation.payment_type', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'list_price', title:'quotation.list_price', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'list_price_dc', title:'quotation.list_price_dc', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'sub_total_amount', title:'quotation.sub_total_amount', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'dc_rate', title:'quotation.dc_rate', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'cutoff_amount', title:'quotation.cutoff_amount', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'total_quotation_amount', title:'quotation.total_quotation_amount', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'profit', title:'quotation.profit_amount', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'profit_rate', title:'quotation.profit_rate', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'upper_memo', title:'quotation.upper_memo', detail:{ type:'textarea', extra:'long', editing:handleDetailChange }},
+    { key:'lower_memo', title:'quotation.lower_memo', detail:{ type:'textarea', extra:'long', editing:handleDetailChange }},
+    { key:'lead_name', title:'lead.lead_name', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'department', title:'lead.department', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'position', title:'lead.position', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'mobile_number', title:'lead.mobile', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'phone_number', title:'common.phone_no', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'fax_number', title:'lead.fax_number', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'email', title:'lead.email', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'company_name', title:'company.company_name', detail:{ type:'label', extra:'long', editing:handleDetailChange }},
   ];
 
   // --- useEffect ------------------------------------------------------
   useEffect(() => {
-    if(selectedQuotation !== defaultQuotation) {
-      console.log('[QuotationDetailsModel] called!');
-      setOrgQuotationDate(
-        selectedQuotation.quotation_date
-          ? new Date(selectedQuotation.quotation_date)
-          : null
-      );
-
-      setOrgConfirmDate(
-        selectedQuotation.comfirm_date
-          ? new Date(selectedQuotation.comfirm_date)
-          : null
-      );
+    if((selectedQuotation !== defaultQuotation)
+      && (selectedQuotation.quotation_code !== currentQuotationCode)
+    && ((quotationState & 1) === 1)
+    ){
+      console.log('[QuotationDetailsModel] useEffect / quotation! :', selectedQuotation);
 
       const headerValues = selectedQuotation.quotation_table.split('|');
       if(headerValues && Array.isArray(headerValues)){
@@ -397,13 +424,21 @@ const QuotationDetailsModel = () => {
         setIsFullScreen(true);
       };
     };
-  }, [ selectedQuotation, editedValues ]);
+
+    setCurrentQuotationCode(selectedQuotation.quotation_code);
+  }, [selectedQuotation, editedDetailValues, currentQuotationCode, quotationState]);
+
+  useEffect(() => {
+    if ((userState & 1) === 0) {
+      loadAllUsers();
+    }
+  }, [loadAllUsers, userState]);
 
   return (
     <>
       <div
         className="modal right fade"
-        id="quotations-details"
+        id="quotation-details"
         tabIndex={-1}
         role="dialog"
         aria-modal="true"
@@ -416,19 +451,19 @@ const QuotationDetailsModel = () => {
                   original={selectedQuotation.quotation_title}
                   name='title'
                   title={t('common.title')}
-                  onEditing={handleEditing}
+                  onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
                   original={selectedQuotation.quotation_number}
                   name='quotation_number'
                   title={t('quotation.doc_no')}
-                  onEditing={handleEditing}
+                  onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
                   original={selectedQuotation.status}
                   name='status'
                   title={t('common.status')}
-                  onEditing={handleEditing}
+                  onEditing={handleDetailChange}
                 />
               </div>
               <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
@@ -492,19 +527,18 @@ const QuotationDetailsModel = () => {
                                 { qotation_items_info.map((item, index) => 
                                   <DetailCardItem
                                     key={index}
-                                    defaultText={selectedQuotation[item.at(0)]}
-                                    edited={editedValues}
-                                    name={item.at(0)}
-                                    title={t(item.at(1))}
-                                    detail={item.at(2)}
-                                    editing={handleEditing}
+                                    title={t(item.title)}
+                                    defaultValue={selectedQuotation[item.key]}
+                                    edited={editedDetailValues}
+                                    name={item.key}
+                                    detail={item.detail}
                                   />
                                 )}
                               </Space>
                             </div>
                           </div>
-                          { editedValues !== null &&
-                            Object.keys(editedValues).length !== 0 && (
+                          { editedDetailValues !== null &&
+                            Object.keys(editedDetailValues).length !== 0 && (
                               <div className="text-center py-3">
                                 <button
                                   type="button"

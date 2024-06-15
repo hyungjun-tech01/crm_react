@@ -11,6 +11,10 @@ import { atomCurrentQuotation
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
+export const QuotationTypes = [
+    { value: 'quotation', label: '견적' },
+    { value: 'order', label: '발주' },
+];
 
 export const QuotationSendTypes = [
     { value: 'FAX', label: 'Fax'},

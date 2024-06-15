@@ -21,7 +21,7 @@ import {
 } from '../../atoms/atomsUser';
 import { UserRepo } from '../../repository/user';
 import { LeadRepo } from "../../repository/lead";
-import { QuotationRepo, QuotationSendTypes } from "../../repository/quotation";
+import { QuotationRepo, QuotationTypes, QuotationSendTypes } from "../../repository/quotation";
 import { ConverTextAmount, formatDate } from "../../constants/functions";
 
 import AddBasicItem from "../../constants/AddBasicItem";
@@ -31,15 +31,6 @@ const default_quotation_content = {
   '6': null, '7': null, '8': null, '9': null, '10': null,
   '11': null, '12': null, '13': null, '14': null, '15': null,
   '16': null, '17': null, '18': null, '19': null, '998': null,
-};
-
-const default_prices = {
-  'consumer_price': 0,
-  'discount_rate': 0,
-  'quotation_unit_price': 0,
-  'quotation_total_price': 0,
-  'raw_price': 0,
-  'profit': 0,
 };
 
 const QuotationAddModel = (props) => {
@@ -157,11 +148,6 @@ const QuotationAddModel = (props) => {
     ['17', t('quotation.raw_price')],
     ['18', t('quotation.profit_amount')],
     ['19', t('quotation.note')],
-  ];
-
-  const QuotationTypes = [
-    { value: 'quotation', label: t('quotation.quotation') },
-    { value: 'order', label: t('quotation.order') },
   ];
 
   // eslint-disable-next-line react-hooks/exhaustive-deps

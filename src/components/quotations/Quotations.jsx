@@ -17,9 +17,7 @@ import { MoreVert } from '@mui/icons-material';
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { QuotationRepo } from "../../repository/quotation";
-import { atomAllCompanies,
-  atomAllQuotations,
-  atomAllLeads,
+import { atomAllQuotations,
   atomFilteredQuotation,
   atomCompanyState,
   atomLeadState,
@@ -33,8 +31,6 @@ const Quotations = () => {
   const companyState = useRecoilValue(atomCompanyState);
   const leadState = useRecoilValue(atomLeadState);
   const quotationState = useRecoilValue(atomQuotationState);
-  const allCompanyData = useRecoilValue(atomAllCompanies);
-  const allLeadData = useRecoilValue(atomAllLeads);
   const allQuotationData = useRecoilValue(atomAllQuotations);
   const filteredQuotation= useRecoilValue(atomFilteredQuotation);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
@@ -208,7 +204,7 @@ const Quotations = () => {
     if((quotationState & 1) === 0) {
       loadAllQuotations();
     };
-  }, [allCompanyData, allLeadData, allQuotationData, companyState, leadState, quotationState]);
+  }, [companyState, leadState, quotationState, loadAllCompanies, loadAllLeads, loadAllQuotations]);
 
   return (
     <HelmetProvider>
@@ -287,8 +283,8 @@ const Quotations = () => {
                       onRow={(record, rowIndex) => {
                         return {
                           onDoubleClick: (event) => {
-                            console.log("[Quotation] set current quotation : ", record.quotation_codecode);
-                            setCurrentQuotation(record.quotation_codecode);
+                            console.log("[Quotation] set current quotation : ", record.quotation_code);
+                            setCurrentQuotation(record.quotation_code);
                             let myModal = new bootstrap.Modal(document.getElementById('quotations-details'), {
                               keyboard: false
                             })
