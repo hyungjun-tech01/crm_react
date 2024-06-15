@@ -106,12 +106,6 @@ const ConsultingDetailsModel = () => {
       let temp_all_saved = {
         ...editedDetailValues
       };
-      if(editedDetailValues.receipt_time) {
-        const date_string = formatDate(editedDetailValues.receipt_time);
-        const time_string = formatTime(editedDetailValues.receipt_time);
-        temp_all_saved['receipt_date'] = date_string;
-        temp_all_saved['receipt_time'] = time_string;
-      };
       temp_all_saved['action_type'] = "UPDATE";
       temp_all_saved['modify_user'] = cookies.myLationCrmUserId;
       temp_all_saved['consulting_code'] = selectedConsulting.consulting_code;
@@ -144,7 +138,7 @@ const ConsultingDetailsModel = () => {
     { key: 'phone_number', title:'common.phone_no', detail:{ type:'label', editing: handleDetailChange}},
     { key: 'email', title:'lead.email', detail:{ type:'label', editing: handleDetailChange}},
     { key: 'status', title:'common.status', detail:{ type:'select', options:ConsultingStatusTypes, editing: handleDetailSelectChange}},
-    { key: 'receipt_time', title:'consulting.receipt_time', detail:{ type:'date', editing: handleDetailDateChange }},
+    { key: 'receipt_date', title:'consulting.receipt_date', detail:{ type:'date', editing: handleDetailDateChange }},
     { key: 'consulting_type', title:'consulting.type', detail:{ type:'select', options:ConsultingTypes, editing: handleDetailSelectChange}},
     { key: 'lead_time', title:'consulting.lead_time', detail:{ type:'select', options:ConsultingTimeTypes, editing: handleDetailSelectChange}},
     { key: 'product_type', title:'consulting.product_type', detail:{ type:'select', options:ProductTypes, editing: handleDetailSelectChange}},

@@ -94,7 +94,7 @@ const AddBasicItem = (props) => {
                                 className="add-basic-date"
                                 name = {name}
                                 selected={time.data}
-                                onChange={onChange}
+                                onChange={(date) => onChange(name, date)}
                                 dateFormat="yyyy-MM-dd"
                             /> 
                         }

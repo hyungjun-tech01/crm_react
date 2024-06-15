@@ -100,7 +100,6 @@ const enResource = {
             lead_time: 'Lead Time',
             product_type: 'Product Type',
             receipt_date:'Receipt Date',
-            receipt_time: 'Receipt Date',
             receiver: 'Receiver',
             request_content: 'Consulting Content',
             request_type: 'Request Type',

@@ -5,7 +5,7 @@ import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
 import { C_logo,  } from "../imagepath";
-import { option_locations, option_deal_type } from '../../constants/constans';
+import { option_locations, option_deal_type } from '../../constants/constants';
 
 import { 
   atomCurrentCompany,

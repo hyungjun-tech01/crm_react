@@ -76,7 +76,7 @@ const Consultings = () => {
     {
       title: t('consulting.receipt_date'),
       dataIndex: 'receipt_date',
-      render: (text, record) => <>{formatDate(record.receipt_date) + record.receipt_time}</>,
+      render: (text, record) => <>{text}</>,
     },
     {
       title: t('consulting.receiver'),

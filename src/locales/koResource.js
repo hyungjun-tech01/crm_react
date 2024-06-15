@@ -101,7 +101,6 @@ const koResource = {
             product_type: '물품 유형',
             request_content: '상담 내역',
             receipt_date:'접수 일자',
-            receipt_time: '상담 일시',
             receiver: '상담 진행자',
             request_type: '요청 유형',
             status: '상담 상태',

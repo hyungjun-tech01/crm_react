@@ -52,16 +52,12 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
 
   //===== Handles to edit 'ConsultingAddModel' ========================================
   const [consultingChange, setConsultingChange] = useState({ ...defaultConsulting });
-  const [receiptDate, setReceiptDate] = useState(null);
 
   const initializeConsultingTemplate = useCallback(() => {
     document.querySelector("#add_new_consulting_form").reset();
 
     // set Receipt date -------------
     const tempDate = new Date();
-    setReceiptDate(tempDate);
-    const localDate = formatDate(tempDate);
-    const localTime = tempDate.toLocaleTimeString('ko-KR');
 
     if (leadCode && leadCode !=='') {
       const foundIdx = leadsForSelection.findIndex(item => item.value.lead_code === leadCode);
@@ -70,29 +66,23 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
         setConsultingChange({
           ...found_lead_info.value,
           receiver: cookies.myLationCrmUserName,
-          receipt_date: localDate,
-          receipt_time: localTime,
+          receipt_date: tempDate,
         });
       };
     } else {
       setConsultingChange({
         receiver: cookies.myLationCrmUserName,
-        receipt_date: localDate,
-        receipt_time: localTime,
+        receipt_date: tempDate,
       });
     };
   }, [cookies.myLationCrmUserName, leadCode, leadsForSelection]);
 
-  const handleReceiptDateChange = (date) => {
-    setReceiptDate(date);
-    const localDate = formatDate(date);
-    const localTime = date.toLocaleTimeString('ko-KR');
-    const tempChanges = {
+  const handleDateChange = (name, date) => {
+    const modifiedData = {
       ...consultingChange,
-      receipt_date: localDate,
-      receipt_time: localTime,
+      [name]: date
     };
-    setConsultingChange(tempChanges);
+    setConsultingChange(modifiedData);
   };
 
   const handleItemChange = useCallback((e) => {
@@ -208,9 +198,10 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
                 <AddBasicItem
                   title={t('consulting.receipt_date')}
                   type='date'
-                  time={{ data: receiptDate, time: true }}
+                  name='receipt_date'
+                  time={{ data: consultingChange.receipt_date, time: true }}
                   required
-                  onChange={handleReceiptDateChange}
+                  onChange={handleDateChange}
                 />
                 <AddBasicItem
                   title={t('consulting.receiver')}
@@ -268,10 +259,10 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
                           <td>{consultingChange.phone}</td>
                         </tr>
                         <tr>
+                          <td><b>{t('lead.fax_number')}</b></td>
+                          <td>{consultingChange.fax_number}</td>
                           <td><b>{t('lead.email')}</b></td>
                           <td>{consultingChange.email}</td>
-                          <td></td>
-                          <td></td>
                         </tr>
                       </tbody>
                     </table>

@@ -117,7 +117,6 @@ export const defaultConsulting = {
     consulting_code: null,
     consulting_type: null,
     receipt_date: null,
-    receipt_time: null,
     receiver: null,
     product_type: null,
     lead_time: null,

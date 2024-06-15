@@ -27,7 +27,7 @@ import ConsultingAddModel from "../consulting/ConsultingAddModel";
 import ConsultingDetailsModel from "../consulting/ConsultingDetailsModel";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
-import { option_locations } from "../../constants/constans";
+import { option_locations } from "../../constants/constants";
 
 import LeadConsultingModel from "./LeadConsultingModel";
 import LeadQuotationModel from "./LeadQutotationModel"
@@ -102,7 +102,6 @@ const LeadDetailsModel = () => {
         ...editedDetailValues,
         [e.target.name]: e.target.value,
       };
-      console.log('handleDetailChange : ', tempEdited);
       setEditedDetailValues(tempEdited);
     } else {
       if (editedDetailValues[e.target.name]) {
@@ -122,7 +121,6 @@ const LeadDetailsModel = () => {
   }, [editedDetailValues, selectedLead]);
 
   const handleDetailSelectChange = useCallback((name, selected) => {
-    console.log('handleDetailSelectChange / start : ', selected);
     let tempEdited = null;
     let isChanged = false;
     if (name === 'company_name') {
@@ -147,7 +145,6 @@ const LeadDetailsModel = () => {
       };
     };
     if (isChanged) {
-      console.log('handleDetailSelectChange : ', tempEdited);
       setEditedDetailValues(tempEdited);
     };
   }, [editedDetailValues, selectedLead]);
@@ -184,7 +181,7 @@ const LeadDetailsModel = () => {
       };
       if (modifyLead(temp_all_saved)) {
         console.log(`Succeeded to modify lead`);
-        let temp_update_company = null;
+        let temp_update_company = {};
         if (editedDetailValues['company_name'])
           temp_update_company['company_name'] = editedDetailValues['company_name'];
         if (editedDetailValues['company_name_en'])

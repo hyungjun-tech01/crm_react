@@ -7,7 +7,7 @@ import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection 
 import { CompanyRepo } from "../../repository/company";
 import { UserRepo } from '../../repository/user';
 import { formatDate } from '../../constants/functions';
-import { option_locations, option_deal_type, option_industry_type } from "../../constants/constans";
+import { option_locations, option_deal_type, option_industry_type } from "../../constants/constants";
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddAddressItem from '../../constants/AddAddressItem';
