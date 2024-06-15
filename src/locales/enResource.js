@@ -187,6 +187,7 @@ const enResource = {
             product_name:'Product Name',
             product_type:'Product Type',
             purchase:'Purchase',
+            purchase_manage:'Purchase',
             receipt_date:'Receipt Date',
             register:'Register',
             registration_code:'Registraction Code',

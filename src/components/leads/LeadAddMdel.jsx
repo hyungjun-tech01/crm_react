@@ -14,20 +14,30 @@ import AddAddressItem from '../../constants/AddAddressItem';
 
 const LeadAddModel = (props) => {
     const { init, handleInit } = props;
+    const { t } = useTranslation();
+    const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+    
+
+    //===== [RecoilState] Related with Company =============================================
     const companyState = useRecoilValue(atomCompanyState);
     const { loadAllCompanies } = useRecoilValue(CompanyRepo);
     const companyForSelection = useRecoilValue(atomCompanyForSelection);
+
+
+    //===== [RecoilState] Related with Lead ================================================
+    const { loadAllUsers } = useRecoilValue(UserRepo)
+    const { modifyLead } = useRecoilValue(LeadRepo);
+
+
+    //===== [RecoilState] Related with User ================================================
     const userState = useRecoilValue(atomUserState);
     const engineersForSelection = useRecoilValue(atomEngineersForSelection);
     const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
-    const { loadAllUsers } = useRecoilValue(UserRepo)
-    const { modifyLead } = useRecoilValue(LeadRepo);
-    const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+
+    
+    //===== Handles to edit 'Lead Add' =====================================================
     const [ leadChange, setLeadChange ] = useState(defaultLead);
     const [ disabledItems, setDisabledItems ] = useState({});
-
-    const { t } = useTranslation();
-
 
     const initializeLeadTemplate = useCallback(() => {
         setLeadChange(defaultLead);

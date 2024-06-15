@@ -187,6 +187,7 @@ const koResource = {
             product_name:'제품명',
             product_type:'제품유형',
             purchase:'구매',
+            purchase_manage:'제품관리',
             receipt_date:'입고일',
             register:'등록자',
             registration_code:'등록코드',

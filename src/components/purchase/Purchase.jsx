@@ -18,7 +18,7 @@ import { atomAllCompanies,
   atomPurchaseState,
 } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
-import { compareText } from "../../constants/functions";
+import { compareText, formatDate } from "../../constants/functions";
 import { useTranslation } from "react-i18next";
 
 const Purchase = () => {
@@ -148,13 +148,9 @@ const Purchase = () => {
 
   const columns = [
     {
-      title: t('purchase.product_type'),
-      dataIndex: "product_type",
-      render: (text, record) => (
-        <>
-          {text}
-        </>
-      ),
+      title: t('purchase.delivery_date'),
+      dataIndex: "delivery_date",
+      render: (text, record) => <>{formatDate(record.delivery_date)}</>,
       sorter: (a, b) => compareText(a.purchase_type, b.purchase_type),
     },
     {

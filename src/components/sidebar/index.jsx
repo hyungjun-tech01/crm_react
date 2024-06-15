@@ -96,7 +96,7 @@ const SidebarNav = (props) => {
               </li>
               <li>
                 <Link className={`${pathname.includes("purchases") ? "active" : ""}`} to="/purchases">
-                  <ShoppingBagOutlined /> <span>{t('purchase.purchase')}</span>
+                  <ShoppingBagOutlined /> <span>{t('purchase.purchase_manage')}</span>
                 </Link>
               </li>
               {/* <li>
