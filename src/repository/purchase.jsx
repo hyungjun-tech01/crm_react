@@ -108,7 +108,9 @@ export const PurchaseRepo = selector({
                 const data = await response.json();
                 if(data.message){
                     console.log('\t[ modifyPurchase ] message:', data.message);
-                    return false;
+                    return {
+                        result: false,
+                    };
                 };
 
                 const allPurchases = await snapshot.getPromise(atomAllPurchases);
@@ -123,7 +125,10 @@ export const PurchaseRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomAllPurchases, allPurchases.concat(updatedNewPurchase));
-                    return true;
+                    return {
+                        result: true,
+                        code: data.out_purchase_code,
+                    };
                 } else if(newPurchase.action_type === 'UPDATE'){
                     const currentPurchase = await snapshot.getPromise(atomCurrentPurchase);
                     delete newPurchase.action_type;
@@ -145,10 +150,14 @@ export const PurchaseRepo = selector({
                             ...allPurchases.slice(foundIdx + 1,),
                         ];
                         set(atomAllPurchases, updatedAllPurchases);
-                        return true;
+                        return {
+                            result: false,
+                        };
                     } else {
                         console.log('\t[ modifyPurchase ] No specified purchase is found');
-                        return false;
+                        return {
+                            result: false,
+                        };
                     }
                 }
             }

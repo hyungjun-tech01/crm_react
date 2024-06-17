@@ -116,7 +116,8 @@ const CompanyPurchaseModel = (props) => {
 
             switch (code_name) {
                 case 'purchase_code':
-                    if (modifyPurchase(tempSubValues)) {
+                    const res_data = modifyPurchase(tempSubValues);
+                    if (res_data.result) {
                         console.log(`Succeeded to modify purchase`);
                         const modfiedPurchase = {
                             ...currentPurchase,
@@ -221,9 +222,9 @@ const CompanyPurchaseModel = (props) => {
 
             switch (code_name) {
                 case 'purchase_code':
-                    if (modifyPurchase(tempSubValues)) {
+                    const res_data = modifyPurchase(tempSubValues);
+                    if(res_data.result) {
                         console.log(`Succeeded to add purchase`);
-
                     } else {
                         console.error('Failed to add company')
                     };
@@ -277,7 +278,7 @@ const CompanyPurchaseModel = (props) => {
                 type: 'select', options: ProductTypeOptions,
                 editing:handleNewItemSelectChange
         }},
-        { key:'serial_number', title:'purchase.serial', detail:{ type: 'label', editing: handleNewItemChange }},
+        { key:'serial_number', title:'purchase.serial_number', detail:{ type: 'label', editing: handleNewItemChange }},
         { key:'licence_info', title:'purchase.licence_info', detail:{ type: 'label', editing: handleNewItemChange }},
         { key:'module', title:'purchase.module', detail:{ type: 'label', editing: handleNewItemChange }},
         { key:'quantity', title:'common.quantity', detail:{ type: 'label', editing: handleNewItemChange }},
@@ -306,7 +307,7 @@ const CompanyPurchaseModel = (props) => {
                 type: 'select', options: ProductTypeOptions,
                 editing:handleOtherItemSelectChange
         }},
-        { key:'serial_number', title:'purchase.serial', detail:{ type: 'label', editing: handleOtherItemChange }},
+        { key:'serial_number', title:'purchase.serial_number', detail:{ type: 'label', editing: handleOtherItemChange }},
         { key:'licence_info', title:'purchase.licence_info', detail:{ type: 'label', editing: handleOtherItemChange }},
         { key:'module', title:'purchase.module', detail:{ type: 'label', editing: handleOtherItemChange }},
         { key:'quantity', title:'common.quantity', detail:{ type: 'label', editing: handleOtherItemChange }},
@@ -335,7 +336,7 @@ const CompanyPurchaseModel = (props) => {
             render: (text, record) => <>{text}</>,
         },
         {
-            title: t('purchase.serial'),
+            title: t('purchase.serial_number'),
             dataIndex: "serial_number",
             render: (text, record) => <>{text}</>,
         },
@@ -392,6 +393,21 @@ const CompanyPurchaseModel = (props) => {
             if (result) {
                 const updatedContracts = maContractByPurchase.concat(result);
                 setMaContractByPurchase(updatedContracts);
+
+                // Update MA Contract end date
+                if(currentPurchase 
+                    && (!currentPurchase.MA_finish_date || (new Date(currentPurchase.MA_finish_date) < finalData.MA_finish_date))){
+                    const modifiedPurchase = {
+                        ...currentPurchase,
+                        MA_finish_date: finalData.MA_finish_date,
+                    };
+                    const res_data = modifyPurchase(modifiedPurchase);
+                    if(res_data){
+                        console.log('Succeeded to update MA end date');
+                    } else {
+                        console.log('Fail to update MA end date');
+                    };
+                };
             } else {
                 console.error('Failed to add/modify ma contract');
             }
@@ -399,7 +415,7 @@ const CompanyPurchaseModel = (props) => {
 
         setSelectedContractRowKeys([]);
         setIsSubModalOpen(false);
-    }, [orgSubModalValues, editedSubModalValues, modifyMAContract, maContractByPurchase]);
+    }, [orgSubModalValues, editedSubModalValues, modifyMAContract, maContractByPurchase, currentPurchase, modifyPurchase]);
 
     const handleSubModalCancel = () => {
         setSubModalItems([]);
@@ -427,7 +443,7 @@ const CompanyPurchaseModel = (props) => {
             { name: 'ma_price', title: t('common.price_1'), detail: { type: 'label' } },
             { name: 'ma_memo', title: t('common.memo'), detail: { type: 'textarea', row_no: 4 } },
         ]);
-        setSubModalSetting({ title: t('contract.add_contract') })
+        setSubModalSetting({ title: t('contract.add_contract') });
         setIsSubModalOpen(true);
     }, [cookies.myLationCrmUserId, t]);
 
@@ -449,7 +465,7 @@ const CompanyPurchaseModel = (props) => {
                 { name: 'ma_price', title: t('common.price_1'), detail: { type: 'label' } },
                 { name: 'ma_memo', title: t('common.memo'), detail: { type: 'textarea', row_no: 4 } },
             ]);
-            setSubModalSetting({ title: t('contract.add_contract') })
+            setSubModalSetting({ title: t('contract.add_contract') });
             setIsSubModalOpen(true);
         } else {
             console.error("Impossible Case~");

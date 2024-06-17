@@ -20,7 +20,7 @@ const AddBasicItem = (props) => {
                             name = {name}
                             type="text"
                             placeholder={title}
-                            value={defaultValue}
+                            value={defaultValue ? defaultValue : ''}
                             disabled={disabled ? disabled : false}
                             onChange={onChange}
                         />
@@ -40,7 +40,7 @@ const AddBasicItem = (props) => {
                             name = {name}
                             placeholder={title}
                             rows={row_no}
-                            value={defaultValue}
+                            value={defaultValue ? defaultValue : ''}
                             disabled={disabled ? disabled : false}
                             onChange={onChange}
                         />

@@ -34,7 +34,7 @@ export const compareText = (text1, text2) => {
 };
 
 export const formatDate = (date_value) => {
-    if(date_value === null) return "";
+    if(date_value === undefined || date_value === null) return "";
     
     let  converted = null;
     if(typeof date_value === 'string') {

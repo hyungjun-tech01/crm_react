@@ -1,50 +1,44 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import { Table } from "antd";
-import Select from "react-select";
 import { useCookies } from "react-cookie";
+import { useTranslation } from "react-i18next";
+import { Table } from "antd";
 import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
-import PurchaseDetailsModel from "./PurchaseDetailsModel";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { PurchaseRepo } from "../../repository/purchase";
-import { atomAllCompanies,
-  atomAllPurchases,
-  defaultPurchase,
+import { atomAllPurchases,
   atomFilteredPurchase,
   atomCompanyState,
   atomPurchaseState,
 } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
+import { PurchaseRepo } from "../../repository/purchase";
 import { compareText, formatDate } from "../../constants/functions";
-import { useTranslation } from "react-i18next";
+
+import PurchaseAddModel from "./PurchaseAddModel";
+import PurchaseDetailsModel from "./PurchaseDetailsModel";
+
 
 const Purchase = () => {
-  const companyState = useRecoilValue(atomCompanyState);
-  const purchaseState = useRecoilValue(atomPurchaseState);
-  const allCompanyData = useRecoilValue(atomAllCompanies);
-  const allPurchaseData = useRecoilValue(atomAllPurchases);
-  const filteredPurchase = useRecoilValue(atomFilteredPurchase);
-  const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
-  const { loadAllPurchases, modifyPurchase, setCurrentPurchase, filterPurchases } = useRecoilValue(PurchaseRepo);
+  const { t } = useTranslation();
   const [ cookies ] = useCookies(["myLationCrmUserName",  "myLationCrmUserId"]);
 
-  const [ purchaseChange, setPurchaseChange ] = useState(null);
-  const [ companiesForSelection, setCompaniesForSelection ] = useState(null);
 
-  const [ deliveryDate, setDeliveryDate ] = useState(new Date());
-  const [ contactDate, setContactDate ] = useState(new Date());
-  const [ finishDate, setFinishDate ] = useState(new Date());
-  const [ registerDate, setRegisterDate ] = useState(new Date());
+  //===== [RecoilState] Related with Company =============================================
+  const companyState = useRecoilValue(atomCompanyState);
+  const { loadAllCompanies } = useRecoilValue(CompanyRepo);
 
+
+  //===== [RecoilState] Related with Purchase ============================================
+  const purchaseState = useRecoilValue(atomPurchaseState);
+  const allPurchaseData = useRecoilValue(atomAllPurchases);
+  const filteredPurchase = useRecoilValue(atomFilteredPurchase);
+  const { loadAllPurchases, modifyPurchase, setCurrentPurchase, filterPurchases } = useRecoilValue(PurchaseRepo);
+
+
+  //===== Handles to deal 'Purcahse' ====================================================
   const [ initAddNewPurchase, setInitAddNewPurchase ] = useState(false);
   
-  const selectCompanyRef = useRef(null);
-
-  const { t } = useTranslation();
-
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
 
@@ -70,81 +64,9 @@ const Purchase = () => {
   },[setCurrentPurchase]);
 
   const handleAddNewPurchaseClicked = useCallback(() => {
-    initializePurchaseTemplate();
+    setInitAddNewPurchase(true);
   }, []);
 
-  // --- Functions used for Add New Purchase ------------------------------
-  const initializePurchaseTemplate = useCallback(() => {
-    setPurchaseChange({...defaultPurchase});
-    setDeliveryDate(null);
-    setContactDate(null);
-    setFinishDate(null);
-    setRegisterDate(null);
-
-    if(selectCompanyRef.current)
-      selectCompanyRef.current.clearValue();
-
-    document.querySelector("#add_new_purchase_form").reset();
-  }, [defaultPurchase]);
-
-  const handleCompanySelectionChange = useCallback((value) => {
-    purchaseChange.lead_code = value.value.lead_code;
-    purchaseChange.company_code = value.value.company_code;
-  });
-
-  const handleDeliveryDateChange = useCallback((date) => {
-    console.log(`[ handleDeliveryDateChange ] ${date}`);
-    setDeliveryDate(date);
-    purchaseChange.delivery_date = date;
-  },[purchaseChange, setDeliveryDate]);
-
-  const handleContactDateChange = useCallback((date) => {
-    console.log(`[ handleContactDateChange ] ${date}`);
-    setContactDate(date);
-    purchaseChange.MA_contact_date = date;
-  },[purchaseChange, setContactDate]);
-
-  const handleFinishDateChange = useCallback((date) => {
-    console.log(`[ handleContactDateChange ] ${date}`);
-    setFinishDate(date);
-    purchaseChange.MA_finish_date = date;
-  },[purchaseChange, setFinishDate]);
-
-  const handleRegisterDateChange = useCallback((date) => {
-    console.log(`[ handleContactDateChange ] ${date}`);
-    setRegisterDate(date);
-    purchaseChange.registration_date = date;
-  },[purchaseChange, setFinishDate]);
-
-  const handlePurchaseChange = useCallback((e)=>{
-    const modifiedData = {
-      ...purchaseChange,
-      [e.target.name]: e.target.value,
-    };
-    setPurchaseChange(modifiedData);
-  }, [purchaseChange]);
-
-  const handleAddNewPurchase = useCallback((event)=>{
-    // Check data if they are available
-    if(purchaseChange.company_code === null
-      || purchaseChange.product_code === null)
-    {
-      console.log("Necessary inputs must be available!");
-      return;
-    };
-
-    const newPurchaseData = {
-      ...purchaseChange,
-      action_type: 'ADD',
-      modify_user: cookies.myLationCrmUserId,
-    };
-    console.log(`[ handleAddNewPurchase ]`, newPurchaseData);
-    const result = modifyPurchase(newPurchaseData);
-    if(result){
-      initializePurchaseTemplate();
-      //close modal ?
-    };
-  },[purchaseChange, cookies.myLationCrmUserName, initializePurchaseTemplate, modifyPurchase]);
 
   const columns = [
     {
@@ -160,7 +82,7 @@ const Purchase = () => {
       sorter: (a, b) => compareText(a.product_name, b.product_name),
     },
     {
-      title: t('purchase.serial'),
+      title: t('purchase.serial_number'),
       dataIndex: "serial_number",
       render: (text, record) =>
         <>
@@ -170,15 +92,7 @@ const Purchase = () => {
         </>,
       sorter: (a, b) => compareText(a.serial_number, b.serial_number),
     },
-    {
-      title: t('purchase.delivery_date'),
-      dataIndex: "delivery_date",
-      render: (text, record) =>
-        <>
-          { (text && text !=="") && new Date(text).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day: 'numeric'}) }
-        </>,
-      sorter: (a, b) => a.delivery_date - b.delivery_date,
-    },
+    
     {
       title: t('purchase.ma_contract_date'),
       dataIndex: "MA_contact_date",
@@ -236,102 +150,21 @@ const Purchase = () => {
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.regcode, b.regcode),
     },
-    // {
-    //   title: "",
-    //   dataIndex: "star",
-    //   render: (text, record) => (
-    //     <i className="fa fa-star" aria-hidden="true" />
-    //   ),
-    //   sorter: (a, b) => a.status.length - b.status.length,
-    // },
-    // {
-    //   title: "Actions",
-    //   dataIndex: "status",
-    //   render: (text, record) => (
-    //     <div className="dropdown dropdown-action">
-    //       <a
-    //         href="#"
-    //         className="action-icon dropdown-toggle"
-    //         data-bs-toggle="dropdown"
-    //         aria-expanded="false"
-    //       >
-    //         <MoreVert />
-    //       </a>
-    //       <div className="dropdown-menu dropdown-menu-right">
-    //         <a className="dropdown-item" href="#">
-    //           Edit This Purchase
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Change Organization Image
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Delete This Organization
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Change Record Owner
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Generate Merge Document
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Print This Organization
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Add New Task For Organization
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Add New Event For Organization
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Add Activity Set To Organization
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Add New Contact For Organization
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Add New Opportunity For Organization
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Add New Opportunity For Organization
-    //         </a>
-    //         <a className="dropdown-item" href="#">
-    //           Add New Project For Organization
-    //         </a>
-    //       </div>
-    //     </div>
-    //   ),
-    // },
   ];
 
+  //===== useEffect functions ==========================================
   useEffect(() => {
     console.log('Purchase called!');
     if((companyState & 1) === 0) {
       loadAllCompanies();
     };
-    if( (companiesForSelection !== null &&  allCompanyData !== null ) &&  companiesForSelection.length !== allCompanyData.length){
-      const company_subset = allCompanyData.map((data) => {
-        return {
-          label: data.company_name,
-          value: data.company_code,
-        }
-      });
-      company_subset.sort((a, b) => {
-        if (a.label > b.label) {
-          return 1;
-        }
-        if (a.label < b.label) {
-          return -1;
-        }
-        // a must be equal to b
-        return 0;
-      });
-      setCompaniesForSelection(company_subset);
-    };
+  }, [companyState, loadAllCompanies]);
+
+  useEffect(()=>{
     if((purchaseState & 1) === 0) {
       loadAllPurchases();
     };
-    if(initAddNewPurchase) initializePurchaseTemplate();
-  }, [allCompanyData, allPurchaseData, initAddNewPurchase, companyState, purchaseState]);
+  }, [loadAllPurchases, purchaseState]);
 
   return (
     <HelmetProvider>
@@ -555,189 +388,7 @@ const Purchase = () => {
           </div>
         </div>
         {/* Modal */}
-        <div
-          className="modal right fade"
-          id="add_purchase"
-          tabIndex={-1}
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="modal-dialog" role="document">
-            <button
-              type="button"
-              className="close md-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
-            <div className="modal-content">
-              <div className="modal-header">
-                <h4 className="modal-title text-center"><b>{t('purchase.add_purchase')}</b></h4>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                ></button>
-              </div>
-              <div className="modal-body">
-                <div className="row">
-                  <div className="col-md-12">
-                    <form id="add_new_purchase_form">
-                      <h4>{t('company.company')}</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-6">
-                          <label className="col-form-label">
-                            {t('company.company_name')}
-                            <span className="text-danger">*</span>
-                          </label>
-                          <Select options={companiesForSelection} onChange={handleCompanySelectionChange}/>
-                        </div>
-                      </div>
-                      <h4>{t('common.product')}</h4>
-                      <h4>Deal</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-3">
-                          <label className="col-form-label">{t('common.quantity')}</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder={t('common.quantity')}
-                            name="quantity"
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                        <div className="col-sm-6">
-                          <label className="col-form-label">{t('common.price')}</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder={t('common.price')}
-                            name="price"
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                        <div className="col-sm-3">
-                          <label className="col-form-label">{t('common.currency')}</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder={t('common.currency')}
-                            name="currency"
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-4">
-                          <label className="col-form-label">{t('purchase.delivery_date')}</label>
-                          <DatePicker
-                            className="form-control form-control-sm"
-                            selected={deliveryDate}
-                            dateFormat="yyyy.MM.dd"
-                            onChange={handleDeliveryDateChange}
-                          />
-                        </div>
-                        <div className="col-sm-4">
-                          <label className="col-form-label">{t('purchase.ma_contract_date')}</label>
-                          <DatePicker
-                            className="form-control form-control-sm"
-                            selected={contactDate}
-                            dateFormat="yyyy.MM.dd"
-                            onChange={handleContactDateChange}
-                          />
-                        </div>
-                        <div className="col-sm-4">
-                          <label className="col-form-label">{t('purchase.ma_finish_date')}</label>
-                          <DatePicker
-                            className="form-control form-control-sm"
-                            selected={finishDate}
-                            dateFormat="yyyy.MM.dd"
-                            onChange={handleFinishDateChange}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-4">
-                          <label className="col-form-label">{t('purchase.register')}</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder={t('purchase.register')}
-                            name="register"
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                        <div className="col-sm-4">
-                          <label className="col-form-label">{t('purchase.registration_code')}</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm"
-                            placeholder={t('purchase.registration_code')}
-                            name="regcode"
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                        <div className="col-sm-4">
-                          <label className="col-form-label">{t('purchase.registration_date')}</label>
-                          <DatePicker
-                            className="form-control form-control-sm"
-                            selected={registerDate}
-                            dateFormat="yyyy.MM.dd"
-                            onChange={handleRegisterDateChange}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group row">
-                        <div className="col-sm-12">
-                          <label className="col-form-label">{t('common.memo')}</label>
-                          <textarea
-                            className="form-control"
-                            rows={2}
-                            name="purchase_memo"
-                            placeholder={t('common.memo')}
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                      </div>
-                      <h4>{t('common.status')} {t('common.information')}</h4>
-                      <div className="form-group row">
-                        <div className="col-sm-12">
-                          <textarea
-                            className="form-control"
-                            rows={2}
-                            name="status"
-                            placeholder={t('common.status')}
-                            onChange={handlePurchaseChange}
-                          />
-                        </div>
-                      </div>
-                      <div className="text-center py-3">
-                        <button
-                          type="button"
-                          className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                          onClick={handleAddNewPurchase}
-                        >
-                          {t('common.save')}
-                        </button>
-                        &nbsp;&nbsp;
-                        <button
-                          type="button"
-                          className="btn btn-secondary btn-rounded"
-                          data-bs-dismiss="modal"
-                        >
-                          {t('common.cancel')}
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* modal-content */}
-          </div>
-          {/* modal-dialog */}
-        </div>
+        <PurchaseAddModel init={initAddNewPurchase} handleInit={setInitAddNewPurchase} />
         <PurchaseDetailsModel />
       </div>
     </HelmetProvider>

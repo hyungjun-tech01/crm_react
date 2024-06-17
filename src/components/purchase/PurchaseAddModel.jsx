@@ -1,21 +1,37 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
+import { Table } from 'antd';
+import { ItemRender, ShowTotal } from "../paginationfunction";
 
-import { atomCompanyForSelection,
+import {
+    atomCompanyForSelection,
     atomCompanyState,
     defaultPurchase,
+    atomCurrentPurchase,
+    atomProductClassList,
+    atomProductClassListState,
+    atomAllProducts,
+    atomProductsState,
     atomProductOptions,
+    atomCompanyMAContracts,
+    defaultMAContract,
 } from '../../atoms/atoms';
 import { CompanyRepo } from '../../repository/company';
+import { PurchaseRepo } from '../../repository/purchase';
+import { MAContractRepo } from "../../repository/ma_contract";
+import { ProductClassListRepo, ProductRepo, ProductTypeOptions } from '../../repository/product';
 
 import AddBasicItem from "../../constants/AddBasicItem";
+import DetailSubModal from '../../constants/DetailSubModal';
+import { ConverTextAmount } from '../../constants/functions';
+import { Add } from "@mui/icons-material";
 
 const PurchaseAddModel = (props) => {
     const { init, handleInit } = props;
     const { t } = useTranslation();
-    const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+    const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
 
     //===== [RecoilState] Related with Company =============================================
@@ -24,13 +40,30 @@ const PurchaseAddModel = (props) => {
     const { loadAllCompanies } = useRecoilValue(CompanyRepo);
 
 
-    //===== [RecoilState] Related with Company =============================================
-    const { productsForSelection } = useRecoilValue(atomProductOptions);
+    //===== [RecoilState] Related with Purcahse ============================================
+    const { currentPurchase } = useRecoilValue(atomCurrentPurchase);
+    const { modifyPurchase, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
+
+
+    //===== [RecoilState] Related with Product =============================================
+    const productClassState = useRecoilValue(atomProductClassListState);
+    const allProductClassList = useRecoilValue(atomProductClassList);
+    const { loadAllProductClassList } = useRecoilValue(ProductClassListRepo);
+    const productState = useRecoilValue(atomProductsState);
+    const allProducts = useRecoilValue(atomAllProducts);
+    const { loadAllProducts } = useRecoilValue(ProductRepo);
+    const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
+
+
+    //===== [RecoilState] Related with MA Contract =========================================
+    const companyMAContracts = useRecoilValue(atomCompanyMAContracts);
+    const { modifyMAContract, setCurrentMAContract } = useRecoilValue(MAContractRepo);
 
 
     //===== Handles to edit 'Purchase Add' =================================================
     const [ addChange, setAddChange ] = useState({});
-
+    const [ companyData, setCompanyData ] = useState({ company_name: '', company_code: '' });
+    
     const initializeAddTemplate = useCallback(() => {
         setAddChange({
             ...defaultPurchase,
@@ -49,21 +82,208 @@ const PurchaseAddModel = (props) => {
 
     const handleAddSelectChange = useCallback((name, selected) => {
         let modifiedData = null;
-        if(name === 'company_name') {
+        if (name === 'company_name') {
+            const tempCompany = {
+                company_code: selected.value.company_code,
+                company_name: selected.value.company_name,
+            };
+            setCompanyData(tempCompany);
+
             modifiedData = {
                 ...addChange,
-                company_name: selected.value.company_name,
+                // company_name: selected.value.company_name,
                 company_code: selected.value.company_code,
             };
-        } else {
+        }
+        else if (name === 'product_name') {
             modifiedData = {
                 ...addChange,
-                [name]: selected.value,
+                product_name: selected.value.product_name,
+                product_class_name: selected.value.product_class_name,
+                product_code: selected.value.product_code,
+            };
+        } else if (name === 'product_type') {
+            modifiedData = {
+                ...addChange,
+                product_type: selected.value,
             };
         };
         setAddChange(modifiedData);
     }, [addChange]);
 
+    const handleAddDateChange = useCallback((name, date) => {
+        const modifiedData = {
+            ...addChange,
+            [name]: date,
+        };
+        setAddChange(modifiedData);
+    }, [addChange]);
+
+    const handleAddNewPurchase = useCallback((event) => {
+        // Check data if they are available
+        if (addChange.company_code === null
+            || addChange.product_code === null) {
+            console.log("Necessary inputs must be available!");
+            return;
+        };
+        const newPurchaseData = {
+            ...addChange,
+            action_type: 'ADD',
+            modify_user: cookies.myLationCrmUserId,
+        };
+
+        console.log(`[ handleAddNewPurchase ]`, newPurchaseData);
+        const res_data = modifyPurchase(newPurchaseData);
+        if(res_data.result)
+        {
+            setCurrentPurchase(res_data.code);
+        }
+        else
+        {
+            console.log('[PurchaseAddModel] fail to add purchase');
+        };
+    }, [addChange, cookies.myLationCrmUserId, modifyPurchase, setCurrentPurchase]);
+
+
+    //===== Handles to edit 'MA contract' =================================================
+    const [ isSubModalOpen, setIsSubModalOpen ] = useState(false);
+    const [subModalSetting, setSubModalSetting] = useState({ title: '' })
+    const [ contractLists, setContractLists ] = useState([]);
+    const [ selectedMAContractRowKeys, setSelectedMAContractRowKeys ] = useState([]);
+    const [orgSubModalValues, setOrgSubModalValues] = useState({});
+    const [editedSubModalValues, setEditedSubModalValues] = useState({});
+    
+    const columns_ma_contract = [
+        {
+            title: t('contract.contract_date'),
+            dataIndex: "ma_contract_date",
+            render: (text, record) => <>{text}</>,
+        },
+        {
+            title: t('contract.contract_end_date'),
+            dataIndex: "ma_finish_date",
+            render: (text, record) => <>{text}</>,
+        },
+        {
+            title: t('contract.contract_type'),
+            dataIndex: "action_type",
+            render: (text, record) => <>{text}</>,
+        },
+        {
+            title: t('common.price_1'),
+            dataIndex: "ma_price",
+            render: (text, record) => <>{ConverTextAmount(record.ma_price)}</>,
+        },
+        {
+            title: t('common.memo'),
+            dataIndex: "ma_memo",
+            render: (text, record) => <>{text}</>,
+        },
+    ];
+
+    const maContractRowSelection = {
+        selectedRowKeys: selectedMAContractRowKeys,
+        type: 'radio',
+        onChange: (selectedRowKeys, selectedRows) => {
+            setSelectedMAContractRowKeys(selectedRowKeys);
+
+            if (selectedRows.length > 0) {
+                // Set data to edit selected purchase ----------------------
+                const selectedValue = selectedRows.at(0);
+                setCurrentMAContract(selectedValue.guid);
+            } else {
+                setCurrentMAContract();
+            };
+        },
+        getCheckboxProps: (record) => ({
+            disabled: record.name === "Disabled User", // Column configuration not to be checked
+            name: record.name,
+            className: "checkbox-red",
+        }),
+    };
+    
+    const ma_contract_items = [
+        { name: 'ma_contract_date', title: t('contract.contract_date'), detail: { type: 'date' } },
+        { name: 'ma_finish_date', title: t('contract.end_date'), detail: { type: 'date' } },
+        { name: 'ma_price', title: t('common.price_1'), detail: { type: 'label' } },
+        { name: 'ma_memo', title: t('common.memo'), detail: { type: 'textarea', row_no: 4 } },
+    ];
+
+    const handleSubModalOk = useCallback(() => {
+        const finalData = {
+            ...orgSubModalValues,
+            ...editedSubModalValues,
+        };
+        const resp = modifyMAContract(finalData);
+        resp.then(result => {
+            if (result) {
+                const updatedContracts = contractLists.concat(result);
+                setContractLists(updatedContracts);
+
+                // Update MA Contract end date
+                if(currentPurchase
+                    && (!currentPurchase.MA_finish_date || (new Date(currentPurchase.MA_finish_date) < finalData.MA_finish_date))){
+                    const modifiedPurchase = {
+                        ...currentPurchase,
+                        MA_finish_date: finalData.MA_finish_date,
+                    };
+                    const res_data = modifyPurchase(modifiedPurchase);
+                    if(res_data){
+                        console.log('Succeeded to update MA end date');
+                    } else {
+                        console.log('Fail to update MA end date');
+                    };
+                };
+            } else {
+                console.error('Failed to add/modify ma contract');
+            }
+        });
+
+        setSelectedMAContractRowKeys([]);
+        setIsSubModalOpen(false);
+    }, [contractLists, currentPurchase, editedSubModalValues, modifyMAContract, modifyPurchase, orgSubModalValues]);
+
+    const handleSubModalCancel = () => {
+        setOrgSubModalValues(null);
+        setSelectedMAContractRowKeys([]);
+        setIsSubModalOpen(false);
+    };
+
+    const handleSubModalItemChange = useCallback(data => {
+        setEditedSubModalValues(data);
+    }, []);
+
+    const handleAddMAContract = useCallback((company_code, purchase_code) => {
+        orgSubModalValues({});
+        setOrgSubModalValues({
+            ...defaultMAContract,
+            action_type: 'ADD',
+            ma_company_code: company_code,
+            purchase_code: purchase_code,
+            modify_user: cookies.myLationCrmUserId,
+        });
+        setSubModalSetting({ title: t('contract.add_contract') });
+        setIsSubModalOpen(true);
+    }, [cookies.myLationCrmUserId, orgSubModalValues, t]);
+
+    const handleModifyMAContract = useCallback((code) => {
+        setEditedSubModalValues(null);
+        const foundMAContract = contractLists.filter(item => item.guid === code);
+        if (foundMAContract.length > 0) {
+            const selectedContract = foundMAContract[0];
+            setOrgSubModalValues({
+                ...selectedContract,
+                ma_contract_date: new Date(selectedContract.ma_contract_date),
+                ma_finish_date: new Date(selectedContract.ma_finish_date),
+                action_type: 'UPDATE',
+                modify_user: cookies.myLationCrmUserId,
+            });
+            setSubModalSetting({ title: t('contract.add_contract') });
+            setIsSubModalOpen(true);
+        } else {
+            console.error("Impossible Case~");
+        };
+    }, [contractLists, cookies.myLationCrmUserId, t]);
 
     //===== useEffect functions ===========================================================
     useEffect(() => {
@@ -81,10 +301,41 @@ const PurchaseAddModel = (props) => {
         };
     }, [companyState, loadAllCompanies]);
 
+    // ----- useEffect for Production -----------------------------------
+    useEffect(() => {
+        console.log('[CompanyDetailModel] useEffect / Production');
+        if ((productClassState & 1) === 0) {
+            console.log('CompanyDetailsModel / loadAllProductClassList');
+            loadAllProductClassList();
+        };
+        if ((productState & 1) === 0) {
+            console.log('CompanyDetailsModel / loadAllProducts');
+            loadAllProducts();
+        };
+        if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
+            console.log("Check Product Options\n - ", productOptions);
+            const productOptionsValue = allProductClassList.map(proClass => {
+                const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
+                const subOptions = foundProducts.map(item => {
+                    return {
+                        label: <span>{item.product_name}</span>,
+                        value: { product_code: item.product_code, product_name: item.product_name, product_class_name: item.product_class_name }
+                    }
+                });
+                return {
+                    label: <span>{proClass.product_class_name}</span>,
+                    title: proClass.product_class_name,
+                    options: subOptions,
+                };
+            });
+            setProductOptions(productOptionsValue);
+        };
+    }, [allProductClassList, allProducts, loadAllProductClassList, loadAllProducts, productClassState, productOptions, productState, setProductOptions]);
+
     return (
         <div
             className="modal right fade"
-            id="add_lead"
+            id="add_purchase"
             tabIndex={-1}
             role="dialog"
             aria-modal="true"
@@ -116,7 +367,7 @@ const PurchaseAddModel = (props) => {
                                             title={t('company.company_name')}
                                             type='select'
                                             name="company_name"
-                                            defaultValue={addChange.company_name}
+                                            defaultValue={companyData.company_name}
                                             required
                                             long
                                             options={companyForSelection}
@@ -130,16 +381,204 @@ const PurchaseAddModel = (props) => {
                                             name="product_name"
                                             defaultValue={addChange.product_name}
                                             required
-                                            options={productsForSelection}
+                                            options={productOptions}
                                             onChange={handleAddSelectChange}
                                         />
+                                        <AddBasicItem
+                                            title={t('purchase.product_type')}
+                                            type='select'
+                                            name="product_type"
+                                            defaultValue={addChange.product_type}
+                                            options={ProductTypeOptions}
+                                            onChange={handleAddSelectChange}
+                                        />
+                                    </div>
+                                    <div className="form-group row">
+                                        <AddBasicItem
+                                            title={t('purchase.serial_number')}
+                                            type='text'
+                                            name="serial_number"
+                                            defaultValue={addChange.serial_number}
+                                            onChange={handleAddChange}
+                                        />
+                                        <AddBasicItem
+                                            title={t('purchase.licence_info')}
+                                            type='text'
+                                            name="licence_info"
+                                            defaultValue={addChange.licence_info}
+                                            onChange={handleAddChange}
+                                        />
+                                    </div>
+                                    <div className="form-group row">
+                                        <AddBasicItem
+                                            title={t('purchase.module')}
+                                            type='text'
+                                            name="module"
+                                            defaultValue={addChange.module}
+                                            onChange={handleAddChange}
+                                        />
+                                        <AddBasicItem
+                                            title={t('common.quantity')}
+                                            type='text'
+                                            name="quantity"
+                                            defaultValue={addChange.quantity}
+                                            onChange={handleAddChange}
+                                        />
+                                    </div>
+                                    <div className="form-group row">
+                                        <AddBasicItem
+                                            title={t('purchase.receipt_date')}
+                                            type='date'
+                                            name="receipt_date"
+                                            time={{ data: addChange.receipt_date }}
+                                            onChange={handleAddDateChange}
+                                        />
+                                        <AddBasicItem
+                                            title={t('purchase.delivery_date')}
+                                            type='date'
+                                            name="delivery_date"
+                                            time={{ data: addChange.delivery_date }}
+                                            onChange={handleAddDateChange}
+                                        />
+                                    </div>
+                                    <div className="form-group row">
+                                        <AddBasicItem
+                                            title={t('purchase.hq_finish_date')}
+                                            type='date'
+                                            name="hq_finish_date"
+                                            time={{ data: addChange.hq_finish_date }}
+                                            onChange={handleAddDateChange}
+                                        />
+                                        <AddBasicItem
+                                            title={t('purchase.ma_finish_date')}
+                                            type='date'
+                                            name="ma_finish_date"
+                                            time={{ data: addChange.ma_finish_date }}
+                                            onChange={handleAddDateChange}
+                                        />
+                                    </div>
+                                    <div className="form-group row">
+                                        <AddBasicItem
+                                            title={t('purchase.po_number')}
+                                            type='text'
+                                            name="po_number"
+                                            defaultValue={addChange.po_number}
+                                            onChange={handleAddChange}
+                                        />
+                                        <AddBasicItem
+                                            title={t('common.price_1')}
+                                            type='text'
+                                            name="price"
+                                            defaultValue={addChange.price}
+                                            onChange={handleAddChange}
+                                        />
+                                    </div>
+                                    <div className="form-group row">
+                                        <AddBasicItem
+                                            title={t('purchase.invoice_no')}
+                                            type='text'
+                                            name="invoiceno"
+                                            defaultValue={addChange.invoiceno}
+                                            onChange={handleAddChange}
+                                        />
+                                        <AddBasicItem
+                                            title={t('common.status')}
+                                            type='text'
+                                            name="status"
+                                            defaultValue={addChange.status}
+                                            onChange={handleAddChange}
+                                        />
+                                    </div>
+                                    <div className="form-group row">
+                                        <AddBasicItem
+                                            title={t('company.memo')}
+                                            type='textarea'
+                                            name="purchase_memo"
+                                            long
+                                            defaultValue={addChange.purchase_memo}
+                                            onChange={handleAddChange}
+                                        />
+                                    </div>
+                                    <div className="text-center">
+                                        <button
+                                            type="button"
+                                            className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                                            onClick={handleAddNewPurchase}
+                                        >
+                                            {t('common.save')}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="btn btn-secondary btn-rounded"
+                                            data-bs-dismiss="modal"
+                                        >
+                                            {t('common.cancel')}
+                                        </button>
                                     </div>
                                 </form>
                             </div>
                         </div>
+                        { currentPurchase !== defaultPurchase &&
+                            <div className="row">
+                                <div className="card mb-0">
+                                    <div className="table-body">
+                                        <div className="table-responsive">
+                                            <Table
+                                                rowSelection={maContractRowSelection}
+                                                pagination={{
+                                                    total: contractLists.length,
+                                                    showTotal: ShowTotal,
+                                                    showSizeChanger: true,
+                                                    ItemRender: ItemRender,
+                                                }}
+                                                className="table"
+                                                style={{ overflowX: "auto" }}
+                                                columns={columns_ma_contract}
+                                                dataSource={contractLists}
+                                                rowKey={(record) => record.purchase_code}
+                                                title={() =>
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        backgroundColor: '#cccccc',
+                                                        fontWeight: 600,
+                                                        lineHeight: 1.5,
+                                                        height: '2.5rem',
+                                                        padding: '0.5rem 0.8rem',
+                                                        borderRadius: '5px',
+                                                    }}
+                                                    >
+                                                        <div>{t('purchase.information')}</div>
+                                                        <Add onClick={() => handleAddMAContract(currentPurchase.company_code, currentPurchase.purchase_code)} />
+                                                    </div>
+                                                }
+                                                onRow={(record, rowIndex) => {
+                                                    return {
+                                                        onClick: (event) => {
+                                                            setSelectedMAContractRowKeys([record.guid]);
+                                                            handleModifyMAContract(record.guid);
+                                                        }, // click row
+                                                    };
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
+            <DetailSubModal
+                title={subModalSetting.title}
+                open={isSubModalOpen}
+                item={ma_contract_items}
+                original={orgSubModalValues}
+                edited={editedSubModalValues}
+                handleEdited={handleSubModalItemChange}
+                handleOk={handleSubModalOk}
+                handleCancel={handleSubModalCancel}
+            />
         </div>
     );
 };

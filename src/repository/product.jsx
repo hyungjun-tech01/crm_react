@@ -91,7 +91,6 @@ export const ProductClassListRepo = selector({
 });
 
 export const ProductTypeOptions = [
-    {value:null, label: 'N/A'},
     {value:'N(Act)', label: 'N(Act)'},
     {value:'ST(Act)', label: 'ST(Act)'},
     {value:'D(USB)', label: 'D(USB)'},

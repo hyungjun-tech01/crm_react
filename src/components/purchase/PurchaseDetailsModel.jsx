@@ -49,7 +49,8 @@ const PurchaseDetailsModel = () => {
         modify_user: cookies.myLationCrmUserId,
         purchase_code: selectedPurchase.purchase_code,
       };
-      if (modifyPurchase(temp_all_saved)) {
+      const res_data = modifyPurchase(temp_all_saved);
+      if(res_data.result) {
         console.log(`Succeeded to modify purchase`);
         if(editedValues.delivery_date){
           setOrgDeliveryDate(editedValues.delivery_date);
@@ -105,7 +106,7 @@ const PurchaseDetailsModel = () => {
   }, []);
 
   const purchase_items_info = [
-    ['serial_number','purchase.serial',{ type:'label',extra:'long'}],
+    ['serial_number','purchase.serial_number',{ type:'label',extra:'long'}],
     ['quantity','common.quantity',{ type:'label'}],
     ['price','common.price',{ type:'label' }],
     ['currency','common.currency',{ type:'label' }],
