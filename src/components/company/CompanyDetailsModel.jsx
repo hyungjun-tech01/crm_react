@@ -242,7 +242,7 @@ const CompanyDetailsModel = () => {
               <DetailTitleItem
                 defaultText={selectedCompany.company_name_eng}
                 name='company_name_eng'
-                title={t('company.eng_company_name')}
+                title={t('company.company_name_eng')}
                 onEditing={handleDetailChange}
               />
               <DetailTitleItem

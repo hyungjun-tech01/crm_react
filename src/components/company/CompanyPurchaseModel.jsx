@@ -396,10 +396,10 @@ const CompanyPurchaseModel = (props) => {
 
                 // Update MA Contract end date
                 if(currentPurchase 
-                    && (!currentPurchase.MA_finish_date || (new Date(currentPurchase.MA_finish_date) < finalData.MA_finish_date))){
+                    && (!currentPurchase.ma_finish_date || (new Date(currentPurchase.ma_finish_date) < finalData.ma_finish_date))){
                     const modifiedPurchase = {
                         ...currentPurchase,
-                        MA_finish_date: finalData.MA_finish_date,
+                        ma_finish_date: finalData.ma_finish_date,
                     };
                     const res_data = modifyPurchase(modifiedPurchase);
                     if(res_data){

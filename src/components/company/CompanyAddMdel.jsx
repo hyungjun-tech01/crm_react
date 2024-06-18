@@ -143,7 +143,7 @@ const CompanyAddModel = (props) => {
                                             onChange={handleCompanyChange}
                                         />
                                         <AddBasicItem
-                                            title={t('company.eng_company_name')}
+                                            title={t('company.company_name_eng')}
                                             type='text'
                                             name="company_name_eng"
                                             defaultValue={companyChange.company_name_eng}

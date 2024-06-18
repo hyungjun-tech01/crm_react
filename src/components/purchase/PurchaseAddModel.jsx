@@ -25,8 +25,9 @@ import { ProductClassListRepo, ProductRepo, ProductTypeOptions } from '../../rep
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import DetailSubModal from '../../constants/DetailSubModal';
-import { ConverTextAmount } from '../../constants/functions';
+import { ConverTextAmount, formatDate } from '../../constants/functions';
 import { Add } from "@mui/icons-material";
+
 
 const PurchaseAddModel = (props) => {
     const { init, handleInit } = props;
@@ -56,13 +57,13 @@ const PurchaseAddModel = (props) => {
 
 
     //===== [RecoilState] Related with MA Contract =========================================
-    const companyMAContracts = useRecoilValue(atomCompanyMAContracts);
     const { modifyMAContract, setCurrentMAContract } = useRecoilValue(MAContractRepo);
 
 
     //===== Handles to edit 'Purchase Add' =================================================
     const [ addChange, setAddChange ] = useState({});
     const [ companyData, setCompanyData ] = useState({ company_name: '', company_code: '' });
+    const [ needInit, setNeedInit ] = useState(false);
     
     const initializeAddTemplate = useCallback(() => {
         setCurrentPurchase();   // initialize current purchase
@@ -70,6 +71,7 @@ const PurchaseAddModel = (props) => {
             ...defaultPurchase,
             company_name: null,
         });
+        setNeedInit(false);
         document.querySelector("#add_new_purchase_form").reset();
     }, [setCurrentPurchase]);
 
@@ -138,6 +140,7 @@ const PurchaseAddModel = (props) => {
         res_data.then((res) => {
             if(res.result) {
                 setCurrentPurchase(res.code);
+                setNeedInit(true);
             } else {
                 console.log('[PurchaseAddModel] fail to add purchase');
             }
@@ -157,16 +160,16 @@ const PurchaseAddModel = (props) => {
         {
             title: t('contract.contract_date'),
             dataIndex: "ma_contract_date",
-            render: (text, record) => <>{text}</>,
+            render: (text, record) => <>{formatDate(record.ma_contract_date)}</>,
         },
         {
             title: t('contract.contract_end_date'),
             dataIndex: "ma_finish_date",
-            render: (text, record) => <>{text}</>,
+            render: (text, record) => <>{formatDate(record.ma_finish_date)}</>,
         },
         {
             title: t('contract.contract_type'),
-            dataIndex: "action_type",
+            dataIndex: "ma_contract_type",
             render: (text, record) => <>{text}</>,
         },
         {
@@ -228,10 +231,10 @@ const PurchaseAddModel = (props) => {
 
                 // Update MA Contract end date
                 if(currentPurchase.purchase_code
-                    && (!currentPurchase.MA_finish_date || (new Date(currentPurchase.MA_finish_date) < finalData.MA_finish_date))){
+                    && (!currentPurchase.ma_finish_date || (new Date(currentPurchase.ma_finish_date) < finalData.ma_finish_date))){
                     const modifiedPurchase = {
                         ...currentPurchase,
-                        MA_finish_date: finalData.MA_finish_date,
+                        ma_finish_date: finalData.ma_finish_date,
                         action_type: 'UPDATE',
                         modify_user: cookies.myLationCrmUserId,
                     };
@@ -239,6 +242,11 @@ const PurchaseAddModel = (props) => {
                     res_data.then(res => {
                         if(res.result){
                             console.log('Succeeded to update MA end date');
+                            const updateAddChange = {
+                                ...addChange,
+                                ma_finish_date: finalData.ma_finish_date,
+                            };
+                            setAddChange(updateAddChange);
                         } else {
                             console.log('Fail to update MA end date');
                         };
@@ -509,13 +517,23 @@ const PurchaseAddModel = (props) => {
                                         />
                                     </div>
                                     <div className="text-center py-3">
-                                        <button
-                                            type="button"
-                                            className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                                            onClick={handleAddNewPurchase}
-                                        >
-                                            {t('common.save')}
-                                        </button>
+                                        { needInit ? 
+                                            <button
+                                                type="button"
+                                                className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                                                onClick={initializeAddTemplate}
+                                            >
+                                                {t('common.initialize')}
+                                                </button>
+                                            :
+                                            <button
+                                                type="button"
+                                                className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                                                onClick={handleAddNewPurchase}
+                                            >
+                                                {t('common.save')}
+                                            </button>
+                                        }
                                         &nbsp;&nbsp;
                                         <button
                                             type="button"

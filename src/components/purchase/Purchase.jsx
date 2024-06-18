@@ -10,10 +10,11 @@ import { atomAllPurchases,
   atomFilteredPurchase,
   atomCompanyState,
   atomPurchaseState,
+  atomAllCompanies,
 } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
 import { PurchaseRepo } from "../../repository/purchase";
-import { compareText, formatDate } from "../../constants/functions";
+import { ConverTextAmount, compareText, formatDate } from "../../constants/functions";
 
 import PurchaseAddModel from "./PurchaseAddModel";
 import PurchaseDetailsModel from "./PurchaseDetailsModel";
@@ -26,6 +27,7 @@ const Purchase = () => {
 
   //===== [RecoilState] Related with Company =============================================
   const companyState = useRecoilValue(atomCompanyState);
+  const allCompanyData = useRecoilValue(atomAllCompanies);
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
 
 
@@ -33,11 +35,12 @@ const Purchase = () => {
   const purchaseState = useRecoilValue(atomPurchaseState);
   const allPurchaseData = useRecoilValue(atomAllPurchases);
   const filteredPurchase = useRecoilValue(atomFilteredPurchase);
-  const { loadAllPurchases, modifyPurchase, setCurrentPurchase, filterPurchases } = useRecoilValue(PurchaseRepo);
+  const { loadAllPurchases, setCurrentPurchase, filterPurchases } = useRecoilValue(PurchaseRepo);
 
 
   //===== Handles to deal 'Purcahse' ====================================================
   const [ initAddNewPurchase, setInitAddNewPurchase ] = useState(false);
+  const [ tableData, setTableData ] = useState([]);
   
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -76,10 +79,28 @@ const Purchase = () => {
       sorter: (a, b) => compareText(a.purchase_type, b.purchase_type),
     },
     {
+      title: t('company.company_name'),
+      dataIndex: "company_name",
+      render: (text, record) => <>{text}</>,
+      sorter: (a, b) => compareText(a.company_name, b.company_name),
+    },
+    {
+      title: t('company.company_name_eng'),
+      dataIndex: "company_name_eng",
+      render: (text, record) => <>{text}</>,
+      sorter: (a, b) => compareText(a.company_name_eng, b.company_name_eng),
+    },
+    {
       title: t('purchase.product_name'),
       dataIndex: "product_name",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.product_name, b.product_name),
+    },
+    {
+      title: t('common.quantity'),
+      dataIndex: "quantity",
+      render: (text, record) => <>{text}</>,
+      sorter: (a, b) => a.quantity - b.quantity,
     },
     {
       title: t('purchase.serial_number'),
@@ -95,60 +116,21 @@ const Purchase = () => {
     
     {
       title: t('purchase.ma_contract_date'),
-      dataIndex: "MA_contact_date",
+      dataIndex: "ma_contact_date",
       render: (text, record) =>
         <>
           { (text && text !=="") && new Date(text).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day: 'numeric'}) }
         </>,
-      sorter: (a, b) => a.MA_contact_date - b.MA_contact_date,
+      sorter: (a, b) => a.ma_contact_date - b.ma_contact_date,
     },
     {
       title: t('purchase.ma_finish_date'),
-      dataIndex: "MA_finish_date",
+      dataIndex: "ma_finish_date",
       render: (text, record) =>
         <>
           { (text && text !=="") && new Date(text).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day: 'numeric'}) }
         </>,
-      sorter: (a, b) => a.MA_finish_date - b.MA_finish_date,
-    },
-    {
-      title: t('common.quantity'),
-      dataIndex: "quantity",
-      render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.quantity - b.quantity,
-    },
-    {
-      title: t('common.price'),
-      dataIndex: "price",
-      render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.price - b.price,
-    },
-    {
-      title: t('company.company_name'),
-      dataIndex: "company_name",
-      render: (text, record) => <>{text}</>,
-      sorter: (a, b) => compareText(a.company_name, b.company_name),
-    },
-    {
-      title: t('purchase.register'),
-      dataIndex: "register",
-      render: (text, record) => <>{text}</>,
-      sorter: (a, b) => a.register - b.register,
-    },
-    {
-      title:t('purchase.registration_date'),
-      dataIndex: "registration_date",
-      render: (text, record) => 
-      <>
-        { (text && text !=="") && new Date(text).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day: 'numeric'}) }
-      </>,
-      sorter: (a, b) => a.registration_date - b.registration_date,
-    },
-    {
-      title: t('purchase.registration_code'),
-      dataIndex: "regcode",
-      render: (text, record) => <>{text}</>,
-      sorter: (a, b) => compareText(a.regcode, b.regcode),
+      sorter: (a, b) => a.ma_finish_date - b.ma_finish_date,
     },
   ];
 
@@ -158,13 +140,26 @@ const Purchase = () => {
     if((companyState & 1) === 0) {
       loadAllCompanies();
     };
-  }, [companyState, loadAllCompanies]);
-
-  useEffect(()=>{
     if((purchaseState & 1) === 0) {
       loadAllPurchases();
     };
-  }, [loadAllPurchases, purchaseState]);
+    if(((companyState & 1) === 1) && ((purchaseState & 1) === 1)) {
+      const modifiedData = allPurchaseData.map(purchase => {
+        const foundIdx = allCompanyData.findIndex(company => company.company_code === purchase.company_code);
+        if(foundIdx !== -1){
+          return {
+            ...purchase,
+            company_name: allCompanyData[foundIdx].company_name,
+            company_name_eng: allCompanyData[foundIdx].company_name_eng,
+          }
+        } else {
+          return null;
+        };
+      });
+      setTableData(modifiedData);
+    };
+  }, [companyState, purchaseState, loadAllCompanies, loadAllPurchases, allPurchaseData, allCompanyData]);
+
 
   return (
     <HelmetProvider>
@@ -252,7 +247,7 @@ const Purchase = () => {
                   {searchCondition === "" ? 
                     <Table
                       pagination={{
-                        total: allPurchaseData.length,
+                        total: tableData.length,
                         showTotal: ShowTotal,
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
@@ -261,7 +256,7 @@ const Purchase = () => {
                       className="table"
                       style={{ overflowX: "auto" }}
                       columns={columns}
-                      dataSource={allPurchaseData}
+                      dataSource={tableData}
                       rowKey={(record) => record.purchase_code}
                       onRow={(record, rowIndex) => {
                         return {
@@ -286,7 +281,7 @@ const Purchase = () => {
                       }}
                       style={{ overflowX: "auto" }}
                       columns={columns}
-                      dataSource={filteredPurchase.length >0 ?  filteredPurchase:null}
+                      dataSource={filteredPurchase.length >0 ? filteredPurchase : null}
                       rowKey={(record) => record.lead_code}
                       onRow={(record, rowIndex) => {
                         return {

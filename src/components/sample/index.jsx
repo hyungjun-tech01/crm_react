@@ -45,7 +45,7 @@ const Sample = () => {
     //   product_name   :"BBBBBBB"     ,
     //   serial_number  :"1234"     ,
     //   delivery_date  :"2024.03.01"      ,
-    //   MA_finish_date : "2025.10.10"      , 
+    //   ma_finish_date : "2025.10.10"      , 
     //   price : "1110000",
     //   quantity: "100"};    
     const v_txn_contents = [{transaction_code:"bbbb", product_name:null}, {transaction_code:"aaa", product_name:null}];

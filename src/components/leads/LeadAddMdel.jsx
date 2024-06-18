@@ -221,7 +221,7 @@ const LeadAddModel = (props) => {
                                             onChange={handleSelectCompany}
                                         />
                                         <AddBasicItem
-                                            title={t('company.eng_company_name')}
+                                            title={t('company.company_name_eng')}
                                             type='text'
                                             name="company_name_en"
                                             defaultValue={leadChange.company_name_en}

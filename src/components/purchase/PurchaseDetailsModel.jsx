@@ -55,11 +55,11 @@ const PurchaseDetailsModel = () => {
         if(editedValues.delivery_date){
           setOrgDeliveryDate(editedValues.delivery_date);
         };
-        if(editedValues.MA_contact_date){
-          setOrgContactDate(editedValues.MA_contact_date);
+        if(editedValues.ma_contact_date){
+          setOrgContactDate(editedValues.ma_contact_date);
         };
-        if(editedValues.MA_finish_date){
-          setOrgFinishDate(editedValues.MA_finish_date);
+        if(editedValues.ma_finish_date){
+          setOrgFinishDate(editedValues.ma_finish_date);
         };
         if(editedValues.registration_date){
           setOrgRegisterDate(editedValues.registration_date);
@@ -113,10 +113,10 @@ const PurchaseDetailsModel = () => {
     ['delivery_date','purchase.delivery_date',
       { type:'date', orgTimeData: orgDeliveryDate, timeDataChange: handleDateChange }
     ],
-    ['MA_contact_date','purchase.ma_contract_date',
+    ['ma_contact_date','purchase.ma_contract_date',
       { type:'date', orgTimeData: orgContactDate, timeDataChange: handleDateChange }
     ],
-    ['MA_finish_date','purchase.ma_finish_date',
+    ['ma_finish_date','purchase.ma_finish_date',
       { type:'date', orgTimeData: orgFinishDate, timeDataChange: handleDateChange }
     ],
     ['register','purchase.register',{ type:'label' }],
@@ -137,13 +137,13 @@ const PurchaseDetailsModel = () => {
           : null
       );
       setOrgContactDate(
-        selectedPurchase.MA_contact_date
-          ? new Date(selectedPurchase.MA_contact_date)
+        selectedPurchase.ma_contact_date
+          ? new Date(selectedPurchase.ma_contact_date)
           : null
       );
       setOrgFinishDate(
-        selectedPurchase.MA_finish_date
-          ? new Date(selectedPurchase.MA_finish_date)
+        selectedPurchase.ma_finish_date
+          ? new Date(selectedPurchase.ma_finish_date)
           : null
       );
       setOrgRegisterDate(

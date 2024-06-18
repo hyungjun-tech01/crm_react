@@ -303,7 +303,7 @@ export const defaultPurchase = {
     //----- Deal info --------------
     receipt_date: null,
     delivery_date: null,
-    MA_finish_date: null,
+    ma_finish_date: null,
     invoiceno: null,
     price: null,
     register: null,
@@ -311,7 +311,7 @@ export const defaultPurchase = {
     hq_finish_date: null,
     quantity: null,
     regcode: null,
-    MA_contact_date: null,
+    ma_contact_date: null,
     //----- Etc info --------------
     purchase_memo: null,
     modify_user: null,
@@ -341,15 +341,16 @@ export const atomPurchaseState = atom({
 
 //----- MA Contract ------------------------
 export const defaultMAContract = {
-    action_type : null,                 
-    guid : null,                        
-    purchase_code : null,               
-    ma_company_code : null,             
-    ma_contract_date : null,            
-    ma_finish_date : null,              
-    ma_price : null,                    
-    ma_memo : null,                     
-    modify_user : null,  
+    action_type : null,
+    guid : null,
+    purchase_code : null,
+    ma_company_code : null,
+    ma_contract_date : null,
+    ma_contract_type: null,
+    ma_finish_date : null,
+    ma_price : null,
+    ma_memo : null,
+    modify_user : null,
 };
 export const atomCurrentMAContract = atom({
     key: "currentMAContract",

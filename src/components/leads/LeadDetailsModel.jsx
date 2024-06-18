@@ -226,7 +226,7 @@ const LeadDetailsModel = () => {
     { key: 'is_keyman', title: 'lead.is_keyman', detail: { type: 'select', options: KeyManForSelection, editing: handleDetailSelectChange } },
     { key: 'region', title: 'common.region', detail: { type: 'select', options: option_locations.ko, editing: handleDetailSelectChange } },
     { key: 'company_name', title: 'company.company_name', detail: { type: 'select', options: companyForSelection, key: 'company_name', editing: handleDetailSelectChange } },
-    { key: 'company_name_en', title: 'company.eng_company_name', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'company_name_en', title: 'company.company_name_eng', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'department', title: 'lead.department', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'mobile_number', title: 'lead.mobile', detail: { type: 'label', editing: handleDetailChange } },
