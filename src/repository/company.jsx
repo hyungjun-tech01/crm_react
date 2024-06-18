@@ -23,12 +23,10 @@ export const companyColumn = [
  ];
 
  export const ColumnQueryCondition = [
-    { value: 'include', label: '포함'},
-    { value: 'is_null', label: '값이없는'},
-    { value: 'is_not_null', label: '값이있는'},
-    { value: 'equeal', label: '='},
-    { value: 'greater_than', label: '>='},
-    { value: 'less_than', label: '=<'},
+    { value: 'like', label: '포함'},
+    { value: 'is null', label: '값이없는'},
+    { value: 'is not null', label: '값이있는'},
+    { value: '=', label: '='},
 ];
 
 export const CompanyRepo = selector({

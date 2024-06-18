@@ -1,5 +1,6 @@
 import React, {  useState , useCallback} from "react";
 import { Button, Modal, Checkbox, CheckboxProps } from 'antd';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Select from "react-select";
 import { companyColumn, ColumnQueryCondition } from "../repository/company";
 import { useTranslation } from "react-i18next";
@@ -7,7 +8,7 @@ import AddBasicItem from "./AddBasicItem";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const QueryRow = ({ index, companyColumn, columnQueryCondition, companyColumnValue, columnQueryConditionValue, multiQueryInputValue, andOrValue, onCompanyColumnChange, onColumnQueryConditionChange, onMultiQueryInputChange, onAndOrChange }) => (
+const QueryRow = ({ index, companyColumn, columnQueryCondition, companyColumnValue, columnQueryConditionValue, multiQueryInputValue, andOrValue, onCompanyColumnChange, onColumnQueryConditionChange, onMultiQueryInputChange, onAndOrChange, onDelete }) => (
   <tr>
     <td>
       <Select options={companyColumn} value={companyColumnValue} onChange={(value) => onCompanyColumnChange(index, value)} />
@@ -29,6 +30,11 @@ const QueryRow = ({ index, companyColumn, columnQueryCondition, companyColumnVal
         {andOrValue}
       </Button>
     </td>
+    <td>
+      <Button  onClick={() => onDelete(index)}>
+        <DeleteIcon/>
+      </Button>
+    </td>
   </tr>
 );
 
@@ -39,6 +45,8 @@ const MultiQueryModal = (props) => {
     const { t } = useTranslation();
 
     const [queryConditions, setQueryConditions] = useState([
+      { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+      { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
       { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
       { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
     ]);
@@ -81,15 +89,36 @@ const MultiQueryModal = (props) => {
       setQueryConditions(newConditions);
     };  
 
+    const onDelete  = (index) => {
+      const newConditions = [...queryConditions];
+      newConditions[index].companyColumn = "";
+      newConditions[index].columnQueryCondition = "";
+      newConditions[index].multiQueryInput = "";
+      newConditions[index].andOr = "And";
+      setQueryConditions(newConditions);
+    }
+
     const handleSubmit = () => {
       console.log(queryConditions);
       let queryString = "";
       for (const i of queryConditions){
         console.log("i", i.companyColumn.value);
-        queryString = queryString 
-                     + i.companyColumn.value +' '
-                     + i.columnQueryCondition.value + ' ' 
-                     + "'" + i.multiQueryInput + "'" + ' ' + i.andOr + ' ';
+        if( i.companyColumn.value !== undefined || i.companyColumn.value !== null || i.companyColumn.value !== ""){
+          if ( i.columnQueryCondition.value === "like")
+            queryString = queryString 
+                     + i.companyColumn.value + " "
+                     + i.columnQueryCondition.value + " "
+                     + "'%" + i.multiQueryInput + "%'" + " " + i.andOr + " ";
+          if ( i.columnQueryCondition.value === "is null" || i.columnQueryCondition.value === "is not null")
+            queryString = queryString 
+                    + i.companyColumn.value + " "
+                    + i.columnQueryCondition.value + " " + i.andOr + " ";
+          if ( i.columnQueryCondition.value === "=")
+            queryString = queryString 
+                     + i.companyColumn.value + " "
+                     + i.columnQueryCondition.value + " "
+                     + "'" + i.multiQueryInput + "'" + " " + i.andOr + " ";
+        }
       }
       console.log("queryString", queryString);
     }
@@ -183,12 +212,14 @@ const MultiQueryModal = (props) => {
                 onColumnQueryConditionChange={handleSelectColumnQueryCondition}
                 onMultiQueryInputChange={handleMultiQueryInput}
                 onAndOrChange={handleAndOr}
+                onDelete = {onDelete}
               />
               ))}       
                
               
               </tbody>
               </table>     
+              
               <div style={{ display: 'flex', alignItems: 'center' }}>
                   <div style={{ width: '200px' }}>
                   <Checkbox checked={checked} disabled={disabled} onChange={onChange} style={{width:'200px'}}>
