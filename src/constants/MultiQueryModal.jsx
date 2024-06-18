@@ -83,12 +83,15 @@ const MultiQueryModal = (props) => {
 
     const handleSubmit = () => {
       console.log(queryConditions);
-      let queryString;
+      let queryString = "";
       for (const i of queryConditions){
-        console.log("i", i);
-        queryString = i.companyColumn.valueOf + i.columnQueryCondition.valueOf + "'" + i.multiQueryInput + "'" + i.andOr;
+        console.log("i", i.companyColumn.value);
+        queryString = queryString 
+                     + i.companyColumn.value +' '
+                     + i.columnQueryCondition.value + ' ' 
+                     + "'" + i.multiQueryInput + "'" + ' ' + i.andOr + ' ';
       }
-      console.log(queryString);
+      console.log("queryString", queryString);
     }
 
     //check box 
