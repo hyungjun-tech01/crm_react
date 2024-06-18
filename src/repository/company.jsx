@@ -35,43 +35,49 @@ export const CompanyRepo = selector({
     key: "CompanyRepository",
     get: ({getCallback}) => {
         const loadAllCompanies = getCallback(({set, snapshot}) => async () => {
-            try{
-                const response = await fetch(`${BASE_PATH}/companies`);
-                const data = await response.json();
-                if(data.message){
-                    console.log('\t[ loadAllCompanies ] message:', data.message);
+            // It is possible that this function might be called by more than two componets almost at the same time.
+            // So, to prevent this function from being executed again and again, check the loading state at first.
+            // (State & 1) : check if data is already loaded
+            // (State & (1 << 1)) : check if it is on the way to load data.
+            const loadStates = await snapshot.getPromise(atomCompanyState);
+            if((loadStates & 1) === 0 && (loadStates & (1 << 1)) === 0){
+                try{
+                    console.log('[CompanyRepository] Try loading all');
+                    set(atomCompanyState, (loadStates | (1 << 1)));
+                    
+                    const response = await fetch(`${BASE_PATH}/companies`);
+                    const data = await response.json();
+                    set(atomCompanyState, (loadStates & ~(1 << 1)));
+                    if(data.message){
+                        console.log('\t[ loadAllCompanies ] message:', data.message);
+                        set(atomAllCompanies, []);
+                        set(atomCompanyForSelection, []);
+                        set(atomCompanyState, (loadStates & ~1));
+                        return;
+                    }
+                    set(atomAllCompanies, data);
+                    const tempCompanySelection = data.map(item => ({
+                        value: {
+                            company_code: item.company_code,
+                            company_name: item.company_name,
+                            company_name_en: item.company_name_en,
+                            company_zip_code: item.company_zip_code,
+                            company_address: item.company_address,
+                            region: item.region,
+                        },
+                        label: item.company_name,
+                    }));
+                    set(atomCompanyForSelection, tempCompanySelection);
+                    set(atomCompanyState, (loadStates | 1));
+                }
+                catch(err){
+                    console.error(`\t[ loadAllCompanies ] Error : ${err}`);
                     set(atomAllCompanies, []);
                     set(atomCompanyForSelection, []);
 
                     const loadStates = await snapshot.getPromise(atomCompanyState);
-                    set(atomCompanyState, (loadStates & ~1));
-                    return;
-                }
-                set(atomAllCompanies, data);
-                const tempCompanySelection = data.map(item => ({
-                    value: {
-                        company_code: item.company_code,
-                        company_name: item.company_name,
-                        company_name_en: item.company_name_en,
-                        company_zip_code: item.company_zip_code,
-                        company_address: item.company_address,
-                        region: item.region,
-                    },
-                    label: item.company_name,
-                }));
-                set(atomCompanyForSelection, tempCompanySelection);
-
-                // Change loading state
-                const loadStates = await snapshot.getPromise(atomCompanyState);
-                set(atomCompanyState, (loadStates | 1));
-            }
-            catch(err){
-                console.error(`\t[ loadAllCompanies ] Error : ${err}`);
-                set(atomAllCompanies, []);
-                set(atomCompanyForSelection, []);
-
-                const loadStates = await snapshot.getPromise(atomCompanyState);
-                set(atomCompanyState, (loadStates & ~1));
+                    set(atomCompanyState, (loadStates & ~3));
+                };
             };
         });
 

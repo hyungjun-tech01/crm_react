@@ -61,22 +61,25 @@ export const ConsultingRepo = selector({
     key: "ConsultingRepository",
     get: ({getCallback}) => {
         const loadAllConsultings = getCallback(({set, snapshot}) => async () => {
-            try{
-                const response = await fetch(`${BASE_PATH}/consultings`);
-                const data = await response.json();
-                if(data.message){
-                    console.log('loadAllConsultings message:', data.message);
-                    set(atomAllConsultings, []);
-                    return;
+            // It is possible that this function might be called by more than two componets almost at the same time.
+            // So, to prevent this function from being executed again and again, check the loading state at first.
+            const loadStates = await snapshot.getPromise(atomConsultingState);
+            if((loadStates & 1) === 0){
+                try{
+                    console.log('[ConsultingRepository] Try loading all')
+                    const response = await fetch(`${BASE_PATH}/consultings`);
+                    const data = await response.json();
+                    if(data.message){
+                        console.log('loadAllConsultings message:', data.message);
+                        set(atomAllConsultings, []);
+                        return;
+                    }
+                    set(atomAllConsultings, data);
+                    set(atomConsultingState, (loadStates | 1));
                 }
-                set(atomAllConsultings, data);
-
-                // Change loading state
-                const loadStates = await snapshot.getPromise(atomConsultingState);
-                set(atomConsultingState, (loadStates | 1));
-            }
-            catch(err){
-                console.error(`loadAllCompanies / Error : ${err}`);
+                catch(err){
+                    console.error(`loadAllCompanies / Error : ${err}`);
+                };
             };
         });
         const loadCompanyConsultings = getCallback(({set}) => async (company_code) => {

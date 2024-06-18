@@ -13,23 +13,25 @@ export const ProductClassListRepo = selector({
     key: "ProductClassListRepository",
     get: ({getCallback}) => {
         const loadAllProductClassList = getCallback(({set, snapshot}) => async () => {
-            try{
-                console.log('product class list repostigory');
-                const response = await fetch(`${BASE_PATH}/productClass`);
-                const data = await response.json();
-                if(data.message){
-                    console.log('loadAllProductClassList message:', data.message);
-                    set(atomProductClassList, []);
-                    return;
+            // It is possible that this function might be called by more than two componets almost at the same time.
+            // So, to prevent this function from being executed again and again, check the loading state at first.
+            const loadStates = await snapshot.getPromise(atomProductClassListState);
+            if((loadStates & 1) === 0){
+                try{
+                    console.log('[ProductClassListRepository] Try loading all');
+                    const response = await fetch(`${BASE_PATH}/productClass`);
+                    const data = await response.json();
+                    if(data.message){
+                        console.log('loadAllProductClassList message:', data.message);
+                        set(atomProductClassList, []);
+                        return;
+                    }
+                    set(atomProductClassList, data);
+                    set(atomProductClassListState, (loadStates | 1));
                 }
-                set(atomProductClassList, data);
-
-                // Change loading state
-                const loadStates = await snapshot.getPromise(atomProductClassListState);
-                set(atomProductClassListState, (loadStates | 1));
-            }
-            catch(err){
-                console.error(`loadAllCompanies / Error : ${err}`);
+                catch(err){
+                    console.error(`loadAllCompanies / Error : ${err}`);
+                };
             };
         });
         const modifyProductClass = getCallback(({set, snapshot}) => async (newProductClass) => {
@@ -103,24 +105,26 @@ export const ProductRepo = selector({
     key: "ProductRepository",
     get: ({getCallback}) => {
         const loadAllProducts = getCallback(({set, snapshot}) => async () => {
-            try{
-                console.log('product repostigory');
-                const response = await fetch(`${BASE_PATH}/product`);
-                const data = await response.json();
-                if(data.message){
-                    console.log('loadAllProducts message:', data.message);
-                    set(atomAllProducts, []);
-                    return;
+            // It is possible that this function might be called by more than two componets almost at the same time.
+            // So, to prevent this function from being executed again and again, check the loading state at first.
+            const loadStates = await snapshot.getPromise(atomProductsState);
+            if((loadStates & 1) === 0){
+                try{
+                    console.log('[ProductRepository] Try loading all')
+                    const response = await fetch(`${BASE_PATH}/product`);
+                    const data = await response.json();
+                    if(data.message){
+                        console.log('loadAllProducts message:', data.message);
+                        set(atomAllProducts, []);
+                        return;
+                    }
+                    set(atomAllProducts, data);
+                    set(atomProductsState, (loadStates | 1));
                 }
-                set(atomAllProducts, data);
-
-                // Change loading state
-                const loadStates = await snapshot.getPromise(atomProductsState);
-                set(atomProductsState, (loadStates | 1));
-            }
-            catch(err){
-                console.error(`loadAllCompanies / Error : ${err}`);
-            };
+                catch(err){
+                    console.error(`loadAllCompanies / Error : ${err}`);
+                };    
+;            }
         });
         const modifyProduct = getCallback(({set, snapshot}) => async (newProduct) => {
             const input_json = JSON.stringify(newProduct);

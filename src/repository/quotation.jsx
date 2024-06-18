@@ -25,22 +25,25 @@ export const QuotationRepo = selector({
     key: "QuotationRepository",
     get: ({getCallback}) => {
         const loadAllQuotations = getCallback(({set, snapshot}) => async () => {
-            try{
-                const response = await fetch(`${BASE_PATH}/quotations`);
-                const data = await response.json();
-                if(data.message){
-                    console.log('loadAllQuotations message:', data.message);
-                    set(atomAllQuotations, []);
-                    return;
+            // It is possible that this function might be called by more than two componets almost at the same time.
+            // So, to prevent this function from being executed again and again, check the loading state at first.
+            const loadStates = await snapshot.getPromise(atomQuotationState);
+            if((loadStates & 1) === 0){
+                try{
+                    console.log('[QuotationRepository] Try loading all')
+                    const response = await fetch(`${BASE_PATH}/quotations`);
+                    const data = await response.json();
+                    if(data.message){
+                        console.log('loadAllQuotations message:', data.message);
+                        set(atomAllQuotations, []);
+                        return;
+                    }
+                    set(atomAllQuotations, data);
+                    set(atomQuotationState, (loadStates | 1));
                 }
-                set(atomAllQuotations, data);
-
-                // Change loading state
-                const loadStates = await snapshot.getPromise(atomQuotationState);
-                set(atomQuotationState, (loadStates | 1));
-            }
-            catch(err){
-                console.error(`loadAllCompanies / Error : ${err}`);
+                catch(err){
+                    console.error(`loadAllCompanies / Error : ${err}`);
+                };
             };
         });
         

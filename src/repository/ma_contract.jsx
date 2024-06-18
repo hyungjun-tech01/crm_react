@@ -8,6 +8,15 @@ import { atomCompanyMAContracts
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
+
+export const ContractTypes=[
+    {label: 'YLC', value: 'YLC'},
+    {label: 'YSC', value: 'YSC'},
+    {label: 'QLC', value: 'QLC'},
+    {label: 'ASC', value: 'ASC'},
+];
+
+
 export const MAContractRepo = selector({
     key: "MAContractRepository",
     get: ({getCallback}) => {
@@ -55,7 +64,6 @@ export const MAContractRepo = selector({
         });
         const modifyMAContract = getCallback((({set, snapshot}) => async(newContract) => {
             const input_json = JSON.stringify(newContract);
-            console.log(`[ modifyMAContract ] input : `, input_json);
             try{
                 const response = await fetch(`${BASE_PATH}/modifyMaContract`, {
                     method: "POST",

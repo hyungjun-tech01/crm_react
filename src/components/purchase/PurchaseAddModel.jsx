@@ -20,7 +20,7 @@ import {
 } from '../../atoms/atoms';
 import { CompanyRepo } from '../../repository/company';
 import { PurchaseRepo } from '../../repository/purchase';
-import { MAContractRepo } from "../../repository/ma_contract";
+import { MAContractRepo, ContractTypes } from "../../repository/ma_contract";
 import { ProductClassListRepo, ProductRepo, ProductTypeOptions } from '../../repository/product';
 
 import AddBasicItem from "../../constants/AddBasicItem";
@@ -36,12 +36,12 @@ const PurchaseAddModel = (props) => {
 
     //===== [RecoilState] Related with Company =============================================
     const companyState = useRecoilValue(atomCompanyState);
-    const { companyForSelection } = useRecoilValue(atomCompanyForSelection);
+    const companyForSelection = useRecoilValue(atomCompanyForSelection);
     const { loadAllCompanies } = useRecoilValue(CompanyRepo);
 
 
     //===== [RecoilState] Related with Purcahse ============================================
-    const { currentPurchase } = useRecoilValue(atomCurrentPurchase);
+    const currentPurchase = useRecoilValue(atomCurrentPurchase);
     const { modifyPurchase, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
 
 
@@ -65,12 +65,13 @@ const PurchaseAddModel = (props) => {
     const [ companyData, setCompanyData ] = useState({ company_name: '', company_code: '' });
     
     const initializeAddTemplate = useCallback(() => {
+        setCurrentPurchase();   // initialize current purchase
         setAddChange({
             ...defaultPurchase,
             company_name: null,
         });
         document.querySelector("#add_new_purchase_form").reset();
-    }, []);
+    }, [setCurrentPurchase]);
 
     const handleAddChange = useCallback((e) => {
         const modifiedData = {
@@ -134,24 +135,23 @@ const PurchaseAddModel = (props) => {
 
         console.log(`[ handleAddNewPurchase ]`, newPurchaseData);
         const res_data = modifyPurchase(newPurchaseData);
-        if(res_data.result)
-        {
-            setCurrentPurchase(res_data.code);
-        }
-        else
-        {
-            console.log('[PurchaseAddModel] fail to add purchase');
-        };
+        res_data.then((res) => {
+            if(res.result) {
+                setCurrentPurchase(res.code);
+            } else {
+                console.log('[PurchaseAddModel] fail to add purchase');
+            }
+        });
     }, [addChange, cookies.myLationCrmUserId, modifyPurchase, setCurrentPurchase]);
 
 
     //===== Handles to edit 'MA contract' =================================================
     const [ isSubModalOpen, setIsSubModalOpen ] = useState(false);
-    const [subModalSetting, setSubModalSetting] = useState({ title: '' })
+    const [ subModalSetting, setSubModalSetting ] = useState({ title: '' })
     const [ contractLists, setContractLists ] = useState([]);
     const [ selectedMAContractRowKeys, setSelectedMAContractRowKeys ] = useState([]);
-    const [orgSubModalValues, setOrgSubModalValues] = useState({});
-    const [editedSubModalValues, setEditedSubModalValues] = useState({});
+    const [ orgSubModalValues, setOrgSubModalValues ] = useState({});
+    const [ editedSubModalValues, setEditedSubModalValues ] = useState({});
     
     const columns_ma_contract = [
         {
@@ -205,6 +205,7 @@ const PurchaseAddModel = (props) => {
     const ma_contract_items = [
         { name: 'ma_contract_date', title: t('contract.contract_date'), detail: { type: 'date' } },
         { name: 'ma_finish_date', title: t('contract.end_date'), detail: { type: 'date' } },
+        { name: 'ma_contract_type', title: t('contract.contract_type'), detail: { type: 'select', options: ContractTypes } },
         { name: 'ma_price', title: t('common.price_1'), detail: { type: 'label' } },
         { name: 'ma_memo', title: t('common.memo'), detail: { type: 'textarea', row_no: 4 } },
     ];
@@ -214,25 +215,34 @@ const PurchaseAddModel = (props) => {
             ...orgSubModalValues,
             ...editedSubModalValues,
         };
+        if(!finalData.ma_finish_date) {
+            console.error('[PurchaseAddModel] no end date!');
+            return;
+        };
         const resp = modifyMAContract(finalData);
         resp.then(result => {
             if (result) {
                 const updatedContracts = contractLists.concat(result);
+                console.log(`[ handleSubModalOk ] update contract list : `, updatedContracts);
                 setContractLists(updatedContracts);
 
                 // Update MA Contract end date
-                if(currentPurchase
+                if(currentPurchase.purchase_code
                     && (!currentPurchase.MA_finish_date || (new Date(currentPurchase.MA_finish_date) < finalData.MA_finish_date))){
                     const modifiedPurchase = {
                         ...currentPurchase,
                         MA_finish_date: finalData.MA_finish_date,
+                        action_type: 'UPDATE',
+                        modify_user: cookies.myLationCrmUserId,
                     };
                     const res_data = modifyPurchase(modifiedPurchase);
-                    if(res_data){
-                        console.log('Succeeded to update MA end date');
-                    } else {
-                        console.log('Fail to update MA end date');
-                    };
+                    res_data.then(res => {
+                        if(res.result){
+                            console.log('Succeeded to update MA end date');
+                        } else {
+                            console.log('Fail to update MA end date');
+                        };
+                    });
                 };
             } else {
                 console.error('Failed to add/modify ma contract');
@@ -254,7 +264,6 @@ const PurchaseAddModel = (props) => {
     }, []);
 
     const handleAddMAContract = useCallback((company_code, purchase_code) => {
-        orgSubModalValues({});
         setOrgSubModalValues({
             ...defaultMAContract,
             action_type: 'ADD',
@@ -264,7 +273,7 @@ const PurchaseAddModel = (props) => {
         });
         setSubModalSetting({ title: t('contract.add_contract') });
         setIsSubModalOpen(true);
-    }, [cookies.myLationCrmUserId, orgSubModalValues, t]);
+    }, [cookies.myLationCrmUserId, t]);
 
     const handleModifyMAContract = useCallback((code) => {
         setEditedSubModalValues(null);
@@ -295,25 +304,24 @@ const PurchaseAddModel = (props) => {
     }, [init, handleInit, initializeAddTemplate]);
 
     useEffect(() => {
-        if ((companyState & 1) === 0) {
-            console.log('[PurchaseAddModel] loading company data!');
+        if ((companyState & 1) === 0 && (companyState & (1 << 1)) === 0) {
             loadAllCompanies();
         };
     }, [companyState, loadAllCompanies]);
 
     // ----- useEffect for Production -----------------------------------
     useEffect(() => {
-        console.log('[CompanyDetailModel] useEffect / Production');
+        console.log('[PurchaseAddModel] useEffect / Production');
         if ((productClassState & 1) === 0) {
-            console.log('CompanyDetailsModel / loadAllProductClassList');
+            console.log('[PurchaseAddModel] loadAllProductClassList');
             loadAllProductClassList();
         };
         if ((productState & 1) === 0) {
-            console.log('CompanyDetailsModel / loadAllProducts');
+            console.log('[PurchaseAddModel] loadAllProducts');
             loadAllProducts();
         };
         if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
-            console.log("Check Product Options\n - ", productOptions);
+            console.log('[PurchaseAddModel] set companies for selection');
             const productOptionsValue = allProductClassList.map(proClass => {
                 const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
                 const subOptions = foundProducts.map(item => {
@@ -339,6 +347,7 @@ const PurchaseAddModel = (props) => {
             tabIndex={-1}
             role="dialog"
             aria-modal="true"
+            data-bs-focus="false"
         >
             <div className="modal-dialog" role="document">
                 <button
@@ -499,7 +508,7 @@ const PurchaseAddModel = (props) => {
                                             onChange={handleAddChange}
                                         />
                                     </div>
-                                    <div className="text-center">
+                                    <div className="text-center py-3">
                                         <button
                                             type="button"
                                             className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
@@ -507,6 +516,7 @@ const PurchaseAddModel = (props) => {
                                         >
                                             {t('common.save')}
                                         </button>
+                                        &nbsp;&nbsp;
                                         <button
                                             type="button"
                                             className="btn btn-secondary btn-rounded"
@@ -518,7 +528,7 @@ const PurchaseAddModel = (props) => {
                                 </form>
                             </div>
                         </div>
-                        { currentPurchase !== defaultPurchase &&
+                        { (currentPurchase.purchase_code) &&
                             <div className="row">
                                 <div className="card mb-0">
                                     <div className="table-body">

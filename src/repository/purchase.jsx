@@ -16,23 +16,25 @@ export const PurchaseRepo = selector({
     key: "PurchaseRepository",
     get: ({getCallback}) => {
         const loadAllPurchases = getCallback(({set, snapshot}) => async () => {
-            try{
-                console.log('purchase repostigory');
-                const response = await fetch(`${BASE_PATH}/purchases`);
-                const data = await response.json();
-                if(data.message){
-                    console.log('loadAllPurchases message:', data.message);
-                    set(atomAllPurchases, []);
-                    return;
+            // It is possible that this function might be called by more than two componets almost at the same time.
+            // So, to prevent this function from being executed again and again, check the loading state at first.
+            const loadStates = await snapshot.getPromise(atomPurchaseState);
+            if((loadStates & 1) === 0){
+                try{
+                    console.log('[PurchaseRepository] Try loading all')
+                    const response = await fetch(`${BASE_PATH}/purchases`);
+                    const data = await response.json();
+                    if(data.message){
+                        console.log('loadAllPurchases message:', data.message);
+                        set(atomAllPurchases, []);
+                        return;
+                    }
+                    set(atomAllPurchases, data);
+                    set(atomPurchaseState, (loadStates | 1));
                 }
-                set(atomAllPurchases, data);
-
-                // Change loading state
-                const loadStates = await snapshot.getPromise(atomPurchaseState);
-                set(atomPurchaseState, (loadStates | 1));
-            }
-            catch(err){
-                console.error(`loadAllCompanies / Error : ${err}`);
+                catch(err){
+                    console.error(`loadAllCompanies / Error : ${err}`);
+                };
             };
         });
         const loadCompanyPurchases = getCallback(({set}) => async (company_code) => {
@@ -98,7 +100,6 @@ export const PurchaseRepo = selector({
         });            
         const modifyPurchase = getCallback(({set, snapshot}) => async (newPurchase) => {
             const input_json = JSON.stringify(newPurchase);
-            console.log(`[ modifyPurchase ] input : `, input_json);
             try{
                 const response = await fetch(`${BASE_PATH}/modifyPurchase`, {
                     method: "POST",
@@ -151,7 +152,8 @@ export const PurchaseRepo = selector({
                         ];
                         set(atomAllPurchases, updatedAllPurchases);
                         return {
-                            result: false,
+                            result: true,
+                            code: modifiedPurchase.purchase_code,
                         };
                     } else {
                         console.log('\t[ modifyPurchase ] No specified purchase is found');

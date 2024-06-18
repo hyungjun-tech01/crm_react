@@ -63,6 +63,7 @@ const DetailSubModal = (props) => {
                     defaultValue={original[item.name]}
                     edited={edited}
                     name={item.name}
+                    options={item.detail.type === 'select'? item.detail.options : null}
                     detail={modifiedDetail}
                 />
             )})}

@@ -14,22 +14,25 @@ export const TransactionRepo = selector({
     key: "TransactionRepository",
     get: ({getCallback}) => {
         const loadAllTransactions = getCallback(({set, snapshot}) => async () => {
-            try{
-                const response = await fetch(`${BASE_PATH}/transactions`);
-                const data = await response.json();
-                if(data.message){
-                    console.log('loadAllTransactions message:', data.message);
-                    set(atomAllTransactions, []);
-                    return;
+            // It is possible that this function might be called by more than two componets almost at the same time.
+            // So, to prevent this function from being executed again and again, check the loading state at first.
+            const loadStates = await snapshot.getPromise(atomTransationState);
+            if((loadStates & 1) === 0){
+                try{
+                    console.log('[TransactionRepository] Try loading all')
+                    const response = await fetch(`${BASE_PATH}/transactions`);
+                    const data = await response.json();
+                    if(data.message){
+                        console.log('loadAllTransactions message:', data.message);
+                        set(atomAllTransactions, []);
+                        return;
+                    }
+                    set(atomAllTransactions, data);
+                    set(atomTransationState, (loadStates | 1));
                 }
-                set(atomAllTransactions, data);
-
-                // Change loading state
-                const loadStates = await snapshot.getPromise(atomTransationState);
-                set(atomTransationState, (loadStates | 1));
-            }
-            catch(err){
-                console.error(`loadAllCompanies / Error : ${err}`);
+                catch(err){
+                    console.error(`loadAllCompanies / Error : ${err}`);
+                };
             };
         });
         const filterTransactions = getCallback(({set, snapshot }) => async (itemName, filterText) => {
