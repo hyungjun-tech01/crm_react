@@ -220,9 +220,9 @@ const PurchaseDetailsModel = (props) => {
   }, [cookies.myLationCrmUserId, editedSubModalValues, handleSelected, modifyMAContract, modifyPurchase, orgSubModalValues, selected]);
 
   const handleSubModalCancel = () => {
-    setOrgSubModalValues(null);
-    setSelectedMAContractRowKeys([]);
     setIsSubModalOpen(false);
+    setOrgSubModalValues(defaultMAContract);
+    setSelectedMAContractRowKeys([]);
   };
 
   const handleSubModalItemChange = useCallback(data => {
