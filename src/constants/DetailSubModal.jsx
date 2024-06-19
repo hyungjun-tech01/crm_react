@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Modal } from 'antd';
 import DetailCardItem from './DetailCardItem';
 
@@ -26,6 +26,10 @@ const DetailSubModal = (props) => {
         };
         handleEdited(tempData);
     };
+
+    useEffect(()=>{
+        console.log('[DetailSubModal] check data: ', original);
+    }, [original]);
 
     return (
         <Modal

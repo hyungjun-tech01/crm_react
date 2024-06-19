@@ -76,6 +76,16 @@
     border-radius: 5px;
     background-color:rgb(243, 231, 250);
 }
+.detail-title-select {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 0.8rem;
+    font-weight: 400;
+    line-height: 1.5;
+    border: 0;
+}
 .detail-edit-label {
     display: block;
     width: 100%;

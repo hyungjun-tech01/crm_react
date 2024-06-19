@@ -15,7 +15,7 @@ import {
     atomAllProducts,
     atomProductsState,
     atomProductOptions,
-    atomCompanyMAContracts,
+    atomMAContractSet,
     defaultMAContract,
 } from '../../atoms/atoms';
 import { CompanyRepo } from '../../repository/company';
@@ -193,7 +193,7 @@ const PurchaseAddModel = (props) => {
             if (selectedRows.length > 0) {
                 // Set data to edit selected purchase ----------------------
                 const selectedValue = selectedRows.at(0);
-                setCurrentMAContract(selectedValue.guid);
+                setCurrentMAContract(selectedValue.ma_code);
             } else {
                 setCurrentMAContract();
             };
@@ -285,7 +285,7 @@ const PurchaseAddModel = (props) => {
 
     const handleModifyMAContract = useCallback((code) => {
         setEditedSubModalValues(null);
-        const foundMAContract = contractLists.filter(item => item.guid === code);
+        const foundMAContract = contractLists.filter(item => item.ma_code === code);
         if (foundMAContract.length > 0) {
             const selectedContract = foundMAContract[0];
             setOrgSubModalValues({
@@ -583,8 +583,8 @@ const PurchaseAddModel = (props) => {
                                                 onRow={(record, rowIndex) => {
                                                     return {
                                                         onClick: (event) => {
-                                                            setSelectedMAContractRowKeys([record.guid]);
-                                                            handleModifyMAContract(record.guid);
+                                                            setSelectedMAContractRowKeys([record.ma_code]);
+                                                            handleModifyMAContract(record.ma_code);
                                                         }, // click row
                                                     };
                                                 }}

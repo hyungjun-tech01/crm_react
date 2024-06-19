@@ -29,12 +29,12 @@ const Header = (props) => {
   };
   const headerTitles = {
     dashboard: t('dashboard.dashboard'),
-    companies : t('company.company'),
-    leads : t('lead.lead'),
+    companies : t('company.company_manage'),
+    leads : t('lead.lead_manage'),
     consultings : t('consulting.consulting'),
     quotations : t('quotation.quotation'),
     transactions : t('transaction.transaction'),
-    purchases : t('purchase.purchase'),
+    purchases : t('purchase.purchase_manage'),
   };
 
   const changeLanguage = (lng) => {   // 언어 변경  

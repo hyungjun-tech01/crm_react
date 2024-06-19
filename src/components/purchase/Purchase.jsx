@@ -143,8 +143,13 @@ const Purchase = () => {
       const modifiedData = allPurchaseData.map(purchase => {
         const foundIdx = allCompanyData.findIndex(company => company.company_code === purchase.company_code);
         if(foundIdx !== -1){
-          const remain_date = purchase.ma_finish_date
-            ? Math.ceil((new Date(purchase.ma_finish_date).getTime() - new Date().getTime())/86400000) : '';
+          let remain_date = '';
+          if(purchase.ma_finish_date) {
+            const calc_remain_date = Math.ceil((new Date(purchase.ma_finish_date).getTime() - new Date().getTime())/86400000);
+            if(calc_remain_date >= 0){
+              remain_date = calc_remain_date;
+            };
+          };
           return {
             ...purchase,
             company_name: allCompanyData[foundIdx].company_name,
@@ -164,7 +169,7 @@ const Purchase = () => {
     <HelmetProvider>
       <div className="page-wrapper">
         <Helmet>
-          <title>{t('purchase.purchase')}</title>
+          <title>{t('purchase.purchase_manage')}</title>
           <meta name="description" content="Reactify Blank Page" />
         </Helmet>
         <div className="content container-fluid">
@@ -260,7 +265,7 @@ const Purchase = () => {
                       onRow={(record, rowIndex) => {
                         return {
                           onDoubleClick: (event) => {
-                            handleClickPurchase(record.purchase_code)
+                            handleClickPurchase(record)
                             let myModal = new bootstrap.Modal(document.getElementById('purchase-details'), {
                               keyboard: false
                             })
@@ -285,7 +290,7 @@ const Purchase = () => {
                       onRow={(record, rowIndex) => {
                         return {
                           onDoubleClick: (event) => {
-                            handleClickPurchase(record)
+                            handleClickPurchase(record);
                             let myModal = new bootstrap.Modal(document.getElementById('purchase-details'), {
                               keyboard: false
                             })
@@ -383,7 +388,7 @@ const Purchase = () => {
         </div>
         {/* Modal */}
         <PurchaseAddModel init={initAddNewPurchase} handleInit={setInitAddNewPurchase} />
-        <PurchaseDetailsModel selected={selectedPurchase}/>
+        <PurchaseDetailsModel selected={selectedPurchase} handleSelected={setSelectedPurchase} />
       </div>
     </HelmetProvider>
   );

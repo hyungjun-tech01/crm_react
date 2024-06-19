@@ -342,7 +342,7 @@ export const atomPurchaseState = atom({
 //----- MA Contract ------------------------
 export const defaultMAContract = {
     action_type : null,
-    guid : null,
+    ma_code : null,
     purchase_code : null,
     ma_company_code : null,
     ma_contract_date : null,
@@ -356,8 +356,8 @@ export const atomCurrentMAContract = atom({
     key: "currentMAContract",
     default: defaultMAContract,
 });
-export const atomCompanyMAContracts = atom({
-    key: "companyMAcontracts",
+export const atomMAContractSet = atom({
+    key: "MAcontractSet",
     default: [],
 });
 export const atomMAContractState = atom({

@@ -26,30 +26,33 @@ const DetailTitleItem = (props) => {
     if(type === 'select' && !!options){
         let defaultOption = null;
         if(!!group){
-            console.log('[DetailTitleItem] group :', group);
             const foundIdx = options.findIndex(item => item.title === group);
             if(foundIdx !== -1){
-                const groupOptions = options[foundIdx];
-                console.log('[DetailTitleItem] group options :', groupOptions);
+                const groupOptions = options[foundIdx].options;
                 const foundIdxSub = groupOptions.findIndex(item => item.value[name] === original);
                 if(foundIdxSub !== -1) {
                     defaultOption = groupOptions[foundIdxSub];
                 };
             };
         } else {
-            console.log('[DetailTitleItem] No group');
-            const foundIdx = options.findIndex(item => item.value === original);
-            if(foundIdx !== -1){
-                defaultOption = options[foundIdx];
-            };
+            if(typeof options[0].value === 'object') {
+                const foundIdx = options.findIndex(item => item.value[name] === original);
+                if(foundIdx !== -1){
+                    defaultOption = options[foundIdx];
+                };
+            } else {
+                const foundIdx = options.findIndex(item => item.value === original);
+                if(foundIdx !== -1){
+                    defaultOption = options[foundIdx];
+                };;
+            }
         };
-        console.log('[DetailTitleItem] value :', defaultOption);
         return (
             <div className={classSize}>
                 <span><b>{title}</b></span>
                 <div style={{display: 'flex'}}>
                     <Select
-                        className='detail-title-input'
+                        className='detail-title-select'
                         value={defaultOption}
                         options={options}
                         onChange={onEditing}

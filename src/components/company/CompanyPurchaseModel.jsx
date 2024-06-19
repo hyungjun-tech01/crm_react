@@ -10,7 +10,7 @@ import { Add } from "@mui/icons-material";
 import {
     atomCurrentPurchase,
     defaultPurchase,
-    atomCompanyMAContracts,
+    atomMAContractSet,
     defaultMAContract,
     atomProductClassList,
     atomProductClassListState,
@@ -32,7 +32,7 @@ const CompanyPurchaseModel = (props) => {
     const productState = useRecoilValue(atomProductsState);
     const currentPurchase = useRecoilValue(atomCurrentPurchase);
     const { modifyPurchase, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
-    const companyMAContracts = useRecoilValue(atomCompanyMAContracts);
+    const companyMAContracts = useRecoilValue(atomMAContractSet);
     const { modifyMAContract } = useRecoilValue(MAContractRepo);
 
     const allProductClassList = useRecoilValue(atomProductClassList);
@@ -45,7 +45,7 @@ const CompanyPurchaseModel = (props) => {
     const { t } = useTranslation();
 
     const [ isSubModalOpen, setIsSubModalOpen ] = useState(false);
-    const [subModalSetting, setSubModalSetting] = useState({ title: '' })
+    const [ subModalSetting, setSubModalSetting] = useState({ title: '' })
 
     const [editedOtherValues, setEditedOtherValues] = useState(null);
     const [orgTimeOther, setOrgTimeOther] = useState(null);
@@ -241,7 +241,7 @@ const CompanyPurchaseModel = (props) => {
 
 
     // --- Variables for only Purchase ------------------------------------------------
-    const [maContractByPurchase, setMaContractByPurchase] = useState([]);
+    const [ maContractByPurchase, setMaContractByPurchase ] = useState([]);
 
     const handleSelectPurchase = useCallback((purchase) => {
         setCurrentPurchase(purchase.purchase_code);
@@ -449,7 +449,7 @@ const CompanyPurchaseModel = (props) => {
 
     const handleModifyMAContract = useCallback((code) => {
         setEditedSubModalValues(null);
-        const foundMAContract = maContractByPurchase.filter(item => item.guid === code);
+        const foundMAContract = maContractByPurchase.filter(item => item.ma_code === code);
         if (foundMAContract.length > 0) {
             const selectedContract = foundMAContract[0];
             setOrgSubModalValues({
@@ -479,9 +479,14 @@ const CompanyPurchaseModel = (props) => {
             render: (text, record) => <>{formatDate(record.ma_contract_date)}</>,
         },
         {
-            title: t('contract.end_date'),
+            title: t('contract.contract_end_date'),
             dataIndex: "ma_finish_date",
             render: (text, record) => <>{formatDate(record.ma_finish_date)}</>,
+        },
+        {
+            title: t('contract.contract_type'),
+            dataIndex: "ma_contract_type",
+            render: (text, record) => <>{text}</>,
         },
         {
             title: t('common.price_1'),
@@ -504,7 +509,7 @@ const CompanyPurchaseModel = (props) => {
             if (selectedRows.length > 0) {
                 // Set data to edit selected purchase ----------------------
                 const selectedValue = selectedRows.at(0);
-                handleModifyMAContract(selectedValue.guid);
+                handleModifyMAContract(selectedValue.ma_code);
             } else {
                 setCurrentPurchase(defaultPurchase);
                 setEditedOtherValues(null);
@@ -587,7 +592,7 @@ const CompanyPurchaseModel = (props) => {
                                 }
                                 onRow={(record, rowIndex) => {
                                     return {
-                                        onClick: (event) => {
+                                        onDoubleClick: (event) => {
                                             setSelectedPurchaseRowKeys([record.purchase_code]);
                                             handleSelectPurchase(record);
                                             setSelectedContractRowKeys([]);   //initialize the selected list about contract
@@ -668,7 +673,7 @@ const CompanyPurchaseModel = (props) => {
                                         style={{ overflowX: "auto" }}
                                         columns={columns_ma_contract}
                                         dataSource={maContractByPurchase}
-                                        rowKey={(record) => record.guid}
+                                        rowKey={(record) => record.ma_code}
                                         title={() =>
                                             <div style={{
                                                 display: 'flex',
@@ -688,8 +693,8 @@ const CompanyPurchaseModel = (props) => {
                                         onRow={(record, rowIndex) => {
                                             return {
                                                 onClick: (event) => {
-                                                    setSelectedContractRowKeys([record.guid]);
-                                                    handleModifyMAContract(record.guid);
+                                                    setSelectedContractRowKeys([record.ma_code]);
+                                                    handleModifyMAContract(record.ma_code);
                                                 }, // click row
                                             };
                                         }}

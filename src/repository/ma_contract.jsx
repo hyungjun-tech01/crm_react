@@ -1,6 +1,6 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomCompanyMAContracts
+import { atomMAContractSet
     , atomCurrentMAContract
     , defaultMAContract
     , atomMAContractState
@@ -32,10 +32,35 @@ export const MAContractRepo = selector({
                 const data = await response.json();
                 if(data.message){
                     console.log('[loadCompanyMAContracts] message:', data.message);
-                    set(atomCompanyMAContracts, []);
+                    set(atomMAContractSet, []);
                     return;
                 }
-                set(atomCompanyMAContracts, data);
+                set(atomMAContractSet, data);
+
+                // Change loading state
+                const loadStates = await snapshot.getPromise(atomMAContractState);
+                set(atomMAContractState, (loadStates | 1));
+            }
+            catch(err){
+                console.error(`loadCompanyMAContracts / Error : ${err}`);
+            };
+        });
+        const loadPurchaseMAContracts = getCallback(({set, snapshot}) => async (code) => {
+            const input_json = JSON.stringify({purchase_code: code});
+            console.log(`[ loadPurchaseMAContracts ] input : `, input_json);
+            try{
+                const response = await fetch(`${BASE_PATH}/purchaseMaContract`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+                const data = await response.json();
+                if(data.message){
+                    console.log('[loadPurchaseMAContracts] message:', data.message);
+                    set(atomMAContractSet, []);
+                    return;
+                }
+                set(atomMAContractSet, data);
 
                 // Change loading state
                 const loadStates = await snapshot.getPromise(atomMAContractState);
@@ -51,7 +76,7 @@ export const MAContractRepo = selector({
                     set(atomCurrentMAContract, defaultMAContract);
                     return;
                 };
-                let companyMAContras = await snapshot.getPromise(atomCompanyMAContracts);
+                let companyMAContras = await snapshot.getPromise(atomMAContractSet);
 
                const selected_arrary = companyMAContras.filter(contract => contract.company_code === company_code);
                 if(selected_arrary.length > 0){
@@ -76,18 +101,18 @@ export const MAContractRepo = selector({
                     return null;
                 };
 
-                const companyMAContracts = await snapshot.getPromise(atomCompanyMAContracts);
+                const companyMAContracts = await snapshot.getPromise(atomMAContractSet);
                 if(newContract.action_type === 'ADD'){
                     delete newContract.action_type;
                     const updatedNewMAContract = {
                         ...newContract,
-                        guid : data.out_guid,
+                        ma_code : data.out_ma_code,
                         create_user : data.out_create_user,
                         create_date : data.out_create_date,
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomCompanyMAContracts, companyMAContracts.concat(updatedNewMAContract));
+                    set(atomMAContractSet, companyMAContracts.concat(updatedNewMAContract));
                     return updatedNewMAContract;
                 } else if(newContract.action_type === 'UPDATE'){
                     const currentMAContract = await snapshot.getPromise(atomCurrentMAContract);
@@ -101,15 +126,15 @@ export const MAContractRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCurrentMAContract, modifiedMAContract);
-                    const foundIdx = atomCompanyMAContracts.findIndex(contract => 
-                        contract.guid === modifiedMAContract.guid);
+                    const foundIdx = atomMAContractSet.findIndex(contract => 
+                        contract.ma_code === modifiedMAContract.ma_code);
                     if(foundIdx !== -1){
                         const updatedCompanyContracts = [
-                            ...atomCompanyMAContracts.slice(0, foundIdx),
+                            ...atomMAContractSet.slice(0, foundIdx),
                             modifiedMAContract,
-                            ...atomCompanyMAContracts.slice(foundIdx + 1,),
+                            ...atomMAContractSet.slice(foundIdx + 1,),
                         ];
-                        set(atomCompanyMAContracts, updatedCompanyContracts);
+                        set(atomMAContractSet, updatedCompanyContracts);
                         return modifiedMAContract;
                     } else {
                         console.log('\t[ modifyMAContract ] No specified MA contract is found');
@@ -124,6 +149,7 @@ export const MAContractRepo = selector({
         }));
         return {
             loadCompanyMAContracts,
+            loadPurchaseMAContracts,
             setCurrentMAContract,
             modifyMAContract,
         };
