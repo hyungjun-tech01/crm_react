@@ -113,24 +113,23 @@ const Purchase = () => {
         </>,
       sorter: (a, b) => compareText(a.serial_number, b.serial_number),
     },
-    
     {
       title: t('purchase.ma_contract_date'),
       dataIndex: "ma_contact_date",
-      render: (text, record) =>
-        <>
-          { (text && text !=="") && new Date(text).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day: 'numeric'}) }
-        </>,
+      render: (text, record) => <>{formatDate(record.ma_contact_date)}</>,
       sorter: (a, b) => a.ma_contact_date - b.ma_contact_date,
     },
     {
       title: t('purchase.ma_finish_date'),
       dataIndex: "ma_finish_date",
-      render: (text, record) =>
-        <>
-          { (text && text !=="") && new Date(text).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day: 'numeric'}) }
-        </>,
+      render: (text, record) => <>{formatDate(record.ma_finish_date)}</>,
       sorter: (a, b) => a.ma_finish_date - b.ma_finish_date,
+    },
+    {
+      title: t('purchase.ma_remain_date'),
+      dataIndex: "ma_remain_date",
+      render: (text, record) => <>{text}</>,
+      sorter: (a, b) => a.ma_remain_date - b.ma_remain_date,
     },
   ];
 
@@ -147,10 +146,13 @@ const Purchase = () => {
       const modifiedData = allPurchaseData.map(purchase => {
         const foundIdx = allCompanyData.findIndex(company => company.company_code === purchase.company_code);
         if(foundIdx !== -1){
+          const remain_date = purchase.ma_finish_date
+            ? Math.ceil((new Date(purchase.ma_finish_date).getTime() - new Date().getTime())/86400000) : '';
           return {
             ...purchase,
             company_name: allCompanyData[foundIdx].company_name,
             company_name_eng: allCompanyData[foundIdx].company_name_eng,
+            ma_remain_date: remain_date,
           }
         } else {
           return null;

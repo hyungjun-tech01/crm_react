@@ -182,6 +182,7 @@ const enResource = {
             licence_info: 'License Info.',
             ma_contract_date:'MA Date',
             ma_finish_date:'MA Finish Date',
+            ma_remain_date: 'MA Remain Date',
             modify_purchase:'Modify Purchase',
             module: 'Module',
             po_number: 'PO No.',

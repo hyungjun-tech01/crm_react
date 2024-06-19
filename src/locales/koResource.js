@@ -182,6 +182,7 @@ const koResource = {
             licence_info: '라이센스 정보',
             ma_contract_date:'유지보수계약일',
             ma_finish_date:'유지보수종료일',
+            ma_remain_date: '유지보수잔여일',
             modify_purchase:'구매 정보 변경',
             module: '모듈',
             po_number: 'PO No.',
