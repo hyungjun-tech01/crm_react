@@ -142,7 +142,7 @@ const TransactionsDetailsModel = () => {
                 original={selectedTransaction.company_name}
                 name='company_name'
                 title={t('company.company_name')}
-                type='col-md-4'
+                size='col-md-4'
                 onEditing={handleEditing}
               />
               <DetailTitleItem

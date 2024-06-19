@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
@@ -22,7 +21,6 @@ import PurchaseDetailsModel from "./PurchaseDetailsModel";
 
 const Purchase = () => {
   const { t } = useTranslation();
-  const [ cookies ] = useCookies(["myLationCrmUserName",  "myLationCrmUserId"]);
 
 
   //===== [RecoilState] Related with Company =============================================
@@ -35,16 +33,16 @@ const Purchase = () => {
   const purchaseState = useRecoilValue(atomPurchaseState);
   const allPurchaseData = useRecoilValue(atomAllPurchases);
   const filteredPurchase = useRecoilValue(atomFilteredPurchase);
-  const { loadAllPurchases, setCurrentPurchase, filterPurchases } = useRecoilValue(PurchaseRepo);
+  const { loadAllPurchases, filterPurchases } = useRecoilValue(PurchaseRepo);
 
 
   //===== Handles to deal 'Purcahse' ====================================================
   const [ initAddNewPurchase, setInitAddNewPurchase ] = useState(false);
   const [ tableData, setTableData ] = useState([]);
+  const [ selectedPurchase, setSelectedPurchase ] = useState(null);
   
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
-
   const [statusSearch, setStatusSearch] = useState('common.all');
 
   const handleStatusSearch = (newValue) => {
@@ -61,10 +59,9 @@ const Purchase = () => {
   };
 
   // --- Functions used for Table ------------------------------
-  const handleClickPurchase = useCallback((id)=>{
-    console.log('[Purchase] set current purchase : ', id);
-    setCurrentPurchase(id);
-  },[setCurrentPurchase]);
+  const handleClickPurchase = useCallback((data)=>{
+    setSelectedPurchase(data);
+  },[setSelectedPurchase]);
 
   const handleAddNewPurchaseClicked = useCallback(() => {
     setInitAddNewPurchase(true);
@@ -107,7 +104,7 @@ const Purchase = () => {
       dataIndex: "serial_number",
       render: (text, record) =>
         <>
-          <a href="#" data-bs-toggle="modal" data-bs-target="#purchase-details" onClick={()=>{handleClickPurchase(record.purchase_code);}}>
+          <a href="#" data-bs-toggle="modal" data-bs-target="#purchase-details" onClick={()=>{handleClickPurchase(record);}}>
             {text}
           </a>
         </>,
@@ -288,7 +285,7 @@ const Purchase = () => {
                       onRow={(record, rowIndex) => {
                         return {
                           onDoubleClick: (event) => {
-                            handleClickPurchase(record.purchase_code)
+                            handleClickPurchase(record)
                             let myModal = new bootstrap.Modal(document.getElementById('purchase-details'), {
                               keyboard: false
                             })
@@ -386,7 +383,7 @@ const Purchase = () => {
         </div>
         {/* Modal */}
         <PurchaseAddModel init={initAddNewPurchase} handleInit={setInitAddNewPurchase} />
-        <PurchaseDetailsModel />
+        <PurchaseDetailsModel selected={selectedPurchase}/>
       </div>
     </HelmetProvider>
   );
