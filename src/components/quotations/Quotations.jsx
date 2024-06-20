@@ -85,7 +85,7 @@ const Quotations = () => {
         <>
           <a href="#"
             data-bs-toggle="modal"
-            data-bs-target="#quotations-details"
+            data-bs-target="#quotation-details"
             onClick={()=>{
               console.log("[Quotation] set current quotation : ", record.quotation_code);
               setCurrentQuotation(record.quotation_code);
@@ -103,7 +103,7 @@ const Quotations = () => {
         <>
           <a href="#"
             data-bs-toggle="modal"
-            data-bs-target="#quotations-details"
+            data-bs-target="#quotation-details"
             onClick={()=>{
               console.log("[Quotation] set current quotation : ", record.quotation_code);
               setCurrentQuotation(record.quotation_code);
@@ -121,7 +121,7 @@ const Quotations = () => {
         <>
           <a href="#"
             data-bs-toggle="modal"
-            data-bs-target="#quotations-details"
+            data-bs-target="#quotation-details"
             onClick={()=>{
               console.log("[Quotation] set current quotation : ", record.quotation_code);
               setCurrentQuotation(record.quotation_code);
@@ -285,7 +285,7 @@ const Quotations = () => {
                           onDoubleClick: (event) => {
                             console.log("[Quotation] set current quotation : ", record.quotation_code);
                             setCurrentQuotation(record.quotation_code);
-                            let myModal = new bootstrap.Modal(document.getElementById('quotations-details'), {
+                            let myModal = new bootstrap.Modal(document.getElementById('quotation-details'), {
                               keyboard: false
                             })
                             myModal.show();
@@ -312,7 +312,7 @@ const Quotations = () => {
                           onDoubleClick: (event) => {
                             console.log("[Quotation] set current quotation : ", record.quotation_codecode);
                             setCurrentQuotation(record.quotation_codecode);
-                            let myModal = new bootstrap.Modal(document.getElementById('quotations-details'), {
+                            let myModal = new bootstrap.Modal(document.getElementById('quotation-details'), {
                               keyboard: false
                             })
                             myModal.show();

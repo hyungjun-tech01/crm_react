@@ -86,7 +86,7 @@ const SidebarNav = (props) => {
               </li>
               <li>
                 <Link className={`${pathname.includes("quotations") ? "active" : ""}`} to="/quotations">
-                  <CalculateOutlined /> <span>{t('quotation.quotation')}</span>
+                  <CalculateOutlined /> <span>{t('quotation.quotation_manage')}</span>
                 </Link>
               </li>
               <li>

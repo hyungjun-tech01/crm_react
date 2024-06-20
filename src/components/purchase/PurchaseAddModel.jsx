@@ -259,7 +259,7 @@ const PurchaseAddModel = (props) => {
 
         setSelectedMAContractRowKeys([]);
         setIsSubModalOpen(false);
-    }, [contractLists, currentPurchase, editedSubModalValues, modifyMAContract, modifyPurchase, orgSubModalValues]);
+    }, [addChange, contractLists, cookies.myLationCrmUserId, currentPurchase, editedSubModalValues, modifyMAContract, modifyPurchase, orgSubModalValues]);
 
     const handleSubModalCancel = () => {
         setOrgSubModalValues(null);

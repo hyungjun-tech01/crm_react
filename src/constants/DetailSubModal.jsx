@@ -27,7 +27,7 @@ const DetailSubModal = (props) => {
         handleEdited(tempData);
     };
 
-    useEffect(()=>{
+    useEffect(() => {
         console.log('[DetailSubModal] check data: ', original);
     }, [original]);
 
@@ -37,26 +37,26 @@ const DetailSubModal = (props) => {
             open={open}
             onOk={handleOk}
             onCancel={handleCancel}
-            footer={ edited ? [
-                    <Button key="cancel" onClick={handleCancel}>
+            footer={edited ? [
+                <Button key="cancel" onClick={handleCancel}>
                     Cancel
-                    </Button>,
-                    <Button key="submit" type="primary" onClick={handleOk}>
+                </Button>,
+                <Button key="submit" type="primary" onClick={handleOk}>
                     Submit
-                    </Button>,
-                ]:[
-                    <Button key="cancel" onClick={handleCancel}>
-                      Cancel
-                    </Button>,
-                ]}
+                </Button>,
+            ] : [
+                <Button key="cancel" onClick={handleCancel}>
+                    Cancel
+                </Button>,
+            ]}
             style={{ top: 120, width: 240 }}
             zIndex={2001}
         >
-            {item && item.map((item, index ) => {
-                let modifiedDetail = {...item.detail};
-                if(item.detail.type === 'date') {
+            {item && item.map((item, index) => {
+                let modifiedDetail = { ...item.detail };
+                if (item.detail.type === 'date') {
                     modifiedDetail['editing'] = handleTime;
-                } else if(item.detail.type === 'select') {
+                } else if (item.detail.type === 'select') {
                     modifiedDetail['editing'] = handleSelect;
                 } else {
                     modifiedDetail['editing'] = handleValue;
@@ -67,13 +67,13 @@ const DetailSubModal = (props) => {
                     defaultValue={original[item.name]}
                     edited={edited}
                     name={item.name}
-                    options={item.detail.type === 'select'? item.detail.options : null}
+                    options={item.detail.type === 'select' ? item.detail.options : null}
                     detail={modifiedDetail}
                 />
-            )})}
+                )
+            })}
         </Modal>
     );
-
 };
 
 export default DetailSubModal;

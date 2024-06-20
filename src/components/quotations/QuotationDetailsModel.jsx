@@ -1,18 +1,24 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Collapse, Space, Switch } from "antd";
 import { atomCurrentQuotation,
   defaultQuotation,
   atomQuotationState,
+  atomProductClassList,
+  atomProductClassListState,
+  atomProductsState,
+  atomProductOptions,
+  atomAllProducts,
 } from "../../atoms/atoms";
 import { atomUserState,
   atomUsersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
 import { QuotationRepo, QuotationTypes } from "../../repository/quotation";
+import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 import { UserRepo } from '../../repository/user';
 
 import DetailLabelItem from "../../constants/DetailLabelItem";
@@ -35,22 +41,21 @@ const QuotationDetailsModel = () => {
   const selectedQuotation = useRecoilValue(atomCurrentQuotation);
   const { modifyQuotation, setCurrentQuotation } = useRecoilValue(QuotationRepo);
 
+  //===== [RecoilState] Related with Product ==========================================
+  const productClassState = useRecoilValue(atomProductClassListState);
+  const allProductClassList = useRecoilValue(atomProductClassList);
+  const { loadAllProductClassList } = useRecoilValue(ProductClassListRepo);
+  const productState = useRecoilValue(atomProductsState);
+  const allProducts = useRecoilValue(atomAllProducts);
+  const { loadAllProducts } = useRecoilValue(ProductRepo);
+  const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
 
-  //===== [RecoilState] Related with Users ==========================================
+
+  //===== [RecoilState] Related with Users ============================================
   const userState = useRecoilValue(atomUserState);
   const { loadAllUsers } = useRecoilValue(UserRepo)
   const usersForSelection = useRecoilValue(atomUsersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
-
-  const [ orgQuotationContents, setOrgQuotationContents ] = useState([]);
-  const [ quotationContents, setQuotationContents ] = useState([]);
-  const [ quotationHeaders, setQuotationHeaders ] = useState([]);
-
-  const [ editedContentValues, setEditedContentValues ] = useState(null);
-  const [ savedContentValues, setSavedContentValues ] = useState(null);
-
-  const [ checkContentState, setCheckContentState ] = useState(null);
-  const [ isNewlyAdded, setIsNewlyAdded ] = useState(false);
 
 
   //===== Handles to deal this component ==============================================
@@ -116,12 +121,6 @@ const QuotationDetailsModel = () => {
       };
       if (modifyQuotation(temp_all_saved)) {
         console.log(`Succeeded to modify Quotation`);
-        if(editedDetailValues.quotation_date){
-          setOrgQuotationDate(editedDetailValues.quotation_date);
-        };
-        if(editedDetailValues.confirm_date){
-          setOrgConfirmDate(editedDetailValues.confirm_date);
-        };
       } else {
         console.error("Failed to modify Quotation");
       }
@@ -136,7 +135,17 @@ const QuotationDetailsModel = () => {
   }, []);
 
 
-  // --- Funtions for Content Editing --------------------------------------------------
+  //===== Handles to edit 'Content' ===================================================
+  const [ orgQuotationContents, setOrgQuotationContents ] = useState([]);
+  const [ quotationContents, setQuotationContents ] = useState([]);
+  const [ quotationHeaders, setQuotationHeaders ] = useState([]);
+
+  const [ editedContentValues, setEditedContentValues ] = useState(null);
+  const [ savedContentValues, setSavedContentValues ] = useState(null);
+
+  const [ checkContentState, setCheckContentState ] = useState(null);
+  const [ isNewlyAdded, setIsNewlyAdded ] = useState(false);
+
   const handleCheckContentEditState = useCallback((key) => {
     return editedContentValues !== null && key in editedContentValues;
   }, [editedContentValues]);
@@ -434,6 +443,37 @@ const QuotationDetailsModel = () => {
     }
   }, [loadAllUsers, userState]);
 
+  // ----- useEffect for Production -----------------------------------
+  useEffect(() => {
+    console.log('[PurchaseAddModel] useEffect / Production');
+    if ((productClassState & 1) === 0) {
+        console.log('[PurchaseAddModel] loadAllProductClassList');
+        loadAllProductClassList();
+    };
+    if ((productState & 1) === 0) {
+        console.log('[PurchaseAddModel] loadAllProducts');
+        loadAllProducts();
+    };
+    if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
+        console.log('[PurchaseAddModel] set companies for selection');
+        const productOptionsValue = allProductClassList.map(proClass => {
+            const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
+            const subOptions = foundProducts.map(item => {
+                return {
+                    label: <span>{item.product_name}</span>,
+                    value: { product_code: item.product_code, product_name: item.product_name, product_class_name: item.product_class_name }
+                }
+            });
+            return {
+                label: <span>{proClass.product_class_name}</span>,
+                title: proClass.product_class_name,
+                options: subOptions,
+            };
+        });
+        setProductOptions(productOptionsValue);
+    };
+}, [allProductClassList, allProducts, loadAllProductClassList, loadAllProducts, productClassState, productOptions, productState, setProductOptions]);
+
   return (
     <>
       <div
@@ -487,7 +527,7 @@ const QuotationDetailsModel = () => {
                         <li className="nav-item">
                           <Link
                             className="nav-link active"
-                            to="#quotation-details"
+                            to="#sub-quotation-details"
                             data-bs-toggle="tab"
                           >
                             {t('common.details')}
@@ -496,7 +536,7 @@ const QuotationDetailsModel = () => {
                         <li className="nav-item">
                           <Link
                             className="nav-link"
-                            to="#quotation-products"
+                            to="#sub-quotation-products"
                             data-bs-toggle="tab"
                           >
                             {t('quotation.product_lists')}
@@ -505,7 +545,7 @@ const QuotationDetailsModel = () => {
                         <li className="nav-item">
                           <Link
                             className="nav-link"
-                            to="#quotation-pdf-view"
+                            to="#sub-quotation-pdf-view"
                             data-bs-toggle="tab"
                           >
                             {t('common.view')}
@@ -514,7 +554,7 @@ const QuotationDetailsModel = () => {
                       </ul>
                       <div className="tab-content">
 {/*---- Start -- Tab : Detail Quotation-------------------------------------------------------------*/}
-                        <div className="tab-pane show active p-0" id="quotation-details">
+                        <div className="tab-pane show active p-0" id="sub-quotation-details">
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item">
                               <Space
@@ -560,7 +600,7 @@ const QuotationDetailsModel = () => {
                         </div>
 {/*---- End   -- Tab : Detail Quotation ------------------------------------------------------------*/}
 {/*---- Start -- Tab : Product Lists - Quotation ---------------------------------------------------*/}
-                        <div className="tab-pane task-related p-0" id="quotation-products">
+                        <div className="tab-pane task-related p-0" id="sub-quotation-products">
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
                             { quotationContents && quotationContents.length > 0 && 
@@ -673,7 +713,7 @@ const QuotationDetailsModel = () => {
                         </div>
 {/*---- End   -- Tab : Product Lists - Quotation ---------------------------------------------------*/}
 {/*---- Start -- Tab : PDF View - Quotation --------------------------------------------------------*/}
-                        <div className="tab-pane task-related p-0" id="quotation-pdf-view">
+                        <div className="tab-pane task-related p-0" id="sub-quotation-pdf-view">
                           { selectedQuotation && (selectedQuotation.quotation_contents.length > 0) &&
                             <QuotationView/>
                           }

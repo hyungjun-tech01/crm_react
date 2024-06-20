@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "antd/dist/reset.css";
@@ -12,7 +12,12 @@ import { option_locations } from '../../constants/constants';
 import {
   atomLeadState,
   atomLeadsForSelection,
-  defaultQuotation
+  defaultQuotation,
+  atomProductClassList,
+  atomProductClassListState,
+  atomProductsState,
+  atomProductOptions,
+  atomAllProducts,
 } from "../../atoms/atoms";
 import {
   atomUserState,
@@ -22,9 +27,10 @@ import {
 import { UserRepo } from '../../repository/user';
 import { LeadRepo } from "../../repository/lead";
 import { QuotationRepo, QuotationTypes, QuotationSendTypes } from "../../repository/quotation";
-import { ConverTextAmount, formatDate } from "../../constants/functions";
+import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 
 import AddBasicItem from "../../constants/AddBasicItem";
+import DetailSubModal from "../../constants/DetailSubModal";
 
 const default_quotation_content = {
   '1': null, '2': null, '3': null, '4': null, '5': null,
@@ -48,9 +54,15 @@ const QuotationAddModel = (props) => {
   const leadsForSelection = useRecoilValue(atomLeadsForSelection);
   const { loadAllLeads } = useRecoilValue(LeadRepo);
 
-  const [quotationContents, setQuotationContents] = useState([]);
-  const [temporaryContent, setTemporaryContent] = useState(null);
-  const [selectedRows, setSelectedRows] = useState([]);
+
+  //===== [RecoilState] Related with Product ==========================================
+  const productClassState = useRecoilValue(atomProductClassListState);
+  const allProductClassList = useRecoilValue(atomProductClassList);
+  const { loadAllProductClassList } = useRecoilValue(ProductClassListRepo);
+  const productState = useRecoilValue(atomProductsState);
+  const allProducts = useRecoilValue(atomAllProducts);
+  const { loadAllProducts } = useRecoilValue(ProductRepo);
+  const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
 
 
   //===== [RecoilState] Related with Users ==========================================
@@ -62,6 +74,9 @@ const QuotationAddModel = (props) => {
 
   //===== Handles to edit 'QuotationAddModel' ========================================
   const [quotationChange, setQuotationChange] = useState({ ...defaultQuotation });
+  const [quotationContents, setQuotationContents] = useState([]);
+  const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
+  const [currentContent, setCurrentContent] = useState(null);
 
   const initializeQuotationTemplate = useCallback(() => {
     document.querySelector("#add_new_quotation_form").reset();
@@ -210,85 +225,29 @@ const QuotationAddModel = (props) => {
       size: 15,
       render: (text, record) => <>{text}</>,
     },
-    {
-      title: "Edit",
-      render: (text, record) => (
-        <div className="dropdown dropdown-action text-center">
-          <ModeEdit onClick={() => {
-            handleLoadSelectedContent(record);
-          }} />
-        </div>
-      ),
-    },
+    // {
+    //   title: "Edit",
+    //   render: (text, record) => (
+    //     <div className="dropdown dropdown-action text-center">
+    //       <ModeEdit onClick={() => {
+    //         handleLoadSelectedContent(record);
+    //       }} />
+    //     </div>
+    //   ),
+    // },
   ];
 
   const rowSelection = {
+    selectedRowKeys: selectedContentRowKeys,
     onChange: (selectedRowKeys, selectedRows) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
-      setSelectedRows(selectedRows);
+      setSelectedContentRowKeys(selectedRows);
     },
   };
 
-  const [contentColumns, setContentColumns] = useState(default_columns);
-  const [editHeaders, setEditHeaders] = useState(false);
-
-  const handleHeaderCheckChange = useCallback((event) => {
-    const targetName = event.target.name;
-    const targetIndex = Number(targetName);
-
-    if (event.target.checked) {
-      const foundIndex = contentColumns.findIndex(
-        item => Number(item.dataIndex) > targetIndex);
-
-      const tempColumns = [
-        ...contentColumns.slice(0, foundIndex),
-        {
-          title: default_content_array[targetIndex - 2][1],
-          dataIndex: targetName,
-          size: 0,
-          render: (text, record) => <>{text}</>,
-        },
-        ...contentColumns.slice(foundIndex,),
-      ];
-      setContentColumns(tempColumns);
-    } else {
-      const foundIndex = contentColumns.findIndex(
-        item => Number(item.dataIndex) === targetIndex);
-
-      const tempColumns = [
-        ...contentColumns.slice(0, foundIndex),
-        ...contentColumns.slice(foundIndex + 1,),
-      ];
-      setContentColumns(tempColumns);
-    }
-  }, [contentColumns, default_content_array]);
-
-  const handleHeaderSizeChange = useCallback((event) => {
-    const targetName = event.target.name;
-    const foundIndex = contentColumns.findIndex(
-      item => item.dataIndex === targetName);
-    if (foundIndex !== -1) {
-      const tempColumn = {
-        ...contentColumns.at(foundIndex),
-        size: event.target.value,
-      }
-      const tempColumns = [
-        ...contentColumns.slice(0, foundIndex),
-        tempColumn,
-        ...contentColumns.slice(foundIndex + 1,),
-      ];
-      setContentColumns(tempColumns);
-    }
-  }, [contentColumns]);
-
-  // --- Functions used for editing content ------------------------------
-  const handleLoadNewTemporaryContent = useCallback(() => {
+   // --- Functions used for editing content ------------------------------
+  const handleAddNewContent = useCallback(() => {
     if (!quotationChange.lead_name) {
-      console.log('\t[handleLoadNewTemporaryContent] No lead is selected');
+      console.log('\t[handleAddNewContent] No lead is selected');
       return;
     };
 
@@ -296,15 +255,11 @@ const QuotationAddModel = (props) => {
       ...default_quotation_content,
       '1': quotationContents.length + 1,
     };
-    setTemporaryContent(tempContent);
+    setCurrentContent(tempContent);
   }, [quotationContents, quotationChange]);
 
-  const handleLoadSelectedContent = useCallback((data) => {
-    setTemporaryContent(data);
-  }, [setTemporaryContent]);
-
   const handleDeleteSelectedConetents = useCallback(() => {
-    if (selectedRows.length === 0) {
+    if (selectedContentRowKeys.length === 0) {
       console.log('\t[handleDeleteSelectedConetents] No row is selected');
       return;
     };
@@ -312,7 +267,7 @@ const QuotationAddModel = (props) => {
     let tempContents = [
       ...quotationContents
     ];
-    selectedRows.forEach(row => {
+    selectedContentRowKeys.forEach(row => {
       const filteredContents = tempContents.filter(item => item['1'] !== row['1']);
       tempContents = filteredContents;
     });
@@ -328,54 +283,8 @@ const QuotationAddModel = (props) => {
     setQuotationChange(tempQuotation);
     console.log('handleDeleteSelectedConetents / final : ', finalContents);
     setQuotationContents(finalContents);
-  }, [selectedRows, quotationContents, quotationChange, setQuotationContents, setQuotationChange]);
+  }, []);
 
-  const handleEditTemporaryContent = useCallback((event) => {
-    const tempContent = {
-      ...temporaryContent,
-      [event.target.name]: event.target.value,
-    };
-    setTemporaryContent(tempContent);
-  }, [temporaryContent, setTemporaryContent]);
-
-  const handleSaveTemporaryEdit = useCallback(() => {
-    const contentToSave = {
-      ...temporaryContent
-    };
-    if (!contentToSave['1'] || !contentToSave['5'] || !contentToSave['16']) {
-      console.log('[ Quotation / handleSaveTemporaryEdit ] Necessary Input is ommited!');
-      return;
-    };
-    const temp_index = contentToSave['1'] - 1;
-    let tempContents = [];
-    let temp_total_amount = contentToSave['16'];
-    if (quotationChange['total_quotation_amount']) {
-      temp_total_amount = quotationChange['total_quotation_amount'];
-    };
-    if (temp_index === quotationContents.length) {
-      tempContents = [
-        ...quotationContents,
-        contentToSave
-      ];
-    } else {
-      tempContents = [
-        ...quotationContents.slice(0, temp_index),
-        contentToSave,
-        ...quotationContents.slice(temp_index + 1,)
-      ];
-    }
-    setQuotationContents(tempContents);
-    const tempQuotationChange = {
-      ...quotationChange,
-      total_quotation_amount: temp_total_amount,
-    };
-    setQuotationChange(tempQuotationChange);
-    setTemporaryContent(null);
-  }, [temporaryContent, quotationChange, quotationContents]);
-
-  const handleCloseTemporaryEdit = useCallback(() => {
-    setTemporaryContent(null);
-  }, [setTemporaryContent]);
 
   // --- Functions used for adding new quotation ------------------------------
   const handleAddNewQuotation = useCallback((event) => {
@@ -390,7 +299,7 @@ const QuotationAddModel = (props) => {
     };
     const newQuotationData = {
       ...quotationChange,
-      quotation_table: ConvertHeaderInfosToString(contentColumns),
+      quotation_table: "",
       quotation_contents: JSON.stringify(quotationContents),
       action_type: 'ADD',
       lead_number: '99999',// Temporary
@@ -403,8 +312,49 @@ const QuotationAddModel = (props) => {
       initializeQuotationTemplate();
       //close modal ?
     };
-  }, [quotationChange, quotationContents, ConvertHeaderInfosToString, contentColumns, cookies.myLationCrmUserId, modifyQuotation, initializeQuotationTemplate]);
+  }, [cookies.myLationCrmUserId, initializeQuotationTemplate, modifyQuotation, quotationChange, quotationContents]);
 
+
+  //===== Handles to edit 'MA contract' =================================================
+  const [isSubModalOpen, setIsSubModalOpen] = useState(false);
+  const [subModalSetting, setSubModalSetting] = useState({ title: '' })
+  const [orgSubModalValues, setOrgSubModalValues] = useState({});
+  const [editedSubModalValues, setEditedSubModalValues] = useState({});
+
+  const content_items = [
+    { name: 'product_name', title: t('purchase.product_name'), detail: { type: 'select', options: productOptions } },
+    { name: 'detail_spec', title: t('quotation.detail_spec'), detail: { type: 'label' } },
+    { name: 'quantity', title: t('common.quantity'), detail: { type: 'label' } },
+    { name: 'quotation_unit_price', title: t('quotation.quotation_unit_price'), detail: { type: 'label' } },
+    { name: 'quotation_amount', title: t('quotation.quotation_amount'), detail: { type: 'label' } },
+  ];
+
+  const handleSubModalOk = useCallback(() => {
+    const finalData = {
+        ...orgSubModalValues,
+        ...editedSubModalValues,
+        index: quotationContents.length + 1,
+    };
+    if(!finalData.product_name || !finalData.quotatio_amount){
+      console.log("Inevitable data can't be null");
+      return;
+    };
+    const updatedContents = quotationContents.concat(finalData);
+    setQuotationContents(updatedContents);
+
+    setSelectedContentRowKeys([]);
+    setIsSubModalOpen(false);
+}, [editedSubModalValues, orgSubModalValues, quotationContents]);
+
+const handleSubModalCancel = () => {
+    setOrgSubModalValues(null);
+    setSelectedContentRowKeys([]);
+    setIsSubModalOpen(false);
+};
+
+const handleSubModalItemChange = useCallback(data => {
+    setEditedSubModalValues(data);
+}, []);
 
   //===== useEffect functions ==========================================
   useEffect(() => {
@@ -425,6 +375,37 @@ const QuotationAddModel = (props) => {
       loadAllLeads();
     };
   }, [leadsState, loadAllLeads]);
+
+  // ----- useEffect for Production -----------------------------------
+  useEffect(() => {
+    console.log('[PurchaseAddModel] useEffect / Production');
+    if ((productClassState & 1) === 0) {
+      console.log('[PurchaseAddModel] loadAllProductClassList');
+      loadAllProductClassList();
+    };
+    if ((productState & 1) === 0) {
+      console.log('[PurchaseAddModel] loadAllProducts');
+      loadAllProducts();
+    };
+    if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
+      console.log('[PurchaseAddModel] set companies for selection');
+      const productOptionsValue = allProductClassList.map(proClass => {
+        const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
+        const subOptions = foundProducts.map(item => {
+          return {
+            label: <span>{item.product_name}</span>,
+            value: { product_code: item.product_code, product_name: item.product_name, product_class_name: item.product_class_name }
+          }
+        });
+        return {
+          label: <span>{proClass.product_class_name}</span>,
+          title: proClass.product_class_name,
+          options: subOptions,
+        };
+      });
+      setProductOptions(productOptionsValue);
+    };
+  }, [allProductClassList, allProducts, loadAllProductClassList, loadAllProducts, productClassState, productOptions, productState, setProductOptions]);
 
   return (
     <div
@@ -457,17 +438,6 @@ const QuotationAddModel = (props) => {
           </div>
           <div className="modal-body">
             <form className="forms-sampme" id="add_new_quotation_form">
-              <div className="form-group row">
-                <AddBasicItem
-                  title={t('common.title')}
-                  type='text'
-                  name='quotation_title'
-                  defaultValue={quotationChange.quotation_title}
-                  required
-                  long
-                  onChange={handleItemChange}
-                />
-              </div>
               <div className="form-group row">
                 <AddBasicItem
                   title={t('lead.lead_name')}
@@ -507,6 +477,17 @@ const QuotationAddModel = (props) => {
                   </div>
                 </div>
               }
+              <div className="form-group row">
+                <AddBasicItem
+                  title={t('common.title')}
+                  type='text'
+                  name='quotation_title'
+                  defaultValue={quotationChange.quotation_title}
+                  required
+                  long
+                  onChange={handleItemChange}
+                />
+              </div>
               <div className="form-group row">
                 <AddBasicItem
                   title={t('quotation.quotation_type')}
@@ -625,30 +606,28 @@ const QuotationAddModel = (props) => {
                 />
               </div>
               <h4 className="h4-price">
-                <div style={{fontSize: 18, fontWeight: 600}}>{t('common.product')}{t('common.table')}</div>
+                <div style={{ fontSize: 18, fontWeight: 600 }}>{t('common.product')}{t('common.table')}</div>
                 <div className="text-end flex-row">
                   <div>
                     <AddBoxOutlined
                       style={{ height: 32, width: 32, color: 'gray' }}
-                      onClick={handleLoadNewTemporaryContent}
+                      onClick={handleAddNewContent}
                     />
                     <IndeterminateCheckBoxOutlined
                       style={{ height: 32, width: 32, color: 'gray' }}
                       onClick={handleDeleteSelectedConetents}
-                      disabled={!selectedRows}
+                      disabled={!selectedContentRowKeys}
                     />
-                    <SettingsOutlined
+                    {/* <SettingsOutlined
                       style={{ height: 32, width: 32, color: 'gray' }}
                       onClick={() => { setEditHeaders(!editHeaders); }}
-                    />
+                    /> */}
                   </div>
                 </div>
               </h4>
               <div className="form-group row">
                 <Table
-                  rowSelection={{
-                    ...rowSelection,
-                  }}
+                  rowSelection={rowSelection}
                   pagination={{
                     total: quotationContents.length,
                     showTotal: ShowTotal,
@@ -657,7 +636,7 @@ const QuotationAddModel = (props) => {
                     ItemRender: ItemRender,
                   }}
                   style={{ overflowX: "auto" }}
-                  columns={contentColumns}
+                  columns={default_columns}
                   bordered
                   dataSource={quotationContents}
                   rowKey={(record) => record['1']}
@@ -685,7 +664,7 @@ const QuotationAddModel = (props) => {
           </div>
         </div>
       </div>
-      {temporaryContent &&
+      {/* {temporaryContent &&
         <div className="edit-content">
           <div className="edit-content-header">
             <h4>&nbsp;&nbsp;<b>{t('common.edit_content')}</b></h4>
@@ -773,8 +752,8 @@ const QuotationAddModel = (props) => {
             </button>
           </div>
         </div>
-      }
-      {editHeaders &&
+      } */}
+      {/* {editHeaders &&
         <div className="edit-content">
           <div className="edit-content-header">
             <h4><b>{t('quotation.header_setting')}</b></h4>
@@ -830,7 +809,17 @@ const QuotationAddModel = (props) => {
             </table>
           </div>
         </div>
-      }
+      } */}
+      <DetailSubModal
+        title={subModalSetting.title}
+        open={isSubModalOpen}
+        item={content_items}
+        original={orgSubModalValues}
+        edited={editedSubModalValues}
+        handleEdited={handleSubModalItemChange}
+        handleOk={handleSubModalOk}
+        handleCancel={handleSubModalCancel}
+      />
     </div>
   );
 };

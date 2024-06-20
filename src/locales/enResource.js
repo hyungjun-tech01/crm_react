@@ -134,6 +134,7 @@ const enResource = {
             quotation_amount: 'Quotation Amount',
             quotation_date: 'Quotation Date',
             quotation_information: 'Quotation Information',
+            quotation_manage: 'Quotation Management',
             quotation_manager: 'Quotation Manager',
             quotation_owner: 'Quotation Owner',
             quotation_price_information: 'Quotation Price Information',

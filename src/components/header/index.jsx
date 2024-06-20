@@ -32,7 +32,7 @@ const Header = (props) => {
     companies : t('company.company_manage'),
     leads : t('lead.lead_manage'),
     consultings : t('consulting.consulting'),
-    quotations : t('quotation.quotation'),
+    quotations : t('quotation.quotation_manage'),
     transactions : t('transaction.transaction'),
     purchases : t('purchase.purchase_manage'),
   };

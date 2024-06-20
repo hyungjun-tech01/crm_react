@@ -120,8 +120,7 @@ const SelectInput = (props) => {
 };
 
 const DetailCardItem = (props) => {
-    const { title, name, defaultValue, edited, detail
-    } = props;
+    const { title, name, defaultValue, edited, detail} = props;
     
     const currentValue = (edited && edited[name])
             ? edited[name]
