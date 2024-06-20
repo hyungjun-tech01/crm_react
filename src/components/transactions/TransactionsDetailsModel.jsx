@@ -94,9 +94,7 @@ const TransactionsDetailsModel = () => {
     ['publish_type','transaction.publish_type',{ type:'label' }],
     ['payment_type','transaction.payment_type',{ type:'label' }],
     ['currency','common.currency',{ type:'label' }],
-    ['publish_date','transaction.publish_date',
-      { type:'date', orgTimeData: orgPublishDate, timeDataChange: handleDateChange }
-    ],
+    ['publish_date','transaction.publish_date',{ type:'date', orgTimeData: orgPublishDate, timeDataChange: handleDateChange }],
     ['supply_price','transaction.supply_price',{ type:'label' }],
     ['tax_price','transaction.tax_price',{ type:'label' }],
     ['total_price','transaction.total_price',{ type:'label' }],

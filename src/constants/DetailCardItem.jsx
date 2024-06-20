@@ -71,20 +71,20 @@ const TextareaInput = (props) => {
 };
 
 const SelectInput = (props) => {
-    const { addonBefore, style, value, onChange, options, disabled, groupVal, keyVal } = props;
+    const { addonBefore, name, style, value, onChange, options, disabled, group } = props;
 
     let defaultOption = null;
     if(value) {
-        if(groupVal) {
-            const groupOptions = options.filter(item => item.title === groupVal);
+        if(group.key) {
+            const groupOptions = options.filter(item => item.title === group.value);
             if(groupOptions && groupOptions.length > 0) {
-                const foundValue = groupOptions[0].options.filter(item => item.value[keyVal] === value);
+                const foundValue = groupOptions[0].options.filter(item => item.value[name] === value);
                 if(foundValue && foundValue.length > 0){
                     defaultOption = foundValue[0];
                 };
             };
-        } else if(keyVal){
-            const optionFiltered = options.filter(item => item.value[keyVal] === value);
+        } else if(typeof options[0].value === 'object'){
+            const optionFiltered = options.filter(item => item.value[name] === value);
             if(optionFiltered && optionFiltered.length > 0) {
                 defaultOption = optionFiltered[0];
             };
@@ -120,7 +120,7 @@ const SelectInput = (props) => {
 };
 
 const DetailCardItem = (props) => {
-    const { title, name, defaultValue, edited, detail} = props;
+    const { title, name, defaultValue, groupValue, edited, detail} = props;
     
     const currentValue = (edited && edited[name])
             ? edited[name]
@@ -149,8 +149,8 @@ const DetailCardItem = (props) => {
         case 'textarea':
             return <TextareaInput {...SharedProps} row_no={ detail.row_no ? detail.row_no : 2} onChange={detail.editing} style={detail.extra === 'memo' ? {width: `calc(100% - 380px)`, flexGrow: 1} : {width: widthValue}}/>;
         case 'select':
-            const groupValue = (detail.group && detail.value && detail.value[detail.group]) ? detail.value[detail.group] : null;
-            return <SelectInput {...SharedProps} options={detail.options} groupVal={groupValue} keyVal={detail.key ? detail.key : null} onChange={(selected)=>detail.editing(name, selected)} style={{width: widthValue, height: 38}}/>;
+            const group = {key: detail.group, value: (edited && edited[detail.group]) ? edited[detail.group] : groupValue};
+            return <SelectInput {...SharedProps} options={detail.options} group={group} onChange={(selected)=>detail.editing(name, selected)} style={{width: widthValue, height: 38}}/>;
         default:
             return null;
     };

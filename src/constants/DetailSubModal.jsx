@@ -13,10 +13,18 @@ const DetailSubModal = (props) => {
         handleEdited(tempData)
     };
     const handleSelect = (name, value) => {
-        const tempData = {
-            ...edited,
-            [name]: value.value,
-        };
+        let tempData = {};
+        if(typeof value.value === 'object') {
+            tempData = {
+                ...edited,
+                ...value.value,
+            };
+        } else {
+            tempData = {
+                ...edited,
+                [name]: value.value,
+            };
+        }
         handleEdited(tempData);
     };
     const handleValue = (event) => {
@@ -61,16 +69,16 @@ const DetailSubModal = (props) => {
                 } else {
                     modifiedDetail['editing'] = handleValue;
                 };
-                return (<DetailCardItem
-                    key={index}
-                    title={item.title}
-                    defaultValue={original[item.name]}
-                    edited={edited}
-                    name={item.name}
-                    options={item.detail.type === 'select' ? item.detail.options : null}
-                    detail={modifiedDetail}
-                />
-                )
+                return (
+                    <DetailCardItem
+                        key={index}
+                        title={item.title}
+                        defaultValue={original[item.name]}
+                        name={item.name}
+                        edited={edited}
+                        detail={modifiedDetail}
+                    />
+                );
             })}
         </Modal>
     );

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "antd/dist/reset.css";
@@ -13,11 +13,6 @@ import {
   atomLeadState,
   atomLeadsForSelection,
   defaultQuotation,
-  atomProductClassList,
-  atomProductClassListState,
-  atomProductsState,
-  atomProductOptions,
-  atomAllProducts,
 } from "../../atoms/atoms";
 import {
   atomUserState,
@@ -27,10 +22,9 @@ import {
 import { UserRepo } from '../../repository/user';
 import { LeadRepo } from "../../repository/lead";
 import { QuotationRepo, QuotationTypes, QuotationSendTypes } from "../../repository/quotation";
-import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 
 import AddBasicItem from "../../constants/AddBasicItem";
-import DetailSubModal from "../../constants/DetailSubModal";
+import QuotationContentModal from "./QuotationContentModal";
 
 const default_quotation_content = {
   '1': null, '2': null, '3': null, '4': null, '5': null,
@@ -53,16 +47,6 @@ const QuotationAddModel = (props) => {
   const leadsState = useRecoilValue(atomLeadState);
   const leadsForSelection = useRecoilValue(atomLeadsForSelection);
   const { loadAllLeads } = useRecoilValue(LeadRepo);
-
-
-  //===== [RecoilState] Related with Product ==========================================
-  const productClassState = useRecoilValue(atomProductClassListState);
-  const allProductClassList = useRecoilValue(atomProductClassList);
-  const { loadAllProductClassList } = useRecoilValue(ProductClassListRepo);
-  const productState = useRecoilValue(atomProductsState);
-  const allProducts = useRecoilValue(atomAllProducts);
-  const { loadAllProducts } = useRecoilValue(ProductRepo);
-  const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
 
 
   //===== [RecoilState] Related with Users ==========================================
@@ -153,7 +137,7 @@ const QuotationAddModel = (props) => {
     ['7', t('common.type')],
     ['8', t('common.color')],
     ['9', t('common.standard')],
-    ['10', t('quotation.detail_spec')],
+    ['10', t('quotation.detail_desc')],
     ['11', t('common.unit')],
     ['12', t('common.quantity')],
     ['13', t('quotation.consumer_price')],
@@ -202,7 +186,7 @@ const QuotationAddModel = (props) => {
       render: (text, record) => <>{text}</>,
     },
     {
-      title: t('quotation.detail_spec'),
+      title: t('quotation.detail_desc'),
       dataIndex: '10',
       size: 10,
       render: (text, record) => <>{text}</>,
@@ -244,19 +228,6 @@ const QuotationAddModel = (props) => {
     },
   };
 
-   // --- Functions used for editing content ------------------------------
-  const handleAddNewContent = useCallback(() => {
-    if (!quotationChange.lead_name) {
-      console.log('\t[handleAddNewContent] No lead is selected');
-      return;
-    };
-
-    const tempContent = {
-      ...default_quotation_content,
-      '1': quotationContents.length + 1,
-    };
-    setCurrentContent(tempContent);
-  }, [quotationContents, quotationChange]);
 
   const handleDeleteSelectedConetents = useCallback(() => {
     if (selectedContentRowKeys.length === 0) {
@@ -284,7 +255,6 @@ const QuotationAddModel = (props) => {
     console.log('handleDeleteSelectedConetents / final : ', finalContents);
     setQuotationContents(finalContents);
   }, []);
-
 
   // --- Functions used for adding new quotation ------------------------------
   const handleAddNewQuotation = useCallback((event) => {
@@ -315,46 +285,81 @@ const QuotationAddModel = (props) => {
   }, [cookies.myLationCrmUserId, initializeQuotationTemplate, modifyQuotation, quotationChange, quotationContents]);
 
 
-  //===== Handles to edit 'MA contract' =================================================
+
+  //===== Handles to edit 'Contents' =================================================
   const [isSubModalOpen, setIsSubModalOpen] = useState(false);
   const [subModalSetting, setSubModalSetting] = useState({ title: '' })
   const [orgSubModalValues, setOrgSubModalValues] = useState({});
   const [editedSubModalValues, setEditedSubModalValues] = useState({});
 
-  const content_items = [
-    { name: 'product_name', title: t('purchase.product_name'), detail: { type: 'select', options: productOptions } },
-    { name: 'detail_spec', title: t('quotation.detail_spec'), detail: { type: 'label' } },
-    { name: 'quantity', title: t('common.quantity'), detail: { type: 'label' } },
-    { name: 'quotation_unit_price', title: t('quotation.quotation_unit_price'), detail: { type: 'label' } },
-    { name: 'quotation_amount', title: t('quotation.quotation_amount'), detail: { type: 'label' } },
-  ];
+
+  // --- Functions used for editing content ------------------------------
+  const handleAddNewContent = useCallback(() => {
+    if (!quotationChange.lead_name) {
+      console.log('\t[handleAddNewContent] No lead is selected');
+      return;
+    };
+
+    const tempContent = {
+      ...default_quotation_content,
+      '1': quotationContents.length + 1,
+    };
+    setCurrentContent(tempContent);
+    setSubModalSetting({ title: t('quotation.add_content') });
+    setOrgSubModalValues({
+      product_name: null,
+      product_class_name: null,
+      detail_desc_on_off: false,
+      detail_desc: null,
+      quantity: null,
+      quotation_unit_price: null,
+      quotation_amount: null,
+    });
+    setIsSubModalOpen(true);
+  }, [quotationChange.lead_name, quotationContents.length, t]);
+
+  const handleModifyContent = useCallback((data) => {
+    if (!data) {
+      console.log('\t[handleModifyContent] No Data');
+      return;
+    };
+
+    const tempContent = {
+      ...default_quotation_content,
+      '1': quotationContents.length + 1,
+    };
+    setCurrentContent(tempContent);
+    setIsSubModalOpen(true);
+  }, [quotationContents, quotationChange]);
 
   const handleSubModalOk = useCallback(() => {
     const finalData = {
-        ...orgSubModalValues,
-        ...editedSubModalValues,
-        index: quotationContents.length + 1,
+      ...orgSubModalValues,
+      ...editedSubModalValues,
+      index: quotationContents.length + 1,
     };
-    if(!finalData.product_name || !finalData.quotatio_amount){
+    if (!finalData.product_name || !finalData.quotatio_amount) {
       console.log("Inevitable data can't be null");
       return;
     };
+    setIsSubModalOpen(false);
+    console.log('[handleSubModalOk] ', finalData);
     const updatedContents = quotationContents.concat(finalData);
     setQuotationContents(updatedContents);
-
     setSelectedContentRowKeys([]);
-    setIsSubModalOpen(false);
-}, [editedSubModalValues, orgSubModalValues, quotationContents]);
 
-const handleSubModalCancel = () => {
+  }, [editedSubModalValues, orgSubModalValues, quotationContents]);
+
+  const handleSubModalCancel = () => {
+    setIsSubModalOpen(false);
+    setEditedSubModalValues(null);
     setOrgSubModalValues(null);
     setSelectedContentRowKeys([]);
-    setIsSubModalOpen(false);
-};
+  };
 
-const handleSubModalItemChange = useCallback(data => {
+  const handleSubModalItemChange = useCallback(data => {
     setEditedSubModalValues(data);
-}, []);
+  }, []);
 
   //===== useEffect functions ==========================================
   useEffect(() => {
@@ -376,36 +381,7 @@ const handleSubModalItemChange = useCallback(data => {
     };
   }, [leadsState, loadAllLeads]);
 
-  // ----- useEffect for Production -----------------------------------
-  useEffect(() => {
-    console.log('[PurchaseAddModel] useEffect / Production');
-    if ((productClassState & 1) === 0) {
-      console.log('[PurchaseAddModel] loadAllProductClassList');
-      loadAllProductClassList();
-    };
-    if ((productState & 1) === 0) {
-      console.log('[PurchaseAddModel] loadAllProducts');
-      loadAllProducts();
-    };
-    if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
-      console.log('[PurchaseAddModel] set companies for selection');
-      const productOptionsValue = allProductClassList.map(proClass => {
-        const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
-        const subOptions = foundProducts.map(item => {
-          return {
-            label: <span>{item.product_name}</span>,
-            value: { product_code: item.product_code, product_name: item.product_name, product_class_name: item.product_class_name }
-          }
-        });
-        return {
-          label: <span>{proClass.product_class_name}</span>,
-          title: proClass.product_class_name,
-          options: subOptions,
-        };
-      });
-      setProductOptions(productOptionsValue);
-    };
-  }, [allProductClassList, allProducts, loadAllProductClassList, loadAllProducts, productClassState, productOptions, productState, setProductOptions]);
+  
 
   return (
     <div
@@ -414,6 +390,7 @@ const handleSubModalItemChange = useCallback(data => {
       tabIndex={-1}
       role="dialog"
       aria-modal="true"
+      data-bs-focus="false"
     >
       <div
         className="modal-dialog modal-dialog-centered modal-lg"
@@ -810,10 +787,9 @@ const handleSubModalItemChange = useCallback(data => {
           </div>
         </div>
       } */}
-      <DetailSubModal
+      <QuotationContentModal
         title={subModalSetting.title}
         open={isSubModalOpen}
-        item={content_items}
         original={orgSubModalValues}
         edited={editedSubModalValues}
         handleEdited={handleSubModalItemChange}

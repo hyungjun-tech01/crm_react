@@ -117,33 +117,35 @@ const CompanyPurchaseModel = (props) => {
             switch (code_name) {
                 case 'purchase_code':
                     const res_data = modifyPurchase(tempSubValues);
-                    if (res_data.result) {
-                        console.log(`Succeeded to modify purchase`);
-                        const modfiedPurchase = {
-                            ...currentPurchase,
-                            ...editedOtherValues,
-                        };
-                        const foundIdx = purchases.findIndex(item => item.purchase_code === currentPurchase.purchase_code);
-                        if (foundIdx !== -1) {
-                            const updatedPurchases = [
-                                ...purchases.slice(0, foundIdx),
-                                modfiedPurchase,
-                                ...purchases.slice(foundIdx + 1,),
-                            ];
-                            handlePurchase(updatedPurchases);
+                    res_data.then( res => {
+                        if (res) {
+                            console.log(`Succeeded to modify purchase`);
+                            const modfiedPurchase = {
+                                ...currentPurchase,
+                                ...editedOtherValues,
+                            };
+                            const foundIdx = purchases.findIndex(item => item.purchase_code === currentPurchase.purchase_code);
+                            if (foundIdx !== -1) {
+                                const updatedPurchases = [
+                                    ...purchases.slice(0, foundIdx),
+                                    modfiedPurchase,
+                                    ...purchases.slice(foundIdx + 1,),
+                                ];
+                                handlePurchase(updatedPurchases);
+                            } else {
+                                console.error("handleOtherItemChangeSave / Purchase : Impossible case!!!");
+                            };
+                            setCurrentPurchase();
+                            setSelectedPurchaseRowKeys([]);
+                            setIsOtherItemSelected(false);
                         } else {
-                            console.error("handleOtherItemChangeSave / Purchase : Impossible case!!!");
+                            console.error('Failed to modify company')
                         };
-                        setCurrentPurchase();
-                        setSelectedPurchaseRowKeys([]);
-                        setIsOtherItemSelected(false);
-                    } else {
-                        console.error('Failed to modify company')
-                    };
+                    });
                     break;
                 default:
                     console.log("handleOtherItemChangeSave / Impossible case!!!");
-                    break;
+                break;
             };
 
             setEditedOtherValues(null);
@@ -223,11 +225,13 @@ const CompanyPurchaseModel = (props) => {
             switch (code_name) {
                 case 'purchase_code':
                     const res_data = modifyPurchase(tempSubValues);
-                    if(res_data.result) {
-                        console.log(`Succeeded to add purchase`);
-                    } else {
-                        console.error('Failed to add company')
-                    };
+                    res_data.then(res => {
+                        if(res) {
+                            console.log(`Succeeded to add purchase`);
+                        } else {
+                            console.error('Failed to add company')
+                        };
+                    });
                     break;
                 default:
                     console.log("handleSaveNewItemChange / Impossible case!!!");
@@ -268,9 +272,7 @@ const CompanyPurchaseModel = (props) => {
             detail:{
                 type: 'select',
                 group: 'product_class_name',
-                key: 'product_name',
                 options: productOptions,
-                value: editedNewSelectValues,
                 editing: handleNewItemSelectChange
         }},
         { key:'product_type', title:'purchase.product_type',
@@ -297,9 +299,7 @@ const CompanyPurchaseModel = (props) => {
             detail:{
                 type: 'select',
                 group: 'product_class_name',
-                key: 'product_name',
                 options: productOptions,
-                value: editedOtherSelectValues,
                 editing:handleOtherItemSelectChange
         }},
         { key:'product_type', title:'purchase.product_type',
@@ -541,7 +541,7 @@ const CompanyPurchaseModel = (props) => {
                 const subOptions = foundProducts.map(item => {
                     return {
                         label: <span>{item.product_name}</span>,
-                        value: { product_code: item.product_code, product_name: item.product_name, product_class_name: item.product_class_name }
+                        value: { product_code: item.product_code, product_name: item.product_name, product_class_name: item.product_class_name, detail_desc: item.detail_desc }
                     }
                 });
                 return {
@@ -622,6 +622,7 @@ const CompanyPurchaseModel = (props) => {
                                             key={index}
                                             title={t(item.title)}
                                             defaultValue={currentPurchase[item.key]}
+                                            groupValue={item.detail.group? currentPurchase[item.detail.group]:null}
                                             name={item.key}
                                             edited={editedOtherValues}
                                             detail={item.detail}

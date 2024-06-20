@@ -461,7 +461,7 @@ const QuotationDetailsModel = () => {
             const subOptions = foundProducts.map(item => {
                 return {
                     label: <span>{item.product_name}</span>,
-                    value: { product_code: item.product_code, product_name: item.product_name, product_class_name: item.product_class_name }
+                    value: { product_code: item.product_code, product_name: item.product_name, product_class_name: item.product_class_name, detail_desc: item.detail_desc }
                 }
             });
             return {
@@ -482,6 +482,7 @@ const QuotationDetailsModel = () => {
         tabIndex={-1}
         role="dialog"
         aria-modal="true"
+        data-bs-focus="false"
       >
         <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
           <div className="modal-content">
