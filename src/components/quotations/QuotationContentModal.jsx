@@ -35,12 +35,12 @@ const QuotationContentModal = (props) => {
     const detail_spec_desc_select = [{label:t('common.na'), value:false}, {label:t('common.avail'), value:true}]
     const content_items = [
         { name: 'product_name', title: t('purchase.product_name'), detail: {
-            type: 'select', options: productOptions, group: 'product_class_name', extra: 'modal' } },
-        { name: 'detail_desc_on_off', title: t('quotation.detail_desc_on_off'), detail: { type: 'select', options: detail_spec_desc_select, extra: 'modal' } },
-        { name: 'detail_desc', title: t('quotation.detail_desc'), detail: { type: 'textarea', row_no:  8, extra: 'modal' } },
-        { name: 'quantity', title: t('common.quantity'), detail: { type: 'label', extra: 'modal' } },
-        { name: 'quotation_unit_price', title: t('quotation.quotation_unit_price'), detail: { type: 'label', extra: 'modal' } },
-        { name: 'quotation_amount', title: t('quotation.quotation_amount'), detail: { type: 'label', extra: 'modal' } },
+            type: 'select', options: productOptions, group: 'product_class_name', extra: 'long' } },
+        { name: 'detail_desc_on_off', title: t('quotation.detail_desc_on_off'), detail: { type: 'select', options: detail_spec_desc_select, extra: 'long' } },
+        { name: 'detail_desc', title: t('quotation.detail_desc'), detail: { type: 'textarea', row_no:  8, extra: 'long' } },
+        { name: 'quantity', title: t('common.quantity'), detail: { type: 'label', extra: 'long' } },
+        { name: 'quotation_unit_price', title: t('quotation.quotation_unit_price'), detail: { type: 'label', extra: 'long', price: true } },
+        { name: 'quotation_amount', title: t('quotation.quotation_amount'), detail: { type: 'label', extra: 'long', disabled: true, price: true } },
     ];
 
     const handleTime = (name, time) => {
@@ -51,31 +51,26 @@ const QuotationContentModal = (props) => {
         handleEdited(tempData)
     };
     const handleSelect = (name, value) => {
-        let tempData = {};
+        let tempData = {...edited};
         switch(name){
             case 'product_name':
-                tempData = {
-                    ...edited,
-                    ...value.value,
-                };
+                tempData['product_code'] = value.value.product_code;
+                tempData['product_class_name'] = value.value.product_class_name;
+                tempData['product_name'] = value.value.product_name;
+                tempData['quotation_unit_price'] = value.value.list_price;
+                    
                 setTempDetailSpec(value.value.detail_desc);
-                if(!showDetailDesc){
-                    delete tempData.detail_desc;    
+                if(showDetailDesc){
+                    tempData['detail_desc'] = value.value.detail_desc;
                 };
                 break;
             case 'detail_desc_on_off':
                 setShowDetailDesc(value.value);
+                tempData['detail_desc_on_off'] =  value.value;
+
                 if(value.value){
-                    tempData={
-                        ...edited,
-                        detail_desc: tempDetailSpec,
-                        detail_desc_on_off: value.value,
-                    };
+                    tempData['detail_desc'] = tempDetailSpec;
                 } else {
-                    tempData={
-                        ...edited,
-                        detail_desc_on_off: value.value,
-                    };
                     delete tempData.detail_desc;;
                 };
                 break;
@@ -89,9 +84,21 @@ const QuotationContentModal = (props) => {
         handleEdited(tempData);
     };
     const handleValue = (event) => {
-        const tempData = {
-            ...edited,
-            [event.target.name]: event.target.value,
+        const target_name = event.target.name;
+        let tempData = {...edited};
+        tempData[event.target.name] = event.target.value;
+        if(target_name === 'quantity'){
+            if(!edited['quotation_unit_price'] || edited.quotation_unit_price ===''){
+                tempData['quotation_amount'] = '';
+            } else {
+                tempData['quotation_amount'] = (Number(event.target.value) * Number(edited.quotation_unit_price)).toString();
+            };
+        } else if(target_name === 'quotation_unit_price'){
+            if(!edited['quantity'] || edited.quantity ===''){
+                tempData['quotation_amount'] = '';
+            } else {
+                tempData['quotation_amount'] = (Number(event.target.value) * Number(edited.quotation_unit_price)).toString();
+            };
         };
         handleEdited(tempData);
     };
@@ -108,13 +115,18 @@ const QuotationContentModal = (props) => {
             loadAllProducts();
         };
         if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
-            console.log('[PurchaseAddModel] set companies for selection');
+            console.log('[PurchaseAddModel] set products for selection');
             const productOptionsValue = allProductClassList.map(proClass => {
                 const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
                 const subOptions = foundProducts.map(item => {
                     return {
                         label: <span>{item.product_name}</span>,
-                        value: { product_code: item.product_code, product_name: item.product_name, product_class_name: item.product_class_name, detail_desc: item.detail_desc }
+                        value: { product_code: item.product_code,
+                            product_name: item.product_name,
+                            product_class_name: item.product_class_name,
+                            detail_desc: item.detail_desc ,
+                            list_price: item.list_price,
+                        }
                     }
                 });
                 return {
@@ -145,7 +157,8 @@ const QuotationContentModal = (props) => {
                     Cancel
                 </Button>,
             ]}
-            style={{ top: 120, width: 240 }}
+            style={{ top: 120 }}
+            width={820}
             zIndex={2001}
         >
             {content_items && content_items.map((item, index) => {

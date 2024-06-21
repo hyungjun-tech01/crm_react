@@ -3,7 +3,7 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "antd/dist/reset.css";
-import { Table } from 'antd';
+import { Button, Checkbox, Space, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import { AddBoxOutlined, ModeEdit, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
@@ -353,7 +353,6 @@ const QuotationAddModel = (props) => {
   const handleSubModalCancel = () => {
     setIsSubModalOpen(false);
     setEditedSubModalValues(null);
-    setOrgSubModalValues(null);
     setSelectedContentRowKeys([]);
   };
 
@@ -602,6 +601,21 @@ const QuotationAddModel = (props) => {
                   </div>
                 </div>
               </h4>
+              <div className="form-group row">
+                <Space
+                  align="start"
+                  direction="horizontal"
+                  size="small"
+                  style={{ display: 'flex', marginBottom: '0.5rem' }}
+                  wrap
+                >
+                  <Button>금액 : 얼마얼마얼마</Button>
+                  <Checkbox>{t('quotation.tax_included')}</Checkbox>
+                  <Checkbox>{t('quotation.total_applied_only')}</Checkbox>
+                  <Checkbox>{t('quotation.auto_calculation')}</Checkbox>
+                  <Checkbox>{t('quotation.show_decimal')}</Checkbox>
+                </Space>
+              </div>
               <div className="form-group row">
                 <Table
                   rowSelection={rowSelection}

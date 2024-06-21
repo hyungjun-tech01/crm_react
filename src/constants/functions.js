@@ -59,25 +59,34 @@ export const formatTime = (date_value) => {
 };
 
 export const ConverTextAmount = (amount) => {
-    if(!amount) return "";
+    if(amount === undefined || amount === null || amount === '') return "";
 
-    let input = null;
+    let input_str = null;
     if(typeof amount === 'number'){
-        input = amount.toString();
-    } else if(typeof amount === 'string')
-    {
-        input = amount;
+        input_str = amount.toString();
+    } else if(typeof amount === 'string'){
+        input_str = amount;
     };
-    
+
     let ret = "";
-    for(let i = input.length - 1, m = 0; i >= 0; i--, m++)
-    {
-        let temp_ret = input.at(i);
-        if(m !==0 && m % 3 === 0 && !isNaN(Number(temp_ret))){
-            temp_ret += ",";
+    const splitted = input_str.split('.');
+    if(splitted.length > 2){
+        console.log('[ ConverTextAmount ] Input is not right number');
+        ret = input_str;
+    } else {
+        const upper_no = splitted[0];
+        for(let i = upper_no.length - 1, m = 0; i >= 0; i--, m++)
+        {
+            let temp_ret = upper_no.at(i);
+            if(m !==0 && m % 3 === 0 && !isNaN(Number(temp_ret))){
+                temp_ret += ",";
+            };
+            ret = temp_ret + ret;
         };
-        ret = temp_ret + ret;
     };
-    // console.log('\t[ ConverTextAmount ] output : ', ret);
+    if(splitted.length === 2){
+        ret += '.' + splitted[1];
+    };
+     
     return ret;
 };

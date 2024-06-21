@@ -3,6 +3,7 @@ import { Input } from 'antd';
 import Select from 'react-select';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { ConverTextAmount } from './functions';
 
 const DateInput = (props) => {
     const { name, addonBefore, onChange, format, showTime, style, value, disabled } = props;
@@ -135,7 +136,7 @@ const DetailCardItem = (props) => {
     const SharedProps = {
         name: name,
         addonBefore: <div className='detail-card-before'>{title}</div>,
-        value: currentValue,
+        value: detail.price ? ConverTextAmount(currentValue) : currentValue,
         disabled: detail.disabled ? detail.disabled : false,
     };
 
