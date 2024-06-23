@@ -26,7 +26,7 @@ import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import DetailSubModal from "../../constants/DetailSubModal";
 import { ItemRender, ShowTotal } from "../paginationfunction";
-import { ConverTextAmount, formatDate } from "../../constants/functions";
+import { ConvertCurrency, formatDate } from "../../constants/functions";
 
 
 const PurchaseDetailsModel = (props) => {
@@ -280,7 +280,7 @@ const PurchaseDetailsModel = (props) => {
     {
       title: t('common.price_1'),
       dataIndex: "ma_price",
-      render: (text, record) => <>{ConverTextAmount(record.ma_price)}</>,
+      render: (text, record) => <>{ConvertCurrency(record.ma_price)}</>,
     },
     {
       title: t('common.memo'),

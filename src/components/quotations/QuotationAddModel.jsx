@@ -3,7 +3,7 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "antd/dist/reset.css";
-import { Button, Checkbox, Space, Table } from 'antd';
+import { Button, Checkbox, InputNumber, Space, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import { AddBoxOutlined, ModeEdit, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
@@ -25,6 +25,7 @@ import { QuotationRepo, QuotationTypes, QuotationSendTypes } from "../../reposit
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import QuotationContentModal from "./QuotationContentModal";
+import { ConvertCurrency } from "../../constants/functions";
 
 const default_quotation_content = {
   '1': null, '2': null, '3': null, '4': null, '5': null,
@@ -80,7 +81,11 @@ const QuotationAddModel = (props) => {
       setQuotationChange({
         ...defaultQuotation,
       });
+      handleContentModalCancel();
     };
+    setAmountsForContent({
+      sum_each_items: 0, dc_amount: 0, sum_dc_applied:0, vat_amount:0, cut_off_amount: 0, sum_final: 0
+    });
   }, [leadCode, leadsForSelection]);
 
   const handleItemChange = useCallback((e) => {
@@ -189,7 +194,7 @@ const QuotationAddModel = (props) => {
       title: t('quotation.detail_desc'),
       dataIndex: '10',
       size: 10,
-      render: (text, record) => <>{text}</>,
+      render: (text, record) => <>{record['10'] ? t('common.avail') : t('common.na')}</>,
     },
     {
       title: t('common.quantity'),
@@ -201,13 +206,13 @@ const QuotationAddModel = (props) => {
       title: t('quotation.quotation_unit_price'),
       dataIndex: '15',
       size: 15,
-      render: (text, record) => <>{text}</>,
+      render: (text, record) => <>{ConvertCurrency(record['15'], settingForContent.show_decimal)}</>,
     },
     {
       title: t('quotation.quotation_amount'),
       dataIndex: '16',
       size: 15,
-      render: (text, record) => <>{text}</>,
+      render: (text, record) => <>{ConvertCurrency(record['16'], settingForContent.show_decimal)}</>,
     },
     // {
     //   title: "Edit",
@@ -227,7 +232,6 @@ const QuotationAddModel = (props) => {
       setSelectedContentRowKeys(selectedRows);
     },
   };
-
 
   const handleDeleteSelectedConetents = useCallback(() => {
     if (selectedContentRowKeys.length === 0) {
@@ -254,7 +258,7 @@ const QuotationAddModel = (props) => {
     setQuotationChange(tempQuotation);
     console.log('handleDeleteSelectedConetents / final : ', finalContents);
     setQuotationContents(finalContents);
-  }, []);
+  }, [quotationChange, quotationContents, selectedContentRowKeys]);
 
   // --- Functions used for adding new quotation ------------------------------
   const handleAddNewQuotation = useCallback((event) => {
@@ -285,13 +289,157 @@ const QuotationAddModel = (props) => {
   }, [cookies.myLationCrmUserId, initializeQuotationTemplate, modifyQuotation, quotationChange, quotationContents]);
 
 
-
   //===== Handles to edit 'Contents' =================================================
-  const [isSubModalOpen, setIsSubModalOpen] = useState(false);
-  const [subModalSetting, setSubModalSetting] = useState({ title: '' })
-  const [orgSubModalValues, setOrgSubModalValues] = useState({});
-  const [editedSubModalValues, setEditedSubModalValues] = useState({});
+  const [isContentModalOpen, setIsContentModalOpen] = useState(false);
+  const [orgContentModalValues, setorgContentModalValues] = useState({});
+  const [editedContentModalValues, seteditedContentModalValues] = useState({});
+  const [settingForContent, setSettingForContent] = useState({ title: '',
+    vat_included: false, unit_vat_included: false, total_only: false, auto_calc: true, show_decimal: false,
+    vat_included_disabled: false, unit_vat_included_disabled: true, total_only_disabled: true, dc_rate: 0,
+  });
+  const [amountsForContent, setAmountsForContent] = useState({
+    sum_each_items: 0, dc_amount: 0, sum_dc_applied:0, vat_amount:0, cut_off_amount: 0, sum_final: 0
+  });
 
+  const handleChangeContentSetting = (event) => {
+    const target_name = event.target.name;
+    const target_value = event.target.checked;
+    console.log(`[handleChangeContentSetting] Target : ${target_name} / Value : ${target_value}`);
+
+    let tempSetting = { ...settingForContent };
+    switch(target_name)
+    {
+      case 'vat_included':
+        tempSetting.vat_included = target_value;
+        tempSetting.unit_vat_included_disabled = !target_value;
+        if(settingForContent.auto_calc){
+          const vat_amount = target_value ? amountsForContent.sum_dc_applied*0.1 : 0;
+          const updatedAmount = {
+            ...amountsForContent,
+            vat_amount: vat_amount,
+            sum_final: amountsForContent.sum_dc_applied + vat_amount - amountsForContent.cut_off_amount,
+          };
+          console.log('[handleContentModalOk] calcualted amount :', updatedAmount);
+          setAmountsForContent(updatedAmount);
+        };
+        break;
+      case 'unit_vat_included':
+        tempSetting.vat_included_disabled = target_value;
+        tempSetting.unit_vat_included = target_value;
+        tempSetting.total_only_disabled = !target_value;
+        break;
+      case 'total_only':
+        tempSetting.total_only = target_value;
+        break;
+      case 'auto_calc':
+        tempSetting.auto_calc = target_value;
+        break;
+      default:
+        console.log('handleChangeContentSetting - Impossible case');
+        break;
+    };
+    setSettingForContent(tempSetting);
+  };
+
+  const handleChangeEachSum = (value) => {
+    let updatedAmount = {
+      ...amountsForContent,
+      sum_each_items : value,
+    };
+    if(settingForContent.auto_calc){
+      const dc_amount = value * settingForContent.dc_rate* 0.01;
+      const sum_dc_applied = value - dc_amount;
+      const vat_amount = settingForContent.vat_included ? sum_dc_applied*0.1 : 0;
+      updatedAmount.dc_amount = dc_amount;
+      updatedAmount.sum_dc_applied = sum_dc_applied;
+      updatedAmount.vat_amount = vat_amount;
+      updatedAmount.sum_final = sum_dc_applied + vat_amount - amountsForContent.cut_off_amount;
+      console.log('[handleContentModalOk] calcualted amount :', updatedAmount);
+    };
+    setAmountsForContent(updatedAmount);
+  };
+
+  const handleChangeDCRate = (value) => {
+    const updatedSetting = {
+      ...settingForContent,
+      dc_rate : value
+    };
+    setSettingForContent(updatedSetting);
+
+    if(settingForContent.auto_calc && amountsForContent.sum_each_items !==0){
+      const dc_amount = amountsForContent.sum_each_items * value* 0.01;
+      const sum_dc_applied = amountsForContent.sum_each_items - dc_amount;
+      const vat_amount = settingForContent.vat_included ? sum_dc_applied*0.1 : 0;
+      const tempAmount = {
+        ...amountsForContent,
+        dc_amount: dc_amount,
+        sum_dc_applied: sum_dc_applied,
+        vat_amount: vat_amount,
+        sum_final: sum_dc_applied + vat_amount - amountsForContent.cut_off_amount,
+      };
+      console.log('[handleContentModalOk] calcualted amount :', tempAmount);
+      setAmountsForContent(tempAmount);
+    };
+  };
+
+  const handleChangeDCAmount = (value) => {
+    let updatedAmount = {
+      ...amountsForContent,
+      dc_amount : value
+    };
+    if(settingForContent.auto_calc){
+      const sum_dc_applied = amountsForContent.sum_each_items - value;
+      const vat_amount = settingForContent.vat_included ? sum_dc_applied*0.1 : 0;
+      updatedAmount.sum_dc_applied = sum_dc_applied;
+      updatedAmount.vat_amount = vat_amount;
+      updatedAmount.sum_final = sum_dc_applied + vat_amount - amountsForContent.cut_off_amount;
+    };
+    console.log('[handleContentModalOk] calcualted amount :', updatedAmount);
+    setAmountsForContent(updatedAmount);
+  };
+
+  const handleChangeDCAppliedSum = (value) => {
+    let updatedAmount = {
+      ...amountsForContent,
+      sum_dc_applied : value
+    };
+    if(settingForContent.auto_calc){
+      const vat_amount = settingForContent.vat_included ? value*0.1 : 0;
+      updatedAmount.vat_amount = vat_amount;
+      updatedAmount.sum_final = value + vat_amount - amountsForContent.cut_off_amount;
+    };
+    setAmountsForContent(updatedAmount);
+  };
+
+  const handleChangeVAT = (value) => {
+    let updatedAmount = {
+      ...amountsForContent,
+      vat_amount : value,
+    };
+    if(settingForContent.auto_calc){
+      updatedAmount.sum_final = amountsForContent.sum_dc_applied + value - amountsForContent.cut_off_amount;
+    };
+    setAmountsForContent(updatedAmount);
+  };
+
+  const handleChangeCutOffAmount = (value) => {
+    let updatedAmount = {
+      ...amountsForContent,
+      cut_off_amount : value
+    };
+    if(settingForContent.auto_calc){
+      updatedAmount.sum_final = amountsForContent.sum_dc_applied + amountsForContent.vat_amount - value;
+    }
+    setAmountsForContent(updatedAmount);
+  };
+
+  const handleChangeFinalAmount = (value) => {
+    const updatedSetting = {
+      ...amountsForContent,
+      sum_final : value,
+    };
+    setAmountsForContent(updatedSetting);
+  };
 
   // --- Functions used for editing content ------------------------------
   const handleAddNewContent = useCallback(() => {
@@ -305,8 +453,10 @@ const QuotationAddModel = (props) => {
       '1': quotationContents.length + 1,
     };
     setCurrentContent(tempContent);
-    setSubModalSetting({ title: t('quotation.add_content') });
-    setOrgSubModalValues({
+    setSettingForContent({ ...settingForContent,
+      title: t('quotation.add_content'),
+    });
+    setorgContentModalValues({
       product_name: null,
       product_class_name: null,
       detail_desc_on_off: false,
@@ -315,8 +465,8 @@ const QuotationAddModel = (props) => {
       quotation_unit_price: null,
       quotation_amount: null,
     });
-    setIsSubModalOpen(true);
-  }, [quotationChange.lead_name, quotationContents.length, t]);
+    setIsContentModalOpen(true);
+  }, [quotationChange.lead_name, quotationContents.length, settingForContent, t]);
 
   const handleModifyContent = useCallback((data) => {
     if (!data) {
@@ -329,36 +479,72 @@ const QuotationAddModel = (props) => {
       '1': quotationContents.length + 1,
     };
     setCurrentContent(tempContent);
-    setIsSubModalOpen(true);
-  }, [quotationContents, quotationChange]);
+    setIsContentModalOpen(true);
+  }, [quotationContents.length]);
 
-  const handleSubModalOk = useCallback(() => {
+  const handleContentModalOk = useCallback(() => {
     const finalData = {
-      ...orgSubModalValues,
-      ...editedSubModalValues,
+      ...orgContentModalValues,
+      ...editedContentModalValues,
       index: quotationContents.length + 1,
     };
-    if (!finalData.product_name || !finalData.quotatio_amount) {
+    if (!finalData.product_name || !finalData.quotation_amount) {
       console.log("Inevitable data can't be null");
       return;
     };
-    setIsSubModalOpen(false);
-    console.log('[handleSubModalOk] ', finalData);
-    const updatedContents = quotationContents.concat(finalData);
+    console.log('[handleContentModalOk] new content :', );
+    // update Contents -------------------------------------------------
+    const updatedContent = {
+      '1': quotationContents.length + 1,
+      '5': finalData.product_name,
+      '10': finalData.detail_desc_on_off,
+      '12': finalData.quantity,
+      '15': finalData.quotation_unit_price,
+      '16': finalData.quotation_amount,
+      '99': finalData.detail_desc? finalData.detail_desc : '',
+    };
+    const updatedContents = quotationContents.concat(updatedContent);
     setQuotationContents(updatedContents);
-    setSelectedContentRowKeys([]);
 
-  }, [editedSubModalValues, orgSubModalValues, quotationContents]);
+    // update Amounts -------------------------------------------------
+    if(settingForContent.auto_calc){
+      const sum_each_items = amountsForContent.sum_each_items + finalData.quotation_amount;
+      const dc_amount = sum_each_items * settingForContent.dc_rate* 0.01;
+      const sum_dc_applied = sum_each_items - dc_amount;
+      const vat_amount = settingForContent.vat_included ? sum_dc_applied*0.1 : 0;
+      const tempAmount = {
+        ...amountsForContent,
+        sum_each_items: sum_each_items,
+        dc_amount: dc_amount,
+        sum_dc_applied: sum_dc_applied,
+        vat_amount: vat_amount,
+        sum_final: sum_dc_applied + vat_amount - amountsForContent.cut_off_amount,
+      };
+      console.log('[handleContentModalOk] calcualted amount :', tempAmount);
+      setAmountsForContent(tempAmount);
+    };
+    handleContentModalCancel();
+  }, [amountsForContent, editedContentModalValues, orgContentModalValues, quotationContents, settingForContent.auto_calc, settingForContent.dc_rate, settingForContent.vat_included]);
 
-  const handleSubModalCancel = () => {
-    setIsSubModalOpen(false);
-    setEditedSubModalValues(null);
+  const handleContentModalCancel = () => {
+    setIsContentModalOpen(false);
+    seteditedContentModalValues({});
+    setorgContentModalValues({});
     setSelectedContentRowKeys([]);
   };
 
-  const handleSubModalItemChange = useCallback(data => {
-    setEditedSubModalValues(data);
+  const handleContentItemChange = useCallback(data => {
+    seteditedContentModalValues(data);
   }, []);
+
+  const hanldeFomatter = useCallback((value) => {
+    if(value === undefined || value === null || value === '') return '';
+    if(typeof value === 'string') return value;
+
+    return settingForContent.show_decimal
+    ? value.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+    : value.toFixed().replace(/\d(?=(\d{3})+\.)/g, '$&,')
+  }, [settingForContent.show_decimal]);
 
   //===== useEffect functions ==========================================
   useEffect(() => {
@@ -371,7 +557,6 @@ const QuotationAddModel = (props) => {
         if (handleInit) handleInit(!init);
       };
     };
-
   }, [handleInit, init, initializeQuotationTemplate, loadAllUsers, userState]);
 
   useEffect(() => {
@@ -379,7 +564,6 @@ const QuotationAddModel = (props) => {
       loadAllLeads();
     };
   }, [leadsState, loadAllLeads]);
-
   
 
   return (
@@ -603,17 +787,49 @@ const QuotationAddModel = (props) => {
               </h4>
               <div className="form-group row">
                 <Space
-                  align="start"
+                  align="center"
                   direction="horizontal"
-                  size="small"
-                  style={{ display: 'flex', marginBottom: '0.5rem' }}
+                  size="middle"
+                  style={{ display: 'flex', marginBottom: '0.25rem', marginTop: '0.25rem' }}
                   wrap
                 >
-                  <Button>금액 : 얼마얼마얼마</Button>
-                  <Checkbox>{t('quotation.tax_included')}</Checkbox>
-                  <Checkbox>{t('quotation.total_applied_only')}</Checkbox>
-                  <Checkbox>{t('quotation.auto_calculation')}</Checkbox>
-                  <Checkbox>{t('quotation.show_decimal')}</Checkbox>
+                  <Checkbox
+                    name='vat_included'
+                    checked={settingForContent.vat_included}
+                    disabled={settingForContent.vat_included_disabled}
+                    onChange={handleChangeContentSetting}
+                   >
+                    {t('quotation.vat_included')}
+                  </Checkbox>
+                  <Checkbox
+                    name='unit_vat_included'
+                    checked={settingForContent.unit_vat_included}
+                    disabled={settingForContent.unit_vat_included_disabled}
+                    onChange={handleChangeContentSetting}
+                   >
+                    {t('quotation.unit_vat_included')}
+                  </Checkbox>
+                  <Checkbox
+                    name='total_only'
+                    checked={settingForContent.total_only}
+                    disabled={settingForContent.total_only_disabled}
+                    onChange={handleChangeContentSetting}
+                  >
+                    {t('quotation.total_applied_only')}
+                  </Checkbox>
+                  <Checkbox
+                    name='auto_calc'
+                    checked={settingForContent.auto_calc}
+                    onChange={handleChangeContentSetting}
+                  >
+                    {t('quotation.auto_calculation')}
+                  </Checkbox>
+                  <Checkbox
+                    name='show_decimal'
+                    onChange={handleChangeContentSetting}
+                  >
+                    {t('quotation.show_decimal')}
+                  </Checkbox>
                 </Space>
               </div>
               <div className="form-group row">
@@ -633,6 +849,94 @@ const QuotationAddModel = (props) => {
                   rowKey={(record) => record['1']}
                 // onChange={handleTableChange}
                 />
+              </div>
+              <div className="form-group row">
+                <Space
+                  align="center"
+                  direction="horizontal"
+                  size="middle"
+                  style={{ display: 'flex', marginBottom: '0.25rem', marginTop: '0.25rem' }}
+                >
+                  <Space.Compact direction="vertical">
+                    <label>{t('transaction.total_price')}</label>
+                    <InputNumber
+                      name='sum_each_items'
+                      defaultValue={0}
+                      value={amountsForContent.sum_each_items}
+                      formatter={hanldeFomatter}
+                      parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                      disabled={settingForContent.auto_calc}
+                      onChange={handleChangeEachSum}
+                    />
+                  </Space.Compact>
+                  <Space.Compact direction="vertical">
+                    <label >{t('quotation.dc_rate')}</label>
+                    <InputNumber
+                      name='dc_rate'
+                      value={settingForContent.dc_rate}
+                      onChange={handleChangeDCRate}
+                    />
+                  </Space.Compact>
+                  <Space.Compact direction="vertical">
+                    <label >{t('quotation.dc_amount')}</label>
+                    <InputNumber
+                      name='dc_amount'
+                      defaultValue={0}
+                      value={amountsForContent.dc_amount}
+                      formatter={hanldeFomatter}
+                      parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                      disabled={settingForContent.auto_calc}
+                      onChange={handleChangeDCAmount}
+                    />
+                  </Space.Compact>
+                  <Space.Compact direction="vertical">
+                    <label >{t('quotation.quotation_amount')}</label>
+                    <InputNumber
+                      name='sum_dc_applied'
+                      defaultValue={0}
+                      value={amountsForContent.sum_dc_applied}
+                      disabled={settingForContent.auto_calc}
+                      formatter={hanldeFomatter}
+                      parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                      onChange={handleChangeDCAppliedSum}
+                    />
+                  </Space.Compact>
+                  <Space.Compact direction="vertical">
+                    <label >{t('quotation.tax_amount')}</label>
+                    <InputNumber
+                      name='vat_amount'
+                      defaultValue={0}
+                      value={amountsForContent.vat_amount}
+                      disabled={settingForContent.auto_calc}
+                      formatter={hanldeFomatter}
+                      parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                      onChange={handleChangeVAT}
+                    />
+                  </Space.Compact>
+                  <Space.Compact direction="vertical">
+                    <label >{t('quotation.cutoff_amount')}</label>
+                    <InputNumber
+                      name='cut_off_amount'
+                      defaultValue={0}
+                      value={amountsForContent.cut_off_amount}
+                      formatter={hanldeFomatter}
+                      parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                      onChange={handleChangeCutOffAmount}
+                    />
+                  </Space.Compact>
+                  <Space.Compact direction="vertical">
+                    <label >{t('quotation.total_quotation_amount')}</label>
+                    <InputNumber
+                      name='sum_final'
+                      defaultValue={0}
+                      value={amountsForContent.sum_final}
+                      disabled={settingForContent.auto_calc}
+                      formatter={hanldeFomatter}
+                      parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                      onChange={handleChangeFinalAmount}
+                    />
+                  </Space.Compact>
+                </Space>
               </div>
               <div className="text-center">
                 <button
@@ -802,13 +1106,13 @@ const QuotationAddModel = (props) => {
         </div>
       } */}
       <QuotationContentModal
-        title={subModalSetting.title}
-        open={isSubModalOpen}
-        original={orgSubModalValues}
-        edited={editedSubModalValues}
-        handleEdited={handleSubModalItemChange}
-        handleOk={handleSubModalOk}
-        handleCancel={handleSubModalCancel}
+        setting={settingForContent}
+        open={isContentModalOpen}
+        original={orgContentModalValues}
+        edited={editedContentModalValues}
+        handleEdited={handleContentItemChange}
+        handleOk={handleContentModalOk}
+        handleCancel={handleContentModalCancel}
       />
     </div>
   );

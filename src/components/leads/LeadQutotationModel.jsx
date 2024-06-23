@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
 import { ItemRender, ShowTotal } from "../paginationfunction";
-import { formatDate, ConverTextAmount } from "../../constants/functions";
+import { formatDate, ConvertCurrency } from "../../constants/functions";
 import { Add } from "@mui/icons-material";
 
 import { QuotationRepo } from "../../repository/quotation";
@@ -58,7 +58,7 @@ const LeadQuotationModel = (props) => {
         {
             title: t('quotation.total_quotation_amount'),
             dataIndex: "total_quotation_amount",
-            render: (text, record) => <>{ConverTextAmount(record.total_quotation_amount)}</>,
+            render: (text, record) => <>{ConvertCurrency(record.total_quotation_amount)}</>,
         },
         {
             title: t('quotation.quotation_manager'),

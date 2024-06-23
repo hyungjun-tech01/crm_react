@@ -58,7 +58,7 @@ export const formatTime = (date_value) => {
           + ":" + (sec < 10 ? "0" + sec.toString() : sec.toString());
 };
 
-export const ConverTextAmount = (amount) => {
+export const ConvertCurrency = (amount, show_digit = false) => {
     if(amount === undefined || amount === null || amount === '') return "";
 
     let input_str = null;
@@ -67,26 +67,33 @@ export const ConverTextAmount = (amount) => {
     } else if(typeof amount === 'string'){
         input_str = amount;
     };
+    if(isNaN(Number(input_str))) return;
 
     let ret = "";
     const splitted = input_str.split('.');
     if(splitted.length > 2){
-        console.log('[ ConverTextAmount ] Input is not right number');
+        console.log('[ ConvertCurrency ] Input is not right number');
         ret = input_str;
     } else {
         const upper_no = splitted[0];
         for(let i = upper_no.length - 1, m = 0; i >= 0; i--, m++)
         {
             let temp_ret = upper_no.at(i);
-            if(m !==0 && m % 3 === 0 && !isNaN(Number(temp_ret))){
+            if(m !==0 && m % 3 === 0){
                 temp_ret += ",";
             };
             ret = temp_ret + ret;
         };
     };
-    if(splitted.length === 2){
-        ret += '.' + splitted[1];
+    if(splitted.length === 2 && show_digit){
+        if(splitted[1].length >= 4){
+            ret += '.' + splitted[1].substring(0,4);
+        } else {
+            ret += '.' + splitted[1];
+            for(let i=0; i<(4 - splitted[1].length); i++) {
+                ret += '0';
+            };
+        };
     };
-     
     return ret;
 };

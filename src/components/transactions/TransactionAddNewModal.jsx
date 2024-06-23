@@ -14,7 +14,7 @@ import { AddBoxOutlined, ModeEdit, IndeterminateCheckBoxOutlined } from '@mui/ic
 import { LeadRepo } from "../../repository/lead";
 import { TransactionRepo } from "../../repository/transaction";
 import { atomAllCompanies, atomAllLeads, defaultTransaction } from "../../atoms/atoms";
-import { ConverTextAmount, formatDate } from "../../constants/functions";
+import { ConvertCurrency, formatDate } from "../../constants/functions";
 
 const default_transaction_content = {
   "transaction_code": null,
@@ -733,17 +733,17 @@ const TransactionAddNewModal = (props) => {
               <tr>
                 <td><b>{trans_key_to_name.supply_price}</b></td>
                 <td>
-                  {ConverTextAmount(supplyPrice)}
+                  {ConvertCurrency(supplyPrice)}
                 </td>
                 <td><b>{trans_key_to_name.tax_price}</b></td>
                 <td>
-                  {ConverTextAmount(taxyPrice)}
+                  {ConvertCurrency(taxyPrice)}
                 </td>
               </tr>
               <tr>
                 <td><b>{trans_key_to_name.total_price}</b></td>
                 <td>
-                  {ConverTextAmount(totalPrice)}
+                  {ConvertCurrency(totalPrice)}
                 </td>
               </tr>
             </tbody>

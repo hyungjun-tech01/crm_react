@@ -14,7 +14,7 @@ import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 import DetailCardItem from '../../constants/DetailCardItem';
 
 const QuotationContentModal = (props) => {
-    const { title, open, original, edited, handleEdited, handleOk, handleCancel } = props;
+    const { setting, open, original, edited, handleEdited, handleOk, handleCancel } = props;
     const [t] = useTranslation();
 
 
@@ -39,8 +39,8 @@ const QuotationContentModal = (props) => {
         { name: 'detail_desc_on_off', title: t('quotation.detail_desc_on_off'), detail: { type: 'select', options: detail_spec_desc_select, extra: 'long' } },
         { name: 'detail_desc', title: t('quotation.detail_desc'), detail: { type: 'textarea', row_no:  8, extra: 'long' } },
         { name: 'quantity', title: t('common.quantity'), detail: { type: 'label', extra: 'long' } },
-        { name: 'quotation_unit_price', title: t('quotation.quotation_unit_price'), detail: { type: 'label', extra: 'long', price: true } },
-        { name: 'quotation_amount', title: t('quotation.quotation_amount'), detail: { type: 'label', extra: 'long', disabled: true, price: true } },
+        { name: 'quotation_unit_price', title: t('quotation.quotation_unit_price'), detail: { type: 'label', extra: 'long', price: true, decimal: setting.show_decimal } },
+        { name: 'quotation_amount', title: t('quotation.quotation_amount'), detail: { type: 'label', extra: 'long', disabled: true, price: true, decimal: setting.show_decimal } },
     ];
 
     const handleTime = (name, time) => {
@@ -57,7 +57,7 @@ const QuotationContentModal = (props) => {
                 tempData['product_code'] = value.value.product_code;
                 tempData['product_class_name'] = value.value.product_class_name;
                 tempData['product_name'] = value.value.product_name;
-                tempData['quotation_unit_price'] = value.value.list_price;
+                tempData['quotation_unit_price'] = setting.unit_vat_included ? Number(value.value.list_price) / 1.1 : Number(value.value.list_price);
                     
                 setTempDetailSpec(value.value.detail_desc);
                 if(showDetailDesc){
@@ -91,13 +91,13 @@ const QuotationContentModal = (props) => {
             if(!edited['quotation_unit_price'] || edited.quotation_unit_price ===''){
                 tempData['quotation_amount'] = '';
             } else {
-                tempData['quotation_amount'] = (Number(event.target.value) * Number(edited.quotation_unit_price)).toString();
+                tempData['quotation_amount'] = Number(event.target.value) * Number(edited.quotation_unit_price);
             };
         } else if(target_name === 'quotation_unit_price'){
             if(!edited['quantity'] || edited.quantity ===''){
                 tempData['quotation_amount'] = '';
             } else {
-                tempData['quotation_amount'] = (Number(event.target.value) * Number(edited.quotation_unit_price)).toString();
+                tempData['quotation_amount'] = Number(event.target.value) * Number(edited.quotation_unit_price);
             };
         };
         handleEdited(tempData);
@@ -141,7 +141,7 @@ const QuotationContentModal = (props) => {
 
     return (
         <Modal
-            title={title}
+            title={setting.title}
             open={open}
             onOk={handleOk}
             onCancel={handleCancel}

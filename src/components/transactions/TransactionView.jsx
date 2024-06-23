@@ -6,7 +6,7 @@ import { atomCurrentTransaction, defaultTransaction } from "../../atoms/atoms";
 import NotoSansRegular from "../../fonts/NotoSansKR-Regular.ttf";
 import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";
-import { ConverTextAmount } from '../../constants/functions';
+import { ConvertCurrency } from '../../constants/functions';
 
 // Create styles
 const Styles = StyleSheet.create({
@@ -223,16 +223,16 @@ const TransactionView = () => {
                                                             <Text style={Styles.text}>{item.standard}</Text>
                                                         </View>
                                                         <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#eeeeee",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={Styles.text}>{ConverTextAmount(item.quantity)}</Text>
+                                                            <Text style={Styles.text}>{ConvertCurrency(item.quantity)}</Text>
                                                         </View>
                                                         <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#eeeeee",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={Styles.text}>{ConverTextAmount(item.supply_price)}</Text>
+                                                            <Text style={Styles.text}>{ConvertCurrency(item.supply_price)}</Text>
                                                         </View>
                                                         <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#eeeeee",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={Styles.text}>{ConverTextAmount(item.total_price)}</Text>
+                                                            <Text style={Styles.text}>{ConvertCurrency(item.total_price)}</Text>
                                                         </View>
                                                         <View style={[Styles.contentCell, {width:80,border:0,flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={Styles.text}>{ConverTextAmount(item.tax_price)}</Text>
+                                                            <Text style={Styles.text}>{ConvertCurrency(item.tax_price)}</Text>
                                                         </View>
                                                     </View>
                                             )};
@@ -249,16 +249,16 @@ const TransactionView = () => {
                                                             <Text style={Styles.text}>{item.standard}</Text>
                                                         </View>
                                                         <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#eeeeee",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={Styles.text}>{ConverTextAmount(item.quantity)}</Text>
+                                                            <Text style={Styles.text}>{ConvertCurrency(item.quantity)}</Text>
                                                         </View>
                                                         <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#eeeeee",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={Styles.text}>{ConverTextAmount(item.supply_price)}</Text>
+                                                            <Text style={Styles.text}>{ConvertCurrency(item.supply_price)}</Text>
                                                         </View>
                                                         <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#eeeeee",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={Styles.text}>{ConverTextAmount(item.total_price)}</Text>
+                                                            <Text style={Styles.text}>{ConvertCurrency(item.total_price)}</Text>
                                                         </View>
                                                         <View style={[Styles.contentCell, {width:80,border:0,flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={Styles.text}>{ConverTextAmount(item.tax_price)}</Text>
+                                                            <Text style={Styles.text}>{ConvertCurrency(item.tax_price)}</Text>
                                                         </View>
                                                     </View>
                                             )};
@@ -347,13 +347,13 @@ const TransactionView = () => {
                                         <Text style={Styles.text}>{}</Text>
                                     </View>
                                     <View style={{width:'25%',margin:0,padding:0,borderRight:1,borderColor:'#eeeeee',alignItems:'center',justifyContent:'flex-end'}}>
-                                        <Text style={Styles.text}>{ConverTextAmount(currentTransaction.supply_price)}</Text>
+                                        <Text style={Styles.text}>{ConvertCurrency(currentTransaction.supply_price)}</Text>
                                     </View>
                                     <View style={{width:'25%',margin:0,padding:0,borderRight:1,borderColor:'#eeeeee',alignItems:'center',justifyContent:'flex-end'}}>
-                                        <Text style={Styles.text}>{ConverTextAmount(currentTransaction.tax_price)}</Text>
+                                        <Text style={Styles.text}>{ConvertCurrency(currentTransaction.tax_price)}</Text>
                                     </View>
                                     <View style={{width:'25%',margin:0,padding:0,alignItems:'center',justifyContent:'flex-end'}}>
-                                        <Text style={Styles.text}>{ConverTextAmount(currentTransaction.total_price)}</Text>
+                                        <Text style={Styles.text}>{ConvertCurrency(currentTransaction.total_price)}</Text>
                                     </View>
                                 </View>
                             </View>

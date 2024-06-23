@@ -13,7 +13,7 @@ import { atomAllPurchases,
 } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
 import { PurchaseRepo } from "../../repository/purchase";
-import { ConverTextAmount, compareText, formatDate } from "../../constants/functions";
+import { ConvertCurrency, compareText, formatDate } from "../../constants/functions";
 
 import PurchaseAddModel from "./PurchaseAddModel";
 import PurchaseDetailsModel from "./PurchaseDetailsModel";

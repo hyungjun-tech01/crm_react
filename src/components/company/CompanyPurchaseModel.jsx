@@ -4,7 +4,7 @@ import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Button, Space, Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
-import { ConverTextAmount, formatDate } from "../../constants/functions";
+import { ConvertCurrency, formatDate } from "../../constants/functions";
 import { Add } from "@mui/icons-material";
 
 import {

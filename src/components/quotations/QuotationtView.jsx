@@ -6,7 +6,7 @@ import { atomCurrentQuotation, defaultQuotation } from "../../atoms/atoms";
 import NotoSansRegular from "../../fonts/NotoSansKR-Regular.ttf";
 import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";
-import { ConverTextAmount } from '../../constants/functions';
+import { ConvertCurrency } from '../../constants/functions';
 
 const ConvStrNumToKor = (digit) => {
     switch(digit)
@@ -350,7 +350,7 @@ const QuotationView = () => {
                         <View style={{width:'100%',height:20,margin:0,padding:1,borderTop:1,borderLeft:1,borderRight:1,flexGrow:0}}>
                             <Text style={Styles.textBold}>
                                     견적합계: 일금{ConvertKoreanAmount(currentQuotation.total_quotation_amount)}원정
-                                    ({ConvCurrencyMark(currentQuotation.currency)}{ConverTextAmount(currentQuotation.total_quotation_amount)})(VAT별도)
+                                    ({ConvCurrencyMark(currentQuotation.currency)}{ConvertCurrency(currentQuotation.total_quotation_amount)})(VAT별도)
                             </Text>
                         </View>
                         <View style={{width:'100%',margin:0,padding:0,borderLeft:1,borderRight:1,borderBottom:1,flexDirection:'column'}}>
@@ -442,7 +442,7 @@ const QuotationView = () => {
                                      if(index === (quotationTables.length - 1))
                                         return (
                                             <View key={item.at(0)} style={{width: item.at(2),height:'100%',margin:0,padding:0,flexGrow:0}} >
-                                                <Text style={Styles.text}>{ConverTextAmount(currentQuotation.total_quotation_amount)}</Text>
+                                                <Text style={Styles.text}>{ConvertCurrency(currentQuotation.total_quotation_amount)}</Text>
                                             </View>
                                         )
                                     }

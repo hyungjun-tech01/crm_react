@@ -3,7 +3,7 @@ import { useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
-import { ConverTextAmount, formatDate } from "../../constants/functions";
+import { ConvertCurrency, formatDate } from "../../constants/functions";
 
 import { TransactionRepo } from "../../repository/transaction";
 
@@ -71,17 +71,17 @@ const CompanyTransactionModel = (props) => {
         {
             title: t('transaction.supply_price'),
             dataIndex: "supply_price",
-            render: (text, record) => <>{ConverTextAmount(record.supply_price)}</>,
+            render: (text, record) => <>{ConvertCurrency(record.supply_price)}</>,
         },
         {
             title: t('transaction.tax_price'),
             dataIndex: "tax_price",
-            render: (text, record) => <>{ConverTextAmount(record.tax_price)}</>,
+            render: (text, record) => <>{ConvertCurrency(record.tax_price)}</>,
         },
         {
             title: t('transaction.total_price'),
             dataIndex: "total_price",
-            render: (text, record) => <>{ConverTextAmount(record.total_price)}</>,
+            render: (text, record) => <>{ConvertCurrency(record.total_price)}</>,
         },
         {
             title: t('transaction.publish_type'),
