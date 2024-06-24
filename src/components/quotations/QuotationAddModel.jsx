@@ -206,13 +206,13 @@ const QuotationAddModel = (props) => {
       title: t('quotation.quotation_unit_price'),
       dataIndex: '15',
       size: 15,
-      render: (text, record) => <>{ConvertCurrency(record['15'], settingForContent.show_decimal)}</>,
+      render: (text, record) => <>{handleFormatter(record['15'])}</>,
     },
     {
       title: t('quotation.quotation_amount'),
       dataIndex: '16',
       size: 15,
-      render: (text, record) => <>{ConvertCurrency(record['16'], settingForContent.show_decimal)}</>,
+      render: (text, record) => <>{handleFormatter(record['16'])}</>,
     },
     // {
     //   title: "Edit",
@@ -229,36 +229,9 @@ const QuotationAddModel = (props) => {
   const rowSelection = {
     selectedRowKeys: selectedContentRowKeys,
     onChange: (selectedRowKeys, selectedRows) => {
-      setSelectedContentRowKeys(selectedRows);
+      setSelectedContentRowKeys(selectedRowKeys);
     },
   };
-
-  const handleDeleteSelectedConetents = useCallback(() => {
-    if (selectedContentRowKeys.length === 0) {
-      console.log('\t[handleDeleteSelectedConetents] No row is selected');
-      return;
-    };
-
-    let tempContents = [
-      ...quotationContents
-    ];
-    selectedContentRowKeys.forEach(row => {
-      const filteredContents = tempContents.filter(item => item['1'] !== row['1']);
-      tempContents = filteredContents;
-    });
-    let temp_total_amount = 0;
-    const finalContents = tempContents.map((item, index) => {
-      temp_total_amount += item['16'];
-      return { ...item, '1': index + 1 };
-    });
-    const tempQuotation = {
-      ...quotationChange,
-      total_quotation_amount: temp_total_amount,
-    };
-    setQuotationChange(tempQuotation);
-    console.log('handleDeleteSelectedConetents / final : ', finalContents);
-    setQuotationContents(finalContents);
-  }, [quotationChange, quotationContents, selectedContentRowKeys]);
 
   // --- Functions used for adding new quotation ------------------------------
   const handleAddNewQuotation = useCallback((event) => {
@@ -324,15 +297,49 @@ const QuotationAddModel = (props) => {
         };
         break;
       case 'unit_vat_included':
-        tempSetting.vat_included_disabled = target_value;
-        tempSetting.unit_vat_included = target_value;
-        tempSetting.total_only_disabled = !target_value;
-        break;
+        {
+          tempSetting.vat_included_disabled = target_value;
+          tempSetting.unit_vat_included = target_value;
+          tempSetting.total_only_disabled = !target_value;
+          let updatedEachSums = 0;
+          const updatedContents = quotationContents.map(item => {
+            const newPrice = (target_value && !settingForContent.total_only) ? item['org_unit_prce'] / 1.1 : item['org_unit_prce'];
+            const updatedAmount = newPrice*item['12'];
+            updatedEachSums += updatedAmount;
+            return {
+              ...item,
+              '15': newPrice,
+              '16': updatedAmount,
+            };
+          });
+          setQuotationContents(updatedContents);
+          handleChangeEachSum(updatedEachSums);
+          break;
+        }
       case 'total_only':
-        tempSetting.total_only = target_value;
-        break;
+        {
+          tempSetting.unit_vat_included_disabled = target_value;
+          tempSetting.total_only = target_value;
+          let updatedEachSums = 0;
+          const updatedContents = quotationContents.map(item => {
+            const newPrice = (!target_value && settingForContent.unit_vat_included) ? item['org_unit_prce'] / 1.1 : item['org_unit_prce'];
+            const updatedAmount = newPrice*item['12'];
+            updatedEachSums += updatedAmount;
+            return {
+              ...item,
+              '15': newPrice,
+              '16': updatedAmount,
+            };
+          });
+          setQuotationContents(updatedContents);
+          handleChangeEachSum(target_value ? updatedEachSums / 1.1 : updatedEachSums);
+          break;
+        }
       case 'auto_calc':
         tempSetting.auto_calc = target_value;
+        break;
+      case 'show_decimal':
+        tempSetting.show_decimal = target_value;
         break;
       default:
         console.log('handleChangeContentSetting - Impossible case');
@@ -340,6 +347,27 @@ const QuotationAddModel = (props) => {
     };
     setSettingForContent(tempSetting);
   };
+
+  const handleCalculateAmounts = useCallback((items) => {
+    let SumEachItems = 0;
+    items.forEach(item => {
+      SumEachItems += item['16'];
+    });
+    const sum_each_items = settingForContent.total_only ? SumEachItems / 1.1 : SumEachItems;
+    const dc_amount = sum_each_items * settingForContent.dc_rate* 0.01;
+    const sum_dc_applied = sum_each_items - dc_amount;
+    const vat_amount = settingForContent.vat_included ? sum_dc_applied*0.1 : 0;
+    const tempAmount = {
+      ...amountsForContent,
+      sum_each_items: sum_each_items,
+      dc_amount: dc_amount,
+      sum_dc_applied: sum_dc_applied,
+      vat_amount: vat_amount,
+      sum_final: sum_dc_applied + vat_amount - amountsForContent.cut_off_amount,
+    };
+    console.log('[handleContentModalOk] calcualted amount :', tempAmount);
+    setAmountsForContent(tempAmount);
+  }, [amountsForContent, settingForContent.dc_rate, settingForContent.total_only, settingForContent.vat_included]);
 
   const handleChangeEachSum = (value) => {
     let updatedAmount = {
@@ -453,18 +481,21 @@ const QuotationAddModel = (props) => {
       '1': quotationContents.length + 1,
     };
     setCurrentContent(tempContent);
+    
     setSettingForContent({ ...settingForContent,
+      action: 'ADD',
       title: t('quotation.add_content'),
     });
     setorgContentModalValues({
       product_name: null,
       product_class_name: null,
-      detail_desc_on_off: false,
+      detail_desc_on_off: '없음',
       detail_desc: null,
       quantity: null,
       quotation_unit_price: null,
       quotation_amount: null,
     });
+    seteditedContentModalValues({});
     setIsContentModalOpen(true);
   }, [quotationChange.lead_name, quotationContents.length, settingForContent, t]);
 
@@ -475,75 +506,146 @@ const QuotationAddModel = (props) => {
     };
 
     const tempContent = {
-      ...default_quotation_content,
-      '1': quotationContents.length + 1,
+      ...data
     };
     setCurrentContent(tempContent);
+
+    setSettingForContent({ ...settingForContent,
+      action: 'UPDATE',
+      title: t('quotation.modify_content'),
+    });
+    setorgContentModalValues({
+      product_name: data['5'],
+      product_class_name: data['2'],
+      detail_desc_on_off: data['10'],
+      detail_desc:  data['998'],
+      quantity:  data['12'],
+      quotation_unit_price:  data['15'],
+      quotation_amount: data['16'],
+    });
+    seteditedContentModalValues({});
     setIsContentModalOpen(true);
-  }, [quotationContents.length]);
+  }, [settingForContent, t]);
+
+  const handleDeleteSelectedConetents = useCallback(() => {
+    if (selectedContentRowKeys.length === 0) {
+      console.log('\t[handleDeleteSelectedConetents] No row is selected');
+      return;
+    };
+
+    let tempContents = [
+      ...quotationContents
+    ];
+    selectedContentRowKeys.forEach(row => {
+      console.log('[handleDeleteSelectedConetents] row :', row);
+      const filteredContents = tempContents.filter(item => item['1'] !== row);
+      tempContents = filteredContents;
+    });
+    let temp_total_amount = 0;
+    const finalContents = tempContents.map((item, index) => {
+      temp_total_amount += item['16'];
+      return { ...item, '1': index + 1 };
+    });
+    const tempQuotation = {
+      ...quotationChange,
+      total_quotation_amount: temp_total_amount,
+    };
+    setQuotationChange(tempQuotation);
+    console.log('handleDeleteSelectedConetents / final : ', finalContents);
+    setQuotationContents(finalContents);
+    handleCalculateAmounts(finalContents);
+    setSelectedContentRowKeys([]);
+
+  }, [handleCalculateAmounts, quotationChange, quotationContents, selectedContentRowKeys]);
 
   const handleContentModalOk = useCallback(() => {
     const finalData = {
       ...orgContentModalValues,
       ...editedContentModalValues,
-      index: quotationContents.length + 1,
     };
     if (!finalData.product_name || !finalData.quotation_amount) {
       console.log("Inevitable data can't be null");
       return;
     };
     console.log('[handleContentModalOk] new content :', );
-    // update Contents -------------------------------------------------
-    const updatedContent = {
-      '1': quotationContents.length + 1,
-      '5': finalData.product_name,
-      '10': finalData.detail_desc_on_off,
-      '12': finalData.quantity,
-      '15': finalData.quotation_unit_price,
-      '16': finalData.quotation_amount,
-      '99': finalData.detail_desc? finalData.detail_desc : '',
-    };
-    const updatedContents = quotationContents.concat(updatedContent);
-    setQuotationContents(updatedContents);
 
-    // update Amounts -------------------------------------------------
-    if(settingForContent.auto_calc){
-      const sum_each_items = amountsForContent.sum_each_items + finalData.quotation_amount;
-      const dc_amount = sum_each_items * settingForContent.dc_rate* 0.01;
-      const sum_dc_applied = sum_each_items - dc_amount;
-      const vat_amount = settingForContent.vat_included ? sum_dc_applied*0.1 : 0;
-      const tempAmount = {
-        ...amountsForContent,
-        sum_each_items: sum_each_items,
-        dc_amount: dc_amount,
-        sum_dc_applied: sum_dc_applied,
-        vat_amount: vat_amount,
-        sum_final: sum_dc_applied + vat_amount - amountsForContent.cut_off_amount,
+    // update Contents -------------------------------------------------
+    if(settingForContent.action === "ADD") {
+      const updatedContent = {
+        ...default_quotation_content,
+        '1': quotationContents.length + 1,
+        '2': finalData.product_class_name,
+        '5': finalData.product_name,
+        '10': finalData.detail_desc_on_off,
+        '12': finalData.quantity,
+        '15': finalData.quotation_unit_price,
+        '16': finalData.quotation_amount,
+        '998': finalData.detail_desc? finalData.detail_desc : '',
+        'org_price': finalData.org_unit_price,
       };
-      console.log('[handleContentModalOk] calcualted amount :', tempAmount);
-      setAmountsForContent(tempAmount);
+      const updatedContents = quotationContents.concat(updatedContent);
+      setQuotationContents(updatedContents);
+
+      if(settingForContent.auto_calc){
+        handleCalculateAmounts(updatedContents);
+      };
+    } else {  //Update
+      const updatedContent = {
+        ...default_quotation_content,
+        '1': currentContent['1'],
+        '2': finalData.product_class_name,
+        '5': finalData.product_name,
+        '10': finalData.detail_desc_on_off,
+        '12': finalData.quantity,
+        '15': finalData.quotation_unit_price,
+        '16': finalData.quotation_amount,
+        '998': finalData.detail_desc? finalData.detail_desc : '',
+        'org_price': finalData.org_unit_price,
+      };
+      const foundIdx = quotationContents.findIndex(item => item['1'] === currentContent['1']);
+      if(foundIdx === -1){
+        console.log('Something Wrong when modifying content');
+        return;
+      };
+      const updatedContents = [
+        ...quotationContents.slice(0, foundIdx),
+        updatedContent,
+        ...quotationContents.slice(foundIdx + 1,),
+      ];
+      setQuotationContents(updatedContents);
+
+      if(settingForContent.auto_calc){
+        handleCalculateAmounts(updatedContents);
+      };
     };
+
     handleContentModalCancel();
-  }, [amountsForContent, editedContentModalValues, orgContentModalValues, quotationContents, settingForContent.auto_calc, settingForContent.dc_rate, settingForContent.vat_included]);
+  }, [currentContent, editedContentModalValues, handleCalculateAmounts, orgContentModalValues, quotationContents, settingForContent.action, settingForContent.auto_calc]);
 
   const handleContentModalCancel = () => {
     setIsContentModalOpen(false);
     seteditedContentModalValues({});
     setorgContentModalValues({});
     setSelectedContentRowKeys([]);
+    setCurrentContent(null);
   };
 
   const handleContentItemChange = useCallback(data => {
+    console.log('handleContentItemChange : ', data);
     seteditedContentModalValues(data);
   }, []);
 
-  const hanldeFomatter = useCallback((value) => {
+  const handleFormatter = useCallback((value) => {
     if(value === undefined || value === null || value === '') return '';
-    if(typeof value === 'string') return value;
-
+    let ret = value;
+    if(typeof value === 'string') {
+      ret = Number(value);
+      if(isNaN(ret)) return;
+    };
+    
     return settingForContent.show_decimal
-    ? value.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,')
-    : value.toFixed().replace(/\d(?=(\d{3})+\.)/g, '$&,')
+      ? ret?.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+      : ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }, [settingForContent.show_decimal]);
 
   //===== useEffect functions ==========================================
@@ -847,7 +949,13 @@ const QuotationAddModel = (props) => {
                   bordered
                   dataSource={quotationContents}
                   rowKey={(record) => record['1']}
-                // onChange={handleTableChange}
+                  onRow={(record, rowIndex) => {
+                    return {
+                        onDoubleClick: (event) => {
+                          handleModifyContent(record);
+                        }, // click row
+                    };
+                }}
                 />
               </div>
               <div className="form-group row">
@@ -863,18 +971,28 @@ const QuotationAddModel = (props) => {
                       name='sum_each_items'
                       defaultValue={0}
                       value={amountsForContent.sum_each_items}
-                      formatter={hanldeFomatter}
+                      formatter={handleFormatter}
                       parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                       disabled={settingForContent.auto_calc}
                       onChange={handleChangeEachSum}
+                      style={{
+                        width: 180,
+                      }}
                     />
                   </Space.Compact>
                   <Space.Compact direction="vertical">
                     <label >{t('quotation.dc_rate')}</label>
                     <InputNumber
                       name='dc_rate'
+                      min={0}
+                      max={100}
+                      formatter={(value) => `${value}%`}
+                      parser={(value) => value?.replace('%', '')}
                       value={settingForContent.dc_rate}
                       onChange={handleChangeDCRate}
+                      style={{
+                        width: 180,
+                      }}
                     />
                   </Space.Compact>
                   <Space.Compact direction="vertical">
@@ -883,10 +1001,13 @@ const QuotationAddModel = (props) => {
                       name='dc_amount'
                       defaultValue={0}
                       value={amountsForContent.dc_amount}
-                      formatter={hanldeFomatter}
+                      formatter={handleFormatter}
                       parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                       disabled={settingForContent.auto_calc}
                       onChange={handleChangeDCAmount}
+                      style={{
+                        width: 180,
+                      }}
                     />
                   </Space.Compact>
                   <Space.Compact direction="vertical">
@@ -896,9 +1017,12 @@ const QuotationAddModel = (props) => {
                       defaultValue={0}
                       value={amountsForContent.sum_dc_applied}
                       disabled={settingForContent.auto_calc}
-                      formatter={hanldeFomatter}
+                      formatter={handleFormatter}
                       parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                       onChange={handleChangeDCAppliedSum}
+                      style={{
+                        width: 180,
+                      }}
                     />
                   </Space.Compact>
                   <Space.Compact direction="vertical">
@@ -908,9 +1032,12 @@ const QuotationAddModel = (props) => {
                       defaultValue={0}
                       value={amountsForContent.vat_amount}
                       disabled={settingForContent.auto_calc}
-                      formatter={hanldeFomatter}
+                      formatter={handleFormatter}
                       parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                       onChange={handleChangeVAT}
+                      style={{
+                        width: 180,
+                      }}
                     />
                   </Space.Compact>
                   <Space.Compact direction="vertical">
@@ -919,9 +1046,12 @@ const QuotationAddModel = (props) => {
                       name='cut_off_amount'
                       defaultValue={0}
                       value={amountsForContent.cut_off_amount}
-                      formatter={hanldeFomatter}
+                      formatter={handleFormatter}
                       parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                       onChange={handleChangeCutOffAmount}
+                      style={{
+                        width: 180,
+                      }}
                     />
                   </Space.Compact>
                   <Space.Compact direction="vertical">
@@ -931,9 +1061,12 @@ const QuotationAddModel = (props) => {
                       defaultValue={0}
                       value={amountsForContent.sum_final}
                       disabled={settingForContent.auto_calc}
-                      formatter={hanldeFomatter}
+                      formatter={handleFormatter}
                       parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                       onChange={handleChangeFinalAmount}
+                      style={{
+                        width: 180,
+                      }}
                     />
                   </Space.Compact>
                 </Space>

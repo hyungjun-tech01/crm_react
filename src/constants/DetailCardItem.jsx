@@ -123,7 +123,7 @@ const SelectInput = (props) => {
 const DetailCardItem = (props) => {
     const { title, name, defaultValue, groupValue, edited, detail} = props;
     
-    const currentValue = (edited && edited[name])
+    const currentValue = (edited && (edited[name] !== undefined) && (edited[name] !== null))
             ? edited[name]
             : (defaultValue === null ? null :
                 (detail.type === 'date'

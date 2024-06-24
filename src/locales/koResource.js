@@ -112,7 +112,7 @@ const koResource = {
             auto_calculation: '자동계산',
             confirm_date: '최종확인',
             consumer_price: '소비자가',
-            cutoff_amount: '절삭금액',
+            cutoff_amount: '절사금액',
             dc_amount: '할인금액',
             dc_rate: '할인율(%)',
             delivery_location: '인도장소',
