@@ -38,6 +38,32 @@ const QueryRow = ({ index, companyColumn, columnQueryCondition, companyColumnVal
   </tr>
 );
 
+const DateRangePicker = ({ checked, onChange, label, fromDate, toDate, handleFromDateChange, handleToDateChange }) => (
+  <div style={{ display: 'flex', alignItems: 'center' }}>
+    <div style={{ width: '200px' }}>
+      <Checkbox checked={checked}  onChange={()=>{onChange(!checked)}} style={{ width: '200px' }}>
+        {label}
+      </Checkbox>
+    </div>
+    <div style={{ width: '150px', marginRight: '3px' }}>
+      <DatePicker
+        className="basic-date"
+        selected={fromDate}
+        onChange={handleFromDateChange}
+        dateFormat="yyyy-MM-dd"
+      />
+    </div>
+    ~
+    <div style={{ width: '150px', marginLeft: '3px' }}>
+      <DatePicker
+        className="basic-date"
+        selected={toDate}
+        onChange={handleToDateChange}
+        dateFormat="yyyy-MM-dd"
+      />
+    </div>
+  </div>
+);
 
 const MultiQueryModal = (props) => {
     const {  open, title, handleOk, handleCancel } = props;
@@ -124,6 +150,12 @@ const MultiQueryModal = (props) => {
     }
 
     //check box 
+    const [regDatechecked, setRegDatechecked] = useState(true);
+    const [deliDatechecked, setDeliDatechecked] = useState(true);
+    const [hqFinishDatechecked, setHqFinishDatechecked] = useState(true);
+    const [maFinishDatechecked, setMaFinishDatechecked] = useState(true);
+
+
     const [checked, setChecked] = useState(true);
     const [disabled, setDisabled] = useState(false);
   
@@ -147,28 +179,31 @@ const MultiQueryModal = (props) => {
     oneMonthAgo.setMonth(today.getMonth() - 1);
   
     const [registrationFromDate, setRegistrationFromDate] = useState(oneMonthAgo);
-
     const handleRegistrationDateFromChange = useCallback((date) => {
       setRegistrationFromDate(date);
     }, []);
-
     const [registrationToDate, setRegistrationToDate] = useState(today);
-
     const handleRegistrationDateToChange = useCallback((date) => {
       setRegistrationToDate(date);
     }, []);
 
     const [deliveryFromDate, setDeliveryFromDate] = useState(oneMonthAgo);
-
     const handleDeliveryFromDateChange = useCallback((date) => {
       setDeliveryFromDate(date);
     }, []);    
-
-    const [deliveryToDate, setDeliveryToDate] = useState(oneMonthAgo);
-
+    const [deliveryToDate, setDeliveryToDate] = useState(today);
     const handleDeliveryToDateChange = useCallback((date) => {
       setDeliveryToDate(date);
     }, []);        
+
+    const [hqFindishFromDate, setHqFindishFromDate] = useState(oneMonthAgo);
+    const handleHqFindishFromDate = useCallback((date) => {
+      setHqFindishFromDate(date);
+    }, []);    
+    const [hqFindishToDate, setHqFindishToDate] = useState(today);
+    const handleHqFindishToDate = useCallback((date) => {
+      setHqFindishToDate(date);
+    }, []);     
 
     return (
         <Modal
@@ -215,90 +250,49 @@ const MultiQueryModal = (props) => {
                 onDelete = {onDelete}
               />
               ))}       
-               
-              
               </tbody>
               </table>     
-              
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <div style={{ width: '200px' }}>
-                  <Checkbox checked={checked} disabled={disabled} onChange={onChange} style={{width:'200px'}}>
-                    {t('purchase.registration_date')}
-                  </Checkbox>
-                  </div>
-                  <div style={{ width: '150px',marginRight:'3px'}}>
-                    <DatePicker
-                        className="basic-date"
-                        name = 'registrationFromDate'           
-                        selected={registrationFromDate}
-                        onChange={handleRegistrationDateFromChange}
-                        dateFormat="yyyy-MM-dd"
-                    /> 
-                  </div>
-                  ~
-                  <div style={{ width: '150px',marginLeft:'3px'}}>
-                    <DatePicker
-                          className="basic-date"
-                          name = 'registrationToDate'
-                          selected={registrationToDate}
-                          onChange={handleRegistrationDateToChange}
-                          dateFormat="yyyy-MM-dd"
-                      /> 
-                  </div>
-              </div>     
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{ width: '200px' }}>
-                  <Checkbox checked={checked} disabled={disabled} onChange={onChange} style={{width:'200px'}}>
-                    {t('purchase.delivery_date')} : 
-                  </Checkbox>
-                </div>
-                <div style={{ width: '150px',marginRight:'3px'}}>
-                  <DatePicker
-                      className="basic-date"
-                      name = 'deliveryFromDate'           
-                      selected={deliveryFromDate}
-                      onChange={handleDeliveryFromDateChange}
-                      dateFormat="yyyy-MM-dd"
-                  /> 
-                </div>
-                ~
-                <div style={{ width: '150px',marginLeft:'3px' }}>
-                  <DatePicker
-                        className="basic-date"
-                        name = 'deliveryToDate'
-                        selected={deliveryToDate}
-                        onChange={handleDeliveryToDateChange  }
-                        dateFormat="yyyy-MM-dd"
-                    /> 
-                </div>
-             
-              </div>             
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{ width: '200px' }}>
-                  <Checkbox checked={checked} disabled={disabled} onChange={onChange} style={{width:'200px'}}>
-                    {t('purchase.hq_finish_date')} : 
-                  </Checkbox>
-                </div>
-                <div style={{ width: '150px',marginRight:'3px'}}>
-                  <DatePicker
-                      className="basic-date"
-                      name = 'deliveryFromDate'           
-                      selected={deliveryFromDate}
-                      onChange={handleDeliveryFromDateChange}
-                      dateFormat="yyyy-MM-dd"
-                  /> 
-                </div>
-                ~
-                <div style={{ width: '150px',marginLeft:'3px'}}>
-                  <DatePicker
-                        className="basic-date"
-                        name = 'deliveryToDate'
-                        selected={deliveryToDate}
-                        onChange={handleDeliveryToDateChange  }
-                        dateFormat="yyyy-MM-dd"
-                    /> 
-                </div>
-              </div>        
+
+              <DateRangePicker
+                checked={regDatechecked}
+                onChange={setRegDatechecked}
+                label={t('purchase.registration_date')}
+                fromDate={registrationFromDate}
+                toDate={registrationToDate}
+                handleFromDateChange={handleRegistrationDateFromChange}
+                handleToDateChange={handleRegistrationDateToChange}
+              />
+
+              <DateRangePicker
+                checked={deliDatechecked}
+                onChange={setDeliDatechecked}
+                label={t('purchase.delivery_date')}
+                fromDate={deliveryFromDate}
+                toDate={deliveryToDate}
+                handleFromDateChange={handleDeliveryFromDateChange}
+                handleToDateChange={handleDeliveryToDateChange}
+              />
+
+              <DateRangePicker
+                checked={hqFinishDatechecked}
+                onChange={setHqFinishDatechecked}
+                label={t('purchase.hq_finish_date')}
+                fromDate={hqFindishFromDate}
+                toDate={hqFindishToDate}
+                handleFromDateChange={handleHqFindishFromDate}
+                handleToDateChange={handleHqFindishToDate}
+              />
+
+              <DateRangePicker
+                checked={maFinishDatechecked}
+                onChange={setMaFinishDatechecked}
+                label={t('purchase.ma_finish_date')}
+                fromDate={hqFindishFromDate}
+                toDate={hqFindishToDate}
+                handleFromDateChange={handleHqFindishFromDate}
+                handleToDateChange={handleHqFindishToDate}
+              />
+        
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div style={{ width: '200px' }}>
                   <Checkbox checked={checked} disabled={disabled} onChange={onChange} style={{width:'200px'}}>
