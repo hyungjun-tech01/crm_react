@@ -159,7 +159,13 @@ const MultiQueryModal = (props) => {
         toDate: dates[key].toDate,
         checked: dates[key].checked,
       }));
-      console.log('Checked Dates:', checkedDates);
+
+      for (const i of checkedDates){
+        queryString = queryString
+                   +"(" + i.label + " between " 
+                   +"'"+ i.fromDate +"'" + " and " + "'" + i.toDate + "' )" +" And ";
+      }
+      console.log('queryString:', queryString);
 
     }
 
