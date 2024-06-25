@@ -40,7 +40,7 @@ const QuotationContentModal = (props) => {
             { name: 'detail_desc_on_off', title: t('quotation.detail_desc_on_off'), detail: { type: 'select', options: detail_spec_desc_select, extra: 'long' } },
             { name: 'detail_desc', title: t('quotation.detail_desc'), detail: { type: 'textarea', row_no:  8, extra: 'long' } },
             { name: 'quantity', title: t('common.quantity'), detail: { type: 'label', extra: 'long' } },
-            { name: 'quotation_unit_price', title: t('quotation.quotation_unit_price'), detail: { type: 'label', extra: 'long', price: true, decimal: setting.show_decimal } },
+            { name: 'list_price', title: t('quotation.quotation_unit_price'), detail: { type: 'label', extra: 'long', price: true, decimal: setting.show_decimal } },
             { name: 'quotation_amount', title: t('quotation.quotation_amount'), detail: { type: 'label', extra: 'long', disabled: true, price: true, decimal: setting.show_decimal } },
         ] :
         [
@@ -66,7 +66,9 @@ const QuotationContentModal = (props) => {
                 tempData['product_code'] = value.value.product_code;
                 tempData['product_class_name'] = value.value.product_class_name;
                 tempData['product_name'] = value.value.product_name;
-                tempData['quotation_unit_price'] = setting.unit_vat_included ? Number(value.value.list_price) / 1.1 : Number(value.value.list_price);
+                tempData['cost_price'] = value.value.cost_price;
+                tempData['reseller_price'] = value.value.reseller_price;
+                tempData['list_price'] = setting.unit_vat_included ? Number(value.value.list_price) / 1.1 : Number(value.value.list_price);
                 tempData['org_unit_prce'] = Number(value.value.list_price);
                     
                 setTempDetailSpec(value.value.detail_desc);
@@ -127,7 +129,6 @@ const QuotationContentModal = (props) => {
 
     // ----- useEffect for Production -----------------------------------
     useEffect(() => {
-        console.log('[PurchaseAddModel] useEffect ');
         if ((productClassState & 1) === 0) {
             console.log('[PurchaseAddModel] loadAllProductClassList');
             loadAllProductClassList();
@@ -137,7 +138,6 @@ const QuotationContentModal = (props) => {
             loadAllProducts();
         };
         if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
-            console.log('[PurchaseAddModel] set products for selection');
             const productOptionsValue = allProductClassList.map(proClass => {
                 const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
                 const subOptions = foundProducts.map(item => {
@@ -146,7 +146,9 @@ const QuotationContentModal = (props) => {
                         value: { product_code: item.product_code,
                             product_name: item.product_name,
                             product_class_name: item.product_class_name,
-                            detail_desc: item.detail_desc ,
+                            detail_desc: item.detail_desc,
+                            cost_price: item.const_price,
+                            reseller_price: item.reseller_price,
                             list_price: item.list_price,
                         }
                     }

@@ -12,8 +12,8 @@ import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
 export const QuotationTypes = [
-    { value: 'quotation', label: '견적' },
-    { value: 'order', label: '발주' },
+    { value: '견적서', label: '견적' },
+    { value: '발주서', label: '발주' },
 ];
 
 export const QuotationSendTypes = [

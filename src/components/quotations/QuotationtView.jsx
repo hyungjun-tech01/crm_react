@@ -345,7 +345,7 @@ const QuotationView = () => {
                             </View>
                         </View>
                     </View>
-                    <View style={{margin: 0,padding: 0,flexDirection:'column',flexGrow:1}}>
+                    
                         <Text style={Styles.text}>{currentQuotation.upper_memo}</Text>
                         <View style={{width:'100%',height:20,margin:0,padding:1,borderTop:1,borderLeft:1,borderRight:1,flexGrow:0}}>
                             <Text style={Styles.textBold}>
@@ -353,8 +353,8 @@ const QuotationView = () => {
                                     ({ConvCurrencyMark(currentQuotation.currency)}{ConvertCurrency(currentQuotation.total_quotation_amount)})(VAT별도)
                             </Text>
                         </View>
-                        <View style={{width:'100%',margin:0,padding:0,borderLeft:1,borderRight:1,borderBottom:1,flexDirection:'column'}}>
-                            <View style={{width:'100%',height:20,margin:0,padding:0,borderBottom:1,borderTop:1,backgroundColor:"#cccccc",flexDirection:'row',flexGrow:0}} fixed>
+                        <View style={{width:'100%',margin:0,padding:0,borderLeft:1,borderRight:1,borderBottom:1,flexDirection:'column'}} fixed>
+                            <View style={{width:'100%',height:20,margin:0,padding:0,borderBottom:1,borderTop:1,backgroundColor:"#cccccc",flexDirection:'row',flexGrow:0}}>
                                 { quotationTables && quotationTables.map((item, index) => 
                                     index !== (quotationTables.length - 1) ? (
                                         <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,borderRight:1}} fixed>
@@ -366,95 +366,41 @@ const QuotationView = () => {
                                         </View>)
                                 )}
                             </View>
-                            <View style={{width:'100%',margin:0,padding:0,border:0,justifyContent:'flex-start',flexDirection:'column',flexGrow:1}}>
-                                { quotationContents.map((content, index) => 
-                                    <View key={index} wrap={false} style={{width:'100%',margin:0,padding:0,border:0,flexDirection:'row',flexGrow: 1}}>
-                                        { quotationTables && quotationTables.map((item, index) => 
-                                            index !== (quotationTables.length - 1) ? (
-                                                <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,borderRight:1}}>
-                                                    { content[item.at(0)] && <Text style={Styles.text}>{content[item.at(0)]}</Text>}
-                                                    { item.at(0) === '5' && content['998'] && ConvertComment(content['998'])}
-                                                </View>
-                                                ) : (
-                                                <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,border:0}}>
-                                                    { content[item.at(0)] && <Text style={Styles.text}>{content[item.at(0)]}</Text>}
-                                                </View>)
-                                        )}
-                                    </View>
-                                )}
-                                { false && <View style={{width:'100%',margin:0,padding:0,borderBottom:1,flexDirection:'row',alignItems:'stretch',alignContent:'start'}}>
-                                        <View style={{width: 30, height:'100%',margin:0,padding:0,borderRight:1,flexGrow:0}}>
-                                            <Text style={Styles.text}>{}</Text>
-                                        </View>
-                                        <View style={{height:'100%',margin:0,padding:0,borderRight:1,flexGrow:1}}>
-                                            <Text style={{marginHorizontal:2,marginVertical:0,fontSize:10,fontWeight:'bold',textAlign:'justify',textWrap:'wrap',fontFamily:'Noto Sans'}}>
-                                                +++ 상기 공통 사항 +++
-                                            </Text>
-                                            {common_items.map((item, index) => <Text key={index} style={Styles.textComment}>{item}</Text>)}
-                                        </View>
-                                        <View style={{width: 40, height:'100%',margin:0,padding:0,borderRight:1,flexGrow:0}}>
-                                            <Text style={Styles.text}>{}</Text>
-                                        </View>
-                                        <View style={{width: 60, height:'100%',margin:0,padding:0,borderRight:1,flexGrow:0}}>
-                                            <Text style={Styles.text}>{}</Text>
-                                        </View>
-                                        <View style={{width: 60, height:'100%',margin:0,padding:0,borderRight:1,flexGrow:0}}>
-                                            <Text style={Styles.text}>{}</Text>
-                                        </View>
-                                        <View style={{width: 60, height:'100%',margin:0,padding:0,flexGrow:0}}>
-                                            <Text style={Styles.text}>{}</Text>
-                                        </View>
-                                    </View>
-                                }
-                                { quotationContents.length === 0 && <View style={{width:'100%',margin:0,padding:0,flexDirection:'row',alignItems:'stretch',alignContent:'start'}}>
-                                        <View style={{width: 30, height:'100%',margin:0,padding:0,borderRight:1,flexGrow:0}}>
-                                            <Text style={Styles.text}>{}</Text>
-                                        </View>
-                                        <View style={{height:'100%',margin:0,padding:0,borderRight:1,flexGrow:1}}>
-                                            <Text style={Styles.text}>{}</Text>
-                                        </View>
-                                        <View style={{width: 40, height:'100%',margin:0,padding:0,borderRight:1,flexGrow:0}}>
-                                            <Text style={Styles.text}>{}</Text>
-                                        </View>
-                                        <View style={{width: 60, height:'100%',margin:0,padding:0,borderRight:1,flexGrow:0}}>
-                                            <Text style={Styles.text}>{}</Text>
-                                        </View>
-                                        <View style={{width: 60, height:'100%',margin:0,padding:0,borderRight:1,flexGrow:0}}>
-                                            <Text style={Styles.text}>{}</Text>
-                                        </View>
-                                        <View style={{width: 60, height:'100%',margin:0,padding:0,flexGrow:0}}>
-                                            <Text style={Styles.text}>{}</Text>
-                                        </View>
-                                    </View>
-                                }
-                            </View>
+                            { quotationContents.map((content, index) => 
+                                <View key={index} wrap={false} style={{width:'100%',margin:0,padding:0,border:0,flexDirection:'row',flexGrow: 1}}>
+                                    { quotationTables && quotationTables.map((item, index) => 
+                                        index !== (quotationTables.length - 1) ? (
+                                            <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,borderRight:1}}>
+                                                { content[item.at(0)] && <Text style={Styles.text}>{content[item.at(0)]}</Text>}
+                                                { item.at(0) === '5' && content['998'] && ConvertComment(content['998'])}
+                                            </View>
+                                            ) : (
+                                            <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,border:0}}>
+                                                { content[item.at(0)] && <Text style={Styles.text}>{ConvertCurrency(content[item.at(0)])}</Text>}
+                                            </View>)
+                                    )}
+                                </View>
+                            )}
                             <View style={{width:'100%',height:25,margin:0,padding:0,borderTop:1,flexDirection:'row',flexGrow:0}}>
                                 <View style={{height:'100%',margin:0,padding:0,borderRight:1,flexGrow:1}}>
                                     <Text style={Styles.text}>{}</Text>
                                 </View>
-                                { quotationTables && quotationTables.map((item, index) => 
-                                    { if(index === (quotationTables.length - 2))
-                                        return (
-                                            <View key={item.at(0)} style={{width: item.at(2),height:'100%',margin:0,padding:0,borderRight:1,flexGrow:0, backgroundColor: '#aaaaaa'}} >
-                                                <Text style={Styles.text}>견적합계</Text>
-                                            </View>
-                                        );
-                                     if(index === (quotationTables.length - 1))
-                                        return (
-                                            <View key={item.at(0)} style={{width: item.at(2),height:'100%',margin:0,padding:0,flexGrow:0}} >
-                                                <Text style={Styles.text}>{ConvertCurrency(currentQuotation.total_quotation_amount)}</Text>
-                                            </View>
-                                        )
-                                    }
-                                )}
+                                { quotationTables.length > 0 && <>
+                                    <View key={quotationTables.at(-2).at(0)} style={{width: quotationTables.at(-2).at(2),height:'100%',margin:0,padding:0,borderRight:1,flexGrow:0, backgroundColor: '#aaaaaa'}} >
+                                        <Text style={Styles.text}>견적합계</Text>
+                                    </View>
+                                    <View key={quotationTables.at(-1).at(0)} style={{width: quotationTables.at(-1).at(2),height:'100%',margin:0,padding:0,flexGrow:0}} >
+                                        <Text style={Styles.text}>{ConvertCurrency(currentQuotation.total_quotation_amount)}</Text>
+                                    </View>
+                                </>}
                             </View>
                             <View style={{width:'100%',height:25,margin:0,padding:0,borderTop:1,flexDirection:'row',flexGrow:0}}>
-                                <View style={{height:'100%',margin:0,padding:0,borderRight:1,flexGrow:1}}>
+                                <View style={{height:'100%',margin:0,padding:0,flexGrow:1}}>
                                     <Text style={Styles.text}>{currentQuotation.lower_memo}</Text>
                                 </View>
                             </View>
                         </View>
-                    </View>
+                    
                 </Page>
             </Document>
         </PDFViewer>

@@ -17,7 +17,7 @@ import { atomUserState,
   atomUsersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
-import { QuotationRepo, QuotationTypes } from "../../repository/quotation";
+import { QuotationRepo, QuotationSendTypes, QuotationTypes } from "../../repository/quotation";
 import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 import { UserRepo } from '../../repository/user';
 
@@ -362,9 +362,9 @@ const QuotationDetailsModel = () => {
   }, [setCurrentQuotation]);
 
   const qotation_items_info = [
-    { key:'quotation_type', title:'quotation.quotation_type', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'quotation_type', title:'quotation.quotation_type', detail:{ type:'select', options:QuotationTypes, editing:handleDetailChange }},
     { key:'quotation_manager', title:'quotation.quotation_manager', detail:{ type:'select', options:usersForSelection, editing:handleDetailChange }},
-    { key:'quotation_send_type', title:'quotation.send_type', detail:{ type:'select', options:QuotationTypes, editing:handleDetailChange }},
+    { key:'quotation_send_type', title:'quotation.send_type', detail:{ type:'select', options:QuotationSendTypes, editing:handleDetailChange }},
     { key:'quotation_date', title:'quotation.quotation_date', detail:{ type:'date', editing:handleDetailDateChange}},
     { key:'quotation_expiration_date', title:'quotation.expiry_date', detail:{ type:'label', editing:handleDetailChange }},
     { key:'comfirm_date', title:'quotation.confirm_date', detail:{ type:'date', editing:handleDetailDateChange}},
@@ -464,7 +464,9 @@ const QuotationDetailsModel = () => {
                     value: { product_code: item.product_code,
                       product_name: item.product_name,
                       product_class_name: item.product_class_name,
-                      detail_desc: item.detail_desc ,
+                      detail_desc: item.detail_desc,
+                      cost_price: item.const_price,
+                      reseller_price: item.reseller_price,
                       list_price: item.list_price,
                   }
                 }
@@ -527,7 +529,7 @@ const QuotationDetailsModel = () => {
                   className="tab-pane active p-0"
                   id="not-contacted"
                 >
-                  <div className="">
+                  <div>
                     <div className="task-infos">
                       <ul className="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified">
                         <li className="nav-item">
