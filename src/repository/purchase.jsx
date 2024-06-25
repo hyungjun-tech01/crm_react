@@ -125,7 +125,7 @@ export const PurchaseRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomAllPurchases, allPurchases.concat(updatedNewPurchase));
+                    set(atomAllPurchases, [updatedNewPurchase, ...allPurchases]);
                     return {
                         result: true,
                         code: data.out_purchase_code,

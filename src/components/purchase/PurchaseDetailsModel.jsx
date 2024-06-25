@@ -154,7 +154,7 @@ const PurchaseDetailsModel = (props) => {
     { key: 'ma_finish_date', title: 'purchase.ma_finish_date', detail: { type: 'date', editing: handleDetailDateChange } },
     { key: 'po_number', title: 'purchase.po_number', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'price', title: 'common.price_1', detail: { type: 'label', editing: handleDetailChange } },
-    { key: 'invoiceno', title: 'purchase.invoice_no', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'invoice_number', title: 'purchase.invoice_no', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'status', title: 'common.status', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'purchase_memo', title: 'common.memo', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
   ];

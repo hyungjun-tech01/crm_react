@@ -186,7 +186,7 @@ export const ConsultingRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomAllConsultings, allConsultings.concat(updatedNewConsulting));
+                    set(atomAllConsultings, [updatedNewConsulting, ...allConsultings]);
                     return true;
                 } else if(newConsulting.action_type === 'UPDATE'){
                     const currentConsulting = await snapshot.getPromise(atomCurrentConsulting);

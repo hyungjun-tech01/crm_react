@@ -82,7 +82,7 @@ const QuotationAddModel = (props) => {
       handleContentModalCancel();
     };
     setAmountsForContent({
-      sum_each_items: 0, dc_amount: 0, sum_dc_applied:0, vat_amount:0, cut_off_amount: 0, sum_final: 0
+      sub_total_amount: 0, dc_amount: 0, sum_dc_applied:0, vat_amount:0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
     });
   }, [leadCode, leadsForSelection]);
 
@@ -264,8 +264,13 @@ const QuotationAddModel = (props) => {
   const ConvertHeaderInfosToString = (data) => {
     let ret = '';
 
-    default_content_array.forEach(item => {
-      ret += item.at(0) + '|' + item.at(1) + '|';
+    default_content_array.forEach((item, index) => {
+      if(index === 0)
+        ret += item.at(0);
+      else
+        ret += '|' + item.at(0);
+
+      ret +=  '|' + item.at(1) + '|';
 
       const foundIdx = data.findIndex(col => col.title === item.at(1));
       if (foundIdx === -1) {
@@ -275,7 +280,6 @@ const QuotationAddModel = (props) => {
       }
     });
 
-    console.log('\t[ ConvertHeaderInfosToString ] Result : ', ret);
     return ret;
   };
 
@@ -289,13 +293,12 @@ const QuotationAddModel = (props) => {
     vat_included_disabled: false, unit_vat_included_disabled: true, total_only_disabled: true, dc_rate: 0,
   });
   const [amountsForContent, setAmountsForContent] = useState({
-    sum_each_items: 0, dc_amount: 0, sum_dc_applied:0, vat_amount:0, cut_off_amount: 0, sum_final: 0
+    sub_total_amount: 0, dc_amount: 0, sum_dc_applied:0, vat_amount:0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
   });
 
   const handleChangeContentSetting = (event) => {
     const target_name = event.target.name;
     const target_value = event.target.checked;
-    console.log(`[handleChangeContentSetting] Target : ${target_name} / Value : ${target_value}`);
 
     let tempSetting = { ...settingForContent };
     switch(target_name)
@@ -310,7 +313,6 @@ const QuotationAddModel = (props) => {
             vat_amount: vat_amount,
             sum_final: amountsForContent.sum_dc_applied + vat_amount - amountsForContent.cut_off_amount,
           };
-          console.log('[handleContentModalOk] calcualted amount :', updatedAmount);
           setAmountsForContent(updatedAmount);
         };
         break;
@@ -367,40 +369,43 @@ const QuotationAddModel = (props) => {
   };
 
   const handleCalculateAmounts = useCallback((items) => {
-    let SumEachItems = 0;
+    let SumEachItems = 0, SumEachCosts = 0;
     items.forEach(item => {
       SumEachItems += item['16'];
+      SumEachCosts += item['13'];
     });
-    const sum_each_items = settingForContent.total_only ? SumEachItems / 1.1 : SumEachItems;
-    const dc_amount = sum_each_items * settingForContent.dc_rate* 0.01;
-    const sum_dc_applied = sum_each_items - dc_amount;
+    const sum_cost_items = SumEachCosts;
+    const sub_total_amount = settingForContent.total_only ? SumEachItems / 1.1 : SumEachItems;
+    const dc_amount = sub_total_amount * settingForContent.dc_rate* 0.01;
+    const sum_dc_applied = sub_total_amount - dc_amount;
     const vat_amount = settingForContent.vat_included ? sum_dc_applied*0.1 : 0;
+    const sum_final= sum_dc_applied + vat_amount - amountsForContent.cut_off_amount;
     const tempAmount = {
       ...amountsForContent,
-      sum_each_items: sum_each_items,
+      sub_total_amount: sub_total_amount,
       dc_amount: dc_amount,
       sum_dc_applied: sum_dc_applied,
       vat_amount: vat_amount,
-      sum_final: sum_dc_applied + vat_amount - amountsForContent.cut_off_amount,
+      sum_final: sum_final,
+      total_cost_price: sum_cost_items,
     };
-    console.log('[handleContentModalOk] calcualted amount :', tempAmount);
     setAmountsForContent(tempAmount);
+
   }, [amountsForContent, settingForContent]);
 
   const handleChangeEachSum = (value) => {
     let updatedAmount = {
       ...amountsForContent,
-      sum_each_items : value,
+      sub_total_amount : value,
     };
     if(settingForContent.auto_calc){
       const dc_amount = value * settingForContent.dc_rate* 0.01;
       const sum_dc_applied = value - dc_amount;
-      const vat_amount = settingForContent.vat_included ? sum_dc_applied*0.1 : 0;
+      const vat_amount = settingForContent.vat_included ? sum_dc_applied * 0.1 : 0;
       updatedAmount.dc_amount = dc_amount;
       updatedAmount.sum_dc_applied = sum_dc_applied;
       updatedAmount.vat_amount = vat_amount;
       updatedAmount.sum_final = sum_dc_applied + vat_amount - amountsForContent.cut_off_amount;
-      console.log('[handleContentModalOk] calcualted amount :', updatedAmount);
     };
     setAmountsForContent(updatedAmount);
   };
@@ -412,9 +417,9 @@ const QuotationAddModel = (props) => {
     };
     setSettingForContent(updatedSetting);
 
-    if(settingForContent.auto_calc && amountsForContent.sum_each_items !==0){
-      const dc_amount = amountsForContent.sum_each_items * value* 0.01;
-      const sum_dc_applied = amountsForContent.sum_each_items - dc_amount;
+    if(settingForContent.auto_calc && amountsForContent.sub_total_amount !==0){
+      const dc_amount = amountsForContent.sub_total_amount * value * 0.01;
+      const sum_dc_applied = amountsForContent.sub_total_amount - dc_amount;
       const vat_amount = settingForContent.vat_included ? sum_dc_applied*0.1 : 0;
       const tempAmount = {
         ...amountsForContent,
@@ -423,7 +428,7 @@ const QuotationAddModel = (props) => {
         vat_amount: vat_amount,
         sum_final: sum_dc_applied + vat_amount - amountsForContent.cut_off_amount,
       };
-      console.log('[handleContentModalOk] calcualted amount :', tempAmount);
+      console.log('[handleChangeDCRate] calcualted amount :', tempAmount);
       setAmountsForContent(tempAmount);
     };
   };
@@ -434,13 +439,12 @@ const QuotationAddModel = (props) => {
       dc_amount : value
     };
     if(settingForContent.auto_calc){
-      const sum_dc_applied = amountsForContent.sum_each_items - value;
+      const sum_dc_applied = amountsForContent.sub_total_amount - value;
       const vat_amount = settingForContent.vat_included ? sum_dc_applied*0.1 : 0;
       updatedAmount.sum_dc_applied = sum_dc_applied;
       updatedAmount.vat_amount = vat_amount;
       updatedAmount.sum_final = sum_dc_applied + vat_amount - amountsForContent.cut_off_amount;
     };
-    console.log('[handleContentModalOk] calcualted amount :', updatedAmount);
     setAmountsForContent(updatedAmount);
   };
 
@@ -686,12 +690,14 @@ const QuotationAddModel = (props) => {
     };
     const newQuotationData = {
       ...quotationChange,
+      sub_total_amount: amountsForContent.sub_total_amount,
       dc_rate: settingForContent.dc_rate,
       dc_amount: amountsForContent.dc_amount,
-      quotation_amount: amountsForContent.sum_each_items,
+      quotation_amount: amountsForContent.sum_dc_applied,
       tax_amount: amountsForContent.vat_amount,
       cutoff_amount: amountsForContent.cut_off_amount,
       total_quotation_amount: amountsForContent.sum_final,
+      total_cost_price: amountsForContent.total_cost_price,
       quotation_table: ConvertHeaderInfosToString(contentColumns),
       quotation_contents: JSON.stringify(quotationContents),
       action_type: 'ADD',
@@ -707,7 +713,7 @@ const QuotationAddModel = (props) => {
       initializeQuotationTemplate();
       //close modal ?
     };
-  }, [contentColumns, cookies.myLationCrmUserId, initializeQuotationTemplate, modifyQuotation, quotationChange, quotationContents]);
+  }, [ConvertHeaderInfosToString, amountsForContent.cut_off_amount, amountsForContent.dc_amount, amountsForContent.sub_total_amount, amountsForContent.sum_dc_applied, amountsForContent.sum_final, amountsForContent.total_cost_price, amountsForContent.vat_amount, contentColumns, cookies.myLationCrmUserId, initializeQuotationTemplate, modifyQuotation, quotationChange, quotationContents, settingForContent.dc_rate]);
 
 
   //===== useEffect functions ==========================================
@@ -1030,9 +1036,9 @@ const QuotationAddModel = (props) => {
                   <Space.Compact direction="vertical">
                     <label>{t('transaction.total_price')}</label>
                     <InputNumber
-                      name='sum_each_items'
+                      name='sub_total_amount'
                       defaultValue={0}
-                      value={amountsForContent.sum_each_items}
+                      value={amountsForContent.sub_total_amount}
                       formatter={handleFormatter}
                       parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                       disabled={settingForContent.auto_calc}

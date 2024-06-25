@@ -304,7 +304,7 @@ export const defaultPurchase = {
     receipt_date: null,
     delivery_date: null,
     ma_finish_date: null,
-    invoiceno: null,
+    invoice_number: null,
     price: null,
     register: null,
     registration_date: null,

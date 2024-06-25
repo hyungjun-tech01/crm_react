@@ -153,7 +153,7 @@ export const QuotationRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     console.log('\t[ modifyQuotation ] new quotation : ', updatedNewQuotation);
-                    set(atomAllQuotations, allQuotations.concat(updatedNewQuotation));
+                    set(atomAllQuotations, [updatedNewQuotation, ...allQuotations]);
                     return true;
                 } else if(newQuotation.action_type === 'UPDATE'){
                     const currentQuotation = await snapshot.getPromise(atomCurrentQuotation);

@@ -112,7 +112,7 @@ export const MAContractRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomMAContractSet, companyMAContracts.concat(updatedNewMAContract));
+                    set(atomMAContractSet, [updatedNewMAContract, ...companyMAContracts]);
                     return updatedNewMAContract;
                 } else if(newContract.action_type === 'UPDATE'){
                     const currentMAContract = await snapshot.getPromise(atomCurrentMAContract);

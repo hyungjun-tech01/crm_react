@@ -60,7 +60,7 @@ export const ProductClassListRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomProductClassList, allProductClassLists.concat(updatedNewProduct));
+                    set(atomProductClassList, [updatedNewProduct, ...allProductClassLists]);
                     return true;
                 } else if(newProductClass.action_type === 'UPDATE'){
                     delete newProductClass.action_type;

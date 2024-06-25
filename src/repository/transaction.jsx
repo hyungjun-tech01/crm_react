@@ -90,7 +90,7 @@ export const TransactionRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomAllTransactions, allTransactions.concat(updatedNewTransaction));
+                    set(atomAllTransactions, [updatedNewTransaction, ...allTransactions]);
                     return true;
                 } else if(newTransaction.action_type === 'UPDATE'){
                     const currentTransaction = await snapshot.getPromise(atomCurrentTransaction);

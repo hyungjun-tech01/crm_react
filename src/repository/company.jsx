@@ -137,7 +137,7 @@ export const CompanyRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomAllCompanies, allCompany.concat(updatedNewCompany));
+                    set(atomAllCompanies, [updatedNewCompany, ...allCompany]);
                     set(atomCompanyForSelection, allCompanySelection.concat({
                         value: {
                             company_code: updatedNewCompany.company_code,

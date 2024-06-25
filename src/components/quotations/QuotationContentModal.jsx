@@ -40,7 +40,7 @@ const QuotationContentModal = (props) => {
             { name: 'detail_desc_on_off', title: t('quotation.detail_desc_on_off'), detail: { type: 'select', options: detail_spec_desc_select, extra: 'long' } },
             { name: 'detail_desc', title: t('quotation.detail_desc'), detail: { type: 'textarea', row_no:  8, extra: 'long' } },
             { name: 'quantity', title: t('common.quantity'), detail: { type: 'label', extra: 'long' } },
-            { name: 'list_price', title: t('quotation.quotation_unit_price'), detail: { type: 'label', extra: 'long', price: true, decimal: setting.show_decimal } },
+            { name: 'list_price', title: t('quotation.list_price'), detail: { type: 'label', extra: 'long', price: true, decimal: setting.show_decimal } },
             { name: 'quotation_amount', title: t('quotation.quotation_amount'), detail: { type: 'label', extra: 'long', disabled: true, price: true, decimal: setting.show_decimal } },
         ] :
         [
@@ -48,7 +48,7 @@ const QuotationContentModal = (props) => {
                 type: 'select', options: productOptions, group: 'product_class_name', extra: 'long' } },
             { name: 'detail_desc_on_off', title: t('quotation.detail_desc_on_off'), detail: { type: 'select', options: detail_spec_desc_select, extra: 'long' } },
             { name: 'quantity', title: t('common.quantity'), detail: { type: 'label', extra: 'long' } },
-            { name: 'quotation_unit_price', title: t('quotation.quotation_unit_price'), detail: { type: 'label', extra: 'long', price: true, decimal: setting.show_decimal } },
+            { name: 'list_price', title: t('quotation.list_price'), detail: { type: 'label', extra: 'long', price: true, decimal: setting.show_decimal } },
             { name: 'quotation_amount', title: t('quotation.quotation_amount'), detail: { type: 'label', extra: 'long', disabled: true, price: true, decimal: setting.show_decimal } },
         ];
 
@@ -66,8 +66,8 @@ const QuotationContentModal = (props) => {
                 tempData['product_code'] = value.value.product_code;
                 tempData['product_class_name'] = value.value.product_class_name;
                 tempData['product_name'] = value.value.product_name;
-                tempData['cost_price'] = value.value.cost_price;
-                tempData['reseller_price'] = value.value.reseller_price;
+                tempData['cost_price'] = Number(value.value.cost_price);
+                tempData['reseller_price'] = Number(value.value.reseller_price);
                 tempData['list_price'] = setting.unit_vat_included ? Number(value.value.list_price) / 1.1 : Number(value.value.list_price);
                 tempData['org_unit_prce'] = Number(value.value.list_price);
                     
@@ -100,25 +100,28 @@ const QuotationContentModal = (props) => {
         let tempData = {...edited};
         if(target_name === 'quantity'){
             tempData[target_name] = event.target.value !== '' ? Number(event.target.value) : 0;
-            if(!edited['quotation_unit_price'] || edited.quotation_unit_price ==='' || edited.quotation_unit_price === 0){
-                if(!original.quotation_unit_price){
+            if(!edited['list_price']
+                || edited.list_price === ''
+                || edited.list_price === 0
+            ){
+                if(!original.list_price){
                     tempData['quotation_amount'] = 0;
                 } else {
-                    tempData['quotation_amount'] = Number(original.quotation_unit_price) * tempData.quantity;
+                    tempData['quotation_amount'] = Number(original.list_price) * tempData.quantity;
                 }
             } else {
-                tempData['quotation_amount'] = tempData['quantity'] * Number(edited.quotation_unit_price);
+                tempData['quotation_amount'] = tempData['quantity'] * Number(edited.list_price);
             };
-        } else if(target_name === 'quotation_unit_price'){
+        } else if(target_name === 'list_price'){
             tempData[target_name] = event.target.value !== '' ? Number(event.target.value) : 0;
             if(!edited['quantity'] || edited.quantity ==='' || edited.quantity === 0){
                 if(!original.quantity){
                     tempData['quotation_amount'] = 0;
                 } else {
-                    tempData['quotation_amount'] = Number(original.quantity) * tempData.quotation_unit_price;
+                    tempData['quotation_amount'] = Number(original.quantity) * tempData.list_price;
                 }
             } else {
-                tempData['quotation_amount'] = tempData['quotation_unit_price'] * Number(edited.quantity);
+                tempData['quotation_amount'] = tempData['list_price'] * Number(edited.quantity);
             };
         } else {
             tempData[target_name] = event.target.value;

@@ -143,7 +143,7 @@ export const LeadRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomAllLeads, allLeads.concat(updatedNewLead));
+                    set(atomAllLeads, [updatedNewLead, ...allLeads]);
                     return true;
                 } else if(newLead.action_type === 'UPDATE'){
                     const currentLead = await snapshot.getPromise(atomCurrentLead);

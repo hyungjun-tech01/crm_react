@@ -501,8 +501,8 @@ const PurchaseAddModel = (props) => {
                                         <AddBasicItem
                                             title={t('purchase.invoice_no')}
                                             type='text'
-                                            name="invoiceno"
-                                            defaultValue={addChange.invoiceno}
+                                            name="invoice_number"
+                                            defaultValue={addChange.invoice_number}
                                             onChange={handleAddChange}
                                         />
                                         <AddBasicItem
