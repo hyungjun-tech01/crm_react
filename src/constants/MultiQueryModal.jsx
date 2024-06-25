@@ -70,6 +70,10 @@ const MultiQueryModal = (props) => {
 
     const { t } = useTranslation();
 
+    const today = new Date();
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(today.getMonth() - 1);
+
     const [queryConditions, setQueryConditions] = useState([
       { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
       { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
@@ -77,19 +81,21 @@ const MultiQueryModal = (props) => {
       { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
     ]);
 
+    //  
+    const dateRangeSettings = [
+      { label: t('purchase.registration_date'), stateKey: 'registration_date', checked: false },
+      { label: t('purchase.delivery_date'), stateKey: 'delivery_date', checked: false },
+      { label: t('purchase.hq_finish_date'), stateKey: 'hq_finish_date', checked: false },
+      { label: t('purchase.ma_finish_date'), stateKey: 'ma_finish_date', checked: false },
+    ];
+    const initialState = {
+      registration_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
+      delivery_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
+      hq_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
+      ma_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
+    };
 
-  //   const add_purchase_items = [
-  //     ['registration_date', 'purchase.registration_date',
-  //         { type: 'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
-  //     ['delivery_date', 'purchase.delivery_date',
-  //         { type: 'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
-  //     ['hq_finish_date', 'purchase.hq_finish_date',
-  //         { type: 'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
-  //     ['ma_finish_date', 'purchase.ma_finish_date',
-  //         { type: 'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],
-  //     ['ma_non_extended', 'purchase.ma_non_extended',
-  //         { type: 'date', orgTimeData: null, timeDateChange: handleNewItemDateChange }],    
-  // ];
+    const [dates, setDates] = useState(initialState);
 
     const handleSelectCompanyColumn = (index, value) => {
       const newConditions = [...queryConditions];
@@ -147,63 +153,52 @@ const MultiQueryModal = (props) => {
         }
       }
       console.log("queryString", queryString);
+      const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+        label: key,
+        fromDate: dates[key].fromDate,
+        toDate: dates[key].toDate,
+        checked: dates[key].checked,
+      }));
+      console.log('Checked Dates:', checkedDates);
+
     }
 
     //check box 
-    const [regDatechecked, setRegDatechecked] = useState(true);
-    const [deliDatechecked, setDeliDatechecked] = useState(true);
-    const [hqFinishDatechecked, setHqFinishDatechecked] = useState(true);
-    const [maFinishDatechecked, setMaFinishDatechecked] = useState(true);
+    const [maNonExtendedchecked, setMaNonExtendedchecked] = useState(false);
+    // date 
+    const [maNonExtendedDate, setMaNonExtendDate] = useState(oneMonthAgo);
+    const handleMaNonExtendedDate = useCallback((date) => {
+      setMaNonExtendDate(date);
+    }, []);   
 
 
-    const [checked, setChecked] = useState(true);
-    const [disabled, setDisabled] = useState(false);
-  
-    const toggleChecked = () => {
-      setChecked(!checked);
+const handleDateChange = (key, dateType, date) => {
+  setDates((prevDates) => {
+    const updatedDates = {
+      ...prevDates,
+      [key]: {
+        ...prevDates[key],
+        [dateType]: date,
+      },
     };
-  
-    const toggleDisable = () => {
-      setDisabled(!disabled);
+    console.log(`Updated dates for ${key}:`, updatedDates[key]);
+    return updatedDates;
+  });
+};
+
+const handleCheckedChange = (key) => {
+  setDates((prevDates) => {
+    const updatedDates = {
+      ...prevDates,
+      [key]: {
+        ...prevDates[key],
+        checked: !prevDates[key].checked,
+      },
     };
-  
-    const onChange = (e) => {
-      console.log('checked = ', e.target.checked);
-      setChecked(e.target.checked);
-    };
-  
-    const label = `${checked ? 'Checked' : 'Unchecked'}-${disabled ? 'Disabled' : 'Enabled'}`;
-
-    const today = new Date();
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(today.getMonth() - 1);
-  
-    const [registrationFromDate, setRegistrationFromDate] = useState(oneMonthAgo);
-    const handleRegistrationDateFromChange = useCallback((date) => {
-      setRegistrationFromDate(date);
-    }, []);
-    const [registrationToDate, setRegistrationToDate] = useState(today);
-    const handleRegistrationDateToChange = useCallback((date) => {
-      setRegistrationToDate(date);
-    }, []);
-
-    const [deliveryFromDate, setDeliveryFromDate] = useState(oneMonthAgo);
-    const handleDeliveryFromDateChange = useCallback((date) => {
-      setDeliveryFromDate(date);
-    }, []);    
-    const [deliveryToDate, setDeliveryToDate] = useState(today);
-    const handleDeliveryToDateChange = useCallback((date) => {
-      setDeliveryToDate(date);
-    }, []);        
-
-    const [hqFindishFromDate, setHqFindishFromDate] = useState(oneMonthAgo);
-    const handleHqFindishFromDate = useCallback((date) => {
-      setHqFindishFromDate(date);
-    }, []);    
-    const [hqFindishToDate, setHqFindishToDate] = useState(today);
-    const handleHqFindishToDate = useCallback((date) => {
-      setHqFindishToDate(date);
-    }, []);     
+    console.log(`Updated checked state for ${key}:`, updatedDates[key].checked);
+    return updatedDates;
+  });
+};
 
     return (
         <Modal
@@ -253,84 +248,31 @@ const MultiQueryModal = (props) => {
               </tbody>
               </table>     
 
-              <DateRangePicker
-                checked={regDatechecked}
-                onChange={setRegDatechecked}
-                label={t('purchase.registration_date')}
-                fromDate={registrationFromDate}
-                toDate={registrationToDate}
-                handleFromDateChange={handleRegistrationDateFromChange}
-                handleToDateChange={handleRegistrationDateToChange}
-              />
-
-              <DateRangePicker
-                checked={deliDatechecked}
-                onChange={setDeliDatechecked}
-                label={t('purchase.delivery_date')}
-                fromDate={deliveryFromDate}
-                toDate={deliveryToDate}
-                handleFromDateChange={handleDeliveryFromDateChange}
-                handleToDateChange={handleDeliveryToDateChange}
-              />
-
-              <DateRangePicker
-                checked={hqFinishDatechecked}
-                onChange={setHqFinishDatechecked}
-                label={t('purchase.hq_finish_date')}
-                fromDate={hqFindishFromDate}
-                toDate={hqFindishToDate}
-                handleFromDateChange={handleHqFindishFromDate}
-                handleToDateChange={handleHqFindishToDate}
-              />
-
-              <DateRangePicker
-                checked={maFinishDatechecked}
-                onChange={setMaFinishDatechecked}
-                label={t('purchase.ma_finish_date')}
-                fromDate={hqFindishFromDate}
-                toDate={hqFindishToDate}
-                handleFromDateChange={handleHqFindishFromDate}
-                handleToDateChange={handleHqFindishToDate}
-              />
-        
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{ width: '200px' }}>
-                  <Checkbox checked={checked} disabled={disabled} onChange={onChange} style={{width:'200px'}}>
-                    {t('purchase.ma_finish_date')} : 
-                  </Checkbox>
+              {dateRangeSettings.map((setting) => (
+                <div key={setting.stateKey}>
+                  <DateRangePicker
+                    checked={dates[setting.stateKey].checked}
+                    onChange={() => handleCheckedChange(setting.stateKey)}
+                    label={setting.label}
+                    fromDate={dates[setting.stateKey].fromDate}
+                    toDate={dates[setting.stateKey].toDate}
+                    handleFromDateChange={(date) => handleDateChange(setting.stateKey, 'fromDate', date)}
+                    handleToDateChange={(date) => handleDateChange(setting.stateKey, 'toDate', date)}
+                  />
                 </div>
-                <div style={{ width: '150px',marginRight:'3px'}}>
-                  <DatePicker
-                      className="basic-date"
-                      name = 'deliveryFromDate'           
-                      selected={deliveryFromDate}
-                      onChange={handleDeliveryFromDateChange}
-                      dateFormat="yyyy-MM-dd"
-                  /> 
-                </div>
-                ~
-                <div style={{ width: '150px',marginLeft:'3px'}}>
-                  <DatePicker
-                        className="basic-date"
-                        name = 'deliveryToDate'
-                        selected={deliveryToDate}
-                        onChange={handleDeliveryToDateChange  }
-                        dateFormat="yyyy-MM-dd"
-                    /> 
-                </div>
-              </div>   
+              ))}
               <div style={{ display: 'flex', alignItems: 'center' }}> 
                 <div style={{ width: '200px' }}>
-                  <Checkbox checked={checked} disabled={disabled} onChange={onChange} style={{width:'200px'}}>
+                  <Checkbox checked={maNonExtendedchecked}  onChange={()=>setMaNonExtendedchecked(!maNonExtendedchecked)} style={{width:'200px'}}>
                     {t('company.ma_non_extended')} : 
                   </Checkbox>
                 </div>
                 <div style={{ width: '150px',marginRight:'3px'}}>
                   <DatePicker
                       className="basic-date"
-                      name = 'deliveryFromDate'           
-                      selected={deliveryFromDate}
-                      onChange={handleDeliveryFromDateChange}
+                      name = 'maNonExtendedDate'           
+                      selected={maNonExtendedDate}
+                      onChange={handleMaNonExtendedDate}
                       dateFormat="yyyy-MM-dd"
                   /> 
                 </div>
