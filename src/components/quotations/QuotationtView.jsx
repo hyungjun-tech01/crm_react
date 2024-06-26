@@ -128,6 +128,8 @@ const Styles = StyleSheet.create({
         paddingTop: 25,
         paddingBottom: 35,
         paddingHorizontal: 20,
+        display: 'flex',
+        flexDirection: 'column',
     },
     header: {
         fontSize: 10,
@@ -260,92 +262,95 @@ const QuotationView = () => {
             <Document>
                 <Page wrap size="A4" style={Styles.body}>
                     {currentQuotation.sales_representative &&
-                        <Text style={Styles.header} fixed>담당자: {currentQuotation.sales_representative}</Text>
+                            <Text style={{fontSize: 10, marginBottom: 20, textAlign: 'start', color: 'grey', fontFamily: 'Noto Sans',}} fixed>
+                                담당자: {currentQuotation.sales_representative}
+                            </Text>
                     }
-                    <Text style={{fontSize:10,textAlign:'right',marginBottom:20,fontFamily:'Noto Sans'}}>
-                        견적번호: {currentQuotation.quotation_number}
-                    </Text>
-                    <Text style={{fontSize: 24,fontWeight: 'bold',marginBottom: 30,textAlign: 'center',textDecoration: 'underline',fontFamily: 'Noto Sans'}}>
-                        {currentQuotation.quotation_type}
-                    </Text>
-                    <Text style={{fontSize: 16,textAlign: 'left',textDecoration: 'underline',marginLeft: 20,marginBottom: 10,fontFamily: 'Noto Sans'}}>
-                        {currentQuotation.company_name} 귀중
-                    </Text>
-                    <View style={{marginBottom: 20,padding:0,flexDirection:'row',flexGrow:0}}>
-                        <View style={{width:'50%',margin:0,padding:5}}>
-                            <Text style={Styles.text}>받으실 분:  {currentQuotation.department} {currentQuotation.lead_name} {currentQuotation.position}</Text>
-                            <Text style={Styles.text}>견적 일자:  {new Date(currentQuotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day:'numeric'})}</Text>
-                            <Text style={Styles.text}>지불 조건:  {currentQuotation.payment_type}</Text>
-                            <Text style={Styles.text}>납품 기간:  {currentQuotation.delivery_period}</Text>
-                            <Text style={Styles.text}>유효 기간:  {currentQuotation.quotation_expiration_date}</Text>
-                        </View>
-                        <View style={{width:'50%',margin:0,padding:0,border:1,flexDirection: 'row'}}>
-                            <View style={{width:20,margin:0,backgroundColor:'#cccccc',borderRight:1,flexDirection:'column',alignItems:'center',justifyContent:'space-around'}}>
-                                <Text style={Styles.text}>공</Text>
-                                <Text style={Styles.text}>급</Text>
-                                <Text style={Styles.text}>자</Text>
+                    {/*----- Header ---------------------------------------------*/}
+                    <View style={{width: '100%', flexGrow: 0}} >
+                        <Text style={{fontSize:10,textAlign:'right',marginBottom:20,fontFamily:'Noto Sans'}}>
+                            견적번호: {currentQuotation.quotation_number}
+                        </Text>
+                        <Text style={{fontSize: 24,fontWeight: 'bold',marginBottom: 30,textAlign: 'center',textDecoration: 'underline',fontFamily: 'Noto Sans'}}>
+                            {currentQuotation.quotation_type}
+                        </Text>
+                        <Text style={{fontSize: 16,textAlign: 'left',textDecoration: 'underline',marginLeft: 20,marginBottom: 10,fontFamily: 'Noto Sans'}}>
+                            {currentQuotation.company_name} 귀중
+                        </Text>
+                        <View style={{marginBottom: 20,padding:0,flexDirection:'row',flexGrow:0}}>
+                            <View style={{width:'50%',margin:0,padding:5}}>
+                                <Text style={Styles.text}>받으실 분:  {currentQuotation.department} {currentQuotation.lead_name} {currentQuotation.position}</Text>
+                                <Text style={Styles.text}>견적 일자:  {new Date(currentQuotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day:'numeric'})}</Text>
+                                <Text style={Styles.text}>지불 조건:  {currentQuotation.payment_type}</Text>
+                                <Text style={Styles.text}>납품 기간:  {currentQuotation.delivery_period}</Text>
+                                <Text style={Styles.text}>유효 기간:  {currentQuotation.quotation_expiration_date}</Text>
                             </View>
-                            <View style={{margin:0,border:0,flexDirection:'column'}}>
-                                <View style={[Styles.supplierRow,{height:20,borderBottom:1}]}>
-                                    <View style={Styles.supplierSubject}>
-                                        <Text style={Styles.supplierText}>등록번호</Text>
-                                    </View>
-                                    <View style={Styles.supplierContent}>
-                                        <Text style={Styles.supplierText}>106-86-26016</Text>
-                                    </View>
+                            <View style={{width:'50%',margin:0,padding:0,border:1,flexDirection: 'row'}}>
+                                <View style={{width:20,margin:0,backgroundColor:'#cccccc',borderRight:1,flexDirection:'column',alignItems:'center',justifyContent:'space-around'}}>
+                                    <Text style={Styles.text}>공</Text>
+                                    <Text style={Styles.text}>급</Text>
+                                    <Text style={Styles.text}>자</Text>
                                 </View>
-                                <View style={[Styles.supplierRow,{height:20,borderBottom:1}]}>
-                                    <View style={Styles.supplierSubject}>
-                                        <Text style={Styles.supplierText}>상호</Text>
+                                <View style={{margin:0,border:0,flexDirection:'column'}}>
+                                    <View style={[Styles.supplierRow,{height:20,borderBottom:1}]}>
+                                        <View style={Styles.supplierSubject}>
+                                            <Text style={Styles.supplierText}>등록번호</Text>
+                                        </View>
+                                        <View style={Styles.supplierContent}>
+                                            <Text style={Styles.supplierText}>106-86-26016</Text>
+                                        </View>
                                     </View>
-                                    <View style={Styles.supplierContent}>
-                                        <Text style={Styles.supplierText}>노드데이타</Text>
+                                    <View style={[Styles.supplierRow,{height:20,borderBottom:1}]}>
+                                        <View style={Styles.supplierSubject}>
+                                            <Text style={Styles.supplierText}>상호</Text>
+                                        </View>
+                                        <View style={Styles.supplierContent}>
+                                            <Text style={Styles.supplierText}>노드데이타</Text>
+                                        </View>
                                     </View>
-                                </View>
-                                <View style={[Styles.supplierRow,{height:20,borderBottom:1}]}>
-                                    <View style={Styles.supplierSubject}>
-                                        <Text style={Styles.supplierText}>대표자명</Text>
+                                    <View style={[Styles.supplierRow,{height:20,borderBottom:1}]}>
+                                        <View style={Styles.supplierSubject}>
+                                            <Text style={Styles.supplierText}>대표자명</Text>
+                                        </View>
+                                        <View style={Styles.supplierContent}>
+                                            <Text style={Styles.supplierText}>김신일</Text>
+                                        </View>
                                     </View>
-                                    <View style={Styles.supplierContent}>
-                                        <Text style={Styles.supplierText}>김신일</Text>
+                                    <View style={[Styles.supplierRow,{height:36,borderBottom:1}]}>
+                                        <View style={Styles.supplierSubject}>
+                                            <Text style={Styles.supplierText}>주소</Text>
+                                        </View>
+                                        <View style={Styles.supplierContent}>
+                                            <Text style={Styles.supplierText}>서울특별시 금천구 가산디지털 1로 128 1811 (STX V-Tower)</Text>
+                                        </View>
                                     </View>
-                                </View>
-                                <View style={[Styles.supplierRow,{height:36,borderBottom:1}]}>
-                                    <View style={Styles.supplierSubject}>
-                                        <Text style={Styles.supplierText}>주소</Text>
+                                    <View style={[Styles.supplierRow,{height:36,borderBottom:1}]}>
+                                        <View style={Styles.supplierSubject}>
+                                            <Text style={Styles.supplierText}>업태/종목</Text>
+                                        </View>
+                                        <View style={Styles.supplierContent}>
+                                            <Text style={Styles.supplierText}>도소매서비스/컴퓨터및주변기기,S/W개발,공급,자문</Text>
+                                        </View>
                                     </View>
-                                    <View style={Styles.supplierContent}>
-                                        <Text style={Styles.supplierText}>서울특별시 금천구 가산디지털 1로 128 1811 (STX V-Tower)</Text>
+                                    <View style={[Styles.supplierRow,{height:20,borderBottom:1}]}>
+                                        <View style={Styles.supplierSubject}>
+                                            <Text style={Styles.supplierText}>회사전화</Text>
+                                        </View>
+                                        <View style={Styles.supplierContent}>
+                                            <Text style={Styles.supplierText}>02-595-4450 / 051-517-4450</Text>
+                                        </View>
                                     </View>
-                                </View>
-                                <View style={[Styles.supplierRow,{height:36,borderBottom:1}]}>
-                                    <View style={Styles.supplierSubject}>
-                                        <Text style={Styles.supplierText}>업태/종목</Text>
-                                    </View>
-                                    <View style={Styles.supplierContent}>
-                                        <Text style={Styles.supplierText}>도소매서비스/컴퓨터및주변기기,S/W개발,공급,자문</Text>
-                                    </View>
-                                </View>
-                                <View style={[Styles.supplierRow,{height:20,borderBottom:1}]}>
-                                    <View style={Styles.supplierSubject}>
-                                        <Text style={Styles.supplierText}>회사전화</Text>
-                                    </View>
-                                    <View style={Styles.supplierContent}>
-                                        <Text style={Styles.supplierText}>02-595-4450 / 051-517-4450</Text>
-                                    </View>
-                                </View>
-                                <View style={[Styles.supplierRow,{height:20,border:0}]}>
-                                    <View style={Styles.supplierSubject}>
-                                        <Text style={Styles.supplierText}>회사팩스</Text>
-                                    </View>
-                                    <View style={Styles.supplierContent}>
-                                        <Text style={Styles.supplierText}>02-595-4454 / 051-518-4452</Text>
+                                    <View style={[Styles.supplierRow,{height:20,border:0}]}>
+                                        <View style={Styles.supplierSubject}>
+                                            <Text style={Styles.supplierText}>회사팩스</Text>
+                                        </View>
+                                        <View style={Styles.supplierContent}>
+                                            <Text style={Styles.supplierText}>02-595-4454 / 051-518-4452</Text>
+                                        </View>
                                     </View>
                                 </View>
                             </View>
                         </View>
-                    </View>
-                    
                         <Text style={Styles.text}>{currentQuotation.upper_memo}</Text>
                         <View style={{width:'100%',height:20,margin:0,padding:1,borderTop:1,borderLeft:1,borderRight:1,flexGrow:0}}>
                             <Text style={Styles.textBold}>
@@ -353,8 +358,11 @@ const QuotationView = () => {
                                     ({ConvCurrencyMark(currentQuotation.currency)}{ConvertCurrency(currentQuotation.total_quotation_amount)})(VAT별도)
                             </Text>
                         </View>
-                        <View style={{width:'100%',margin:0,padding:0,borderLeft:1,borderRight:1,borderBottom:1,flexDirection:'column'}} fixed>
-                            <View style={{width:'100%',height:20,margin:0,padding:0,borderBottom:1,borderTop:1,backgroundColor:"#cccccc",flexDirection:'row',flexGrow:0}}>
+                    </View>
+                    {/*----- Table ---------------------------------------------*/}
+                    <View style={{width: '100%', flexGrow: 1}} >
+                        <View style={{width:'100%',margin:0,padding:0,border:1,flexDirection:'column'}} fixed>
+                            <View style={{width:'100%',height:20,margin:0,padding:0,borderBottom:1,backgroundColor:"#cccccc",flexDirection:'row',flexGrow:0}} fixed>
                                 { quotationTables && quotationTables.map((item, index) => 
                                     index !== (quotationTables.length - 1) ? (
                                         <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,borderRight:1}} fixed>
@@ -367,15 +375,15 @@ const QuotationView = () => {
                                 )}
                             </View>
                             { quotationContents.map((content, index) => 
-                                <View key={index} wrap={false} style={{width:'100%',margin:0,padding:0,border:0,flexDirection:'row',flexGrow: 1}}>
+                                <View wrap key={index} style={{width:'100%',margin:0,padding:0,border:0,flexDirection:'row',flexGrow: 1}}>
                                     { quotationTables && quotationTables.map((item, index) => 
                                         index !== (quotationTables.length - 1) ? (
-                                            <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,borderRight:1}}>
+                                            <View key={item.at(0)} wrap style={{width: item.at(2),margin:0,padding:0,borderRight:1}}>
                                                 { content[item.at(0)] && <Text style={Styles.text}>{content[item.at(0)]}</Text>}
                                                 { item.at(0) === '5' && content['998'] && ConvertComment(content['998'])}
                                             </View>
                                             ) : (
-                                            <View key={item.at(0)} style={{width: item.at(2),margin:0,padding:0,border:0}}>
+                                            <View key={item.at(0)} wrap style={{width: item.at(2),margin:0,padding:0,border:0}}>
                                                 { content[item.at(0)] && <Text style={Styles.text}>{ConvertCurrency(content[item.at(0)])}</Text>}
                                             </View>)
                                     )}
@@ -400,7 +408,7 @@ const QuotationView = () => {
                                 </View>
                             </View>
                         </View>
-                    
+                    </View>
                 </Page>
             </Document>
         </PDFViewer>
