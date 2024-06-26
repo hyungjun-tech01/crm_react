@@ -26,6 +26,7 @@ const Company = () => {
   const [multiQueryModal, setMultiQueryModal] = useState(false);
   const { t } = useTranslation();
   const [ initToAddCompany, setInitToAddCompany ] = useState(false);
+  const [multiQueryString, setMultiQueryString] = useState("");
 
 
   const handleMultiQueryModal = () => {
@@ -37,6 +38,10 @@ const Company = () => {
   const handleMultiQueryModalCancel = () => {
     setMultiQueryModal(false);
   };
+  const handleQueryString=(a) => {
+    setMultiQueryString(a);
+    console.log('handleQueryString', multiQueryString);
+  }
 
 
   const handleStatusSearch = (newValue) => {
@@ -355,6 +360,7 @@ const Company = () => {
           open={multiQueryModal}
           handleOk={handleMultiQueryModalOk}
           handleCancel={handleMultiQueryModalCancel}
+          setQueryString={handleQueryString}
         />
       </div>
     </HelmetProvider>
