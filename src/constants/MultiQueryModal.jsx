@@ -4,6 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Select from "react-select";
 import { companyColumn, ColumnQueryCondition } from "../repository/company";
 import { useTranslation } from "react-i18next";
+import { formatDate } from "./functions";
 import AddBasicItem from "./AddBasicItem";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -66,7 +67,7 @@ const DateRangePicker = ({ checked, onChange, label, fromDate, toDate, handleFro
 );
 
 const MultiQueryModal = (props) => {
-    const {  open, title, handleOk, handleCancel } = props;
+    const {  open, title, handleOk, handleCancel, setQueryString } = props;
 
     const { t } = useTranslation();
 
@@ -83,13 +84,13 @@ const MultiQueryModal = (props) => {
 
     //  
     const dateRangeSettings = [
-      { label: t('purchase.registration_date'), stateKey: 'registration_date', checked: false },
-      { label: t('purchase.delivery_date'), stateKey: 'delivery_date', checked: false },
-      { label: t('purchase.hq_finish_date'), stateKey: 'hq_finish_date', checked: false },
-      { label: t('purchase.ma_finish_date'), stateKey: 'ma_finish_date', checked: false },
+      { label: t('purchase.registration_date'), stateKey: 'create_date', checked: false },
+     // { label: t('purchase.delivery_date'), stateKey: 'delivery_date', checked: false },
+     // { label: t('purchase.hq_finish_date'), stateKey: 'hq_finish_date', checked: false },
+     // { label: t('purchase.ma_finish_date'), stateKey: 'ma_finish_date', checked: false },
     ];
     const initialState = {
-      registration_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
+      create_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
       delivery_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
       hq_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
       ma_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
@@ -161,12 +162,14 @@ const MultiQueryModal = (props) => {
       }));
 
       for (const i of checkedDates){
+        console.log(formatDate(i.fromDate), formatDate(i.toDate));
         queryString = queryString
                    +"(" + i.label + " between " 
-                   +"'"+ i.fromDate +"'" + " and " + "'" + i.toDate + "' )" +" And ";
+                   +"'"+ formatDate(i.fromDate) +"'" + " and " + "'" + formatDate(i.toDate) + "' )" +" And ";
       }
-      console.log('queryString:', queryString);
-
+      console.log('queryString:', queryString.replace(/And\s*$/, ''));
+      setQueryString(queryString.replace(/And\s*$/, ''));
+      handleOk;
     }
 
     //check box 
