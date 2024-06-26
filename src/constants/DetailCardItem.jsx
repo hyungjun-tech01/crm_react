@@ -131,7 +131,7 @@ const DetailCardItem = (props) => {
                     : defaultValue
                 ));
 
-    const widthValue = detail['extra'] ? ( detail.extra === 'long' ? 770 : (detail.extra === 'modal' ? 470 : 380)) : 380;
+    const widthValue = detail['extra'] ? ( detail.extra === 'long' ? 768 : (detail.extra === 'modal' ? 470 : 380)) : 380;
 
     const SharedProps = {
         name: name,

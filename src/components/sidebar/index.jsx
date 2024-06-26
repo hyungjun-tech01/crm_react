@@ -81,7 +81,7 @@ const SidebarNav = (props) => {
               </li>
               <li>
                 <Link className={`${pathname.includes("consultings") ? "active" : ""}`} to="/consultings">
-                  <EditCalendarOutlined/> <span>{t('consulting.consulting')}</span>
+                  <EditCalendarOutlined/> <span>{t('consulting.consulting_manage')}</span>
                 </Link>
               </li>
               <li>
@@ -91,7 +91,7 @@ const SidebarNav = (props) => {
               </li>
               <li>
                 <Link className={`${pathname.includes("transactions") ? "active" : ""}`} to="/transactions">
-                  <ReceiptLongOutlined /> <span>{t('transaction.transaction')}</span>
+                  <ReceiptLongOutlined /> <span>{t('transaction.transaction_manage')}</span>
                 </Link>
               </li>
               <li>
