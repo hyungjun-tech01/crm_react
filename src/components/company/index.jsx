@@ -13,6 +13,8 @@ import { compareCompanyName, compareText } from "../../constants/functions";
 import CompanyAddModel from "./CompanyAddMdel";
 import CompanyDetailsModel from "./CompanyDetailsModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
+import { formatDate } from "../../constants/functions";
+
 // import { MoreVert } from '@mui/icons-material';
 
 
@@ -28,12 +30,82 @@ const Company = () => {
   const [ initToAddCompany, setInitToAddCompany ] = useState(false);
   const [multiQueryString, setMultiQueryString] = useState("");
 
+  const [queryConditions, setQueryConditions] = useState([
+    { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+  ]);
+
+  const today = new Date();
+  const oneMonthAgo = new Date();
+  oneMonthAgo.setMonth(today.getMonth() - 1);
+
+  const initialState = {
+    registration_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
+    delivery_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
+    hq_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
+    ma_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
+  };
+
+
+  const [dates, setDates] = useState(initialState);
+
+  const dateRangeSettings = [
+    { label: t('purchase.registration_date'), stateKey: 'registration_date', checked: false },
+    { label: t('purchase.delivery_date'), stateKey: 'delivery_date', checked: false },
+    { label: t('purchase.hq_finish_date'), stateKey: 'hq_finish_date', checked: false },
+    { label: t('purchase.ma_finish_date'), stateKey: 'ma_finish_date', checked: false },
+  ];
 
   const handleMultiQueryModal = () => {
     setMultiQueryModal(true);
   }
   const handleMultiQueryModalOk = () => {
     setMultiQueryModal(false);
+
+    // query condition 세팅 후 query
+    console.log("queryConditions", queryConditions);
+    
+    
+      let queryString = "";
+      for (const i of queryConditions){
+        console.log("i", i.companyColumn.value);
+        if( i.companyColumn.value !== undefined || i.companyColumn.value !== null || i.companyColumn.value !== ""){
+          if ( i.columnQueryCondition.value === "like")
+            queryString = queryString 
+                     + i.companyColumn.value + " "
+                     + i.columnQueryCondition.value + " "
+                     + "'%" + i.multiQueryInput + "%'" + " " + i.andOr + " ";
+          if ( i.columnQueryCondition.value === "is null" || i.columnQueryCondition.value === "is not null")
+            queryString = queryString 
+                    + i.companyColumn.value + " "
+                    + i.columnQueryCondition.value + " " + i.andOr + " ";
+          if ( i.columnQueryCondition.value === "=")
+            queryString = queryString 
+                     + i.companyColumn.value + " "
+                     + i.columnQueryCondition.value + " "
+                     + "'" + i.multiQueryInput + "'" + " " + i.andOr + " ";
+        }
+      }
+
+      const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+        label: key,
+        fromDate: dates[key].fromDate,
+        toDate: dates[key].toDate,
+        checked: dates[key].checked,
+      }));
+
+      console.log("checkedDates", checkedDates);
+
+      for (const i of checkedDates){
+        console.log(formatDate(i.fromDate), formatDate(i.toDate));
+        queryString = queryString
+                   +"(" + i.label + " between " 
+                   +"'"+ formatDate(i.fromDate) +"'" + " and " + "'" + formatDate(i.toDate) + "' )" +" And ";
+      }
+      // console.log('queryString:', queryString.replace(/And\s*$/, ''));
+     
   };
   const handleMultiQueryModalCancel = () => {
     setMultiQueryModal(false);
@@ -361,6 +433,11 @@ const Company = () => {
           handleOk={handleMultiQueryModalOk}
           handleCancel={handleMultiQueryModalCancel}
           setQueryString={handleQueryString}
+          queryConditions={queryConditions}
+          setQueryConditions={setQueryConditions}
+          dates={dates}
+          setDates={setDates}
+          dateRangeSettings={dateRangeSettings}
         />
       </div>
     </HelmetProvider>
