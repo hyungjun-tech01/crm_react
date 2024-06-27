@@ -31,9 +31,9 @@ const Header = (props) => {
     dashboard: t('dashboard.dashboard'),
     companies : t('company.company_manage'),
     leads : t('lead.lead_manage'),
-    consultings : t('consulting.consulting'),
+    consultings : t('consulting.consulting_manage'),
     quotations : t('quotation.quotation_manage'),
-    transactions : t('transaction.transaction'),
+    transactions : t('transaction.transaction_manage'),
     purchases : t('purchase.purchase_manage'),
   };
 

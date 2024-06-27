@@ -6,7 +6,7 @@ import { Table } from "antd";
 import "antd/dist/reset.css";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
-import TransactionsDetailsModel from "./TransactionsDetailsModel";
+import TransactionDetailsModel from "./TransactionDetailsModel";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import "react-datepicker/dist/react-datepicker.css";
@@ -21,7 +21,7 @@ import { atomAllCompanies,
   atomTransationState,
 } from "../../atoms/atoms";
 import { compareCompanyName , compareText } from "../../constants/functions";
-import TransactionAddNewModal from "./TransactionAddNewModal";
+import TransactionAddModel from "./TransactionAddModel";
 import { useTranslation } from "react-i18next";
 
 const Transactions = () => {
@@ -279,8 +279,8 @@ const Transactions = () => {
         {/* modal */}
         <SystemUserModel />
         <CompanyDetailsModel />
-        <TransactionsDetailsModel />
-        <TransactionAddNewModal init={initAddNewTransaction} handleInit={setInitAddNewTransaction}/>
+        <TransactionDetailsModel />
+        <TransactionAddModel init={initAddNewTransaction} handleInit={setInitAddNewTransaction}/>
       </div>
     </HelmetProvider>
   );

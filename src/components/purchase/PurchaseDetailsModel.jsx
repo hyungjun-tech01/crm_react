@@ -465,24 +465,26 @@ const PurchaseDetailsModel = (props) => {
                         <div className="crms-tasks">
                           <div className="tasks__item crms-task-item active">
                             <div className="row">
-                              <Space
-                                align="start"
-                                direction="horizontal"
-                                size="small"
-                                style={{ display: 'flex', marginBottom: '0.5rem' }}
-                                wrap
-                              >
-                                {purchase_items_info.map((item, index) =>
-                                  <DetailCardItem
-                                    key={index}
-                                    defaultValue={selected[item.key]}
-                                    edited={editedDetailValues}
-                                    name={item.key}
-                                    title={t(item.title)}
-                                    detail={item.detail}
-                                  />
-                                )}
-                              </Space>
+                              <div className="card pt-3 mb-2">
+                                <Space
+                                  align="start"
+                                  direction="horizontal"
+                                  size="small"
+                                  style={{ display: 'flex', marginBottom: '0.5rem' }}
+                                  wrap
+                                >
+                                  {purchase_items_info.map((item, index) =>
+                                    <DetailCardItem
+                                      key={index}
+                                      defaultValue={selected[item.key]}
+                                      edited={editedDetailValues}
+                                      name={item.key}
+                                      title={t(item.title)}
+                                      detail={item.detail}
+                                    />
+                                  )}
+                                </Space>
+                              </div>
                             </div>
                             <div className="row">
                               <div className="card mb-0">
