@@ -10,7 +10,7 @@ import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import TransactionView from "./TransactionView";
 
-const TransactionsDetailsModel = () => {
+const TransactionDetailsModel = () => {
   const selectedTransaction = useRecoilValue(atomCurrentTransaction);
   const { modifyTransaction, setCurrentTransaction } = useRecoilValue(TransactionRepo);
   const [cookies] = useCookies(["myLationCrmUserId"]);
@@ -253,4 +253,4 @@ const TransactionsDetailsModel = () => {
   );
 };
 
-export default TransactionsDetailsModel;
+export default TransactionDetailsModel;

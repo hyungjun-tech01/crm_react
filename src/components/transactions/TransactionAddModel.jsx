@@ -56,7 +56,7 @@ const trans_key_to_name = {
   "modify_date": '날짜',
 };
 
-const TransactionAddNewModal = (props) => {
+const TransactionAddModel = (props) => {
   const { init, handleInit } = props;
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
@@ -651,7 +651,7 @@ const TransactionAddNewModal = (props) => {
           <table className="table">
             <tbody>
               <tr>
-                <td><b>{trans_key_to_name.company_name}</b></td>
+                <td><b>{t('transaction.company_name')}</b></td>
                 <td>{temporaryContent.company_name}</td>
                 <td><b>{trans_key_to_name.transaction_sub_type}</b></td>
                 <td>
@@ -781,4 +781,4 @@ const TransactionAddNewModal = (props) => {
   );
 };
 
-export default TransactionAddNewModal;
+export default TransactionAddModel;
