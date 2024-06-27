@@ -281,3 +281,38 @@
     padding: 10px;
     background-color: white;
 }
+.trans_cell
+{
+    border: 1px solid #ff5522;
+}
+.trans_table
+{
+    border: 2px solid #ff5522;
+    border-top: 1px solid #ff5522;
+}
+.trans_title
+{
+    border-bottom: 2px solid rgb(195, 195, 195);
+    padding: 0.25rem 0;
+    font-size: 14;
+    text-align: center;
+}
+.trans_title.right
+{
+    border-right: 2px solid rgb(195, 195, 195);
+}
+.trans_amount
+{
+    padding: 0.25rem 1rem;
+    font-size: 14;
+    text-align: end;
+    border-right: 1px solid rgb(215, 215, 215);
+    border-bottom: 2px solid #ff5522;
+}
+.trans_amount_right
+{
+    padding: 0.25rem 1rem;
+    font-size: 14;
+    text-align: end;
+    border-bottom: 2px solid #ff5522;
+}

@@ -172,7 +172,7 @@ const koResource = {
             publish_date: '발행일자',
             publish_type: '발행유형',
             statement_of_account: '거래명세표',
-            supply_price: '공급가',
+            supply_price: '공급가액',
             tax_price: '세액',
             tax_invoice: '세금계산서',
             title: '거래 제목',

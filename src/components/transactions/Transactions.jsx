@@ -22,6 +22,7 @@ import { atomAllCompanies,
 } from "../../atoms/atoms";
 import { compareCompanyName , compareText } from "../../constants/functions";
 import TransactionAddModel from "./TransactionAddModel";
+import TransactionAddModel2 from "./TransactionAddModel2";
 import { useTranslation } from "react-i18next";
 
 const Transactions = () => {
@@ -57,6 +58,21 @@ const Transactions = () => {
   // --- Section for Table ------------------------------
   const columns = [
     {
+      title: t('transaction.type'),
+      dataIndex: "transaction_type",
+      render: (text, record) => <>{text}</>,
+      sorter: (a, b) => compareText(a.transaction_type, b.transaction_type),
+    },
+    {
+      title: t('transaction.publish_date'),
+      dataIndex: "publish_date",
+      render: (text, record) => 
+        <>
+          {new Date(text).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day: 'numeric'})}
+        </>,
+      sorter: (a, b) => a.publish_date - b.publish_date,
+    },
+    {
       title: t('company.company_name'),
       dataIndex: "company_name",
       render: (text, record) => (
@@ -72,45 +88,33 @@ const Transactions = () => {
       sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
     {
-      title: t('transaction.title'),
-      dataIndex: "transaction_title",
+      title: t('company.business_registration_code'),
+      dataIndex: "business_registration_code",
       render: (text, record) => (
         <>
-          <a href="#"
-            data-bs-toggle="modal"
-            data-bs-target="#transactions-details"
-            onClick={()=>setCurrentTransaction(record.transaction_code)}
+          <a href="#" data-bs-toggle="modal"
+            data-bs-target="#company-details"
+            onClick={()=>setCurrentCompany(record.company_code)}
           >
             {text}
           </a>
         </>
       ),
-      sorter: (a, b) => compareText(a.transaction_title, b.transaction_title),
     },
     {
-      title: t('transaction.type'),
-      dataIndex: "transaction_type",
-      render: (text, record) => (
-        <>
-          <a href="#"
-            data-bs-toggle="modal"
-            data-bs-target="#transactions-details"
-            onClick={()=>setCurrentTransaction(record.transaction_code)}
-          >
-            {text}
-          </a>
-        </>
-      ),
-      sorter: (a, b) => compareText(a.transaction_type, b.transaction_type),
+      title: t('transaction.supply_price'),
+      dataIndex: "supply_price",
+      render: (text, record) => <>{text}</>,
     },
     {
-      title: t('transaction.publish_date'),
-      dataIndex: "publish_date",
-      render: (text, record) => 
-        <>
-          {new Date(text).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day: 'numeric'})}
-        </>,
-      sorter: (a, b) => a.publish_date - b.publish_date,
+      title: t('transaction.tax_price'),
+      dataIndex: "tax_price",
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: t('transaction.total_price'),
+      dataIndex: "total_price",
+      render: (text, record) => <>{text}</>,
     },
     {
       title: t('transaction.publish_type'),
@@ -119,29 +123,10 @@ const Transactions = () => {
       sorter: (a, b) => compareText(a.publish_type, b.publish_type),
     },
     {
-      title: t('transaction.payment_type'),
-      dataIndex: "payment_type",
+      title: t('common.issued_by'),
+      dataIndex: "recent_user",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => compareText(a.payment_type, b.payment_type),
-    },
-    {
-      title: t('lead.actions'),
-      render: (text, record) => (
-        <div className="dropdown dropdown-action text-center">
-          <a
-            className="action-icon dropdown-toggle"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            <MoreVert />
-          </a>
-          <div className="dropdown-menu dropdown-menu-right h-100">
-            <a style={{ display: "initial" }} className="dropdown-item">
-              Edit
-            </a>
-          </div>
-        </div>
-      ),
+      sorter: (a, b) => compareText(a.publish_type, b.publish_type),
     },
   ];
 
@@ -201,7 +186,7 @@ const Transactions = () => {
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                       id="add-task"
                       data-bs-toggle="modal"
-                      data-bs-target="#add_new_transaction"
+                      data-bs-target="#add_new_transaction2"
                       onClick={handleAddNewTransaction}
                     >
                       {t('transaction.add_transaction')}
@@ -235,7 +220,7 @@ const Transactions = () => {
                           return {
                             onDoubleClick: (event) => {
                               setCurrentTransaction(record.transaction_code)
-                              let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
+                              let myModal = new bootstrap.Modal(document.getElementById('transaction-details'), {
                                 keyboard: false
                               })
                               myModal.show();
@@ -260,7 +245,7 @@ const Transactions = () => {
                         return {
                           onDoubleClick: (event) => {
                             setCurrentTransaction(record.transaction_code)
-                            let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
+                            let myModal = new bootstrap.Modal(document.getElementById('transaction-details'), {
                               keyboard: false
                             })
                             myModal.show();
@@ -281,6 +266,7 @@ const Transactions = () => {
         <CompanyDetailsModel />
         <TransactionDetailsModel />
         <TransactionAddModel init={initAddNewTransaction} handleInit={setInitAddNewTransaction}/>
+        <TransactionAddModel2 init={initAddNewTransaction} handleInit={setInitAddNewTransaction}/>
       </div>
     </HelmetProvider>
   );
