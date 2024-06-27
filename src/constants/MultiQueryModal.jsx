@@ -4,7 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Select from "react-select";
 import { companyColumn, ColumnQueryCondition } from "../repository/company";
 import { useTranslation } from "react-i18next";
-import { formatDate } from "./functions";
+
 import AddBasicItem from "./AddBasicItem";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -67,36 +67,9 @@ const DateRangePicker = ({ checked, onChange, label, fromDate, toDate, handleFro
 );
 
 const MultiQueryModal = (props) => {
-    const {  open, title, handleOk, handleCancel, setQueryString } = props;
+    const {  open, title, handleOk, handleCancel, setQueryString, queryConditions, setQueryConditions, dates, setDates, dateRangeSettings } = props;
 
     const { t } = useTranslation();
-
-    const today = new Date();
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(today.getMonth() - 1);
-
-    const [queryConditions, setQueryConditions] = useState([
-      { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
-      { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
-      { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
-      { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
-    ]);
-
-    //  
-    const dateRangeSettings = [
-      { label: t('purchase.registration_date'), stateKey: 'create_date', checked: false },
-     // { label: t('purchase.delivery_date'), stateKey: 'delivery_date', checked: false },
-     // { label: t('purchase.hq_finish_date'), stateKey: 'hq_finish_date', checked: false },
-     // { label: t('purchase.ma_finish_date'), stateKey: 'ma_finish_date', checked: false },
-    ];
-    const initialState = {
-      create_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
-      delivery_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
-      hq_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
-      ma_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
-    };
-
-    const [dates, setDates] = useState(initialState);
 
     const handleSelectCompanyColumn = (index, value) => {
       const newConditions = [...queryConditions];
@@ -132,45 +105,13 @@ const MultiQueryModal = (props) => {
     }
 
     const handleSubmit = () => {
-      console.log(queryConditions);
-      let queryString = "";
-      for (const i of queryConditions){
-        console.log("i", i.companyColumn.value);
-        if( i.companyColumn.value !== undefined || i.companyColumn.value !== null || i.companyColumn.value !== ""){
-          if ( i.columnQueryCondition.value === "like")
-            queryString = queryString 
-                     + i.companyColumn.value + " "
-                     + i.columnQueryCondition.value + " "
-                     + "'%" + i.multiQueryInput + "%'" + " " + i.andOr + " ";
-          if ( i.columnQueryCondition.value === "is null" || i.columnQueryCondition.value === "is not null")
-            queryString = queryString 
-                    + i.companyColumn.value + " "
-                    + i.columnQueryCondition.value + " " + i.andOr + " ";
-          if ( i.columnQueryCondition.value === "=")
-            queryString = queryString 
-                     + i.companyColumn.value + " "
-                     + i.columnQueryCondition.value + " "
-                     + "'" + i.multiQueryInput + "'" + " " + i.andOr + " ";
-        }
-      }
-      console.log("queryString", queryString);
-      const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
-        label: key,
-        fromDate: dates[key].fromDate,
-        toDate: dates[key].toDate,
-        checked: dates[key].checked,
-      }));
-
-      for (const i of checkedDates){
-        console.log(formatDate(i.fromDate), formatDate(i.toDate));
-        queryString = queryString
-                   +"(" + i.label + " between " 
-                   +"'"+ formatDate(i.fromDate) +"'" + " and " + "'" + formatDate(i.toDate) + "' )" +" And ";
-      }
-      console.log('queryString:', queryString.replace(/And\s*$/, ''));
-      setQueryString(queryString.replace(/And\s*$/, ''));
-      handleOk;
+      
+   
     }
+
+    const today = new Date();
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(today.getMonth() - 1);
 
     //check box 
     const [maNonExtendedchecked, setMaNonExtendedchecked] = useState(false);
@@ -220,7 +161,7 @@ const handleCheckedChange = (key) => {
                 <Button key="cancel" onClick={handleCancel}>
                   Cancel
                 </Button>,
-                <Button key="submit" type="primary" onClick={handleSubmit}>
+                <Button key="submit" type="primary" onClick={handleOk}>
                   Submit
                 </Button>,
                 ] }
