@@ -213,6 +213,7 @@ const QuotationView = () => {
     const currentQuotation = useRecoilValue(atomCurrentQuotation);
     const [ quotationContents, setQuotationContents ] = useState([]);
     const [ quotationTables, setQuotationTables ] = useState([]);
+    const [ viewSetting, setViewSetting ] = useState({});
 
     useEffect(() => {
         console.log('[QuotationView] called');
@@ -254,6 +255,14 @@ const QuotationView = () => {
                 tableHeaderInfos.push([index, tempObject.at(0), tableWidthPercent.toString()+'%']);
             });
             setQuotationTables(tableHeaderInfos);
+
+            // set Setting ------------------------
+            if(Number(currentQuotation.tax_amount) === 0){
+                const tempSetting = {
+                    vat_included : false,
+                };
+                setViewSetting(tempSetting);
+            };
         }
     }, [currentQuotation]);
 
@@ -355,7 +364,8 @@ const QuotationView = () => {
                         <View style={{width:'100%',height:20,margin:0,padding:1,borderTop:1,borderLeft:1,borderRight:1,flexGrow:0}}>
                             <Text style={Styles.textBold}>
                                     견적합계: 일금{ConvertKoreanAmount(currentQuotation.total_quotation_amount)}원정
-                                    ({ConvCurrencyMark(currentQuotation.currency)}{ConvertCurrency(currentQuotation.total_quotation_amount)})(VAT별도)
+                                    ({ConvCurrencyMark(currentQuotation.currency)}{ConvertCurrency(currentQuotation.total_quotation_amount)})
+                                    ({viewSetting.vat_included ? 'VAT포함' : 'VAT별도'})
                             </Text>
                         </View>
                     </View>
@@ -388,23 +398,54 @@ const QuotationView = () => {
                             )}
                         </View>
                     )}
-                    <View style={{width:'100%',height:25,margin:0,padding:0,borderTop:1,flexDirection:'row',flexGrow:0}}>
-                        <View style={{height:'100%',margin:0,padding:0,borderRight:1,flexGrow:1}}>
-                            <Text style={Styles.text}>{}</Text>
+                    {quotationTables.length > 0 &&
+                        <View style={{width:'100%',margin:0,padding:0,border:1,flexDirection:'column',flexGrow:0}}>
+                            <View style={{width:'100%',height:24,margin:0,padding:0,border:0,flexDirection:'row',flexGrow:0}}>
+                                <View style={{margin:0,padding:0,borderRight:1,flexGrow:1}}>
+                                    <Text style={Styles.text}>{}</Text>
+                                </View>
+                                
+                                <View key={quotationTables.at(-2).at(0)} style={{width: quotationTables.at(-2).at(2),margin:0,padding:0,borderRight:1,borderBottom:1,flexGrow:0, backgroundColor: '#aaaaaa'}} >
+                                    <Text style={Styles.text}>중간합계</Text>
+                                </View>
+                                <View key={quotationTables.at(-1).at(0)} style={{width: quotationTables.at(-1).at(2),margin:0,padding:0,borderBottom:1,flexGrow:0}} >
+                                    <Text style={Styles.text}>{ConvertCurrency(currentQuotation.sub_total_amount)}</Text>
+                                </View>
+                            </View>
+                            { viewSetting.vat_included &&
+                                <View style={{width:'100%',height:24,margin:0,padding:0,border:0,flexDirection:'row',flexGrow:0}}>
+                                    <View style={{margin:0,padding:0,borderRight:1,flexGrow:1}}>
+                                        <Text style={Styles.text}>{}</Text>
+                                    </View>
+                                    <View key={quotationTables.at(-2).at(0)} style={{width: quotationTables.at(-2).at(2),margin:0,padding:0,borderRight:1,borderBottom:1,flexGrow:0,backgroundColor: '#aaaaaa'}} >
+                                        <Text style={Styles.text}>부가세합계</Text>
+                                    </View>
+                                    <View key={quotationTables.at(-1).at(0)} style={{width: quotationTables.at(-1).at(2),margin:0,padding:0,borderBottom:1,flexGrow:0}} >
+                                        <Text style={Styles.text}>{ConvertCurrency(currentQuotation.tax_amount)}</Text>
+                                    </View>
+                                </View>}
+                            <View style={{width:'100%',height:24,margin:0,padding:0,border:0,flexDirection:'row',flexGrow:0}}>
+                                <View style={{margin:0,padding:0,borderRight:1,flexGrow:1}}>
+                                    <Text style={Styles.text}>{}</Text>
+                                </View>
+                                { quotationTables.length > 0 && <>
+                                    <View key={quotationTables.at(-2).at(0)} style={{width: quotationTables.at(-2).at(2),margin:0,padding:0,borderRight:1,flexGrow:0, backgroundColor: '#aaaaaa'}} >
+                                        <Text style={Styles.text}>견적합계</Text>
+                                    </View>
+                                    <View key={quotationTables.at(-1).at(0)} style={{width: quotationTables.at(-1).at(2),margin:0,padding:0,flexGrow:0}} >
+                                        <Text style={Styles.text}>{ConvertCurrency(currentQuotation.total_quotation_amount)}</Text>
+                                    </View>
+                                </>}
+                            </View>
                         </View>
-                        { quotationTables.length > 0 && <>
-                            <View key={quotationTables.at(-2).at(0)} style={{width: quotationTables.at(-2).at(2),height:'100%',margin:0,padding:0,borderRight:1,flexGrow:0, backgroundColor: '#aaaaaa'}} >
-                                <Text style={Styles.text}>견적합계</Text>
-                            </View>
-                            <View key={quotationTables.at(-1).at(0)} style={{width: quotationTables.at(-1).at(2),height:'100%',margin:0,padding:0,flexGrow:0}} >
-                                <Text style={Styles.text}>{ConvertCurrency(currentQuotation.total_quotation_amount)}</Text>
-                            </View>
-                        </>}
-                    </View>
-                    <View style={{width:'100%',height:25,margin:0,padding:0,borderTop:1,flexDirection:'row',flexGrow:0}}>
+                    }
+                    <View style={{width:'100%',height:25,margin:0,padding:0,borderLeft:1,borderRight:1,flexDirection:'row',flexGrow:0}}>
                         <View style={{height:'100%',margin:0,padding:0,flexGrow:1}}>
                             <Text style={Styles.text}>{currentQuotation.lower_memo}</Text>
                         </View>
+                    </View>
+                    <View style={{width:'100%',height:1,margin:0,padding:0,borderTop:1,flexGrow:0}} fixed>
+                        {}
                     </View>
                 </Page>
             </Document>
