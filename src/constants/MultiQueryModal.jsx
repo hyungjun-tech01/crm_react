@@ -84,13 +84,13 @@ const MultiQueryModal = (props) => {
 
     //  
     const dateRangeSettings = [
-      { label: t('purchase.registration_date'), stateKey: 'create_date', checked: false },
-     // { label: t('purchase.delivery_date'), stateKey: 'delivery_date', checked: false },
-     // { label: t('purchase.hq_finish_date'), stateKey: 'hq_finish_date', checked: false },
-     // { label: t('purchase.ma_finish_date'), stateKey: 'ma_finish_date', checked: false },
+      { label: t('purchase.registration_date'), stateKey: 'registration_date', checked: false },
+      { label: t('purchase.delivery_date'), stateKey: 'delivery_date', checked: false },
+      { label: t('purchase.hq_finish_date'), stateKey: 'hq_finish_date', checked: false },
+      { label: t('purchase.ma_finish_date'), stateKey: 'ma_finish_date', checked: false },
     ];
     const initialState = {
-      create_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
+      registration_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
       delivery_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
       hq_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
       ma_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
