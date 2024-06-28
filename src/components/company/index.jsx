@@ -68,26 +68,26 @@ const Company = () => {
     console.log("queryConditions", queryConditions);
     
     
-      let queryString = "";
-      for (const i of queryConditions){
-        console.log("i", i.companyColumn.value);
-        if( i.companyColumn.value !== undefined || i.companyColumn.value !== null || i.companyColumn.value !== ""){
-          if ( i.columnQueryCondition.value === "like")
-            queryString = queryString 
-                     + i.companyColumn.value + " "
-                     + i.columnQueryCondition.value + " "
-                     + "'%" + i.multiQueryInput + "%'" + " " + i.andOr + " ";
-          if ( i.columnQueryCondition.value === "is null" || i.columnQueryCondition.value === "is not null")
-            queryString = queryString 
-                    + i.companyColumn.value + " "
-                    + i.columnQueryCondition.value + " " + i.andOr + " ";
-          if ( i.columnQueryCondition.value === "=")
-            queryString = queryString 
-                     + i.companyColumn.value + " "
-                     + i.columnQueryCondition.value + " "
-                     + "'" + i.multiQueryInput + "'" + " " + i.andOr + " ";
-        }
-      }
+      // let queryString = "";
+      // for (const i of queryConditions){
+      //   console.log("i", i.companyColumn.value);
+      //   if( i.companyColumn.value !== undefined || i.companyColumn.value !== null || i.companyColumn.value !== ""){
+      //     if ( i.columnQueryCondition.value === "like")
+      //       queryString = queryString 
+      //                + i.companyColumn.value + " "
+      //                + i.columnQueryCondition.value + " "
+      //                + "'%" + i.multiQueryInput + "%'" + " " + i.andOr + " ";
+      //     if ( i.columnQueryCondition.value === "is null" || i.columnQueryCondition.value === "is not null")
+      //       queryString = queryString 
+      //               + i.companyColumn.value + " "
+      //               + i.columnQueryCondition.value + " " + i.andOr + " ";
+      //     if ( i.columnQueryCondition.value === "=")
+      //       queryString = queryString 
+      //                + i.companyColumn.value + " "
+      //                + i.columnQueryCondition.value + " "
+      //                + "'" + i.multiQueryInput + "'" + " " + i.andOr + " ";
+      //   }
+      // }
 
       const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
         label: key,
@@ -98,12 +98,12 @@ const Company = () => {
 
       console.log("checkedDates", checkedDates);
 
-      for (const i of checkedDates){
-        console.log(formatDate(i.fromDate), formatDate(i.toDate));
-        queryString = queryString
-                   +"(" + i.label + " between " 
-                   +"'"+ formatDate(i.fromDate) +"'" + " and " + "'" + formatDate(i.toDate) + "' )" +" And ";
-      }
+      // for (const i of checkedDates){
+      //   console.log(formatDate(i.fromDate), formatDate(i.toDate));
+      //   queryString = queryString
+      //              +"(" + i.label + " between " 
+      //              +"'"+ formatDate(i.fromDate) +"'" + " and " + "'" + formatDate(i.toDate) + "' )" +" And ";
+      // }
       // console.log('queryString:', queryString.replace(/And\s*$/, ''));
      
   };
