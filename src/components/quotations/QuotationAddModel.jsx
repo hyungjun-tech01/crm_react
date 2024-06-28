@@ -43,13 +43,13 @@ const QuotationAddModel = (props) => {
   const { modifyQuotation } = useRecoilValue(QuotationRepo);
 
 
-  //===== [RecoilState] Related with Lead =============================================
+  //===== [RecoilState] Related with Lead ============================================
   const leadsState = useRecoilValue(atomLeadState);
   const leadsForSelection = useRecoilValue(atomLeadsForSelection);
   const { loadAllLeads } = useRecoilValue(LeadRepo);
 
 
-  //===== [RecoilState] Related with Users ==========================================
+  //===== [RecoilState] Related with Users ===========================================
   const userState = useRecoilValue(atomUserState);
   const { loadAllUsers } = useRecoilValue(UserRepo)
   const usersForSelection = useRecoilValue(atomUsersForSelection);
@@ -1024,7 +1024,7 @@ const QuotationAddModel = (props) => {
                           handleModifyContent(record);
                         }, // click row
                     };
-                }}
+                  }}
                 />
               </div>
               <div className="form-group row">

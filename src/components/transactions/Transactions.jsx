@@ -9,7 +9,6 @@ import "../antdstyle.css";
 import TransactionDetailsModel from "./TransactionDetailsModel";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
-import "react-datepicker/dist/react-datepicker.css";
 
 import { MoreVert } from '@mui/icons-material';
 import { CompanyRepo } from "../../repository/company";
@@ -20,7 +19,7 @@ import { atomAllCompanies,
   atomCompanyState,
   atomTransationState,
 } from "../../atoms/atoms";
-import { compareCompanyName , compareText } from "../../constants/functions";
+import { compareCompanyName , compareText, ConvertCurrency } from "../../constants/functions";
 import TransactionAddModel from "./TransactionAddModel";
 import TransactionAddModel2 from "./TransactionAddModel2";
 import { useTranslation } from "react-i18next";
@@ -104,17 +103,17 @@ const Transactions = () => {
     {
       title: t('transaction.supply_price'),
       dataIndex: "supply_price",
-      render: (text, record) => <>{text}</>,
+      render: (text, record) => <>{ConvertCurrency(text)}</>,
     },
     {
       title: t('transaction.tax_price'),
       dataIndex: "tax_price",
-      render: (text, record) => <>{text}</>,
+      render: (text, record) => <>{ConvertCurrency(text)}</>,
     },
     {
       title: t('transaction.total_price'),
       dataIndex: "total_price",
-      render: (text, record) => <>{text}</>,
+      render: (text, record) => <>{ConvertCurrency(text)}</>,
     },
     {
       title: t('transaction.publish_type'),

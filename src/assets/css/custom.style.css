@@ -281,6 +281,27 @@
     padding: 10px;
     background-color: white;
 }
+.trans_receiver
+{
+    border: 2px solid #ff5522;
+    border-bottom: 0;
+    display: flex;
+    align-items: stretch;
+}
+.trans_rec_item
+{
+    height: 42px;
+    border-bottom: 2px solid #ff5522;
+}
+.trans_rec_title
+{
+    border-right: 2px solid #ff5522;
+    text-align: center;
+}
+.trans_rec_content
+{
+    border-right: 2px solid #ff5522;
+}
 .trans_title
 {
     font-size: 32px;
@@ -349,4 +370,16 @@
 .trans_border_right
 {
     border-right: 2px solid #ff5522;
+}
+.trans_select
+{
+    width: 250px;
+    height: 35px;
+}
+.trans_date
+{
+    width: 250px;
+    height: 35px;
+    border-radius: 5px;
+    border: 1px solid black;
 }
