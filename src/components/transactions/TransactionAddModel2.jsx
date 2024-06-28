@@ -4,7 +4,7 @@ import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "antd/dist/reset.css";
-import { Col, Row, Table } from 'antd';
+import { Button, Checkbox, Col, Row, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import DatePicker from "react-datepicker";
@@ -36,54 +36,40 @@ const default_transaction_content = {
   "modify_date": null,
 };
 
-const trans_key_to_name = {
-  "transaction_code": '거래코드',
-  "month_day": '월일',
-  "product_name": '품목',
-  "standard": '규격',
-  "unit": '단위',
-  "quantity": '수량',
-  "unit_price": '단가',
-  "supply_price": '공급가액',
-  "tax_price": '세액',
-  "total_price": '합계금액',
-  "memo": '비고',
-  "trasaction_sub_index": '순번',
-  "lead_code": '거래처코드',
-  "company_name": '거래처명',
-  "statement_number": '전표번호',
-  "transaction_sub_type": '구분',
-  "modify_date": '날짜',
-};
-
 const TransactionAddModel = (props) => {
   const { init, handleInit } = props;
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const allLeadData = useRecoilValue(atomAllLeads);
   const { loadAllLeads } = useRecoilValue(LeadRepo);
   const { modifyTransaction } = useRecoilValue(TransactionRepo);
-  const [ cookies] = useCookies(["myLationCrmUserId"]);
+  const [cookies] = useCookies(["myLationCrmUserId"]);
   const { t } = useTranslation();
 
-  const [ leadsForSelection, setLeadsForSelection ] = useState([]);
-  const [ selectedCompany, setSelectedCompany ] = useState(null);
-  const [ transactionChange, setTransactionChange ] = useState(null);
-  const [ publishDate, setPublishDate ] = useState(new Date());
+  const [leadsForSelection, setLeadsForSelection] = useState([]);
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [transactionChange, setTransactionChange] = useState(null);
+  const [publishDate, setPublishDate] = useState(new Date());
 
-  const [ transactionContents, setTransactionContents ] = useState([]);
-  const [ temporaryContent, setTemporaryContent ] = useState(null);
-  const [ selectedRows, setSelectedRows ] = useState([]);
+  const [transactionContents, setTransactionContents] = useState([]);
+  const [temporaryContent, setTemporaryContent] = useState(null);
+  const [selectedRows, setSelectedRows] = useState([]);
 
-  const [ supplyPrice, setSupplyPrice ] = useState(0);
-  const [ taxyPrice, setTaxPrice ] = useState(0);
-  const [ totalPrice, setTotalPrice ] = useState(0);
+  const [supplyPrice, setSupplyPrice] = useState(0);
+  const [taxyPrice, setTaxPrice] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [isSale, setIsSale] = useState(true);
 
-  
+  const trans_types = [
+    { value: '매출', label: t('company.deal_type_sales') },
+    { value: '매입', label: t('company.deal_type_purchase') },
+  ];
+
+
   // --- Functions / Variables dealing with editing -------------------------------
   const selectLeadRef = useRef(null);
 
-  const handleSelectLead= useCallback((value) => {
-    if(value) {
+  const handleSelectLead = useCallback((value) => {
+    if (value) {
       const tempChanges = {
         ...transactionChange,
         lead_code: value.value.lead_code,
@@ -173,20 +159,10 @@ const TransactionAddModel = (props) => {
       dataIndex: 'modify_date',
       render: (text, record) => <>{text}</>,
     },
-    {
-      title: t('common.edit'),
-      render: (text, record) => (
-        <div className="dropdown dropdown-action text-center">
-          <ModeEdit onClick={() => {
-            handleLoadSelectedContent(record);
-          }} />
-        </div>
-      ),
-    },
   ];
 
   const handleLoadNewTemporaryContent = useCallback(() => {
-    if(!transactionChange.company_name) {
+    if (!transactionChange.company_name) {
       console.log('\t[handleLoadNewTemporaryContent] No company is selected');
       return;
     };
@@ -203,13 +179,13 @@ const TransactionAddModel = (props) => {
     setTemporaryContent(data);
   }, [setTemporaryContent]);
 
-  const handleDeleteSelectedConetents = useCallback(()=>{
-    if(selectedRows.length === 0) {
+  const handleDeleteSelectedConetents = useCallback(() => {
+    if (selectedRows.length === 0) {
       console.log('\t[handleDeleteSelectedConetents] No row is selected');
       return;
     };
 
-    let tempContents=[
+    let tempContents = [
       ...transactionContents
     ];
     selectedRows.forEach(row => {
@@ -223,7 +199,7 @@ const TransactionAddModel = (props) => {
       temp_supply_price += item.supply_price;
       temp_tax_price += item.tax_price;
       temp_total_price += item.total_price;
-      return { ...item, trasaction_sub_index: index};
+      return { ...item, trasaction_sub_index: index };
     });
     const tempTransaction = {
       ...transactionChange,
@@ -241,45 +217,45 @@ const TransactionAddModel = (props) => {
     let tempContent = {
       ...temporaryContent
     };
-    if(event.target.name === 'unit_price') {
+    if (event.target.name === 'unit_price') {
       temp_value = Number(event.target.value);
-      if(isNaN(temp_value)) {
+      if (isNaN(temp_value)) {
         console.log('\t[ handleEditTemporaryContent ] Wrong input value');
         return;
       };
-      if(temp_value !== 0) {
+      if (temp_value !== 0) {
         tempContent.unit_price = temp_value;
-        if(tempContent.quantity !== 0) {
+        if (tempContent.quantity !== 0) {
           tempContent.supply_price = temp_value * tempContent.quantity;
-          tempContent.tax_price = tempContent.supply_price*0.1;
+          tempContent.tax_price = tempContent.supply_price * 0.1;
           tempContent.total_price = tempContent.supply_price + tempContent.tax_price;
           setSupplyPrice(tempContent.supply_price);
           setTaxPrice(tempContent.tax_price);
           setTotalPrice(tempContent.total_price);
         };
       }
-    } else if(event.target.name === 'quantity'){
+    } else if (event.target.name === 'quantity') {
       temp_value = Number(event.target.value);
-      if(isNaN(temp_value)) {
+      if (isNaN(temp_value)) {
         console.log('\t[ handleEditTemporaryContent ] Wrong input value');
         return;
       };
-      if(temp_value !== 0) {
+      if (temp_value !== 0) {
         tempContent.quantity = temp_value;
-        if(tempContent.unit_price !== 0) {
+        if (tempContent.unit_price !== 0) {
           tempContent.supply_price = temp_value * tempContent.unit_price;
-          tempContent.tax_price = tempContent.supply_price*0.1;
+          tempContent.tax_price = tempContent.supply_price * 0.1;
           tempContent.total_price = tempContent.supply_price + tempContent.tax_price;
           setSupplyPrice(tempContent.supply_price);
           setTaxPrice(tempContent.tax_price);
           setTotalPrice(tempContent.total_price);
         };
       }
-      
+
     } else {
       tempContent[event.target.name] = event.target.value;
     }
-    
+
     setTemporaryContent(tempContent);
   }, [temporaryContent, setTemporaryContent]);
 
@@ -342,8 +318,9 @@ const TransactionAddModel = (props) => {
     setPublishDate(null);
     setSelectedCompany(null);
     setTransactionContents([]);
+    setIsSale(true);
 
-    if(selectLeadRef.current)
+    if (selectLeadRef.current)
       selectLeadRef.current.clearValue();
 
     document.querySelector("#add_new_transaction_form").reset();
@@ -397,10 +374,10 @@ const TransactionAddModel = (props) => {
     if (allLeadData.length === 0) {
       loadAllLeads();
     } else {
-      if(allCompanyData.length > 0) {
+      if (allCompanyData.length > 0) {
         const temp_data = allLeadData.map(lead => {
           const foundIdx = allCompanyData.findIndex(com => com.company_code === lead.company_code);
-          if(foundIdx !== -1) {
+          if (foundIdx !== -1) {
             const foundCompany = allCompanyData[foundIdx];
             return {
               label: lead.lead_name + " / " + lead.company_name,
@@ -445,7 +422,7 @@ const TransactionAddModel = (props) => {
     };
 
     // ----- Initialize template to store values -----
-    if(init) initializeTransactionTemplate();
+    if (init) initializeTransactionTemplate();
 
   }, [allLeadData, init]);
 
@@ -484,63 +461,98 @@ const TransactionAddModel = (props) => {
                 <Row>
                   <Col flex={13}>
                     <Row justify="space-around" align="middle">
-                      <Col>거래명세서</Col>
+                      <Col className="trans_title">{t("transaction.statement_of_account")}</Col>
                     </Row>
                     <Row justify="space-around" align="middle">
-                      <Col>
-                        <Row>
-                          <Col>구분: 매출 / 발행일자 : 2024년 6월 25일</Col>
+                      <Col flex={2}>
+                        <Row justify='end' style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
+                          <Col>{t('common.type2')} : </Col>
                         </Row>
-                        <Row>
-                          <Col>거래처명: 신도리코 / 검색, 목록, 추가</Col>
+                        <Row justify='end' style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
+                          <Col>{t('transaction.customer_name')}: </Col>
+                        </Row>
+                      </Col>
+                      <Col flex={3}>
+                        <Row justify='space-between' style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
+                          <Col>
+                            <select name='type' onChange={(e)=>{
+                              if(e.target.value==='sale'){
+                                setIsSale(true);
+                              }else{setIsSale(false)}}}
+                            >
+                              <option value='sale'>매출</option>
+                              <option value='purchase'>매입</option>
+                            </select>
+                          </Col>
+                          <Col>{t('transaction.publish_date')} : </Col>
+                        </Row>
+                        <Row style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
+                          <Col><input type="text" /></Col>
+                        </Row>
+                      </Col>
+                      <Col flex={3}>
+                        <Row style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
+                          <Col><DatePicker /></Col>
+                        </Row>
+                        <Row style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
+                          <Col>
+                            <Button>{t('common.search')}</Button>
+                            <Button>{t('common.list')}</Button>
+                            <Button>{t('common.add')}</Button>
+                          </Col>
                         </Row>
                       </Col>
                     </Row>
-                  </Col>                      
-                  <Col flex={11} className="trans_cell">
-                    <Row>
-                      <Col flex='30px' className="trans_cell" >공 급 받 는 자</Col>
-                      <Col flex='auto'>
-                        <Row align='stretch'>
-                          <Col flex='125px' className="trans_cell">등록번호</Col>
-                          <Col flex='auto' className="trans_cell">656-40-01152 / 등록정보</Col>
-                        </Row>
-                        <Row>
-                          <Col flex='125px' className="trans_cell">상호(법인명)</Col>
-                          <Col flex='auto' className="trans_cell">마이레이션 / 성명 : 이길재</Col>
-                          </Row>
-                        <Row>
-                          <Col flex='125px' className="trans_cell">사업장주소</Col>
-                          <Col flex='auto' className="trans_cell">서울금천구 가산동.......</Col>
-                          </Row>
-                        <Row>
-                          <Col flex='125px' className="trans_cell">업 태</Col>
-                          <Col flex='auto' className="trans_cell">정보통신업 및 도매 / 종목 : 응용 소프트웨어 개발 및 판매</Col>
-                          </Row>
-                      </Col>
-                    </Row>
+                  </Col>
+                  <Col flex={10} style={{ border: '2px solid #ff5522', borderBottom: 0, display: 'flex', alignItems: 'stretch' }}>
+                    <Col flex='25px' style={{ width: 25, borderRight: '2px solid #ff5522',textAlign:'center' }} >{t('transaction.receiver')}</Col>
+                    <Col flex='auto' align='strech'>
+                      <Row style={{ height: 42, borderBottom: '2px solid #ff5522' }}>
+                        <Col flex='125px' style={{ borderRight: '2px solid #ff5522',textAlign:'center'}}>{t('transaction.register_no')}</Col>
+                        <Col flex='auto'><input type='text' /></Col>
+                      </Row>
+                      <Row style={{ height: 42, borderBottom: '2px solid #ff5522' }}>
+                        <Col flex='125px' style={{ borderRight: '2px solid #ff5522',textAlign:'center' }}>{t('transaction.company_name')}</Col>
+                        <Col flex={1} style={{ borderRight: '2px solid #ff5522' }}><input type='text' /></Col>
+                        <Col flex='25px' style={{ borderRight: '2px solid #ff5522',textAlign:'center' }}>{t('common.name2')}</Col>
+                        <Col flex={1}><input type='text' /></Col>
+                      </Row>
+                      <Row style={{ height: 42, borderBottom: '2px solid #ff5522' }}>
+                        <Col flex='125px' style={{ borderRight: '2px solid #ff5522',textAlign:'center' }}>{t('transaction.address')}</Col>
+                        <Col flex='auto'><input type='text' /></Col>
+                      </Row>
+                      <Row style={{ height: 42 }}>
+                        <Col flex='125px' style={{ borderRight: '2px solid #ff5522',textAlign:'center' }}>{t('company.business_type')}</Col>
+                        <Col flex={1} style={{ borderRight: '2px solid #ff5522' }}><input type='text' /></Col>
+                        <Col flex='25px' style={{ borderRight: '2px solid #ff5522',textAlign:'center' }}>{t('company.business_item')}</Col>
+                        <Col flex={1}><input type='text' /></Col>
+                      </Row>
+                    </Col>
+                  </Col>
+                </Row>
+                <Row align='middle'>
+                  <Col flex={13} className={`trans_cell_left ${!isSale && "trans_pur"}`}>
+                    <Button>열추가</Button>
+                    <Button>품목추가</Button>
+                    <Button>(세금)계산서</Button>
+                    <Button>열삽입</Button>
+                    <Button>삭제</Button>
+                  </Col>
+                  <Col flex={12} className={`trans_cell_right ${!isSale && "trans_pur"}`}>
+                    <div style={{ flexGrow: 1 }}>과세구분 : </div>
+                    <div style={{ flexGrow: 3 }}>
+                      <select name='vat_type'>
+                        <option value='vat_excluded'>{t('quotation.vat_excluded')}</option>
+                        <option value='vat_included'>{t('quotation.vat_included')}</option>
+                      </select>
+                    </div>
+                    <div style={{ flexGrow: 3 }}>
+                      <Checkbox>소수점</Checkbox>
+                    </div>
                   </Col>
                 </Row>
                 <Row>
-                  <Col  flex={13} className="trans_cell">
-                    <Row>
-                      <Col flex='auto'>열추가/품목추가/세금계산서</Col>
-                    </Row>
-                    <Row>
-                      <Col flex='auto'>열삽입/삭제</Col>
-                    </Row>
-                  </Col>
-                  <Col  flex={11} className="trans_cell">
-                    <Row>
-                      <Col flex='auto'>과세구분: 부가세별도</Col>
-                    </Row>
-                    <Row>
-                      <Col flex='auto'>소수점(자동)</Col>
-                    </Row>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col flex='auto' className="trans_table">
+                  <Col flex='auto' className={`trans_table ${!isSale && "trans_pur"}`}>
                     <Table
                       rowSelection={{
                         ...rowSelection,
@@ -561,29 +573,61 @@ const TransactionAddModel = (props) => {
                   </Col>
                 </Row>
                 <Row>
-                  <Col flex={5} style={{borderLeft:'2px solid #ff5522'}}>
-                    <Row><Col flex='auto' className="trans_title right">전잔액</Col></Row>
-                    <Row><Col flex='auto' className="trans_amount">0</Col></Row>
-                    <Row><Col flex='auto' className="trans_title right">입금</Col></Row>
-                    <Row><Col flex='auto' className="trans_amount">0</Col></Row>
+                  <Col flex={5} className={`trans_border_left ${!isSale && "trans_pur"}`}>
+                    <Row>
+                    <Col flex='auto' className="trans_amt_title right">
+                        {t('transaction.balance_prev')}
+                      </Col>
+                    </Row>
+                    <Row><Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>0</Col></Row>
+                    <Row>
+                    <Col flex='auto' className="trans_amt_title right">
+                        {t('transaction.receipt')}
+                      </Col>
+                    </Row>
+                    <Row><Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>0</Col></Row>
                   </Col>
                   <Col flex={5}>
-                    <Row><Col flex='auto' className="trans_title right">공급가액</Col></Row>
-                    <Row><Col flex='auto' className="trans_amount">0</Col></Row>
-                    <Row><Col flex='auto' className="trans_title right">총잔액</Col></Row>
-                    <Row><Col flex='auto' className="trans_amount">0</Col></Row>
+                    <Row>
+                    <Col flex='auto' className="trans_amt_title right">
+                        {t('transaction.supply_price')}
+                      </Col>
+                    </Row>
+                    <Row><Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>0</Col></Row>
+                    <Row>
+                    <Col flex='auto' className="trans_amt_title right">
+                        {t('transaction.balance_total')}
+                      </Col>
+                    </Row>
+                    <Row><Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>0</Col></Row>
                   </Col>
                   <Col flex={5}>
-                    <Row><Col flex='auto' className="trans_title right">세액</Col></Row>
-                    <Row><Col flex='auto' className="trans_amount">0</Col></Row>
-                    <Row><Col flex='auto' className="trans_title right">인수자</Col></Row>
-                    <Row><Col flex='auto' className="trans_amount">0</Col></Row>
+                    <Row>
+                      <Col flex='auto' className="trans_amt_title right">
+                        {t('transaction.tax_price')}
+                      </Col>
+                    </Row>
+                    <Row><Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>0</Col></Row>
+                    <Row>
+                      <Col flex='auto' className="trans_amt_title right ">
+                        {t('transaction.receiver2')}
+                      </Col>
+                    </Row>
+                    <Row><Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>0</Col></Row>
                   </Col>
-                  <Col flex={5} style={{borderRight:'2px solid #ff5522'}}>
-                    <Row><Col flex='auto' className="trans_title">합계금액</Col></Row>
-                    <Row><Col flex='auto' className="trans_amount_right">0</Col></Row>
-                    <Row><Col flex='auto' className="trans_title">현재/전체/Page</Col></Row>
-                    <Row><Col flex='auto' className="trans_amount_right">0</Col></Row>
+                  <Col flex={5} className={`trans_border_right ${!isSale && "trans_pur"}`}>
+                    <Row>
+                      <Col flex='auto' className="trans_amt_title">
+                        {t('transaction.sum_price')}
+                      </Col>
+                    </Row>
+                    <Row><Col flex='auto' className={`trans_amt ${!isSale && "trans_pur"}`}>0</Col></Row>
+                    <Row>
+                    <Col flex='auto' className="trans_amt_title">
+                        {t('transaction.trans_pages')}
+                      </Col>
+                    </Row>
+                    <Row><Col flex='auto' className={`trans_amt ${!isSale && "trans_pur"}`}>0</Col></Row>
                   </Col>
                 </Row>
               </div>
