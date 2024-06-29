@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { useTranslation } from "react-i18next";
@@ -19,7 +19,8 @@ import { formatDate } from "../../constants/functions";
 
 
 const Company = () => {
-  const companyState = useRecoilValue(atomCompanyState);
+  //const companyState = useRecoilValue(atomCompanyState);
+  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
   const { loadAllCompanies, filterCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const filteredCompany = useRecoilValue(atomFilteredCompany);
@@ -62,49 +63,30 @@ const Company = () => {
     setMultiQueryModal(true);
   }
   const handleMultiQueryModalOk = () => {
+
+    setCompanyState(0);
     setMultiQueryModal(false);
 
     // query condition 세팅 후 query
     console.log("queryConditions", queryConditions);
     
-    
-      // let queryString = "";
-      // for (const i of queryConditions){
-      //   console.log("i", i.companyColumn.value);
-      //   if( i.companyColumn.value !== undefined || i.companyColumn.value !== null || i.companyColumn.value !== ""){
-      //     if ( i.columnQueryCondition.value === "like")
-      //       queryString = queryString 
-      //                + i.companyColumn.value + " "
-      //                + i.columnQueryCondition.value + " "
-      //                + "'%" + i.multiQueryInput + "%'" + " " + i.andOr + " ";
-      //     if ( i.columnQueryCondition.value === "is null" || i.columnQueryCondition.value === "is not null")
-      //       queryString = queryString 
-      //               + i.companyColumn.value + " "
-      //               + i.columnQueryCondition.value + " " + i.andOr + " ";
-      //     if ( i.columnQueryCondition.value === "=")
-      //       queryString = queryString 
-      //                + i.companyColumn.value + " "
-      //                + i.columnQueryCondition.value + " "
-      //                + "'" + i.multiQueryInput + "'" + " " + i.andOr + " ";
-      //   }
-      // }
-
-      const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
         label: key,
         fromDate: dates[key].fromDate,
         toDate: dates[key].toDate,
         checked: dates[key].checked,
-      }));
+    }));
 
-      console.log("checkedDates", checkedDates);
+    console.log("checkedDates", checkedDates);
 
-      // for (const i of checkedDates){
-      //   console.log(formatDate(i.fromDate), formatDate(i.toDate));
-      //   queryString = queryString
-      //              +"(" + i.label + " between " 
-      //              +"'"+ formatDate(i.fromDate) +"'" + " and " + "'" + formatDate(i.toDate) + "' )" +" And ";
-      // }
-      // console.log('queryString:', queryString.replace(/And\s*$/, ''));
+      const multiQueryCondi = {
+        queryConditions:queryConditions,
+        checkedDates:checkedDates,
+        singleDate:null
+      }
+
+      loadAllCompanies(multiQueryCondi);
+
      
   };
   const handleMultiQueryModalCancel = () => {
@@ -115,13 +97,6 @@ const Company = () => {
     console.log('handleQueryString', multiQueryString);
   }
 
-
-  const handleStatusSearch = (newValue) => {
-    setStatusSearch(newValue);
-    loadAllCompanies();
-
-    setSearchCondition("");
-  };
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
@@ -184,9 +159,16 @@ const Company = () => {
   useEffect(() => {   
     console.log('Company called!');
     if((companyState & 1) === 0) {
-      loadAllCompanies();
+
+      const multiQueryCondi = {
+        queryConditions:null,
+        checkedDates:null,
+        singleDate:null
+      }
+      loadAllCompanies(multiQueryCondi);
     };
-  }, [companyState, loadAllCompanies]);
+  }, []);
+  //}, [companyState, loadAllCompanies]);
 
   return (
     <HelmetProvider>
