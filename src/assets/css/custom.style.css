@@ -293,6 +293,10 @@
     height: 42px;
     border-bottom: 2px solid #ff5522;
 }
+.trans_rec_item_last
+{
+    height: 40px;
+}
 .trans_rec_title
 {
     border-right: 2px solid #ff5522;

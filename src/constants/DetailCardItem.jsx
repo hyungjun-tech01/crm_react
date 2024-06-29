@@ -136,7 +136,7 @@ const DetailCardItem = (props) => {
     const SharedProps = {
         name: name,
         addonBefore: <div className='detail-card-before'>{title}</div>,
-        value: detail.price ? ConvertCurrency(currentValue, detail.decimal ? true : false) : currentValue,
+        value: currentValue,
         disabled: detail.disabled ? detail.disabled : false,
     };
 
