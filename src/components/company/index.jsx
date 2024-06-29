@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { useTranslation } from "react-i18next";
@@ -19,7 +19,8 @@ import { formatDate } from "../../constants/functions";
 
 
 const Company = () => {
-  const companyState = useRecoilValue(atomCompanyState);
+  //const companyState = useRecoilValue(atomCompanyState);
+  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
   const { loadAllCompanies, filterCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const filteredCompany = useRecoilValue(atomFilteredCompany);
@@ -41,13 +42,14 @@ const Company = () => {
   const oneMonthAgo = new Date();
   oneMonthAgo.setMonth(today.getMonth() - 1);
 
+  // from date + to date picking 만들기 
+
   const initialState = {
     registration_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
     delivery_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
     hq_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
     ma_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
   };
-
 
   const [dates, setDates] = useState(initialState);
 
@@ -58,70 +60,53 @@ const Company = () => {
     { label: t('purchase.ma_finish_date'), stateKey: 'ma_finish_date', checked: false },
   ];
 
+
+  // from date date 1개짜리 picking 만들기 
+  const initialSingleDate = {
+    ma_non_extended: { fromDate: oneMonthAgo,  checked: false },  
+  };
+
+  const [singleDate, setSingleDate] = useState(initialSingleDate);
+
+  const singleDateSettings = [
+    { label: t('company.ma_non_extended'), stateKey: 'ma_non_extended', checked: false },
+  ];
+
+
   const handleMultiQueryModal = () => {
     setMultiQueryModal(true);
   }
   const handleMultiQueryModalOk = () => {
+
+    setCompanyState(0);
     setMultiQueryModal(false);
 
     // query condition 세팅 후 query
     console.log("queryConditions", queryConditions);
     
-    
-      // let queryString = "";
-      // for (const i of queryConditions){
-      //   console.log("i", i.companyColumn.value);
-      //   if( i.companyColumn.value !== undefined || i.companyColumn.value !== null || i.companyColumn.value !== ""){
-      //     if ( i.columnQueryCondition.value === "like")
-      //       queryString = queryString 
-      //                + i.companyColumn.value + " "
-      //                + i.columnQueryCondition.value + " "
-      //                + "'%" + i.multiQueryInput + "%'" + " " + i.andOr + " ";
-      //     if ( i.columnQueryCondition.value === "is null" || i.columnQueryCondition.value === "is not null")
-      //       queryString = queryString 
-      //               + i.companyColumn.value + " "
-      //               + i.columnQueryCondition.value + " " + i.andOr + " ";
-      //     if ( i.columnQueryCondition.value === "=")
-      //       queryString = queryString 
-      //                + i.companyColumn.value + " "
-      //                + i.columnQueryCondition.value + " "
-      //                + "'" + i.multiQueryInput + "'" + " " + i.andOr + " ";
-      //   }
-      // }
-
-      const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
         label: key,
         fromDate: dates[key].fromDate,
         toDate: dates[key].toDate,
         checked: dates[key].checked,
-      }));
+    }));
 
-      console.log("checkedDates", checkedDates);
+    console.log("checkedDates", checkedDates);
 
-      // for (const i of checkedDates){
-      //   console.log(formatDate(i.fromDate), formatDate(i.toDate));
-      //   queryString = queryString
-      //              +"(" + i.label + " between " 
-      //              +"'"+ formatDate(i.fromDate) +"'" + " and " + "'" + formatDate(i.toDate) + "' )" +" And ";
-      // }
-      // console.log('queryString:', queryString.replace(/And\s*$/, ''));
+      const multiQueryCondi = {
+        queryConditions:queryConditions,
+        checkedDates:checkedDates,
+        singleDate:null
+      }
+
+      loadAllCompanies(multiQueryCondi);
+
      
   };
   const handleMultiQueryModalCancel = () => {
     setMultiQueryModal(false);
   };
-  const handleQueryString=(a) => {
-    setMultiQueryString(a);
-    console.log('handleQueryString', multiQueryString);
-  }
 
-
-  const handleStatusSearch = (newValue) => {
-    setStatusSearch(newValue);
-    loadAllCompanies();
-
-    setSearchCondition("");
-  };
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
@@ -184,9 +169,16 @@ const Company = () => {
   useEffect(() => {   
     console.log('Company called!');
     if((companyState & 1) === 0) {
-      loadAllCompanies();
+
+      const multiQueryCondi = {
+        queryConditions:null,
+        checkedDates:null,
+        singleDate:null
+      }
+      loadAllCompanies(multiQueryCondi);
     };
-  }, [companyState, loadAllCompanies]);
+  }, []);
+  //}, [companyState, loadAllCompanies]);
 
   return (
     <HelmetProvider>
@@ -432,12 +424,14 @@ const Company = () => {
           open={multiQueryModal}
           handleOk={handleMultiQueryModalOk}
           handleCancel={handleMultiQueryModalCancel}
-          setQueryString={handleQueryString}
           queryConditions={queryConditions}
           setQueryConditions={setQueryConditions}
           dates={dates}
           setDates={setDates}
           dateRangeSettings={dateRangeSettings}
+          singleDate={singleDate}
+          setSingleDate={setSingleDate}
+          singleDateSettings={singleDateSettings}
         />
       </div>
     </HelmetProvider>

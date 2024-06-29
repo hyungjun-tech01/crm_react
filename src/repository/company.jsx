@@ -32,18 +32,27 @@ export const companyColumn = [
 export const CompanyRepo = selector({
     key: "CompanyRepository",
     get: ({getCallback}) => {
-        const loadAllCompanies = getCallback(({set, snapshot}) => async () => {
+        const loadAllCompanies = getCallback(({set, snapshot}) => async (multiQueryCondi) => {
             // It is possible that this function might be called by more than two componets almost at the same time.
             // So, to prevent this function from being executed again and again, check the loading state at first.
             // (State & 1) : check if data is already loaded
             // (State & (1 << 1)) : check if it is on the way to load data.
             const loadStates = await snapshot.getPromise(atomCompanyState);
+            const input_json = JSON.stringify(multiQueryCondi);
+
             if((loadStates & 1) === 0 && (loadStates & (1 << 1)) === 0){
                 try{
                     console.log('[CompanyRepository] Try loading all');
                     set(atomCompanyState, (loadStates | (1 << 1)));
                     
-                    const response = await fetch(`${BASE_PATH}/companies`);
+                    //const response = await fetch(`${BASE_PATH}/companies`);
+                    const response = await fetch(`${BASE_PATH}/companies`, {
+                        method: "POST",
+                        headers:{'Content-Type':'application/json'},
+                        body: input_json,
+                    });
+    
+
                     const data = await response.json();
                     set(atomCompanyState, (loadStates & ~(1 << 1)));
                     if(data.message){

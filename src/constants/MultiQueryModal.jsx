@@ -66,8 +66,27 @@ const DateRangePicker = ({ checked, onChange, label, fromDate, toDate, handleFro
   </div>
 );
 
+const SingleDatePicker = ({ checked, onChange, label, fromDate, handleFromDateChange }) => (
+  <div style={{ display: 'flex', alignItems: 'center' }}>
+    <div style={{ width: '200px' }}>
+      <Checkbox checked={checked}  onChange={()=>{onChange(!checked)}} style={{ width: '200px' }}>
+        {label}
+      </Checkbox>
+    </div>
+    <div style={{ width: '150px', marginRight: '3px' }}>
+      <DatePicker
+        className="basic-date"
+        selected={fromDate}
+        onChange={handleFromDateChange}
+        dateFormat="yyyy-MM-dd"
+      />
+    </div>
+  </div>
+);
+
+
 const MultiQueryModal = (props) => {
-    const {  open, title, handleOk, handleCancel, setQueryString, queryConditions, setQueryConditions, dates, setDates, dateRangeSettings } = props;
+    const {  open, title, handleOk, handleCancel, queryConditions, setQueryConditions, dates, setDates, dateRangeSettings, singleDate , setSingleDate, singleDateSettings} = props;
 
     const { t } = useTranslation();
 
@@ -104,22 +123,17 @@ const MultiQueryModal = (props) => {
       setQueryConditions(newConditions);
     }
 
-    const handleSubmit = () => {
-      
-   
-    }
-
     const today = new Date();
     const oneMonthAgo = new Date();
     oneMonthAgo.setMonth(today.getMonth() - 1);
 
     //check box 
-    const [maNonExtendedchecked, setMaNonExtendedchecked] = useState(false);
-    // date 
-    const [maNonExtendedDate, setMaNonExtendDate] = useState(oneMonthAgo);
-    const handleMaNonExtendedDate = useCallback((date) => {
-      setMaNonExtendDate(date);
-    }, []);   
+    // const [maNonExtendedchecked, setMaNonExtendedchecked] = useState(false);
+    // // date 
+    // const [maNonExtendedDate, setMaNonExtendDate] = useState(oneMonthAgo);
+    // const handleMaNonExtendedDate = useCallback((date) => {
+    //   setMaNonExtendDate(date);
+    // }, []);   
 
 
 const handleDateChange = (key, dateType, date) => {
@@ -138,6 +152,34 @@ const handleDateChange = (key, dateType, date) => {
 
 const handleCheckedChange = (key) => {
   setDates((prevDates) => {
+    const updatedDates = {
+      ...prevDates,
+      [key]: {
+        ...prevDates[key],
+        checked: !prevDates[key].checked,
+      },
+    };
+    console.log(`Updated checked state for ${key}:`, updatedDates[key].checked);
+    return updatedDates;
+  });
+};
+
+const handleSingleDateChange = (key, dateType, date) => {
+  setSingleDate((prevDates) => {
+    const updatedDates = {
+      ...prevDates,
+      [key]: {
+        ...prevDates[key],
+        [dateType]: date,
+      },
+    };
+    console.log(`Updated dates for ${key}:`, updatedDates[key]);
+    return updatedDates;
+  });
+};
+
+const handleSingleCheckedChange = (key) => {
+  setSingleDate((prevDates) => {
     const updatedDates = {
       ...prevDates,
       [key]: {
@@ -211,23 +253,20 @@ const handleCheckedChange = (key) => {
                   />
                 </div>
               ))}
-              <div style={{ display: 'flex', alignItems: 'center' }}> 
-                <div style={{ width: '200px' }}>
-                  <Checkbox checked={maNonExtendedchecked}  onChange={()=>setMaNonExtendedchecked(!maNonExtendedchecked)} style={{width:'200px'}}>
-                    {t('company.ma_non_extended')} : 
-                  </Checkbox>
-                </div>
-                <div style={{ width: '150px',marginRight:'3px'}}>
-                  <DatePicker
-                      className="basic-date"
-                      name = 'maNonExtendedDate'           
-                      selected={maNonExtendedDate}
-                      onChange={handleMaNonExtendedDate}
-                      dateFormat="yyyy-MM-dd"
-                  /> 
-                </div>
-              </div>                                                                 
 
+              {singleDateSettings.map((setting) => (
+                <div key={setting.stateKey}>
+                  <SingleDatePicker
+                    checked={singleDate[setting.stateKey].checked}
+                    onChange={() => handleSingleCheckedChange(setting.stateKey)}
+                    label={setting.label}
+                    fromDate={singleDate[setting.stateKey].fromDate}
+                    handleFromDateChange={(date) => handleSingleDateChange(setting.stateKey, 'fromDate', date)}
+                  />
+                </div>
+              ))}
+
+                                                             
         </Modal>
     );
 
