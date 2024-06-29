@@ -42,13 +42,14 @@ const Company = () => {
   const oneMonthAgo = new Date();
   oneMonthAgo.setMonth(today.getMonth() - 1);
 
+  // from date + to date picking 만들기 
+
   const initialState = {
     registration_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
     delivery_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
     hq_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
     ma_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
   };
-
 
   const [dates, setDates] = useState(initialState);
 
@@ -58,6 +59,19 @@ const Company = () => {
     { label: t('purchase.hq_finish_date'), stateKey: 'hq_finish_date', checked: false },
     { label: t('purchase.ma_finish_date'), stateKey: 'ma_finish_date', checked: false },
   ];
+
+
+  // from date date 1개짜리 picking 만들기 
+  const initialSingleDate = {
+    ma_non_extended: { fromDate: oneMonthAgo,  checked: false },  
+  };
+
+  const [singleDate, setSingleDate] = useState(initialSingleDate);
+
+  const singleDateSettings = [
+    { label: t('company.ma_non_extended'), stateKey: 'ma_non_extended', checked: false },
+  ];
+
 
   const handleMultiQueryModal = () => {
     setMultiQueryModal(true);
@@ -92,10 +106,6 @@ const Company = () => {
   const handleMultiQueryModalCancel = () => {
     setMultiQueryModal(false);
   };
-  const handleQueryString=(a) => {
-    setMultiQueryString(a);
-    console.log('handleQueryString', multiQueryString);
-  }
 
 
   const handleSearchCondition =  (newValue)=> {
@@ -414,12 +424,14 @@ const Company = () => {
           open={multiQueryModal}
           handleOk={handleMultiQueryModalOk}
           handleCancel={handleMultiQueryModalCancel}
-          setQueryString={handleQueryString}
           queryConditions={queryConditions}
           setQueryConditions={setQueryConditions}
           dates={dates}
           setDates={setDates}
           dateRangeSettings={dateRangeSettings}
+          singleDate={singleDate}
+          setSingleDate={setSingleDate}
+          singleDateSettings={singleDateSettings}
         />
       </div>
     </HelmetProvider>
