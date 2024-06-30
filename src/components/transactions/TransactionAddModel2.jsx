@@ -22,6 +22,7 @@ import { ConvertCurrency, formatDate } from "../../constants/functions";
 import TransactionContentModal from "./TransactionContentModal";
 import TransactionReceiptModal from "./TransactionReceiptModal";
 import MessageModal from "../../constants/MessageModal";
+import TransactionPrint from "./TransactionPrint";
 
 const default_transaction_data = {
   title: '',
@@ -422,6 +423,10 @@ const TransactionAddModel = (props) => {
   };
 
   //===== Handles for special actions =============================================
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [transactionForPrint, setTransactionForPrint] = useState({});
+  const [contentsForPrint, setContentsForPrint] = useState({});
+
   const handleInitialize = () => {
     setDataForTransaction(default_transaction_data);
     setTransactionChange({ ...defaultTransaction });
@@ -430,8 +435,22 @@ const TransactionAddModel = (props) => {
     setEditedReceiptModalData({});
   };
 
-  const handleIssueTransaction = () => {
-    // Save this transactions -------------------------
+  const handleShowPrint = () => {
+    console.log('handleShowPrint');
+    const tempTransactionData = {
+      ...transactionChange,
+      ...dataForTransaction,
+    };
+    setTransactionForPrint(tempTransactionData);
+    setContentsForPrint(transactionContents);
+    setIsPrintModalOpen(true);
+  };
+
+  const handleShowTaxBill = () => {
+    console.log('handleShowTaxBill');
+  };
+
+  const handleSaveNewTransaction = (value) => {
     if (transactionChange.company_name === null
       || transactionChange.company_name === ''
       || transactionContents.length === 0
@@ -447,12 +466,34 @@ const TransactionAddModel = (props) => {
       action_type: 'ADD',
       modify_user: cookies.myLationCrmUserId,
     };
-    console.log(`[ handleAddNewTransaction ]`, newTransactionData);
     const result = modifyTransaction(newTransactionData);
-    if (result) {
-      initializeTransactionTemplate();
-      //close modal ?
-    };
+    result.then((res) => {
+      if(res){
+        if(value === 'TaxBill'){
+          handleShowTaxBill();
+        } else if(value === 'print'){
+          handleShowPrint();
+        };
+        initializeTransactionTemplate();
+      }
+      else {
+        setMessage({title: '저장 중 오류', message: '오류가 발생하여 저장하지 못했습니다.'});
+        setIsMessageModalOpen(true);
+      };
+    });
+  };
+
+  const handleAddPrintTransaction = () => {
+    handleSaveNewTransaction('print');
+  };
+
+  const handleAddNewTransaction = () => {
+    handleSaveNewTransaction(null);
+  };
+
+  const handleIssueTransaction = () => {
+    // Save this transactions -------------------------
+    handleSaveNewTransaction('TaxBill');
   };
 
   const handleShowDecimal = (e) => {
@@ -778,6 +819,31 @@ const TransactionAddModel = (props) => {
                   </Col>
                 </Row>
               </div>
+              <div className="text-center">
+                <button
+                  type="button"
+                  className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                  onClick={handleAddPrintTransaction}
+                >
+                  {t('transaction.save_print')}
+                </button>
+                &nbsp;&nbsp;
+                <button
+                  type="button"
+                  className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                  onClick={handleAddNewTransaction}
+                >
+                  {t('common.save')}
+                </button>
+                &nbsp;&nbsp;
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-rounded"
+                  data-bs-dismiss="modal"
+                >
+                  {t('common.cancel')}
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -798,6 +864,12 @@ const TransactionAddModel = (props) => {
         handleEdited={setEditedReceiptModalData}
         handleOk={handleReceiptModalOk}
         handleCancel={handleReceiptModalCancel}
+      />
+      <TransactionPrint
+        open={isPrintModalOpen}
+        handleClose={()=>setIsPrintModalOpen(false)}
+        transaction={transactionForPrint}
+        contents={contentsForPrint}
       />
       <MessageModal
         title={message.title}

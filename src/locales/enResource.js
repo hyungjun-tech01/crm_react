@@ -188,6 +188,7 @@ const enResource = {
             register_no: 'Registration No.',
             remove_selects: 'Remove',
             statement_of_account: 'Satement of account',
+            save_print: 'Save and Print',
             sum_price: 'Price Sum',
             supplier: 'Supplier',
             supply_price: 'Supply Price',

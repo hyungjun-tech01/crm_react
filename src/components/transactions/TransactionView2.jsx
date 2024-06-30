@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { useRecoilValue } from 'recoil';
 import { PDFViewer } from '@react-pdf/renderer';
 import { Page, Text, View, Document, StyleSheet, Font } from '@react-pdf/renderer';
-import { atomCurrentTransaction, defaultTransaction } from "../../atoms/atoms";
 import NotoSansRegular from "../../fonts/NotoSansKR-Regular.ttf";
 import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";
@@ -19,7 +17,9 @@ const Styles = StyleSheet.create({
         marginVertical: 0,
         fontSize: 10,
         textAlign: 'justify',
-        textWrap: 'wrap',
+        overflow: 'hidden',
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
         fontFamily: 'Noto Sans'
     },
     textCenter: {
@@ -72,30 +72,27 @@ Font.register({
     ]
 });
 
-const TransactionView = () => {
-    const currentTransaction = useRecoilValue(atomCurrentTransaction);
+const TransactionView2 = (props) => {
+    const { transaction, contents} = props;
     const [ transactionContents, setTransactionContents ] = useState([]);
 
     useEffect(() => {
-        if(currentTransaction !== defaultTransaction){
-            console.log('Load TransactionView');
-            const tempContents = JSON.parse(currentTransaction.transaction_contents);
-            if(tempContents && Array.isArray(tempContents)){
-                const num_10 = Math.ceil(tempContents.length / 10) * 10;
-                let temp_array = new Array(num_10);
-                let i = 0;
-                for( ; i < tempContents.length; i++)
-                {
-                    temp_array[i] = tempContents[i];
-                }
-                for(; i < num_10; i++)
-                {
-                    temp_array[i] = null;
-                }
-                setTransactionContents(temp_array);
+        if(contents && Array.isArray(contents)){
+            const num_10 = Math.ceil(contents.length / 10) * 10;
+            let temp_array = new Array(num_10);
+            let i = 0;
+            for( ; i < contents.length; i++)
+            {
+                temp_array[i] = contents[i];
             };
-        }
-    }, [currentTransaction]);
+            for(; i < num_10; i++)
+            {
+                temp_array[i] = null;
+            };
+            setTransactionContents(temp_array);
+            console.log('TransactionView2 : ', temp_array);
+        };
+    }, [contents]);
 
     return (
         <PDFViewer style={{width: '100%', minHeight: '320px', height: '640px'}}>
@@ -123,7 +120,7 @@ const TransactionView = () => {
                                         </View>
                                         <View style={{flexGrow:1}}>
                                             <View style={{alignItems:'center'}}>
-                                                <Text style={Styles.text}>{currentTransaction.business_registration_code}</Text>
+                                                <Text style={Styles.text}>{transaction.business_registration_code}</Text>
                                             </View>
                                         </View>
                                     </View>
@@ -136,7 +133,7 @@ const TransactionView = () => {
                                         </View>
                                         <View style={{borderRight:1,borderColor:'#eee5555',flexGrow:1}}>
                                             <View style={{alignItems:'center'}}>
-                                                <Text style={Styles.textCenter}>{currentTransaction.company_name}</Text>
+                                                <Text style={Styles.textCenter}>{transaction.company_name}</Text>
                                             </View>
                                         </View>
                                         <View style={{width:20,borderRight:1,borderColor:'#eee5555',flexGrow:0}}>
@@ -147,7 +144,7 @@ const TransactionView = () => {
                                         </View>
                                         <View style={{width:75,flexGrow:0}}>
                                             <View style={{alignItems:'center'}}>
-                                                <Text style={Styles.text}>{currentTransaction.ceo_name}</Text>
+                                                <Text style={Styles.text}>{transaction.ceo_name}</Text>
                                             </View>
                                         </View>
                                     </View>
@@ -157,7 +154,7 @@ const TransactionView = () => {
                                             <Text style={Styles.textCenterLower}>주  소</Text>
                                         </View>
                                         <View style={{flexGrow:1}}>
-                                            <Text style={Styles.text}>{currentTransaction.company_address}</Text>
+                                            <Text style={Styles.text}>{transaction.company_address}</Text>
                                         </View>
                                     </View>
                                     <View style={{height:22,border:0,flexDirection:'row',alignItems:'center',alignContent:'center'}}>
@@ -165,14 +162,14 @@ const TransactionView = () => {
                                             <Text style={Styles.textCenter}>업  태</Text>
                                         </View>
                                         <View style={{borderRight:1,borderColor:'#eee5555',flexGrow:2}}>
-                                            <Text style={Styles.text}>{currentTransaction.business_type}</Text>
+                                            <Text style={Styles.text}>{transaction.business_type}</Text>
                                         </View>
                                         <View style={{width:20,borderRight:1,borderColor:'#eee5555',flexGrow:0}}>
                                             <Text style={Styles.textCenterUpper}>종</Text>
                                             <Text style={Styles.textCenterLower}>목</Text>
                                         </View>
                                         <View style={{flexGrow:3}}>
-                                            <Text style={Styles.text}>{currentTransaction.business_item}</Text>
+                                            <Text style={Styles.text}>{transaction.business_item}</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -223,7 +220,7 @@ const TransactionView = () => {
                                                             <Text style={Styles.text}>{item.standard}</Text>
                                                         </View>
                                                         <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#eeeeee",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={Styles.text}>{ConvertCurrency(item.quantity)}</Text>
+                                                            <Text style={Styles.text}>{item.quantity}</Text>
                                                         </View>
                                                         <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#eeeeee",flexGrow:0,justifyContent:'flex-end'}]}>
                                                             <Text style={Styles.text}>{ConvertCurrency(item.supply_price)}</Text>
@@ -249,7 +246,7 @@ const TransactionView = () => {
                                                             <Text style={Styles.text}>{item.standard}</Text>
                                                         </View>
                                                         <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#eeeeee",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={Styles.text}>{ConvertCurrency(item.quantity)}</Text>
+                                                            <Text style={Styles.text}>{item.quantity}</Text>
                                                         </View>
                                                         <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#eeeeee",flexGrow:0,justifyContent:'flex-end'}]}>
                                                             <Text style={Styles.text}>{ConvertCurrency(item.supply_price)}</Text>
@@ -277,13 +274,13 @@ const TransactionView = () => {
                                                         <Text style={Styles.text}>{item.quantity}</Text>
                                                     </View>
                                                     <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#eeeeee",flexGrow:0}]}>
-                                                        <Text style={Styles.text}>{item.supply_price}</Text>
+                                                        <Text style={Styles.text}>{ConvertCurrency(item.supply_price)}</Text>
                                                     </View>
                                                     <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#eeeeee",flexGrow:0}]}>
-                                                        <Text style={Styles.text}>{item.total_price}</Text>
+                                                        <Text style={Styles.text}>{ConvertCurrency(item.total_price)}</Text>
                                                     </View>
                                                     <View style={[Styles.contentCell, {width:80,border:0,flexGrow:0}]}>
-                                                        <Text style={Styles.text}>{item.tax_price}</Text>
+                                                        <Text style={Styles.text}>{ConvertCurrency(item.tax_price)}</Text>
                                                     </View>
                                                 </View>
                                             );
@@ -344,16 +341,16 @@ const TransactionView = () => {
                                 </View>
                                 <View style={{width: '100%',height:18,margin:0,padding:0,border:0,flexDirection:'row',alignContent:'center'}}>
                                     <View style={{width:'25%',margin:0,padding:0,borderRight:1,borderColor:'#eeeeee',alignItems:'center',justifyContent:'flex-end'}}>
-                                        <Text style={Styles.text}>{}</Text>
+                                        <Text style={Styles.text}>{ConvertCurrency(transaction.valance_prev)}</Text>
                                     </View>
                                     <View style={{width:'25%',margin:0,padding:0,borderRight:1,borderColor:'#eeeeee',alignItems:'center',justifyContent:'flex-end'}}>
-                                        <Text style={Styles.text}>{ConvertCurrency(currentTransaction.supply_price)}</Text>
+                                        <Text style={Styles.text}>{ConvertCurrency(transaction.supply_price)}</Text>
                                     </View>
                                     <View style={{width:'25%',margin:0,padding:0,borderRight:1,borderColor:'#eeeeee',alignItems:'center',justifyContent:'flex-end'}}>
-                                        <Text style={Styles.text}>{ConvertCurrency(currentTransaction.tax_price)}</Text>
+                                        <Text style={Styles.text}>{ConvertCurrency(transaction.tax_price)}</Text>
                                     </View>
                                     <View style={{width:'25%',margin:0,padding:0,alignItems:'center',justifyContent:'flex-end'}}>
-                                        <Text style={Styles.text}>{ConvertCurrency(currentTransaction.total_price)}</Text>
+                                        <Text style={Styles.text}>{ConvertCurrency(transaction.total_price)}</Text>
                                     </View>
                                 </View>
                             </View>
@@ -374,16 +371,16 @@ const TransactionView = () => {
                                 </View>
                                 <View style={{width: '100%',height:18,margin:0,padding:0,border:0,flexDirection:'row',alignContent:'center'}}>
                                     <View style={{width:'25%',margin:0,padding:0,borderRight:1,borderColor:'#eeeeee',alignItems:'center',justifyContent:'flex-end'}}>
-                                        <Text style={Styles.text}>{}</Text>
+                                        <Text style={Styles.text}>{ConvertCurrency(transaction.receipt)}</Text>
                                     </View>
                                     <View style={{width:'25%',margin:0,padding:0,borderRight:1,borderColor:'#eeeeee',alignItems:'center',justifyContent:'flex-end'}}>
-                                        <Text style={Styles.text}>{}</Text>
+                                        <Text style={Styles.text}>{ConvertCurrency(transaction.valance_final)}</Text>
                                     </View>
                                     <View style={{width:'25%',margin:0,padding:0,borderRight:1,borderColor:'#eeeeee',alignItems:'center',justifyContent:'flex-end'}}>
-                                        <Text style={Styles.text}>{}</Text>
+                                        <Text style={Styles.text}>{transaction.receiver}</Text>
                                     </View>
                                     <View style={{width:'25%',margin:0,padding:0,alignItems:'center',justifyContent:'flex-end'}}>
-                                        <Text style={Styles.text}>{}</Text>
+                                        <Text style={Styles.text}>{`${transaction.page_cur}/${transaction.page_total}/${transaction.page}`}</Text>
                                     </View>
                                 </View>
                             </View>
@@ -395,4 +392,4 @@ const TransactionView = () => {
     );
 };
 
-export default TransactionView;
+export default TransactionView2;
