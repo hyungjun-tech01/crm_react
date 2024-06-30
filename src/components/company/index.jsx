@@ -63,13 +63,13 @@ const Company = () => {
 
   // from date date 1개짜리 picking 만들기 
   const initialSingleDate = {
-    ma_non_extended: { fromDate: oneMonthAgo,  checked: false },  
+    ma_finish_date: { fromDate: oneMonthAgo,  checked: false },  
   };
 
   const [singleDate, setSingleDate] = useState(initialSingleDate);
 
   const singleDateSettings = [
-    { label: t('company.ma_non_extended'), stateKey: 'ma_non_extended', checked: false },
+    { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
   ];
 
 
@@ -93,11 +93,17 @@ const Company = () => {
 
     console.log("checkedDates", checkedDates);
 
-      const multiQueryCondi = {
-        queryConditions:queryConditions,
-        checkedDates:checkedDates,
-        singleDate:null
-      }
+    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+      label: key,
+      fromDate: dates[key].fromDate,
+      checked: dates[key].checked,
+    }));
+
+    const multiQueryCondi = {
+      queryConditions:queryConditions,
+      checkedDates:checkedDates,
+      singleDate:checkedSingleDates
+    }
 
       loadAllCompanies(multiQueryCondi);
 
