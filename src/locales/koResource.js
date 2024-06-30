@@ -188,6 +188,7 @@ const koResource = {
             register_no: '등록번호',
             remove_selects: '선택 삭제',
             statement_of_account: '거래명세서',
+            save_print: '저장 및 인쇄',
             sum_price: '합계금액',
             supplier: '공급자',
             supply_price: '공급가액',

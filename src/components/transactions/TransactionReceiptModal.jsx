@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from "react-i18next";
 import { Button, Modal } from 'antd';
-
-
 import DetailCardItem from '../../constants/DetailCardItem';
-import { use } from 'i18next';
+
 
 const TransactionReceiptModal = (props) => {
     const { open, original, edited, handleEdited, handleOk, handleCancel } = props;
