@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue, useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
@@ -13,22 +13,21 @@ import "react-datepicker/dist/react-datepicker.css";
 import {
   atomCompanyState,
   atomCompanyForSelection,
-  atomProductClassList,
-  atomAllProducts,
-  atomProductOptions,
-  atomProductClassListState,
-  atomProductsState,
   defaultTransaction,
 } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
-import { ProductClassListRepo } from "../../repository/product";
-import { ProductRepo } from "../../repository/product";
 import { DefaultTransactionContent, TransactionRepo } from "../../repository/transaction";
 
 import { ConvertCurrency, formatDate } from "../../constants/functions";
 import TransactionContentModal from "./TransactionContentModal";
 import TransactionReceiptModal from "./TransactionReceiptModal";
 import MessageModal from "../../constants/MessageModal";
+
+const default_transaction_data = {
+  title: '',
+  vat_included: false, show_decimal: 0, auto_calc: true, valance_prev: 0, supply_price: 0, tax_price: 0,
+  total_price: 0, receipt: 0, valance_final: 0, receiver: '', page_cur: 1, page_total: 1, page: '1p'
+};
 
 const TransactionAddModel = (props) => {
   const { init, handleInit } = props;
@@ -48,17 +47,7 @@ const TransactionAddModel = (props) => {
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
-  //===== [RecoilState] Related with Product =========================================
-  const allProductClassList = useRecoilValue(atomProductClassList);
-  const { loadAllProductClassList } = useRecoilValue(ProductClassListRepo);
-  const allProducts = useRecoilValue(atomAllProducts);
-  const { loadAllProducts } = useRecoilValue(ProductRepo);
-  const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
-
-
   //===== Handles to edit 'TransactionAddModel' ======================================
-  const productClassState = useRecoilValue(atomProductClassListState);
-  const productState = useRecoilValue(atomProductsState);
   const [transactionChange, setTransactionChange] = useState({});
   const [transactionContents, setTransactionContents] = useState([]);
   const [isSale, setIsSale] = useState(true);
@@ -156,22 +145,22 @@ const TransactionAddModel = (props) => {
     {
       title: t('transaction.unit_price'),
       dataIndex: 'unit_price',
-      render: (text, record) => <>{ConvertCurrency(text)}</>,
+      render: (text, record) => <>{ConvertCurrency(text, dataForTransaction.show_decimal)}</>,
     },
     {
       title: t('transaction.supply_price'),
       dataIndex: 'supply_price',
-      render: (text, record) => <>{ConvertCurrency(text)}</>,
+      render: (text, record) => <>{ConvertCurrency(text, dataForTransaction.show_decimal)}</>,
     },
     {
       title: t('transaction.tax_price'),
       dataIndex: 'tax_price',
-      render: (text, record) => <>{ConvertCurrency(text)}</>,
+      render: (text, record) => <>{ConvertCurrency(text, dataForTransaction.show_decimal)}</>,
     },
     {
       title: t('transaction.total_price'),
       dataIndex: 'total_price',
-      render: (text, record) => <>{ConvertCurrency(text)}</>,
+      render: (text, record) => <>{ConvertCurrency(text, dataForTransaction.show_decimal)}</>,
     },
     {
       title: t('transaction.modified'),
@@ -182,11 +171,7 @@ const TransactionAddModel = (props) => {
 
 
   //===== Handles to edit 'Contents' =================================================
-  const [dataForTransaction, setDataForTransaction] = useState({
-    title: '',
-    vat_included: false, show_decimal: false, auto_calc: true, valance_prev: 0, supply_price: 0, tax_price: 0,
-    total_price: 0, receipt: 0, valance_final: 0, receiver: '', page_cur: 1, page_total: 1, page: '1p'
-  });
+  const [dataForTransaction, setDataForTransaction] = useState(default_transaction_data);
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [orgContentModalData, setOrgContentModalData] = useState({});
   const [editedContentModalData, setEditedContentModalData] = useState({});
@@ -248,8 +233,8 @@ const TransactionAddModel = (props) => {
       ...orgContentModalData,
       ...editedContentModalData,
       month_day: tempDate,
-      trasaction_sub_index: transactionContents.length + 1,
-      lead_code: transactionChange.company_code,
+      transaction_sub_index: transactionContents.length + 1,
+      company_code: transactionChange.company_code,
       company_name: transactionChange.company_name,
       transaction_sub_type: dataForTransaction.payment_type,
       modify_date: formatDate(new Date()),
@@ -274,7 +259,7 @@ const TransactionAddModel = (props) => {
 
   const handleContentDelete = () => {
     if(selectedContentRowKeys.length ===0) return;
-    const tempContents = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.trasaction_sub_index) === -1);
+    const tempContents = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) === -1);
     setTransactionContents(tempContents);
     setSelectedContentRowKeys([]);
   };
@@ -286,8 +271,8 @@ const TransactionAddModel = (props) => {
     
     let tempContents = null;
     let startIdx = 0;
-    const selecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.trasaction_sub_index) !== -1);
-    const unselecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.trasaction_sub_index) === -1);
+    const selecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) !== -1);
+    const unselecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) === -1);
     const firstIdx = selectedContentRowKeys[0];
     if(firstIdx === 1){
       tempContents = [
@@ -306,7 +291,7 @@ const TransactionAddModel = (props) => {
     const finalContents = tempContents.map((item, index) => {
       const temp3 = {
         ...item,
-        trasaction_sub_index: index + 1,
+        transaction_sub_index: index + 1,
       };
       return temp3;
     });
@@ -326,8 +311,8 @@ const TransactionAddModel = (props) => {
 
     let tempContents = null;
     let startIdx = 0;
-    const selecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.trasaction_sub_index) !== -1);
-    const unselecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.trasaction_sub_index) === -1);
+    const selecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) !== -1);
+    const unselecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) === -1);
     const lastIdx = selectedContentRowKeys.at(-1);
     if(lastIdx === transactionContents.length){
       tempContents = [
@@ -346,7 +331,7 @@ const TransactionAddModel = (props) => {
     const finalContents = tempContents.map((item, index) => {
       const temp3 = {
         ...item,
-        trasaction_sub_index: index + 1,
+        transaction_sub_index: index + 1,
       };
       return temp3;
     });
@@ -366,6 +351,38 @@ const TransactionAddModel = (props) => {
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
   const [orgReceiptModalData, setOrgReceiptModalData] = useState({});
   const [editedReceiptModalData, setEditedReceiptModalData] = useState({});
+
+  const handleVATChange = (e)=>{
+    const tempIncludeVAT = e.target.value === 'vat_included';
+    if(dataForTransaction.vat_included !== tempIncludeVAT){
+      const tempValues = {
+        ...dataForTransaction,
+        vat_included: tempIncludeVAT,
+      };
+      setDataForTransaction(tempValues);
+      if(tempIncludeVAT){
+        const tempContents = transactionContents.map(item => {
+          return {
+            ...item,
+            tax_price: item.supply_price * 0.1,
+            total_price: item.supply_price * 1.1,
+          };
+        });
+        setTransactionContents(tempContents);
+        handleAmountCalculation(tempContents);
+      } else {
+        const tempContents = transactionContents.map(item => {
+          return {
+            ...item,
+            tax_price: 0,
+            total_price: item.supply_price,
+          };
+        });
+        setTransactionContents(tempContents);
+        handleAmountCalculation(tempContents);
+      };
+    }
+  };
 
   const handleStartEditReceipt = () => {
     if(!orgReceiptModalData['payment_amount']){
@@ -405,11 +422,50 @@ const TransactionAddModel = (props) => {
   };
 
   //===== Handles for special actions =============================================
-  const initializeTransactionTemplate = useCallback(() => {
+  const handleInitialize = () => {
+    setDataForTransaction(default_transaction_data);
     setTransactionChange({ ...defaultTransaction });
     setTransactionContents([]);
     setOrgReceiptModalData({});
     setEditedReceiptModalData({});
+  };
+
+  const handleIssueTransaction = () => {
+    // Save this transactions -------------------------
+    if (transactionChange.company_name === null
+      || transactionChange.company_name === ''
+      || transactionContents.length === 0
+    ) {
+      setMessage({title: '*필수 입력 누락*', message: '업체 정보나 품목 정보가 누락되었습니다.'});
+      setIsMessageModalOpen(true);
+      return;
+    };
+    const newTransactionData = {
+      ...transactionChange,
+      transaction_contents: JSON.stringify(transactionContents),
+      transaction_title: transactionContents.at(0).product_name + ' 외',
+      action_type: 'ADD',
+      modify_user: cookies.myLationCrmUserId,
+    };
+    console.log(`[ handleAddNewTransaction ]`, newTransactionData);
+    const result = modifyTransaction(newTransactionData);
+    if (result) {
+      initializeTransactionTemplate();
+      //close modal ?
+    };
+  };
+
+  const handleShowDecimal = (e) => {
+    const decimalValue = e.target.checked ? 4 : 0;
+    const tempData = {
+      ...dataForTransaction,
+      show_decimal: decimalValue,
+    };
+    setDataForTransaction(tempData);
+  };
+
+  const initializeTransactionTemplate = useCallback(() => {
+    handleInitialize();
 
     document.querySelector("#add_new_transaction_form").reset();
 
@@ -516,8 +572,8 @@ const TransactionAddModel = (props) => {
                         </Row>
                         <Row style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
                           <Col>
-                            <Button style={{ width: 150 }}>{t('transaction.issue')}</Button>
-                            <Button style={{ width: 80 }}>{t('common.cancel')}</Button>
+                            <Button onClick={handleIssueTransaction} style={{ width: 150 }}>{t('transaction.issue')}</Button>
+                            <Button onClick={handleInitialize} style={{ width: 100 }}>{t('common.initialize')}</Button>
                           </Col>
                         </Row>
                       </Col>
@@ -593,20 +649,14 @@ const TransactionAddModel = (props) => {
                     <div style={{ flexGrow: 3 }}>
                       <select
                         name='vat_type'
-                        onChange={(e)=>{
-                          const tempValues = {
-                            ...dataForTransaction,
-                            vat_included: e.target.value === 'vat_included',
-                          };
-                          setDataForTransaction(tempValues);
-                        }}
+                        onChange={handleVATChange}
                       >
                         <option value='vat_excluded'>{t('quotation.vat_excluded')}</option>
                         <option value='vat_included'>{t('quotation.vat_included')}</option>
                       </select>
                     </div>
                     <div style={{ flexGrow: 3 }}>
-                      <Checkbox>{t('quotation.show_decimal')}</Checkbox>
+                      <Checkbox onClick={handleShowDecimal}>{t('quotation.show_decimal')}</Checkbox>
                     </div>
                   </Col>
                 </Row>
@@ -625,7 +675,7 @@ const TransactionAddModel = (props) => {
                       columns={default_columns}
                       bordered
                       dataSource={transactionContents}
-                      rowKey={(record) => record.trasaction_sub_index}
+                      rowKey={(record) => record.transaction_sub_index}
                       onRow={(record, rowIndex) => {
                         return {
                           onDoubleClick: (event) => {
@@ -646,7 +696,7 @@ const TransactionAddModel = (props) => {
                     </Row>
                     <Row>
                       <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
-                        {ConvertCurrency(dataForTransaction.valance_prev)}
+                        {ConvertCurrency(dataForTransaction.valance_prev, dataForTransaction.show_decimal)}
                       </Col>
                     </Row>
                     <Row>
@@ -655,8 +705,8 @@ const TransactionAddModel = (props) => {
                       </Col>
                     </Row>
                     <Row>
-                      <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
-                        {ConvertCurrency(dataForTransaction.receipt)}
+                      <Col flex='auto' className={`trans_amt low right ${!isSale && "trans_pur"}`}>
+                        {ConvertCurrency(dataForTransaction.receipt, dataForTransaction.show_decimal)}
                       </Col>
                     </Row>
                   </Col>
@@ -668,7 +718,7 @@ const TransactionAddModel = (props) => {
                     </Row>
                     <Row>
                       <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
-                        {ConvertCurrency(dataForTransaction.supply_price)}
+                        {ConvertCurrency(dataForTransaction.supply_price, dataForTransaction.show_decimal)}
                       </Col>
                     </Row>
                     <Row>
@@ -677,8 +727,8 @@ const TransactionAddModel = (props) => {
                       </Col>
                     </Row>
                     <Row>
-                      <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
-                        {ConvertCurrency(dataForTransaction.valance_final)}
+                      <Col flex='auto' className={`trans_amt  low right ${!isSale && "trans_pur"}`}>
+                        {ConvertCurrency(dataForTransaction.valance_final, dataForTransaction.show_decimal)}
                       </Col>
                     </Row>
                   </Col>
@@ -690,7 +740,7 @@ const TransactionAddModel = (props) => {
                     </Row>
                     <Row>
                       <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
-                        {ConvertCurrency(dataForTransaction.tax_price)}
+                        {ConvertCurrency(dataForTransaction.tax_price, dataForTransaction.show_decimal)}
                       </Col>
                     </Row>
                     <Row>
@@ -699,8 +749,8 @@ const TransactionAddModel = (props) => {
                       </Col>
                     </Row>
                     <Row>
-                      <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
-                        {dataForTransaction.receiver === '' ? "N/A" : dataForTransaction.receiver}
+                      <Col flex='auto' className={`trans_amt low right ${!isSale && "trans_pur"}`}>
+                        {dataForTransaction.receiver}&nbsp;
                       </Col>
                     </Row>
                   </Col>
@@ -712,7 +762,7 @@ const TransactionAddModel = (props) => {
                     </Row>
                     <Row>
                       <Col flex='auto' className={`trans_amt ${!isSale && "trans_pur"}`}>
-                        {ConvertCurrency(dataForTransaction.total_price)}
+                        {ConvertCurrency(dataForTransaction.total_price, dataForTransaction.show_decimal)}
                       </Col>
                     </Row>
                     <Row>
@@ -721,7 +771,7 @@ const TransactionAddModel = (props) => {
                       </Col>
                     </Row>
                     <Row>
-                      <Col flex='auto' className={`trans_amt ${!isSale && "trans_pur"}`}>
+                      <Col flex='auto' className={`trans_amt low ${!isSale && "trans_pur"}`}>
                         {`${dataForTransaction.page_cur}/${dataForTransaction.page_total}/${dataForTransaction.page}`}
                       </Col>
                     </Row>

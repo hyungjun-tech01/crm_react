@@ -24,7 +24,7 @@ export const DefaultTransactionContent = {
     tax_price: 0,
     total_price: 0,
     memo: null,
-    trasaction_sub_index: null,
+    transaction_sub_index: null,
     lead_code: null,
     company_name: null,
     statement_number: null,

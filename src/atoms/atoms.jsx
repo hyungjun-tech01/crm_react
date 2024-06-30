@@ -254,9 +254,8 @@ export const defaultTransaction = {
     total_price: null,
     currency: null,
     payment_type: null,
-    //-----Lead info --------------
-    lead_code: null,
     //-----Company info --------------
+    company_code: null,
     company_name: null,
     ceo_name: null,
     company_address: null,
