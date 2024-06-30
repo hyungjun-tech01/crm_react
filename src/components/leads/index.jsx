@@ -70,7 +70,7 @@ const Leads = () => {
         <>
           <a href="#">
             <span className="person-circle-a person-circle">
-              {text.charAt(0)}
+              {text ? text.charAt(0) : '?'}
             </span>
           </a>
           <a href="#"
