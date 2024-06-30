@@ -127,7 +127,7 @@ const TransactionDetailsModel = () => {
   return (
     <div
       className="modal right fade"
-      id="transactions-details"
+      id="transaction-details"
       tabIndex={-1}
       role="dialog"
       aria-modal="true"

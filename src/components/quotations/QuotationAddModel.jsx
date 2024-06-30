@@ -287,7 +287,7 @@ const QuotationAddModel = (props) => {
 
   //===== Handles to edit 'Contents' =================================================
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
-  const [orgContentModalValues, setorgContentModalValues] = useState({});
+  const [orgContentModalValues, setOrgContentModalValues] = useState({});
   const [editedContentModalValues, setEditedContentModalValues] = useState({});
   const [settingForContent, setSettingForContent] = useState({ title: '',
     vat_included: false, unit_vat_included: false, total_only: false, auto_calc: true, show_decimal: false,
@@ -505,7 +505,7 @@ const QuotationAddModel = (props) => {
       title: t('quotation.add_content'),
     });
 
-    setorgContentModalValues({
+    setOrgContentModalValues({
       product_name: null,
       product_class_name: null,
       detail_desc_on_off: '없음',
@@ -533,7 +533,7 @@ const QuotationAddModel = (props) => {
       title: t('quotation.modify_content'),
     });
 
-    setorgContentModalValues({
+    setOrgContentModalValues({
       product_name: data['5'],
       product_class_name: data['2'],
       detail_desc_on_off: data['10'],
@@ -655,7 +655,7 @@ const QuotationAddModel = (props) => {
   const handleContentModalCancel = () => {
     setIsContentModalOpen(false);
     setEditedContentModalValues({});
-    setorgContentModalValues({});
+    setOrgContentModalValues({});
     setSelectedContentRowKeys([]);
   };
 

@@ -29,7 +29,7 @@ const default_transaction_content = {
   "total_price": 0,
   "memo": null,
   "trasaction_sub_index": null,
-  "lead_code": null,
+  "company_code": null,
   "company_name": null,
   "statement_number": null,
   "transaction_sub_type": null,
@@ -49,7 +49,7 @@ const trans_key_to_name = {
   "total_price": '합계금액',
   "memo": '비고',
   "trasaction_sub_index": '순번',
-  "lead_code": '거래처코드',
+  "company_code": '거래처코드',
   "company_name": '거래처명',
   "statement_number": '전표번호',
   "transaction_sub_type": '구분',
@@ -86,7 +86,7 @@ const TransactionAddModel = (props) => {
     if(value) {
       const tempChanges = {
         ...transactionChange,
-        lead_code: value.value.lead_code,
+        company_code: value.value.company_code,
         company_code: value.value.company_code,
         company_name: value.value.company_name,
         ceo_name: value.value.ceo_name,
@@ -405,7 +405,7 @@ const TransactionAddModel = (props) => {
             return {
               label: lead.lead_name + " / " + lead.company_name,
               value: {
-                lead_code: lead.lead_code,
+                company_code: lead.company_code,
                 company_code: foundCompany.company_code,
                 company_name: foundCompany.company_name,
                 ceo_name: foundCompany.ceo_name,
@@ -419,7 +419,7 @@ const TransactionAddModel = (props) => {
           return {
             label: lead.lead_name + " / " + lead.company_name,
             value: {
-              lead_code: lead.lead_code,
+              company_code: lead.company_code,
               company_code: lead.company_code,
               company_name: lead.company_name,
               ceo_name: null,

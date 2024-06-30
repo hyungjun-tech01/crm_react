@@ -359,6 +359,10 @@
     text-align: end;
     border-bottom: 2px solid #ff5522;
 }
+.trans_amt.low
+{
+    background-color: #f6f7f0;
+}
 .trans_amt.right
 {
     border-right: 1px solid rgb(215, 215, 215) !important;
