@@ -890,6 +890,14 @@ const TransactionAddModel = (props) => {
                 >
                   {t('common.cancel')}
                 </button>
+                &nbsp;&nbsp;
+                <button
+                  type="button"
+                  className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                  onClick={handleShowPrint}
+                >
+                  Test
+                </button>
               </div>
             </form>
           </div>
