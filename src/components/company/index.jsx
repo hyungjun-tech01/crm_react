@@ -435,9 +435,11 @@ const Company = () => {
           dates={dates}
           setDates={setDates}
           dateRangeSettings={dateRangeSettings}
+          initialState={initialState}
           singleDate={singleDate}
           setSingleDate={setSingleDate}
           singleDateSettings={singleDateSettings}
+          initialSingleDate={initialSingleDate}
         />
       </div>
     </HelmetProvider>
