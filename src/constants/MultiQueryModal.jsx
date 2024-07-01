@@ -86,7 +86,9 @@ const SingleDatePicker = ({ checked, onChange, label, fromDate, handleFromDateCh
 
 
 const MultiQueryModal = (props) => {
-    const {  open, title, handleOk, handleCancel, queryConditions, setQueryConditions, dates, setDates, dateRangeSettings, singleDate , setSingleDate, singleDateSettings} = props;
+    const {  open, title, handleOk, handleCancel, queryConditions, setQueryConditions, 
+            dates, setDates, dateRangeSettings,  initialState, 
+            singleDate , setSingleDate, singleDateSettings , initialSingleDate} = props;
 
     const { t } = useTranslation();
 
@@ -121,6 +123,14 @@ const MultiQueryModal = (props) => {
       newConditions[index].multiQueryInput = "";
       newConditions[index].andOr = "And";
       setQueryConditions(newConditions);
+    }
+
+    const handleInitial = () => {
+      for (let i = 0; i < queryConditions.length; i++) {
+        onDelete(i);
+      }
+      setDates(initialState);
+      setSingleDate(initialSingleDate);
     }
 
     const today = new Date();
@@ -200,6 +210,9 @@ const handleSingleCheckedChange = (key) => {
             onCancel={handleCancel}
             width={800}
             footer={  [
+                <Button key="cancel" onClick={handleInitial}>
+                  Initialize
+                </Button>,
                 <Button key="cancel" onClick={handleCancel}>
                   Cancel
                 </Button>,
