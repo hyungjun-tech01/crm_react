@@ -4,7 +4,7 @@ import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "antd/dist/reset.css";
-import { Button, Checkbox, Col, Input, Row, Table } from 'antd';
+import { Button, Checkbox, Col, Input, InputNumber, Row, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import DatePicker from "react-datepicker";
@@ -26,8 +26,21 @@ import TransactionPrint from "./TransactionPrint";
 
 const default_transaction_data = {
   title: '',
-  vat_included: false, show_decimal: 0, auto_calc: true, valance_prev: 0, supply_price: 0, tax_price: 0,
-  total_price: 0, receipt: 0, valance_final: 0, receiver: '', page_cur: 1, page_total: 1, page: '1p'
+  vat_included: false,
+  show_decimal: 0,
+  auto_calc: true,
+  valance_prev: 0,
+  supply_price: 0,
+  tax_price: 0,
+  total_price: 0,
+  receipt: 0,
+  valance_final: 0,
+  receiver: '',
+  page_cur: 1,
+  page_total: 1,
+  page: '1p',
+  receipt_org: '',
+  receipt_account: '',
 };
 
 const TransactionAddModel = (props) => {
@@ -176,6 +189,19 @@ const TransactionAddModel = (props) => {
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [orgContentModalData, setOrgContentModalData] = useState({});
   const [editedContentModalData, setEditedContentModalData] = useState({});
+
+  const handleFormatter = useCallback((value) => {
+    if(value === undefined || value === null || value === '') return '';
+    let ret = value;
+    if(typeof value === 'string') {
+      ret = Number(value);
+      if(isNaN(ret)) return;
+    };
+    
+    return dataForTransaction.show_decimal
+      ? ret?.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+      : ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }, [dataForTransaction.show_decimal]);
 
   const handleAmountCalculation = (data) => {
     let supply_price = 0, tax_price = 0, total_price = 0;
@@ -737,16 +763,30 @@ const TransactionAddModel = (props) => {
                     </Row>
                     <Row>
                       <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
-                        {ConvertCurrency(dataForTransaction.valance_prev, dataForTransaction.show_decimal)}
+                        <InputNumber
+                          value={dataForTransaction.valance_prev}
+                          formatter={handleFormatter}
+                          parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                          style={{width:'180px', height:'30px',border:0,textAlign:'end'}}
+                          onChange={(e)=>{
+                            const value = Number(e.target.value);
+                            if(isNaN(value)) return;
+                            const temp={...dataForTransaction, valance_prev: value};
+                            setDataForTransaction(temp);
+                          }}
+                        />
                       </Col>
                     </Row>
                     <Row>
-                      <Col flex='auto' className="trans_amt_title right" onClick={handleStartEditReceipt}>
+                      <Col flex='auto' className="trans_amt_title right">
                         {t('transaction.receipt')}
                       </Col>
                     </Row>
                     <Row>
-                      <Col flex='auto' className={`trans_amt low right ${!isSale && "trans_pur"}`}>
+                      <Col flex='auto'
+                        onClick={handleStartEditReceipt}
+                        className={`trans_amt low right ${!isSale && "trans_pur"}`}
+                      >
                         {ConvertCurrency(dataForTransaction.receipt, dataForTransaction.show_decimal)}
                       </Col>
                     </Row>
@@ -791,7 +831,14 @@ const TransactionAddModel = (props) => {
                     </Row>
                     <Row>
                       <Col flex='auto' className={`trans_amt low right ${!isSale && "trans_pur"}`}>
-                        {dataForTransaction.receiver}&nbsp;
+                        <Input
+                          value={dataForTransaction.receiver}
+                          style={{height:'30px',border:0,textAlign:'end'}}
+                          onChange={(e)=>{
+                            const temp={...dataForTransaction, receiver: e.target.value};
+                            setDataForTransaction(temp);
+                          }}
+                        />
                       </Col>
                     </Row>
                   </Col>
