@@ -9,7 +9,7 @@ export const defaultUser = {
     department: "",
     position: "",
     email: "",
-    group_: "",
+    private_group: "",
     memo: "",
     jobType: "",
     isWork: ""

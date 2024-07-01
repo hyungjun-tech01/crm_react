@@ -368,8 +368,8 @@ export const atomMAContractState = atom({
 export const defaultProductClass = {
     product_class_code : null,
     product_class_name : null,
-    order : null,
-    memo : null,
+    product_class_order : null,
+    product_class_memo : null,
 };
 export const atomProductClassList = atom({
     key: "allProductClassList",

@@ -354,6 +354,7 @@
 }
 .trans_amt
 {
+    min-height: 42px;
     padding: 0.25rem 1rem;
     font-size: 15px;
     text-align: end;
