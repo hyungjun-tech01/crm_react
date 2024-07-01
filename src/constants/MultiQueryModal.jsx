@@ -88,7 +88,7 @@ const SingleDatePicker = ({ checked, onChange, label, fromDate, handleFromDateCh
 const MultiQueryModal = (props) => {
     const {  open, title, handleOk, handleCancel, queryConditions, setQueryConditions, 
             dates, setDates, dateRangeSettings,  initialState, 
-            singleDate , setSingleDate, singleDateSettings, initialSingleDate} = props;
+            singleDate , setSingleDate, singleDateSettings , initialSingleDate} = props;
 
     const { t } = useTranslation();
 
@@ -125,12 +125,12 @@ const MultiQueryModal = (props) => {
       setQueryConditions(newConditions);
     }
 
-    const handleInitial = () =>{
-     // for (let i = 0; i < queryConditions.length; i++) {
-     //   onDelete(i);
-     // }
+    const handleInitial = () => {
+      for (let i = 0; i < queryConditions.length; i++) {
+        onDelete(i);
+      }
       setDates(initialState);
-      setSingleDate(initialSingleDate);s
+      setSingleDate(initialSingleDate);
     }
 
     const today = new Date();
