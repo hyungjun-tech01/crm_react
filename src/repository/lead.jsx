@@ -11,6 +11,18 @@ import { atomCurrentLead
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
+export const leadColumn = [
+    { value: 'lead_name', label: '고객명'},
+    { value: 'group_', label: '그룹'},
+    { value: 'sales_resource', label: '영업담당자'},
+    { value: 'company_name', label: '회사명'},
+    { value: 'region', label: '지역'},
+    { value: 'company_address', label: '회사주소'},
+    { value: 'is_keyman', label: '키맨여부'},
+    { value: 'email', label: '이메일'},
+    { value: 'status', label: '진행상황'},
+];
+
 export const KeyManForSelection = [
     { value: 'M', label: 'Manager'},
     { value: '결제', label: 'Payer'},

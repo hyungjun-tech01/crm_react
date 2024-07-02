@@ -14,6 +14,7 @@ import CompanyAddModel from "./CompanyAddMdel";
 import CompanyDetailsModel from "./CompanyDetailsModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import { formatDate } from "../../constants/functions";
+import { companyColumn } from "../../repository/company";
 
 // import { MoreVert } from '@mui/icons-material';
 
@@ -32,10 +33,10 @@ const Company = () => {
   const [multiQueryString, setMultiQueryString] = useState("");
 
   const [queryConditions, setQueryConditions] = useState([
-    { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
-    { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
-    { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
-    { companyColumn: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
   ]);
 
   const today = new Date();
@@ -430,6 +431,7 @@ const Company = () => {
           open={multiQueryModal}
           handleOk={handleMultiQueryModalOk}
           handleCancel={handleMultiQueryModalCancel}
+          companyColumn={companyColumn}
           queryConditions={queryConditions}
           setQueryConditions={setQueryConditions}
           dates={dates}
