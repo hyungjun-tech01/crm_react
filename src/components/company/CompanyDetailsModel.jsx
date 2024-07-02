@@ -13,7 +13,7 @@ import {
   atomAllPurchases,
   atomPurchaseState,
   atomAllTransactions,
-  atomTransationState,
+  atomTransactionState,
 } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
@@ -42,7 +42,7 @@ const CompanyDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Transaction ======================================
-  const transactionState = useRecoilValue(atomTransationState);
+  const transactionState = useRecoilValue(atomTransactionState);
   const allTransactions = useRecoilValue(atomAllTransactions);
   const { loadAllTransactions } = useRecoilValue(TransactionRepo);
 
@@ -240,13 +240,13 @@ const CompanyDetailsModel = () => {
                 </div>
               </div>
               <DetailTitleItem
-                defaultText={selectedCompany.company_name_eng}
+                original={selectedCompany.company_name_eng}
                 name='company_name_eng'
                 title={t('company.company_name_eng')}
                 onEditing={handleDetailChange}
               />
               <DetailTitleItem
-                defaultText={selectedCompany.business_registration_code}
+                original={selectedCompany.business_registration_code}
                 name='business_registration_code'
                 title={t('company.business_registration_code')}
                 onEditing={handleDetailChange}
@@ -296,7 +296,7 @@ const CompanyDetailsModel = () => {
                     to="#company-details-tax-invoice"
                     data-bs-toggle="tab"
                   >
-                    {t('transaction.tax_invoice')}
+                    {t('transaction.tax_bill')}
                   </Link>
                 </li>
                 {/* <li className="nav-item">

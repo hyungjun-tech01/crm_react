@@ -17,16 +17,16 @@ import { atomAllCompanies,
   atomAllTransactions,
   atomFilteredTransaction,
   atomCompanyState,
-  atomTransationState,
+  atomTransactionState,
 } from "../../atoms/atoms";
 import { compareCompanyName , compareText, ConvertCurrency } from "../../constants/functions";
-import TransactionAddModel from "./TransactionAddModel";
 import TransactionAddModel2 from "./TransactionAddModel2";
+import TransactionTaxBillModel from "./TransactionTaxBillModel";
 import { useTranslation } from "react-i18next";
 
 const Transactions = () => {
   const companyState = useRecoilValue(atomCompanyState);
-  const transactionState = useRecoilValue(atomTransationState);
+  const transactionState = useRecoilValue(atomTransactionState);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const allTransactionData = useRecoilValue(atomAllTransactions);
   const filteredTransaction= useRecoilValue(atomFilteredTransaction);
@@ -257,6 +257,16 @@ const Transactions = () => {
                 </div>
               </div>
             </div>
+            <div className="text-center">
+              <button
+                type="button"
+                className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                data-bs-toggle="modal"
+                data-bs-target="#add_new_tax_bill"
+              >
+                Test
+              </button>
+              </div>
           </div>
           {/* /Content End */}
         </div>
@@ -264,8 +274,8 @@ const Transactions = () => {
         <SystemUserModel />
         <CompanyDetailsModel />
         <TransactionDetailsModel />
-        <TransactionAddModel init={initAddNewTransaction} handleInit={setInitAddNewTransaction}/>
         <TransactionAddModel2 init={initAddNewTransaction} handleInit={setInitAddNewTransaction}/>
+        <TransactionTaxBillModel />
       </div>
     </HelmetProvider>
   );

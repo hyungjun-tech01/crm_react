@@ -279,7 +279,7 @@ export const atomFilteredTransaction = atom({
     key: "allFilteredTransactions",
     default: [],
 });
-export const atomTransationState = atom({
+export const atomTransactionState = atom({
     key: "transactionState",
     default: 0,
 });

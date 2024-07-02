@@ -4,7 +4,7 @@ import {
     atomCurrentTransaction
     , atomAllTransactions
     , atomFilteredTransaction
-    , atomTransationState,
+    , atomTransactionState,
     defaultTransaction
 } from '../atoms/atoms';
 
@@ -38,7 +38,7 @@ export const TransactionRepo = selector({
         const loadAllTransactions = getCallback(({ set, snapshot }) => async () => {
             // It is possible that this function might be called by more than two componets almost at the same time.
             // So, to prevent this function from being executed again and again, check the loading state at first.
-            const loadStates = await snapshot.getPromise(atomTransationState);
+            const loadStates = await snapshot.getPromise(atomTransactionState);
             if ((loadStates & 1) === 0) {
                 try {
                     console.log('[TransactionRepository] Try loading all')
@@ -50,7 +50,7 @@ export const TransactionRepo = selector({
                         return;
                     }
                     set(atomAllTransactions, data);
-                    set(atomTransationState, (loadStates | 1));
+                    set(atomTransactionState, (loadStates | 1));
                 }
                 catch (err) {
                     console.error(`loadAllCompanies / Error : ${err}`);

@@ -14,6 +14,9 @@ const TransactionDetailsModel = () => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
 
+
+  //===== [RecoilState] Related with Transaction ======================================
+  const transactionState = useRecoilValue(atomTransactionState);
   const selectedTransaction = useRecoilValue(atomCurrentTransaction);
   const { modifyTransaction, setCurrentTransaction } = useRecoilValue(TransactionRepo);
 
@@ -128,11 +131,6 @@ const TransactionDetailsModel = () => {
       && ((transactionState & 1) === 1)
      ) {
       console.log("[TransactionDetailsModel] useEffect!");
-      setOrgPublishDate(
-        selectedTransaction.publish_date
-        ? new Date(selectedTransaction.publish_date)
-        : null
-      );
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if(detailViewStatus === null){
@@ -165,19 +163,19 @@ const TransactionDetailsModel = () => {
                 name='company_name'
                 title={t('company.company_name')}
                 size='col-md-4'
-                onEditing={handleEditing}
+                onEditing={handleDetailChange}
               />
               <DetailTitleItem
                 original={selectedTransaction.ceo_name}
                 name='ceo_name'
                 title={t('company.ceo_name')}
-                onEditing={handleEditing}
+                onEditing={handleDetailChange}
               />
               <DetailTitleItem
                 original={selectedTransaction.business_registration_code}
                 name='business_registration_code'
                 title={t('company.business_registration_code')}
-                onEditing={handleEditing}
+                onEditing={handleDetailChange}
               />
             </div>
             <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
@@ -229,12 +227,11 @@ const TransactionDetailsModel = () => {
                             { transaction_items_info.map((item, index) => 
                               <DetailCardItem
                                 key={index}
-                                defaultText={selectedTransaction[item.at(0)]}
+                                defaultValue={selectedTransaction[item.key]}
                                 edited={editedDetailValues}
-                                name={item.at(0)}
-                                title={t(item.at(1))}
-                                detail={item.at(2)}
-                                editing={handleEditing}
+                                name={item.key}
+                                title={t(item.title)}
+                                detail={item.detail}
                               />
                             )}
                           </Space>
