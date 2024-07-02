@@ -127,11 +127,11 @@ const QuotationDetailsModel = () => {
     } else {
       console.log("[ QuotationDetailModel ] No saved data");
     }
-    setEditedDetailValues(null);
+    setEditedDetailValues({});
   }, [cookies.myLationCrmUserId, modifyQuotation, editedDetailValues, selectedQuotation]);
 
   const handleCancelAll = useCallback(() => {
-    setEditedDetailValues(null);
+    setEditedDetailValues({});
   }, []);
 
 
@@ -399,7 +399,7 @@ const QuotationDetailsModel = () => {
       && (selectedQuotation.quotation_code !== currentQuotationCode)
     && ((quotationState & 1) === 1)
     ){
-      console.log('[QuotationDetailsModel] useEffect / quotation! :', selectedQuotation);
+      console.log('[QuotationDetailsModel] useEffect / quotation!');
 
       const headerValues = selectedQuotation.quotation_table.split('|');
       if(headerValues && Array.isArray(headerValues)){

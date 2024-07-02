@@ -4,77 +4,24 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
-import { atomCurrentTransaction, defaultTransaction } from "../../atoms/atoms";
+import { atomTransactionState, atomCurrentTransaction, defaultTransaction } from "../../atoms/atoms";
 import { TransactionRepo } from "../../repository/transaction";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import TransactionView from "./TransactionView";
 
 const TransactionDetailsModel = () => {
+  const { t } = useTranslation();
+  const [cookies] = useCookies(["myLationCrmUserId"]);
+
   const selectedTransaction = useRecoilValue(atomCurrentTransaction);
   const { modifyTransaction, setCurrentTransaction } = useRecoilValue(TransactionRepo);
-  const [cookies] = useCookies(["myLationCrmUserId"]);
-  const { t } = useTranslation();
 
+
+  //===== Handles to deal this component ==============================================
   const [ isFullScreen, setIsFullScreen ] = useState(false);
+  const [ currentTransactionCode, setCurrentTransactionCode ] = useState('');
 
-  const [editedValues, setEditedValues] = useState(null);
-  const [ orgPublishDate, setOrgPublishDate ] = useState(null);
-
-  // --- Funtions for Editing ---------------------------------
-  const handleEditing = useCallback((e) => {
-    const tempEdited = {
-      ...editedValues,
-      [e.target.name]: e.target.value,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues]);
-
-  const handleSaveAll = useCallback(() => {
-    if (
-      editedValues !== null &&
-      selectedTransaction &&
-      selectedTransaction !== defaultTransaction
-    ) {
-      const temp_all_saved = {
-        ...editedValues,
-        action_type: "UPDATE",
-        modify_user: cookies.myLationCrmUserId,
-        transaction_code: selectedTransaction.transaction_code,
-      };
-      if (modifyTransaction(temp_all_saved)) {
-        console.log(`Succeeded to modify transaction`);
-        if(editedValues.publish_date){
-          setOrgPublishDate(editedValues.publish_date);
-        };
-      } else {
-        console.error("Failed to modify transaction");
-      }
-    } else {
-      console.log("[ TransactionDetailModel ] No saved data");
-    }
-    setEditedValues(null);
-  }, [
-    cookies.myLationCrmUserId,
-    modifyTransaction,
-    editedValues,
-    selectedTransaction,
-  ]);
-
-  const handleCancelAll = useCallback(() => {
-    setEditedValues(null);
-  }, []);
-
-  // --- Funtions for Specific Changes in Detail ---------------------------------
-  const handleDateChange = useCallback((name, date) => {
-    const tempEdited = {
-      ...editedValues,
-      [name]: date,
-    };
-    setEditedValues(tempEdited);
-  }, [editedValues]);
-
-  // --- Funtions for Control Windows ---------------------------------
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
     if(checked)
@@ -83,29 +30,104 @@ const TransactionDetailsModel = () => {
       localStorage.setItem('isFullScreen', '0');
   }, []);
 
+  
+  //===== Handles to edit 'Quotation Details' =========================================
+  const [editedDetailValues, setEditedDetailValues] = useState({});
+
+  const handleDetailChange = useCallback((e) => {
+    if (e.target.value !== selectedTransaction[e.target.name]) {
+      const tempEdited = {
+        ...editedDetailValues,
+        [e.target.name]: e.target.value,
+      };
+      setEditedDetailValues(tempEdited);
+    } else {
+      if(editedDetailValues[e.target.name]){
+        delete editedDetailValues[e.target.name];
+      };
+    };
+  }, [editedDetailValues, selectedTransaction]);
+
+  const handleDetailDateChange = useCallback((name, date) => {
+    if (date !== new Date(selectedTransaction[name])) {
+      const tempEdited = {
+        ...editedDetailValues,
+        [name]: date,
+      };
+      setEditedDetailValues(tempEdited);
+    };
+  }, [editedDetailValues, selectedTransaction]);
+
+  const handleDetailSelectChange = useCallback((name, selected) => {
+    if(selected.value !== selectedTransaction[name]){
+      const tempEdited = {
+        ...editedDetailValues,
+        [name]: selected.value,
+      }
+      setEditedDetailValues(tempEdited);
+    }
+  }, [editedDetailValues, selectedTransaction]);
+
+  const handleSaveAll = useCallback(() => {
+    if (
+      editedDetailValues !== null &&
+      selectedTransaction &&
+      selectedTransaction !== defaultTransaction
+    ) {
+      const temp_all_saved = {
+        ...editedDetailValues,
+        action_type: "UPDATE",
+        modify_user: cookies.myLationCrmUserId,
+        transaction_code: selectedTransaction.transaction_code,
+      };
+      if (modifyTransaction(temp_all_saved)) {
+        console.log(`Succeeded to modify transaction`);
+      } else {
+        console.error("Failed to modify transaction");
+      }
+    } else {
+      console.log("[ TransactionDetailModel ] No saved data");
+    }
+    setEditedDetailValues({});
+  }, [
+    cookies.myLationCrmUserId,
+    modifyTransaction,
+    editedDetailValues,
+    selectedTransaction,
+  ]);
+
+  const handleCancelAll = useCallback(() => {
+    setEditedDetailValues({});
+  }, []);
+
+
+  // --- Funtions for Control Windows ---------------------------------
   const handleClose = useCallback(() => {
-    setEditedValues(null);
+    setEditedDetailValues({});
     setCurrentTransaction();
   }, []);
 
   const transaction_items_info = [
-    ['transaction_title','transaction.title',{ type:'label', extra:'long' }],
-    ['transaction_type','transaction.type',{ type:'label' }],
-    ['publish_type','transaction.publish_type',{ type:'label' }],
-    ['payment_type','transaction.payment_type',{ type:'label' }],
-    ['currency','common.currency',{ type:'label' }],
-    ['publish_date','transaction.publish_date',{ type:'date', orgTimeData: orgPublishDate, timeDataChange: handleDateChange }],
-    ['supply_price','transaction.supply_price',{ type:'label' }],
-    ['tax_price','transaction.tax_price',{ type:'label' }],
-    ['total_price','transaction.total_price',{ type:'label' }],
-    ['company_address','company.address',{ type:'label', extra:'long' }],
-    ['business_type','company.business_type',{ type:'label' }],
-    ['business_item','company.business_item',{ type:'label', extra:'long' }],
+    { key:'transaction_title',title:'transaction.title',detail:{ type:'label',extra:'long',editing:handleDetailChange }},
+    { key:'transaction_type',title:'transaction.type',detail:{ type:'label',editing:handleDetailChange }},
+    { key:'publish_type',title:'transaction.publish_type',detail:{ type:'label',editing:handleDetailChange }},
+    { key:'payment_type',title:'transaction.payment_type',detail:{ type:'label',editing:handleDetailChange }},
+    { key:'currency',title:'common.currency',detail:{ type:'label',editing:handleDetailChange }},
+    { key:'publish_date',title:'transaction.publish_date',detail:{ type:'date',editing:handleDetailChange }},
+    { key:'supply_price',title:'transaction.supply_price',detail:{ type:'label',editing:handleDetailChange }},
+    { key:'tax_price',title:'transaction.tax_price',detail:{ type:'label',editing:handleDetailChange }},
+    { key:'total_price',title:'transaction.total_price',detail:{ type:'label',editing:handleDetailChange }},
+    { key:'company_address',title:'company.address',detail:{ type:'label', extra:'long',editing:handleDetailChange }},
+    { key:'business_type',title:'company.business_type',detail:{ type:'label',editing:handleDetailChange }},
+    { key:'business_item',title:'company.business_item',detail:{ type:'label', extra:'long',editing:handleDetailChange }},
   ];
 
   useEffect(() => {
-    if(selectedTransaction !== defaultTransaction) {
-      console.log("[TransactionDetailsModel] called!");
+    if((selectedTransaction !== defaultTransaction)
+      && (selectedTransaction.transaction_code !== currentTransactionCode)
+      && ((transactionState & 1) === 1)
+     ) {
+      console.log("[TransactionDetailsModel] useEffect!");
       setOrgPublishDate(
         selectedTransaction.publish_date
         ? new Date(selectedTransaction.publish_date)
@@ -121,8 +143,10 @@ const TransactionDetailsModel = () => {
       } else {
         setIsFullScreen(true);
       };
+
+      setCurrentTransactionCode(selectedTransaction.transaction_code);
     };
-  }, [selectedTransaction, editedValues]);
+  }, [selectedTransaction, editedDetailValues, currentTransactionCode]);
 
   return (
     <div
@@ -206,7 +230,7 @@ const TransactionDetailsModel = () => {
                               <DetailCardItem
                                 key={index}
                                 defaultText={selectedTransaction[item.at(0)]}
-                                edited={editedValues}
+                                edited={editedDetailValues}
                                 name={item.at(0)}
                                 title={t(item.at(1))}
                                 detail={item.at(2)}
@@ -224,7 +248,7 @@ const TransactionDetailsModel = () => {
                       <TransactionView />
                     </div>
                   </div>
-                  { editedValues !== null && Object.keys(editedValues).length !== 0 &&
+                  { editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&
                     <div className="text-center py-3">
                       <button
                         type="button"
