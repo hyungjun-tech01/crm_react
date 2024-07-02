@@ -85,7 +85,6 @@ const TransactionAddModel = (props) => {
   }, [transactionChange]);
 
   const handleSelectChange = useCallback((name, selected) => {
-    console.log('handleSelectChange :', name, selected);
     let modifiedData = null;
     if (name === 'company_name') {
       modifiedData = {
@@ -100,9 +99,12 @@ const TransactionAddModel = (props) => {
       };
     } else {
       if (name === 'transaction_type') {
+        console.log('handleSelectChange / transaction_type :', selected);
         if (selected.value === '매출') {
+          console.log('- Check / sale');
           setIsSale(true);
         } else {
+          console.log('- Check / receipt');
           setIsSale(false);
         };
       };
@@ -553,7 +555,7 @@ const TransactionAddModel = (props) => {
       initializeTransactionTemplate();
       handleInit(!init);
     };
-  }, [handleInit, init, initializeTransactionTemplate]);
+  }, [handleInit, init, initializeTransactionTemplate, isSale]);
 
   return (
     <div

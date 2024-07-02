@@ -13,14 +13,6 @@ const Styles = StyleSheet.create({
         paddingRight: 10,
         paddingVertical: 10,
     },
-    text: {
-        marginHorizontal: 2,
-        marginVertical: 0,
-        fontSize: 10,
-        textAlign: 'justify',
-        textOverflow: 'ellipsis',
-        fontFamily: 'Noto Sans'
-    },
     SupplierText: {
         marginHorizontal: 2,
         fontFamily: 'Noto Sans',
@@ -30,6 +22,10 @@ const Styles = StyleSheet.create({
     inputText: {
         maxLines: 2,
         textAlign: 'justify',
+        fontFamily: 'Noto Sans',
+    },
+    inputTextCenter: {
+        textAlign: 'center',
         fontFamily: 'Noto Sans',
     },
     inputAmount: {
@@ -78,8 +74,11 @@ Font.register({
 const TransactionView2 = (props) => {
     const { transaction, contents} = props;
     const [ transactionContents, setTransactionContents ] = useState([]);
+    const [ supplier, setSupplier ] = useState({});
+    const [ receiver, setReceiver ] = useState({});
 
-    const supplier_info = {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const company_info = {
         business_registration_code: '106-86-26016',
         company_name: '노드데이타',
         ceo_name: '김신일',
@@ -102,9 +101,29 @@ const TransactionView2 = (props) => {
                 temp_array[i] = null;
             };
             setTransactionContents(temp_array);
-            console.log('TransactionView2 : ', temp_array);
         };
-    }, [contents]);
+        if(transaction.transaction_type ==='매출'){
+            setSupplier({...company_info});
+            setReceiver({
+                business_registration_code: transaction.business_registration_code,
+                company_name: transaction.company_name,
+                ceo_name: transaction.ceo_name,
+                company_address: transaction.company_address,
+                business_type: transaction.business_type,
+                business_item: transaction.business_item,
+            });
+        } else {
+            setSupplier({
+                business_registration_code: transaction.business_registration_code,
+                company_name: transaction.company_name,
+                ceo_name: transaction.ceo_name,
+                company_address: transaction.company_address,
+                business_type: transaction.business_type,
+                business_item: transaction.business_item,
+            });
+            setReceiver({...company_info});
+        }
+    }, [contents, transaction]);
 
     return (
         <PDFViewer style={{width: '100%', minHeight: '480px', height: '960px'}}>
@@ -138,7 +157,7 @@ const TransactionView2 = (props) => {
                                             <Text style={[Styles.SupplierText,{fontSize:10,marginTop:6}]}>등록번호</Text>
                                         </View>
                                         <View style={{width:'80%'}}>
-                                            <Text style={[Styles.SupplierRegNo]}>{supplier_info.business_registration_code}</Text>
+                                            <Text style={[Styles.SupplierRegNo]}>{supplier.business_registration_code}</Text>
                                         </View>
                                     </View>
                                     <View style={{height:27,borderBottom:1,borderColor:'#0000ff',alignItems:'stretch',alignContent:'center',flexDirection:'row'}}>
@@ -147,14 +166,14 @@ const TransactionView2 = (props) => {
                                             <Text style={[Styles.SupplierText,{fontSize:10,marginTop:-2}]}>(법인명)</Text>
                                         </View>
                                         <View style={{width:'36%',alignItems:'center',borderRight:1,borderColor:'#0000ff'}}>
-                                            <Text style={[Styles.inputText,{fontSize:10,marginTop:6}]}>{supplier_info.company_name}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:10,marginTop:6}]}>{supplier.company_name}</Text>
                                         </View>
-                                        <View style={{width:'8%',alignItems:'center',borderRight:1,borderColor:'#0000ff',flexGrow:0}}>
+                                        <View style={{width:'7%',alignItems:'center',borderRight:1,borderColor:'#0000ff',flexGrow:0}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10,marginBottom:-2}]}>성</Text>
                                             <Text style={[Styles.SupplierText,{fontSize:10,marginTop:-2}]}>명</Text>
                                         </View>
                                         <View style={{width:'36%',alignItems:'center'}}>
-                                            <Text style={[Styles.inputText,{fontSize:10,marginTop:5}]}>{supplier_info.ceo_name}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:10,marginTop:5}]}>{supplier.ceo_name}</Text>
                                         </View>
                                     </View>
                                     <View style={{height:27,borderBottom:1,borderColor:'#0000ff',alignItems:'center',alignContent:'center',flexDirection:'row'}}>
@@ -163,7 +182,7 @@ const TransactionView2 = (props) => {
                                             <Text style={[Styles.SupplierText,{fontSize:10,marginTop:-2}]}>주  소</Text>
                                         </View>
                                         <View style={{width:'75%',alignItems:'center'}}>
-                                            <Text style={[Styles.inputText,{fontSize:10,letterSpacing:-1}]}>{supplier_info.company_address}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:10,letterSpacing:-1}]}>{supplier.company_address}</Text>
                                         </View>
                                     </View>
                                     <View style={{height:26,border:0,flexDirection:'row',alignItems:'center',alignContent:'center'}}>
@@ -171,14 +190,14 @@ const TransactionView2 = (props) => {
                                             <Text style={[Styles.SupplierText,{fontSize:10,marginTop:6}]}>업  태</Text>
                                         </View>
                                         <View style={{width:'27.5%'}}>
-                                            <Text style={[Styles.inputText,{fontSize:10,letterSpacing:-1}]}>{supplier_info.business_type}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:10,letterSpacing:-1}]}>{supplier.business_type}</Text>
                                         </View>
-                                        <View style={{width:'8%',height:26,alignItems:'center',borderLeft:1,borderRight:1,borderColor:'#0000ff',flexGrow:0}}>
+                                        <View style={{width:'7%',height:26,alignItems:'center',borderLeft:1,borderRight:1,borderColor:'#0000ff',flexGrow:0}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10,marginBottom:-2}]}>종</Text>
                                             <Text style={[Styles.SupplierText,{fontSize:10,marginTop:-2}]}>목</Text>
                                         </View>
                                         <View style={{width:'44.5%',}}>
-                                            <Text style={[Styles.inputText,{fontSize:9,letterSpacing:-1}]}>{supplier_info.business_item}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:9,letterSpacing:-1}]}>{supplier.business_item}</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -194,7 +213,7 @@ const TransactionView2 = (props) => {
                                             <Text style={[Styles.SupplierText,{fontSize:10,marginTop:6}]}>등록번호</Text>
                                         </View>
                                         <View style={{width:'80%',}}>
-                                            <Text style={[Styles.SupplierRegNo]}>{transaction.business_registration_code}</Text>
+                                            <Text style={[Styles.SupplierRegNo]}>{receiver.business_registration_code}</Text>
                                         </View>
                                     </View>
                                     <View style={{height:27,borderBottom:1,borderColor:'#0000ff',alignItems:'stretch',alignContent:'center',flexDirection:'row'}}>
@@ -203,14 +222,14 @@ const TransactionView2 = (props) => {
                                             <Text style={[Styles.SupplierText,{fontSize:10,marginTop:-2}]}>(법인명)</Text>
                                         </View>
                                         <View style={{width:'36%',alignItems:'center',borderRight:1,borderColor:'#0000ff'}}>
-                                            <Text style={[Styles.inputText,{fontSize:10,marginTop:6}]}>{transaction.company_name}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:10,marginTop:6}]}>{receiver.company_name}</Text>
                                         </View>
-                                        <View style={{width:'8%',alignItems:'center',borderRight:1,borderColor:'#0000ff',flexGrow:0}}>
+                                        <View style={{width:'7%',alignItems:'center',borderRight:1,borderColor:'#0000ff',flexGrow:0}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10,marginBottom:-2}]}>성</Text>
                                             <Text style={[Styles.SupplierText,{fontSize:10,marginTop:-2}]}>명</Text>
                                         </View>
                                         <View style={{width:'36%',alignItems:'center'}}>
-                                            <Text style={[Styles.inputText,{fontSize:10,marginTop:5}]}>{transaction.ceo_name}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:10,marginTop:5}]}>{receiver.ceo_name}</Text>
                                         </View>
                                     </View>
                                     <View style={{height:27,borderBottom:1,borderColor:'#0000ff',alignItems:'center',alignContent:'center',flexDirection:'row'}}>
@@ -219,7 +238,7 @@ const TransactionView2 = (props) => {
                                             <Text style={[Styles.SupplierText,{fontSize:10,marginTop:-2}]}>주  소</Text>
                                         </View>
                                         <View style={{width:'80%',alignItems:'center'}}>
-                                            <Text style={[Styles.inputText,{fontSize:10,letterSpacing:-1}]}>{transaction.company_address}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:10,letterSpacing:-1}]}>{receiver.company_address}</Text>
                                         </View>
                                     </View>
                                     <View style={{height:26,border:0,flexDirection:'row',alignItems:'center',alignContent:'center'}}>
@@ -227,14 +246,14 @@ const TransactionView2 = (props) => {
                                             <Text style={[Styles.SupplierText,{fontSize:10,marginTop:6}]}>업  태</Text>
                                         </View>
                                         <View style={{width:'27.5%',}}>
-                                            <Text style={[Styles.inputText,{fontSize:10,letterSpacing:-1}]}>{transaction.business_type}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:10,letterSpacing:-1}]}>{receiver.business_type}</Text>
                                         </View>
-                                        <View style={{width:'8%',height:26,alignItems:'center',borderLeft:1,borderRight:1,borderColor:'#0000ff',flexGrow:0}}>
+                                        <View style={{width:'7%',height:26,alignItems:'center',borderLeft:1,borderRight:1,borderColor:'#0000ff',flexGrow:0}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10,marginBottom:-2}]}>종</Text>
                                             <Text style={[Styles.SupplierText,{fontSize:10,marginTop:-2}]}>목</Text>
                                         </View>
                                         <View style={{width:'44.5%',}}>
-                                            <Text style={[Styles.inputText,{fontSize:9,letterSpacing:-1}]}>{transaction.business_item}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:9,letterSpacing:-1}]}>{receiver.business_item}</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -243,25 +262,25 @@ const TransactionView2 = (props) => {
                         <View style={{width:'100%',margin:0,padding:0,border:1,borderColor:'#0000ff',flexDirection:'column',flexGrow:1}}>
                             <View style={{width:'100%',height:200,margin:0,padding:0,borderBottom:1,borderColor:'#0000ff',flexDirection:'column'}}>
                                 <View style={{width: '100%',height:20,margin:0,padding:0,borderBottom:1,borderColor:'#0000ff',flexDirection:'row',alignContent:'center'}}>
-                                    <View style={{width:40,margin:0,padding:0,borderRight:1,borderColor:'#0000ff',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
-                                        <Text style={[Styles.SupplierText,{fontSize:10}]}>월일</Text>
+                                    <View style={{width:'7%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
+                                        <Text style={[Styles.SupplierText,{fontSize:10}]}>월.일</Text>
                                     </View>
-                                    <View style={{margin:0,padding:0,borderRight:1,borderColor:'#0000ff',flexGrow:1,alignItems:'center',justifyContent:'center'}}>
+                                    <View style={{width:'32%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',flexGrow:1,alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.SupplierText,{fontSize:10}]}>품    목</Text>
                                     </View>
-                                    <View style={{width: 50,margin:0,padding:0,borderRight:1,borderColor:'#0000ff',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
+                                    <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.SupplierText,{fontSize:10}]}>규격</Text>
                                     </View>
-                                    <View style={{width: 50,margin:0,padding:0,borderRight:1,borderColor:'#0000ff',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
+                                    <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.SupplierText,{fontSize:10}]}>수량</Text>
                                     </View>
-                                    <View style={{width: 80,margin:0,padding:0,borderRight:1,borderColor:'#0000ff',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
+                                    <View style={{width:'14%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.SupplierText,{fontSize:10}]}>단가</Text>
                                     </View>
-                                    <View style={{width: 80,margin:0,padding:0,borderRight:1,borderColor:'#0000ff',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
+                                    <View style={{width:'15%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.SupplierText,{fontSize:10}]}>공급가액</Text>
                                     </View>
-                                    <View style={{width: 80,margin:0,padding:0,border:0,flexGrow:0,alignItems:'center',justifyContent:'center'}}>
+                                    <View style={{width:'12%',margin:0,padding:0,border:0,flexGrow:0,alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.SupplierText,{fontSize:10}]}>세액</Text>
                                     </View>
                                 </View>
@@ -271,77 +290,77 @@ const TransactionView2 = (props) => {
                                             if(index % 2 === 0) {
                                                 return (
                                                     <View key={index} style={[Styles.contentRow, {borderBottom:1,borderColor:"#0000ff"}]}>
-                                                        <View style={[Styles.contentCell, {width:40,borderRight:1,borderColor:"#0000ff",flexGrow:0,justifyContent:'center'}]}>
-                                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{item.month_day}</Text>
+                                                        <View style={[Styles.contentCell, {width:'7%',borderRight:1,borderColor:"#0000ff",flexGrow:0,justifyContent:'center'}]}>
+                                                            <Text style={[Styles.inputTextCenter,{fontSize:10}]}>{item.month_day}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {borderRight:1,borderColor:"#0000ff",flexGrow:1}]}>
-                                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{item.product_name}</Text>
+                                                        <View style={[Styles.contentCell, {width:'32%',borderRight:1,borderColor:"#0000ff",flexGrow:1}]}>
+                                                            <Text style={[Styles.inputText,{fontSize:10}]}>{item.product_name}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}>
-                                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{item.standard}</Text>
+                                                        <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}>
+                                                            <Text style={[Styles.inputTextCenter,{fontSize:10}]}>{item.standard}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#0000ff",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{item.quantity}</Text>
+                                                        <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#0000ff",flexGrow:0,justifyContent:'flex-end'}]}>
+                                                            <Text style={[Styles.inputTextCenter,{fontSize:10}]}>{item.quantity}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#0000ff",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{ConvertCurrency(item.supply_price)}</Text>
+                                                        <View style={[Styles.contentCell, {width:'14%',borderRight:1,borderColor:"#0000ff",flexGrow:0,justifyContent:'flex-end'}]}>
+                                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.supply_price)}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#0000ff",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{ConvertCurrency(item.total_price)}</Text>
+                                                        <View style={[Styles.contentCell, {width:'15%',borderRight:1,borderColor:"#0000ff",flexGrow:0,justifyContent:'flex-end'}]}>
+                                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.total_price)}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:80,border:0,flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{ConvertCurrency(item.tax_price)}</Text>
+                                                        <View style={[Styles.contentCell, {width:'12%',border:0,flexGrow:0,justifyContent:'flex-end'}]}>
+                                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.tax_price)}</Text>
                                                         </View>
                                                     </View>
                                             )};
                                             if(index % 10 === 9) {
                                                 return (
                                                     <View key={index} style={[Styles.contentRow, {backgroundColor:"#0000ff"}]}>
-                                                        <View style={[Styles.contentCell, {width:40,borderRight:1,borderColor:"#0000ff",flexGrow:0,justifyContent:'center'}]}>
-                                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{item.month_day}</Text>
+                                                        <View style={[Styles.contentCell, {width:'7%',borderRight:1,borderColor:"#0000ff",flexGrow:0,justifyContent:'center'}]}>
+                                                            <Text style={[Styles.inputTextCenter,{fontSize:10}]}>{item.month_day}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {borderRight:1,borderColor:"#0000ff",flexGrow:1}]}>
-                                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{item.product_name}</Text>
+                                                        <View style={[Styles.contentCell, {width:'32%',borderRight:1,borderColor:"#0000ff",flexGrow:1}]}>
+                                                            <Text style={[Styles.inputText,{fontSize:10}]}>{item.product_name}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}>
-                                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{item.standard}</Text>
+                                                        <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}>
+                                                            <Text style={[Styles.inputTextCenter,{fontSize:10}]}>{item.standard}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#0000ff",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{item.quantity}</Text>
+                                                        <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#0000ff",flexGrow:0,justifyContent:'flex-end'}]}>
+                                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{item.quantity}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#0000ff",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{ConvertCurrency(item.supply_price)}</Text>
+                                                        <View style={[Styles.contentCell, {width:'14%',borderRight:1,borderColor:"#0000ff",flexGrow:0,justifyContent:'flex-end'}]}>
+                                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.supply_price)}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#0000ff",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{ConvertCurrency(item.total_price)}</Text>
+                                                        <View style={[Styles.contentCell, {width:'15%',borderRight:1,borderColor:"#0000ff",flexGrow:0,justifyContent:'flex-end'}]}>
+                                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.total_price)}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:80,border:0,flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{ConvertCurrency(item.tax_price)}</Text>
+                                                        <View style={[Styles.contentCell, {width:'12%',border:0,flexGrow:0,justifyContent:'flex-end'}]}>
+                                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.tax_price)}</Text>
                                                         </View>
                                                     </View>
                                             )};
                                             return (
                                                 <View key={index} style={[Styles.contentRow, {borderBottom:1,borderColor:"#0000ff",backgroundColor:"#ededff"}]}>
-                                                    <View style={[Styles.contentCell, {width:40,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}>
-                                                        <Text style={[Styles.SupplierText,{fontSize:10}]}>{item.month_day}</Text>
+                                                    <View style={[Styles.contentCell, {width:'7%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}>
+                                                        <Text style={[Styles.inputTextCenter,{fontSize:10}]}>{item.month_day}</Text>
                                                     </View>
-                                                    <View style={[Styles.contentCell, {borderRight:1,borderColor:"#0000ff",flexGrow:1}]}>
-                                                        <Text style={[Styles.SupplierText,{fontSize:10}]}>{item.product_name}</Text>
+                                                    <View style={[Styles.contentCell, {width:'32%',borderRight:1,borderColor:"#0000ff",flexGrow:1}]}>
+                                                        <Text style={[Styles.inputText,{fontSize:10}]}>{item.product_name}</Text>
                                                     </View>
-                                                    <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}>
-                                                        <Text style={[Styles.SupplierText,{fontSize:10}]}>{item.standard}</Text>
+                                                    <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}>
+                                                        <Text style={[Styles.inputTextCenter,{fontSize:10}]}>{item.standard}</Text>
                                                     </View>
-                                                    <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}>
-                                                        <Text style={[Styles.SupplierText,{fontSize:10}]}>{item.quantity}</Text>
+                                                    <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}>
+                                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{item.quantity}</Text>
                                                     </View>
-                                                    <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}>
-                                                        <Text style={[Styles.SupplierText,{fontSize:10}]}>{ConvertCurrency(item.supply_price)}</Text>
+                                                    <View style={[Styles.contentCell, {width:'14%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}>
+                                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.supply_price)}</Text>
                                                     </View>
-                                                    <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}>
-                                                        <Text style={[Styles.SupplierText,{fontSize:10}]}>{ConvertCurrency(item.total_price)}</Text>
+                                                    <View style={[Styles.contentCell, {width:'15%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}>
+                                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.total_price)}</Text>
                                                     </View>
-                                                    <View style={[Styles.contentCell, {width:80,border:0,flexGrow:0}]}>
-                                                        <Text style={[Styles.SupplierText,{fontSize:10}]}>{ConvertCurrency(item.tax_price)}</Text>
+                                                    <View style={[Styles.contentCell, {width:'12%',border:0,flexGrow:0}]}>
+                                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.tax_price)}</Text>
                                                     </View>
                                                 </View>
                                             );
@@ -349,38 +368,38 @@ const TransactionView2 = (props) => {
                                         if(index % 2 === 0) {
                                             return (
                                                 <View key={index} style={[Styles.contentRow, {borderBottom:1,borderColor:"#0000ff"}]}>
-                                                    <View style={[Styles.contentCell, {width:40,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {borderRight:1,borderColor:"#0000ff",flexGrow:1}]}></View>
-                                                    <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {width:80,border:0,flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'7%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'32%',borderRight:1,borderColor:"#0000ff",flexGrow:1}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'14%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'15%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'12%',border:0,flexGrow:0}]}></View>
                                                 </View>
                                             );
                                         };
                                         if(index % 10 === 9) {
                                             return (
                                                 <View key={index} style={[Styles.contentRow, {backgroundColor:"#ededff"}]}>
-                                                    <View style={[Styles.contentCell, {width:40,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {borderRight:1,borderColor:"#0000ff",flexGrow:1}]}></View>
-                                                    <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#eeeeee",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#eeeeee",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {width:80,border:0,flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'7%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'32%',borderRight:1,borderColor:"#0000ff",flexGrow:1}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'14%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'15%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'12%',border:0,flexGrow:0}]}></View>
                                                 </View> 
                                             );
                                         };
                                         return (
                                             <View key={index} style={[Styles.contentRow, {borderBottom:1,borderColor:"#0000ff",backgroundColor:"#ededff"}]}>
-                                                <View style={[Styles.contentCell, {width:40,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
-                                                <View style={[Styles.contentCell, {borderRight:1,borderColor:"#0000ff",flexGrow:1}]}></View>
-                                                <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
-                                                <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
-                                                <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
-                                                <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
-                                                <View style={[Styles.contentCell, {width:80,border:0,flexGrow:0}]}></View>
+                                                <View style={[Styles.contentCell, {width:'7%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
+                                                <View style={[Styles.contentCell, {width:'32%',borderRight:1,borderColor:"#0000ff",flexGrow:1}]}></View>
+                                                <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
+                                                <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
+                                                <View style={[Styles.contentCell, {width:'14%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
+                                                <View style={[Styles.contentCell, {width:'15%',borderRight:1,borderColor:"#0000ff",flexGrow:0}]}></View>
+                                                <View style={[Styles.contentCell, {width:'12%',border:0,flexGrow:0}]}></View>
                                             </View> 
                                         );
                                 })}
@@ -459,7 +478,7 @@ const TransactionView2 = (props) => {
                                             <Text style={[Styles.ReceiverText,{fontSize:10,marginTop:6}]}>등록번호</Text>
                                         </View>
                                         <View style={{width:'80%'}}>
-                                            <Text style={[Styles.SupplierRegNo]}>{supplier_info.business_registration_code}</Text>
+                                            <Text style={[Styles.SupplierRegNo]}>{supplier.business_registration_code}</Text>
                                         </View>
                                     </View>
                                     <View style={{height:27,borderBottom:1,borderColor:'#ff0505',alignItems:'stretch',alignContent:'center',flexDirection:'row'}}>
@@ -468,14 +487,14 @@ const TransactionView2 = (props) => {
                                             <Text style={[Styles.ReceiverText,{fontSize:10,marginTop:-2}]}>(법인명)</Text>
                                         </View>
                                         <View style={{width:'36%',alignItems:'center',borderRight:1,borderColor:'#ff0505'}}>
-                                            <Text style={[Styles.inputText,{fontSize:10,marginTop:6}]}>{supplier_info.company_name}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:10,marginTop:6}]}>{supplier.company_name}</Text>
                                         </View>
-                                        <View style={{width:'8%',alignItems:'center',borderRight:1,borderColor:'#ff0505',flexGrow:0}}>
+                                        <View style={{width:'7%',alignItems:'center',borderRight:1,borderColor:'#ff0505',flexGrow:0}}>
                                             <Text style={[Styles.ReceiverText,{fontSize:10,marginBottom:-2}]}>성</Text>
                                             <Text style={[Styles.ReceiverText,{fontSize:10,marginTop:-2}]}>명</Text>
                                         </View>
                                         <View style={{width:'36%',alignItems:'center'}}>
-                                            <Text style={[Styles.inputText,{fontSize:10,marginTop:5}]}>{supplier_info.ceo_name}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:10,marginTop:5}]}>{supplier.ceo_name}</Text>
                                         </View>
                                     </View>
                                     <View style={{height:27,borderBottom:1,borderColor:'#ff0505',alignItems:'center',alignContent:'center',flexDirection:'row'}}>
@@ -484,7 +503,7 @@ const TransactionView2 = (props) => {
                                             <Text style={[Styles.ReceiverText,{fontSize:10,marginTop:-2}]}>주  소</Text>
                                         </View>
                                         <View style={{width:'75%',alignItems:'center'}}>
-                                            <Text style={[Styles.inputText,{fontSize:10,letterSpacing:-1}]}>{supplier_info.company_address}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:10,letterSpacing:-1}]}>{supplier.company_address}</Text>
                                         </View>
                                     </View>
                                     <View style={{height:26,border:0,flexDirection:'row',alignItems:'center',alignContent:'center'}}>
@@ -492,14 +511,14 @@ const TransactionView2 = (props) => {
                                             <Text style={[Styles.ReceiverText,{fontSize:10,marginTop:6}]}>업  태</Text>
                                         </View>
                                         <View style={{width:'27.5%'}}>
-                                            <Text style={[Styles.inputText,{fontSize:10,letterSpacing:-1}]}>{supplier_info.business_type}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:10,letterSpacing:-1}]}>{supplier.business_type}</Text>
                                         </View>
-                                        <View style={{width:'8%',height:26,alignItems:'center',borderLeft:1,borderRight:1,borderColor:'#ff0505',flexGrow:0}}>
+                                        <View style={{width:'7%',height:26,alignItems:'center',borderLeft:1,borderRight:1,borderColor:'#ff0505',flexGrow:0}}>
                                             <Text style={[Styles.ReceiverText,{fontSize:10,marginBottom:-2}]}>종</Text>
                                             <Text style={[Styles.ReceiverText,{fontSize:10,marginTop:-2}]}>목</Text>
                                         </View>
                                         <View style={{width:'44.5%',}}>
-                                            <Text style={[Styles.inputText,{fontSize:9,letterSpacing:-1}]}>{supplier_info.business_item}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:9,letterSpacing:-1}]}>{supplier.business_item}</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -515,7 +534,7 @@ const TransactionView2 = (props) => {
                                             <Text style={[Styles.ReceiverText,{fontSize:10,marginTop:6}]}>등록번호</Text>
                                         </View>
                                         <View style={{width:'80%',}}>
-                                            <Text style={[Styles.SupplierRegNo]}>{transaction.business_registration_code}</Text>
+                                            <Text style={[Styles.SupplierRegNo]}>{receiver.business_registration_code}</Text>
                                         </View>
                                     </View>
                                     <View style={{height:27,borderBottom:1,borderColor:'#ff0505',alignItems:'stretch',alignContent:'center',flexDirection:'row'}}>
@@ -524,14 +543,14 @@ const TransactionView2 = (props) => {
                                             <Text style={[Styles.ReceiverText,{fontSize:10,marginTop:-2}]}>(법인명)</Text>
                                         </View>
                                         <View style={{width:'36%',alignItems:'center',borderRight:1,borderColor:'#ff0505'}}>
-                                            <Text style={[Styles.inputText,{fontSize:10,marginTop:6}]}>{transaction.company_name}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:10,marginTop:6}]}>{receiver.company_name}</Text>
                                         </View>
-                                        <View style={{width:'8%',alignItems:'center',borderRight:1,borderColor:'#ff0505',flexGrow:0}}>
+                                        <View style={{width:'7%',alignItems:'center',borderRight:1,borderColor:'#ff0505',flexGrow:0}}>
                                             <Text style={[Styles.ReceiverText,{fontSize:10,marginBottom:-2}]}>성</Text>
                                             <Text style={[Styles.ReceiverText,{fontSize:10,marginTop:-2}]}>명</Text>
                                         </View>
                                         <View style={{width:'36%',alignItems:'center'}}>
-                                            <Text style={[Styles.inputText,{fontSize:10,marginTop:5}]}>{transaction.ceo_name}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:10,marginTop:5}]}>{receiver.ceo_name}</Text>
                                         </View>
                                     </View>
                                     <View style={{height:27,borderBottom:1,borderColor:'#ff0505',alignItems:'center',alignContent:'center',flexDirection:'row'}}>
@@ -540,7 +559,7 @@ const TransactionView2 = (props) => {
                                             <Text style={[Styles.ReceiverText,{fontSize:10,marginTop:-2}]}>주  소</Text>
                                         </View>
                                         <View style={{width:'80%',alignItems:'center'}}>
-                                            <Text style={[Styles.inputText,{fontSize:10,letterSpacing:-1}]}>{transaction.company_address}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:10,letterSpacing:-1}]}>{receiver.company_address}</Text>
                                         </View>
                                     </View>
                                     <View style={{height:26,border:0,flexDirection:'row',alignItems:'center',alignContent:'center'}}>
@@ -548,14 +567,14 @@ const TransactionView2 = (props) => {
                                             <Text style={[Styles.ReceiverText,{fontSize:10,marginTop:6}]}>업  태</Text>
                                         </View>
                                         <View style={{width:'27.5%',}}>
-                                            <Text style={[Styles.inputText,{fontSize:10,letterSpacing:-1}]}>{transaction.business_type}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:10,letterSpacing:-1}]}>{receiver.business_type}</Text>
                                         </View>
-                                        <View style={{width:'8%',height:26,alignItems:'center',borderLeft:1,borderRight:1,borderColor:'#ff0505',flexGrow:0}}>
+                                        <View style={{width:'7%',height:26,alignItems:'center',borderLeft:1,borderRight:1,borderColor:'#ff0505',flexGrow:0}}>
                                             <Text style={[Styles.ReceiverText,{fontSize:10,marginBottom:-2}]}>종</Text>
                                             <Text style={[Styles.ReceiverText,{fontSize:10,marginTop:-2}]}>목</Text>
                                         </View>
                                         <View style={{width:'44.5%',}}>
-                                            <Text style={[Styles.inputText,{fontSize:9,letterSpacing:-1}]}>{transaction.business_item}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:9,letterSpacing:-1}]}>{receiver.business_item}</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -564,25 +583,25 @@ const TransactionView2 = (props) => {
                         <View style={{width:'100%',margin:0,padding:0,border:1,borderColor:'#ff0505',flexDirection:'column',flexGrow:1}}>
                             <View style={{width:'100%',height:200,margin:0,padding:0,borderBottom:1,borderColor:'#ff0505',flexDirection:'column'}}>
                                 <View style={{width: '100%',height:20,margin:0,padding:0,borderBottom:1,borderColor:'#ff0505',flexDirection:'row',alignContent:'center'}}>
-                                    <View style={{width:40,margin:0,padding:0,borderRight:1,borderColor:'#ff0505',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
+                                    <View style={{width:'7%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.ReceiverText,{fontSize:10}]}>월일</Text>
                                     </View>
-                                    <View style={{margin:0,padding:0,borderRight:1,borderColor:'#ff0505',flexGrow:1,alignItems:'center',justifyContent:'center'}}>
+                                    <View style={{width:'30%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',flexGrow:1,alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.ReceiverText,{fontSize:10}]}>품    목</Text>
                                     </View>
-                                    <View style={{width: 50,margin:0,padding:0,borderRight:1,borderColor:'#ff0505',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
+                                    <View style={{width:'12%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.ReceiverText,{fontSize:10}]}>규격</Text>
                                     </View>
-                                    <View style={{width: 50,margin:0,padding:0,borderRight:1,borderColor:'#ff0505',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
+                                    <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.ReceiverText,{fontSize:10}]}>수량</Text>
                                     </View>
-                                    <View style={{width: 80,margin:0,padding:0,borderRight:1,borderColor:'#ff0505',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
+                                    <View style={{width:'14%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.ReceiverText,{fontSize:10}]}>단가</Text>
                                     </View>
-                                    <View style={{width: 80,margin:0,padding:0,borderRight:1,borderColor:'#ff0505',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
+                                    <View style={{width:'15%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',flexGrow:0,alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.ReceiverText,{fontSize:10}]}>공급가액</Text>
                                     </View>
-                                    <View style={{width: 80,margin:0,padding:0,border:0,flexGrow:0,alignItems:'center',justifyContent:'center'}}>
+                                    <View style={{width:'12%',margin:0,padding:0,border:0,flexGrow:0,alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.ReceiverText,{fontSize:10}]}>세액</Text>
                                     </View>
                                 </View>
@@ -592,77 +611,77 @@ const TransactionView2 = (props) => {
                                             if(index % 2 === 0) {
                                                 return (
                                                     <View key={index} style={[Styles.contentRow, {borderBottom:1,borderColor:"#ff0505"}]}>
-                                                        <View style={[Styles.contentCell, {width:40,borderRight:1,borderColor:"#ff0505",flexGrow:0,justifyContent:'center'}]}>
-                                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{item.month_day}</Text>
+                                                        <View style={[Styles.contentCell, {width:'7%',borderRight:1,borderColor:"#ff0505",flexGrow:0,justifyContent:'center'}]}>
+                                                            <Text style={[Styles.inputTextCenter,{fontSize:10}]}>{item.month_day}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {borderRight:1,borderColor:"#ff0505",flexGrow:1}]}>
-                                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{item.product_name}</Text>
+                                                        <View style={[Styles.contentCell, {width:'32%',borderRight:1,borderColor:"#ff0505",flexGrow:1}]}>
+                                                            <Text style={[Styles.inputText,{fontSize:10}]}>{item.product_name}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}>
-                                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{item.standard}</Text>
+                                                        <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}>
+                                                            <Text style={[Styles.inputTextCenter,{fontSize:10}]}>{item.standard}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#ff0505",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{item.quantity}</Text>
+                                                        <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#ff0505",flexGrow:0,justifyContent:'flex-end'}]}>
+                                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{item.quantity}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#ff0505",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{ConvertCurrency(item.supply_price)}</Text>
+                                                        <View style={[Styles.contentCell, {width:'14%',borderRight:1,borderColor:"#ff0505",flexGrow:0,justifyContent:'flex-end'}]}>
+                                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.supply_price)}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#ff0505",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{ConvertCurrency(item.total_price)}</Text>
+                                                        <View style={[Styles.contentCell, {width:'15%',borderRight:1,borderColor:"#ff0505",flexGrow:0,justifyContent:'flex-end'}]}>
+                                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.total_price)}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:80,border:0,flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{ConvertCurrency(item.tax_price)}</Text>
+                                                        <View style={[Styles.contentCell, {width:'12%',border:0,flexGrow:0,justifyContent:'flex-end'}]}>
+                                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.tax_price)}</Text>
                                                         </View>
                                                     </View>
                                             )};
                                             if(index % 10 === 9) {
                                                 return (
                                                     <View key={index} style={[Styles.contentRow, {backgroundColor:"#ff0505"}]}>
-                                                        <View style={[Styles.contentCell, {width:40,borderRight:1,borderColor:"#ff0505",flexGrow:0,justifyContent:'center'}]}>
-                                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{item.month_day}</Text>
+                                                        <View style={[Styles.contentCell, {width:'7%',borderRight:1,borderColor:"#ff0505",flexGrow:0,justifyContent:'center'}]}>
+                                                            <Text style={[Styles.inputTextCenter,{fontSize:10}]}>{item.month_day}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {borderRight:1,borderColor:"#ff0505",flexGrow:1}]}>
-                                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{item.product_name}</Text>
+                                                        <View style={[Styles.contentCell, {width:'32%',borderRight:1,borderColor:"#ff0505",flexGrow:1}]}>
+                                                            <Text style={[Styles.inputText,{fontSize:10}]}>{item.product_name}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}>
-                                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{item.standard}</Text>
+                                                        <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}>
+                                                            <Text style={[Styles.inputTextCenter,{fontSize:10}]}>{item.standard}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#ff0505",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{item.quantity}</Text>
+                                                        <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#ff0505",flexGrow:0,justifyContent:'flex-end'}]}>
+                                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{item.quantity}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#ff0505",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{ConvertCurrency(item.supply_price)}</Text>
+                                                        <View style={[Styles.contentCell, {width:'14%',borderRight:1,borderColor:"#ff0505",flexGrow:0,justifyContent:'flex-end'}]}>
+                                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.supply_price)}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#ff0505",flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{ConvertCurrency(item.total_price)}</Text>
+                                                        <View style={[Styles.contentCell, {width:'15%',borderRight:1,borderColor:"#ff0505",flexGrow:0,justifyContent:'flex-end'}]}>
+                                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.total_price)}</Text>
                                                         </View>
-                                                        <View style={[Styles.contentCell, {width:80,border:0,flexGrow:0,justifyContent:'flex-end'}]}>
-                                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{ConvertCurrency(item.tax_price)}</Text>
+                                                        <View style={[Styles.contentCell, {width:'12%',border:0,flexGrow:0,justifyContent:'flex-end'}]}>
+                                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.tax_price)}</Text>
                                                         </View>
                                                     </View>
                                             )};
                                             return (
                                                 <View key={index} style={[Styles.contentRow, {borderBottom:1,borderColor:"#ff0505",backgroundColor:"#ededff"}]}>
-                                                    <View style={[Styles.contentCell, {width:40,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}>
-                                                        <Text style={[Styles.ReceiverText,{fontSize:10}]}>{item.month_day}</Text>
+                                                    <View style={[Styles.contentCell, {width:'7%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}>
+                                                        <Text style={[Styles.inputTextCenter,{fontSize:10}]}>{item.month_day}</Text>
                                                     </View>
-                                                    <View style={[Styles.contentCell, {borderRight:1,borderColor:"#ff0505",flexGrow:1}]}>
-                                                        <Text style={[Styles.ReceiverText,{fontSize:10}]}>{item.product_name}</Text>
+                                                    <View style={[Styles.contentCell, {width:'32%',borderRight:1,borderColor:"#ff0505",flexGrow:1}]}>
+                                                        <Text style={[Styles.inputText,{fontSize:10}]}>{item.product_name}</Text>
                                                     </View>
-                                                    <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}>
-                                                        <Text style={[Styles.ReceiverText,{fontSize:10}]}>{item.standard}</Text>
+                                                    <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}>
+                                                        <Text style={[Styles.inputTextCenter,{fontSize:10}]}>{item.standard}</Text>
                                                     </View>
-                                                    <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}>
+                                                    <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}>
                                                         <Text style={[Styles.ReceiverText,{fontSize:10}]}>{item.quantity}</Text>
                                                     </View>
-                                                    <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}>
-                                                        <Text style={[Styles.ReceiverText,{fontSize:10}]}>{ConvertCurrency(item.supply_price)}</Text>
+                                                    <View style={[Styles.contentCell, {width:'14%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}>
+                                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.supply_price)}</Text>
                                                     </View>
-                                                    <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}>
-                                                        <Text style={[Styles.ReceiverText,{fontSize:10}]}>{ConvertCurrency(item.total_price)}</Text>
+                                                    <View style={[Styles.contentCell, {width:'15%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}>
+                                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.total_price)}</Text>
                                                     </View>
-                                                    <View style={[Styles.contentCell, {width:80,border:0,flexGrow:0}]}>
-                                                        <Text style={[Styles.ReceiverText,{fontSize:10}]}>{ConvertCurrency(item.tax_price)}</Text>
+                                                    <View style={[Styles.contentCell, {width:'12%',border:0,flexGrow:0}]}>
+                                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(item.tax_price)}</Text>
                                                     </View>
                                                 </View>
                                             );
@@ -670,38 +689,38 @@ const TransactionView2 = (props) => {
                                         if(index % 2 === 0) {
                                             return (
                                                 <View key={index} style={[Styles.contentRow, {borderBottom:1,borderColor:"#ff0505"}]}>
-                                                    <View style={[Styles.contentCell, {width:40,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {borderRight:1,borderColor:"#ff0505",flexGrow:1}]}></View>
-                                                    <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {width:80,border:0,flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'7%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'32%',borderRight:1,borderColor:"#ff0505",flexGrow:1}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'14%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'15%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'12%',border:0,flexGrow:0}]}></View>
                                                 </View>
                                             );
                                         };
                                         if(index % 10 === 9) {
                                             return (
                                                 <View key={index} style={[Styles.contentRow, {backgroundColor:"#ededff"}]}>
-                                                    <View style={[Styles.contentCell, {width:40,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {borderRight:1,borderColor:"#ff0505",flexGrow:1}]}></View>
-                                                    <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#eeeeee",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#eeeeee",flexGrow:0}]}></View>
-                                                    <View style={[Styles.contentCell, {width:80,border:0,flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'7%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'32%',borderRight:1,borderColor:"#ff0505",flexGrow:1}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'14%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'15%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
+                                                    <View style={[Styles.contentCell, {width:'12%',border:0,flexGrow:0}]}></View>
                                                 </View> 
                                             );
                                         };
                                         return (
                                             <View key={index} style={[Styles.contentRow, {borderBottom:1,borderColor:"#ff0505",backgroundColor:"#ededff"}]}>
-                                                <View style={[Styles.contentCell, {width:40,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
-                                                <View style={[Styles.contentCell, {borderRight:1,borderColor:"#ff0505",flexGrow:1}]}></View>
-                                                <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
-                                                <View style={[Styles.contentCell, {width:50,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
-                                                <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
-                                                <View style={[Styles.contentCell, {width:80,borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
-                                                <View style={[Styles.contentCell, {width:80,border:0,flexGrow:0}]}></View>
+                                                <View style={[Styles.contentCell, {width:'7%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
+                                                <View style={[Styles.contentCell, {width:'32%',borderRight:1,borderColor:"#ff0505",flexGrow:1}]}></View>
+                                                <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
+                                                <View style={[Styles.contentCell, {width:'10%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
+                                                <View style={[Styles.contentCell, {width:'14%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
+                                                <View style={[Styles.contentCell, {width:'15%',borderRight:1,borderColor:"#ff0505",flexGrow:0}]}></View>
+                                                <View style={[Styles.contentCell, {width:'12%',border:0,flexGrow:0}]}></View>
                                             </View> 
                                         );
                                 })}

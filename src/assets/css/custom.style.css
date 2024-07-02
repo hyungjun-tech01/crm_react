@@ -283,7 +283,7 @@
 }
 .trans_receiver
 {
-    border: 2px solid #ff5522;
+    border: 2px solid #ff0505;
     border-bottom: 0;
     display: flex;
     align-items: stretch;
@@ -291,7 +291,7 @@
 .trans_rec_item
 {
     height: 42px;
-    border-bottom: 2px solid #ff5522;
+    border-bottom: 2px solid #ff0505;
 }
 .trans_rec_item_last
 {
@@ -299,12 +299,12 @@
 }
 .trans_rec_title
 {
-    border-right: 2px solid #ff5522;
+    border-right: 2px solid #ff0505;
     text-align: center;
 }
 .trans_rec_content
 {
-    border-right: 2px solid #ff5522;
+    border-right: 2px solid #ff0505;
 }
 .trans_title
 {
@@ -317,12 +317,12 @@
 }
 .trans_cell
 {
-    border: 2px solid #ff5522;
+    border: 2px solid #ff0505;
 }
 .trans_cell_left
 {
     height: 60px;
-    border: 2px solid #ff5522;
+    border: 2px solid #ff0505;
     border-bottom: 0;
     padding-left: 1.25rem;
     display: flex;
@@ -331,15 +331,15 @@
 .trans_cell_right
 {
     height: 60px;
-    border-top: 2px solid #ff5522;
-    border-right: 2px solid #ff5522;
+    border-top: 2px solid #ff0505;
+    border-right: 2px solid #ff0505;
     padding-left: 1.25rem;
     display: flex;
     align-items: center;
 }
 .trans_table
 {
-    border: 2px solid #ff5522;
+    border: 2px solid #ff0505;
 }
 .trans_amt_title
 {
@@ -358,7 +358,7 @@
     padding: 0.25rem 1rem;
     font-size: 15px;
     text-align: end;
-    border-bottom: 2px solid #ff5522;
+    border-bottom: 2px solid #ff0505;
 }
 .trans_amt.low
 {
@@ -370,15 +370,15 @@
 }
 .trans_pur
 {
-    border-color: #2277ff !important;
+    border-color: #0000ff !important;
 }
 .trans_border_left
 {
-    border-left: 2px solid #ff5522;
+    border-left: 2px solid #ff0505;
 }
 .trans_border_right
 {
-    border-right: 2px solid #ff5522;
+    border-right: 2px solid #ff0505;
 }
 .trans_select
 {
