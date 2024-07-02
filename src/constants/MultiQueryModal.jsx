@@ -2,17 +2,17 @@ import React, {  useState , useCallback} from "react";
 import { Button, Modal, Checkbox, CheckboxProps } from 'antd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Select from "react-select";
-import { companyColumn, ColumnQueryCondition } from "../repository/company";
+import { ColumnQueryCondition } from "../repository/company";
 import { useTranslation } from "react-i18next";
 
 import AddBasicItem from "./AddBasicItem";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const QueryRow = ({ index, companyColumn, columnQueryCondition, companyColumnValue, columnQueryConditionValue, multiQueryInputValue, andOrValue, onCompanyColumnChange, onColumnQueryConditionChange, onMultiQueryInputChange, onAndOrChange, onDelete }) => (
+const QueryRow = ({ index, column, columnQueryCondition, columnValue, columnQueryConditionValue, multiQueryInputValue, andOrValue, onColumnChange, onColumnQueryConditionChange, onMultiQueryInputChange, onAndOrChange, onDelete }) => (
   <tr>
     <td>
-      <Select options={companyColumn} value={companyColumnValue} onChange={(value) => onCompanyColumnChange(index, value)} />
+      <Select options={column} value={columnValue} onChange={(value) => onColumnChange(index, value)} />
     </td>
     <td>
       <Select options={columnQueryCondition} value={columnQueryConditionValue} onChange={(value) => onColumnQueryConditionChange(index, value)} />
@@ -40,7 +40,7 @@ const QueryRow = ({ index, companyColumn, columnQueryCondition, companyColumnVal
 );
 
 const DateRangePicker = ({ checked, onChange, label, fromDate, toDate, handleFromDateChange, handleToDateChange }) => (
-  <div style={{ display: 'flex', alignItems: 'center' }}>
+  <div style={{ display: 'flex', alignItems: 'center' , marginTop: '5px'}}>
     <div style={{ width: '200px' }}>
       <Checkbox checked={checked}  onChange={()=>{onChange(!checked)}} style={{ width: '200px' }}>
         {label}
@@ -67,7 +67,7 @@ const DateRangePicker = ({ checked, onChange, label, fromDate, toDate, handleFro
 );
 
 const SingleDatePicker = ({ checked, onChange, label, fromDate, handleFromDateChange }) => (
-  <div style={{ display: 'flex', alignItems: 'center' }}>
+  <div style={{ display: 'flex', alignItems: 'center', marginTop:'5px' }}>
     <div style={{ width: '200px' }}>
       <Checkbox checked={checked}  onChange={()=>{onChange(!checked)}} style={{ width: '200px' }}>
         {label}
@@ -86,15 +86,15 @@ const SingleDatePicker = ({ checked, onChange, label, fromDate, handleFromDateCh
 
 
 const MultiQueryModal = (props) => {
-    const {  open, title, handleOk, handleCancel, queryConditions, setQueryConditions, 
+    const {  open, title, handleOk, handleCancel, companyColumn, queryConditions, setQueryConditions, 
             dates, setDates, dateRangeSettings,  initialState, 
             singleDate , setSingleDate, singleDateSettings , initialSingleDate} = props;
 
     const { t } = useTranslation();
 
-    const handleSelectCompanyColumn = (index, value) => {
+    const handleSelectColumn = (index, value) => {
       const newConditions = [...queryConditions];
-      newConditions[index].companyColumn = value;
+      newConditions[index].column = value;
       setQueryConditions(newConditions);
     };
   
@@ -118,7 +118,7 @@ const MultiQueryModal = (props) => {
 
     const onDelete  = (index) => {
       const newConditions = [...queryConditions];
-      newConditions[index].companyColumn = "";
+      newConditions[index].column = "";
       newConditions[index].columnQueryCondition = "";
       newConditions[index].multiQueryInput = "";
       newConditions[index].andOr = "And";
@@ -237,13 +237,13 @@ const handleSingleCheckedChange = (key) => {
               <QueryRow
                 key={index}
                 index={index}
-                companyColumn={companyColumn}
+                column={companyColumn}
                 columnQueryCondition={ColumnQueryCondition}
-                companyColumnValue={condition.companyColumn}
+                columnValue={condition.column}
                 columnQueryConditionValue={condition.columnQueryCondition}
                 multiQueryInputValue={condition.multiQueryInput}
                 andOrValue={condition.andOr}
-                onCompanyColumnChange={handleSelectCompanyColumn}
+                onColumnChange={handleSelectColumn}
                 onColumnQueryConditionChange={handleSelectColumnQueryCondition}
                 onMultiQueryInputChange={handleMultiQueryInput}
                 onAndOrChange={handleAndOr}
