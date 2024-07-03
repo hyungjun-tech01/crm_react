@@ -164,6 +164,7 @@ const enResource = {
             add_content: 'Add Content',
             add_transaction:'Add New Transaction',
             address: 'Customer Address',
+            bill_type: 'Bill Type',
             balance_prev: 'Previous Balance',
             balance_total: 'Total Balance',
             content_table: 'Content Table',

@@ -122,6 +122,10 @@ const TransactionTaxBillModel = (props) => {
     { value: '매출', label: t('company.deal_type_sales') },
     { value: '매입', label: t('company.deal_type_purchase') },
   ];
+  const bill_types = [
+    { value: '세금계산서', label: t('company.deal_type_sales') },
+    { value: '계산서', label: t('company.deal_type_purchase') },
+  ];
 
 
   // --- Functions / Variables dealing with contents -------------------------------
@@ -614,6 +618,26 @@ const TransactionTaxBillModel = (props) => {
                 <div className="tab-pane show active" id="tax-bill-details">
                   <form className="forms-sampme" id="add_new_transaction_form">
                     <div className="card p-3">
+                      <Row align='middle' justify='start' style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
+                        <Col>{t('common.type2')} : </Col>
+                        <Col style={{ paddingLeft: '0.25rem',paddingRight: '1rem'}}>
+                          <Select
+                            className="trans_select"
+                            defaultValue='매출'
+                            onChange={selected => handleSelectChange('transaction_type', selected)}
+                            options={trans_types}
+                          />
+                        </Col>
+                        <Col>{t('transaction.bill_type')} : </Col>
+                        <Col style={{ paddingLeft: '0.25rem'}}>
+                          <Select
+                            className="trans_select"
+                            defaultValue='세금계산서'
+                            onChange={selected => handleSelectChange('bill_type', selected)}
+                            options={bill_types}
+                          />
+                        </Col>
+                      </Row>
                       <Row>
                         <Col flex={13}>
                           <Row justify="space-around" align="middle">
@@ -631,12 +655,7 @@ const TransactionTaxBillModel = (props) => {
                             <Col flex={3}>
                               <Row justify='space-between' style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
                                 <Col>
-                                  <Select
-                                    className="trans_select"
-                                    defaultValue='매출'
-                                    onChange={selected => handleSelectChange('transaction_type', selected)}
-                                    options={trans_types}
-                                  />
+                                  
                                 </Col>
                                 <Col>{t('transaction.publish_date')} : </Col>
                               </Row>
@@ -671,6 +690,65 @@ const TransactionTaxBillModel = (props) => {
                               </Row>
                             </Col>
                           </Row>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col flex={10} className={`trans_receiver ${!isSale && 'trans_pur'}`}>
+                          <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`} >{isSale ? t('transaction.receiver') : t('transaction.supplier')}</Col>
+                          <Col flex='auto' align='strech'>
+                            <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
+                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.register_no')}</Col>
+                              <Col flex='auto'>
+                                <Input
+                                  name='business_registration_code'
+                                  value={transactionChange['business_registration_code']}
+                                  onChange={handleItemChange}
+                                />
+                              </Col>
+                            </Row>
+                            <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
+                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.company_name')}</Col>
+                              <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
+                                <label>{transactionChange['company_name']}</label>
+                              </Col>
+                              <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('common.name2')}</Col>
+                              <Col flex={1}>
+                                <Input
+                                  name='ceo_name'
+                                  value={transactionChange['ceo_name']}
+                                  onChange={handleItemChange}
+                                />
+                              </Col>
+                            </Row>
+                            <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
+                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.address')}</Col>
+                              <Col flex='auto'>
+                                <Input
+                                  name='company_address'
+                                  value={transactionChange['company_address']}
+                                  onChange={handleItemChange}
+                                />
+                              </Col>
+                            </Row>
+                            <Row className="trans_rec_item_last">
+                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('company.business_type')}</Col>
+                              <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
+                                <Input
+                                  name='business_type'
+                                  value={transactionChange['business_type']}
+                                  onChange={handleItemChange}
+                                />
+                              </Col>
+                              <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('company.business_item')}</Col>
+                              <Col flex={1}>
+                                <Input
+                                  name='business_item'
+                                  value={transactionChange['business_item']}
+                                  onChange={handleItemChange}
+                                />
+                              </Col>
+                            </Row>
+                          </Col>
                         </Col>
                         <Col flex={10} className={`trans_receiver ${!isSale && 'trans_pur'}`}>
                           <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`} >{isSale ? t('transaction.receiver') : t('transaction.supplier')}</Col>

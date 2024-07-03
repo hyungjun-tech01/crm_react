@@ -166,6 +166,7 @@ const koResource = {
             address: '사업장주소',
             balance_prev: '전잔액',
             balance_total: '총잔액',
+            bill_type: '세계 구분',
             content_table: '항목표',
             company_name: '상호(법인명)',
             customer_name: '거래처명',

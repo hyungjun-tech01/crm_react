@@ -505,7 +505,7 @@ const TransactionAddModel = (props) => {
         initializeTransactionTemplate();
       }
       else {
-        setMessage({title: '저장 중 오류', message: '오류가 발생하여 저장하지 못했습니다.'});
+        setMessage({title: '저장 중 오류', message: `오류가 발생하여 저장하지 못했습니다.\n- ${res}`});
         setIsMessageModalOpen(true);
       };
     });
