@@ -618,7 +618,7 @@ const TransactionTaxBillModel = (props) => {
                 <div className="tab-pane show active" id="tax-bill-details">
                   <form className="forms-sampme" id="add_new_transaction_form">
                     <div className="card p-3">
-                      <Row align='middle' justify='start' style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
+                      <Row align='middle' justify='start' style={{ fontSize: 15, padding: '0.25rem 0.5rem', marginBottom: '0.5rem' }}>
                         <Col>{t('common.type2')} : </Col>
                         <Col style={{ paddingLeft: '0.25rem',paddingRight: '1rem'}}>
                           <Select
@@ -639,57 +639,26 @@ const TransactionTaxBillModel = (props) => {
                         </Col>
                       </Row>
                       <Row>
-                        <Col flex={13}>
-                          <Row justify="space-around" align="middle">
+                        <Col flex={5} style={{bordorLeft: isSale ? '2px solid #ff0505' : '2px solid #0000ff',bordorTop: isSale ? '2px solid #ff0505' : '2px solid #0000ff' }}>
+                          <Row justify="center" align="middle">
                             <Col className="trans_title">{t("transaction.tax_bill")}</Col>
                           </Row>
-                          <Row justify="space-around" align="middle">
-                            <Col flex={2}>
-                              <Row justify='end' style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
-                                <Col>{t('common.type2')} : </Col>
-                              </Row>
-                              <Row justify='end' style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
-                                <Col>{t('transaction.customer_name')}: </Col>
-                              </Row>
-                            </Col>
-                            <Col flex={3}>
-                              <Row justify='space-between' style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
-                                <Col>
-                                  
-                                </Col>
-                                <Col>{t('transaction.publish_date')} : </Col>
-                              </Row>
-                              <Row style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
-                                <Col>
-                                  <Select
-                                    className="trans_select"
-                                    defaultValue={null}
-                                    onChange={selected => handleSelectChange('company_name', selected)}
-                                    options={companyForSelection}
-                                  />
-                                </Col>
-                              </Row>
-                            </Col>
-                            <Col flex={3}>
-                              <Row style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
-                                <Col>
-                                  <DatePicker
-                                    name="publish_date"
-                                    selected={transactionChange['publish_date']}
-                                    onChange={(date) => handleDateChange('publish_date', date)}
-                                    dateFormat="yyyy-MM-dd"
-                                    className="trans_date"
-                                  />
-                                </Col>
-                              </Row>
-                              <Row style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
-                                <Col>
-                                  <Button onClick={handleIssueTransaction} style={{ width: 150 }}>{t('transaction.issue')}</Button>
-                                  <Button onClick={handleInitialize} style={{ width: 100 }}>{t('common.initialize')}</Button>
-                                </Col>
-                              </Row>
-                            </Col>
+                        </Col>
+                        <Col flex={4} style={{bordorLeft: isSale ? '2px solid #ff0505' : '2px solid #0000ff',bordorTop: isSale ? '2px solid #ff0505' : '2px solid #0000ff' }}>
+                          <Row justify="center" align="middle">
+                            <Col>({t("transaction.receiver")})</Col>
                           </Row>
+                        </Col>
+                        <Col flex={3} style={{bordorLeft: isSale ? '2px solid #ff0505' : '2px solid #0000ff',bordorTop: isSale ? '2px solid #ff0505' : '2px solid #0000ff' }}>
+                          <Row justify="center" align="middle">책 번 호</Row>
+                          <Row justify="center" align="middle">일련번호</Row>
+                        </Col>
+                        <Col flex={4} style={{bordorLeft: isSale ? '2px solid #ff0505' : '2px solid #0000ff',bordorTop: isSale ? '2px solid #ff0505' : '2px solid #0000ff' }}>
+                          <Row justify="end" align="middle">
+                            <Col>2 권</Col>
+                            <Col>호</Col>
+                          </Row>
+                          <Row justify="center" align="middle">{" "}</Row>
                         </Col>
                       </Row>
                       <Row>
@@ -752,7 +721,7 @@ const TransactionTaxBillModel = (props) => {
                         </Col>
                         <Col flex={10} className={`trans_receiver ${!isSale && 'trans_pur'}`}>
                           <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`} >{isSale ? t('transaction.receiver') : t('transaction.supplier')}</Col>
-                          <Col flex='auto' align='strech'>
+                          <Col flex='auto' align='strech' style={{borderRight: isSale ? '2px solid #ff0505' : '2px solid #0000ff'}}>
                             <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
                               <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.register_no')}</Col>
                               <Col flex='auto'>

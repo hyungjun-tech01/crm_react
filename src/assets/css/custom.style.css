@@ -283,7 +283,8 @@
 }
 .trans_receiver
 {
-    border: 2px solid #ff0505;
+    border-top: 2px solid #ff0505;
+    border-left: 2px solid #ff0505;
     border-bottom: 0;
     display: flex;
     align-items: stretch;
