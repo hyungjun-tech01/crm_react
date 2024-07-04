@@ -798,52 +798,83 @@ const TransactionTaxBillModel = (props) => {
                           </Col>
                         </Col>
                       </Row>
-                      <Row align='middle'>
-                        <Col flex={3} className={`trans_cell_left ${!isSale && "trans_pur"}`}>
-                          <Row>
-                            <Col flex={3}>작성</Col>
+                      <Row align='middle' justify='center'>
+                        <Col flex={3} className={`trans_bl trans_bt ${!isSale && "trans_pur"}`}>
+                          <Row style={{width:'100%'}}>
+                            <Col className={`bill_text_center trans_bb ${!isSale && "trans_pur"}`}>작성</Col>
                           </Row>
-                          <Row>
-                            <Col flex={3}>년-월-일</Col>
+                          <Row style={{width:'100%'}}>
+                            <Col className={`bill_text_center trans_bb ${!isSale && "trans_pur"}`}>년-월-일</Col>
                           </Row>
-                          <Row>
-                            <Col flex={3}>2024-07-04</Col>
-                          </Row>
-                        </Col>
-                        <Col flex={10} className={`trans_cell_left ${!isSale && "trans_pur"}`}>
-                          <Row>
-                            <Col flex={14}>공급가액</Col>
-                          </Row>
-                          <Row>
-                            <Col flex={3}>공란수</Col>
-                            <Col flex={1}>백</Col>
-                            <Col flex={1}>십</Col>
-                            <Col flex={1}>억</Col>
-                            <Col flex={1}>천</Col>
-                            <Col flex={1}>백</Col>
-                            <Col flex={1}>십</Col>
-                            <Col flex={1}>만</Col>
-                            <Col flex={1}>천</Col>
-                            <Col flex={1}>백</Col>
-                            <Col flex={1}>십</Col>
-                            <Col flex={1}>일</Col>
-                          </Row>
-                          <Row>
-                            <Col flex={3}>3</Col>
-                            <Col flex={1}>{''}</Col>
-                            <Col flex={1}>{''}</Col>
-                            <Col flex={1}>{''}</Col>
-                            <Col flex={1}>4</Col>
-                            <Col flex={1}>5</Col>
-                            <Col flex={1}>0</Col>
-                            <Col flex={1}>0</Col>
-                            <Col flex={1}>0</Col>
-                            <Col flex={1}>0</Col>
-                            <Col flex={1}>0</Col>
-                            <Col flex={1}>0</Col>
+                          <Row style={{width:'100%'}}>
+                            <Col className={`bill_text_center ${!isSale && "trans_pur"}`}>2024-07-04</Col>
                           </Row>
                         </Col>
-                        <Col flex={10} className={`trans_cell_right ${!isSale && "trans_pur"}`}>
+                        <Col flex={3} className={`trans_bl trans_bt ${!isSale && "trans_pur"}`}>
+                          <Row>
+                            <Col flex={14} className={`bill_text_center trans_bb ${!isSale && "trans_pur"}`}>공급가액</Col>
+                          </Row>
+                          <Row>
+                            <Col flex={3} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>공란수</Col>
+                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>백</Col>
+                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>십</Col>
+                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>억</Col>
+                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>천</Col>
+                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>백</Col>
+                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>십</Col>
+                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>만</Col>
+                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>천</Col>
+                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>백</Col>
+                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>십</Col>
+                            <Col flex={1} className={`bill_text_center trans_bb ${!isSale && "trans_pur"}`}>일</Col>
+                          </Row>
+                          <Row>
+                            <Col flex={3} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>3</Col>
+                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>{''}</Col>
+                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>{''}</Col>
+                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>{''}</Col>
+                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>4</Col>
+                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>5</Col>
+                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
+                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
+                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
+                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
+                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
+                            <Col flex={1} className={`bill_text_center ${!isSale && "trans_pur"}`}>0</Col>
+                          </Row>
+                        </Col>
+                        {isTaxBill &&
+                          <Col flex={3} className={`trans_bl trans_bt ${!isSale && "trans_pur"}`}>
+                            <Row>
+                              <Col flex={14} className={`bill_text_center trans_bb ${!isSale && "trans_pur"}`}>세 액</Col>
+                            </Row>
+                            <Row>
+                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>십</Col>
+                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>억</Col>
+                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>천</Col>
+                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>백</Col>
+                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>십</Col>
+                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>만</Col>
+                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>천</Col>
+                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>백</Col>
+                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>십</Col>
+                              <Col flex={1} className={`bill_text_center trans_bb ${!isSale && "trans_pur"}`}>일</Col>
+                            </Row>
+                            <Row>
+                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>{''}</Col>
+                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>{''}</Col>
+                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>4</Col>
+                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>5</Col>
+                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
+                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
+                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
+                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
+                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
+                              <Col flex={1} className={`bill_text_center ${!isSale && "trans_pur"}`}>0</Col>
+                            </Row>
+                          </Col>
+                        }
+                        <Col flex={3} className={`bill_mid_right ${!isSale && "trans_pur"}`}>
                           <Row><Col>비고</Col></Row>
                           <Row><Col>{''}</Col></Row>
                         </Col>
@@ -929,22 +960,22 @@ const TransactionTaxBillModel = (props) => {
                         </Col>
                         <Col flex={5}>
                           <Row>
-                            <Col flex='auto' className="trans_amt_title right">
+                            <Col flex='auto' className="trans_amt_title">
                               외상미수금
                             </Col>
                           </Row>
                           <Row>
-                            <Col flex='auto' className={`trans_amt  low right ${!isSale && "trans_pur"}`}>
+                            <Col flex='auto' className={`trans_amt low ${!isSale && "trans_pur"}`}>
                               {ConvertCurrency(dataForTransaction.valance_final, dataForTransaction.show_decimal)}
                             </Col>
                           </Row>
                         </Col>
-                        <Col flex={5} className={`trans_br ${!isSale && "trans_pur"}`}>
-                          <Row>
-                            <Col flex='auto' className="trans_amt_title">
-                              이 금액을 청구함.
-                            </Col>
-                          </Row>
+                        <Col flex={5} className={`trans_br trans_bb trans_bl ${!isSale && "trans_pur"}`}>
+                            <Row align='middle' justify='center'>
+                              <Col>
+                                이 금액을 청구함.
+                              </Col>
+                            </Row>
                         </Col>
                       </Row>
                     </div>
