@@ -648,7 +648,7 @@ const TransactionAddModel = (props) => {
                       </Col>
                     </Row>
                   </Col>
-                  <Col flex={10} className={`trans_receiver ${!isSale && 'trans_pur'}`}>
+                  <Col flex={10} className={`trans_receiver trans_br ${!isSale && 'trans_pur'}`}>
                     <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`} >{isSale ? t('transaction.receiver') : t('transaction.supplier')}</Col>
                     <Col flex='auto' align='strech'>
                       <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
@@ -757,7 +757,7 @@ const TransactionAddModel = (props) => {
                   </Col>
                 </Row>
                 <Row>
-                  <Col flex={5} className={`trans_border_left ${!isSale && "trans_pur"}`}>
+                  <Col flex={5} className={`trans_bl ${!isSale && "trans_pur"}`}>
                     <Row>
                       <Col flex='auto' className="trans_amt_title right">
                         {t('transaction.balance_prev')}
@@ -844,7 +844,7 @@ const TransactionAddModel = (props) => {
                       </Col>
                     </Row>
                   </Col>
-                  <Col flex={5} className={`trans_border_right ${!isSale && "trans_pur"}`}>
+                  <Col flex={5} className={`trans_br ${!isSale && "trans_pur"}`}>
                     <Row>
                       <Col flex='auto' className="trans_amt_title">
                         {t('transaction.sum_price')}

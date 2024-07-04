@@ -66,6 +66,7 @@ const TransactionTaxBillModel = (props) => {
   const [transactionChange, setTransactionChange] = useState({});
   const [transactionContents, setTransactionContents] = useState([]);
   const [isSale, setIsSale] = useState(true);
+  const [isTaxBill, setIsTaxBill] = useState(true);
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
 
   const handleItemChange = useCallback((e) => {
@@ -102,11 +103,16 @@ const TransactionTaxBillModel = (props) => {
       if (name === 'transaction_type') {
         console.log('handleSelectChange / transaction_type :', selected);
         if (selected.value === '매출') {
-          console.log('- Check / sale');
           setIsSale(true);
         } else {
-          console.log('- Check / receipt');
           setIsSale(false);
+        };
+      } else if(name === 'bill_type') {
+        console.log('handleSelectChange / bill_type :', selected);
+        if (selected.value === '세금계산서') {
+          setIsTaxBill(true);
+        } else {
+          setIsTaxBill(false);
         };
       };
       modifiedData = {
@@ -123,8 +129,8 @@ const TransactionTaxBillModel = (props) => {
     { value: '매입', label: t('company.deal_type_purchase') },
   ];
   const bill_types = [
-    { value: '세금계산서', label: t('company.deal_type_sales') },
-    { value: '계산서', label: t('company.deal_type_purchase') },
+    { value: '세금계산서', label: t('transaction.tax_bill') },
+    { value: '계산서', label: t('transaction.bill') },
   ];
 
 
@@ -618,7 +624,7 @@ const TransactionTaxBillModel = (props) => {
                 <div className="tab-pane show active" id="tax-bill-details">
                   <form className="forms-sampme" id="add_new_transaction_form">
                     <div className="card p-3">
-                      <Row align='middle' justify='start' style={{ fontSize: 15, padding: '0.25rem 0.5rem', marginBottom: '0.5rem' }}>
+                      <Row align='middle' justify='start' style={{ fontSize: 15, padding: '0.25rem 0.5rem', marginBottom: '0.5rem', borderRadius: '0.25rem', backgroundColor:'#eeeeee' }}>
                         <Col>{t('common.type2')} : </Col>
                         <Col style={{ paddingLeft: '0.25rem',paddingRight: '1rem'}}>
                           <Select
@@ -629,7 +635,7 @@ const TransactionTaxBillModel = (props) => {
                           />
                         </Col>
                         <Col>{t('transaction.bill_type')} : </Col>
-                        <Col style={{ paddingLeft: '0.25rem'}}>
+                        <Col style={{ paddingLeft: '0.25rem', marginRight: '0.5rem'}}>
                           <Select
                             className="trans_select"
                             defaultValue='세금계산서'
@@ -637,33 +643,48 @@ const TransactionTaxBillModel = (props) => {
                             options={bill_types}
                           />
                         </Col>
+                        <Col><Checkbox /></Col>
+                        <Col>{t('quotation.show_decimal')}</Col>
+                      </Row>
+                      <Row align='middle' justify='space-between' className={`trans_bl trans_br trans_bt ${!isSale && 'trans_pur'}`}>
+                        <Col flex={8}>
+                          <Row justify="center" align="middle">
+                            <Col className={`bill_title ${!isSale && 'trans_pur'}`}>{isTaxBill ? t("transaction.tax_bill") : t("transaction.bill")}</Col>
+                          </Row>
+                        </Col>
+                        <Col flex={5}>
+                          <Row justify="center" align="middle">
+                            <Col className={`trans_text ${!isSale && 'trans_pur'}`}>({isSale ? t("transaction.for_receiver") : t('transaction.for_supplier')})</Col>
+                          </Row>
+                        </Col>
+                        <Col flex={3}>
+                          <Row align='middle' className={`trans_br trans_text ${!isSale && 'trans_pur'}`}>
+                            <Col flex={24}>책 번 호&nbsp;</Col>
+                          </Row>
+                          <Row align='middle' className={`trans_br trans_text ${!isSale && 'trans_pur'}`}>
+                            <Col flex={24}>일련번호&nbsp;</Col>
+                          </Row>
+                        </Col>
+                        <Col flex={4}>
+                          <Row align='middle' className={`trans_br trans_text ${!isSale && 'trans_pur'}`}>
+                            <Col flex={24}>{ } 권&nbsp;</Col>
+                          </Row>
+                          <Row align='middle' className={`trans_bt trans_text ${!isSale && 'trans_pur'}`}>
+                            <Col flex={24}>&nbsp;</Col>
+                          </Row>
+                        </Col>
+                        <Col flex={4}>
+                          <Row align='middle' className={`trans_text ${!isSale && 'trans_pur'}`}>
+                            <Col flex={24}>호&nbsp;</Col>
+                          </Row>
+                          <Row align='middle' className={`trans_bt trans_text ${!isSale && 'trans_pur'}`}>
+                            <Col flex={24}>&nbsp;</Col>
+                          </Row>
+                        </Col>
                       </Row>
                       <Row>
-                        <Col flex={5} style={{bordorLeft: isSale ? '2px solid #ff0505' : '2px solid #0000ff',bordorTop: isSale ? '2px solid #ff0505' : '2px solid #0000ff' }}>
-                          <Row justify="center" align="middle">
-                            <Col className="trans_title">{t("transaction.tax_bill")}</Col>
-                          </Row>
-                        </Col>
-                        <Col flex={4} style={{bordorLeft: isSale ? '2px solid #ff0505' : '2px solid #0000ff',bordorTop: isSale ? '2px solid #ff0505' : '2px solid #0000ff' }}>
-                          <Row justify="center" align="middle">
-                            <Col>({t("transaction.receiver")})</Col>
-                          </Row>
-                        </Col>
-                        <Col flex={3} style={{bordorLeft: isSale ? '2px solid #ff0505' : '2px solid #0000ff',bordorTop: isSale ? '2px solid #ff0505' : '2px solid #0000ff' }}>
-                          <Row justify="center" align="middle">책 번 호</Row>
-                          <Row justify="center" align="middle">일련번호</Row>
-                        </Col>
-                        <Col flex={4} style={{bordorLeft: isSale ? '2px solid #ff0505' : '2px solid #0000ff',bordorTop: isSale ? '2px solid #ff0505' : '2px solid #0000ff' }}>
-                          <Row justify="end" align="middle">
-                            <Col>2 권</Col>
-                            <Col>호</Col>
-                          </Row>
-                          <Row justify="center" align="middle">{" "}</Row>
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col flex={10} className={`trans_receiver ${!isSale && 'trans_pur'}`}>
-                          <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`} >{isSale ? t('transaction.receiver') : t('transaction.supplier')}</Col>
+                        <Col flex={12} className={`trans_receiver ${!isSale && 'trans_pur'}`}>
+                          <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`} >{t('transaction.supplier')}</Col>
                           <Col flex='auto' align='strech'>
                             <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
                               <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.register_no')}</Col>
@@ -719,8 +740,8 @@ const TransactionTaxBillModel = (props) => {
                             </Row>
                           </Col>
                         </Col>
-                        <Col flex={10} className={`trans_receiver ${!isSale && 'trans_pur'}`}>
-                          <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`} >{isSale ? t('transaction.receiver') : t('transaction.supplier')}</Col>
+                        <Col flex={12} className={`trans_receiver ${!isSale && 'trans_pur'}`}>
+                          <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`} >{t('transaction.receiver')}</Col>
                           <Col flex='auto' align='strech' style={{borderRight: isSale ? '2px solid #ff0505' : '2px solid #0000ff'}}>
                             <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
                               <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.register_no')}</Col>
@@ -778,26 +799,53 @@ const TransactionTaxBillModel = (props) => {
                         </Col>
                       </Row>
                       <Row align='middle'>
-                        <Col flex={13} className={`trans_cell_left ${!isSale && "trans_pur"}`}>
-                          <Button onClick={handleStartAddContent}>{t('transaction.add_content')}</Button>
-                          <Button onClick={handleContentDelete} disabled={selectedContentRowKeys.length === 0}>{t('transaction.remove_selects')}</Button>
-                          <Button onClick={handleContentMoveUp} disabled={selectedContentRowKeys.length === 0}>{t('transaction.move_up')}</Button>
-                          <Button onClick={handleContentMoveDown} disabled={selectedContentRowKeys.length === 0}>{t('transaction.move_down')}</Button>
+                        <Col flex={3} className={`trans_cell_left ${!isSale && "trans_pur"}`}>
+                          <Row>
+                            <Col flex={3}>작성</Col>
+                          </Row>
+                          <Row>
+                            <Col flex={3}>년-월-일</Col>
+                          </Row>
+                          <Row>
+                            <Col flex={3}>2024-07-04</Col>
+                          </Row>
                         </Col>
-                        <Col flex={12} className={`trans_cell_right ${!isSale && "trans_pur"}`}>
-                          <div style={{ flexGrow: 1 }}>{t('transaction.tax_type')} : </div>
-                          <div style={{ flexGrow: 3 }}>
-                            <select
-                              name='vat_type'
-                              onChange={handleVATChange}
-                            >
-                              <option value='vat_excluded'>{t('quotation.vat_excluded')}</option>
-                              <option value='vat_included'>{t('quotation.vat_included')}</option>
-                            </select>
-                          </div>
-                          <div style={{ flexGrow: 3 }}>
-                            <Checkbox onClick={handleShowDecimal}>{t('quotation.show_decimal')}</Checkbox>
-                          </div>
+                        <Col flex={10} className={`trans_cell_left ${!isSale && "trans_pur"}`}>
+                          <Row>
+                            <Col flex={14}>공급가액</Col>
+                          </Row>
+                          <Row>
+                            <Col flex={3}>공란수</Col>
+                            <Col flex={1}>백</Col>
+                            <Col flex={1}>십</Col>
+                            <Col flex={1}>억</Col>
+                            <Col flex={1}>천</Col>
+                            <Col flex={1}>백</Col>
+                            <Col flex={1}>십</Col>
+                            <Col flex={1}>만</Col>
+                            <Col flex={1}>천</Col>
+                            <Col flex={1}>백</Col>
+                            <Col flex={1}>십</Col>
+                            <Col flex={1}>일</Col>
+                          </Row>
+                          <Row>
+                            <Col flex={3}>3</Col>
+                            <Col flex={1}>{''}</Col>
+                            <Col flex={1}>{''}</Col>
+                            <Col flex={1}>{''}</Col>
+                            <Col flex={1}>4</Col>
+                            <Col flex={1}>5</Col>
+                            <Col flex={1}>0</Col>
+                            <Col flex={1}>0</Col>
+                            <Col flex={1}>0</Col>
+                            <Col flex={1}>0</Col>
+                            <Col flex={1}>0</Col>
+                            <Col flex={1}>0</Col>
+                          </Row>
+                        </Col>
+                        <Col flex={10} className={`trans_cell_right ${!isSale && "trans_pur"}`}>
+                          <Row><Col>비고</Col></Row>
+                          <Row><Col>{''}</Col></Row>
                         </Col>
                       </Row>
                       <Row>
@@ -828,31 +876,10 @@ const TransactionTaxBillModel = (props) => {
                         </Col>
                       </Row>
                       <Row>
-                        <Col flex={5} className={`trans_border_left ${!isSale && "trans_pur"}`}>
+                        <Col flex={5} className={`trans_bl ${!isSale && "trans_pur"}`}>
                           <Row>
                             <Col flex='auto' className="trans_amt_title right">
-                              {t('transaction.balance_prev')}
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
-                              <InputNumber
-                                value={dataForTransaction.valance_prev}
-                                formatter={handleFormatter}
-                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                                style={{width:'180px', height:'30px',border:0,textAlign:'end'}}
-                                onChange={(e)=>{
-                                  const value = Number(e.target.value);
-                                  if(isNaN(value)) return;
-                                  const temp={...dataForTransaction, valance_prev: value};
-                                  setDataForTransaction(temp);
-                                }}
-                              />
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col flex='auto' className="trans_amt_title right">
-                              {t('transaction.receipt')}
+                              합계 금액
                             </Col>
                           </Row>
                           <Row>
@@ -867,17 +894,7 @@ const TransactionTaxBillModel = (props) => {
                         <Col flex={5}>
                           <Row>
                             <Col flex='auto' className="trans_amt_title right">
-                              {t('transaction.supply_price')}
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
-                              {ConvertCurrency(dataForTransaction.supply_price, dataForTransaction.show_decimal)}
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col flex='auto' className="trans_amt_title right">
-                              {t('transaction.balance_total')}
+                              현 금
                             </Col>
                           </Row>
                           <Row>
@@ -889,51 +906,43 @@ const TransactionTaxBillModel = (props) => {
                         <Col flex={5}>
                           <Row>
                             <Col flex='auto' className="trans_amt_title right">
-                              {t('transaction.tax_price')}
+                              수 표
                             </Col>
                           </Row>
                           <Row>
-                            <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
-                              {ConvertCurrency(dataForTransaction.tax_price, dataForTransaction.show_decimal)}
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col flex='auto' className="trans_amt_title right ">
-                              {t('transaction.receiver2')}
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col flex='auto' className={`trans_amt low right ${!isSale && "trans_pur"}`}>
-                              <Input
-                                value={dataForTransaction.receiver}
-                                style={{height:'30px',border:0,textAlign:'end'}}
-                                onChange={(e)=>{
-                                  const temp={...dataForTransaction, receiver: e.target.value};
-                                  setDataForTransaction(temp);
-                                }}
-                              />
+                            <Col flex='auto' className={`trans_amt  low right ${!isSale && "trans_pur"}`}>
+                              {ConvertCurrency(dataForTransaction.valance_final, dataForTransaction.show_decimal)}
                             </Col>
                           </Row>
                         </Col>
-                        <Col flex={5} className={`trans_border_right ${!isSale && "trans_pur"}`}>
+                        <Col flex={5}>
+                          <Row>
+                            <Col flex='auto' className="trans_amt_title right">
+                              어 음
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col flex='auto' className={`trans_amt  low right ${!isSale && "trans_pur"}`}>
+                              {ConvertCurrency(dataForTransaction.valance_final, dataForTransaction.show_decimal)}
+                            </Col>
+                          </Row>
+                        </Col>
+                        <Col flex={5}>
+                          <Row>
+                            <Col flex='auto' className="trans_amt_title right">
+                              외상미수금
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col flex='auto' className={`trans_amt  low right ${!isSale && "trans_pur"}`}>
+                              {ConvertCurrency(dataForTransaction.valance_final, dataForTransaction.show_decimal)}
+                            </Col>
+                          </Row>
+                        </Col>
+                        <Col flex={5} className={`trans_br ${!isSale && "trans_pur"}`}>
                           <Row>
                             <Col flex='auto' className="trans_amt_title">
-                              {t('transaction.sum_price')}
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col flex='auto' className={`trans_amt ${!isSale && "trans_pur"}`}>
-                              {ConvertCurrency(dataForTransaction.total_price, dataForTransaction.show_decimal)}
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col flex='auto' className="trans_amt_title">
-                              {t('transaction.trans_pages')}
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col flex='auto' className={`trans_amt low ${!isSale && "trans_pur"}`}>
-                              {`${dataForTransaction.page_cur}/${dataForTransaction.page_total}/${dataForTransaction.page}`}
+                              이 금액을 청구함.
                             </Col>
                           </Row>
                         </Col>

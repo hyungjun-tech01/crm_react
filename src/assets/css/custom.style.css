@@ -372,14 +372,19 @@
 .trans_pur
 {
     border-color: #0000ff !important;
+    color: #0000ff !important;
 }
-.trans_border_left
+.trans_bl
 {
     border-left: 2px solid #ff0505;
 }
-.trans_border_right
+.trans_br
 {
     border-right: 2px solid #ff0505;
+}
+.trans_bt
+{
+    border-top: 2px solid #ff0505;
 }
 .trans_select
 {
@@ -392,4 +397,19 @@
     height: 35px;
     border-radius: 5px;
     border: 1px solid black;
+}
+.bill_title
+{
+    color: #ff0505;
+    font-size: 32px;
+    font-weight: 600;
+    margin: 0.5rem;
+    padding: 0.25rem 2.5rem;
+}
+.trans_text
+{
+    height: 40px;
+    color: #ff0505;
+    font-size: 14px;
+    text-align: end;
 }
