@@ -409,26 +409,3 @@
     font-size: 14px;
     text-align: end;
 }
-.bill_title
-{
-    color: #ff0505;
-    font-size: 32px;
-    font-weight: 600;
-    margin: 0.5rem;
-    padding: 0.25rem 2.5rem;
-}
-.bill_text_center
-{
-    height: 24px;
-    font-size: 14px;
-    color: #ff0505;
-    text-align: center;
-}
-.bill_mid_right
-{
-    height: 72px;
-    font-size: 14px;
-    border-top: 2px solid #ff0505;
-    border-left: 2px solid #ff0505;
-    border-right: 2px solid #ff0505;
-}

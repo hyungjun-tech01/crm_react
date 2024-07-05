@@ -10,6 +10,7 @@ import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import classNames from 'classnames';
 
 import {
   atomCompanyState,
@@ -24,6 +25,8 @@ import TransactionContentModal from "./TransactionContentModal";
 import TransactionReceiptModal from "./TransactionReceiptModal";
 import MessageModal from "../../constants/MessageModal";
 import TransactionPrint from "./TransactionPrint";
+
+import styles from './Transaction.module.scss';
 
 const default_transaction_data = {
   title: '',
@@ -624,32 +627,32 @@ const TransactionTaxBillModel = (props) => {
                 <div className="tab-pane show active" id="tax-bill-details">
                   <form className="forms-sampme" id="add_new_transaction_form">
                     <div className="card p-3">
-                      <Row align='middle' justify='start' style={{ fontSize: 15, padding: '0.25rem 0.5rem', marginBottom: '0.5rem', borderRadius: '0.25rem', backgroundColor:'#eeeeee' }}>
-                        <Col>{t('common.type2')} : </Col>
-                        <Col style={{ paddingLeft: '0.25rem',paddingRight: '1rem'}}>
+                      <div className={styles.billHeader}>
+                        <div>{t('common.type2')} : </div>
+                        <div className={styles.billTransType}>
                           <Select
                             className="trans_select"
                             defaultValue='매출'
                             onChange={selected => handleSelectChange('transaction_type', selected)}
                             options={trans_types}
                           />
-                        </Col>
-                        <Col>{t('transaction.bill_type')} : </Col>
-                        <Col style={{ paddingLeft: '0.25rem', marginRight: '0.5rem'}}>
+                        </div>
+                        <div>{t('transaction.bill_type')} : </div>
+                        <div className={styles.billBillType}>
                           <Select
                             className="trans_select"
                             defaultValue='세금계산서'
                             onChange={selected => handleSelectChange('bill_type', selected)}
                             options={bill_types}
                           />
-                        </Col>
-                        <Col><Checkbox /></Col>
-                        <Col>{t('quotation.show_decimal')}</Col>
-                      </Row>
+                        </div>
+                        <div style={{paddingRight:'0.5rem'}}><Checkbox /></div>
+                        <div>{t('quotation.show_decimal')}</div>
+                      </div>
                       <Row align='middle' justify='space-between' className={`trans_bl trans_br trans_bt ${!isSale && 'trans_pur'}`}>
                         <Col flex={8}>
                           <Row justify="center" align="middle">
-                            <Col className={`bill_title ${!isSale && 'trans_pur'}`}>{isTaxBill ? t("transaction.tax_bill") : t("transaction.bill")}</Col>
+                            <Col className={classNames(styles.billTitle, {'trans_pur': !isSale})}>{isTaxBill ? t("transaction.tax_bill") : t("transaction.bill")}</Col>
                           </Row>
                         </Col>
                         <Col flex={5}>
@@ -798,89 +801,79 @@ const TransactionTaxBillModel = (props) => {
                           </Col>
                         </Col>
                       </Row>
-                      <Row align='middle' justify='center'>
-                        <Col flex={3} className={`trans_bl trans_bt ${!isSale && "trans_pur"}`}>
-                          <Row style={{width:'100%'}}>
-                            <Col className={`bill_text_center trans_bb ${!isSale && "trans_pur"}`}>작성</Col>
-                          </Row>
-                          <Row style={{width:'100%'}}>
-                            <Col className={`bill_text_center trans_bb ${!isSale && "trans_pur"}`}>년-월-일</Col>
-                          </Row>
-                          <Row style={{width:'100%'}}>
-                            <Col className={`bill_text_center ${!isSale && "trans_pur"}`}>2024-07-04</Col>
-                          </Row>
-                        </Col>
-                        <Col flex={3} className={`trans_bl trans_bt ${!isSale && "trans_pur"}`}>
-                          <Row>
-                            <Col flex={14} className={`bill_text_center trans_bb ${!isSale && "trans_pur"}`}>공급가액</Col>
-                          </Row>
-                          <Row>
-                            <Col flex={3} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>공란수</Col>
-                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>백</Col>
-                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>십</Col>
-                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>억</Col>
-                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>천</Col>
-                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>백</Col>
-                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>십</Col>
-                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>만</Col>
-                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>천</Col>
-                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>백</Col>
-                            <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>십</Col>
-                            <Col flex={1} className={`bill_text_center trans_bb ${!isSale && "trans_pur"}`}>일</Col>
-                          </Row>
-                          <Row>
-                            <Col flex={3} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>3</Col>
-                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>{''}</Col>
-                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>{''}</Col>
-                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>{''}</Col>
-                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>4</Col>
-                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>5</Col>
-                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
-                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
-                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
-                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
-                            <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
-                            <Col flex={1} className={`bill_text_center ${!isSale && "trans_pur"}`}>0</Col>
-                          </Row>
-                        </Col>
+                      <div className={styles.billMidRow}>
+                        <div className={classNames(styles.Date, styles.bdR)}>
+                          <div className={classNames(styles.MidCell,{"trans_pur": !isSale})}>작성</div>
+                          <div className={classNames(styles.MidCell,{"trans_pur": !isSale})}>년-월-일</div>
+                          <div className={classNames(styles.MidCell,{"trans_pur": !isSale})}>2024-07-04</div>
+                        </div>
+                        <div className={classNames(styles.Price, styles.bdR)}>
+                          <div className={classNames(styles.MidCell,{"trans_pur": !isSale})}>공급가액</div>
+                          <div className={classNames(styles.Units)}>
+                            <div className={classNames(styles.Unit3,styles.bdR, {"trans_pur":!isSale})}>공란수</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>백</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>십</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>억</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>천</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>백</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>십</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>만</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>천</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>백</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>십</div>
+                            <div className={classNames(styles.Unit, {"trans_pur":!isSale})}>일</div>
+                          </div>
+                          <div className={classNames(styles.Units)}>
+                            <div className={classNames(styles.Unit3,styles.bdR, {"trans_pur":!isSale})}>3</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>{''}</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>{''}</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>{''}</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>4</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>5</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
+                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
+                            <div className={classNames(styles.Unit, {"trans_pur":!isSale})}>0</div>
+                          </div>
+                        </div>
                         {isTaxBill &&
-                          <Col flex={3} className={`trans_bl trans_bt ${!isSale && "trans_pur"}`}>
-                            <Row>
-                              <Col flex={14} className={`bill_text_center trans_bb ${!isSale && "trans_pur"}`}>세 액</Col>
-                            </Row>
-                            <Row>
-                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>십</Col>
-                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>억</Col>
-                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>천</Col>
-                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>백</Col>
-                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>십</Col>
-                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>만</Col>
-                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>천</Col>
-                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>백</Col>
-                              <Col flex={1} className={`bill_text_center trans_bb trans_br ${!isSale && "trans_pur"}`}>십</Col>
-                              <Col flex={1} className={`bill_text_center trans_bb ${!isSale && "trans_pur"}`}>일</Col>
-                            </Row>
-                            <Row>
-                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>{''}</Col>
-                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>{''}</Col>
-                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>4</Col>
-                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>5</Col>
-                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
-                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
-                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
-                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
-                              <Col flex={1} className={`bill_text_center trans_br ${!isSale && "trans_pur"}`}>0</Col>
-                              <Col flex={1} className={`bill_text_center ${!isSale && "trans_pur"}`}>0</Col>
-                            </Row>
-                          </Col>
+                          <div className={classNames(styles.Tax, styles.bdR)}>
+                            <div className={classNames(styles.MidCell,{"trans_pur": !isSale})}>세 액</div>
+                            <div className={classNames(styles.Units)}>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>십</div>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>억</div>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>천</div>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>백</div>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>십</div>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>만</div>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>천</div>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>백</div>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>십</div>
+                              <div className={classNames(styles.Unit, {"trans_pur":!isSale})}>일</div>
+                            </div>
+                            <div className={classNames(styles.Units)}>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>{''}</div>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>{''}</div>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>4</div>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>5</div>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
+                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
+                              <div className={classNames(styles.Unit, {"trans_pur":!isSale})}>0</div>
+                            </div>
+                          </div>
                         }
-                        <Col flex={3} className={`bill_mid_right ${!isSale && "trans_pur"}`}>
-                          <Row><Col>비고</Col></Row>
-                          <Row><Col>{''}</Col></Row>
-                        </Col>
-                      </Row>
+                        <div className={styles.Note}>
+                          <div className={classNames(styles.MidCell,{"trans_pur": !isSale})}>비고</div>
+                          <div className={styles.Cell}>{''}</div>
+                        </div>
+                      </div>
                       <Row>
-                        <Col flex='auto' className={`trans_table ${!isSale && "trans_pur"}`}>
+                        <Col flex='auto' className={classNames(styles.bdB,styles.bdR,styles.bdL)}>
                           <Table
                             rowSelection={rowSelection}
                             pagination={{

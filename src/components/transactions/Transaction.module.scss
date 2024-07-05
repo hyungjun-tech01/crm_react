@@ -1,0 +1,101 @@
+.billHeader
+{
+    font-size: 14px;
+    padding: 0.5rem 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.25rem;
+    background-color:#eeeeee;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+.billTransType
+{
+    padding-left: 0.25rem;
+    padding-right: 1rem;
+}
+.billBillType
+{
+    padding-left: 0.25rem;
+    padding-right: 1rem;
+}
+.billTitle
+{
+    color: #ff0505;
+    font-size: 32px;
+    font-weight: 600;
+    margin: 0.5rem;
+    padding: 0.25rem 2.5rem;
+}
+.billMidRow
+{
+    border-left: 2px solid #ff0505;
+    border-right: 2px solid #ff0505;
+    border-top: 2px solid #ff0505;
+    display: flex;
+    justify-items: stretch;
+    font-size: 14px;
+    color: #ff0505;
+    text-align: center;
+    .Date {
+        flex: 1 1 10%;
+        display: flex;
+        flex-direction: column;
+        justify-items: stretch;
+    }
+    .Price {
+        flex: 1 1 38%;
+        display: flex;
+        flex-direction: column;
+        justify-items: stretch;
+        
+    }
+    .Tax {
+        flex: 1 1 27%;
+        display: flex;
+        flex-direction: column;
+        justify-items: stretch;
+    }
+    .Note {
+        flex: 3 3 25%;
+        display: flex;
+        flex-direction: column;
+        justify-items: stretch;
+        .Cell{
+            height: 50px;
+            border-bottom: 2px solid #ff0505;
+        }
+    }
+}
+.MidCell {
+    height: 25px;
+    border-bottom: 2px solid #ff0505;
+}
+.Units {
+    display: flex;
+    flex-direction: row;
+    height: 25px;
+    border-bottom: 2px solid #ff0505;
+    .Unit3 {
+        flex: 3 3 21.4%;
+    };
+    .Unit {
+        flex: 1 1 7.1%;
+    }
+}
+.bdB
+{
+    border-bottom: 2px solid #ff0505;
+}
+.bdL
+{
+    border-left: 2px solid #ff0505;
+}
+.bdR
+{
+    border-right: 2px solid #ff0505;
+}
+.bdT
+{
+    border-top: 2px solid #ff0505;
+}
