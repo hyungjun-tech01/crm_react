@@ -10,9 +10,17 @@ import { atomCurrentUser,
 } from '../atoms/atomsUser';
 import { data_user } from './test_data';
 
-
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
+
+export const company_info = {
+    business_registration_code: '106-86-26016',
+    company_name: '노드데이타',
+    ceo_name: '김신일',
+    company_address: '서울특별시 금천구 가산디지털 1로 128 1811 (STX V-Tower)',
+    business_type: '도소매서비스',
+    business_item: '컴퓨터및주변기기, S/W개발, 공급, 자문',
+};
 
 export async function apiLoginValidate(userId, password) {
     try {

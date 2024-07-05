@@ -5,7 +5,6 @@ import NotoSansRegular from "../../fonts/NotoSansKR-Regular.ttf";
 import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";
 import { ConvertCurrency } from '../../constants/functions';
-import { company_info } from '../../repository/user';
 
 // Create styles
 const Styles = StyleSheet.create({
@@ -72,11 +71,21 @@ Font.register({
     ]
 });
 
-const TransactionView2 = (props) => {
+const TaxBillPrint = (props) => {
     const { transaction, contents} = props;
     const [ transactionContents, setTransactionContents ] = useState([]);
     const [ supplier, setSupplier ] = useState({});
     const [ receiver, setReceiver ] = useState({});
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const company_info = {
+        business_registration_code: '106-86-26016',
+        company_name: '노드데이타',
+        ceo_name: '김신일',
+        company_address: '서울특별시 금천구 가산디지털 1로 128 1811 (STX V-Tower)',
+        business_type: '도소매서비스',
+        business_item: '컴퓨터및주변기기, S/W개발, 공급, 자문',
+    };
 
     useEffect(() => {
         if(contents && Array.isArray(contents)){
@@ -766,4 +775,4 @@ const TransactionView2 = (props) => {
     );
 };
 
-export default TransactionView2;
+export default TaxBillPrint;

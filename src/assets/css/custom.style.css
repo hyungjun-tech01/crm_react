@@ -300,6 +300,7 @@
 }
 .trans_rec_title
 {
+    color: #ff0505;
     border-right: 2px solid #ff0505;
     text-align: center;
 }

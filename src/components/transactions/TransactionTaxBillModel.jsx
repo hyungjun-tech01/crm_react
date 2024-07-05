@@ -24,9 +24,10 @@ import { ConvertCurrency, formatDate } from "../../constants/functions";
 import TransactionContentModal from "./TransactionContentModal";
 import TransactionReceiptModal from "./TransactionReceiptModal";
 import MessageModal from "../../constants/MessageModal";
-import TransactionPrint from "./TransactionPrint";
+import TaxBillPrint from "./TaxBillPrint";
 
 import styles from './Transaction.module.scss';
+import { company_info } from "../../repository/user";
 
 const default_transaction_data = {
   title: '',
@@ -48,7 +49,7 @@ const default_transaction_data = {
 };
 
 const TransactionTaxBillModel = (props) => {
-  const { init, handleInit } = props;
+  // const { transaction } = props;
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [ isMessageModalOpen, setIsMessageModalOpen ] = useState(false);
@@ -70,6 +71,9 @@ const TransactionTaxBillModel = (props) => {
   const [transactionContents, setTransactionContents] = useState([]);
   const [isSale, setIsSale] = useState(true);
   const [isTaxBill, setIsTaxBill] = useState(true);
+  const [isRequested, setIsRequested] = useState(true);
+  const [supplier, setSupplier] = useState({});
+  const [receiver, setReceiver] = useState({});
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
 
   const handleItemChange = useCallback((e) => {
@@ -135,6 +139,10 @@ const TransactionTaxBillModel = (props) => {
     { value: '세금계산서', label: t('transaction.tax_bill') },
     { value: '계산서', label: t('transaction.bill') },
   ];
+  const request_type = [
+    { value: '청구', label: '청구' },
+    { value: '영수', label: '영수' },
+  ]
 
 
   // --- Functions / Variables dealing with contents -------------------------------
@@ -552,8 +560,7 @@ const TransactionTaxBillModel = (props) => {
 
     document.querySelector("#add_new_transaction_form").reset();
 
-    handleInit(!init);
-  }, [handleInit, init]);
+  }, []);
 
   //===== useEffect ==============================================================
   useEffect(() => {
@@ -565,11 +572,17 @@ const TransactionTaxBillModel = (props) => {
 
   useEffect(() => {
     console.log('[TransactionTaxBillModel] called!');
-    if (init) {
-      initializeTransactionTemplate();
-      handleInit(!init);
+    const tempTransaction = {
+      ...defaultTransaction,
+      transaction_type: '매출',
+      tax_type: '세금계산서',
+      request_type: '청구',
     };
-  }, [handleInit, init, initializeTransactionTemplate, isSale]);
+    setTransactionChange(tempTransaction);
+    setIsSale(true);
+    setIsTaxBill(true);
+    setIsRequested(true);
+  }, [ initializeTransactionTemplate]);
 
   return (
     <div
@@ -632,7 +645,7 @@ const TransactionTaxBillModel = (props) => {
                         <div className={styles.billTransType}>
                           <Select
                             className="trans_select"
-                            defaultValue='매출'
+                            value={transactionChange.transaction_type}
                             onChange={selected => handleSelectChange('transaction_type', selected)}
                             options={trans_types}
                           />
@@ -641,7 +654,7 @@ const TransactionTaxBillModel = (props) => {
                         <div className={styles.billBillType}>
                           <Select
                             className="trans_select"
-                            defaultValue='세금계산서'
+                            value={transactionChange.tax_type}
                             onChange={selected => handleSelectChange('bill_type', selected)}
                             options={bill_types}
                           />
@@ -668,20 +681,36 @@ const TransactionTaxBillModel = (props) => {
                             <Col flex={24}>일련번호&nbsp;</Col>
                           </Row>
                         </Col>
-                        <Col flex={4}>
+                        <Col flex={8}>
                           <Row align='middle' className={`trans_br trans_text ${!isSale && 'trans_pur'}`}>
-                            <Col flex={24}>{ } 권&nbsp;</Col>
+                            <Col flex={10}>
+                              <Input
+                                className={styles.input}
+                                name='count'
+                                value={transactionChange['count']}
+                                onChange={handleItemChange}
+                              />
+                            </Col>
+                            <Col flex={2}>권&nbsp;</Col>
+                            <Col flex={10}>
+                              <Input
+                                className={styles.input}
+                                name='count'
+                                value={transactionChange['count']}
+                                onChange={handleItemChange}
+                              />
+                            </Col>
+                            <Col flex={2}>호&nbsp;</Col>
                           </Row>
                           <Row align='middle' className={`trans_bt trans_text ${!isSale && 'trans_pur'}`}>
-                            <Col flex={24}>&nbsp;</Col>
-                          </Row>
-                        </Col>
-                        <Col flex={4}>
-                          <Row align='middle' className={`trans_text ${!isSale && 'trans_pur'}`}>
-                            <Col flex={24}>호&nbsp;</Col>
-                          </Row>
-                          <Row align='middle' className={`trans_bt trans_text ${!isSale && 'trans_pur'}`}>
-                            <Col flex={24}>&nbsp;</Col>
+                            <Col flex={24}>
+                              <Input
+                                className={styles.input}
+                                name='serial'
+                                value={transactionChange['serial']}
+                                onChange={handleItemChange}
+                              />
+                            </Col>
                           </Row>
                         </Col>
                       </Row>
@@ -691,54 +720,88 @@ const TransactionTaxBillModel = (props) => {
                           <Col flex='auto' align='strech'>
                             <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
                               <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.register_no')}</Col>
-                              <Col flex='auto'>
-                                <Input
-                                  name='business_registration_code'
-                                  value={transactionChange['business_registration_code']}
-                                  onChange={handleItemChange}
-                                />
+                              <Col flex='auto' style={{color:'black'}}>
+                                {isSale ?
+                                  <label>{company_info.business_registration_code}</label>
+                                  :
+                                  <Input
+                                    className={styles.input}
+                                    name='business_registration_code'
+                                    value={transactionChange['business_registration_code']}
+                                    onChange={handleItemChange}
+                                  />
+                                }
                               </Col>
                             </Row>
                             <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
                               <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.company_name')}</Col>
                               <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
-                                <label>{transactionChange['company_name']}</label>
+                                {isSale ?
+                                  <label style={{color:'black'}}>{company_info.company_name}</label>
+                                  : 
+                                  <Select
+                                    value={transactionChange['company_name']}
+                                    options={companyForSelection}
+                                    onChange={selected => handleSelectChange('company_name', selected)}
+                                  />
+                                }
                               </Col>
                               <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('common.name2')}</Col>
-                              <Col flex={1}>
-                                <Input
-                                  name='ceo_name'
-                                  value={transactionChange['ceo_name']}
-                                  onChange={handleItemChange}
-                                />
+                              <Col flex={1} style={{color:'black'}}>
+                                {isSale ?
+                                  <label>{company_info.ceo_name}</label>
+                                   :
+                                  <Input
+                                    className={styles.input} 
+                                    name='ceo_name'
+                                    value={transactionChange['ceo_name']}
+                                    onChange={handleItemChange}
+                                  />
+                                }
                               </Col>
                             </Row>
                             <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
                               <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.address')}</Col>
-                              <Col flex='auto'>
-                                <Input
-                                  name='company_address'
-                                  value={transactionChange['company_address']}
-                                  onChange={handleItemChange}
-                                />
+                              <Col flex='auto' style={{color:'black'}}>
+                                {isSale ?
+                                  <label>{company_info.company_address}</label>
+                                   :
+                                  <Input
+                                    className={styles.input}
+                                    name='company_address'
+                                    value={transactionChange['company_address']}
+                                    onChange={handleItemChange}
+                                  />
+                                }
                               </Col>
                             </Row>
                             <Row className="trans_rec_item_last">
                               <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('company.business_type')}</Col>
                               <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
-                                <Input
-                                  name='business_type'
-                                  value={transactionChange['business_type']}
-                                  onChange={handleItemChange}
-                                />
+                                {isSale ?
+                                  <label  style={{color:'black'}}>{company_info.business_type}</label>
+                                   :
+                                  <Input
+                                    className={styles.input}
+                                    name='business_type'
+                                    value={transactionChange['business_type']}
+                                    onChange={handleItemChange}
+                                    style={{color:'black'}}
+                                  />
+                                }
                               </Col>
                               <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('company.business_item')}</Col>
-                              <Col flex={1}>
-                                <Input
-                                  name='business_item'
-                                  value={transactionChange['business_item']}
-                                  onChange={handleItemChange}
-                                />
+                              <Col flex={1} style={{color:'black'}}>
+                                {isSale ?
+                                  <label>{company_info.business_item}</label>
+                                   :
+                                  <Input
+                                    className={styles.input}
+                                    name='business_item'
+                                    value={transactionChange['business_item']}
+                                    onChange={handleItemChange}
+                                  />
+                                }
                               </Col>
                             </Row>
                           </Col>
@@ -748,54 +811,88 @@ const TransactionTaxBillModel = (props) => {
                           <Col flex='auto' align='strech' style={{borderRight: isSale ? '2px solid #ff0505' : '2px solid #0000ff'}}>
                             <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
                               <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.register_no')}</Col>
-                              <Col flex='auto'>
-                                <Input
-                                  name='business_registration_code'
-                                  value={transactionChange['business_registration_code']}
-                                  onChange={handleItemChange}
-                                />
+                              <Col flex='auto' style={{color:'black'}}>
+                                {isSale ?
+                                  <Input
+                                    className={styles.input}
+                                    name='business_registration_code'
+                                    value={transactionChange['business_registration_code']}
+                                    onChange={handleItemChange}
+                                  />
+                                  :
+                                  <label>{company_info.business_registration_code}</label>
+                                }
                               </Col>
                             </Row>
                             <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
                               <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.company_name')}</Col>
                               <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
-                                <label>{transactionChange['company_name']}</label>
+                                {isSale ?
+                                  <Select
+                                    value={transactionChange['company_name']}
+                                    options={companyForSelection}
+                                    onChange={selected => handleSelectChange('company_name', selected)}
+                                  />
+                                  :
+                                  <label style={{color:'black'}}>{company_info.company_name}</label>
+                                }
                               </Col>
                               <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('common.name2')}</Col>
-                              <Col flex={1}>
-                                <Input
-                                  name='ceo_name'
-                                  value={transactionChange['ceo_name']}
-                                  onChange={handleItemChange}
-                                />
+                              <Col flex={1} style={{color:'black'}}>
+                                {isSale ?
+                                  <Input
+                                    className={styles.input}
+                                    name='ceo_name'
+                                    value={transactionChange['ceo_name']}
+                                    onChange={handleItemChange}
+                                  />
+                                  :
+                                  <label>{company_info.ceo_name}</label>
+                                }
                               </Col>
                             </Row>
                             <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
                               <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.address')}</Col>
-                              <Col flex='auto'>
-                                <Input
-                                  name='company_address'
-                                  value={transactionChange['company_address']}
-                                  onChange={handleItemChange}
-                                />
+                              <Col flex='auto' style={{color:'black'}}>
+                                {isSale ?
+                                  <Input
+                                    className={styles.input}
+                                    name='company_address'
+                                    value={transactionChange['company_address']}
+                                    onChange={handleItemChange}
+                                  />
+                                  :
+                                  <label>{company_info.company_address}</label>
+                                }
                               </Col>
                             </Row>
                             <Row className="trans_rec_item_last">
                               <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('company.business_type')}</Col>
                               <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
-                                <Input
-                                  name='business_type'
-                                  value={transactionChange['business_type']}
-                                  onChange={handleItemChange}
-                                />
+                                {isSale ?
+                                  <Input
+                                    className={styles.input}
+                                    name='business_type'
+                                    value={transactionChange['business_type']}
+                                    onChange={handleItemChange}
+                                    style={{color:'black'}}
+                                  />
+                                  :
+                                  <label style={{color:'black'}}>{company_info.business_type}</label>
+                                }
                               </Col>
                               <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('company.business_item')}</Col>
-                              <Col flex={1}>
-                                <Input
-                                  name='business_item'
-                                  value={transactionChange['business_item']}
-                                  onChange={handleItemChange}
-                                />
+                              <Col flex={1} style={{color:'black'}}>
+                                {isSale ?
+                                  <Input
+                                    className={styles.input}
+                                    name='business_item'
+                                    value={transactionChange['business_item']}
+                                    onChange={handleItemChange}
+                                  />
+                                  :
+                                  <label>{company_info.business_item}</label>
+                                }
                               </Col>
                             </Row>
                           </Col>
@@ -869,7 +966,14 @@ const TransactionTaxBillModel = (props) => {
                         }
                         <div className={styles.Note}>
                           <div className={classNames(styles.MidCell,{"trans_pur": !isSale})}>비고</div>
-                          <div className={styles.Cell}>{''}</div>
+                          <div className={styles.Cell}>
+                            <Input
+                              className={styles.inputTall}
+                              name='memo'
+                              value={transactionChange['memo']}
+                              onChange={handleItemChange}
+                            />
+                          </div>
                         </div>
                       </div>
                       <Row>
@@ -907,9 +1011,7 @@ const TransactionTaxBillModel = (props) => {
                             </Col>
                           </Row>
                           <Row>
-                            <Col flex='auto'
-                              onClick={handleStartEditReceipt}
-                              className={`trans_amt low right ${!isSale && "trans_pur"}`}
+                            <Col flex='auto' className={`trans_amt low right ${!isSale && "trans_pur"}`}
                             >
                               {ConvertCurrency(dataForTransaction.receipt, dataForTransaction.show_decimal)}
                             </Col>
@@ -923,7 +1025,12 @@ const TransactionTaxBillModel = (props) => {
                           </Row>
                           <Row>
                             <Col flex='auto' className={`trans_amt  low right ${!isSale && "trans_pur"}`}>
-                              {ConvertCurrency(dataForTransaction.valance_final, dataForTransaction.show_decimal)}
+                              <Input
+                                className={styles.input}
+                                name='cash'
+                                value={transactionChange['cash']}
+                                onChange={handleItemChange}
+                              />
                             </Col>
                           </Row>
                         </Col>
@@ -935,7 +1042,12 @@ const TransactionTaxBillModel = (props) => {
                           </Row>
                           <Row>
                             <Col flex='auto' className={`trans_amt  low right ${!isSale && "trans_pur"}`}>
-                              {ConvertCurrency(dataForTransaction.valance_final, dataForTransaction.show_decimal)}
+                              <Input
+                                className={styles.input}
+                                name='check'
+                                value={transactionChange['check']}
+                                onChange={handleItemChange}
+                              />
                             </Col>
                           </Row>
                         </Col>
@@ -947,7 +1059,12 @@ const TransactionTaxBillModel = (props) => {
                           </Row>
                           <Row>
                             <Col flex='auto' className={`trans_amt  low right ${!isSale && "trans_pur"}`}>
-                              {ConvertCurrency(dataForTransaction.valance_final, dataForTransaction.show_decimal)}
+                              <Input
+                                className={styles.input}
+                                name='note'
+                                value={transactionChange['note']}
+                                onChange={handleItemChange}
+                              />
                             </Col>
                           </Row>
                         </Col>
@@ -959,16 +1076,25 @@ const TransactionTaxBillModel = (props) => {
                           </Row>
                           <Row>
                             <Col flex='auto' className={`trans_amt low ${!isSale && "trans_pur"}`}>
-                              {ConvertCurrency(dataForTransaction.valance_final, dataForTransaction.show_decimal)}
+                              <Input
+                                className={styles.input}
+                                name='credit'
+                                value={transactionChange['credit']}
+                                onChange={handleItemChange}
+                              />
                             </Col>
                           </Row>
                         </Col>
                         <Col flex={5} className={`trans_br trans_bb trans_bl ${!isSale && "trans_pur"}`}>
-                            <Row align='middle' justify='center'>
-                              <Col>
-                                이 금액을 청구함.
-                              </Col>
-                            </Row>
+                            <div className={styles.billBottomRow}>
+                              <div>이 금액을</div>
+                              <Select
+                                value={transactionChange.request_type}
+                                options={request_type}
+                                onChange={selected => handleSelectChange('request_type', selected)}
+                              />
+                              <div>함.</div>
+                            </div>
                         </Col>
                       </Row>
                     </div>
