@@ -52,8 +52,8 @@ const TransactionTaxBillModel = (props) => {
   // const { transaction } = props;
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
-  const [ isMessageModalOpen, setIsMessageModalOpen ] = useState(false);
-  const [ message, setMessage ] = useState({title:'', message: ''});
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [message, setMessage] = useState({ title: '', message: '' });
 
 
   //===== [RecoilState] Related with Transaction =====================================
@@ -114,7 +114,7 @@ const TransactionTaxBillModel = (props) => {
         } else {
           setIsSale(false);
         };
-      } else if(name === 'bill_type') {
+      } else if (name === 'bill_type') {
         console.log('handleSelectChange / bill_type :', selected);
         if (selected.value === '세금계산서') {
           setIsTaxBill(true);
@@ -215,13 +215,13 @@ const TransactionTaxBillModel = (props) => {
   const [editedContentModalData, setEditedContentModalData] = useState({});
 
   const handleFormatter = useCallback((value) => {
-    if(value === undefined || value === null || value === '') return '';
+    if (value === undefined || value === null || value === '') return '';
     let ret = value;
-    if(typeof value === 'string') {
+    if (typeof value === 'string') {
       ret = Number(value);
-      if(isNaN(ret)) return;
+      if (isNaN(ret)) return;
     };
-    
+
     return dataForTransaction.show_decimal
       ? ret?.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,')
       : ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -245,15 +245,15 @@ const TransactionTaxBillModel = (props) => {
     };
     setDataForTransaction(tempData);
   };
-  
+
   const handleStartAddContent = () => {
-    if(!transactionChange['company_code']) return;
+    if (!transactionChange['company_code']) return;
     const tempData = {
       ...dataForTransaction,
       title: t('quotation.add_content'),
     };
     setDataForTransaction(tempData);
-    setOrgContentModalData({...DefaultTransactionContent});
+    setOrgContentModalData({ ...DefaultTransactionContent });
     setEditedContentModalData({});
     setIsContentModalOpen(true);
   };
@@ -264,14 +264,14 @@ const TransactionTaxBillModel = (props) => {
       title: `${t('common.item')} ${t('common.edit')}`,
     };
     setDataForTransaction(tempData);
-    setOrgContentModalData({...DefaultTransactionContent});
+    setOrgContentModalData({ ...DefaultTransactionContent });
     setEditedContentModalData({});
     setIsContentModalOpen(true);
   };
 
   const handleContentModalOk = () => {
-    if(!editedContentModalData['transaction_date']){
-      const tempMsg = {title: '확인', message: '거래일 정보가 누락되었습니다.'}
+    if (!editedContentModalData['transaction_date']) {
+      const tempMsg = { title: '확인', message: '거래일 정보가 누락되었습니다.' }
       setMessage(tempMsg);
       setIsMessageModalOpen(true);
       return;
@@ -279,7 +279,7 @@ const TransactionTaxBillModel = (props) => {
 
     setIsContentModalOpen(false);
     const inputData = new Date(editedContentModalData.transaction_date);
-    const tempDate = `${inputData.getMonth()+1}.${inputData.getDate()}`;
+    const tempDate = `${inputData.getMonth() + 1}.${inputData.getDate()}`;
     const tempContent = {
       ...orgContentModalData,
       ...editedContentModalData,
@@ -297,7 +297,7 @@ const TransactionTaxBillModel = (props) => {
     setTransactionContents(tempContents);
     handleAmountCalculation(tempContents);
     setIsContentModalOpen(false);
-    setOrgContentModalData({...DefaultTransactionContent});
+    setOrgContentModalData({ ...DefaultTransactionContent });
     setEditedContentModalData({});
   };
 
@@ -309,23 +309,23 @@ const TransactionTaxBillModel = (props) => {
   };
 
   const handleContentDelete = () => {
-    if(selectedContentRowKeys.length ===0) return;
+    if (selectedContentRowKeys.length === 0) return;
     const tempContents = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) === -1);
     setTransactionContents(tempContents);
     setSelectedContentRowKeys([]);
   };
 
   const handleContentMoveUp = () => {
-    if(selectedContentRowKeys.length === 0) return;
+    if (selectedContentRowKeys.length === 0) return;
     selectedContentRowKeys.sort();
     console.log('handleContentMoveUp : ', selectedContentRowKeys);
-    
+
     let tempContents = null;
     let startIdx = 0;
     const selecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) !== -1);
     const unselecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) === -1);
     const firstIdx = selectedContentRowKeys[0];
-    if(firstIdx === 1){
+    if (firstIdx === 1) {
       tempContents = [
         ...selecteds,
         ...unselecteds,
@@ -335,7 +335,7 @@ const TransactionTaxBillModel = (props) => {
       tempContents = [
         ...unselecteds.slice(0, firstIdx - 2),
         ...selecteds,
-        ...unselecteds.slice(firstIdx - 2, ),
+        ...unselecteds.slice(firstIdx - 2,),
       ];
       startIdx = firstIdx - 1;
     };
@@ -349,14 +349,14 @@ const TransactionTaxBillModel = (props) => {
     setTransactionContents(finalContents);
 
     let tempKeys = [];
-    for(let i = 0; i<selecteds.length; i++, startIdx++){
+    for (let i = 0; i < selecteds.length; i++, startIdx++) {
       tempKeys.push(startIdx);
     }
     setSelectedContentRowKeys(tempKeys);
   };
 
   const handleContentMoveDown = () => {
-    if(selectedContentRowKeys.length === 0) return;
+    if (selectedContentRowKeys.length === 0) return;
     selectedContentRowKeys.sort();
     console.log('handleContentMoveDown :', selectedContentRowKeys);
 
@@ -365,19 +365,19 @@ const TransactionTaxBillModel = (props) => {
     const selecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) !== -1);
     const unselecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) === -1);
     const lastIdx = selectedContentRowKeys.at(-1);
-    if(lastIdx === transactionContents.length){
+    if (lastIdx === transactionContents.length) {
       tempContents = [
         ...unselecteds,
         ...selecteds,
       ];
-      startIdx=lastIdx;
+      startIdx = lastIdx;
     } else {
       tempContents = [
         ...unselecteds.slice(0, lastIdx),
         ...selecteds,
-        ...unselecteds.slice(lastIdx, ),
+        ...unselecteds.slice(lastIdx,),
       ];
-      startIdx=lastIdx + 1;
+      startIdx = lastIdx + 1;
     };
     const finalContents = tempContents.map((item, index) => {
       const temp3 = {
@@ -390,7 +390,7 @@ const TransactionTaxBillModel = (props) => {
     console.log('handleContentMoveUp / final value: ', finalContents);
 
     let tempKeys = [];
-    for(let i = 0; i<selecteds.length; i++){
+    for (let i = 0; i < selecteds.length; i++) {
       tempKeys.push(startIdx--);
     }
     setSelectedContentRowKeys(tempKeys);
@@ -403,15 +403,15 @@ const TransactionTaxBillModel = (props) => {
   const [orgReceiptModalData, setOrgReceiptModalData] = useState({});
   const [editedReceiptModalData, setEditedReceiptModalData] = useState({});
 
-  const handleVATChange = (e)=>{
+  const handleVATChange = (e) => {
     const tempIncludeVAT = e.target.value === 'vat_included';
-    if(dataForTransaction.vat_included !== tempIncludeVAT){
+    if (dataForTransaction.vat_included !== tempIncludeVAT) {
       const tempValues = {
         ...dataForTransaction,
         vat_included: tempIncludeVAT,
       };
       setDataForTransaction(tempValues);
-      if(tempIncludeVAT){
+      if (tempIncludeVAT) {
         const tempContents = transactionContents.map(item => {
           return {
             ...item,
@@ -436,7 +436,7 @@ const TransactionTaxBillModel = (props) => {
   };
 
   const handleStartEditReceipt = () => {
-    if(!orgReceiptModalData['payment_amount']){
+    if (!orgReceiptModalData['payment_amount']) {
       const tempReceipt = {
         payment_amount: 0,
         payment_type: '현금',
@@ -457,9 +457,9 @@ const TransactionTaxBillModel = (props) => {
     setOrgReceiptModalData(tempOrgData);
     setEditedReceiptModalData({});
     console.log('[handleReceiptModalOk] ', tempOrgData);
-    
-    const temp_valance= dataForTransaction.valance_prev + dataForTransaction.total_price - tempOrgData.payment_amount;
-    const tempData={
+
+    const temp_valance = dataForTransaction.valance_prev + dataForTransaction.total_price - tempOrgData.payment_amount;
+    const tempData = {
       ...dataForTransaction,
       receipt: tempOrgData.payment_amount,
       valance_final: temp_valance,
@@ -505,7 +505,7 @@ const TransactionTaxBillModel = (props) => {
       || transactionChange.company_name === ''
       || transactionContents.length === 0
     ) {
-      setMessage({title: '*필수 입력 누락*', message: '업체 정보나 품목 정보가 누락되었습니다.'});
+      setMessage({ title: '*필수 입력 누락*', message: '업체 정보나 품목 정보가 누락되었습니다.' });
       setIsMessageModalOpen(true);
       return;
     };
@@ -518,16 +518,16 @@ const TransactionTaxBillModel = (props) => {
     };
     const result = modifyTransaction(newTransactionData);
     result.then((res) => {
-      if(res){
-        if(value === 'TaxBill'){
+      if (res) {
+        if (value === 'TaxBill') {
           handleShowTaxBill();
-        } else if(value === 'print'){
+        } else if (value === 'print') {
           handleShowPrint();
         };
         initializeTransactionTemplate();
       }
       else {
-        setMessage({title: '저장 중 오류', message: '오류가 발생하여 저장하지 못했습니다.'});
+        setMessage({ title: '저장 중 오류', message: '오류가 발생하여 저장하지 못했습니다.' });
         setIsMessageModalOpen(true);
       };
     });
@@ -582,7 +582,7 @@ const TransactionTaxBillModel = (props) => {
     setIsSale(true);
     setIsTaxBill(true);
     setIsRequested(true);
-  }, [ initializeTransactionTemplate]);
+  }, [initializeTransactionTemplate]);
 
   return (
     <div
@@ -659,68 +659,66 @@ const TransactionTaxBillModel = (props) => {
                             options={bill_types}
                           />
                         </div>
-                        <div style={{paddingRight:'0.5rem'}}><Checkbox /></div>
+                        <div style={{ paddingRight: '0.5rem' }}><Checkbox /></div>
                         <div>{t('quotation.show_decimal')}</div>
                       </div>
-                      <Row align='middle' justify='space-between' className={`trans_bl trans_br trans_bt ${!isSale && 'trans_pur'}`}>
-                        <Col flex={8}>
-                          <Row justify="center" align="middle">
-                            <Col className={classNames(styles.billTitle, {'trans_pur': !isSale})}>{isTaxBill ? t("transaction.tax_bill") : t("transaction.bill")}</Col>
-                          </Row>
-                        </Col>
-                        <Col flex={5}>
-                          <Row justify="center" align="middle">
-                            <Col className={`trans_text ${!isSale && 'trans_pur'}`}>({isSale ? t("transaction.for_receiver") : t('transaction.for_supplier')})</Col>
-                          </Row>
-                        </Col>
-                        <Col flex={3}>
-                          <Row align='middle' className={`trans_br trans_text ${!isSale && 'trans_pur'}`}>
-                            <Col flex={24}>책 번 호&nbsp;</Col>
-                          </Row>
-                          <Row align='middle' className={`trans_br trans_text ${!isSale && 'trans_pur'}`}>
-                            <Col flex={24}>일련번호&nbsp;</Col>
-                          </Row>
-                        </Col>
-                        <Col flex={8}>
-                          <Row align='middle' className={`trans_br trans_text ${!isSale && 'trans_pur'}`}>
-                            <Col flex={10}>
+                      <div className={classNames(styles.billRow, { 'trans_pur': !isSale })}>
+                        <div className={classNames(styles.title, { 'trans_pur': !isSale })}>
+                          <div>{isTaxBill ? t("transaction.tax_bill") : t("transaction.bill")}</div>
+                        </div>
+                        <div className={classNames(styles.billType, { 'trans_pur': !isSale })}>
+                          <div>({isSale ? t("transaction.for_receiver") : t('transaction.for_supplier')})</div>
+                        </div>
+                        <div className={styles.headerIndex}>
+                          <div className={styles.header}>
+                            <div className={classNames(styles.first, styles.text, { 'trans_pur': !isSale })}>
+                              <div>책 번 호</div>
+                            </div>
+                            <div className={classNames(styles.second, { 'trans_pur': !isSale })}>
                               <Input
                                 className={styles.input}
                                 name='count'
                                 value={transactionChange['count']}
                                 onChange={handleItemChange}
                               />
-                            </Col>
-                            <Col flex={2}>권&nbsp;</Col>
-                            <Col flex={10}>
+                              <div className={styles.text}><div>권</div></div>
+                            </div>
+                            <div className={classNames(styles.third, { 'trans_pur': !isSale })}>
                               <Input
                                 className={styles.input}
                                 name='count'
                                 value={transactionChange['count']}
                                 onChange={handleItemChange}
                               />
-                            </Col>
-                            <Col flex={2}>호&nbsp;</Col>
-                          </Row>
-                          <Row align='middle' className={`trans_bt trans_text ${!isSale && 'trans_pur'}`}>
-                            <Col flex={24}>
+                              <div className={styles.text}><div>호</div></div>
+                            </div>
+                          </div>
+                          <div className={styles.header}>
+                            <div className={classNames(styles.first, styles.text, { 'trans_pur': !isSale })}>
+                              <div>일련번호</div>
+                            </div>
+                            <div className={styles.fourth}>
                               <Input
                                 className={styles.input}
                                 name='serial'
                                 value={transactionChange['serial']}
                                 onChange={handleItemChange}
                               />
-                            </Col>
-                          </Row>
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col flex={12} className={`trans_receiver ${!isSale && 'trans_pur'}`}>
-                          <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`} >{t('transaction.supplier')}</Col>
-                          <Col flex='auto' align='strech'>
-                            <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
-                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.register_no')}</Col>
-                              <Col flex='auto' style={{color:'black'}}>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className={classNames(styles.billRow, { 'trans_pur': !isSale })}>
+                        <div className={styles.Contractor}>
+                          <div className={classNames(styles.subTitle, styles.text, { 'trans_pur': !isSale })} >
+                            <div>{t('transaction.supplier')}</div>
+                          </div>
+                          <div className={styles.index} >
+                            <div className={classNames(styles.cell, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.header, styles.text, { 'trans_pur': !isSale })}>
+                                <div>{t('transaction.register_no')}</div>
+                              </div>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
                                   <label>{company_info.business_registration_code}</label>
                                   :
@@ -731,41 +729,47 @@ const TransactionTaxBillModel = (props) => {
                                     onChange={handleItemChange}
                                   />
                                 }
-                              </Col>
-                            </Row>
-                            <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
-                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.company_name')}</Col>
-                              <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
+                              </div>
+                            </div>
+                            <div className={classNames(styles.cell, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.header, styles.text, { 'trans_pur': !isSale })}>
+                                <div>{t('transaction.company_name')}</div>
+                              </div>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label style={{color:'black'}}>{company_info.company_name}</label>
-                                  : 
+                                  <label style={{ color: 'black' }}>{company_info.company_name}</label>
+                                  :
                                   <Select
                                     value={transactionChange['company_name']}
                                     options={companyForSelection}
                                     onChange={selected => handleSelectChange('company_name', selected)}
                                   />
                                 }
-                              </Col>
-                              <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('common.name2')}</Col>
-                              <Col flex={1} style={{color:'black'}}>
+                              </div>
+                              <div className={classNames(styles.subTitle, styles.text, { 'trans_pur': !isSale })}>
+                                <div>{t('common.name2')}</div>
+                              </div>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
                                   <label>{company_info.ceo_name}</label>
-                                   :
+                                  :
                                   <Input
-                                    className={styles.input} 
+                                    className={styles.input}
                                     name='ceo_name'
                                     value={transactionChange['ceo_name']}
                                     onChange={handleItemChange}
                                   />
                                 }
-                              </Col>
-                            </Row>
-                            <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
-                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.address')}</Col>
-                              <Col flex='auto' style={{color:'black'}}>
+                              </div>
+                            </div>
+                            <div className={classNames(styles.cell, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.header, styles.text, { 'trans_pur': !isSale })}>
+                                <div>{t('transaction.address')}</div>
+                              </div>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
                                   <label>{company_info.company_address}</label>
-                                   :
+                                  :
                                   <Input
                                     className={styles.input}
                                     name='company_address'
@@ -773,28 +777,32 @@ const TransactionTaxBillModel = (props) => {
                                     onChange={handleItemChange}
                                   />
                                 }
-                              </Col>
-                            </Row>
-                            <Row className="trans_rec_item_last">
-                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('company.business_type')}</Col>
-                              <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
+                              </div>
+                            </div>
+                            <div className={classNames(styles.cellLast, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.header, styles.text, { 'trans_pur': !isSale })}>
+                                <div>{t('company.business_type')}</div>
+                              </div>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label  style={{color:'black'}}>{company_info.business_type}</label>
-                                   :
+                                  <label style={{ color: 'black' }}>{company_info.business_type}</label>
+                                  :
                                   <Input
                                     className={styles.input}
                                     name='business_type'
                                     value={transactionChange['business_type']}
                                     onChange={handleItemChange}
-                                    style={{color:'black'}}
+                                    style={{ color: 'black' }}
                                   />
                                 }
-                              </Col>
-                              <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('company.business_item')}</Col>
-                              <Col flex={1} style={{color:'black'}}>
+                              </div>
+                              <div className={classNames(styles.subTitle, styles.text, { 'trans_pur': !isSale })} >
+                                <div>{t('company.business_item')}</div>
+                              </div>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
                                   <label>{company_info.business_item}</label>
-                                   :
+                                  :
                                   <Input
                                     className={styles.input}
                                     name='business_item'
@@ -802,16 +810,20 @@ const TransactionTaxBillModel = (props) => {
                                     onChange={handleItemChange}
                                   />
                                 }
-                              </Col>
-                            </Row>
-                          </Col>
-                        </Col>
-                        <Col flex={12} className={`trans_receiver ${!isSale && 'trans_pur'}`}>
-                          <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`} >{t('transaction.receiver')}</Col>
-                          <Col flex='auto' align='strech' style={{borderRight: isSale ? '2px solid #ff0505' : '2px solid #0000ff'}}>
-                            <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
-                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.register_no')}</Col>
-                              <Col flex='auto' style={{color:'black'}}>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className={styles.Contractor}>
+                          <div className={classNames(styles.subTitle, styles.text, { 'trans_pur': !isSale })} >
+                            <div>{t('transaction.receiver')}</div>
+                          </div>
+                          <div className={styles.index}>
+                            <div className={classNames(styles.cell, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.header, styles.text, { 'trans_pur': !isSale })}>
+                                <div>{t('transaction.register_no')}</div>
+                              </div>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
                                   <Input
                                     className={styles.input}
@@ -822,11 +834,13 @@ const TransactionTaxBillModel = (props) => {
                                   :
                                   <label>{company_info.business_registration_code}</label>
                                 }
-                              </Col>
-                            </Row>
-                            <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
-                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.company_name')}</Col>
-                              <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
+                              </div>
+                            </div>
+                            <div className={classNames(styles.cell, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.header, styles.text, { 'trans_pur': !isSale })}>
+                                <div>{t('transaction.company_name')}</div>
+                              </div>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
                                   <Select
                                     value={transactionChange['company_name']}
@@ -834,11 +848,13 @@ const TransactionTaxBillModel = (props) => {
                                     onChange={selected => handleSelectChange('company_name', selected)}
                                   />
                                   :
-                                  <label style={{color:'black'}}>{company_info.company_name}</label>
+                                  <label style={{ color: 'black' }}>{company_info.company_name}</label>
                                 }
-                              </Col>
-                              <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('common.name2')}</Col>
-                              <Col flex={1} style={{color:'black'}}>
+                              </div>
+                              <div className={classNames(styles.subTitle, styles.text, { 'trans_pur': !isSale })}>
+                                <div>{t('common.name2')}</div>
+                              </div>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
                                   <Input
                                     className={styles.input}
@@ -849,11 +865,13 @@ const TransactionTaxBillModel = (props) => {
                                   :
                                   <label>{company_info.ceo_name}</label>
                                 }
-                              </Col>
-                            </Row>
-                            <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
-                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.address')}</Col>
-                              <Col flex='auto' style={{color:'black'}}>
+                              </div>
+                            </div>
+                            <div className={classNames(styles.cell, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.header, styles.text, { 'trans_pur': !isSale })}>
+                                <div>{t('transaction.address')}</div>
+                              </div>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
                                   <Input
                                     className={styles.input}
@@ -864,25 +882,29 @@ const TransactionTaxBillModel = (props) => {
                                   :
                                   <label>{company_info.company_address}</label>
                                 }
-                              </Col>
-                            </Row>
-                            <Row className="trans_rec_item_last">
-                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('company.business_type')}</Col>
-                              <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
+                              </div>
+                            </div>
+                            <div className={classNames(styles.cellLast, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.header, styles.text, { 'trans_pur': !isSale })}>
+                                <div>{t('company.business_type')}</div>
+                              </div>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
                                   <Input
                                     className={styles.input}
                                     name='business_type'
                                     value={transactionChange['business_type']}
                                     onChange={handleItemChange}
-                                    style={{color:'black'}}
+                                    style={{ color: 'black' }}
                                   />
                                   :
-                                  <label style={{color:'black'}}>{company_info.business_type}</label>
+                                  <label style={{ color: 'black' }}>{company_info.business_type}</label>
                                 }
-                              </Col>
-                              <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('company.business_item')}</Col>
-                              <Col flex={1} style={{color:'black'}}>
+                              </div>
+                              <div className={classNames(styles.subTitle, styles.text, { 'trans_pur': !isSale })} >
+                                <div>{t('company.business_item')}</div>
+                              </div>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
                                   <Input
                                     className={styles.input}
@@ -893,79 +915,79 @@ const TransactionTaxBillModel = (props) => {
                                   :
                                   <label>{company_info.business_item}</label>
                                 }
-                              </Col>
-                            </Row>
-                          </Col>
-                        </Col>
-                      </Row>
-                      <div className={styles.billMidRow}>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className={classNames(styles.billRow, { 'trans_pur': !isSale })}>
                         <div className={classNames(styles.Date, styles.bdR)}>
-                          <div className={classNames(styles.MidCell,{"trans_pur": !isSale})}>작성</div>
-                          <div className={classNames(styles.MidCell,{"trans_pur": !isSale})}>년-월-일</div>
-                          <div className={classNames(styles.MidCell,{"trans_pur": !isSale})}>2024-07-04</div>
+                          <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>작성</div>
+                          <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>년-월-일</div>
+                          <div className={classNames(styles.MidCellLast, { "trans_pur": !isSale })}>2024-07-04</div>
                         </div>
                         <div className={classNames(styles.Price, styles.bdR)}>
-                          <div className={classNames(styles.MidCell,{"trans_pur": !isSale})}>공급가액</div>
+                          <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>공급가액</div>
                           <div className={classNames(styles.Units)}>
-                            <div className={classNames(styles.Unit3,styles.bdR, {"trans_pur":!isSale})}>공란수</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>백</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>십</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>억</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>천</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>백</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>십</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>만</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>천</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>백</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>십</div>
-                            <div className={classNames(styles.Unit, {"trans_pur":!isSale})}>일</div>
+                            <div className={classNames(styles.Unit3, styles.bdR, { "trans_pur": !isSale })}>공란수</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>백</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>십</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>억</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>천</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>백</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>십</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>만</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>천</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>백</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>십</div>
+                            <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>일</div>
                           </div>
-                          <div className={classNames(styles.Units)}>
-                            <div className={classNames(styles.Unit3,styles.bdR, {"trans_pur":!isSale})}>3</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>{''}</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>{''}</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>{''}</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>4</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>5</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
-                            <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
-                            <div className={classNames(styles.Unit, {"trans_pur":!isSale})}>0</div>
+                          <div className={classNames(styles.UnitLast)}>
+                            <div className={classNames(styles.Unit3, styles.bdR, { "trans_pur": !isSale })}>3</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>{''}</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>{''}</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>{''}</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>4</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>5</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
+                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
+                            <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>0</div>
                           </div>
                         </div>
                         {isTaxBill &&
                           <div className={classNames(styles.Tax, styles.bdR)}>
-                            <div className={classNames(styles.MidCell,{"trans_pur": !isSale})}>세 액</div>
+                            <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>세 액</div>
                             <div className={classNames(styles.Units)}>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>십</div>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>억</div>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>천</div>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>백</div>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>십</div>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>만</div>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>천</div>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>백</div>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>십</div>
-                              <div className={classNames(styles.Unit, {"trans_pur":!isSale})}>일</div>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>십</div>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>억</div>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>천</div>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>백</div>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>십</div>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>만</div>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>천</div>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>백</div>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>십</div>
+                              <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>일</div>
                             </div>
-                            <div className={classNames(styles.Units)}>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>{''}</div>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>{''}</div>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>4</div>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>5</div>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
-                              <div className={classNames(styles.Unit,styles.bdR, {"trans_pur":!isSale})}>0</div>
-                              <div className={classNames(styles.Unit, {"trans_pur":!isSale})}>0</div>
+                            <div className={classNames(styles.UnitLast)}>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>{''}</div>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>{''}</div>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>4</div>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>5</div>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
+                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
+                              <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>0</div>
                             </div>
                           </div>
                         }
                         <div className={styles.Note}>
-                          <div className={classNames(styles.MidCell,{"trans_pur": !isSale})}>비고</div>
+                          <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>비고</div>
                           <div className={styles.Cell}>
                             <Input
                               className={styles.inputTall}
@@ -976,127 +998,106 @@ const TransactionTaxBillModel = (props) => {
                           </div>
                         </div>
                       </div>
-                      <Row>
-                        <Col flex='auto' className={classNames(styles.bdB,styles.bdR,styles.bdL)}>
-                          <Table
-                            rowSelection={rowSelection}
-                            pagination={{
-                              total: transactionContents.length,
-                              showTotal: ShowTotal,
-                              showSizeChanger: true,
-                              onShowSizeChange: onShowSizeChange,
-                              ItemRender: ItemRender,
-                            }}
-                            style={{ overflowX: "auto" }}
-                            columns={default_columns}
-                            bordered
-                            dataSource={transactionContents}
-                            rowKey={(record) => record.transaction_sub_index}
-                            onRow={(record, rowIndex) => {
-                              return {
-                                onDoubleClick: (event) => {
-                                  console.log('Double Click / Edit - ', record);
-                                  handleStartEditContent(record);
-                                }, // click row
-                              };
-                            }}
-                          />
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col flex={5} className={`trans_bl ${!isSale && "trans_pur"}`}>
-                          <Row>
-                            <Col flex='auto' className="trans_amt_title right">
-                              합계 금액
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col flex='auto' className={`trans_amt low right ${!isSale && "trans_pur"}`}
-                            >
+                      <div className={classNames(styles.billRow, styles.table, { 'trans_pur': !isSale })}>
+                        <Table
+                          rowSelection={rowSelection}
+                          pagination={{
+                            total: transactionContents.length,
+                            showTotal: ShowTotal,
+                            showSizeChanger: true,
+                            onShowSizeChange: onShowSizeChange,
+                            ItemRender: ItemRender,
+                          }}
+                          style={{ flex: 'auto', overflowX: "auto" }}
+                          columns={default_columns}
+                          bordered
+                          dataSource={transactionContents}
+                          rowKey={(record) => record.transaction_sub_index}
+                          onRow={(record, rowIndex) => {
+                            return {
+                              onDoubleClick: (event) => {
+                                console.log('Double Click / Edit - ', record);
+                                handleStartEditContent(record);
+                              }, // click row
+                            };
+                          }}
+                        />
+                      </div>
+                      <div className={classNames(styles.billRow, { 'trans_pur': !isSale })}>
+                        <div className={classNames(styles.PriceParts, { 'trans_pur': !isSale })}>
+                          <div className={styles.item}>
+                            <div className={classNames(styles.header, styles.text)}>
+                              <div>합계 금액</div>
+                            </div>
+                            <div className={styles.content}>
                               {ConvertCurrency(dataForTransaction.receipt, dataForTransaction.show_decimal)}
-                            </Col>
-                          </Row>
-                        </Col>
-                        <Col flex={5}>
-                          <Row>
-                            <Col flex='auto' className="trans_amt_title right">
-                              현 금
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col flex='auto' className={`trans_amt  low right ${!isSale && "trans_pur"}`}>
+                            </div>
+                          </div>
+                          <div className={styles.item}>
+                            <div className={classNames(styles.header, styles.text)}>
+                              <div>현 금</div>
+                            </div>
+                            <div className={styles.content}>
                               <Input
                                 className={styles.input}
                                 name='cash'
                                 value={transactionChange['cash']}
                                 onChange={handleItemChange}
                               />
-                            </Col>
-                          </Row>
-                        </Col>
-                        <Col flex={5}>
-                          <Row>
-                            <Col flex='auto' className="trans_amt_title right">
-                              수 표
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col flex='auto' className={`trans_amt  low right ${!isSale && "trans_pur"}`}>
+                            </div>
+                          </div>
+                          <div className={styles.item}>
+                            <div className={classNames(styles.header, styles.text)}>
+                              <div>수 표</div>
+                            </div>
+                            <div className={styles.content}>
                               <Input
                                 className={styles.input}
                                 name='check'
                                 value={transactionChange['check']}
                                 onChange={handleItemChange}
                               />
-                            </Col>
-                          </Row>
-                        </Col>
-                        <Col flex={5}>
-                          <Row>
-                            <Col flex='auto' className="trans_amt_title right">
-                              어 음
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col flex='auto' className={`trans_amt  low right ${!isSale && "trans_pur"}`}>
+                            </div>
+                          </div>
+                          <div className={styles.item}>
+                            <div className={classNames(styles.header, styles.text)}>
+                              <div>어 음</div>
+                            </div>
+                            <div className={styles.content}>
                               <Input
                                 className={styles.input}
                                 name='note'
                                 value={transactionChange['note']}
                                 onChange={handleItemChange}
                               />
-                            </Col>
-                          </Row>
-                        </Col>
-                        <Col flex={5}>
-                          <Row>
-                            <Col flex='auto' className="trans_amt_title">
-                              외상미수금
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col flex='auto' className={`trans_amt low ${!isSale && "trans_pur"}`}>
+                            </div>
+                          </div>
+                          <div className={styles.item}>
+                            <div className={classNames(styles.headerLast, styles.text)}>
+                              <div>외상미수금</div>
+                            </div>
+                            <div className={styles.contentLast}>
                               <Input
                                 className={styles.input}
                                 name='credit'
                                 value={transactionChange['credit']}
                                 onChange={handleItemChange}
                               />
-                            </Col>
-                          </Row>
-                        </Col>
-                        <Col flex={5} className={`trans_br trans_bb trans_bl ${!isSale && "trans_pur"}`}>
-                            <div className={styles.billBottomRow}>
-                              <div>이 금액을</div>
-                              <Select
-                                value={transactionChange.request_type}
-                                options={request_type}
-                                onChange={selected => handleSelectChange('request_type', selected)}
-                              />
-                              <div>함.</div>
                             </div>
-                        </Col>
-                      </Row>
+                          </div>
+                        </div>
+                        <div className={classNames(styles.NoteParts, { 'trans_pur': !isSale })}>
+                          <div style={{display: 'flex', flexDirection: 'row', justifyContent:'center'}}>
+                            <div className={styles.text}><div>이 금액을 </div></div>
+                            <Select
+                              value={transactionChange.request_type}
+                              options={request_type}
+                              onChange={selected => handleSelectChange('request_type', selected)}
+                            />
+                            <div className={styles.text}><div> 함.</div></div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                     <div className="text-center">
                       <button
@@ -1137,7 +1138,7 @@ const TransactionTaxBillModel = (props) => {
         title={message.title}
         message={message.message}
         open={isMessageModalOpen}
-        handleOk={()=>setIsMessageModalOpen(false)}
+        handleOk={() => setIsMessageModalOpen(false)}
       />
     </div>
   );

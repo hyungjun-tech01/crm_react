@@ -19,25 +19,98 @@
     padding-left: 0.25rem;
     padding-right: 1rem;
 }
-.billTitle
-{
-    color: #ff0505;
-    font-size: 32px;
-    font-weight: 600;
-    margin: 0.5rem;
-    padding: 0.25rem 2.5rem;
-}
-
-.billMidRow
+.billRow
 {
     border-left: 2px solid #ff0505;
-    border-right: 2px solid #ff0505;
     border-top: 2px solid #ff0505;
     display: flex;
+    flex-direction: row;
     justify-items: stretch;
+    justify-content: space-between;
     font-size: 14px;
     color: #ff0505;
     text-align: center;
+    // Top Row ------------------------
+    .title {
+        flex: 8 8 33.3%;
+        font-size: 32px;
+        font-weight: 600;
+        margin: 0.5rem;
+        padding: 0.25rem 2.5rem;
+    }
+    .billType {
+        flex: 5 5 20.8%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .headerIndex {
+        flex: 11 11 45.9%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        .header {
+            display: flex;
+            flex-direction: row;
+        }
+        .first {
+            flex: 2 2 20%;
+            border-right: 2px solid #ff0505;
+        }
+        .second {
+            flex: 4 4 40%;
+            display: flex;
+            flex-direction: row;
+            border-bottom: 2px solid #ff0505;
+            border-right: 2px solid #ff0505;
+        }
+        .third {
+            flex: 4 4 40%;
+            display: flex;
+            flex-direction: row;
+            border-bottom: 2px solid #ff0505;
+            border-right: 2px solid #ff0505;
+        }
+        .fourth {
+            flex: 8 8 80%;
+            border-right: 2px solid #ff0505;
+        }
+    }
+    // Supplier / Receiver Row ------------------------
+    .Contractor {
+        flex: 1 1 50%;
+        display: flex;
+        .subTitle{
+            width: 25px;
+            border-right: 2px solid #ff0505;
+        }
+        .index{
+            flex: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .cell{
+            flex: auto;
+            display: flex;
+            flex-direction: row;
+            border-bottom: 2px solid #ff0505;
+        }
+        .cellLast{
+            flex: auto;
+            display: flex;
+            flex-direction: row;
+        }
+        .header{
+            width: 125px;
+            border-right: 2px solid #ff0505;
+        }
+        .content{
+            flex: auto;
+            color: black;
+            border-right: 2px solid #ff0505;
+        }
+    }
+    // Amount Row ------------------------
     .Date {
         flex: 1 1 10%;
         display: flex;
@@ -64,40 +137,73 @@
         justify-items: stretch;
         .Cell{
             height: 50px;
-            border-bottom: 2px solid #ff0505;
+            border-right: 2px solid #ff0505;
         }
     }
-}
-.MidCell {
-    height: 25px;
-    border-bottom: 2px solid #ff0505;
-}
-.Units {
-    display: flex;
-    flex-direction: row;
-    height: 25px;
-    border-bottom: 2px solid #ff0505;
+    .MidCell {
+        height: 25px;
+        border-bottom: 2px solid #ff0505;
+    }
+    .MidCellLast {
+        height: 25px;
+    }
+    .Units {
+        display: flex;
+        flex-direction: row;
+        height: 25px;
+        border-bottom: 2px solid #ff0505;
+    }
+    .UnitLast {
+        display: flex;
+        flex-direction: row;
+        height: 25px;
+    }
     .Unit3 {
         flex: 3 3 21.4%;
     };
     .Unit {
         flex: 1 1 7.1%;
     }
+    .PriceParts
+    {
+        flex: 4 4 80%;
+        display: flex;
+        flex-direction: row;
+        border-right: 2px solid #ff0505;
+        border-bottom: 2px solid #ff0505;
+        .item{
+            flex: 1 1 25%;
+            display: flex;
+            flex-direction: column;
+            .header{
+                height: 32px;
+                border-right: 2px solid rgb(195, 195, 195);
+            }
+            .headerLast{
+                height: 32px;
+            }
+            .content{
+                border-top: 1px solid rgb(215, 215, 215);
+                border-right: 1px solid rgb(215, 215, 215);
+            }
+            .contentLast{
+                border-top: 1px solid rgb(215, 215, 215);
+            }
+        }
+    }
+    .NoteParts
+    {
+        flex: 1 1 20%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-right: 2px solid #ff0505;
+        border-bottom: 2px solid #ff0505;
+    }
 }
-.billBottom
-{
-    border-bottom: 2px solid rgb(195, 195, 195);
-    font-size: 15px;
-    text-align: center;
-}
-
-.billBottomRow
-{
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: stretch;
-    line-height: 1rem;
+.table {
+    flex: auto;
+    border-right: 2px solid #ff0505;
 }
 .bdB
 {
@@ -130,4 +236,10 @@
     border:0;
     height: 54px;
     background-color: #f6f7f0;
+}
+.text
+{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
