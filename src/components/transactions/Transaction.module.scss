@@ -81,7 +81,7 @@
         flex: 1 1 50%;
         display: flex;
         .subTitle{
-            width: 25px;
+            width: 26px;
             border-right: 2px solid #ff0505;
         }
         .index{
@@ -109,6 +109,10 @@
             color: black;
             border-right: 2px solid #ff0505;
         }
+        .forPurBorder
+        {
+            border-color: #0000ff !important;
+        }
     }
     // Amount Row ------------------------
     .Date {
@@ -116,12 +120,14 @@
         display: flex;
         flex-direction: column;
         justify-items: stretch;
+        border-right: 2px solid #ff0505;
     }
     .Price {
         flex: 1 1 38%;
         display: flex;
         flex-direction: column;
         justify-items: stretch;
+        border-right: 2px solid #ff0505;
         
     }
     .Tax {
@@ -129,29 +135,60 @@
         display: flex;
         flex-direction: column;
         justify-items: stretch;
+        border-right: 2px solid #ff0505;
     }
     .Note {
         flex: 3 3 25%;
         display: flex;
         flex-direction: column;
         justify-items: stretch;
+        border-right: 2px solid #ff0505;
         .Cell{
             height: 50px;
-            border-right: 2px solid #ff0505;
         }
     }
     .MidCell {
-        height: 25px;
+        height: 26px;
         border-bottom: 2px solid #ff0505;
     }
     .MidCellLast {
-        height: 25px;
+        height: 26px;
     }
     .Units {
         display: flex;
         flex-direction: row;
-        height: 25px;
-        border-bottom: 2px solid #ff0505;
+        height: 52px;
+        .upper{
+            width: 100%;
+            border-bottom: 2px solid rgb(195, 195, 195);
+            border-right: 2px solid rgb(195, 195, 195);
+            height: 26px;
+        }
+        .lower{
+            width: 100%;
+            height: 26px;
+            border-right: 1px solid rgb(195, 195, 195);
+        }
+        .upper0{
+            width: 100%;
+            height: 26px;
+            border-bottom: 2px solid rgb(195, 195, 195);
+        }
+        .lower0{
+            width: 100%;
+            height: 26px;
+        }
+        .upper1{
+            width: 100%;
+            height: 26px;
+            border-bottom: 2px solid rgb(195, 195, 195) !important;
+            border-right: 2px solid #ff0505;
+        }
+        .lower1{
+            width: 100%;
+            height: 26px;
+            border-right: 2px solid #ff0505;
+        }
     }
     .UnitLast {
         display: flex;
@@ -160,8 +197,17 @@
     }
     .Unit3 {
         flex: 3 3 21.4%;
+        height: 52px;
+        display: flex;
+        flex-direction: column;
     };
     .Unit {
+        flex: 1 1 7.1%;
+        height: 52px;
+        display: flex;
+        flex-direction: column;
+    }
+    .Unit0 {
         flex: 1 1 7.1%;
     }
     .PriceParts
@@ -175,15 +221,18 @@
             flex: 1 1 25%;
             display: flex;
             flex-direction: column;
+
             .header{
                 height: 32px;
                 border-right: 2px solid rgb(195, 195, 195);
+                border-bottom: 2px solid rgb(195, 195, 195);
             }
             .headerLast{
                 height: 32px;
+                border-bottom: 2px solid rgb(195, 195, 195);
             }
             .content{
-                border-top: 1px solid rgb(215, 215, 215);
+                height: 40px;
                 border-right: 1px solid rgb(215, 215, 215);
             }
             .contentLast{
@@ -205,22 +254,6 @@
     flex: auto;
     border-right: 2px solid #ff0505;
 }
-.bdB
-{
-    border-bottom: 2px solid #ff0505;
-}
-.bdL
-{
-    border-left: 2px solid #ff0505;
-}
-.bdR
-{
-    border-right: 2px solid #ff0505;
-}
-.bdT
-{
-    border-top: 2px solid #ff0505;
-}
 .cellText
 {
     text-align: 'center';
@@ -228,13 +261,12 @@
 .input
 {
     border:0;
-    height: 32px;
     background-color: #f6f7f0;
 }
 .inputTall
 {
     border:0;
-    height: 54px;
+    height: 70px;
     background-color: #f6f7f0;
 }
 .text
@@ -242,4 +274,18 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+.textStart
+{
+    padding-left: 0.5rem;
+    text-align: start;
+}
+.textEnd
+{
+    text-align: end;
+}
+.regNo {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
 }

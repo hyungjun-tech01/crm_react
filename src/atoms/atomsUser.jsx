@@ -44,3 +44,22 @@ export const atomUsersForSelection = atom({
     key: "userSelection",
     default: [],
 });
+
+export const atomAccountState = atom({
+    key: "accountState",
+    default: 0,
+});
+
+export const defaultAccount = {
+    business_registration_code: '',
+    company_name: '',
+    ceo_name: '',
+    company_address: '',
+    business_type: '',
+    business_item: '',
+}
+
+export const atomAccountInfo = atom({
+    key: "accountInfo",
+    default: defaultAccount,
+})

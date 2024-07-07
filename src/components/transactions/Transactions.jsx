@@ -257,16 +257,6 @@ const Transactions = () => {
                 </div>
               </div>
             </div>
-            <div className="text-center">
-              <button
-                type="button"
-                className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                data-bs-toggle="modal"
-                data-bs-target="#add_new_tax_bill"
-              >
-                Test
-              </button>
-              </div>
           </div>
           {/* /Content End */}
         </div>

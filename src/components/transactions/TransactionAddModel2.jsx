@@ -3,6 +3,7 @@ import { useRecoilValue } from "recoil";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
+import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
 import "antd/dist/reset.css";
 import { Button, Checkbox, Col, Input, InputNumber, Row, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
@@ -23,6 +24,7 @@ import TransactionContentModal from "./TransactionContentModal";
 import TransactionReceiptModal from "./TransactionReceiptModal";
 import MessageModal from "../../constants/MessageModal";
 import TransactionPrint from "./TransactionPrint";
+import TransactionTaxBillModel from "./TransactionTaxBillModel";
 
 const default_transaction_data = {
   title: '',
@@ -453,7 +455,7 @@ const TransactionAddModel = (props) => {
   //===== Handles for special actions =============================================
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [transactionForPrint, setTransactionForPrint] = useState({});
-  const [contentsForPrint, setContentsForPrint] = useState({});
+  const [contentsForPrint, setContentsForPrint] = useState([]);
 
   const handleInitialize = () => {
     setDataForTransaction(default_transaction_data);
@@ -476,6 +478,10 @@ const TransactionAddModel = (props) => {
 
   const handleShowTaxBill = () => {
     console.log('handleShowTaxBill');
+    let myModal = new bootstrap.Modal(document.getElementById('add_new_tax_bill'), {
+      keyboard: false
+    })
+    myModal.show();
   };
 
   const handleSaveNewTransaction = (value) => {
@@ -917,6 +923,11 @@ const TransactionAddModel = (props) => {
       <TransactionPrint
         open={isPrintModalOpen}
         handleClose={()=>setIsPrintModalOpen(false)}
+        transaction={transactionForPrint}
+        contents={contentsForPrint}
+      />
+      <TransactionTaxBillModel
+        is_sale={isSale}
         transaction={transactionForPrint}
         contents={contentsForPrint}
       />

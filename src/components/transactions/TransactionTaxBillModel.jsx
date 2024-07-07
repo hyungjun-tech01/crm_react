@@ -5,51 +5,67 @@ import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "antd/dist/reset.css";
-import { Button, Checkbox, Col, Input, InputNumber, Row, Table } from 'antd';
+import { Checkbox, Input, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import classNames from 'classnames';
 
 import {
   atomCompanyState,
   atomCompanyForSelection,
-  defaultTransaction,
 } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
 import { DefaultTransactionContent, TransactionRepo } from "../../repository/transaction";
 
 import { ConvertCurrency, formatDate } from "../../constants/functions";
-import TransactionContentModal from "./TransactionContentModal";
-import TransactionReceiptModal from "./TransactionReceiptModal";
 import MessageModal from "../../constants/MessageModal";
 import TaxBillPrint from "./TaxBillPrint";
 
 import styles from './Transaction.module.scss';
 import { company_info } from "../../repository/user";
 
-const default_transaction_data = {
-  title: '',
-  vat_included: false,
-  show_decimal: 0,
-  auto_calc: true,
-  valance_prev: 0,
-  supply_price: 0,
-  tax_price: 0,
-  total_price: 0,
-  receipt: 0,
-  valance_final: 0,
-  receiver: '',
-  page_cur: 1,
-  page_total: 1,
-  page: '1p',
-  receipt_org: '',
-  receipt_account: '',
+const default_bill_data = {
+  trans_type: '',
+  bill_type: '',
+  vat_included:'',
+  show_decimal: false,
+  request_type: '',
+
+  book_no:'',
+  book_sub_no:'',
+  serial_no:'',
+  
+  supplier: {
+    business_registration_code:'',
+    company_name: '',
+    ceo_name:'',
+    company_address:'',
+    business_type:'',
+    business_item:'',
+  },
+  receiver: {
+    business_registration_code:'',
+    company_name: '',
+    ceo_name:'',
+    company_address:'',
+    business_type:'',
+    business_item:'',
+  },
+  issue_date: null,
+  memo: '',
+
+  supply_amount:0,
+  tax_amount:0,
+  total_amount:0,
+  cash:0,
+  check:0,
+  note:0,
+  credit:0,
 };
 
-const TransactionTaxBillModel = (props) => {
-  // const { transaction } = props;
+
+const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -67,37 +83,40 @@ const TransactionTaxBillModel = (props) => {
 
 
   //===== Handles to edit 'TransactionTaxBillModel' ======================================
-  const [transactionChange, setTransactionChange] = useState({});
+  const [dataForBill, setDataForBill] = useState({...default_bill_data});
   const [transactionContents, setTransactionContents] = useState([]);
   const [isSale, setIsSale] = useState(true);
   const [isTaxBill, setIsTaxBill] = useState(true);
   const [isRequested, setIsRequested] = useState(true);
+  const [vacantNo, setVacantNo] = useState(0);
+  const [amountText, setAmountText] = useState('');
+  const [taxText, setTaxText] = useState('');
   const [supplier, setSupplier] = useState({});
   const [receiver, setReceiver] = useState({});
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
-      ...transactionChange,
+      ...dataForBill,
       [e.target.name]: e.target.value,
     };
     setTransactionChange(modifiedData);
-  }, [transactionChange]);
+  }, [dataForBill]);
 
   const handleDateChange = useCallback((name, date) => {
     const modifiedData = {
-      ...transactionChange,
+      ...dataForBill,
       [name]: date
     };
     console.log('[handleDateChange] : ', modifiedData);
     setTransactionChange(modifiedData);
-  }, [transactionChange]);
+  }, [dataForBill]);
 
   const handleSelectChange = useCallback((name, selected) => {
     let modifiedData = null;
     if (name === 'company_name') {
       modifiedData = {
-        ...transactionChange,
+        ...dataForBill,
         company_code: selected.value.company_code,
         company_name: selected.value.company_name,
         company_address: selected.value.company_address,
@@ -123,13 +142,13 @@ const TransactionTaxBillModel = (props) => {
         };
       };
       modifiedData = {
-        ...transactionChange,
+        ...dataForBill,
         [name]: selected.value,
       };
     };
 
-    setTransactionChange(modifiedData);
-  }, [transactionChange]);
+    setDataForBill(modifiedData);
+  }, [dataForBill]);
 
   const trans_types = [
     { value: '매출', label: t('company.deal_type_sales') },
@@ -154,7 +173,7 @@ const TransactionTaxBillModel = (props) => {
     },
   };
 
-  const default_columns = [
+  const default_columns = isTaxBill ? [
     {
       title: t('transaction.month_day'),
       dataIndex: 'month_day',
@@ -171,8 +190,49 @@ const TransactionTaxBillModel = (props) => {
       render: (text, record) => <>{text}</>,
     },
     {
-      title: t('common.unit'),
-      dataIndex: 'unit',
+      title: t('common.quantity'),
+      dataIndex: 'quantity',
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: t('transaction.unit_price'),
+      dataIndex: 'unit_price',
+      render: (text, record) => <>{ConvertCurrency(text, dataForBill.show_decimal)}</>,
+    },
+    {
+      title: t('transaction.supply_price'),
+      dataIndex: 'supply_price',
+      render: (text, record) => <>{ConvertCurrency(text, dataForBill.show_decimal)}</>,
+    },
+    {
+      title: t('transaction.tax_price'),
+      dataIndex: 'tax_price',
+      render: (text, record) => <>{ConvertCurrency(text, dataForBill.show_decimal)}</>,
+    },
+    {
+      title: t('transaction.total_price'),
+      dataIndex: 'total_price',
+      render: (text, record) => <>{ConvertCurrency(text, dataForBill.show_decimal)}</>,
+    },
+    {
+      title: t('common.memo'),
+      dataIndex: 'memo',
+      render: (text, record) => <>{text}</>,
+    },
+  ] : [
+    {
+      title: t('transaction.month_day'),
+      dataIndex: 'month_day',
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: t('common.product'),
+      dataIndex: 'product_name',
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: t('common.standard'),
+      dataIndex: 'standard',
       render: (text, record) => <>{text}</>,
     },
     {
@@ -183,36 +243,27 @@ const TransactionTaxBillModel = (props) => {
     {
       title: t('transaction.unit_price'),
       dataIndex: 'unit_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForTransaction.show_decimal)}</>,
+      render: (text, record) => <>{ConvertCurrency(text, dataForBill.show_decimal)}</>,
     },
     {
       title: t('transaction.supply_price'),
       dataIndex: 'supply_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForTransaction.show_decimal)}</>,
-    },
-    {
-      title: t('transaction.tax_price'),
-      dataIndex: 'tax_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForTransaction.show_decimal)}</>,
+      render: (text, record) => <>{ConvertCurrency(text, dataForBill.show_decimal)}</>,
     },
     {
       title: t('transaction.total_price'),
       dataIndex: 'total_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForTransaction.show_decimal)}</>,
+      render: (text, record) => <>{ConvertCurrency(text, dataForBill.show_decimal)}</>,
     },
     {
-      title: t('transaction.modified'),
-      dataIndex: 'modify_date',
+      title: t('common.memo'),
+      dataIndex: 'memo',
       render: (text, record) => <>{text}</>,
     },
   ];
 
 
   //===== Handles to edit 'Contents' =================================================
-  const [dataForTransaction, setDataForTransaction] = useState(default_transaction_data);
-  const [isContentModalOpen, setIsContentModalOpen] = useState(false);
-  const [orgContentModalData, setOrgContentModalData] = useState({});
-  const [editedContentModalData, setEditedContentModalData] = useState({});
 
   const handleFormatter = useCallback((value) => {
     if (value === undefined || value === null || value === '') return '';
@@ -222,287 +273,26 @@ const TransactionTaxBillModel = (props) => {
       if (isNaN(ret)) return;
     };
 
-    return dataForTransaction.show_decimal
+    return dataForBill.show_decimal
       ? ret?.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,')
       : ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  }, [dataForTransaction.show_decimal]);
+  }, [dataForBill.show_decimal]);
 
-  const handleAmountCalculation = (data) => {
-    let supply_price = 0, tax_price = 0, total_price = 0;
-    data.forEach(item => {
-      supply_price += item.supply_price;
-      tax_price += item.tax_price;
-      total_price += item.total_price;
-    });
-    console.log('handleAmountCalculation : ', supply_price, tax_price, total_price);
-    const valance_final = dataForTransaction.valance_prev + total_price - dataForTransaction.receipt;
-    const tempData = {
-      ...dataForTransaction,
-      supply_price: supply_price,
-      tax_price: tax_price,
-      total_price: total_price,
-      valance_final: valance_final,
-    };
-    setDataForTransaction(tempData);
-  };
-
-  const handleStartAddContent = () => {
-    if (!transactionChange['company_code']) return;
-    const tempData = {
-      ...dataForTransaction,
-      title: t('quotation.add_content'),
-    };
-    setDataForTransaction(tempData);
-    setOrgContentModalData({ ...DefaultTransactionContent });
-    setEditedContentModalData({});
-    setIsContentModalOpen(true);
-  };
 
   const handleStartEditContent = (data) => {
     const tempData = {
       ...data,
       title: `${t('common.item')} ${t('common.edit')}`,
     };
-    setDataForTransaction(tempData);
-    setOrgContentModalData({ ...DefaultTransactionContent });
-    setEditedContentModalData({});
-    setIsContentModalOpen(true);
+    setDataForBill(tempData);
   };
 
-  const handleContentModalOk = () => {
-    if (!editedContentModalData['transaction_date']) {
-      const tempMsg = { title: '확인', message: '거래일 정보가 누락되었습니다.' }
-      setMessage(tempMsg);
-      setIsMessageModalOpen(true);
-      return;
-    };
-
-    setIsContentModalOpen(false);
-    const inputData = new Date(editedContentModalData.transaction_date);
-    const tempDate = `${inputData.getMonth() + 1}.${inputData.getDate()}`;
-    const tempContent = {
-      ...orgContentModalData,
-      ...editedContentModalData,
-      month_day: tempDate,
-      transaction_sub_index: transactionContents.length + 1,
-      company_code: transactionChange.company_code,
-      company_name: transactionChange.company_name,
-      transaction_sub_type: dataForTransaction.payment_type,
-      modify_date: formatDate(new Date()),
-    };
-    delete tempContent.transaction_date;
-    delete tempContent.product_class_name;
-
-    const tempContents = transactionContents.concat(tempContent);
-    setTransactionContents(tempContents);
-    handleAmountCalculation(tempContents);
-    setIsContentModalOpen(false);
-    setOrgContentModalData({ ...DefaultTransactionContent });
-    setEditedContentModalData({});
-  };
-
-  const handleContentModalCancel = () => {
-    setIsContentModalOpen(false);
-    setEditedContentModalData({});
-    setOrgContentModalData({});
-    setSelectedContentRowKeys([]);
-  };
-
-  const handleContentDelete = () => {
-    if (selectedContentRowKeys.length === 0) return;
-    const tempContents = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) === -1);
-    setTransactionContents(tempContents);
-    setSelectedContentRowKeys([]);
-  };
-
-  const handleContentMoveUp = () => {
-    if (selectedContentRowKeys.length === 0) return;
-    selectedContentRowKeys.sort();
-    console.log('handleContentMoveUp : ', selectedContentRowKeys);
-
-    let tempContents = null;
-    let startIdx = 0;
-    const selecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) !== -1);
-    const unselecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) === -1);
-    const firstIdx = selectedContentRowKeys[0];
-    if (firstIdx === 1) {
-      tempContents = [
-        ...selecteds,
-        ...unselecteds,
-      ];
-      startIdx = 1;
-    } else {
-      tempContents = [
-        ...unselecteds.slice(0, firstIdx - 2),
-        ...selecteds,
-        ...unselecteds.slice(firstIdx - 2,),
-      ];
-      startIdx = firstIdx - 1;
-    };
-    const finalContents = tempContents.map((item, index) => {
-      const temp3 = {
-        ...item,
-        transaction_sub_index: index + 1,
-      };
-      return temp3;
-    });
-    setTransactionContents(finalContents);
-
-    let tempKeys = [];
-    for (let i = 0; i < selecteds.length; i++, startIdx++) {
-      tempKeys.push(startIdx);
-    }
-    setSelectedContentRowKeys(tempKeys);
-  };
-
-  const handleContentMoveDown = () => {
-    if (selectedContentRowKeys.length === 0) return;
-    selectedContentRowKeys.sort();
-    console.log('handleContentMoveDown :', selectedContentRowKeys);
-
-    let tempContents = null;
-    let startIdx = 0;
-    const selecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) !== -1);
-    const unselecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) === -1);
-    const lastIdx = selectedContentRowKeys.at(-1);
-    if (lastIdx === transactionContents.length) {
-      tempContents = [
-        ...unselecteds,
-        ...selecteds,
-      ];
-      startIdx = lastIdx;
-    } else {
-      tempContents = [
-        ...unselecteds.slice(0, lastIdx),
-        ...selecteds,
-        ...unselecteds.slice(lastIdx,),
-      ];
-      startIdx = lastIdx + 1;
-    };
-    const finalContents = tempContents.map((item, index) => {
-      const temp3 = {
-        ...item,
-        transaction_sub_index: index + 1,
-      };
-      return temp3;
-    });
-    setTransactionContents(finalContents);
-    console.log('handleContentMoveUp / final value: ', finalContents);
-
-    let tempKeys = [];
-    for (let i = 0; i < selecteds.length; i++) {
-      tempKeys.push(startIdx--);
-    }
-    setSelectedContentRowKeys(tempKeys);
-    console.log('handleContentMoveDown / final key : ', tempKeys);
-  };
-
-
-  //===== Handles to edit 'Receipt' ==============================================
-  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
-  const [orgReceiptModalData, setOrgReceiptModalData] = useState({});
-  const [editedReceiptModalData, setEditedReceiptModalData] = useState({});
-
-  const handleVATChange = (e) => {
-    const tempIncludeVAT = e.target.value === 'vat_included';
-    if (dataForTransaction.vat_included !== tempIncludeVAT) {
-      const tempValues = {
-        ...dataForTransaction,
-        vat_included: tempIncludeVAT,
-      };
-      setDataForTransaction(tempValues);
-      if (tempIncludeVAT) {
-        const tempContents = transactionContents.map(item => {
-          return {
-            ...item,
-            tax_price: item.supply_price * 0.1,
-            total_price: item.supply_price * 1.1,
-          };
-        });
-        setTransactionContents(tempContents);
-        handleAmountCalculation(tempContents);
-      } else {
-        const tempContents = transactionContents.map(item => {
-          return {
-            ...item,
-            tax_price: 0,
-            total_price: item.supply_price,
-          };
-        });
-        setTransactionContents(tempContents);
-        handleAmountCalculation(tempContents);
-      };
-    }
-  };
-
-  const handleStartEditReceipt = () => {
-    if (!orgReceiptModalData['payment_amount']) {
-      const tempReceipt = {
-        payment_amount: 0,
-        payment_type: '현금',
-        payment_org: '',
-        payment_code: '',
-      };
-      setOrgReceiptModalData(tempReceipt);
-    };
-    setIsReceiptModalOpen(true);
-  };
-
-  const handleReceiptModalOk = () => {
-    setIsReceiptModalOpen(false);
-    const tempOrgData = {
-      ...orgReceiptModalData,
-      ...editedReceiptModalData
-    };
-    setOrgReceiptModalData(tempOrgData);
-    setEditedReceiptModalData({});
-    console.log('[handleReceiptModalOk] ', tempOrgData);
-
-    const temp_valance = dataForTransaction.valance_prev + dataForTransaction.total_price - tempOrgData.payment_amount;
-    const tempData = {
-      ...dataForTransaction,
-      receipt: tempOrgData.payment_amount,
-      valance_final: temp_valance,
-    };
-    setDataForTransaction(tempData);
-  };
-
-  const handleReceiptModalCancel = () => {
-    setIsReceiptModalOpen(false);
-    setEditedReceiptModalData({});
-  };
 
   //===== Handles for special actions =============================================
-  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
-  const [transactionForPrint, setTransactionForPrint] = useState({});
-  const [contentsForPrint, setContentsForPrint] = useState({});
-
-  const handleInitialize = () => {
-    setDataForTransaction(default_transaction_data);
-    setTransactionChange({ ...defaultTransaction });
-    setTransactionContents([]);
-    setOrgReceiptModalData({});
-    setEditedReceiptModalData({});
-  };
-
-  const handleShowPrint = () => {
-    console.log('handleShowPrint');
-    const tempTransactionData = {
-      ...transactionChange,
-      ...dataForTransaction,
-    };
-    setTransactionForPrint(tempTransactionData);
-    setContentsForPrint(transactionContents);
-    setIsPrintModalOpen(true);
-  };
-
-  const handleShowTaxBill = () => {
-    console.log('handleShowTaxBill');
-  };
 
   const handleSaveNewTransaction = (value) => {
-    if (transactionChange.company_name === null
-      || transactionChange.company_name === ''
+    if (dataForBill.company_name === null
+      || dataForBill.company_name === ''
       || transactionContents.length === 0
     ) {
       setMessage({ title: '*필수 입력 누락*', message: '업체 정보나 품목 정보가 누락되었습니다.' });
@@ -510,7 +300,7 @@ const TransactionTaxBillModel = (props) => {
       return;
     };
     const newTransactionData = {
-      ...transactionChange,
+      ...dataForBill,
       transaction_contents: JSON.stringify(transactionContents),
       transaction_title: transactionContents.at(0).product_name + ' 외',
       action_type: 'ADD',
@@ -519,12 +309,7 @@ const TransactionTaxBillModel = (props) => {
     const result = modifyTransaction(newTransactionData);
     result.then((res) => {
       if (res) {
-        if (value === 'TaxBill') {
-          handleShowTaxBill();
-        } else if (value === 'print') {
-          handleShowPrint();
-        };
-        initializeTransactionTemplate();
+        console.log('Test');
       }
       else {
         setMessage({ title: '저장 중 오류', message: '오류가 발생하여 저장하지 못했습니다.' });
@@ -533,34 +318,14 @@ const TransactionTaxBillModel = (props) => {
     });
   };
 
-  const handleAddPrintTransaction = () => {
-    handleSaveNewTransaction('print');
-  };
-
-  const handleAddNewTransaction = () => {
-    handleSaveNewTransaction(null);
-  };
-
-  const handleIssueTransaction = () => {
-    // Save this transactions -------------------------
-    handleSaveNewTransaction('TaxBill');
-  };
 
   const handleShowDecimal = (e) => {
-    const decimalValue = e.target.checked ? 4 : 0;
     const tempData = {
-      ...dataForTransaction,
-      show_decimal: decimalValue,
+      ...dataForBill,
+      show_decimal: e.target.checked,
     };
-    setDataForTransaction(tempData);
+    setDataForBill(tempData);
   };
-
-  const initializeTransactionTemplate = useCallback(() => {
-    handleInitialize();
-
-    document.querySelector("#add_new_transaction_form").reset();
-
-  }, []);
 
   //===== useEffect ==============================================================
   useEffect(() => {
@@ -571,18 +336,88 @@ const TransactionTaxBillModel = (props) => {
   }, [companyState, loadAllCompanies]);
 
   useEffect(() => {
-    console.log('[TransactionTaxBillModel] called!');
-    const tempTransaction = {
-      ...defaultTransaction,
-      transaction_type: '매출',
-      tax_type: '세금계산서',
-      request_type: '청구',
-    };
-    setTransactionChange(tempTransaction);
-    setIsSale(true);
-    setIsTaxBill(true);
-    setIsRequested(true);
-  }, [initializeTransactionTemplate]);
+    if(transaction) {
+      console.log('[TransactionTaxBillModel] called! :', transaction);
+      // dataForBill ------------------------------
+
+      let tempBillData = {
+        ...default_bill_data,
+        trans_type: is_sale?'매출':'매입',
+        bill_type: transaction.vat_included?'세금계산서':'계산서',
+        show_decimal: transaction.show_decimal,
+        request_type: '청구',
+        issue_date: transaction.publish_date,
+        supply_amount: transaction.supply_price,
+        tax_amount: transaction.tax_price,
+        total_amount: transaction.total_price,
+      };
+      
+
+      // IsSale ------------------------------------
+      setIsSale(is_sale);
+      if(is_sale) {
+        tempBillData.supplier = {...company_info};
+        tempBillData.receiver = {
+          business_registration_code: transaction.business_registration_code,
+          company_name: transaction.company_name,
+          ceo_name: transaction.ceo_name,
+          company_address: transaction.company_address,
+          business_type: transaction.business_type,
+          business_item: transaction.business_item,
+        }
+      } else {
+        tempBillData.supplier = {
+          business_registration_code: transaction.business_registration_code,
+          company_name: transaction.company_name,
+          ceo_name: transaction.ceo_name,
+          company_address: transaction.company_address,
+          business_type: transaction.business_type,
+          business_item: transaction.business_item,
+        }
+        tempBillData.receiver = {...company_info};
+      };
+      setDataForBill(tempBillData);
+
+      // Amount ------------------------------------
+      const tempAmountText = typeof transaction.supply_price === 'number'
+        ? transaction.supply_price.toString() : '';
+      const tempVacantCount = 11 - tempAmountText.length;
+      let inputAmountText = '';
+
+      if(tempVacantCount < 0){
+        console.log('Too high value');
+        setVacantNo(0);
+        inputAmountText = tempAmountText.slice(-11);
+      } else {
+        setVacantNo(tempVacantCount);
+        for(let i=0; i < tempVacantCount; i++){
+          inputAmountText += ' ';
+        };
+        inputAmountText += tempAmountText;
+      };
+      setAmountText(inputAmountText);
+
+      const tempTaxText = typeof transaction.tax_price === 'number'
+        ? transaction.tax_price.toFixed().toString() : '';
+      if(tempTaxText.length > 10){
+        setTaxText(tempTaxText.slice(-10));
+      } else {
+        let intputTaxText = '';
+        for(let i=0; i< 10-tempTaxText.length; i++){
+          intputTaxText += ' ';
+        };
+        intputTaxText += tempTaxText;
+        setTaxText(intputTaxText);
+      };
+    }
+
+    // Copy contents into 'transaction contents' -------------------
+    if(contents)
+      setTransactionContents([...contents]);
+    else
+    setTransactionContents([]);
+
+  }, [transaction, contents, is_sale]);
 
   return (
     <div
@@ -645,8 +480,9 @@ const TransactionTaxBillModel = (props) => {
                         <div className={styles.billTransType}>
                           <Select
                             className="trans_select"
-                            value={transactionChange.transaction_type}
-                            onChange={selected => handleSelectChange('transaction_type', selected)}
+                            defaultValue={dataForBill.transType}
+                            value={dataForBill.transType}
+                            onChange={selected => handleSelectChange('trans_type', selected)}
                             options={trans_types}
                           />
                         </div>
@@ -654,12 +490,13 @@ const TransactionTaxBillModel = (props) => {
                         <div className={styles.billBillType}>
                           <Select
                             className="trans_select"
-                            value={transactionChange.tax_type}
+                            defaultValue={dataForBill.tax_type}
+                            value={dataForBill.tax_type}
                             onChange={selected => handleSelectChange('bill_type', selected)}
                             options={bill_types}
                           />
                         </div>
-                        <div style={{ paddingRight: '0.5rem' }}><Checkbox /></div>
+                        <div style={{ paddingRight: '0.5rem' }}><Checkbox onChange={handleShowDecimal}/></div>
                         <div>{t('quotation.show_decimal')}</div>
                       </div>
                       <div className={classNames(styles.billRow, { 'trans_pur': !isSale })}>
@@ -677,18 +514,22 @@ const TransactionTaxBillModel = (props) => {
                             <div className={classNames(styles.second, { 'trans_pur': !isSale })}>
                               <Input
                                 className={styles.input}
-                                name='count'
-                                value={transactionChange['count']}
+                                name='book_no'
+                                defaultValue={dataForBill['book_no']}
+                                value={dataForBill['book_no']}
                                 onChange={handleItemChange}
+                                style={{textAlign: 'end'}}
                               />
                               <div className={styles.text}><div>권</div></div>
                             </div>
                             <div className={classNames(styles.third, { 'trans_pur': !isSale })}>
                               <Input
                                 className={styles.input}
-                                name='count'
-                                value={transactionChange['count']}
+                                defaultValue={dataForBill['book_sub_no']}
+                                name='book_sub_no'
+                                value={dataForBill['book_sub_no']}
                                 onChange={handleItemChange}
+                                style={{textAlign: 'end'}}
                               />
                               <div className={styles.text}><div>호</div></div>
                             </div>
@@ -700,9 +541,10 @@ const TransactionTaxBillModel = (props) => {
                             <div className={styles.fourth}>
                               <Input
                                 className={styles.input}
-                                name='serial'
-                                value={transactionChange['serial']}
+                                name='serial_no'
+                                value={dataForBill['serial_no']}
                                 onChange={handleItemChange}
+                                style={{textAlign: 'center'}}
                               />
                             </div>
                           </div>
@@ -720,12 +562,13 @@ const TransactionTaxBillModel = (props) => {
                               </div>
                               <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label>{company_info.business_registration_code}</label>
+                                  <label className={styles.regNo}>{dataForBill.supplier.business_registration_code}</label>
                                   :
                                   <Input
-                                    className={styles.input}
+                                    className={classNames(styles.input, styles.regNo)}
+                                    defaultValue={dataForBill.supplier['business_registration_code']}
                                     name='business_registration_code'
-                                    value={transactionChange['business_registration_code']}
+                                    value={dataForBill.supplier['business_registration_code']}
                                     onChange={handleItemChange}
                                   />
                                 }
@@ -737,10 +580,11 @@ const TransactionTaxBillModel = (props) => {
                               </div>
                               <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label style={{ color: 'black' }}>{company_info.company_name}</label>
+                                  <label className={styles.textStart}>{dataForBill.supplier.company_name}</label>
                                   :
                                   <Select
-                                    value={transactionChange['company_name']}
+                                    defaultValue={dataForBill.supplier['company_name']}
+                                    value={dataForBill.supplier['company_name']}
                                     options={companyForSelection}
                                     onChange={selected => handleSelectChange('company_name', selected)}
                                   />
@@ -749,14 +593,14 @@ const TransactionTaxBillModel = (props) => {
                               <div className={classNames(styles.subTitle, styles.text, { 'trans_pur': !isSale })}>
                                 <div>{t('common.name2')}</div>
                               </div>
-                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.content, styles.text, styles.textStart, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label>{company_info.ceo_name}</label>
+                                  <label>{dataForBill.supplier.ceo_name}</label>
                                   :
                                   <Input
                                     className={styles.input}
                                     name='ceo_name'
-                                    value={transactionChange['ceo_name']}
+                                    value={dataForBill.supplier['ceo_name']}
                                     onChange={handleItemChange}
                                   />
                                 }
@@ -768,12 +612,12 @@ const TransactionTaxBillModel = (props) => {
                               </div>
                               <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label>{company_info.company_address}</label>
+                                  <label className={styles.textStart}>{dataForBill.supplier.company_address}</label>
                                   :
                                   <Input
                                     className={styles.input}
                                     name='company_address'
-                                    value={transactionChange['company_address']}
+                                    value={dataForBill.supplier['company_address']}
                                     onChange={handleItemChange}
                                   />
                                 }
@@ -785,12 +629,12 @@ const TransactionTaxBillModel = (props) => {
                               </div>
                               <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label style={{ color: 'black' }}>{company_info.business_type}</label>
+                                  <label className={styles.textStart}>{dataForBill.supplier.business_type}</label>
                                   :
                                   <Input
                                     className={styles.input}
                                     name='business_type'
-                                    value={transactionChange['business_type']}
+                                    value={dataForBill.supplier['business_type']}
                                     onChange={handleItemChange}
                                     style={{ color: 'black' }}
                                   />
@@ -799,14 +643,14 @@ const TransactionTaxBillModel = (props) => {
                               <div className={classNames(styles.subTitle, styles.text, { 'trans_pur': !isSale })} >
                                 <div>{t('company.business_item')}</div>
                               </div>
-                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.content, styles.text, styles.textStart, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label>{company_info.business_item}</label>
+                                  <label>{dataForBill.supplier.business_item}</label>
                                   :
                                   <Input
                                     className={styles.input}
                                     name='business_item'
-                                    value={transactionChange['business_item']}
+                                    value={dataForBill.supplier['business_item']}
                                     onChange={handleItemChange}
                                   />
                                 }
@@ -820,100 +664,99 @@ const TransactionTaxBillModel = (props) => {
                           </div>
                           <div className={styles.index}>
                             <div className={classNames(styles.cell, { 'trans_pur': !isSale })}>
-                              <div className={classNames(styles.header, styles.text, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.header, styles.text, { 'trans_pur_bd': !isSale })}>
                                 <div>{t('transaction.register_no')}</div>
                               </div>
-                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur_bd': !isSale })}>
                                 {isSale ?
                                   <Input
-                                    className={styles.input}
+                                    className={classNames(styles.input, styles.regNo)}
                                     name='business_registration_code'
-                                    value={transactionChange['business_registration_code']}
+                                    value={dataForBill.receiver['business_registration_code']}
                                     onChange={handleItemChange}
                                   />
                                   :
-                                  <label>{company_info.business_registration_code}</label>
+                                  <label className={styles.regNo}>{dataForBill.receiver.business_registration_code}</label>
                                 }
                               </div>
                             </div>
                             <div className={classNames(styles.cell, { 'trans_pur': !isSale })}>
-                              <div className={classNames(styles.header, styles.text, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.header, styles.text, { 'trans_pur_bd': !isSale })}>
                                 <div>{t('transaction.company_name')}</div>
                               </div>
-                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur_bd': !isSale })}>
                                 {isSale ?
                                   <Select
-                                    value={transactionChange['company_name']}
+                                    value={dataForBill.receiver['company_name']}
                                     options={companyForSelection}
                                     onChange={selected => handleSelectChange('company_name', selected)}
                                   />
                                   :
-                                  <label style={{ color: 'black' }}>{company_info.company_name}</label>
+                                  <label className={styles.textStart}>{dataForBill.receiver.company_name}</label>
                                 }
                               </div>
-                              <div className={classNames(styles.subTitle, styles.text, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.subTitle, styles.text, { 'trans_pur_bd': !isSale })}>
                                 <div>{t('common.name2')}</div>
                               </div>
-                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur_bd': !isSale })}>
                                 {isSale ?
                                   <Input
                                     className={styles.input}
                                     name='ceo_name'
-                                    value={transactionChange['ceo_name']}
+                                    value={dataForBill.receiver['ceo_name']}
                                     onChange={handleItemChange}
                                   />
                                   :
-                                  <label>{company_info.ceo_name}</label>
+                                  <label>{dataForBill.receiver.ceo_name}</label>
                                 }
                               </div>
                             </div>
                             <div className={classNames(styles.cell, { 'trans_pur': !isSale })}>
-                              <div className={classNames(styles.header, styles.text, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.header, styles.text, { 'trans_pur_bd': !isSale })}>
                                 <div>{t('transaction.address')}</div>
                               </div>
-                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur_bd': !isSale })}>
                                 {isSale ?
                                   <Input
                                     className={styles.input}
                                     name='company_address'
-                                    value={transactionChange['company_address']}
+                                    value={dataForBill.receiver['company_address']}
                                     onChange={handleItemChange}
                                   />
                                   :
-                                  <label>{company_info.company_address}</label>
+                                  <label className={styles.textStart}>{dataForBill.receiver.company_address}</label>
                                 }
                               </div>
                             </div>
                             <div className={classNames(styles.cellLast, { 'trans_pur': !isSale })}>
-                              <div className={classNames(styles.header, styles.text, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.header, styles.text, { 'trans_pur_bd': !isSale })}>
                                 <div>{t('company.business_type')}</div>
                               </div>
-                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur_bd': !isSale })}>
                                 {isSale ?
                                   <Input
                                     className={styles.input}
                                     name='business_type'
-                                    value={transactionChange['business_type']}
+                                    value={dataForBill.receiver['business_type']}
                                     onChange={handleItemChange}
-                                    style={{ color: 'black' }}
                                   />
                                   :
-                                  <label style={{ color: 'black' }}>{company_info.business_type}</label>
+                                  <label className={styles.textStart}>{dataForBill.receiver.business_type}</label>
                                 }
                               </div>
-                              <div className={classNames(styles.subTitle, styles.text, { 'trans_pur': !isSale })} >
+                              <div className={classNames(styles.subTitle, styles.text, { 'trans_pur_bd': !isSale })} >
                                 <div>{t('company.business_item')}</div>
                               </div>
-                              <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.content, styles.text, { 'trans_pur_bd': !isSale })}>
                                 {isSale ?
                                   <Input
                                     className={styles.input}
                                     name='business_item'
-                                    value={transactionChange['business_item']}
+                                    value={dataForBill.receiver['business_item']}
                                     onChange={handleItemChange}
                                   />
                                   :
-                                  <label>{company_info.business_item}</label>
+                                  <label>{dataForBill.receiver.business_item}</label>
                                 }
                               </div>
                             </div>
@@ -921,78 +764,122 @@ const TransactionTaxBillModel = (props) => {
                         </div>
                       </div>
                       <div className={classNames(styles.billRow, { 'trans_pur': !isSale })}>
-                        <div className={classNames(styles.Date, styles.bdR)}>
+                        <div className={classNames(styles.Date, { "trans_pur": !isSale })}>
                           <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>작성</div>
                           <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>년-월-일</div>
-                          <div className={classNames(styles.MidCellLast, { "trans_pur": !isSale })}>2024-07-04</div>
+                          <div className={classNames(styles.MidCellLast, { "trans_pur": !isSale })}>
+                            {dataForBill.issue_date
+                              ? dataForBill.issue_date.toLocaleDateString('ko-KR', {year:'numeric',month:'numeric',date:'numeric'})
+                              : null}</div>
                         </div>
-                        <div className={classNames(styles.Price, styles.bdR)}>
+                        <div className={classNames(styles.Price, { "trans_pur": !isSale })}>
                           <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>공급가액</div>
-                          <div className={classNames(styles.Units)}>
-                            <div className={classNames(styles.Unit3, styles.bdR, { "trans_pur": !isSale })}>공란수</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>백</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>십</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>억</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>천</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>백</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>십</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>만</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>천</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>백</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>십</div>
-                            <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>일</div>
-                          </div>
-                          <div className={classNames(styles.UnitLast)}>
-                            <div className={classNames(styles.Unit3, styles.bdR, { "trans_pur": !isSale })}>3</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>{''}</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>{''}</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>{''}</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>4</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>5</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
-                            <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
-                            <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>0</div>
+                          <div className={classNames(styles.Units, { "trans_pur": !isSale })}>
+                            <div className={classNames(styles.Unit3, { "trans_pur": !isSale })}>
+                              <div className={styles.upper}>공란수</div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{vacantNo}</div></div>
+                            </div>
+                            <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                              <div className={styles.upper}>백</div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{amountText.at(0)}</div></div>
+                            </div>
+                            <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                              <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>십</div>
+                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{amountText.at(1)}</div></div>
+                            </div>
+                            <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                              <div className={styles.upper}>억</div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{amountText.at(2)}</div></div>
+                            </div>
+                            <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                              <div className={styles.upper}>천</div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{amountText.at(3)}</div></div>
+                              </div>
+                            <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                              <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>백</div>
+                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{amountText.at(4)}</div></div>
+                              </div>
+                            <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                              <div className={styles.upper}>십</div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{amountText.at(5)}</div></div>
+                              </div>
+                            <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                              <div className={styles.upper}>만</div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{amountText.at(6)}</div></div>
+                              </div>
+                            <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                              <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>천</div>
+                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{amountText.at(7)}</div></div>
+                              </div>
+                            <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                              <div className={styles.upper}>백</div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{amountText.at(8)}</div></div>
+                              </div>
+                            <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                              <div className={styles.upper}>십</div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{amountText.at(9)}</div></div>
+                            </div>
+                            <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                              <div className={styles.upper0}>원</div>
+                              <div className={styles.lower0}><div style={{color:'black'}}>{amountText.at(10)}</div></div>
+                            </div>
                           </div>
                         </div>
                         {isTaxBill &&
-                          <div className={classNames(styles.Tax, styles.bdR)}>
+                          <div className={classNames(styles.Tax, { "trans_pur": !isSale })}>
                             <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>세 액</div>
-                            <div className={classNames(styles.Units)}>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>십</div>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>억</div>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>천</div>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>백</div>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>십</div>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>만</div>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>천</div>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>백</div>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>십</div>
-                              <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>일</div>
-                            </div>
-                            <div className={classNames(styles.UnitLast)}>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>{''}</div>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>{''}</div>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>4</div>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>5</div>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
-                              <div className={classNames(styles.Unit, styles.bdR, { "trans_pur": !isSale })}>0</div>
-                              <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>0</div>
+                            <div className={classNames(styles.Units, { "trans_pur": !isSale })}>
+                              <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                                <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>십</div>
+                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}>{taxText.at(0)}</div>
+                              </div>
+                              <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                                <div className={styles.upper}>억</div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{taxText.at(1)}</div></div>
+                              </div>
+                              <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                                <div className={styles.upper}>천</div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{taxText.at(2)}</div></div>
+                              </div>
+                              <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                                <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>백</div>
+                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{taxText.at(3)}</div></div>
+                              </div>
+                              <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                                <div className={styles.upper}>십</div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{taxText.at(4)}</div></div>
+                              </div>
+                              <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                                <div className={styles.upper}>만</div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{taxText.at(5)}</div></div>
+                              </div>
+                              <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                                <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>천</div>
+                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{taxText.at(6)}</div></div>
+                              </div>
+                              <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                                <div className={styles.upper}>백</div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{taxText.at(7)}</div></div>
+                              </div>
+                              <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                                <div className={styles.upper}>십</div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{taxText.at(8)}</div></div>
+                              </div>
+                              <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
+                                <div className={styles.upper0}>원</div>
+                                <div className={styles.lower0}><div style={{color:'black'}}>{taxText.at(9)}</div></div>
+                              </div>
                             </div>
                           </div>
                         }
                         <div className={styles.Note}>
                           <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>비고</div>
                           <div className={styles.Cell}>
-                            <Input
+                            <Input.TextArea
                               className={styles.inputTall}
                               name='memo'
-                              value={transactionChange['memo']}
+                              row_no={2}
+                              value={dataForBill['memo']}
                               onChange={handleItemChange}
                             />
                           </div>
@@ -1029,8 +916,8 @@ const TransactionTaxBillModel = (props) => {
                             <div className={classNames(styles.header, styles.text)}>
                               <div>합계 금액</div>
                             </div>
-                            <div className={styles.content}>
-                              {ConvertCurrency(dataForTransaction.receipt, dataForTransaction.show_decimal)}
+                            <div className={classNames(styles.content, styles.text)}>
+                              <div style={{textAlign:'end', paddingRight:'0.5rem'}}>{ConvertCurrency(dataForBill.total_amount, dataForBill.show_decimal?4:0)}</div>
                             </div>
                           </div>
                           <div className={styles.item}>
@@ -1041,8 +928,9 @@ const TransactionTaxBillModel = (props) => {
                               <Input
                                 className={styles.input}
                                 name='cash'
-                                value={transactionChange['cash']}
+                                value={dataForBill['cash']}
                                 onChange={handleItemChange}
+                                style={{textAlign: 'end'}}
                               />
                             </div>
                           </div>
@@ -1054,8 +942,9 @@ const TransactionTaxBillModel = (props) => {
                               <Input
                                 className={styles.input}
                                 name='check'
-                                value={transactionChange['check']}
+                                value={dataForBill['check']}
                                 onChange={handleItemChange}
+                                style={{textAlign: 'end'}}
                               />
                             </div>
                           </div>
@@ -1067,8 +956,9 @@ const TransactionTaxBillModel = (props) => {
                               <Input
                                 className={styles.input}
                                 name='note'
-                                value={transactionChange['note']}
+                                value={dataForBill['note']}
                                 onChange={handleItemChange}
+                                style={{textAlign: 'end'}}
                               />
                             </div>
                           </div>
@@ -1076,12 +966,13 @@ const TransactionTaxBillModel = (props) => {
                             <div className={classNames(styles.headerLast, styles.text)}>
                               <div>외상미수금</div>
                             </div>
-                            <div className={styles.contentLast}>
+                            <div>
                               <Input
                                 className={styles.input}
                                 name='credit'
-                                value={transactionChange['credit']}
+                                value={dataForBill['credit']}
                                 onChange={handleItemChange}
+                                style={{textAlign: 'end'}}
                               />
                             </div>
                           </div>
@@ -1090,7 +981,7 @@ const TransactionTaxBillModel = (props) => {
                           <div style={{display: 'flex', flexDirection: 'row', justifyContent:'center'}}>
                             <div className={styles.text}><div>이 금액을 </div></div>
                             <Select
-                              value={transactionChange.request_type}
+                              value={dataForBill.request_type}
                               options={request_type}
                               onChange={selected => handleSelectChange('request_type', selected)}
                             />
@@ -1098,31 +989,6 @@ const TransactionTaxBillModel = (props) => {
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="text-center">
-                      <button
-                        type="button"
-                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                        onClick={handleAddPrintTransaction}
-                      >
-                        {t('transaction.save_print')}
-                      </button>
-                      &nbsp;&nbsp;
-                      <button
-                        type="button"
-                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                        onClick={handleAddNewTransaction}
-                      >
-                        {t('common.save')}
-                      </button>
-                      &nbsp;&nbsp;
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-rounded"
-                        data-bs-dismiss="modal"
-                      >
-                        {t('common.cancel')}
-                      </button>
                     </div>
                   </form>
                 </div>
