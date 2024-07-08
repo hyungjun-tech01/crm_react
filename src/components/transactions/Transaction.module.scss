@@ -121,6 +121,10 @@
         flex-direction: column;
         justify-items: stretch;
         border-right: 2px solid #ff0505;
+        .datePick{
+            border: 0;
+            text-align: center;
+        }
     }
     .Price {
         flex: 1 1 38%;

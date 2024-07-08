@@ -477,7 +477,12 @@ const TransactionAddModel = (props) => {
   };
 
   const handleShowTaxBill = () => {
-    console.log('handleShowTaxBill');
+    const tempTransactionData = {
+      ...transactionChange,
+      ...dataForTransaction,
+    };
+    setTransactionForPrint(tempTransactionData);
+    setContentsForPrint(transactionContents);
     let myModal = new bootstrap.Modal(document.getElementById('add_new_tax_bill'), {
       keyboard: false
     })
@@ -897,6 +902,14 @@ const TransactionAddModel = (props) => {
                   data-bs-dismiss="modal"
                 >
                   {t('common.cancel')}
+                </button>
+                &nbsp;&nbsp;
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-rounded"
+                  onClick={handleShowTaxBill}
+                >
+                  Test
                 </button>
               </div>
             </form>

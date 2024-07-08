@@ -8,6 +8,7 @@ import "antd/dist/reset.css";
 import { Checkbox, Input, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
+import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import classNames from 'classnames';
 
@@ -87,12 +88,10 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
   const [transactionContents, setTransactionContents] = useState([]);
   const [isSale, setIsSale] = useState(true);
   const [isTaxBill, setIsTaxBill] = useState(true);
-  const [isRequested, setIsRequested] = useState(true);
   const [vacantNo, setVacantNo] = useState(0);
   const [amountText, setAmountText] = useState('');
   const [taxText, setTaxText] = useState('');
-  const [supplier, setSupplier] = useState({});
-  const [receiver, setReceiver] = useState({});
+  const [selectValues, setSelectValue] = useState({})
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
 
   const handleItemChange = useCallback((e) => {
@@ -148,7 +147,13 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
     };
 
     setDataForBill(modifiedData);
-  }, [dataForBill]);
+
+    const tempSelectValues = {
+      ...selectValues,
+      [name]: selected,
+    };
+    setSelectValue(tempSelectValues);
+  }, [dataForBill, selectValues]);
 
   const trans_types = [
     { value: '매출', label: t('company.deal_type_sales') },
@@ -289,36 +294,6 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
 
 
   //===== Handles for special actions =============================================
-
-  const handleSaveNewTransaction = (value) => {
-    if (dataForBill.company_name === null
-      || dataForBill.company_name === ''
-      || transactionContents.length === 0
-    ) {
-      setMessage({ title: '*필수 입력 누락*', message: '업체 정보나 품목 정보가 누락되었습니다.' });
-      setIsMessageModalOpen(true);
-      return;
-    };
-    const newTransactionData = {
-      ...dataForBill,
-      transaction_contents: JSON.stringify(transactionContents),
-      transaction_title: transactionContents.at(0).product_name + ' 외',
-      action_type: 'ADD',
-      modify_user: cookies.myLationCrmUserId,
-    };
-    const result = modifyTransaction(newTransactionData);
-    result.then((res) => {
-      if (res) {
-        console.log('Test');
-      }
-      else {
-        setMessage({ title: '저장 중 오류', message: '오류가 발생하여 저장하지 못했습니다.' });
-        setIsMessageModalOpen(true);
-      };
-    });
-  };
-
-
   const handleShowDecimal = (e) => {
     const tempData = {
       ...dataForBill,
@@ -332,92 +307,99 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
     console.log('Company called!');
     if ((companyState & 1) === 0) {
       loadAllCompanies();
-    };
-  }, [companyState, loadAllCompanies]);
-
-  useEffect(() => {
-    if(transaction) {
-      console.log('[TransactionTaxBillModel] called! :', transaction);
-      // dataForBill ------------------------------
-
-      let tempBillData = {
-        ...default_bill_data,
-        trans_type: is_sale?'매출':'매입',
-        bill_type: transaction.vat_included?'세금계산서':'계산서',
-        show_decimal: transaction.show_decimal,
-        request_type: '청구',
-        issue_date: transaction.publish_date,
-        supply_amount: transaction.supply_price,
-        tax_amount: transaction.tax_price,
-        total_amount: transaction.total_price,
-      };
-      
-
-      // IsSale ------------------------------------
-      setIsSale(is_sale);
-      if(is_sale) {
-        tempBillData.supplier = {...company_info};
-        tempBillData.receiver = {
-          business_registration_code: transaction.business_registration_code,
-          company_name: transaction.company_name,
-          ceo_name: transaction.ceo_name,
-          company_address: transaction.company_address,
-          business_type: transaction.business_type,
-          business_item: transaction.business_item,
-        }
-      } else {
-        tempBillData.supplier = {
-          business_registration_code: transaction.business_registration_code,
-          company_name: transaction.company_name,
-          ceo_name: transaction.ceo_name,
-          company_address: transaction.company_address,
-          business_type: transaction.business_type,
-          business_item: transaction.business_item,
-        }
-        tempBillData.receiver = {...company_info};
-      };
-      setDataForBill(tempBillData);
-
-      // Amount ------------------------------------
-      const tempAmountText = typeof transaction.supply_price === 'number'
-        ? transaction.supply_price.toString() : '';
-      const tempVacantCount = 11 - tempAmountText.length;
-      let inputAmountText = '';
-
-      if(tempVacantCount < 0){
-        console.log('Too high value');
-        setVacantNo(0);
-        inputAmountText = tempAmountText.slice(-11);
-      } else {
-        setVacantNo(tempVacantCount);
-        for(let i=0; i < tempVacantCount; i++){
-          inputAmountText += ' ';
-        };
-        inputAmountText += tempAmountText;
-      };
-      setAmountText(inputAmountText);
-
-      const tempTaxText = typeof transaction.tax_price === 'number'
-        ? transaction.tax_price.toFixed().toString() : '';
-      if(tempTaxText.length > 10){
-        setTaxText(tempTaxText.slice(-10));
-      } else {
-        let intputTaxText = '';
-        for(let i=0; i< 10-tempTaxText.length; i++){
-          intputTaxText += ' ';
-        };
-        intputTaxText += tempTaxText;
-        setTaxText(intputTaxText);
-      };
     }
+    else {
+      if(transaction) {
+        console.log('[TransactionTaxBillModel] called! :', transaction);
+        
+        // dataForBill ------------------------------
+        const selectedCompany = companyForSelection.filter(item=> item.label === transaction.company_name);
+        const tempSelectValues = {
+          trans_type: is_sale? trans_types[0] : trans_types[1],
+          bill_type: transaction.vat_included? bill_types[0] : bill_types[1],
+          request_type: request_type[0],
+          company_name: selectedCompany[0],
+        };
+        console.log('[TransactionTaxBillModel] selectValues :', tempSelectValues);
+        setSelectValue(tempSelectValues);
 
-    // Copy contents into 'transaction contents' -------------------
-    if(contents)
-      setTransactionContents([...contents]);
-    else
-    setTransactionContents([]);
+        let tempBillData = {
+          ...default_bill_data,
+          trans_type: is_sale?'매출':'매입',
+          bill_type: transaction.vat_included?'세금계산서':'계산서',
+          show_decimal: transaction.show_decimal,
+          request_type: '청구',
+          issue_date: transaction.publish_date,
+          supply_amount: transaction.supply_price,
+          tax_amount: transaction.tax_price,
+          total_amount: transaction.total_price,
+        };
 
-  }, [transaction, contents, is_sale]);
+        // IsSale ------------------------------------
+        setIsSale(is_sale);
+        if(is_sale) {
+          tempBillData.supplier = {...company_info};
+          tempBillData.receiver = {
+            business_registration_code: transaction.business_registration_code,
+            company_name: transaction.company_name,
+            ceo_name: transaction.ceo_name,
+            company_address: transaction.company_address,
+            business_type: transaction.business_type,
+            business_item: transaction.business_item,
+          }
+        } else {
+          tempBillData.supplier = {
+            business_registration_code: transaction.business_registration_code,
+            company_name: transaction.company_name,
+            ceo_name: transaction.ceo_name,
+            company_address: transaction.company_address,
+            business_type: transaction.business_type,
+            business_item: transaction.business_item,
+          }
+          tempBillData.receiver = {...company_info};
+        };
+        setDataForBill(tempBillData);
+
+        // Amount ------------------------------------
+        const tempAmountText = typeof transaction.supply_price === 'number'
+          ? transaction.supply_price.toString() : '';
+        const tempVacantCount = 11 - tempAmountText.length;
+        let inputAmountText = '';
+
+        if(tempVacantCount < 0){
+          console.log('Too high value');
+          setVacantNo(0);
+          inputAmountText = tempAmountText.slice(-11);
+        } else {
+          setVacantNo(tempVacantCount);
+          for(let i=0; i < tempVacantCount; i++){
+            inputAmountText += ' ';
+          };
+          inputAmountText += tempAmountText;
+        };
+        setAmountText(inputAmountText);
+
+        const tempTaxText = typeof transaction.tax_price === 'number'
+          ? transaction.tax_price.toFixed().toString() : '';
+        if(tempTaxText.length > 10){
+          setTaxText(tempTaxText.slice(-10));
+        } else {
+          let intputTaxText = '';
+          for(let i=0; i< 10-tempTaxText.length; i++){
+            intputTaxText += ' ';
+          };
+          intputTaxText += tempTaxText;
+          setTaxText(intputTaxText);
+        };
+      }
+      // Copy contents into 'transaction contents' -------------------
+      if(contents)
+        setTransactionContents([...contents]);
+      else
+        setTransactionContents([]);
+    };
+
+  }, [contents, is_sale, transaction, companyState, loadAllCompanies]);
 
   return (
     <div
@@ -480,8 +462,8 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
                         <div className={styles.billTransType}>
                           <Select
                             className="trans_select"
-                            defaultValue={dataForBill.transType}
-                            value={dataForBill.transType}
+                            defaultValue={selectValues.trans_type}
+                            value={selectValues.trans_type}
                             onChange={selected => handleSelectChange('trans_type', selected)}
                             options={trans_types}
                           />
@@ -490,8 +472,8 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
                         <div className={styles.billBillType}>
                           <Select
                             className="trans_select"
-                            defaultValue={dataForBill.tax_type}
-                            value={dataForBill.tax_type}
+                            defaultValue={selectValues.bill_type}
+                            value={selectValues.bill_type}
                             onChange={selected => handleSelectChange('bill_type', selected)}
                             options={bill_types}
                           />
@@ -583,8 +565,8 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
                                   <label className={styles.textStart}>{dataForBill.supplier.company_name}</label>
                                   :
                                   <Select
-                                    defaultValue={dataForBill.supplier['company_name']}
-                                    value={dataForBill.supplier['company_name']}
+                                    defaultValue={selectValues['company_name']}
+                                    value={selectValues['company_name']}
                                     options={companyForSelection}
                                     onChange={selected => handleSelectChange('company_name', selected)}
                                   />
@@ -687,7 +669,8 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
                               <div className={classNames(styles.content, styles.text, { 'trans_pur_bd': !isSale })}>
                                 {isSale ?
                                   <Select
-                                    value={dataForBill.receiver['company_name']}
+                                    defaultValue={selectValues['company_name']}
+                                    value={selectValues['company_name']}
                                     options={companyForSelection}
                                     onChange={selected => handleSelectChange('company_name', selected)}
                                   />
@@ -768,9 +751,17 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
                           <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>작성</div>
                           <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>년-월-일</div>
                           <div className={classNames(styles.MidCellLast, { "trans_pur": !isSale })}>
-                            {dataForBill.issue_date
-                              ? dataForBill.issue_date.toLocaleDateString('ko-KR', {year:'numeric',month:'numeric',date:'numeric'})
-                              : null}</div>
+                            {/* {dataForBill.issue_date
+                              ? dataForBill.issue_date.toLocaleDateString('ko-KR', {year:'numeric',month:'numeric',day:'numeric'})
+                              : null} */}
+                            <DatePicker
+                              name="publish_date"
+                              selected={dataForBill['issue_date']}
+                              onChange={(date) => handleDateChange('issue_date', date)}
+                              dateFormat="yyyy-MM-dd"
+                              className="datePick"
+                            />
+                          </div>
                         </div>
                         <div className={classNames(styles.Price, { "trans_pur": !isSale })}>
                           <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>공급가액</div>
@@ -981,7 +972,7 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
                           <div style={{display: 'flex', flexDirection: 'row', justifyContent:'center'}}>
                             <div className={styles.text}><div>이 금액을 </div></div>
                             <Select
-                              value={dataForBill.request_type}
+                              value={selectValues.request_type}
                               options={request_type}
                               onChange={selected => handleSelectChange('request_type', selected)}
                             />
@@ -993,7 +984,7 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
                   </form>
                 </div>
                 <div className="tab-pane show" id="tax-bill-print">
-
+                  <TaxBillPrint transaction={transaction} contents={contents}/>
                 </div>
               </div>
             </div>

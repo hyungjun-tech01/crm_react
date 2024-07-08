@@ -88,7 +88,7 @@ const TaxBillPrint = (props) => {
     };
 
     useEffect(() => {
-        if(contents && Array.isArray(contents)){
+        if(contents && Array.isArray(contents) && contents.length > 0){
             const num_10 = Math.ceil(contents.length / 10) * 10;
             let temp_array = new Array(num_10);
             let i = 0;
@@ -101,27 +101,31 @@ const TaxBillPrint = (props) => {
                 temp_array[i] = null;
             };
             setTransactionContents(temp_array);
-        };
-        if(transaction.transaction_type ==='매출'){
-            setSupplier({...company_info});
-            setReceiver({
-                business_registration_code: transaction.business_registration_code,
-                company_name: transaction.company_name,
-                ceo_name: transaction.ceo_name,
-                company_address: transaction.company_address,
-                business_type: transaction.business_type,
-                business_item: transaction.business_item,
-            });
         } else {
-            setSupplier({
-                business_registration_code: transaction.business_registration_code,
-                company_name: transaction.company_name,
-                ceo_name: transaction.ceo_name,
-                company_address: transaction.company_address,
-                business_type: transaction.business_type,
-                business_item: transaction.business_item,
-            });
-            setReceiver({...company_info});
+            setTransactionContents([]);
+        };
+        if(transaction) {
+            if(transaction.transaction_type ==='매출'){
+                setSupplier({...company_info});
+                setReceiver({
+                    business_registration_code: transaction.business_registration_code,
+                    company_name: transaction.company_name,
+                    ceo_name: transaction.ceo_name,
+                    company_address: transaction.company_address,
+                    business_type: transaction.business_type,
+                    business_item: transaction.business_item,
+                });
+            } else {
+                setSupplier({
+                    business_registration_code: transaction.business_registration_code,
+                    company_name: transaction.company_name,
+                    ceo_name: transaction.ceo_name,
+                    company_address: transaction.company_address,
+                    business_type: transaction.business_type,
+                    business_item: transaction.business_item,
+                });
+                setReceiver({...company_info});
+            }
         }
     }, [contents, transaction]);
 
@@ -404,48 +408,50 @@ const TaxBillPrint = (props) => {
                                         );
                                 })}
                             </View>
-                            <View style={{width:'100%',height:36,margin:0,padding:0,flexDirection:'column'}}>
-                                <View style={{width: '100%',height:18,margin:0,padding:0,borderBottom:1,borderColor:'#0000ff',flexDirection:'row',alignContent:'center'}}>
-                                    <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
-                                        <Text style={[Styles.SupplierText,{fontSize:10}]}>공급가액</Text>
+                            {transaction && 
+                                <View style={{width:'100%',height:36,margin:0,padding:0,flexDirection:'column'}}>
+                                    <View style={{width: '100%',height:18,margin:0,padding:0,borderBottom:1,borderColor:'#0000ff',flexDirection:'row',alignContent:'center'}}>
+                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>공급가액</Text>
+                                        </View>
+                                        <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
+                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.supply_price)}</Text>
+                                        </View>
+                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>세액</Text>
+                                        </View>
+                                        <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
+                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.tax_price)}</Text>
+                                        </View>
+                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>합계금액</Text>
+                                        </View>
+                                        <View style={{width:'23.4%',margin:0,padding:0,alignItems:'center',justifyContent:'end'}}>
+                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.total_price)}</Text>
+                                        </View>
                                     </View>
-                                    <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.supply_price)}</Text>
-                                    </View>
-                                    <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
-                                        <Text style={[Styles.SupplierText,{fontSize:10}]}>세액</Text>
-                                    </View>
-                                    <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.tax_price)}</Text>
-                                    </View>
-                                    <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
-                                        <Text style={[Styles.SupplierText,{fontSize:10}]}>합계금액</Text>
-                                    </View>
-                                    <View style={{width:'23.4%',margin:0,padding:0,alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.total_price)}</Text>
+                                    <View style={{width: '100%',height:18,margin:0,padding:0,border:0,flexDirection:'row',alignContent:'center'}}>
+                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>입금</Text>
+                                        </View>
+                                        <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
+                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.receipt)}</Text>
+                                        </View>
+                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>미수금</Text>
+                                        </View>
+                                        <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
+                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.valance_prev)}</Text>
+                                        </View>
+                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>인수자</Text>
+                                        </View>
+                                        <View style={{width:'23.4%',margin:0,padding:0,alignItems:'center',justifyContent:'end'}}>
+                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{transaction.receiver}</Text>
+                                        </View>
                                     </View>
                                 </View>
-                                <View style={{width: '100%',height:18,margin:0,padding:0,border:0,flexDirection:'row',alignContent:'center'}}>
-                                    <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
-                                        <Text style={[Styles.SupplierText,{fontSize:10}]}>입금</Text>
-                                    </View>
-                                    <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.receipt)}</Text>
-                                    </View>
-                                    <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
-                                        <Text style={[Styles.SupplierText,{fontSize:10}]}>미수금</Text>
-                                    </View>
-                                    <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.valance_prev)}</Text>
-                                    </View>
-                                    <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
-                                        <Text style={[Styles.SupplierText,{fontSize:10}]}>인수자</Text>
-                                    </View>
-                                    <View style={{width:'23.4%',margin:0,padding:0,alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{transaction.receiver}</Text>
-                                    </View>
-                                </View>
-                            </View>
+                            }
                         </View>
                     </View>
                     {/* 중간 경계선 */}
@@ -725,48 +731,50 @@ const TaxBillPrint = (props) => {
                                         );
                                 })}
                             </View>
-                            <View style={{width:'100%',height:36,margin:0,padding:0,flexDirection:'column'}}>
-                                <View style={{width: '100%',height:18,margin:0,padding:0,borderBottom:1,borderColor:'#ff0505',flexDirection:'row',alignContent:'center'}}>
-                                    <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
-                                        <Text style={[Styles.ReceiverText,{fontSize:10}]}>공급가액</Text>
+                            {transaction &&
+                                <View style={{width:'100%',height:36,margin:0,padding:0,flexDirection:'column'}}>
+                                    <View style={{width: '100%',height:18,margin:0,padding:0,borderBottom:1,borderColor:'#ff0505',flexDirection:'row',alignContent:'center'}}>
+                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
+                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>공급가액</Text>
+                                        </View>
+                                        <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
+                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.supply_price)}</Text>
+                                        </View>
+                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
+                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>세액</Text>
+                                        </View>
+                                        <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
+                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.tax_price)}</Text>
+                                        </View>
+                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
+                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>합계금액</Text>
+                                        </View>
+                                        <View style={{width:'23.4%',margin:0,padding:0,alignItems:'center',justifyContent:'end'}}>
+                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.total_price)}</Text>
+                                        </View>
                                     </View>
-                                    <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.supply_price)}</Text>
-                                    </View>
-                                    <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
-                                        <Text style={[Styles.ReceiverText,{fontSize:10}]}>세액</Text>
-                                    </View>
-                                    <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.tax_price)}</Text>
-                                    </View>
-                                    <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
-                                        <Text style={[Styles.ReceiverText,{fontSize:10}]}>합계금액</Text>
-                                    </View>
-                                    <View style={{width:'23.4%',margin:0,padding:0,alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.total_price)}</Text>
+                                    <View style={{width: '100%',height:18,margin:0,padding:0,border:0,flexDirection:'row',alignContent:'center'}}>
+                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
+                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>입금</Text>
+                                        </View>
+                                        <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
+                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.receipt)}</Text>
+                                        </View>
+                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
+                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>미수금</Text>
+                                        </View>
+                                        <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
+                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.valance_prev)}</Text>
+                                        </View>
+                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
+                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>인수자</Text>
+                                        </View>
+                                        <View style={{width:'23.4%',margin:0,padding:0,alignItems:'center',justifyContent:'end'}}>
+                                            <Text style={[Styles.inputAmount,{fontSize:10}]}>{transaction.receiver}</Text>
+                                        </View>
                                     </View>
                                 </View>
-                                <View style={{width: '100%',height:18,margin:0,padding:0,border:0,flexDirection:'row',alignContent:'center'}}>
-                                    <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
-                                        <Text style={[Styles.ReceiverText,{fontSize:10}]}>입금</Text>
-                                    </View>
-                                    <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.receipt)}</Text>
-                                    </View>
-                                    <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
-                                        <Text style={[Styles.ReceiverText,{fontSize:10}]}>미수금</Text>
-                                    </View>
-                                    <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.valance_prev)}</Text>
-                                    </View>
-                                    <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
-                                        <Text style={[Styles.ReceiverText,{fontSize:10}]}>인수자</Text>
-                                    </View>
-                                    <View style={{width:'23.4%',margin:0,padding:0,alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{transaction.receiver}</Text>
-                                    </View>
-                                </View>
-                            </View>
+                            }
                         </View>
                     </View>
                 </Page>
