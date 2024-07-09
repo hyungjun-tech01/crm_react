@@ -6,53 +6,72 @@ import { defaultCompany } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo } from "../../repository/company";
 import { UserRepo } from '../../repository/user';
-import { formatDate } from '../../constants/functions';
 import { option_locations, option_deal_type, option_industry_type } from "../../constants/constants";
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddAddressItem from '../../constants/AddAddressItem';
+import MessageModal from "../../constants/MessageModal";
 
 
 const CompanyAddModel = (props) => {
     const { init, handleInit } = props;
+    const { t } = useTranslation();
+    const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+    const [ isMessageModalOpen, setIsMessageModalOpen ] = useState(false);
+    const [ message, setMessage ] = useState({title:'', message: ''});
+
+
+    //===== [RecoilState] Related with Company ==========================================
     const { modifyCompany } = useRecoilValue(CompanyRepo);
+
+
+    //===== [RecoilState] Related with Users ============================================
     const [userState, setUserState] = useRecoilState(atomUserState);
     const engineersForSelection = useRecoilValue(atomEngineersForSelection);
     const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
     const { loadAllUsers } = useRecoilValue(UserRepo)
-    const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
-    const { t } = useTranslation();
-    const [companyChange, setCompanyChange] = useState(defaultCompany);
-    const [establishDate, setEstablishDate] = useState(null);
+
+
+    //===== Handles to edit 'CompanyAddModel' ===========================================
+    const [companyChange, setCompanyChange] = useState({ ...defaultCompany });
 
     const initializeCompanyTemplate = useCallback(() => {
-        setCompanyChange(defaultCompany);
-        setEstablishDate(null);
+        setCompanyChange({ ...defaultCompany });
         document.querySelector("#add_new_company_form").reset();
     }, []);
 
-    const handleCompanyChange = useCallback((e) => {
-        let input_data = null;
-        if (e.target.name === 'establishment_date') {
-            const date_value = new Date(e.target.value);
-            if (!isNaN(date_value.valueOf())) {
-                input_data = formatDate(date_value);
-            };
-        } else {
-            input_data = e.target.value;
-        }
+    const handleDateChange = (name, date) => {
         const modifiedData = {
             ...companyChange,
-            [e.target.name]: input_data,
+            [name]: date
         };
         setCompanyChange(modifiedData);
-    }, [companyChange]);
+    };
+
+    const handleItemChange = (e) => {
+        const modifiedData = {
+            ...companyChange,
+            [e.target.name]: e.target.value,
+        };
+        setCompanyChange(modifiedData);
+    };
+
+    const handleSelectChange = (name, selected) => {
+        const modifiedData = {
+            ...companyChange,
+            [name]: selected.value,
+        };
+
+        setCompanyChange(modifiedData);
+    };
 
     const handleAddNewCompany = useCallback((event) => {
         // Check data if they are available
         if (companyChange.company_name === null
             || companyChange.company_name === '') {
-            console.log("Company Name must be available!");
+            const tempMsg = {title: '확인', message: '회사이름이 누락되었습니다.'}
+            setMessage(tempMsg);
+            setIsMessageModalOpen(true);
             return;
         };
 
@@ -71,26 +90,10 @@ const CompanyAddModel = (props) => {
         };
     }, [companyChange, cookies.myLationCrmUserId, initializeCompanyTemplate, modifyCompany]);
 
-    const handleSelectChange = useCallback((name, selected) => {
-        const modifiedData = {
-            ...companyChange,
-            [name]: selected.value,
-        };
-        setCompanyChange(modifiedData);
-    }, [companyChange]);
-
-    const handleEstablishDateChange = useCallback((date) => {
-        setEstablishDate(date);
-        const modifiedData = {
-            ...companyChange,
-            establishment_date: date,
-        };
-        setCompanyChange(modifiedData);
-    }, [companyChange]);
 
     useEffect(() => {
         console.log('[CompanyAddModel] called!');
-        if(init) {
+        if (init) {
             initializeCompanyTemplate();
             handleInit(!init);
         }
@@ -102,8 +105,8 @@ const CompanyAddModel = (props) => {
             const tempUserState = userState | (1 << 1); //change it to pending state
             setUserState(tempUserState);
             loadAllUsers();
-        }
-    }, [userState, loadAllUsers, setUserState])
+        };
+    }, [userState, loadAllUsers, setUserState]);
 
     return (
         <div
@@ -142,14 +145,14 @@ const CompanyAddModel = (props) => {
                                             name="company_name"
                                             defaultValue={companyChange.company_name}
                                             required
-                                            onChange={handleCompanyChange}
+                                            onChange={handleItemChange}
                                         />
                                         <AddBasicItem
                                             title={t('company.company_name_eng')}
                                             type='text'
                                             name="company_name_eng"
                                             defaultValue={companyChange.company_name_eng}
-                                            onChange={handleCompanyChange}
+                                            onChange={handleItemChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -158,14 +161,14 @@ const CompanyAddModel = (props) => {
                                             type='text'
                                             name="ceo_name"
                                             defaultValue={companyChange.ceo_name}
-                                            onChange={handleCompanyChange}
+                                            onChange={handleItemChange}
                                         />
                                         <AddBasicItem
                                             title={t('company.business_registration_code')}
                                             type='text'
                                             name="business_registration_code"
                                             defaultValue={companyChange.business_registration_code}
-                                            onChange={handleCompanyChange}
+                                            onChange={handleItemChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -181,7 +184,7 @@ const CompanyAddModel = (props) => {
                                             type='text'
                                             name="company_phone_number"
                                             defaultValue={companyChange.company_phone_number}
-                                            onChange={handleCompanyChange}
+                                            onChange={handleItemChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -191,14 +194,14 @@ const CompanyAddModel = (props) => {
                                             name="company_zip_code"
                                             defaultValue={companyChange.company_zip_code}
                                             disabled={true}
-                                            onChange={handleCompanyChange}
+                                            onChange={handleItemChange}
                                         />
                                         <AddBasicItem
                                             title={t('company.fax_number')}
                                             type='text'
                                             name="company_fax_number"
                                             defaultValue={companyChange.company_fax_number}
-                                            onChange={handleCompanyChange}
+                                            onChange={handleItemChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -207,14 +210,14 @@ const CompanyAddModel = (props) => {
                                             type='text'
                                             name="homepage"
                                             defaultValue={companyChange.homepage}
-                                            onChange={handleCompanyChange}
+                                            onChange={handleItemChange}
                                         />
                                         <AddBasicItem
                                             title={t('company.company_scale')}
                                             type='text'
                                             name="company_scale"
                                             defaultValue={companyChange.company_scale}
-                                            onChange={handleCompanyChange}
+                                            onChange={handleItemChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -241,14 +244,14 @@ const CompanyAddModel = (props) => {
                                             type='text'
                                             name="business_type"
                                             defaultValue={companyChange.business_type}
-                                            onChange={handleCompanyChange}
+                                            onChange={handleItemChange}
                                         />
                                         <AddBasicItem
                                             title={t('company.business_item')}
                                             type='text'
                                             name="business_item"
                                             defaultValue={companyChange.business_item}
-                                            onChange={handleCompanyChange}
+                                            onChange={handleItemChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -256,8 +259,8 @@ const CompanyAddModel = (props) => {
                                             title={t('company.establishment_date')}
                                             type='date'
                                             name="establishment_date"
-                                            time={{ data: establishDate }}
-                                            onChange={handleEstablishDateChange}
+                                            time={{ data: companyChange.establishment_date }}
+                                            onChange={handleDateChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -266,14 +269,14 @@ const CompanyAddModel = (props) => {
                                             type='text'
                                             name="account_code"
                                             defaultValue={companyChange.account_code}
-                                            onChange={handleCompanyChange}
+                                            onChange={handleItemChange}
                                         />
                                         <AddBasicItem
                                             title={t('company.bank_name')}
                                             type='text'
                                             name="bank_name"
                                             defaultValue={companyChange.bank_name}
-                                            onChange={handleCompanyChange}
+                                            onChange={handleItemChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -282,7 +285,7 @@ const CompanyAddModel = (props) => {
                                             type='text'
                                             name="account_owner"
                                             defaultValue={companyChange.account_owner}
-                                            onChange={handleCompanyChange}
+                                            onChange={handleItemChange}
                                         />
                                         <AddBasicItem
                                             title={t('company.salesman')}
@@ -319,7 +322,7 @@ const CompanyAddModel = (props) => {
                                             row_no={3}
                                             name="memo"
                                             defaultValue={companyChange.memo}
-                                            onChange={handleCompanyChange}
+                                            onChange={handleItemChange}
                                         />
                                     </div>
                                     <div className="text-center py-3">
@@ -347,6 +350,12 @@ const CompanyAddModel = (props) => {
                 </div>
                 {/* modal-content */}
             </div>
+            <MessageModal
+                title={message.title}
+                message={message.message}
+                open={isMessageModalOpen}
+                handleOk={()=>setIsMessageModalOpen(false)}
+            />
             {/* modal-dialog */}
         </div>
     )

@@ -18,6 +18,7 @@ const AddAddressItem = (props) => {
             ...edited,
             [key_address]: event.target.value,
         };
+        console.log('AddAddressItem / handleChange :', modifiedData);
         setEdited(modifiedData);
     };
 
@@ -26,6 +27,7 @@ const AddAddressItem = (props) => {
             ...edited,
             [key_address]: address,
         };
+        console.log('AddAddressItem / handleSetAddress :', modifiedData);
         setEdited(modifiedData);
         document.getElementById('add_adress_input').value = address;
     };
@@ -48,7 +50,7 @@ const AddAddressItem = (props) => {
                     className="add-basic-content"
                     id="add_adress_input"
                     type="text"
-                    value={edited[key_address]}
+                    defaultValue={edited[key_address]}
                     placeholder={title}
                     disabled={disabled ? disabled : false}
                     onChange={handleChange}
