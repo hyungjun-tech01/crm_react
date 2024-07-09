@@ -112,18 +112,43 @@ const TransactionTaxBillModel = ({transaction, contents}) => {
   }, [dataForBill]);
 
   const handleSelectChange = useCallback((name, selected) => {
+    // set data for selection ------------------------------
+    const tempSelectValues = {
+      ...selectValues,
+      [name]: selected,
+    };
+    setSelectValue(tempSelectValues);
+
+    // set changed data ------------------------------------
     let modifiedData = null;
     if (name === 'company_name') {
-      modifiedData = {
-        ...dataForBill,
-        company_code: selected.value.company_code,
-        company_name: selected.value.company_name,
-        company_address: selected.value.company_address,
-        ceo_name: selected.value.ceo_name,
-        business_type: selected.value.business_type,
-        business_item: selected.value.business_item,
-        business_registration_code: selected.value.business_registration_code,
-      };
+      if(isSale){
+        modifiedData = {
+          ...dataForBill,
+          receiver: {
+            company_code: selected.value.company_code,
+            company_name: selected.value.company_name,
+            company_address: selected.value.company_address,
+            ceo_name: selected.value.ceo_name,
+            business_type: selected.value.business_type,
+            business_item: selected.value.business_item,
+            business_registration_code: selected.value.business_registration_code,
+          },
+        };
+      } else {
+        modifiedData = {
+          ...dataForBill,
+          supplier: {
+            company_code: selected.value.company_code,
+            company_name: selected.value.company_name,
+            company_address: selected.value.company_address,
+            ceo_name: selected.value.ceo_name,
+            business_type: selected.value.business_type,
+            business_item: selected.value.business_item,
+            business_registration_code: selected.value.business_registration_code,
+          },
+        };
+      }
     } else {
       if (name === 'transaction_type') {
         console.log('handleSelectChange / transaction_type :', selected);
@@ -145,14 +170,8 @@ const TransactionTaxBillModel = ({transaction, contents}) => {
         [name]: selected.value,
       };
     };
-
     setDataForBill(modifiedData);
-
-    const tempSelectValues = {
-      ...selectValues,
-      [name]: selected,
-    };
-    setSelectValue(tempSelectValues);
+    console.log('handleSelectChange : ', modifiedData);
   }, [dataForBill, selectValues]);
 
   const trans_types = [
@@ -400,7 +419,11 @@ const TransactionTaxBillModel = ({transaction, contents}) => {
         setTransactionContents([]);
     };
 
-  }, [contents, transaction, companyState, loadAllCompanies]);
+  }, [contents, transaction, companyState]);
+
+  useEffect(()=>{
+    console.log('In order to update dataForBill : ', dataForBill);
+  }, [dataForBill]);
 
   return (
     <div
@@ -987,7 +1010,7 @@ const TransactionTaxBillModel = ({transaction, contents}) => {
                   </form>
                 </div>
                 <div className="tab-pane show" id="tax-bill-print">
-                  <TaxBillPrint transaction={transaction} contents={contents}/>
+                  <TaxBillPrint billData={dataForBill} contents={contents}/>
                 </div>
               </div>
             </div>
