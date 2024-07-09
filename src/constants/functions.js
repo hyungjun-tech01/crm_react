@@ -58,7 +58,7 @@ export const formatTime = (date_value) => {
           + ":" + (sec < 10 ? "0" + sec.toString() : sec.toString());
 };
 
-export const ConvertCurrency = (amount, fixed=0) => {
+export const ConvertCurrency = (amount, fixed = 0) => {
     if(amount === undefined || amount === null || amount === '') return "";
 
     let ret = null;
