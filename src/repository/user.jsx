@@ -109,8 +109,7 @@ export const UserRepo = selector({
             }
             catch (err) {
                 console.error(`loadUsers / Error : ${err}`);
-                const loadStates = await snapshot.getPromise(atomUserState);
-                set(atomUserState, (loadStates & ~1));
+                set(atomUserState, 0);
             };
         });
         /////////////////////load Users /////////////////////////////

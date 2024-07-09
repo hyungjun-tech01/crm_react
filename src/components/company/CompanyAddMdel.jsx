@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
 import { defaultCompany } from "../../atoms/atoms";
@@ -16,7 +16,7 @@ import AddAddressItem from '../../constants/AddAddressItem';
 const CompanyAddModel = (props) => {
     const { init, handleInit } = props;
     const { modifyCompany } = useRecoilValue(CompanyRepo);
-    const userState = useRecoilValue(atomUserState);
+    const [userState, setUserState] = useRecoilState(atomUserState);
     const engineersForSelection = useRecoilValue(atomEngineersForSelection);
     const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
     const { loadAllUsers } = useRecoilValue(UserRepo)
@@ -98,10 +98,12 @@ const CompanyAddModel = (props) => {
 
     useEffect(() => {
         console.log('[CompanyAddModel] loading user data!');
-        if((userState & 1) === 0) {
+        if ((userState & 3) === 0) {
+            const tempUserState = userState | (1 << 1); //change it to pending state
+            setUserState(tempUserState);
             loadAllUsers();
         }
-    }, [userState, loadAllUsers ])
+    }, [userState, loadAllUsers, setUserState])
 
     return (
         <div

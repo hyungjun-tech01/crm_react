@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Avatar, Space, Switch } from "antd";
@@ -73,7 +73,7 @@ const LeadDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Users ==========================================
-  const userState = useRecoilValue(atomUserState);
+  const [userState, setUserState] = useRecoilState(atomUserState);
   const { loadAllUsers } = useRecoilValue(UserRepo)
   const engineersForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
@@ -365,9 +365,11 @@ const LeadDetailsModel = () => {
 
   useEffect(() => {
     console.log('[CompanyAddModel] loading user data!');
-    if ((userState & 1) === 0) {
+    if ((userState & 3) === 0) {
+      const tempUserState = userState | (1 << 1); //change it to pending state
+      setUserState(tempUserState);
       loadAllUsers();
-    }
+  }
   }, [userState, loadAllUsers])
 
   return (
