@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
+import ReactDom from 'react-dom';
 import { Input } from 'antd';
 import Select from 'react-select';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { ConvertCurrency } from './functions';
+import { FiSearch } from "react-icons/fi";
+
+import PopupPostCode from "./PostCode";
+
+const PopupDom = ({ children }) => {
+    const el = document.getElementById('popupDom2');
+    return ReactDom.createPortal(children, el);
+};
 
 const DateInput = (props) => {
     const { name, addonBefore, onChange, format, showTime, style, value, disabled } = props;
@@ -120,6 +128,67 @@ const SelectInput = (props) => {
     );
 };
 
+const AddressInput = (props) => {
+    const { addonBefore, title, name, value, disabled, onChange, style, key_zip } = props;
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+    const handleChange = (event) => {
+        const tempInput={
+            [name]: event.target.value
+        };
+        onChange(tempInput);
+    };
+
+    const handleData = (data) =>{
+        const tempInput = {
+            [name]: data.address,
+            [key_zip]: data.zip,
+        };
+        onChange(tempInput);
+    };
+
+    return (
+        <div className="ant-space-item" style={style}>
+            <span className='ant-input-group-wrapper
+                ant-input-group-wrapper-outlined
+                css-dev-only-do-not-override-1uweeqc'
+            >
+                <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-1uweeqc'>
+                    <span className='ant-input-group-addon'>
+                        { addonBefore }
+                    </span>
+                    <input
+                        className="ant-input detail-input-extra"
+                        name={ name }
+                        placeholder={ title }
+                        onChange={ handleChange }
+                        style={{ backgroundColor: 'white', borderTopRightRadius: '5px', borderBottomRightRadius: '5px' }}
+                        value={ value }
+                        disabled={ disabled }
+                    />
+                    <div className="add-basic-btn" onClick={() => {
+                            console.log('Check click!', disabled);
+                            if(!disabled) setIsPopupOpen(!isPopupOpen)
+                        }}
+                    >
+                        <FiSearch />
+                    </div>
+                    <div id="popupDom2">
+                        {isPopupOpen && (
+                            <PopupDom>
+                                <PopupPostCode
+                                    onSetData={handleData}
+                                    onClose={() => setIsPopupOpen(false)}
+                                />
+                            </PopupDom>
+                        )}
+                    </div>
+                </span>
+            </span>
+        </div>
+    );
+}
+
 const DetailCardItem = (props) => {
     const { title, name, defaultValue, groupValue, edited, detail} = props;
     
@@ -152,6 +221,8 @@ const DetailCardItem = (props) => {
         case 'select':
             const group = {key: detail.group, value: (edited && edited[detail.group]) ? edited[detail.group] : groupValue};
             return <SelectInput {...SharedProps} options={detail.options} group={group} onChange={(selected)=>detail.editing(name, selected)} style={{width: widthValue, height: 38}}/>;
+        case 'address':
+            return <AddressInput {...SharedProps} title={title} key_zip={detail.key_zip} onChange={detail.editing} style={{width: widthValue, height: 38}} />
         default:
             return null;
     };

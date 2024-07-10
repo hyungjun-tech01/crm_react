@@ -45,7 +45,6 @@ const CompanyAddModel = (props) => {
             ...companyChange,
             [name]: date
         };
-        console.log(`handleDateChange / ${name} :`, modifiedData);
         setCompanyChange(modifiedData);
     };
 
@@ -54,7 +53,6 @@ const CompanyAddModel = (props) => {
             ...companyChange,
             [e.target.name]: e.target.value,
         };
-        console.log(`handleItemChange / ${e.target.name} :`, modifiedData);
         setCompanyChange(modifiedData);
     };
 
@@ -63,7 +61,6 @@ const CompanyAddModel = (props) => {
             ...companyChange,
             [name]: selected.value,
         };
-        console.log(`handleSelectChange / ${name} :`, modifiedData);
         setCompanyChange(modifiedData);
     };
 

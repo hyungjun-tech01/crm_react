@@ -109,6 +109,15 @@ const CompanyDetailsModel = () => {
     };
   }, [editedDetailValues, selectedCompany]);
 
+  const handleDetailAddressChange = useCallback(obj =>{
+    const tempEdited = {
+      ...editedDetailValues,
+      ...obj,
+    };
+    console.log('handleDetailAddressChange :', tempEdited);
+    setEditedDetailValues(tempEdited);
+  }, [editedDetailValues])
+
   const handleDetailSave = useCallback(() => {
     if(editedDetailValues !== null
       && selectedCompany !== defaultCompany)
@@ -141,9 +150,9 @@ const CompanyDetailsModel = () => {
   }, [setCurrentCompany]);
 
   const company_items_info = [
-    {key:'company_address',title:'common.address',detail:{type:'label',extra:'long',editing:handleDetailChange}},
+    {key:'company_address',title:'common.address',detail:{type:'address',extra:'long',key_zip:'company_zip_code',editing:handleDetailAddressChange}},
     {key:'company_phone_number',title:'common.phone_no',detail:{ type:'label',editing:handleDetailChange}},
-    {key:'company_zip_code',title:'common.zip_code',detail:{ type:'label',editing:handleDetailChange}},
+    {key:'company_zip_code',title:'common.zip_code',detail:{ type:'label',editing:handleDetailChange,disabled:true}},
     {key:'company_fax_number',title:'common.fax_no',detail:{ type:'label',editing:handleDetailChange}},
     {key:'homepage',title:'company.homepage',detail:{ type:'label',editing:handleDetailChange}},
     {key:'company_scale',title:'company.company_scale',detail:{ type:'label',editing:handleDetailChange}},
