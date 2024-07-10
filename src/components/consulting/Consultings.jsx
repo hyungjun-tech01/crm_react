@@ -250,7 +250,7 @@ const Consultings = () => {
                         rowKey={(record) => record.consulting_code}
                         onRow={(record, rowIndex) => {
                           return {
-                            onDoubleClick: (event) => {
+                            onClick: (event) => {
                               console.log("[Consulting] set current consulting : ", record.consulting_code);
                               setCurrentConsulting(record.consulting_code);
                               let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
@@ -277,7 +277,7 @@ const Consultings = () => {
                         rowKey={(record) => record.consulting_code}
                         onRow={(record, rowIndex) => {
                           return {
-                            onDoubleClick: (event) => {
+                            onClick: (event) => {
                               console.log("[Consulting] set current consulting : ", record.consulting_code);
                               setCurrentConsulting(record.consulting_code);
                               let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {

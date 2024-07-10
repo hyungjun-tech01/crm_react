@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
+import * as bootstrap from '../../assets/plugins/bootstrap/js/bootstrap';
 
 import { TransactionRepo } from "../../repository/transaction";
 
@@ -19,6 +20,10 @@ const CompanyTransactionModel = (props) => {
     const handleSelectTransaction = useCallback((value) => {
         console.log('handleSelectTransaction :', value);
         setCurrentTransaction(value.transaction_code);
+        let myModal = new bootstrap.Modal(document.getElementById('add_new_transaction2'), {
+            keyboard: false
+          })
+          myModal.show();
     }, [setCurrentTransaction]);
 
     const transactionRowSelection = {
@@ -42,12 +47,7 @@ const CompanyTransactionModel = (props) => {
         }),
     };
 
-    const columns_purchase = [
-        {
-            title: 'No',
-            dataIndex: 'index',
-            render: (text, record) => <>{record.rowIndex}</>,
-        },
+    const columns_transaction = [
         {
             title: t('company.deal_type'),
             dataIndex: "transaction_type",
@@ -64,8 +64,8 @@ const CompanyTransactionModel = (props) => {
             render: (text, record) => <>{text}</>,
         },
         {
-            title: t('transaction.transaction_content'),
-            dataIndex: "transaction_contents",
+            title: t('transaction.title'),
+            dataIndex: "transaction_title",
             render: (text, record) => <>{text}</>,
         },
         {
@@ -115,9 +115,9 @@ const CompanyTransactionModel = (props) => {
                             }}
                             className="table"
                             style={{ overflowX: "auto" }}
-                            columns={columns_purchase}
+                            columns={columns_transaction}
                             dataSource={transactions}
-                            rowKey={(record) => record.transaction_code}
+                            rowKey={(record) => record.publish_date}
                             onRow={(record, rowIndex) => {
                                 return {
                                     onClick: (event) => {

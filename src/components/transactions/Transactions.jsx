@@ -20,7 +20,7 @@ import { atomAllCompanies,
   atomTransactionState,
 } from "../../atoms/atoms";
 import { compareCompanyName , compareText, ConvertCurrency } from "../../constants/functions";
-import TransactionAddModel2 from "./TransactionAddModel2";
+import TransactionAddModel from "./TransactionAddModel2";
 import TransactionTaxBillModel from "./TransactionTaxBillModel";
 import { useTranslation } from "react-i18next";
 
@@ -217,7 +217,7 @@ const Transactions = () => {
                         rowKey={(record) => record.transaction_code}
                         onRow={(record, rowIndex) => {
                           return {
-                            onDoubleClick: (event) => {
+                            onClick: (event) => {
                               setCurrentTransaction(record.transaction_code)
                               let myModal = new bootstrap.Modal(document.getElementById('transaction-details'), {
                                 keyboard: false
@@ -242,9 +242,9 @@ const Transactions = () => {
                       rowKey={(record) => record.transaction_code}
                       onRow={(record, rowIndex) => {
                         return {
-                          onDoubleClick: (event) => {
+                          onClick: (event) => {
                             setCurrentTransaction(record.transaction_code)
-                            let myModal = new bootstrap.Modal(document.getElementById('transaction-details'), {
+                            let myModal = new bootstrap.Modal(document.getElementById('add_new_transaction2'), {
                               keyboard: false
                             })
                             myModal.show();
@@ -263,8 +263,8 @@ const Transactions = () => {
         {/* modal */}
         <SystemUserModel />
         <CompanyDetailsModel />
-        <TransactionDetailsModel />
-        <TransactionAddModel2 init={initAddNewTransaction} handleInit={setInitAddNewTransaction}/>
+        {/* <TransactionDetailsModel /> */}
+        <TransactionAddModel init={initAddNewTransaction} handleInit={setInitAddNewTransaction}/>
         <TransactionTaxBillModel />
       </div>
     </HelmetProvider>

@@ -283,7 +283,7 @@ const Quotations = () => {
                         rowKey={(record) => record.quotation_code}
                         onRow={(record, rowIndex) => {
                           return {
-                            onDoubleClick: (event) => {
+                            onClick: (event) => {
                               console.log("[Quotation] set current quotation : ", record.quotation_code);
                               setCurrentQuotation(record.quotation_code);
                               let myModal = new bootstrap.Modal(document.getElementById('quotation-details'), {
@@ -310,7 +310,7 @@ const Quotations = () => {
                         rowKey={(record) => record.quotation_code}
                         onRow={(record, rowIndex) => {
                           return {
-                            onDoubleClick: (event) => {
+                            onClick: (event) => {
                               console.log("[Quotation] set current quotation : ", record.quotation_codecode);
                               setCurrentQuotation(record.quotation_codecode);
                               let myModal = new bootstrap.Modal(document.getElementById('quotation-details'), {

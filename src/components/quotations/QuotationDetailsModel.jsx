@@ -52,7 +52,7 @@ const QuotationDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Users ============================================
-  const userState = useRecoilValue(atomUserState);
+  const [userState, setUserState] = useRecoilState(atomUserState);
   const { loadAllUsers } = useRecoilValue(UserRepo)
   const usersForSelection = useRecoilValue(atomUsersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
@@ -438,7 +438,9 @@ const QuotationDetailsModel = () => {
   }, [selectedQuotation, editedDetailValues, currentQuotationCode, quotationState]);
 
   useEffect(() => {
-    if ((userState & 1) === 0) {
+    if ((userState & 3) === 0) {
+      const tempUserState = userState | (1 << 1); //change it to pending state
+      setUserState(tempUserState);
       loadAllUsers();
     }
   }, [loadAllUsers, userState]);

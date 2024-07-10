@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "react-datepicker/dist/react-datepicker.css";
@@ -42,8 +42,8 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
   const { loadAllLeads } = useRecoilValue(LeadRepo);
 
 
-  //===== [RecoilState] Related with Users ==========================================
-  const userState = useRecoilValue(atomUserState);
+  //===== [RecoilState] Related with Users ============================================
+  const [userState, setUserState] = useRecoilState(atomUserState);
   const { loadAllUsers } = useRecoilValue(UserRepo)
   const usersForSelection = useRecoilValue(atomUsersForSelection);
   const engineersForSelection = useRecoilValue(atomEngineersForSelection);
@@ -152,7 +152,9 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
   }, [leadsState, loadAllLeads]);
 
   useEffect(() => {
-    if ((userState & 1) === 0) {
+    if ((userState & 3) === 0) {
+      const tempUserState = userState | (1 << 1); //change it to pending state
+      setUserState(tempUserState);
       loadAllUsers();
     } else {
       if (init) {

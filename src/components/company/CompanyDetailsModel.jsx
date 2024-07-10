@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
@@ -15,15 +15,18 @@ import {
   atomAllTransactions,
   atomTransactionState,
 } from "../../atoms/atoms";
+import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from "../../atoms/atomsUser";
 import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
 import { PurchaseRepo } from "../../repository/purchase";
 import { MAContractRepo } from "../../repository/ma_contract";
+import { UserRepo } from '../../repository/user';
 
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import CompanyPurchaseModel from "./CompanyPurchaseModel";
 import CompanyTransactionModel from "./CompanyTransactionModel";
+import TransactionAddModel from "../transactions/TransactionAddModel2";
 
 const CompanyDetailsModel = () => {
   const { t } = useTranslation();
@@ -45,6 +48,13 @@ const CompanyDetailsModel = () => {
   const transactionState = useRecoilValue(atomTransactionState);
   const allTransactions = useRecoilValue(atomAllTransactions);
   const { loadAllTransactions } = useRecoilValue(TransactionRepo);
+
+
+  //===== [RecoilState] Related with Users ============================================
+  const [userState, setUserState] = useRecoilState(atomUserState);
+  const { loadAllUsers } = useRecoilValue(UserRepo)
+  const engineerForSelection = useRecoilValue(atomEngineersForSelection);
+  const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
 
   //===== Handles to deal this component ==============================================
@@ -100,6 +110,15 @@ const CompanyDetailsModel = () => {
     };
   }, [editedDetailValues, selectedCompany]);
 
+  const handleDetailAddressChange = useCallback(obj =>{
+    const tempEdited = {
+      ...editedDetailValues,
+      ...obj,
+    };
+    console.log('handleDetailAddressChange :', tempEdited);
+    setEditedDetailValues(tempEdited);
+  }, [editedDetailValues])
+
   const handleDetailSave = useCallback(() => {
     if(editedDetailValues !== null
       && selectedCompany !== defaultCompany)
@@ -132,9 +151,9 @@ const CompanyDetailsModel = () => {
   }, [setCurrentCompany]);
 
   const company_items_info = [
-    {key:'company_address',title:'common.address',detail:{type:'label',extra:'long',editing:handleDetailChange}},
+    {key:'company_address',title:'common.address',detail:{type:'address',extra:'long',key_zip:'company_zip_code',editing:handleDetailAddressChange}},
     {key:'company_phone_number',title:'common.phone_no',detail:{ type:'label',editing:handleDetailChange}},
-    {key:'company_zip_code',title:'common.zip_code',detail:{ type:'label',editing:handleDetailChange}},
+    {key:'company_zip_code',title:'common.zip_code',detail:{ type:'label',editing:handleDetailChange,disabled:true}},
     {key:'company_fax_number',title:'common.fax_no',detail:{ type:'label',editing:handleDetailChange}},
     {key:'homepage',title:'company.homepage',detail:{ type:'label',editing:handleDetailChange}},
     {key:'company_scale',title:'company.company_scale',detail:{ type:'label',editing:handleDetailChange}},
@@ -147,8 +166,8 @@ const CompanyDetailsModel = () => {
     {key:'account_code',title:'company.account_code',detail:{ type:'label',editing:handleDetailChange}},
     {key:'bank_name',title:'company.bank_name',detail:{ type:'label',editing:handleDetailChange}},
     {key:'account_owner',title:'company.account_owner',detail:{ type:'label',editing:handleDetailChange}},
-    {key:'sales_resource',title:'company.salesman',detail:{ type:'label',editing:handleDetailChange}},
-    {key:'application_engineer',title:'company.engineer',detail:{ type:'label',editing:handleDetailChange}},
+    {key:'sales_resource',title:'company.salesman',detail:{ type:'select',options:salespersonsForSelection,editing:handleDetailSelectChange}},
+    {key:'application_engineer',title:'company.engineer',detail:{ type:'select',options:engineerForSelection, editing:handleDetailSelectChange}},
     {key:'region',title:'common.region',detail: { type:'select', options: option_locations.ko,editing:handleDetailSelectChange}},
     {key:'memo',title:'common.memo',detail:{ type:'textarea', extra:'long',editing:handleDetailChange}},
   ];
@@ -214,6 +233,15 @@ const CompanyDetailsModel = () => {
     }
   }, [transactionState, allTransactions, loadAllTransactions, transactionByCompany.length, selectedCompany.company_name]);
 
+
+  //===== useEffect for User ==========================================================
+  useEffect(() => {
+    if ((userState & 3) === 0) {
+      const tempUserState = userState | (1 << 1); //change it to pending state
+      setUserState(tempUserState);
+      loadAllUsers();
+    }
+  }, [loadAllUsers, userState]);
   
   return (
     <div
@@ -369,6 +397,7 @@ const CompanyDetailsModel = () => {
           </div>
         </div>
         {/* modal-content */}
+        <TransactionAddModel init={false} handleInit={null}/>
       </div>
     </div>
   );

@@ -599,7 +599,7 @@ const CompanyPurchaseModel = (props) => {
                                 }
                                 onRow={(record, rowIndex) => {
                                     return {
-                                        onDoubleClick: (event) => {
+                                        onClick: (event) => {
                                             setSelectedPurchaseRowKeys([record.purchase_code]);
                                             handleSelectPurchase(record);
                                             setSelectedContractRowKeys([]);   //initialize the selected list about contract

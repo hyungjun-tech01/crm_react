@@ -17,9 +17,9 @@ import {
   atomCompanyForSelection,
 } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
-import { DefaultTransactionContent, TransactionRepo } from "../../repository/transaction";
+import { TransactionRepo } from "../../repository/transaction";
 
-import { ConvertCurrency, formatDate } from "../../constants/functions";
+import { ConvertCurrency } from "../../constants/functions";
 import MessageModal from "../../constants/MessageModal";
 import TaxBillPrint from "./TaxBillPrint";
 
@@ -66,7 +66,7 @@ const default_bill_data = {
 };
 
 
-const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
+const TransactionTaxBillModel = ({transaction, contents}) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -99,7 +99,7 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
       ...dataForBill,
       [e.target.name]: e.target.value,
     };
-    setTransactionChange(modifiedData);
+    setDataForBill(modifiedData);
   }, [dataForBill]);
 
   const handleDateChange = useCallback((name, date) => {
@@ -108,22 +108,47 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
       [name]: date
     };
     console.log('[handleDateChange] : ', modifiedData);
-    setTransactionChange(modifiedData);
+    setDataForBill(modifiedData);
   }, [dataForBill]);
 
   const handleSelectChange = useCallback((name, selected) => {
+    // set data for selection ------------------------------
+    const tempSelectValues = {
+      ...selectValues,
+      [name]: selected,
+    };
+    setSelectValue(tempSelectValues);
+
+    // set changed data ------------------------------------
     let modifiedData = null;
     if (name === 'company_name') {
-      modifiedData = {
-        ...dataForBill,
-        company_code: selected.value.company_code,
-        company_name: selected.value.company_name,
-        company_address: selected.value.company_address,
-        ceo_name: selected.value.ceo_name,
-        business_type: selected.value.business_type,
-        business_item: selected.value.business_item,
-        business_registration_code: selected.value.business_registration_code,
-      };
+      if(isSale){
+        modifiedData = {
+          ...dataForBill,
+          receiver: {
+            company_code: selected.value.company_code,
+            company_name: selected.value.company_name,
+            company_address: selected.value.company_address,
+            ceo_name: selected.value.ceo_name,
+            business_type: selected.value.business_type,
+            business_item: selected.value.business_item,
+            business_registration_code: selected.value.business_registration_code,
+          },
+        };
+      } else {
+        modifiedData = {
+          ...dataForBill,
+          supplier: {
+            company_code: selected.value.company_code,
+            company_name: selected.value.company_name,
+            company_address: selected.value.company_address,
+            ceo_name: selected.value.ceo_name,
+            business_type: selected.value.business_type,
+            business_item: selected.value.business_item,
+            business_registration_code: selected.value.business_registration_code,
+          },
+        };
+      }
     } else {
       if (name === 'transaction_type') {
         console.log('handleSelectChange / transaction_type :', selected);
@@ -145,14 +170,8 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
         [name]: selected.value,
       };
     };
-
     setDataForBill(modifiedData);
-
-    const tempSelectValues = {
-      ...selectValues,
-      [name]: selected,
-    };
-    setSelectValue(tempSelectValues);
+    console.log('handleSelectChange : ', modifiedData);
   }, [dataForBill, selectValues]);
 
   const trans_types = [
@@ -315,7 +334,7 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
         // dataForBill ------------------------------
         const selectedCompany = companyForSelection.filter(item=> item.label === transaction.company_name);
         const tempSelectValues = {
-          trans_type: is_sale? trans_types[0] : trans_types[1],
+          trans_type: transaction.is_sale? trans_types[0] : trans_types[1],
           bill_type: transaction.vat_included? bill_types[0] : bill_types[1],
           request_type: request_type[0],
           company_name: selectedCompany[0],
@@ -325,7 +344,7 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
 
         let tempBillData = {
           ...default_bill_data,
-          trans_type: is_sale?'매출':'매입',
+          trans_type: transaction.is_sale?'매출':'매입',
           bill_type: transaction.vat_included?'세금계산서':'계산서',
           show_decimal: transaction.show_decimal,
           request_type: '청구',
@@ -335,9 +354,10 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
           total_amount: transaction.total_price,
         };
 
+        setIsTaxBill(transaction.vat_included);
         // IsSale ------------------------------------
-        setIsSale(is_sale);
-        if(is_sale) {
+        setIsSale(transaction.is_sale);
+        if(transaction.is_sale) {
           tempBillData.supplier = {...company_info};
           tempBillData.receiver = {
             business_registration_code: transaction.business_registration_code,
@@ -399,7 +419,11 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
         setTransactionContents([]);
     };
 
-  }, [contents, is_sale, transaction, companyState, loadAllCompanies]);
+  }, [contents, transaction, companyState]);
+
+  useEffect(()=>{
+    console.log('In order to update dataForBill : ', dataForBill);
+  }, [dataForBill]);
 
   return (
     <div
@@ -478,7 +502,9 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
                             options={bill_types}
                           />
                         </div>
-                        <div style={{ paddingRight: '0.5rem' }}><Checkbox onChange={handleShowDecimal}/></div>
+                        <div style={{ paddingRight: '0.5rem' }}>
+                          <Checkbox defaultValue={dataForBill.show_decimal} onChange={handleShowDecimal}/>
+                        </div>
                         <div>{t('quotation.show_decimal')}</div>
                       </div>
                       <div className={classNames(styles.billRow, { 'trans_pur': !isSale })}>
@@ -893,7 +919,7 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
                           rowKey={(record) => record.transaction_sub_index}
                           onRow={(record, rowIndex) => {
                             return {
-                              onDoubleClick: (event) => {
+                              onClick: (event) => {
                                 console.log('Double Click / Edit - ', record);
                                 handleStartEditContent(record);
                               }, // click row
@@ -984,7 +1010,7 @@ const TransactionTaxBillModel = ({is_sale, transaction, contents}) => {
                   </form>
                 </div>
                 <div className="tab-pane show" id="tax-bill-print">
-                  <TaxBillPrint transaction={transaction} contents={contents}/>
+                  <TaxBillPrint billData={dataForBill} contents={contents}/>
                 </div>
               </div>
             </div>
