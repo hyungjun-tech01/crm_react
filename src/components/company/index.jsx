@@ -13,7 +13,6 @@ import { compareCompanyName, compareText } from "../../constants/functions";
 import CompanyAddModel from "./CompanyAddMdel";
 import CompanyDetailsModel from "./CompanyDetailsModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
-import { formatDate } from "../../constants/functions";
 import { companyColumn } from "../../repository/company";
 
 // import { MoreVert } from '@mui/icons-material';
@@ -27,11 +26,12 @@ const Company = () => {
   const filteredCompany = useRecoilValue(atomFilteredCompany);
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
-  const [multiQueryModal, setMultiQueryModal] = useState(false);
+  
   const { t } = useTranslation();
   const [ initToAddCompany, setInitToAddCompany ] = useState(false);
-  const [multiQueryString, setMultiQueryString] = useState("");
 
+  const [multiQueryModal, setMultiQueryModal] = useState(false);
+  
   const [queryConditions, setQueryConditions] = useState([
     { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
     { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },

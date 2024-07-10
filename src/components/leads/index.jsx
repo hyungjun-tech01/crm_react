@@ -20,6 +20,8 @@ import {
   atomLeadState,
 } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
+import MultiQueryModal from "../../constants/MultiQueryModal";
+import { leadColumn } from "../../repository/lead";
 import { useTranslation } from "react-i18next";
 import LeadAddModel from "./LeadAddMdel";
 
@@ -41,6 +43,82 @@ const Leads = () => {
 
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
+
+  const [multiQueryModal, setMultiQueryModal] = useState(false);
+
+  const [queryConditions, setQueryConditions] = useState([
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+  ]);
+
+  const today = new Date();
+  const oneMonthAgo = new Date();
+  oneMonthAgo.setMonth(today.getMonth() - 1);
+
+  // from date + to date picking 만들기 
+
+  const initialState = {
+    registration_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
+  }
+
+  const [dates, setDates] = useState(initialState);
+
+  const dateRangeSettings = [
+    { label: t('purchase.registration_date'), stateKey: 'registration_date', checked: false },
+  ];
+
+    // from date date 1개짜리 picking 만들기 
+    const initialSingleDate = {
+      ma_finish_date: { fromDate: oneMonthAgo,  checked: false },  
+    };
+  
+    const [singleDate, setSingleDate] = useState(initialSingleDate);
+  
+    const singleDateSettings = [
+      { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
+    ];
+
+  const handleMultiQueryModal = () => {
+    setMultiQueryModal(true);
+  }
+  const handleMultiQueryModalOk = () => {
+
+    setCompanyState(0);
+    setMultiQueryModal(false);
+
+    // query condition 세팅 후 query
+    console.log("queryConditions", queryConditions);
+    
+    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+        label: key,
+        fromDate: dates[key].fromDate,
+        toDate: dates[key].toDate,
+        checked: dates[key].checked,
+    }));
+
+
+    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+      label: key,
+      fromDate: dates[key].fromDate,
+      checked: dates[key].checked,
+    }));
+    
+    const multiQueryCondi = {
+      queryConditions:queryConditions,
+      checkedDates:checkedDates,
+      singleDate:checkedSingleDates
+    }
+
+     // loadAllCompanies(multiQueryCondi);
+
+     
+  };
+  const handleMultiQueryModalCancel = () => {
+    setMultiQueryModal(false);
+  };
+
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
@@ -257,6 +335,15 @@ const Leads = () => {
                       onChange ={(e) => handleSearchCondition(e.target.value)}
                 />  
               </div>
+              <div className="col text-start" style={{margin:'0px 20px 5px 20px'}}>
+                  <button
+                      className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
+                      id="multi-company-query"
+                      onClick={handleMultiQueryModal}
+                  >
+                      {t('company.company_multi_query')}
+                  </button>                
+              </div>
 
               <div className="col text-end">
                 <ul className="list-inline-item pl-0">
@@ -432,6 +519,23 @@ const Leads = () => {
         </div>
         <LeadAddModel init={initToAddLead} handleInit={setInitToAddLead} />
         <LeadDetailsModel />
+        <MultiQueryModal 
+          title= {t('lead.lead_multi_query')}
+          open={multiQueryModal}
+          handleOk={handleMultiQueryModalOk}
+          handleCancel={handleMultiQueryModalCancel}
+          companyColumn={leadColumn}
+          queryConditions={queryConditions}
+          setQueryConditions={setQueryConditions}
+          dates={dates}
+          setDates={setDates}
+          dateRangeSettings={dateRangeSettings}
+          initialState={initialState}
+          singleDate={singleDate}
+          setSingleDate={setSingleDate}
+          singleDateSettings={singleDateSettings}
+          initialSingleDate={initialSingleDate}
+        />        
       </div>
     </HelmetProvider>
   );
