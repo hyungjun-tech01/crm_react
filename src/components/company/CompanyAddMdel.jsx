@@ -45,6 +45,7 @@ const CompanyAddModel = (props) => {
             ...companyChange,
             [name]: date
         };
+        console.log(`handleDateChange / ${name} :`, modifiedData);
         setCompanyChange(modifiedData);
     };
 
@@ -53,6 +54,7 @@ const CompanyAddModel = (props) => {
             ...companyChange,
             [e.target.name]: e.target.value,
         };
+        console.log(`handleItemChange / ${e.target.name} :`, modifiedData);
         setCompanyChange(modifiedData);
     };
 
@@ -61,7 +63,7 @@ const CompanyAddModel = (props) => {
             ...companyChange,
             [name]: selected.value,
         };
-
+        console.log(`handleSelectChange / ${name} :`, modifiedData);
         setCompanyChange(modifiedData);
     };
 
@@ -84,10 +86,15 @@ const CompanyAddModel = (props) => {
         };
         console.log(`[ handleAddNewCompany ]`, newComData);
         const result = modifyCompany(newComData);
-        if (result) {
-            initializeCompanyTemplate();
-            //close modal ?
-        };
+        result.then(res => {
+            if(res) {
+                initializeCompanyTemplate();
+            } else {
+                const tempMsg = {title: '확인', message: `저장하지 못했습니다.\n-오류 이유 : ${res}`};
+                setMessage(tempMsg);
+                setIsMessageModalOpen(true);
+            }
+        });
     }, [companyChange, cookies.myLationCrmUserId, initializeCompanyTemplate, modifyCompany]);
 
 

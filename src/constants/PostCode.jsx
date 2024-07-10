@@ -1,10 +1,8 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import DaumPostcode from "react-daum-postcode";
  
 const PopupPostCode = (props) => {
-    const { onSetAddress, onSetPostCode, onClose } = props;
-    const { t } = useTranslation();
+    const { onSetData, onClose } = props;
 	// 우편번호 검색 후 주소 클릭 시 실행될 함수, data callback 용
     const handlePostCode = (data) => {
         console.log('\thandlePostCode called~~~~~');
@@ -21,8 +19,7 @@ const PopupPostCode = (props) => {
           fullAddress += (extraAddress !== '' ? ` (${extraAddress})` : '');
         }
         // console.log(data)
-        onSetAddress(fullAddress);
-        onSetPostCode(data.zonecode);
+        onSetData({address:fullAddress, zip: data.zonecode});
         onClose();
     }
  

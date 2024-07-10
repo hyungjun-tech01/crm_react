@@ -22,23 +22,15 @@ const AddAddressItem = (props) => {
         setEdited(modifiedData);
     };
 
-    const handleSetAddress = (address) => {
+    const handleData = (data) =>{
         const modifiedData = {
             ...edited,
-            [key_address]: address,
+            [key_address]: data.address,
+            [key_zip]: data.zip,
         };
-        console.log('AddAddressItem / handleSetAddress :', modifiedData);
+        console.log('AddAddressItem / handleData :', modifiedData);
         setEdited(modifiedData);
-        document.getElementById('add_adress_input').value = address;
-    };
-
-    const handleSetZipCode = (zip_code) => {
-        const modifiedData = {
-            ...edited,
-            [key_zip]: zip_code,
-        };
-        setEdited(modifiedData);
-    };
+    }
 
     return (
         <div className={ long ? "col-sm-12" : "col-sm-6"} >
@@ -62,8 +54,7 @@ const AddAddressItem = (props) => {
                     {isPopupOpen && (
                         <PopupDom>
                             <PopupPostCode
-                                onSetAddress={handleSetAddress}
-                                onSetPostCode={handleSetZipCode}
+                                onSetData={handleData}
                                 onClose={() => setIsPopupOpen(false)}
                             />
                         </PopupDom>
