@@ -26,6 +26,7 @@ import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import CompanyPurchaseModel from "./CompanyPurchaseModel";
 import CompanyTransactionModel from "./CompanyTransactionModel";
+import TransactionAddModel from "../transactions/TransactionAddModel2";
 
 const CompanyDetailsModel = () => {
   const { t } = useTranslation();
@@ -396,6 +397,7 @@ const CompanyDetailsModel = () => {
           </div>
         </div>
         {/* modal-content */}
+        <TransactionAddModel init={false} handleInit={null}/>
       </div>
     </div>
   );

@@ -42,9 +42,6 @@ export const CompanyRepo = selector({
 
             if((loadStates & 1) === 0 && (loadStates & (1 << 1)) === 0){
                 try{
-                    console.log('[CompanyRepository] Try loading all');
-                    set(atomCompanyState, (loadStates | (1 << 1)));
-                    
                     //const response = await fetch(`${BASE_PATH}/companies`);
                     const response = await fetch(`${BASE_PATH}/companies`, {
                         method: "POST",
@@ -52,14 +49,12 @@ export const CompanyRepo = selector({
                         body: input_json,
                     });
     
-
                     const data = await response.json();
-                    set(atomCompanyState, (loadStates & ~(1 << 1)));
                     if(data.message){
                         console.log('\t[ loadAllCompanies ] message:', data.message);
                         set(atomAllCompanies, []);
                         set(atomCompanyForSelection, []);
-                        set(atomCompanyState, (loadStates & ~1));
+                        set(atomCompanyState, 0);
                         return;
                     }
                     set(atomAllCompanies, data);
@@ -85,9 +80,7 @@ export const CompanyRepo = selector({
                     console.error(`\t[ loadAllCompanies ] Error : ${err}`);
                     set(atomAllCompanies, []);
                     set(atomCompanyForSelection, []);
-
-                    const loadStates = await snapshot.getPromise(atomCompanyState);
-                    set(atomCompanyState, (loadStates & ~3));
+                    set(atomCompanyState, 0);
                 };
             };
         });

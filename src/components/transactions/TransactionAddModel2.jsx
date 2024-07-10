@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
@@ -14,6 +14,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import {
   atomCompanyState,
   atomCompanyForSelection,
+  atomCurrentTransaction,
   defaultTransaction,
 } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
@@ -52,17 +53,18 @@ const TransactionAddModel = (props) => {
 
 
   //===== [RecoilState] Related with Transaction =====================================
-  const { modifyTransaction } = useRecoilValue(TransactionRepo);
+  const currentTransaction = useRecoilValue(atomCurrentTransaction);
+  const { modifyTransaction, setCurrentTransaction } = useRecoilValue(TransactionRepo);
 
 
   //===== [RecoilState] Related with Company =========================================
-  const companyState = useRecoilValue(atomCompanyState);
+  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
   //===== Handles to edit 'TransactionAddModel' ======================================
-  const [transactionChange, setTransactionChange] = useState({});
+  const [transactionChange, setTransactionChange] = useState(null);
   const [transactionContents, setTransactionContents] = useState([]);
   const [isSale, setIsSale] = useState(true);
   const [isVatIncluded, setIsVatIncluded] = useState(true);
@@ -455,6 +457,7 @@ const TransactionAddModel = (props) => {
     setTransactionContents([]);
     setOrgReceiptModalData({});
     setEditedReceiptModalData({});
+    setCurrentTransaction(defaultTransaction);
   };
 
   const handleShowPrint = () => {
@@ -538,26 +541,36 @@ const TransactionAddModel = (props) => {
     handleInitialize();
 
     document.querySelector("#add_new_transaction_form").reset();
-
-    handleInit(!init);
+    if(handleInit) {
+      handleInit(!init);
+    }
   }, [handleInit, init]);
 
   //===== useEffect ==============================================================
   useEffect(() => {
     console.log('Company called!');
-    if ((companyState & 1) === 0) {
+    if ((companyState & 3) === 0) {
+      setCompanyState(2);   //pending state
       loadAllCompanies();
     };
-  }, [companyState, loadAllCompanies]);
+  }, [companyState, loadAllCompanies, setCompanyState]);
 
   useEffect(() => {
-    console.log('[TransactionAddModel] called!');
     if (init) {
+      console.log('[TransactionAddModel] called to add new~~!');
       initializeTransactionTemplate();
       handleInit(!init);
+    } else {
+      console.log('[TransactionAddModel] called to modify the current ~~!');
+      if(currentTransaction !== defaultTransaction){
+        setTransactionChange({...currentTransaction});
+        const currentContents = JSON.parse(currentTransaction.transaction_contents);
+        setTransactionContents(currentContents);
+      };
     };
-  }, [handleInit, init, initializeTransactionTemplate, isSale]);
+  }, [handleInit, init, initializeTransactionTemplate, currentTransaction]);
 
+  if(!transactionChange) return null;
 
   return (
     <div

@@ -125,7 +125,7 @@ import ForgotPassword from "./components/forgotpassword";
 // sample 
 import Sample from "./components/sample";
 
-import "./assets/js/bootstrap.bundle.js";
+// import "./assets/js/bootstrap.bundle.js";
 import "./assets/js/jquery.slimscroll.min.js";
 import "./assets/js/theme-settings.js";
 import "./assets/js/app.js";
