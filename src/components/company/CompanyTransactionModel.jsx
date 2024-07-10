@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
-import * as bootstrap from '../../assets/plugins/bootstrap/js/bootstrap';
+import * as bootstrap from '../../assets/js/bootstrap';
 
 import { TransactionRepo } from "../../repository/transaction";
 
@@ -18,12 +18,13 @@ const CompanyTransactionModel = (props) => {
     const [selectedTransactionRowKeys, setSelectedTransactionRowKeys] = useState([]);
 
     const handleSelectTransaction = useCallback((value) => {
-        console.log('handleSelectTransaction :', value);
         setCurrentTransaction(value.transaction_code);
         let myModal = new bootstrap.Modal(document.getElementById('add_new_transaction2'), {
             keyboard: false
-          })
-          myModal.show();
+        });
+        setTimeout(() => {
+            myModal.show();
+        }, 2000);
     }, [setCurrentTransaction]);
 
     const transactionRowSelection = {

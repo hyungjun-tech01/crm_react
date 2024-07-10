@@ -3,7 +3,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
+import * as bootstrap from '../../assets/js/bootstrap';
 import "antd/dist/reset.css";
 import { Button, Checkbox, Col, Input, InputNumber, Row, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
@@ -70,6 +70,7 @@ const TransactionAddModel = (props) => {
   const [isVatIncluded, setIsVatIncluded] = useState(true);
   const [showDecimal, setShowDecimal] = useState(false);
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
+  const [selectData, setSelectData] = useState({});
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
@@ -458,6 +459,7 @@ const TransactionAddModel = (props) => {
     setOrgReceiptModalData({});
     setEditedReceiptModalData({});
     setCurrentTransaction(defaultTransaction);
+    setSelectData({trans_type: trans_types[0], tax_type: 'vat_included', company_selection: null});
   };
 
   const handleShowPrint = () => {
@@ -527,7 +529,11 @@ const TransactionAddModel = (props) => {
 
   const handleIssueTransaction = () => {
     // Save this transactions -------------------------
-    handleSaveNewTransaction('TaxBill');
+    if(currentTransaction === defaultTransaction) {
+      handleSaveNewTransaction('TaxBill');
+    } else {
+      handleShowTaxBill();
+    }
   };
 
   const handleShowDecimal = (e) => {
@@ -563,9 +569,24 @@ const TransactionAddModel = (props) => {
     } else {
       console.log('[TransactionAddModel] called to modify the current ~~!');
       if(currentTransaction !== defaultTransaction){
-        setTransactionChange({...currentTransaction});
+        const tempTransaction = {
+          ...currentTransaction,
+          publish_date: new Date(currentTransaction.publish_date),
+        }
+        setTransactionChange(tempTransaction);
+
         const currentContents = JSON.parse(currentTransaction.transaction_contents);
         setTransactionContents(currentContents);
+
+        const tempCurrentCompany = companyForSelection.filter(item => item.value.company_code === currentTransaction.company_code);
+        const tempData = {
+          trans_type: (currentTransaction.business_type === '매출' || currentTransaction.business_type === 'sale')
+            ? trans_types[0] : trans_types[1],
+          tax_type: currentTransaction.tax_price && currentTransaction.tax_price > 0 ? 'vat_included' : 'vat_excluded',
+          company_selection: tempCurrentCompany.length > 0 ? tempCurrentCompany[0]: null,
+        }
+        setSelectData(tempData);
+
       };
     };
   }, [handleInit, init, initializeTransactionTemplate, currentTransaction]);
@@ -624,7 +645,7 @@ const TransactionAddModel = (props) => {
                           <Col>
                             <Select
                               className="trans_select"
-                              defaultValue='매출'
+                              defaultValue={selectData.trans_type}
                               onChange={selected => handleSelectChange('transaction_type', selected)}
                               options={trans_types}
                             />
@@ -635,7 +656,7 @@ const TransactionAddModel = (props) => {
                           <Col>
                             <Select
                               className="trans_select"
-                              defaultValue={null}
+                              defaultValue={selectData.company_selection}
                               onChange={selected => handleSelectChange('company_name', selected)}
                               options={companyForSelection}
                             />
@@ -734,7 +755,7 @@ const TransactionAddModel = (props) => {
                       <select
                         name='vat_type'
                         onChange={handleVATChange}
-                        defaultValue={isVatIncluded ? 'vat_included' : 'vat_exlcuded'}
+                        defaultValue={selectData.tax_type}
                       >
                         <option value='vat_excluded'>{t('quotation.vat_excluded')}</option>
                         <option value='vat_included'>{t('quotation.vat_included')}</option>

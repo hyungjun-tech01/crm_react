@@ -40,7 +40,7 @@ export const CompanyRepo = selector({
             const loadStates = await snapshot.getPromise(atomCompanyState);
             const input_json = JSON.stringify(multiQueryCondi);
 
-            if((loadStates & 1) === 0 && (loadStates & (1 << 1)) === 0){
+            if((loadStates & 1) === 0){
                 try{
                     //const response = await fetch(`${BASE_PATH}/companies`);
                     const response = await fetch(`${BASE_PATH}/companies`, {

@@ -96,8 +96,8 @@ const CompanyAddModel = (props) => {
 
 
     useEffect(() => {
-        console.log('[CompanyAddModel] called!');
         if (init) {
+            console.log('[CompanyAddModel] initialzie!');
             initializeCompanyTemplate();
             handleInit(!init);
         }
@@ -106,8 +106,7 @@ const CompanyAddModel = (props) => {
     useEffect(() => {
         console.log('[CompanyAddModel] loading user data!');
         if ((userState & 3) === 0) {
-            const tempUserState = userState | (1 << 1); //change it to pending state
-            setUserState(tempUserState);
+            setUserState(2);    //pending
             loadAllUsers();
         };
     }, [userState, loadAllUsers, setUserState]);

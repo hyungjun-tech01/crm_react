@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
+import * as bootstrap from '../../assets/js/bootstrap';
 import { Table } from "antd";
 import "antd/dist/reset.css";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
@@ -219,7 +219,7 @@ const Transactions = () => {
                           return {
                             onClick: (event) => {
                               setCurrentTransaction(record.transaction_code)
-                              let myModal = new bootstrap.Modal(document.getElementById('transaction-details'), {
+                              let myModal = new bootstrap.Modal(document.getElementById('add_new_transaction2'), {
                                 keyboard: false
                               })
                               myModal.show();

@@ -3,7 +3,7 @@ import { useRecoilValue, useRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { useTranslation } from "react-i18next";
-import * as bootstrap from "../../assets/plugins/bootstrap/js/bootstrap";
+import * as bootstrap from '../../assets/js/bootstrap';
 
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { CompanyRepo } from "../../repository/company";
@@ -26,12 +26,12 @@ const Company = () => {
   const filteredCompany = useRecoilValue(atomFilteredCompany);
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
-  
+
   const { t } = useTranslation();
-  const [ initToAddCompany, setInitToAddCompany ] = useState(false);
+  const [initToAddCompany, setInitToAddCompany] = useState(false);
 
   const [multiQueryModal, setMultiQueryModal] = useState(false);
-  
+
   const [queryConditions, setQueryConditions] = useState([
     { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
     { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
@@ -64,7 +64,7 @@ const Company = () => {
 
   // from date date 1개짜리 picking 만들기 
   const initialSingleDate = {
-    ma_finish_date: { fromDate: oneMonthAgo,  checked: false },  
+    ma_finish_date: { fromDate: oneMonthAgo, checked: false },
   };
 
   const [singleDate, setSingleDate] = useState(initialSingleDate);
@@ -84,12 +84,12 @@ const Company = () => {
 
     // query condition 세팅 후 query
     console.log("queryConditions", queryConditions);
-    
+
     const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
-        label: key,
-        fromDate: dates[key].fromDate,
-        toDate: dates[key].toDate,
-        checked: dates[key].checked,
+      label: key,
+      fromDate: dates[key].fromDate,
+      toDate: dates[key].toDate,
+      checked: dates[key].checked,
     }));
 
     console.log("checkedDates", checkedDates);
@@ -101,31 +101,35 @@ const Company = () => {
     }));
 
     const multiQueryCondi = {
-      queryConditions:queryConditions,
-      checkedDates:checkedDates,
-      singleDate:checkedSingleDates
+      queryConditions: queryConditions,
+      checkedDates: checkedDates,
+      singleDate: checkedSingleDates
     }
 
-      loadAllCompanies(multiQueryCondi);
+    loadAllCompanies(multiQueryCondi);
 
-     
+
   };
   const handleMultiQueryModalCancel = () => {
     setMultiQueryModal(false);
   };
 
 
-  const handleSearchCondition =  (newValue)=> {
+  const handleSearchCondition = (newValue) => {
     setSearchCondition(newValue);
     console.log('handle search', newValue);
     filterCompanies(statusSearch, newValue);
   };
 
   // --- Functions used for Table ------------------------------
-  const handleClickCompanyName = useCallback((id)=>{
+  const handleClickCompanyName = useCallback((id) => {
     console.log('[Company] set current company : ', id);
     setCurrentCompany(id);
-  },[setCurrentCompany]);
+    let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
+      keyboard: false
+    });
+    myModal.show();
+  }, [setCurrentCompany]);
 
   const columns = [
     {
@@ -136,7 +140,7 @@ const Company = () => {
           <a href="#" className="person-circle-a person-circle">
             {text.charAt(0)}
           </a>
-          <a href="#" data-bs-toggle="modal" data-bs-target="#company-details" onClick={()=>{handleClickCompanyName(record.company_code);}}>
+          <a href="#" onClick={() => { handleClickCompanyName(record.company_code); }}>
             {text}
           </a>
         </>
@@ -153,7 +157,7 @@ const Company = () => {
       title: t('company.address'),
       dataIndex: "company_address",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => compareText(a.company_address , b.company_address),
+      sorter: (a, b) => compareText(a.company_address, b.company_address),
     },
     {
       title: t('company.salesman'),
@@ -173,14 +177,14 @@ const Company = () => {
     setInitToAddCompany(true);
   }, [setInitToAddCompany]);
 
-  useEffect(() => {   
+  useEffect(() => {
     console.log('Company called!');
-    if((companyState & 1) === 0) {
-
+    if ((companyState & 3) === 0) {
+      setCompanyState(2);
       const multiQueryCondi = {
-        queryConditions:null,
-        checkedDates:null,
-        singleDate:null
+        queryConditions: null,
+        checkedDates: null,
+        singleDate: null
       }
       loadAllCompanies(multiQueryCondi);
     };
@@ -213,26 +217,26 @@ const Company = () => {
                   </div>
                 </div> 
                 */}
-              
-              <div className="col text-start" style={{width:'300px'}}>
+
+              <div className="col text-start" style={{ width: '300px' }}>
                 <input
-                      id = "searchCondition"
-                      className="form-control" 
-                      type="text"
-                      placeholder={t('common.search_here')}
-                      style={{width:'300px', display: 'inline'}}
-                      value={searchCondition}
-                      onChange ={(e) => handleSearchCondition(e.target.value)}
-                />  
+                  id="searchCondition"
+                  className="form-control"
+                  type="text"
+                  placeholder={t('common.search_here')}
+                  style={{ width: '300px', display: 'inline' }}
+                  value={searchCondition}
+                  onChange={(e) => handleSearchCondition(e.target.value)}
+                />
               </div>
-              <div className="col text-start" style={{margin:'0px 20px 5px 20px'}}>
-                  <button
-                      className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
-                      id="multi-company-query"
-                      onClick={handleMultiQueryModal}
-                  >
-                      {t('company.company_multi_query')}
-                  </button>                
+              <div className="col text-start" style={{ margin: '0px 20px 5px 20px' }}>
+                <button
+                  className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
+                  id="multi-company-query"
+                  onClick={handleMultiQueryModal}
+                >
+                  {t('company.company_multi_query')}
+                </button>
               </div>
               <div className="col text-end">
                 <ul className="list-inline-item pl-0">
@@ -284,58 +288,54 @@ const Company = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive">
-                    { searchCondition === "" ? 
-                    <Table
-                      pagination={{
-                        total:  allCompanyData.length,
-                        showTotal: ShowTotal,
-                        showSizeChanger: true,
-                        onShowSizeChange: onShowSizeChange,
-                        ItemRender: ItemRender,
-                      }}
-                      className="table"
-                      style={{ overflowX: "auto" }}
-                      columns={columns}
-                      dataSource={allCompanyData}
-                      rowKey={(record) => record.company_code}
-                      onRow={(record, rowIndex) => {
-                        return {
-                          onClick: (event) => {
+                    {searchCondition === "" ?
+                      <Table
+                        pagination={{
+                          total: allCompanyData.length,
+                          showTotal: ShowTotal,
+                          showSizeChanger: true,
+                          onShowSizeChange: onShowSizeChange,
+                          ItemRender: ItemRender,
+                        }}
+                        className="table"
+                        style={{ overflowX: "auto" }}
+                        columns={columns}
+                        dataSource={allCompanyData}
+                        rowKey={(record) => record.company_code}
+                        onRow={(record, rowIndex) => {
+                          return {
+                            onClick: (event) => {
                               handleClickCompanyName(record.company_code);
                               let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
                                 keyboard: false
                               })
                               myModal.show();
-                          }, // double click row
-                        };
-                      }}
-                    />
-                    :
-                    <Table
-                      pagination={{
-                        total:  filteredCompany.length > 0 ? filteredCompany.length:0,
-                        showTotal: ShowTotal,
-                        showSizeChanger: true,
-                        onShowSizeChange: onShowSizeChange,
-                        ItemRender: ItemRender,
-                      }}
-                      className="table"
-                      style={{ overflowX: "auto" }}
-                      columns={columns}
-                      dataSource={filteredCompany.length > 0 ? filteredCompany:null}
-                      rowKey={(record) => record.company_code}
-                      onRow={(record, rowIndex) => {
-                        return {
-                          onClick: (event) => {
-                              handleClickCompanyName(record.company_code)
-                              let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
-                                keyboard: false
-                              })
-                              myModal.show();
-                          }, // double click row
-                        };
-                      }}
-                    />
+                            }, // double click row
+                          };
+                        }}
+                      />
+                      :
+                      <Table
+                        pagination={{
+                          total: filteredCompany.length > 0 ? filteredCompany.length : 0,
+                          showTotal: ShowTotal,
+                          showSizeChanger: true,
+                          onShowSizeChange: onShowSizeChange,
+                          ItemRender: ItemRender,
+                        }}
+                        className="table"
+                        style={{ overflowX: "auto" }}
+                        columns={columns}
+                        dataSource={filteredCompany.length > 0 ? filteredCompany : null}
+                        rowKey={(record) => record.company_code}
+                        onRow={(record, rowIndex) => {
+                          return {
+                            onClick: (event) => {
+                              handleClickCompanyName(record.company_code);
+                            }, // double click row
+                          };
+                        }}
+                      />
                     }
                   </div>
                 </div>
@@ -426,8 +426,8 @@ const Company = () => {
         {/* Modal */}
         <CompanyAddModel init={initToAddCompany} handleInit={setInitToAddCompany} />
         <CompanyDetailsModel />
-        <MultiQueryModal 
-          title= {t('company.company_multi_query')}
+        <MultiQueryModal
+          title={t('company.company_multi_query')}
           open={multiQueryModal}
           handleOk={handleMultiQueryModalOk}
           handleCancel={handleMultiQueryModalCancel}
