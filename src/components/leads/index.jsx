@@ -363,7 +363,7 @@ const Leads = () => {
                       rowKey={(record) => record.lead_code}
                       onRow={(record, rowIndex) => {
                         return {
-                          onDoubleClick: (event) => {
+                          onClick: (event) => {
                               console.log("[Lead] set current lead : ", record.lead_code);
                               setCurrentLead(record.lead_code);
                               setCurrentCompany(record.company_code);   // 현재 company 세팅 
@@ -394,7 +394,7 @@ const Leads = () => {
                       rowKey={(record) => record.lead_code}
                       onRow={(record, rowIndex) => {
                         return {
-                          onDoubleClick: (event) => {
+                          onClick: (event) => {
                               console.log("[Lead] set current lead : ", record.lead_code);
                               setCurrentLead(record.lead_code);
                               setCurrentCompany(record.company_code);   // 현재 company 세팅 

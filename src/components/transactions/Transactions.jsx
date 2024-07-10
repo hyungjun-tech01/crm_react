@@ -217,7 +217,7 @@ const Transactions = () => {
                         rowKey={(record) => record.transaction_code}
                         onRow={(record, rowIndex) => {
                           return {
-                            onDoubleClick: (event) => {
+                            onClick: (event) => {
                               setCurrentTransaction(record.transaction_code)
                               let myModal = new bootstrap.Modal(document.getElementById('transaction-details'), {
                                 keyboard: false
@@ -242,7 +242,7 @@ const Transactions = () => {
                       rowKey={(record) => record.transaction_code}
                       onRow={(record, rowIndex) => {
                         return {
-                          onDoubleClick: (event) => {
+                          onClick: (event) => {
                             setCurrentTransaction(record.transaction_code)
                             let myModal = new bootstrap.Modal(document.getElementById('transaction-details'), {
                               keyboard: false

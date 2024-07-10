@@ -136,7 +136,7 @@ const LeadConsultingModel = (props) => {
                             }
                             onRow={(record, rowIndex) => {
                                 return {
-                                    onDoubleClick: (event) => {
+                                    onClick: (event) => {
                                         setSelectedRowKeys([record.consulting_code]);
                                         setCurrentConsulting(record.consulting_code);
                                         transferToOtherModal('consulting-details');

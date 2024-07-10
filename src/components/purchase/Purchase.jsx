@@ -264,7 +264,7 @@ const Purchase = () => {
                       rowKey={(record) => record.purchase_code}
                       onRow={(record, rowIndex) => {
                         return {
-                          onDoubleClick: (event) => {
+                          onClick: (event) => {
                             handleClickPurchase(record)
                             let myModal = new bootstrap.Modal(document.getElementById('purchase-details'), {
                               keyboard: false
@@ -289,7 +289,7 @@ const Purchase = () => {
                       rowKey={(record) => record.lead_code}
                       onRow={(record, rowIndex) => {
                         return {
-                          onDoubleClick: (event) => {
+                          onClick: (event) => {
                             handleClickPurchase(record);
                             let myModal = new bootstrap.Modal(document.getElementById('purchase-details'), {
                               keyboard: false

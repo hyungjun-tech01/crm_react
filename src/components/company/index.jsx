@@ -300,7 +300,7 @@ const Company = () => {
                       rowKey={(record) => record.company_code}
                       onRow={(record, rowIndex) => {
                         return {
-                          onDoubleClick: (event) => {
+                          onClick: (event) => {
                               handleClickCompanyName(record.company_code);
                               let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
                                 keyboard: false
@@ -326,7 +326,7 @@ const Company = () => {
                       rowKey={(record) => record.company_code}
                       onRow={(record, rowIndex) => {
                         return {
-                          onDoubleClick: (event) => {
+                          onClick: (event) => {
                               handleClickCompanyName(record.company_code)
                               let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
                                 keyboard: false

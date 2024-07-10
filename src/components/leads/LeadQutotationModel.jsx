@@ -130,7 +130,7 @@ const LeadQuotationModel = (props) => {
                             }
                             onRow={(record, rowIndex) => {
                                 return {
-                                    onDoubleClick: (event) => {
+                                    onClick: (event) => {
                                         setSelectedRowKeys([record.quotation_code]);
                                         setCurrentQuotation(record.quotation_code);
                                         transferToOtherModal('quotation-details');

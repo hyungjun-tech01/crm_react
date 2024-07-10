@@ -1022,7 +1022,7 @@ const QuotationAddModel = (props) => {
                   rowKey={(record) => record['1']}
                   onRow={(record, rowIndex) => {
                     return {
-                        onDoubleClick: (event) => {
+                        onClick: (event) => {
                           handleModifyContent(record);
                         }, // click row
                     };

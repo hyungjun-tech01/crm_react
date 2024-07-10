@@ -521,7 +521,7 @@ const PurchaseDetailsModel = (props) => {
                                       }
                                       onRow={(record, rowIndex) => {
                                         return {
-                                          onDoubleClick: (event) => {
+                                          onClick: (event) => {
                                             setSelectedMAContractRowKeys([record.ma_code]);
                                             handleModifyMAContract(record.ma_code);
                                           }, // click row

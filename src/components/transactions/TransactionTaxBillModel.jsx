@@ -919,7 +919,7 @@ const TransactionTaxBillModel = ({transaction, contents}) => {
                           rowKey={(record) => record.transaction_sub_index}
                           onRow={(record, rowIndex) => {
                             return {
-                              onDoubleClick: (event) => {
+                              onClick: (event) => {
                                 console.log('Double Click / Edit - ', record);
                                 handleStartEditContent(record);
                               }, // click row
