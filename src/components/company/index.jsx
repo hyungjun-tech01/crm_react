@@ -14,7 +14,7 @@ import CompanyAddModel from "./CompanyAddMdel";
 import CompanyDetailsModel from "./CompanyDetailsModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import { companyColumn } from "../../repository/company";
-import TransactionAddModel from "../transactions/TransactionAddModel2";
+import TransactionEditModel from "../transactions/TransactionEditModel";
 
 // import { MoreVert } from '@mui/icons-material';
 
@@ -420,7 +420,7 @@ const Company = () => {
         {/* Modal */}
         <CompanyAddModel init={initToAddCompany} handleInit={setInitToAddCompany} />
         <CompanyDetailsModel />
-        <TransactionAddModel init={false} handleInit={null}/>
+        <TransactionEditModel init={false} handleInit={null}/>
         <MultiQueryModal
           title={t('company.company_multi_query')}
           open={multiQueryModal}

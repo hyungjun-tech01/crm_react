@@ -48,6 +48,7 @@ export const LeadRepo = selector({
                     console.log('loadAllLeads message:', data.message);
                     set(atomAllLeads, []);
                     set(atomLeadsForSelection, []);
+                    set(atomLeadState, 0);
                     return;
                 }
                 set(atomAllLeads, data);
@@ -85,6 +86,7 @@ export const LeadRepo = selector({
             }
             catch(err){
                 console.error(`loadAllCompanies / Error : ${err}`);
+                set(atomLeadState, 0);
             };
         });
         const filterLeads = getCallback(({set, snapshot }) => async (itemName, filterText) => {

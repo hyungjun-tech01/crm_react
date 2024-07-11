@@ -27,6 +27,7 @@ export const PurchaseRepo = selector({
                     if(data.message){
                         console.log('loadAllPurchases message:', data.message);
                         set(atomAllPurchases, []);
+                        set(atomPurchaseState, 0);
                         return;
                     }
                     set(atomAllPurchases, data);
@@ -34,6 +35,7 @@ export const PurchaseRepo = selector({
                 }
                 catch(err){
                     console.error(`loadAllCompanies / Error : ${err}`);
+                    set(atomPurchaseState, 0);
                 };
             };
         });

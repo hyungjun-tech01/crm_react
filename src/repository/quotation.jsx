@@ -36,6 +36,7 @@ export const QuotationRepo = selector({
                     if(data.message){
                         console.log('loadAllQuotations message:', data.message);
                         set(atomAllQuotations, []);
+                        set(atomQuotationState, 0);
                         return;
                     }
                     set(atomAllQuotations, data);
@@ -43,6 +44,7 @@ export const QuotationRepo = selector({
                 }
                 catch(err){
                     console.error(`loadAllCompanies / Error : ${err}`);
+                    set(atomQuotationState, 0);
                 };
             };
         });

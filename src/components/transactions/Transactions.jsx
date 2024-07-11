@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Table } from "antd";
 import "antd/dist/reset.css";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
-import TransactionDetailsModel from "./TransactionDetailsModel";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
 
@@ -18,21 +17,22 @@ import { atomAllCompanies,
   atomFilteredTransaction,
   atomCompanyState,
   atomTransactionState,
+  defaultTransaction,
 } from "../../atoms/atoms";
 import { compareCompanyName , compareText, ConvertCurrency } from "../../constants/functions";
-import TransactionAddModel from "./TransactionAddModel2";
+import TransactionEditModel from "./TransactionEditModel";
 import TransactionTaxBillModel from "./TransactionTaxBillModel";
 import { useTranslation } from "react-i18next";
 
+
 const Transactions = () => {
-  const companyState = useRecoilValue(atomCompanyState);
-  const transactionState = useRecoilValue(atomTransactionState);
+  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
+  const [transactionState, setTransactionState] = useRecoilValue(atomTransactionState);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const allTransactionData = useRecoilValue(atomAllTransactions);
   const filteredTransaction= useRecoilValue(atomFilteredTransaction);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const { loadAllTransactions, setCurrentTransaction , filterTransactions} = useRecoilValue(TransactionRepo);
-  const [ initAddNewTransaction, setInitAddNewTransaction ] = useState(false);
 
   const { t } = useTranslation();
 
@@ -47,7 +47,7 @@ const Transactions = () => {
 
     setExpaned(false);
     setSearchCondition("");
-  }
+  };
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
@@ -130,15 +130,17 @@ const Transactions = () => {
   ];
 
   const handleAddNewTransaction = useCallback(() => {
-    setInitAddNewTransaction(!initAddNewTransaction);
-  }, [initAddNewTransaction]);
+    setCurrentTransaction(defaultTransaction);
+  }, [setCurrentTransaction]);
 
   useEffect(() => {
     console.log('Transaction called!');
-    if((companyState & 1) === 0) {
+    if((companyState & 3) === 0) {
+      setCompanyState(2);
       loadAllCompanies();
     };
-    if((transactionState & 1) === 0) {
+    if((transactionState & 3) === 0) {
+      setTransactionState(2);
       loadAllTransactions();
     };
   }, [allCompanyData, allTransactionData, companyState, transactionState]);
@@ -264,7 +266,7 @@ const Transactions = () => {
         <SystemUserModel />
         <CompanyDetailsModel />
         {/* <TransactionDetailsModel /> */}
-        <TransactionAddModel init={initAddNewTransaction} handleInit={setInitAddNewTransaction}/>
+        <TransactionEditModel />
         <TransactionTaxBillModel />
       </div>
     </HelmetProvider>

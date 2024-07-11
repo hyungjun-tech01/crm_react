@@ -72,6 +72,7 @@ export const ConsultingRepo = selector({
                     if(data.message){
                         console.log('loadAllConsultings message:', data.message);
                         set(atomAllConsultings, []);
+                        set(atomConsultingState, 0);
                         return;
                     }
                     set(atomAllConsultings, data);
@@ -79,6 +80,7 @@ export const ConsultingRepo = selector({
                 }
                 catch(err){
                     console.error(`loadAllCompanies / Error : ${err}`);
+                    set(atomConsultingState, 0);
                 };
             };
         });

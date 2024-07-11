@@ -36,8 +36,6 @@ export const TransactionRepo = selector({
     key: "TransactionRepository",
     get: ({ getCallback }) => {
         const loadAllTransactions = getCallback(({ set, snapshot }) => async () => {
-            // It is possible that this function might be called by more than two componets almost at the same time.
-            // So, to prevent this function from being executed again and again, check the loading state at first.
             const loadStates = await snapshot.getPromise(atomTransactionState);
             if ((loadStates & 1) === 0) {
                 try {
@@ -47,6 +45,7 @@ export const TransactionRepo = selector({
                     if (data.message) {
                         console.log('loadAllTransactions message:', data.message);
                         set(atomAllTransactions, []);
+                        set(atomTransactionState, 0);
                         return;
                     }
                     set(atomAllTransactions, data);
@@ -54,6 +53,7 @@ export const TransactionRepo = selector({
                 }
                 catch (err) {
                     console.error(`loadAllCompanies / Error : ${err}`);
+                    set(atomTransactionState, 0);
                 };
             };
         });

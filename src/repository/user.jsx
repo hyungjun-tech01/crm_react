@@ -82,8 +82,7 @@ export const UserRepo = selector({
                 if (data.message) {
                     console.log('loadUsers message:', data.message);
                     set(atomAllUsers, []);
-                    const loadStates = await snapshot.getPromise(atomUserState);
-                    set(atomUserState, (loadStates & ~1));
+                    set(atomUserState, 0);
                     return;
                 }
                 set(atomAllUsers, data);

@@ -116,6 +116,7 @@ export const ProductRepo = selector({
                     if(data.message){
                         console.log('loadAllProducts message:', data.message);
                         set(atomAllProducts, []);
+                        set(atomProductsState, 0);
                         return;
                     }
                     set(atomAllProducts, data);
@@ -123,6 +124,7 @@ export const ProductRepo = selector({
                 }
                 catch(err){
                     console.error(`loadAllCompanies / Error : ${err}`);
+                    set(atomProductsState, 0);
                 };    
 ;            }
         });

@@ -33,6 +33,7 @@ export const MAContractRepo = selector({
                 if(data.message){
                     console.log('[loadCompanyMAContracts] message:', data.message);
                     set(atomMAContractSet, []);
+                    set(atomMAContractState, 0);
                     return;
                 }
                 set(atomMAContractSet, data);
@@ -43,6 +44,7 @@ export const MAContractRepo = selector({
             }
             catch(err){
                 console.error(`loadCompanyMAContracts / Error : ${err}`);
+                set(atomMAContractState, 0);
             };
         });
         const loadPurchaseMAContracts = getCallback(({set, snapshot}) => async (code) => {

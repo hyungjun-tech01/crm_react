@@ -45,7 +45,7 @@ const default_transaction_data = {
   page: '1p',
 };
 
-const TransactionAddModel = (props) => {
+const TransactionEditModel = (props) => {
   const { init, handleInit } = props;
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
@@ -64,7 +64,7 @@ const TransactionAddModel = (props) => {
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
-  //===== Handles to edit 'TransactionAddModel' ======================================
+  //===== Handles to edit 'TransactionEditModel' ======================================
   const [transactionChange, setTransactionChange] = useState(null);
   const [transactionContents, setTransactionContents] = useState([]);
   const [isSale, setIsSale] = useState(true);
@@ -563,11 +563,11 @@ const TransactionAddModel = (props) => {
 
   useEffect(() => {
     if (init) {
-      console.log('[TransactionAddModel] called to add new~~!');
+      console.log('[TransactionEditModel] called to add new~~!');
       initializeTransactionTemplate();
       handleInit(!init);
     } else {
-      console.log('[TransactionAddModel] called to modify the current ~~!');
+      console.log('[TransactionEditModel] called to modify the current ~~!');
       if(currentTransaction !== defaultTransaction){
         const tempTransaction = {
           ...currentTransaction,
@@ -1002,4 +1002,4 @@ const TransactionAddModel = (props) => {
   );
 };
 
-export default TransactionAddModel;
+export default TransactionEditModel;
