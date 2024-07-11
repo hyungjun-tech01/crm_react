@@ -3,7 +3,7 @@ import { useRecoilValue, useRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { useTranslation } from "react-i18next";
-import * as bootstrap from '../../assets/js/bootstrap';
+import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { CompanyRepo } from "../../repository/company";
@@ -14,12 +14,12 @@ import CompanyAddModel from "./CompanyAddMdel";
 import CompanyDetailsModel from "./CompanyDetailsModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import { companyColumn } from "../../repository/company";
+import TransactionAddModel from "../transactions/TransactionAddModel2";
 
 // import { MoreVert } from '@mui/icons-material';
 
 
 const Company = () => {
-  //const companyState = useRecoilValue(atomCompanyState);
   const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
   const { loadAllCompanies, filterCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
@@ -125,9 +125,7 @@ const Company = () => {
   const handleClickCompanyName = useCallback((id) => {
     console.log('[Company] set current company : ', id);
     setCurrentCompany(id);
-    let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
-      keyboard: false
-    });
+    let myModal = bootstrap.Modal.getOrCreateInstance('#company-details');
     myModal.show();
   }, [setCurrentCompany]);
 
@@ -306,11 +304,7 @@ const Company = () => {
                           return {
                             onClick: (event) => {
                               handleClickCompanyName(record.company_code);
-                              let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
-                                keyboard: false
-                              })
-                              myModal.show();
-                            }, // double click row
+                            },
                           };
                         }}
                       />
@@ -332,7 +326,7 @@ const Company = () => {
                           return {
                             onClick: (event) => {
                               handleClickCompanyName(record.company_code);
-                            }, // double click row
+                            },
                           };
                         }}
                       />
@@ -426,6 +420,7 @@ const Company = () => {
         {/* Modal */}
         <CompanyAddModel init={initToAddCompany} handleInit={setInitToAddCompany} />
         <CompanyDetailsModel />
+        <TransactionAddModel init={false} handleInit={null}/>
         <MultiQueryModal
           title={t('company.company_multi_query')}
           open={multiQueryModal}

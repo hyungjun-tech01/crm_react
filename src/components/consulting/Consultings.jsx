@@ -3,7 +3,7 @@ import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import * as bootstrap from '../../assets/js/bootstrap';
+import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Table } from "antd";
 import "antd/dist/reset.css";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";

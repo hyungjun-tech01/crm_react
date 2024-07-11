@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import * as bootstrap from '../../assets/js/bootstrap';
+import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import "antd/dist/reset.css";
 import { Button, Checkbox, Col, Input, InputNumber, Row, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
@@ -24,7 +25,7 @@ import { ConvertCurrency, formatDate } from "../../constants/functions";
 import TransactionContentModal from "./TransactionContentModal";
 import TransactionReceiptModal from "./TransactionReceiptModal";
 import MessageModal from "../../constants/MessageModal";
-import TransactionPrint from "./TransactionPrint";
+import TransactionView2 from "./TransactionView2";
 import TransactionTaxBillModel from "./TransactionTaxBillModel";
 
 const default_transaction_data = {
@@ -445,7 +446,6 @@ const TransactionAddModel = (props) => {
   };
 
   //===== Handles for special actions =============================================
-  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [transactionForPrint, setTransactionForPrint] = useState({});
   const [contentsForPrint, setContentsForPrint] = useState([]);
 
@@ -469,7 +469,6 @@ const TransactionAddModel = (props) => {
     };
     setTransactionForPrint(tempTransactionData);
     setContentsForPrint(transactionContents);
-    setIsPrintModalOpen(true);
   };
 
   const handleShowTaxBill = () => {
@@ -552,6 +551,7 @@ const TransactionAddModel = (props) => {
     }
   }, [handleInit, init]);
 
+
   //===== useEffect ==============================================================
   useEffect(() => {
     console.log('Company called!');
@@ -586,7 +586,6 @@ const TransactionAddModel = (props) => {
           company_selection: tempCurrentCompany.length > 0 ? tempCurrentCompany[0]: null,
         }
         setSelectData(tempData);
-
       };
     };
   }, [handleInit, init, initializeTransactionTemplate, currentTransaction]);
@@ -624,321 +623,351 @@ const TransactionAddModel = (props) => {
             ></button>
           </div>
           <div className="modal-body">
-            <form className="forms-sampme" id="add_new_transaction_form">
-              <div className="card p-3">
-                <Row>
-                  <Col flex={13}>
-                    <Row justify="space-around" align="middle">
-                      <Col className="trans_title">{t("transaction.statement_of_account")}</Col>
-                    </Row>
-                    <Row justify="space-around" align="middle">
-                      <Col flex={2}>
-                        <Row justify='end' style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
-                          <Col>{t('common.type2')} : </Col>
-                        </Row>
-                        <Row justify='end' style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
-                          <Col>{t('transaction.customer_name')}: </Col>
-                        </Row>
-                      </Col>
-                      <Col flex={3}>
-                        <Row justify='space-between' style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
-                          <Col>
-                            <Select
-                              className="trans_select"
-                              defaultValue={selectData.trans_type}
-                              onChange={selected => handleSelectChange('transaction_type', selected)}
-                              options={trans_types}
-                            />
+            <div className="task-infos">
+              <ul className="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified">
+                <li className="nav-item">
+                  <Link
+                    className="nav-link active"
+                    to="#transaction-details"
+                    data-bs-toggle="tab"
+                  >
+                    {t('common.details')}
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link"
+                    to="#transaction-print"
+                    data-bs-toggle="tab"
+                    onClick={handleShowPrint}
+                  >
+                    {t('common.preview')}
+                  </Link>
+                </li>
+              </ul>
+              <div className="tab-content">
+                <div className="tab-pane show active" id="transaction-details">
+                  <form className="forms-sampme" id="add_new_transaction_form">
+                    <div className="card p-3">
+                      <Row>
+                        <Col flex={13}>
+                          <Row justify="space-around" align="middle">
+                            <Col className="trans_title">{t("transaction.statement_of_account")}</Col>
+                          </Row>
+                          <Row justify="space-around" align="middle">
+                            <Col flex={2}>
+                              <Row justify='end' style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
+                                <Col>{t('common.type2')} : </Col>
+                              </Row>
+                              <Row justify='end' style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
+                                <Col>{t('transaction.customer_name')}: </Col>
+                              </Row>
+                            </Col>
+                            <Col flex={3}>
+                              <Row justify='space-between' style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
+                                <Col>
+                                  <Select
+                                    className="trans_select"
+                                    defaultValue={selectData.trans_type}
+                                    onChange={selected => handleSelectChange('transaction_type', selected)}
+                                    options={trans_types}
+                                  />
+                                </Col>
+                                <Col>{t('transaction.publish_date')} : </Col>
+                              </Row>
+                              <Row style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
+                                <Col>
+                                  <Select
+                                    className="trans_select"
+                                    defaultValue={selectData.company_selection}
+                                    onChange={selected => handleSelectChange('company_name', selected)}
+                                    options={companyForSelection}
+                                  />
+                                </Col>
+                              </Row>
+                            </Col>
+                            <Col flex={3}>
+                              <Row style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
+                                <Col>
+                                  <DatePicker
+                                    name="publish_date"
+                                    selected={transactionChange['publish_date']}
+                                    onChange={(date) => handleDateChange('publish_date', date)}
+                                    dateFormat="yyyy-MM-dd"
+                                    className="trans_date"
+                                  />
+                                </Col>
+                              </Row>
+                              <Row style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
+                                <Col>
+                                  <Button onClick={handleIssueTransaction} style={{ width: 150 }}>{t('transaction.issue')}</Button>
+                                  <Button onClick={handleInitialize} style={{ width: 100 }}>{t('common.initialize')}</Button>
+                                </Col>
+                              </Row>
+                            </Col>
+                          </Row>
+                        </Col>
+                        <Col flex={10} className={`trans_receiver trans_br ${!isSale && 'trans_pur'}`}>
+                          <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`} >{isSale ? t('transaction.receiver') : t('transaction.supplier')}</Col>
+                          <Col flex='auto' align='strech'>
+                            <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
+                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.register_no')}</Col>
+                              <Col flex='auto'>
+                                <Input
+                                  name='business_registration_code'
+                                  value={transactionChange['business_registration_code']}
+                                  onChange={handleItemChange}
+                                />
+                              </Col>
+                            </Row>
+                            <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
+                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.company_name')}</Col>
+                              <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
+                                <label>{transactionChange['company_name']}</label>
+                              </Col>
+                              <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('common.name2')}</Col>
+                              <Col flex={1}>
+                                <Input
+                                  name='ceo_name'
+                                  value={transactionChange['ceo_name']}
+                                  onChange={handleItemChange}
+                                />
+                              </Col>
+                            </Row>
+                            <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
+                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.address')}</Col>
+                              <Col flex='auto'>
+                                <Input
+                                  name='company_address'
+                                  value={transactionChange['company_address']}
+                                  onChange={handleItemChange}
+                                />
+                              </Col>
+                            </Row>
+                            <Row className="trans_rec_item_last">
+                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('company.business_type')}</Col>
+                              <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
+                                <Input
+                                  name='business_type'
+                                  value={transactionChange['business_type']}
+                                  onChange={handleItemChange}
+                                />
+                              </Col>
+                              <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('company.business_item')}</Col>
+                              <Col flex={1}>
+                                <Input
+                                  name='business_item'
+                                  value={transactionChange['business_item']}
+                                  onChange={handleItemChange}
+                                />
+                              </Col>
+                            </Row>
                           </Col>
-                          <Col>{t('transaction.publish_date')} : </Col>
-                        </Row>
-                        <Row style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
-                          <Col>
-                            <Select
-                              className="trans_select"
-                              defaultValue={selectData.company_selection}
-                              onChange={selected => handleSelectChange('company_name', selected)}
-                              options={companyForSelection}
-                            />
-                          </Col>
-                        </Row>
-                      </Col>
-                      <Col flex={3}>
-                        <Row style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
-                          <Col>
-                            <DatePicker
-                              name="publish_date"
-                              selected={transactionChange['publish_date']}
-                              onChange={(date) => handleDateChange('publish_date', date)}
-                              dateFormat="yyyy-MM-dd"
-                              className="trans_date"
-                            />
-                          </Col>
-                        </Row>
-                        <Row style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
-                          <Col>
-                            <Button onClick={handleIssueTransaction} style={{ width: 150 }}>{t('transaction.issue')}</Button>
-                            <Button onClick={handleInitialize} style={{ width: 100 }}>{t('common.initialize')}</Button>
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                  </Col>
-                  <Col flex={10} className={`trans_receiver trans_br ${!isSale && 'trans_pur'}`}>
-                    <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`} >{isSale ? t('transaction.receiver') : t('transaction.supplier')}</Col>
-                    <Col flex='auto' align='strech'>
-                      <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
-                        <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.register_no')}</Col>
-                        <Col flex='auto'>
-                          <Input
-                            name='business_registration_code'
-                            value={transactionChange['business_registration_code']}
-                            onChange={handleItemChange}
+                        </Col>
+                      </Row>
+                      <Row align='middle'>
+                        <Col flex={13} className={`trans_cell_left ${!isSale && "trans_pur"}`}>
+                          <Button onClick={handleStartAddContent}>{t('transaction.add_content')}</Button>
+                          <Button onClick={handleContentDelete} disabled={selectedContentRowKeys.length === 0}>{t('transaction.remove_selects')}</Button>
+                          <Button onClick={handleContentMoveUp} disabled={selectedContentRowKeys.length === 0}>{t('transaction.move_up')}</Button>
+                          <Button onClick={handleContentMoveDown} disabled={selectedContentRowKeys.length === 0}>{t('transaction.move_down')}</Button>
+                        </Col>
+                        <Col flex={12} className={`trans_cell_right ${!isSale && "trans_pur"}`}>
+                          <div style={{ flexGrow: 1 }}>{t('transaction.tax_type')} : </div>
+                          <div style={{ flexGrow: 3 }}>
+                            <select
+                              name='vat_type'
+                              onChange={handleVATChange}
+                              defaultValue={selectData.tax_type}
+                            >
+                              <option value='vat_excluded'>{t('quotation.vat_excluded')}</option>
+                              <option value='vat_included'>{t('quotation.vat_included')}</option>
+                            </select>
+                          </div>
+                          <div style={{ flexGrow: 3 }}>
+                            <Checkbox onClick={handleShowDecimal}>{t('quotation.show_decimal')}</Checkbox>
+                          </div>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col flex='auto' className={`trans_table ${!isSale && "trans_pur"}`}>
+                          <Table
+                            rowSelection={rowSelection}
+                            pagination={{
+                              total: transactionContents.length,
+                              showTotal: ShowTotal,
+                              showSizeChanger: true,
+                              onShowSizeChange: onShowSizeChange,
+                              ItemRender: ItemRender,
+                            }}
+                            style={{ overflowX: "auto" }}
+                            columns={default_columns}
+                            bordered
+                            dataSource={transactionContents}
+                            rowKey={(record) => record.transaction_sub_index}
+                            onRow={(record, rowIndex) => {
+                              return {
+                                onClick: (event) => {
+                                  console.log('Double Click / Edit - ', record);
+                                  handleStartEditContent(record);
+                                }, // click row
+                              };
+                            }}
                           />
                         </Col>
                       </Row>
-                      <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
-                        <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.company_name')}</Col>
-                        <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
-                          <label>{transactionChange['company_name']}</label>
+                      <Row>
+                        <Col flex={5} className={`trans_bl ${!isSale && "trans_pur"}`}>
+                          <Row>
+                            <Col flex='auto' className="trans_amt_title right">
+                              {t('transaction.balance_prev')}
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
+                              <InputNumber
+                                value={dataForTransaction.valance_prev}
+                                formatter={handleFormatter}
+                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                                style={{width:'180px', height:'30px',border:0,textAlign:'end'}}
+                                onChange={(e)=>{
+                                  const value = Number(e.target.value);
+                                  if(isNaN(value)) return;
+                                  const temp={...dataForTransaction, valance_prev: value};
+                                  setDataForTransaction(temp);
+                                }}
+                              />
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col flex='auto' className="trans_amt_title right">
+                              {t('transaction.receipt')}
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col flex='auto'
+                              onClick={handleStartEditReceipt}
+                              className={`trans_amt low right ${!isSale && "trans_pur"}`}
+                            >
+                              {ConvertCurrency(dataForTransaction.receipt, dataForTransaction.show_decimal && 4)}
+                            </Col>
+                          </Row>
                         </Col>
-                        <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('common.name2')}</Col>
-                        <Col flex={1}>
-                          <Input
-                            name='ceo_name'
-                            value={transactionChange['ceo_name']}
-                            onChange={handleItemChange}
-                          />
+                        <Col flex={5}>
+                          <Row>
+                            <Col flex='auto' className="trans_amt_title right">
+                              {t('transaction.supply_price')}
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
+                              {ConvertCurrency(dataForTransaction.supply_price, dataForTransaction.show_decimal && 4)}
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col flex='auto' className="trans_amt_title right">
+                              {t('transaction.balance_total')}
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col flex='auto' className={`trans_amt  low right ${!isSale && "trans_pur"}`}>
+                              {ConvertCurrency(dataForTransaction.valance_final, dataForTransaction.show_decimal && 4)}
+                            </Col>
+                          </Row>
+                        </Col>
+                        <Col flex={5}>
+                          <Row>
+                            <Col flex='auto' className="trans_amt_title right">
+                              {t('transaction.tax_price')}
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
+                              {ConvertCurrency(dataForTransaction.tax_price, dataForTransaction.show_decimal && 4)}
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col flex='auto' className="trans_amt_title right ">
+                              {t('transaction.receiver2')}
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col flex='auto' className={`trans_amt low right ${!isSale && "trans_pur"}`}>
+                              <Input
+                                value={dataForTransaction.receiver}
+                                style={{height:'30px',border:0,textAlign:'end'}}
+                                onChange={(e)=>{
+                                  const temp={...dataForTransaction, receiver: e.target.value};
+                                  setDataForTransaction(temp);
+                                }}
+                              />
+                            </Col>
+                          </Row>
+                        </Col>
+                        <Col flex={5} className={`trans_br ${!isSale && "trans_pur"}`}>
+                          <Row>
+                            <Col flex='auto' className="trans_amt_title">
+                              {t('transaction.sum_price')}
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col flex='auto' className={`trans_amt ${!isSale && "trans_pur"}`}>
+                              {ConvertCurrency(dataForTransaction.total_price, dataForTransaction.show_decimal && 4)}
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col flex='auto' className="trans_amt_title">
+                              {t('transaction.trans_pages')}
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col flex='auto' className={`trans_amt low ${!isSale && "trans_pur"}`}>
+                              {`${dataForTransaction.page_cur}/${dataForTransaction.page_total}/${dataForTransaction.page}`}
+                            </Col>
+                          </Row>
                         </Col>
                       </Row>
-                      <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
-                        <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.address')}</Col>
-                        <Col flex='auto'>
-                          <Input
-                            name='company_address'
-                            value={transactionChange['company_address']}
-                            onChange={handleItemChange}
-                          />
-                        </Col>
-                      </Row>
-                      <Row className="trans_rec_item_last">
-                        <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('company.business_type')}</Col>
-                        <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
-                          <Input
-                            name='business_type'
-                            value={transactionChange['business_type']}
-                            onChange={handleItemChange}
-                          />
-                        </Col>
-                        <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('company.business_item')}</Col>
-                        <Col flex={1}>
-                          <Input
-                            name='business_item'
-                            value={transactionChange['business_item']}
-                            onChange={handleItemChange}
-                          />
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Col>
-                </Row>
-                <Row align='middle'>
-                  <Col flex={13} className={`trans_cell_left ${!isSale && "trans_pur"}`}>
-                    <Button onClick={handleStartAddContent}>{t('transaction.add_content')}</Button>
-                    <Button onClick={handleContentDelete} disabled={selectedContentRowKeys.length === 0}>{t('transaction.remove_selects')}</Button>
-                    <Button onClick={handleContentMoveUp} disabled={selectedContentRowKeys.length === 0}>{t('transaction.move_up')}</Button>
-                    <Button onClick={handleContentMoveDown} disabled={selectedContentRowKeys.length === 0}>{t('transaction.move_down')}</Button>
-                  </Col>
-                  <Col flex={12} className={`trans_cell_right ${!isSale && "trans_pur"}`}>
-                    <div style={{ flexGrow: 1 }}>{t('transaction.tax_type')} : </div>
-                    <div style={{ flexGrow: 3 }}>
-                      <select
-                        name='vat_type'
-                        onChange={handleVATChange}
-                        defaultValue={selectData.tax_type}
-                      >
-                        <option value='vat_excluded'>{t('quotation.vat_excluded')}</option>
-                        <option value='vat_included'>{t('quotation.vat_included')}</option>
-                      </select>
                     </div>
-                    <div style={{ flexGrow: 3 }}>
-                      <Checkbox onClick={handleShowDecimal}>{t('quotation.show_decimal')}</Checkbox>
-                    </div>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col flex='auto' className={`trans_table ${!isSale && "trans_pur"}`}>
-                    <Table
-                      rowSelection={rowSelection}
-                      pagination={{
-                        total: transactionContents.length,
-                        showTotal: ShowTotal,
-                        showSizeChanger: true,
-                        onShowSizeChange: onShowSizeChange,
-                        ItemRender: ItemRender,
-                      }}
-                      style={{ overflowX: "auto" }}
-                      columns={default_columns}
-                      bordered
-                      dataSource={transactionContents}
-                      rowKey={(record) => record.transaction_sub_index}
-                      onRow={(record, rowIndex) => {
-                        return {
-                          onClick: (event) => {
-                            console.log('Double Click / Edit - ', record);
-                            handleStartEditContent(record);
-                          }, // click row
-                        };
-                      }}
-                    />
-                  </Col>
-                </Row>
-                <Row>
-                  <Col flex={5} className={`trans_bl ${!isSale && "trans_pur"}`}>
-                    <Row>
-                      <Col flex='auto' className="trans_amt_title right">
-                        {t('transaction.balance_prev')}
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
-                        <InputNumber
-                          value={dataForTransaction.valance_prev}
-                          formatter={handleFormatter}
-                          parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                          style={{width:'180px', height:'30px',border:0,textAlign:'end'}}
-                          onChange={(e)=>{
-                            const value = Number(e.target.value);
-                            if(isNaN(value)) return;
-                            const temp={...dataForTransaction, valance_prev: value};
-                            setDataForTransaction(temp);
-                          }}
-                        />
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col flex='auto' className="trans_amt_title right">
-                        {t('transaction.receipt')}
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col flex='auto'
-                        onClick={handleStartEditReceipt}
-                        className={`trans_amt low right ${!isSale && "trans_pur"}`}
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                        onClick={handleAddPrintTransaction}
                       >
-                        {ConvertCurrency(dataForTransaction.receipt, dataForTransaction.show_decimal && 4)}
-                      </Col>
-                    </Row>
-                  </Col>
-                  <Col flex={5}>
-                    <Row>
-                      <Col flex='auto' className="trans_amt_title right">
-                        {t('transaction.supply_price')}
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
-                        {ConvertCurrency(dataForTransaction.supply_price, dataForTransaction.show_decimal && 4)}
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col flex='auto' className="trans_amt_title right">
-                        {t('transaction.balance_total')}
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col flex='auto' className={`trans_amt  low right ${!isSale && "trans_pur"}`}>
-                        {ConvertCurrency(dataForTransaction.valance_final, dataForTransaction.show_decimal && 4)}
-                      </Col>
-                    </Row>
-                  </Col>
-                  <Col flex={5}>
-                    <Row>
-                      <Col flex='auto' className="trans_amt_title right">
-                        {t('transaction.tax_price')}
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
-                        {ConvertCurrency(dataForTransaction.tax_price, dataForTransaction.show_decimal && 4)}
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col flex='auto' className="trans_amt_title right ">
-                        {t('transaction.receiver2')}
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col flex='auto' className={`trans_amt low right ${!isSale && "trans_pur"}`}>
-                        <Input
-                          value={dataForTransaction.receiver}
-                          style={{height:'30px',border:0,textAlign:'end'}}
-                          onChange={(e)=>{
-                            const temp={...dataForTransaction, receiver: e.target.value};
-                            setDataForTransaction(temp);
-                          }}
-                        />
-                      </Col>
-                    </Row>
-                  </Col>
-                  <Col flex={5} className={`trans_br ${!isSale && "trans_pur"}`}>
-                    <Row>
-                      <Col flex='auto' className="trans_amt_title">
-                        {t('transaction.sum_price')}
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col flex='auto' className={`trans_amt ${!isSale && "trans_pur"}`}>
-                        {ConvertCurrency(dataForTransaction.total_price, dataForTransaction.show_decimal && 4)}
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col flex='auto' className="trans_amt_title">
-                        {t('transaction.trans_pages')}
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col flex='auto' className={`trans_amt low ${!isSale && "trans_pur"}`}>
-                        {`${dataForTransaction.page_cur}/${dataForTransaction.page_total}/${dataForTransaction.page}`}
-                      </Col>
-                    </Row>
-                  </Col>
-                </Row>
+                        {t('transaction.save_print')}
+                      </button>
+                      &nbsp;&nbsp;
+                      <button
+                        type="button"
+                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                        onClick={handleAddNewTransaction}
+                      >
+                        {t('common.save')}
+                      </button>
+                      &nbsp;&nbsp;
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-rounded"
+                        data-bs-dismiss="modal"
+                      >
+                        {t('common.cancel')}
+                      </button>
+                      &nbsp;&nbsp;
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-rounded"
+                        onClick={handleShowTaxBill}
+                      >
+                        Test
+                      </button>
+                    </div>
+                  </form>
+                </div>
+                <div className="tab-pane show" id="transaction-print">
+                  <TransactionView2 transaction={transactionForPrint} contents={contentsForPrint}/>
+                </div>
               </div>
-              <div className="text-center">
-                <button
-                  type="button"
-                  className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                  onClick={handleAddPrintTransaction}
-                >
-                  {t('transaction.save_print')}
-                </button>
-                &nbsp;&nbsp;
-                <button
-                  type="button"
-                  className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                  onClick={handleAddNewTransaction}
-                >
-                  {t('common.save')}
-                </button>
-                &nbsp;&nbsp;
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-rounded"
-                  data-bs-dismiss="modal"
-                >
-                  {t('common.cancel')}
-                </button>
-                &nbsp;&nbsp;
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-rounded"
-                  onClick={handleShowTaxBill}
-                >
-                  Test
-                </button>
-              </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
@@ -958,12 +987,6 @@ const TransactionAddModel = (props) => {
         handleEdited={setEditedReceiptModalData}
         handleOk={handleReceiptModalOk}
         handleCancel={handleReceiptModalCancel}
-      />
-      <TransactionPrint
-        open={isPrintModalOpen}
-        handleClose={()=>setIsPrintModalOpen(false)}
-        transaction={transactionForPrint}
-        contents={contentsForPrint}
       />
       <TransactionTaxBillModel
         transaction={transactionForPrint}

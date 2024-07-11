@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
-import * as bootstrap from '../../assets/js/bootstrap';
+import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { formatDate } from "../../constants/functions";
 import { Add } from "@mui/icons-material";

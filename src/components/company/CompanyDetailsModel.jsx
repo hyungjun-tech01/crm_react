@@ -26,7 +26,6 @@ import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import CompanyPurchaseModel from "./CompanyPurchaseModel";
 import CompanyTransactionModel from "./CompanyTransactionModel";
-import TransactionAddModel from "../transactions/TransactionAddModel2";
 
 const CompanyDetailsModel = () => {
   const { t } = useTranslation();
@@ -237,11 +236,10 @@ const CompanyDetailsModel = () => {
   //===== useEffect for User ==========================================================
   useEffect(() => {
     if ((userState & 3) === 0) {
-      const tempUserState = userState | (1 << 1); //change it to pending state
-      setUserState(tempUserState);
+      setUserState(2); //change it to pending state
       loadAllUsers();
     }
-  }, [loadAllUsers, userState]);
+  }, [loadAllUsers, setUserState, userState]);
   
   return (
     <div
@@ -397,7 +395,6 @@ const CompanyDetailsModel = () => {
           </div>
         </div>
         {/* modal-content */}
-        <TransactionAddModel init={false} handleInit={null}/>
       </div>
     </div>
   );
