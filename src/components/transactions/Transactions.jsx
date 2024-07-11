@@ -187,7 +187,7 @@ const Transactions = () => {
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                       id="add-task"
                       data-bs-toggle="modal"
-                      data-bs-target="#add_new_transaction2"
+                      data-bs-target="#edit_transaction"
                       onClick={handleAddNewTransaction}
                     >
                       {t('transaction.add_transaction')}
@@ -221,7 +221,7 @@ const Transactions = () => {
                           return {
                             onClick: (event) => {
                               setCurrentTransaction(record.transaction_code)
-                              let myModal = new bootstrap.Modal(document.getElementById('add_new_transaction2'), {
+                              let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
                                 keyboard: false
                               })
                               myModal.show();
@@ -246,7 +246,7 @@ const Transactions = () => {
                         return {
                           onClick: (event) => {
                             setCurrentTransaction(record.transaction_code)
-                            let myModal = new bootstrap.Modal(document.getElementById('add_new_transaction2'), {
+                            let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
                               keyboard: false
                             })
                             myModal.show();

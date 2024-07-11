@@ -19,20 +19,19 @@ const CompanyTransactionModel = (props) => {
 
     const handleSelectTransaction = useCallback((value) => {
         setCurrentTransaction(value.transaction_code);
-        // let myModal = new bootstrap.Modal(document.getElementById('add_new_transaction2'), {
+        // let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
         //     keyboard: false
         // });
         let oldModal = bootstrap.Modal.getInstance('#company-details');
         if(oldModal) {
             oldModal.hide();
-        }
+        };
         setTimeout(()=>{
-            let myModal = new bootstrap.Modal(document.getElementById('add_new_transaction2'), {
+            let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
                 keyboard: false
             });
             myModal.show();
         }, 500);
-        
     }, [setCurrentTransaction]);
 
     const transactionRowSelection = {

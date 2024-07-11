@@ -25,7 +25,7 @@ import { ConvertCurrency, formatDate } from "../../constants/functions";
 import TransactionContentModal from "./TransactionContentModal";
 import TransactionReceiptModal from "./TransactionReceiptModal";
 import MessageModal from "../../constants/MessageModal";
-import TransactionView2 from "./TransactionView2";
+import TransactionPrint from "./TransactionPrint";
 import TransactionTaxBillModel from "./TransactionTaxBillModel";
 
 const default_transaction_data = {
@@ -45,8 +45,7 @@ const default_transaction_data = {
   page: '1p',
 };
 
-const TransactionEditModel = (props) => {
-  const { init, handleInit } = props;
+const TransactionEditModel = () => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [ isMessageModalOpen, setIsMessageModalOpen ] = useState(false);
@@ -65,7 +64,8 @@ const TransactionEditModel = (props) => {
 
 
   //===== Handles to edit 'TransactionEditModel' ======================================
-  const [transactionChange, setTransactionChange] = useState(null);
+  const [orgTransaction, setOrgTransaction] = useState({});
+  const [transactionChange, setTransactionChange] = useState({});
   const [transactionContents, setTransactionContents] = useState([]);
   const [isSale, setIsSale] = useState(true);
   const [isVatIncluded, setIsVatIncluded] = useState(true);
@@ -449,7 +449,7 @@ const TransactionEditModel = (props) => {
   const [transactionForPrint, setTransactionForPrint] = useState({});
   const [contentsForPrint, setContentsForPrint] = useState([]);
 
-  const handleInitialize = () => {
+  const handleInitialize = useCallback(() => {
     setIsSale(true);
     setIsVatIncluded(true);
     setShowDecimal(false);
@@ -460,7 +460,9 @@ const TransactionEditModel = (props) => {
     setEditedReceiptModalData({});
     setCurrentTransaction(defaultTransaction);
     setSelectData({trans_type: trans_types[0], tax_type: 'vat_included', company_selection: null});
-  };
+    setOrgTransaction({});
+    document.querySelector("#add_new_transaction_form").reset();
+  }, []);
 
   const handleShowPrint = () => {
     const tempTransactionData = {
@@ -473,43 +475,54 @@ const TransactionEditModel = (props) => {
 
   const handleShowTaxBill = () => {
     const tempTransactionData = {
+      ...orgTransaction,
       ...transactionChange,
       ...dataForTransaction,
     };
-    console.log('handleShowTaxBill : ', tempTransactionData);
     setTransactionForPrint(tempTransactionData);
     setContentsForPrint(transactionContents);
-    let myModal = new bootstrap.Modal(document.getElementById('add_new_tax_bill'), {
-      keyboard: false
-    })
-    myModal.show();
+    let oldModal = bootstrap.Modal.getInstance('#edit_transaction');
+    if(oldModal) {
+        oldModal.hide();
+    }
+    setTimeout(()=>{
+        let myModal = new bootstrap.Modal(document.getElementById('edit_bill'), {
+            keyboard: false
+        });
+        myModal.show();
+    }, 500);
   };
 
-  const handleSaveNewTransaction = (value) => {
-    if (transactionChange.company_name === null
-      || transactionChange.company_name === ''
-      || transactionContents.length === 0
+  const handleSaveTransaction = (value) => {
+    let newTransactionData = {
+      ...orgTransaction,
+      ...transactionChange,
+    };
+    if (newTransactionData.company_name === null
+      || newTransactionData.company_name === ''
+      || newTransactionData.length === 0
     ) {
       setMessage({title: '*필수 입력 누락*', message: '업체 정보나 품목 정보가 누락되었습니다.'});
       setIsMessageModalOpen(true);
       return;
     };
-    const newTransactionData = {
-      ...transactionChange,
-      transaction_contents: JSON.stringify(transactionContents),
-      transaction_title: transactionContents.at(0).product_name + ' 외',
-      action_type: 'ADD',
-      modify_user: cookies.myLationCrmUserId,
-    };
+    if (currentTransaction === defaultTransaction){
+      newTransactionData['transaction_contents']= JSON.stringify(transactionContents);
+      newTransactionData['transaction_title'] = transactionContents.at(0).product_name + ' 외';
+      newTransactionData['action_type'] = 'ADD';
+      newTransactionData['modify_user'] = cookies.myLationCrmUserId;
+    } else {
+      newTransactionData['transaction_contents']= JSON.stringify(transactionContents);
+      newTransactionData['action_type'] = 'UPDATE';
+      newTransactionData['modify_user'] = cookies.myLationCrmUserId;
+    }
     const result = modifyTransaction(newTransactionData);
     result.then((res) => {
       if(res){
         if(value === 'TaxBill'){
           handleShowTaxBill();
-        } else if(value === 'print'){
-          handleShowPrint();
+          handleInitialize();
         };
-        initializeTransactionTemplate();
       }
       else {
         setMessage({title: '저장 중 오류', message: `오류가 발생하여 저장하지 못했습니다.\n- ${res}`});
@@ -518,21 +531,13 @@ const TransactionEditModel = (props) => {
     });
   };
 
-  const handleAddPrintTransaction = () => {
-    handleSaveNewTransaction('print');
-  };
-
-  const handleAddNewTransaction = () => {
-    handleSaveNewTransaction(null);
-  };
-
-  const handleIssueTransaction = () => {
+  const handleIssueBill = () => {
     // Save this transactions -------------------------
-    if(currentTransaction === defaultTransaction) {
-      handleSaveNewTransaction('TaxBill');
+    if(transactionChange && Object.keys(transactionChange).length > 0) {
+      handleSaveTransaction('TaxBill');
     } else {
       handleShowTaxBill();
-    }
+    };
   };
 
   const handleShowDecimal = (e) => {
@@ -542,42 +547,24 @@ const TransactionEditModel = (props) => {
     };
   };
 
-  const initializeTransactionTemplate = useCallback(() => {
-    handleInitialize();
-
-    document.querySelector("#add_new_transaction_form").reset();
-    if(handleInit) {
-      handleInit(!init);
-    }
-  }, [handleInit, init]);
-
 
   //===== useEffect ==============================================================
   useEffect(() => {
-    console.log('Company called!');
     if ((companyState & 3) === 0) {
       setCompanyState(2);   //pending state
       loadAllCompanies();
+      return;
     };
-  }, [companyState, loadAllCompanies, setCompanyState]);
-
-  useEffect(() => {
-    if (init) {
-      console.log('[TransactionEditModel] called to add new~~!');
-      initializeTransactionTemplate();
-      handleInit(!init);
-    } else {
-      console.log('[TransactionEditModel] called to modify the current ~~!');
-      if(currentTransaction !== defaultTransaction){
-        const tempTransaction = {
-          ...currentTransaction,
-          publish_date: new Date(currentTransaction.publish_date),
-        }
-        setTransactionChange(tempTransaction);
-
+    if (Object.keys(orgTransaction).length === 0) {
+      console.log('TransactionEditModel orgTransaction has no member');
+      if (currentTransaction === defaultTransaction) {
+        console.log('[TransactionEditModel] Add New Transaction~');
+        handleInitialize();
+      } else {
+        console.log('[TransactionEditModel] Modify Transaction~');
         const currentContents = JSON.parse(currentTransaction.transaction_contents);
         setTransactionContents(currentContents);
-
+  
         const tempCurrentCompany = companyForSelection.filter(item => item.value.company_code === currentTransaction.company_code);
         const tempData = {
           trans_type: (currentTransaction.business_type === '매출' || currentTransaction.business_type === 'sale')
@@ -587,15 +574,19 @@ const TransactionEditModel = (props) => {
         }
         setSelectData(tempData);
       };
+  
+      const tempTransaction = {
+        ...currentTransaction,
+        publish_date: currentTransaction.publish_date ? new Date(currentTransaction.publish_date) : null,
+      };
+      setOrgTransaction(tempTransaction);
     };
-  }, [handleInit, init, initializeTransactionTemplate, currentTransaction]);
-
-  if(!transactionChange) return null;
+  }, [companyState, orgTransaction, currentTransaction]);
 
   return (
     <div
       className="modal right fade"
-      id="add_new_transaction2"
+      id="edit_transaction"
       tabIndex={-1}
       role="dialog"
       aria-modal="true"
@@ -691,7 +682,7 @@ const TransactionEditModel = (props) => {
                                 <Col>
                                   <DatePicker
                                     name="publish_date"
-                                    selected={transactionChange['publish_date']}
+                                    selected={transactionChange['publish_date'] ? transactionChange['publish_date'] : orgTransaction.publish_date}
                                     onChange={(date) => handleDateChange('publish_date', date)}
                                     dateFormat="yyyy-MM-dd"
                                     className="trans_date"
@@ -700,7 +691,7 @@ const TransactionEditModel = (props) => {
                               </Row>
                               <Row style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
                                 <Col>
-                                  <Button onClick={handleIssueTransaction} style={{ width: 150 }}>{t('transaction.issue')}</Button>
+                                  <Button onClick={handleIssueBill} style={{ width: 150 }}>{t('transaction.issue')}</Button>
                                   <Button onClick={handleInitialize} style={{ width: 100 }}>{t('common.initialize')}</Button>
                                 </Col>
                               </Row>
@@ -715,7 +706,9 @@ const TransactionEditModel = (props) => {
                               <Col flex='auto'>
                                 <Input
                                   name='business_registration_code'
-                                  value={transactionChange['business_registration_code']}
+                                  value={transactionChange['business_registration_code']
+                                    ? transactionChange['business_registration_code']
+                                    : orgTransaction.business_registration_code}
                                   onChange={handleItemChange}
                                 />
                               </Col>
@@ -729,7 +722,7 @@ const TransactionEditModel = (props) => {
                               <Col flex={1}>
                                 <Input
                                   name='ceo_name'
-                                  value={transactionChange['ceo_name']}
+                                  value={transactionChange['ceo_name'] ? transactionChange['ceo_name'] : orgTransaction.ceo_name}
                                   onChange={handleItemChange}
                                 />
                               </Col>
@@ -739,7 +732,9 @@ const TransactionEditModel = (props) => {
                               <Col flex='auto'>
                                 <Input
                                   name='company_address'
-                                  value={transactionChange['company_address']}
+                                  value={transactionChange['company_address']
+                                    ? transactionChange['company_address']
+                                    : orgTransaction.company_address}
                                   onChange={handleItemChange}
                                 />
                               </Col>
@@ -749,7 +744,7 @@ const TransactionEditModel = (props) => {
                               <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
                                 <Input
                                   name='business_type'
-                                  value={transactionChange['business_type']}
+                                  value={transactionChange['business_type'] ? transactionChange['business_type'] : orgTransaction.business_type}
                                   onChange={handleItemChange}
                                 />
                               </Col>
@@ -757,7 +752,7 @@ const TransactionEditModel = (props) => {
                               <Col flex={1}>
                                 <Input
                                   name='business_item'
-                                  value={transactionChange['business_item']}
+                                  value={transactionChange['business_item'] ? transactionChange['business_item'] : orgTransaction.business_item}
                                   onChange={handleItemChange}
                                 />
                               </Col>
@@ -932,15 +927,7 @@ const TransactionEditModel = (props) => {
                       <button
                         type="button"
                         className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                        onClick={handleAddPrintTransaction}
-                      >
-                        {t('transaction.save_print')}
-                      </button>
-                      &nbsp;&nbsp;
-                      <button
-                        type="button"
-                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                        onClick={handleAddNewTransaction}
+                        onClick={handleSaveTransaction}
                       >
                         {t('common.save')}
                       </button>
@@ -952,19 +939,11 @@ const TransactionEditModel = (props) => {
                       >
                         {t('common.cancel')}
                       </button>
-                      &nbsp;&nbsp;
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-rounded"
-                        onClick={handleShowTaxBill}
-                      >
-                        Test
-                      </button>
                     </div>
                   </form>
                 </div>
                 <div className="tab-pane show" id="transaction-print">
-                  <TransactionView2 transaction={transactionForPrint} contents={contentsForPrint}/>
+                  <TransactionPrint transaction={transactionForPrint} contents={contentsForPrint}/>
                 </div>
               </div>
             </div>

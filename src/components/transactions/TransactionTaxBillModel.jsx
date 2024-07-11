@@ -428,7 +428,7 @@ const TransactionTaxBillModel = ({transaction, contents}) => {
   return (
     <div
       className="modal right fade"
-      id="add_new_tax_bill"
+      id="edit_bill"
       tabIndex={-1}
       role="dialog"
       aria-modal="true"
