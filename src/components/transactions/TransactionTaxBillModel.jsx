@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
@@ -66,7 +66,7 @@ const default_bill_data = {
 };
 
 
-const TransactionTaxBillModel = ({transaction, contents}) => {
+const TransactionTaxBillModel = ({open, close}) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -78,7 +78,7 @@ const TransactionTaxBillModel = ({transaction, contents}) => {
 
 
   //===== [RecoilState] Related with Company =========================================
-  const companyState = useRecoilValue(atomCompanyState);
+  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
@@ -323,8 +323,8 @@ const TransactionTaxBillModel = ({transaction, contents}) => {
 
   //===== useEffect ==============================================================
   useEffect(() => {
-    console.log('Company called!');
-    if ((companyState & 1) === 0) {
+    if ((companyState & 3) === 0) {
+      setCompanyState(2);
       loadAllCompanies();
     }
     else {
@@ -421,9 +421,6 @@ const TransactionTaxBillModel = ({transaction, contents}) => {
 
   }, [contents, transaction, companyState]);
 
-  useEffect(()=>{
-    console.log('In order to update dataForBill : ', dataForBill);
-  }, [dataForBill]);
 
   return (
     <div

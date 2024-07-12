@@ -24,6 +24,7 @@ export const ProductClassListRepo = selector({
                     if(data.message){
                         console.log('loadAllProductClassList message:', data.message);
                         set(atomProductClassList, []);
+                        set(atomProductClassListState, 0);
                         return;
                     }
                     set(atomProductClassList, data);
@@ -31,6 +32,7 @@ export const ProductClassListRepo = selector({
                 }
                 catch(err){
                     console.error(`loadAllCompanies / Error : ${err}`);
+                    set(atomProductClassListState, 0);
                 };
             };
         });

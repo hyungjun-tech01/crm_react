@@ -27,7 +27,7 @@ import DetailTitleItem from "../../constants/DetailTitleItem";
 import CompanyPurchaseModel from "./CompanyPurchaseModel";
 import CompanyTransactionModel from "./CompanyTransactionModel";
 
-const CompanyDetailsModel = () => {
+const CompanyDetailsModel = ({openTransaction}) => {
   const { t } = useTranslation();
   const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
@@ -37,14 +37,14 @@ const CompanyDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Purchase =========================================
-  const purchaseState = useRecoilValue(atomPurchaseState);
+  const [purchaseState, setPurchaseState] = useRecoilState(atomPurchaseState);
   const allPurchases = useRecoilValue(atomAllPurchases);
   const { loadAllPurchases} = useRecoilValue(PurchaseRepo);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
 
   //===== [RecoilState] Related with Transaction ======================================
-  const transactionState = useRecoilValue(atomTransactionState);
+  const [transactionState, setTransactionState] = useRecoilState(atomTransactionState);
   const allTransactions = useRecoilValue(atomAllTransactions);
   const { loadAllTransactions } = useRecoilValue(TransactionRepo);
 
@@ -199,8 +199,9 @@ const CompanyDetailsModel = () => {
   //===== useEffect for Purchase =======================================================
   useEffect(() => {
     console.log('[CompanyDetailModel] useEffect / Purchase');
-    if((purchaseState & 1) === 0) {
-      console.log('[CompanyDetailsModel] loadAllPurchases');
+    if((purchaseState & 3) === 0) {
+      console.log('[CompanyDetailsModel] start loading pruchase');
+      setPurchaseState(2);
       loadAllPurchases();
     } else {
       const tempCompanyPurchases = allPurchases.filter(purchase => purchase.company_code === selectedCompany.company_code);
@@ -215,13 +216,14 @@ const CompanyDetailsModel = () => {
         setValidMACount(valid_count);
       };
     };
-  }, [purchaseState, allPurchases, purchasesByCompany, loadAllPurchases, selectedCompany.company_code]);
+  }, [purchaseState, allPurchases, purchasesByCompany, selectedCompany.company_code]);
 
 
   //===== useEffect for Transaction ====================================================
   useEffect(() => {
-    if((transactionState & 1) === 0) {
-      console.log('CompanyDetailsModel / loadAllTransactions');
+    if((transactionState & 3) === 0) {
+      console.log('[CompanyDetailsModel] start loading transaction');
+      setTransactionState(2);
       loadAllTransactions();
     } else {
       const tempCompanyTransactions = allTransactions.filter(transaction => transaction.company_name === selectedCompany.company_name);
@@ -230,7 +232,7 @@ const CompanyDetailsModel = () => {
         setTransactionByCompany(tempCompanyTransactions);
       };
     }
-  }, [transactionState, allTransactions, loadAllTransactions, transactionByCompany.length, selectedCompany.company_name]);
+  }, [transactionState, allTransactions, transactionByCompany.length, selectedCompany.company_name]);
 
 
   //===== useEffect for User ==========================================================
@@ -240,6 +242,8 @@ const CompanyDetailsModel = () => {
       loadAllUsers();
     }
   }, [loadAllUsers, setUserState, userState]);
+
+  if(selectedCompany === defaultCompany) return;
   
   return (
     <div
@@ -369,7 +373,7 @@ const CompanyDetailsModel = () => {
                     handlePurchase={setPurchasesByCompany} />
                 </div>
                 <div className="tab-pane company-details-transaction" id="company-details-transaction">
-                  <CompanyTransactionModel transactions={transactionByCompany} />
+                  <CompanyTransactionModel transactions={transactionByCompany} openTransaction={openTransaction} />
                 </div>
               </div>
               { editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&

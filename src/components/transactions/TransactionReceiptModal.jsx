@@ -16,16 +16,17 @@ const TransactionReceiptModal = (props) => {
 
     const content_items = isCash ? 
         [
-            { name: 'payment_amount', title: t('common.price_1'), detail: {type: 'label',extra: 'modal' } },
+            { name: 'paid_money', title: t('common.price_1'), detail: {type: 'label',extra: 'modal' } },
             { name: 'payment_type', title: t('transaction.payment_type'), detail: { type: 'select', options: paymentTypeForSelection, extra: 'modal' } },
-            { name: 'payment_org', title: t('company.bank_name'), detail: {type: 'label',extra: 'modal' } },
-            { name: 'payment_code', title: t('company.account_code'), detail: {type: 'label',extra: 'modal' } },
+            { name: 'bank_name', title: t('company.bank_name'), detail: {type: 'label',extra: 'modal' } },
+            { name: 'account_owner', title: t('company.account_owner'), detail: {type: 'label',extra: 'modal' } },
+            { name: 'account_number', title: t('company.account_code'), detail: {type: 'label',extra: 'modal' } },
         ] :
         [
-            { name: 'payment_amount', title: t('common.price_1'), detail: {type: 'label',extra: 'modal' } },
+            { name: 'paid_money', title: t('common.price_1'), detail: {type: 'label',extra: 'modal' } },
             { name: 'payment_type', title: t('transaction.payment_type'), detail: { type: 'select', options: paymentTypeForSelection, extra: 'modal' } },
-            { name: 'payment_org', title: t('common.card_name'), detail: {type: 'label',extra: 'modal' } },
-            { name: 'payment_code', title: t('common.card_no'), detail: {type: 'label',extra: 'modal' } },
+            { name: 'card_name', title: t('common.card_name'), detail: {type: 'label',extra: 'modal' } },
+            { name: 'card_number', title: t('common.card_no'), detail: {type: 'label',extra: 'modal' } },
         ];
 
     const handleSelect = (name, value) => {

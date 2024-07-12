@@ -10,7 +10,7 @@ import { TransactionRepo } from "../../repository/transaction";
 
 
 const CompanyTransactionModel = (props) => {
-    const { transactions } = props;
+    const { transactions, openTransaction } = props;
     const { setCurrentTransaction } = useRecoilValue(TransactionRepo);
     const { t } = useTranslation();
 
@@ -19,9 +19,8 @@ const CompanyTransactionModel = (props) => {
 
     const handleSelectTransaction = useCallback((value) => {
         setCurrentTransaction(value.transaction_code);
-        // let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
-        //     keyboard: false
-        // });
+        openTransaction();
+
         let oldModal = bootstrap.Modal.getInstance('#company-details');
         if(oldModal) {
             oldModal.hide();

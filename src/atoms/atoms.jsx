@@ -139,7 +139,7 @@ export const defaultConsulting = {
     email: null,
     //-----Etc info -----------------
     create_date: null,
-    creater: null,
+    creator: null,
     modify_date: null,
     recent_user: null,
 };
@@ -254,6 +254,13 @@ export const defaultTransaction = {
     total_price: null,
     currency: null,
     payment_type: null,
+    paid_money: null,
+    bank_name: null,
+    account_owner: null,
+    account_number: null,
+    card_name: null,
+    card_number: null,
+    is_bill_publish: null,
     //-----Company info --------------
     company_code: null,
     company_name: null,
@@ -263,7 +270,7 @@ export const defaultTransaction = {
     business_item: null,
     business_registration_code: null,
     //-----Etc info --------------
-    creater: null,
+    creator: null,
     modify_date: null,
     recent_user: null,
 };

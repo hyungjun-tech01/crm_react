@@ -24,6 +24,8 @@ const Company = () => {
   const { loadAllCompanies, filterCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const filteredCompany = useRecoilValue(atomFilteredCompany);
+  const [ openTransaction, setOpenTransaction ] = useState(false);
+  const [ openBill, setOpenBill ] = useState(false);
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
 
@@ -117,7 +119,6 @@ const Company = () => {
 
   const handleSearchCondition = (newValue) => {
     setSearchCondition(newValue);
-    console.log('handle search', newValue);
     filterCompanies(statusSearch, newValue);
   };
 
@@ -125,8 +126,11 @@ const Company = () => {
   const handleClickCompanyName = useCallback((id) => {
     console.log('[Company] set current company : ', id);
     setCurrentCompany(id);
-    let myModal = bootstrap.Modal.getOrCreateInstance('#company-details');
-    myModal.show();
+    setTimeout(()=>{
+      let myModal = bootstrap.Modal.getOrCreateInstance('#company-details');
+      myModal.show();
+    }, 500);
+    
   }, [setCurrentCompany]);
 
   const columns = [
@@ -419,8 +423,9 @@ const Company = () => {
         </div>
         {/* Modal */}
         <CompanyAddModel init={initToAddCompany} handleInit={setInitToAddCompany} />
-        <CompanyDetailsModel />
-        <TransactionEditModel init={false} handleInit={null}/>
+        <CompanyDetailsModel openTransaction={() =>setOpenTransaction(true)}/>
+        <TransactionEditModel open={openTransaction} close={() =>setOpenTransaction(false)} openBill={()=>setOpenBill(true)} />
+        {/* <TransactionTaxBillModel open={openBill} close={() =>setOpenBill(false)} /> */}
         <MultiQueryModal
           title={t('company.company_multi_query')}
           open={multiQueryModal}

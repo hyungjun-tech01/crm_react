@@ -26,7 +26,6 @@ import TransactionContentModal from "./TransactionContentModal";
 import TransactionReceiptModal from "./TransactionReceiptModal";
 import MessageModal from "../../constants/MessageModal";
 import TransactionPrint from "./TransactionPrint";
-import TransactionTaxBillModel from "./TransactionTaxBillModel";
 
 const default_transaction_data = {
   title: '',
@@ -45,7 +44,7 @@ const default_transaction_data = {
   page: '1p',
 };
 
-const TransactionEditModel = () => {
+const TransactionEditModel = ({open, close, openBill}) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [ isMessageModalOpen, setIsMessageModalOpen ] = useState(false);
@@ -458,7 +457,7 @@ const TransactionEditModel = () => {
     setTransactionContents([]);
     setOrgReceiptModalData({});
     setEditedReceiptModalData({});
-    setCurrentTransaction(defaultTransaction);
+    // setCurrentTransaction(defaultTransaction);
     setSelectData({trans_type: trans_types[0], tax_type: 'vat_included', company_selection: null});
     setOrgTransaction({});
     document.querySelector("#add_new_transaction_form").reset();
@@ -485,6 +484,7 @@ const TransactionEditModel = () => {
     if(oldModal) {
         oldModal.hide();
     }
+    openBill();
     setTimeout(()=>{
         let myModal = new bootstrap.Modal(document.getElementById('edit_bill'), {
             keyboard: false
@@ -547,14 +547,21 @@ const TransactionEditModel = () => {
     };
   };
 
+  const handleClose = () => {
+    handleInitialize();
+    close();
+  }
 
   //===== useEffect ==============================================================
   useEffect(() => {
+    if(!open) return;
+    console.log('[TransactionEditModel] after open~');
     if ((companyState & 3) === 0) {
       setCompanyState(2);   //pending state
       loadAllCompanies();
       return;
     };
+    
     if (Object.keys(orgTransaction).length === 0) {
       console.log('TransactionEditModel orgTransaction has no member');
       if (currentTransaction === defaultTransaction) {
@@ -581,7 +588,9 @@ const TransactionEditModel = () => {
       };
       setOrgTransaction(tempTransaction);
     };
-  }, [companyState, orgTransaction, currentTransaction]);
+  }, [open, companyState, orgTransaction, currentTransaction]);
+
+  if(!open) return;
 
   return (
     <div
@@ -601,6 +610,7 @@ const TransactionEditModel = () => {
           className="close md-close"
           data-bs-dismiss="modal"
           aria-label="Close"
+          onClick = {handleClose}
         >
           <span aria-hidden="true">×</span>
         </button>
@@ -611,6 +621,7 @@ const TransactionEditModel = () => {
               type="button"
               className="btn-close"
               data-bs-dismiss="modal"
+              onClick = {handleClose}
             ></button>
           </div>
           <div className="modal-body">
@@ -936,6 +947,7 @@ const TransactionEditModel = () => {
                         type="button"
                         className="btn btn-secondary btn-rounded"
                         data-bs-dismiss="modal"
+                        onClick = {handleClose}
                       >
                         {t('common.cancel')}
                       </button>
@@ -966,10 +978,6 @@ const TransactionEditModel = () => {
         handleEdited={setEditedReceiptModalData}
         handleOk={handleReceiptModalOk}
         handleCancel={handleReceiptModalCancel}
-      />
-      <TransactionTaxBillModel
-        transaction={transactionForPrint}
-        contents={contentsForPrint}
       />
       <MessageModal
         title={message.title}

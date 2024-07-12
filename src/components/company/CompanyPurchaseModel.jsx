@@ -28,8 +28,8 @@ import DetailSubModal from '../../constants/DetailSubModal';
 
 const CompanyPurchaseModel = (props) => {
     const { company, purchases, handlePurchase } = props;
-    const productClassState = useRecoilValue(atomProductClassListState);
-    const productState = useRecoilValue(atomProductsState);
+    const [productClassState, setProductClassState] = useRecoilState(atomProductClassListState);
+    const [productState, setProductState] = useRecoilState(atomProductsState);
     const currentPurchase = useRecoilValue(atomCurrentPurchase);
     const { modifyPurchase, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
     const companyMAContracts = useRecoilValue(atomMAContractSet);
@@ -525,13 +525,14 @@ const CompanyPurchaseModel = (props) => {
 
     // ----- useEffect for Production -----------------------------------
     useEffect(() => {
-        console.log('[CompanyDetailModel] useEffect / Production');
-        if ((productClassState & 1) === 0) {
-            console.log('CompanyDetailsModel / loadAllProductClassList');
+        if ((productClassState & 3) === 0) {
+            console.log('[CompanyPurchaseModel] start loading product class list');
+            setProductClassState(2);
             loadAllProductClassList();
         };
-        if ((productState & 1) === 0) {
-            console.log('CompanyDetailsModel / loadAllProducts');
+        if ((productState & 3) === 0) {
+            console.log('[CompanyPurchaseModel] start loading product list');
+            setProductState(2);
             loadAllProducts();
         };
         if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
