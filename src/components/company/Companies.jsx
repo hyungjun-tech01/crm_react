@@ -15,17 +15,20 @@ import CompanyDetailsModel from "./CompanyDetailsModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import { companyColumn } from "../../repository/company";
 import TransactionEditModel from "../transactions/TransactionEditModel";
+import TransactionEditBillModel from "../transactions/TransactionEditBillModel";
 
 // import { MoreVert } from '@mui/icons-material';
 
 
-const Company = () => {
+const Companies = () => {
   const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
   const { loadAllCompanies, filterCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const filteredCompany = useRecoilValue(atomFilteredCompany);
   const [ openTransaction, setOpenTransaction ] = useState(false);
   const [ openBill, setOpenBill ] = useState(false);
+  const [ billData, setBillData ] = useState({});
+  const [ billContents, setBillContents ] = useState({});
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
 
@@ -75,10 +78,10 @@ const Company = () => {
     { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
   ];
 
-
   const handleMultiQueryModal = () => {
     setMultiQueryModal(true);
   }
+
   const handleMultiQueryModalOk = () => {
 
     setCompanyState(0);
@@ -109,13 +112,11 @@ const Company = () => {
     }
 
     loadAllCompanies(multiQueryCondi);
-
-
   };
+
   const handleMultiQueryModalCancel = () => {
     setMultiQueryModal(false);
   };
-
 
   const handleSearchCondition = (newValue) => {
     setSearchCondition(newValue);
@@ -424,8 +425,19 @@ const Company = () => {
         {/* Modal */}
         <CompanyAddModel init={initToAddCompany} handleInit={setInitToAddCompany} />
         <CompanyDetailsModel openTransaction={() =>setOpenTransaction(true)}/>
-        <TransactionEditModel open={openTransaction} close={() =>setOpenTransaction(false)} openBill={()=>setOpenBill(true)} />
-        {/* <TransactionTaxBillModel open={openBill} close={() =>setOpenBill(false)} /> */}
+        <TransactionEditModel
+          open={openTransaction}
+          close={() =>setOpenTransaction(false)}
+          openBill={()=>setOpenBill(true)} 
+          setBillData={setBillData}
+          setBillContents={setBillContents}
+        />
+        <TransactionEditBillModel
+          open={openBill}
+          close={() =>setOpenBill(false)}
+          data={billData}
+          contents={billContents}
+        />
         <MultiQueryModal
           title={t('company.company_multi_query')}
           open={multiQueryModal}
@@ -447,4 +459,4 @@ const Company = () => {
     </HelmetProvider>
   );
 };
-export default Company;
+export default Companies;

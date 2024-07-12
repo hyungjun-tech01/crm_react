@@ -8,7 +8,6 @@ import { atomCurrentUser,
     atomSalespersonsForSelection,
     atomEngineersForSelection
 } from '../atoms/atomsUser';
-import { data_user } from './test_data';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;

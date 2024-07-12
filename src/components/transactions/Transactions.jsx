@@ -21,7 +21,7 @@ import { atomAllCompanies,
 } from "../../atoms/atoms";
 import { compareCompanyName , compareText, ConvertCurrency } from "../../constants/functions";
 import TransactionEditModel from "./TransactionEditModel";
-import TransactionTaxBillModel from "./TransactionTaxBillModel";
+import TransactionEditBillModel from "./TransactionEditBillModel";
 import { useTranslation } from "react-i18next";
 
 
@@ -265,9 +265,8 @@ const Transactions = () => {
         {/* modal */}
         <SystemUserModel />
         <CompanyDetailsModel />
-        {/* <TransactionDetailsModel /> */}
         <TransactionEditModel />
-        <TransactionTaxBillModel />
+        <TransactionEditBillModel />
       </div>
     </HelmetProvider>
   );

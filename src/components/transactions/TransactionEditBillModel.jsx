@@ -66,7 +66,7 @@ const default_bill_data = {
 };
 
 
-const TransactionTaxBillModel = ({open, close}) => {
+const TransactionEditBillModel = ({open, close, data, contents}) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -83,7 +83,7 @@ const TransactionTaxBillModel = ({open, close}) => {
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
-  //===== Handles to edit 'TransactionTaxBillModel' ======================================
+  //===== Handles to edit 'TransactionEditBillModel' ======================================
   const [dataForBill, setDataForBill] = useState({...default_bill_data});
   const [transactionContents, setTransactionContents] = useState([]);
   const [isSale, setIsSale] = useState(true);
@@ -323,66 +323,68 @@ const TransactionTaxBillModel = ({open, close}) => {
 
   //===== useEffect ==============================================================
   useEffect(() => {
+    if(!open) return;
+
     if ((companyState & 3) === 0) {
       setCompanyState(2);
       loadAllCompanies();
     }
     else {
-      if(transaction) {
-        console.log('[TransactionTaxBillModel] called! :', transaction);
+      if(data) {
+        console.log('[TransactionEditBillModel] called! :', data);
         
         // dataForBill ------------------------------
-        const selectedCompany = companyForSelection.filter(item=> item.label === transaction.company_name);
+        const selectedCompany = companyForSelection.filter(item=> item.label === data.company_name);
         const tempSelectValues = {
-          trans_type: transaction.is_sale? trans_types[0] : trans_types[1],
-          bill_type: transaction.vat_included? bill_types[0] : bill_types[1],
+          trans_type: data.is_sale? trans_types[0] : trans_types[1],
+          bill_type: data.vat_included? bill_types[0] : bill_types[1],
           request_type: request_type[0],
           company_name: selectedCompany[0],
         };
-        console.log('[TransactionTaxBillModel] selectValues :', tempSelectValues);
+        console.log('[TransactionEditBillModel] selectValues :', tempSelectValues);
         setSelectValue(tempSelectValues);
 
         let tempBillData = {
           ...default_bill_data,
-          trans_type: transaction.is_sale?'매출':'매입',
-          bill_type: transaction.vat_included?'세금계산서':'계산서',
-          show_decimal: transaction.show_decimal,
+          trans_type: data.is_sale?'매출':'매입',
+          bill_type: data.vat_included?'세금계산서':'계산서',
+          show_decimal: data.show_decimal,
           request_type: '청구',
-          issue_date: transaction.publish_date,
-          supply_amount: transaction.supply_price,
-          tax_amount: transaction.tax_price,
-          total_amount: transaction.total_price,
+          issue_date: data.publish_date,
+          supply_amount: data.supply_price,
+          tax_amount: data.tax_price,
+          total_amount: data.total_price,
         };
 
-        setIsTaxBill(transaction.vat_included);
+        setIsTaxBill(data.vat_included);
         // IsSale ------------------------------------
-        setIsSale(transaction.is_sale);
-        if(transaction.is_sale) {
+        setIsSale(data.is_sale);
+        if(data.is_sale) {
           tempBillData.supplier = {...company_info};
           tempBillData.receiver = {
-            business_registration_code: transaction.business_registration_code,
-            company_name: transaction.company_name,
-            ceo_name: transaction.ceo_name,
-            company_address: transaction.company_address,
-            business_type: transaction.business_type,
-            business_item: transaction.business_item,
+            business_registration_code: data.business_registration_code,
+            company_name: data.company_name,
+            ceo_name: data.ceo_name,
+            company_address: data.company_address,
+            business_type: data.business_type,
+            business_item: data.business_item,
           }
         } else {
           tempBillData.supplier = {
-            business_registration_code: transaction.business_registration_code,
-            company_name: transaction.company_name,
-            ceo_name: transaction.ceo_name,
-            company_address: transaction.company_address,
-            business_type: transaction.business_type,
-            business_item: transaction.business_item,
+            business_registration_code: data.business_registration_code,
+            company_name: data.company_name,
+            ceo_name: data.ceo_name,
+            company_address: data.company_address,
+            business_type: data.business_type,
+            business_item: data.business_item,
           }
           tempBillData.receiver = {...company_info};
         };
         setDataForBill(tempBillData);
 
         // Amount ------------------------------------
-        const tempAmountText = typeof transaction.supply_price === 'number'
-          ? transaction.supply_price.toString() : '';
+        const tempAmountText = typeof data.supply_price === 'number'
+          ? data.supply_price.toString() : '';
         const tempVacantCount = 11 - tempAmountText.length;
         let inputAmountText = '';
 
@@ -399,8 +401,8 @@ const TransactionTaxBillModel = ({open, close}) => {
         };
         setAmountText(inputAmountText);
 
-        const tempTaxText = typeof transaction.tax_price === 'number'
-          ? transaction.tax_price.toFixed().toString() : '';
+        const tempTaxText = typeof data.tax_price === 'number'
+          ? data.tax_price.toFixed().toString() : '';
         if(tempTaxText.length > 10){
           setTaxText(tempTaxText.slice(-10));
         } else {
@@ -419,8 +421,9 @@ const TransactionTaxBillModel = ({open, close}) => {
         setTransactionContents([]);
     };
 
-  }, [contents, transaction, companyState]);
+  }, [contents, data, companyState]);
 
+  if(!open) return;
 
   return (
     <div
@@ -1024,4 +1027,4 @@ const TransactionTaxBillModel = ({open, close}) => {
   );
 };
 
-export default TransactionTaxBillModel;
+export default TransactionEditBillModel;

@@ -73,7 +73,7 @@ Font.register({
 });
 
 const TransactionPrint = (props) => {
-    const { transaction, contents} = props;
+    const { data, contents} = props;
     const [ transactionContents, setTransactionContents ] = useState([]);
     const [ supplier, setSupplier ] = useState({});
     const [ receiver, setReceiver ] = useState({});
@@ -93,28 +93,33 @@ const TransactionPrint = (props) => {
             };
             setTransactionContents(temp_array);
         };
-        if(transaction.transaction_type ==='매출'){
-            setSupplier({...company_info});
-            setReceiver({
-                business_registration_code: transaction.business_registration_code,
-                company_name: transaction.company_name,
-                ceo_name: transaction.ceo_name,
-                company_address: transaction.company_address,
-                business_type: transaction.business_type,
-                business_item: transaction.business_item,
-            });
-        } else {
-            setSupplier({
-                business_registration_code: transaction.business_registration_code,
-                company_name: transaction.company_name,
-                ceo_name: transaction.ceo_name,
-                company_address: transaction.company_address,
-                business_type: transaction.business_type,
-                business_item: transaction.business_item,
-            });
-            setReceiver({...company_info});
-        }
-    }, [contents, transaction]);
+        if(data) {
+            console.log('[TransactionPrint] :', data);
+            if(data.transaction_type ==='매출'){
+                setSupplier({...company_info});
+                setReceiver({
+                    business_registration_code: data.business_registration_code,
+                    company_name: data.company_name,
+                    ceo_name: data.ceo_name,
+                    company_address: data.company_address,
+                    business_type: data.business_type,
+                    business_item: data.business_item,
+                });
+            } else {
+                setSupplier({
+                    business_registration_code: data.business_registration_code,
+                    company_name: data.company_name,
+                    ceo_name: data.ceo_name,
+                    company_address: data.company_address,
+                    business_type: data.business_type,
+                    business_item: data.business_item,
+                });
+                setReceiver({...company_info});
+            };
+        };
+    }, [contents, data]);
+
+    if(!data) return;
 
     return (
         <PDFViewer style={{width: '100%', minHeight: '480px', height: '960px'}}>
@@ -401,19 +406,19 @@ const TransactionPrint = (props) => {
                                         <Text style={[Styles.SupplierText,{fontSize:10}]}>공급가액</Text>
                                     </View>
                                     <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.supply_price)}</Text>
+                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(data.supply_price)}</Text>
                                     </View>
                                     <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.SupplierText,{fontSize:10}]}>세액</Text>
                                     </View>
                                     <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.tax_price)}</Text>
+                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(data.tax_price)}</Text>
                                     </View>
                                     <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.SupplierText,{fontSize:10}]}>합계금액</Text>
                                     </View>
                                     <View style={{width:'23.4%',margin:0,padding:0,alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.total_price)}</Text>
+                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(data.total_price)}</Text>
                                     </View>
                                 </View>
                                 <View style={{width: '100%',height:18,margin:0,padding:0,border:0,flexDirection:'row',alignContent:'center'}}>
@@ -421,19 +426,19 @@ const TransactionPrint = (props) => {
                                         <Text style={[Styles.SupplierText,{fontSize:10}]}>입금</Text>
                                     </View>
                                     <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.receipt)}</Text>
+                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(data.receipt)}</Text>
                                     </View>
                                     <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.SupplierText,{fontSize:10}]}>미수금</Text>
                                     </View>
                                     <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.valance_prev)}</Text>
+                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(data.valance_prev)}</Text>
                                     </View>
                                     <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.SupplierText,{fontSize:10}]}>인수자</Text>
                                     </View>
                                     <View style={{width:'23.4%',margin:0,padding:0,alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{transaction.receiver}</Text>
+                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{data.receiver}</Text>
                                     </View>
                                 </View>
                             </View>
@@ -722,19 +727,19 @@ const TransactionPrint = (props) => {
                                         <Text style={[Styles.ReceiverText,{fontSize:10}]}>공급가액</Text>
                                     </View>
                                     <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.supply_price)}</Text>
+                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(data.supply_price)}</Text>
                                     </View>
                                     <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.ReceiverText,{fontSize:10}]}>세액</Text>
                                     </View>
                                     <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.tax_price)}</Text>
+                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(data.tax_price)}</Text>
                                     </View>
                                     <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.ReceiverText,{fontSize:10}]}>합계금액</Text>
                                     </View>
                                     <View style={{width:'23.4%',margin:0,padding:0,alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.total_price)}</Text>
+                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(data.total_price)}</Text>
                                     </View>
                                 </View>
                                 <View style={{width: '100%',height:18,margin:0,padding:0,border:0,flexDirection:'row',alignContent:'center'}}>
@@ -742,19 +747,19 @@ const TransactionPrint = (props) => {
                                         <Text style={[Styles.ReceiverText,{fontSize:10}]}>입금</Text>
                                     </View>
                                     <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.receipt)}</Text>
+                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(data.receipt)}</Text>
                                     </View>
                                     <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.ReceiverText,{fontSize:10}]}>미수금</Text>
                                     </View>
                                     <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(transaction.valance_prev)}</Text>
+                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(data.valance_prev)}</Text>
                                     </View>
                                     <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.ReceiverText,{fontSize:10}]}>인수자</Text>
                                     </View>
                                     <View style={{width:'23.4%',margin:0,padding:0,alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{transaction.receiver}</Text>
+                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{data.receiver}</Text>
                                     </View>
                                 </View>
                             </View>

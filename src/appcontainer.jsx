@@ -10,7 +10,7 @@ import Dashboard from "./components/dashboard";
 import ProjectDashboard from "./components/dashboard/projectdashboard";
 import LeadDashboard from "./components/dashboard/leaddashboard";
 //main
-import Company from "./components/company";
+import Companies from "./components/company/Companies";
 import Leads from "./components/leads/index.jsx";
 import Consultings from "./components/consulting/Consultings.jsx";
 import Transactions from "./components/transactions/Transactions.jsx";
@@ -226,7 +226,7 @@ const AppUniversal = (props) => {
           <Route path="/SystemUserModel" exact component={SystemUserModel} />
           <Route path="/TaskDetailModel" exact component={TaskDetailModel} />
           <Route path="/contacts" exact component={Contacts} />
-          <Route path="/companies" exact component={Company} />
+          <Route path="/companies" exact component={Companies} />
           <Route path="/CompanyDetailsModel" exact component={CompanyDetailsModel} />
           <Route path="/leads" exact component={Leads} />
           <Route path="/LeadDetailModel" exact component={LeadDetailsModel} />

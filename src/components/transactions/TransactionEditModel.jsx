@@ -44,7 +44,7 @@ const default_transaction_data = {
   page: '1p',
 };
 
-const TransactionEditModel = ({open, close, openBill}) => {
+const TransactionEditModel = ({open, close, openBill, setBillData, setBillContents}) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [ isMessageModalOpen, setIsMessageModalOpen ] = useState(false);
@@ -114,9 +114,14 @@ const TransactionEditModel = ({open, close, openBill}) => {
         [name]: selected.value,
       };
     };
-
     setTransactionChange(modifiedData);
-  }, [transactionChange]);
+
+    const tempSelect = {
+      ...selectData,
+      [name]: selected,
+    };
+    setSelectData(tempSelect);
+  }, [transactionChange, selectData]);
 
   const trans_types = [
     { value: '매출', label: t('company.deal_type_sales') },
@@ -405,7 +410,12 @@ const TransactionEditModel = ({open, close, openBill}) => {
         setTransactionContents(tempContents);
         handleAmountCalculation(tempContents);
       };
-    }
+    };
+    const tempSelect = {
+      ...selectData,
+      tax_type: e.target.value
+    };
+    setSelectData(tempSelect);
   };
 
   const handleStartEditReceipt = () => {
@@ -445,26 +455,33 @@ const TransactionEditModel = ({open, close, openBill}) => {
   };
 
   //===== Handles for special actions =============================================
-  const [transactionForPrint, setTransactionForPrint] = useState({});
-  const [contentsForPrint, setContentsForPrint] = useState([]);
+  const [transactionForPrint, setTransactionForPrint] = useState(null);
+  const [contentsForPrint, setContentsForPrint] = useState(null);
 
   const handleInitialize = useCallback(() => {
     setIsSale(true);
     setIsVatIncluded(true);
     setShowDecimal(false);
     setDataForTransaction({...default_transaction_data});
-    setTransactionChange({ ...defaultTransaction });
+    setTransactionChange({});
     setTransactionContents([]);
     setOrgReceiptModalData({});
     setEditedReceiptModalData({});
     // setCurrentTransaction(defaultTransaction);
     setSelectData({trans_type: trans_types[0], tax_type: 'vat_included', company_selection: null});
     setOrgTransaction({});
+    setTransactionForPrint(null);
+    setContentsForPrint(null);
     document.querySelector("#add_new_transaction_form").reset();
   }, []);
 
   const handleShowPrint = () => {
+    console.log('[TransactionEditModel] org:', orgTransaction);
+    console.log('[TransactionEditModel] change:', transactionChange);
+    console.log('[TransactionEditModel] data:', dataForTransaction);
+
     const tempTransactionData = {
+      ...orgTransaction,
       ...transactionChange,
       ...dataForTransaction,
     };
@@ -473,13 +490,14 @@ const TransactionEditModel = ({open, close, openBill}) => {
   };
 
   const handleShowTaxBill = () => {
-    const tempTransactionData = {
+    setBillData({
       ...orgTransaction,
       ...transactionChange,
       ...dataForTransaction,
-    };
-    setTransactionForPrint(tempTransactionData);
-    setContentsForPrint(transactionContents);
+    });
+    setBillContents([
+      ...transactionContents,
+    ]);
     let oldModal = bootstrap.Modal.getInstance('#edit_transaction');
     if(oldModal) {
         oldModal.hide();
@@ -568,14 +586,14 @@ const TransactionEditModel = ({open, close, openBill}) => {
         console.log('[TransactionEditModel] Add New Transaction~');
         handleInitialize();
       } else {
-        console.log('[TransactionEditModel] Modify Transaction~');
+        console.log('[TransactionEditModel] Modify Transaction~', currentTransaction);
         const currentContents = JSON.parse(currentTransaction.transaction_contents);
         setTransactionContents(currentContents);
   
         const tempCurrentCompany = companyForSelection.filter(item => item.value.company_code === currentTransaction.company_code);
         const tempData = {
-          trans_type: (currentTransaction.business_type === '매출' || currentTransaction.business_type === 'sale')
-            ? trans_types[0] : trans_types[1],
+          trans_type: (currentTransaction.transaction_type === '매입' || currentTransaction.transaction_type === 'purchase')
+            ? trans_types[1] : trans_types[0],
           tax_type: currentTransaction.tax_price && currentTransaction.tax_price > 0 ? 'vat_included' : 'vat_excluded',
           company_selection: tempCurrentCompany.length > 0 ? tempCurrentCompany[0]: null,
         }
@@ -584,6 +602,7 @@ const TransactionEditModel = ({open, close, openBill}) => {
   
       const tempTransaction = {
         ...currentTransaction,
+        transaction_type: currentTransaction.transaction_type ? currentTransaction.transaction_type : '매출',
         publish_date: currentTransaction.publish_date ? new Date(currentTransaction.publish_date) : null,
       };
       setOrgTransaction(tempTransaction);
@@ -670,7 +689,7 @@ const TransactionEditModel = ({open, close, openBill}) => {
                                 <Col>
                                   <Select
                                     className="trans_select"
-                                    defaultValue={selectData.trans_type}
+                                    value={selectData.trans_type}
                                     onChange={selected => handleSelectChange('transaction_type', selected)}
                                     options={trans_types}
                                   />
@@ -681,7 +700,7 @@ const TransactionEditModel = ({open, close, openBill}) => {
                                 <Col>
                                   <Select
                                     className="trans_select"
-                                    defaultValue={selectData.company_selection}
+                                    value={selectData.company_selection}
                                     onChange={selected => handleSelectChange('company_name', selected)}
                                     options={companyForSelection}
                                   />
@@ -727,7 +746,12 @@ const TransactionEditModel = ({open, close, openBill}) => {
                             <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
                               <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.company_name')}</Col>
                               <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
-                                <label>{transactionChange['company_name']}</label>
+                                <label>
+                                  {transactionChange['company_name']
+                                    ? transactionChange['company_name']
+                                    : orgTransaction.company_name
+                                  }
+                                </label>
                               </Col>
                               <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('common.name2')}</Col>
                               <Col flex={1}>
@@ -782,9 +806,9 @@ const TransactionEditModel = ({open, close, openBill}) => {
                           <div style={{ flexGrow: 1 }}>{t('transaction.tax_type')} : </div>
                           <div style={{ flexGrow: 3 }}>
                             <select
-                              name='vat_type'
+                              name='tax_type'
                               onChange={handleVATChange}
-                              defaultValue={selectData.tax_type}
+                              value={selectData.tax_type}
                             >
                               <option value='vat_excluded'>{t('quotation.vat_excluded')}</option>
                               <option value='vat_included'>{t('quotation.vat_included')}</option>
@@ -955,7 +979,9 @@ const TransactionEditModel = ({open, close, openBill}) => {
                   </form>
                 </div>
                 <div className="tab-pane show" id="transaction-print">
-                  <TransactionPrint transaction={transactionForPrint} contents={contentsForPrint}/>
+                  {transactionForPrint && 
+                    <TransactionPrint data={transactionForPrint} contents={contentsForPrint}/>
+                  }
                 </div>
               </div>
             </div>
