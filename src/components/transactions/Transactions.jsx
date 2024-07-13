@@ -26,15 +26,19 @@ import { useTranslation } from "react-i18next";
 
 
 const Transactions = () => {
+  const { t } = useTranslation();
   const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
-  const [transactionState, setTransactionState] = useRecoilValue(atomTransactionState);
+  const [transactionState, setTransactionState] = useRecoilState(atomTransactionState);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const allTransactionData = useRecoilValue(atomAllTransactions);
   const filteredTransaction= useRecoilValue(atomFilteredTransaction);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const { loadAllTransactions, setCurrentTransaction , filterTransactions} = useRecoilValue(TransactionRepo);
+  const [ openTransaction, setOpenTransaction ] = useState(false);
+  const [ openBill, setOpenBill ] = useState(false);
+  const [ billData, setBillData ] = useState(null);
+  const [ billContents, setBillContents ] = useState(null);
 
-  const { t } = useTranslation();
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -133,6 +137,18 @@ const Transactions = () => {
     setCurrentTransaction(defaultTransaction);
   }, [setCurrentTransaction]);
 
+  const handleOpenTransactoin = (code) => {
+    setCurrentTransaction(code)
+    setOpenTransaction(true);
+
+    setTimeout(()=>{
+      let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
+        keyboard: false
+      })
+      myModal.show();
+    }, 500);
+  }
+
   useEffect(() => {
     console.log('Transaction called!');
     if((companyState & 3) === 0) {
@@ -220,11 +236,7 @@ const Transactions = () => {
                         onRow={(record, rowIndex) => {
                           return {
                             onClick: (event) => {
-                              setCurrentTransaction(record.transaction_code)
-                              let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
-                                keyboard: false
-                              })
-                              myModal.show();
+                              handleOpenTransactoin(record.transaction_code)
                             }, // double click row
                           };
                         }}
@@ -245,11 +257,7 @@ const Transactions = () => {
                       onRow={(record, rowIndex) => {
                         return {
                           onClick: (event) => {
-                            setCurrentTransaction(record.transaction_code)
-                            let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
-                              keyboard: false
-                            })
-                            myModal.show();
+                            handleOpenTransactoin(record.transaction_code)
                           }, // double click row
                         };
                       }}
@@ -265,8 +273,19 @@ const Transactions = () => {
         {/* modal */}
         <SystemUserModel />
         <CompanyDetailsModel />
-        <TransactionEditModel />
-        <TransactionEditBillModel />
+        <TransactionEditModel
+          open={openTransaction}
+          close={()=>setOpenTransaction(false)}
+          openBill={()=>setOpenBill(true)}
+          setBillData={setBillData}
+          setBillContents={setBillContents}
+        />
+        <TransactionEditBillModel
+          open={openBill}
+          close={()=>setOpenBill(false)}
+          data={billData}
+          contents={billContents}
+        />
       </div>
     </HelmetProvider>
   );
