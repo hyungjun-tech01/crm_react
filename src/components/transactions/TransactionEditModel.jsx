@@ -164,24 +164,19 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
       render: (text, record) => <>{text}</>,
     },
     {
-      title: t('transaction.unit_price'),
-      dataIndex: 'unit_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForTransaction.show_decimal && 4)}</>,
-    },
-    {
       title: t('transaction.supply_price'),
       dataIndex: 'supply_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForTransaction.show_decimal && 4)}</>,
+      render: (text, record) => <>{ConvertCurrency(record.supply_price, dataForTransaction.show_decimal && 4)}</>,
     },
     {
       title: t('transaction.tax_price'),
       dataIndex: 'tax_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForTransaction.show_decimal && 4)}</>,
+      render: (text, record) => <>{ConvertCurrency(record.tax_price, dataForTransaction.show_decimal && 4)}</>,
     },
     {
       title: t('transaction.total_price'),
       dataIndex: 'total_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForTransaction.show_decimal && 4)}</>,
+      render: (text, record) => <>{ConvertCurrency(record.total_price, dataForTransaction.show_decimal && 4)}</>,
     },
     {
       title: t('transaction.modified'),

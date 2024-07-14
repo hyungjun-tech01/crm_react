@@ -146,7 +146,7 @@ const Transactions = () => {
         keyboard: false
       })
       myModal.show();
-    }, 500);
+    }, 1000);
   }
 
   useEffect(() => {

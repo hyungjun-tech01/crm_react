@@ -63,6 +63,10 @@ const default_bill_data = {
   check:0,
   note:0,
   credit:0,
+
+  supply_text:'',
+  tax_text:'',
+  vacant_count: 0,
 };
 
 
@@ -88,9 +92,6 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
   const [transactionContents, setTransactionContents] = useState([]);
   const [isSale, setIsSale] = useState(true);
   const [isTaxBill, setIsTaxBill] = useState(true);
-  const [vacantNo, setVacantNo] = useState(0);
-  const [amountText, setAmountText] = useState('');
-  const [taxText, setTaxText] = useState('');
   const [selectValues, setSelectValue] = useState({})
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
 
@@ -219,24 +220,19 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
       render: (text, record) => <>{text}</>,
     },
     {
-      title: t('transaction.unit_price'),
-      dataIndex: 'unit_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForBill.show_decimal)}</>,
-    },
-    {
       title: t('transaction.supply_price'),
       dataIndex: 'supply_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForBill.show_decimal)}</>,
+      render: (text, record) => <>{ConvertCurrency(record.supply_price, dataForBill.show_decimal && 4)}</>,
     },
     {
       title: t('transaction.tax_price'),
       dataIndex: 'tax_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForBill.show_decimal)}</>,
+      render: (text, record) => <>{ConvertCurrency(record.tax_price, dataForBill.show_decimal && 4)}</>,
     },
     {
       title: t('transaction.total_price'),
       dataIndex: 'total_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForBill.show_decimal)}</>,
+      render: (text, record) => <>{ConvertCurrency(record.total_price, dataForBill.show_decimal && 4)}</>,
     },
     {
       title: t('common.memo'),
@@ -344,6 +340,39 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
         console.log('[TransactionEditBillModel] selectValues :', tempSelectValues);
         setSelectValue(tempSelectValues);
 
+        // Text for Supply ------------------------------------
+        let inputAmountText = '';
+        let vacantCount = 0;
+
+        const tempAmountText = typeof data.supply_price === 'number'
+          ? data.supply_price.toString() : '';
+        const tempVacantCount = 11 - tempAmountText.length;
+
+        if(tempVacantCount < 0){
+          console.log('Too high value');
+          vacantCount = 0;
+          inputAmountText = tempAmountText.slice(-11);
+        } else {
+          vacantCount = tempVacantCount;
+          for(let i=0; i < tempVacantCount; i++){
+            inputAmountText += ' ';
+          };
+          inputAmountText += tempAmountText;
+        };
+
+        // Text for Tax ------------------------------------
+        let intputTaxText = '';
+        const tempTaxText = typeof data.tax_price === 'number'
+          ? data.tax_price.toFixed().toString() : '';
+        if(tempTaxText.length > 10){
+          intputTaxText = tempTaxText.slice(-10);
+        } else {
+          for(let i=0; i< 10-tempTaxText.length; i++){
+            intputTaxText += ' ';
+          };
+          intputTaxText += tempTaxText;
+        };
+
         let tempBillData = {
           ...default_bill_data,
           trans_type: data.is_sale?'매출':'매입',
@@ -354,6 +383,10 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
           supply_amount: data.supply_price,
           tax_amount: data.tax_price,
           total_amount: data.total_price,
+
+          supply_text: inputAmountText,
+          tax_text: intputTaxText,
+          vacant_count: vacantCount,
         };
 
         setIsTaxBill(data.vat_included);
@@ -381,38 +414,6 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
           tempBillData.receiver = {...company_info};
         };
         setDataForBill(tempBillData);
-
-        // Amount ------------------------------------
-        const tempAmountText = typeof data.supply_price === 'number'
-          ? data.supply_price.toString() : '';
-        const tempVacantCount = 11 - tempAmountText.length;
-        let inputAmountText = '';
-
-        if(tempVacantCount < 0){
-          console.log('Too high value');
-          setVacantNo(0);
-          inputAmountText = tempAmountText.slice(-11);
-        } else {
-          setVacantNo(tempVacantCount);
-          for(let i=0; i < tempVacantCount; i++){
-            inputAmountText += ' ';
-          };
-          inputAmountText += tempAmountText;
-        };
-        setAmountText(inputAmountText);
-
-        const tempTaxText = typeof data.tax_price === 'number'
-          ? data.tax_price.toFixed().toString() : '';
-        if(tempTaxText.length > 10){
-          setTaxText(tempTaxText.slice(-10));
-        } else {
-          let intputTaxText = '';
-          for(let i=0; i< 10-tempTaxText.length; i++){
-            intputTaxText += ' ';
-          };
-          intputTaxText += tempTaxText;
-          setTaxText(intputTaxText);
-        };
       }
       // Copy contents into 'transaction contents' -------------------
       if(contents)
@@ -794,51 +795,51 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
                           <div className={classNames(styles.Units, { "trans_pur": !isSale })}>
                             <div className={classNames(styles.Unit3, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>공란수</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{vacantNo}</div></div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.vacant_count}</div></div>
                             </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>백</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{amountText.at(0)}</div></div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(0)}</div></div>
                             </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>십</div>
-                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{amountText.at(1)}</div></div>
+                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForBill.supply_text.at(1)}</div></div>
                             </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>억</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{amountText.at(2)}</div></div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(2)}</div></div>
                             </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>천</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{amountText.at(3)}</div></div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(3)}</div></div>
                               </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>백</div>
-                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{amountText.at(4)}</div></div>
+                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForBill.supply_text.at(4)}</div></div>
                               </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>십</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{amountText.at(5)}</div></div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(5)}</div></div>
                               </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>만</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{amountText.at(6)}</div></div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(6)}</div></div>
                               </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>천</div>
-                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{amountText.at(7)}</div></div>
+                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForBill.supply_text.at(7)}</div></div>
                               </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>백</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{amountText.at(8)}</div></div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(8)}</div></div>
                               </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>십</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{amountText.at(9)}</div></div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(9)}</div></div>
                             </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper0}>원</div>
-                              <div className={styles.lower0}><div style={{color:'black'}}>{amountText.at(10)}</div></div>
+                              <div className={styles.lower0}><div style={{color:'black'}}>{dataForBill.supply_text.at(10)}</div></div>
                             </div>
                           </div>
                         </div>
@@ -848,43 +849,43 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
                             <div className={classNames(styles.Units, { "trans_pur": !isSale })}>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>십</div>
-                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}>{taxText.at(0)}</div>
+                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}>{dataForBill.tax_text.at(0)}</div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>억</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{taxText.at(1)}</div></div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(1)}</div></div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>천</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{taxText.at(2)}</div></div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(2)}</div></div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>백</div>
-                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{taxText.at(3)}</div></div>
+                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForBill.tax_text.at(3)}</div></div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>십</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{taxText.at(4)}</div></div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(4)}</div></div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>만</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{taxText.at(5)}</div></div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(5)}</div></div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>천</div>
-                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{taxText.at(6)}</div></div>
+                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForBill.tax_text.at(6)}</div></div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>백</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{taxText.at(7)}</div></div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(7)}</div></div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>십</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{taxText.at(8)}</div></div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(8)}</div></div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper0}>원</div>
-                                <div className={styles.lower0}><div style={{color:'black'}}>{taxText.at(9)}</div></div>
+                                <div className={styles.lower0}><div style={{color:'black'}}>{dataForBill.tax_text.at(9)}</div></div>
                               </div>
                             </div>
                           </div>
