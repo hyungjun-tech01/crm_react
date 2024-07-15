@@ -616,39 +616,49 @@ const TransactionBillPrint = (props) => {
                                 })}
                             </View>
                             {billData && 
-                                <View style={{width:'100%',height:36,margin:0,padding:0,flexDirection:'column'}}>
-                                    <View style={{width: '100%',height:18,margin:0,padding:0,borderBottom:1,borderColor:'#0000ff',flexDirection:'row',alignContent:'center'}}>
-                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
+                                <View style={{width: '100%',margin:0,padding:0,flexDirection:'row',alignContent:'center'}}>
+                                    <View style={{flex:'1 1 16%',margin:0,padding:0,borderBottom:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',alignContent:'center'}}>
+                                        <View style={{width: '100%',height:18,margin:0,padding:0,borderRight:0.6,borderBottom:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>합 계 금 액</Text>
                                         </View>
-                                        <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
+                                        <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
                                             <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(billData.total_amount)}</Text>
                                         </View>
-                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
+                                    </View>
+                                    <View style={{flex:'1 1 16%',margin:0,padding:0,borderBottom:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',alignContent:'center'}}>
+                                        <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderBottom:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>현    금</Text>
                                         </View>
-                                        <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
+                                        <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
                                             <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(billData.cash)}</Text>
                                         </View>
-                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
+                                    </View>
+                                    <View style={{flex:'1 1 16%',margin:0,padding:0,borderBottom:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',alignContent:'center'}}>
+                                        <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderBottom:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>수    표</Text>
                                         </View>
-                                        <View style={{width:'23.4%',margin:0,padding:0,alignItems:'center',justifyContent:'end'}}>
+                                        <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,alignItems:'center',justifyContent:'end'}}>
                                             <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(billData.check)}</Text>
                                         </View>
-                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
+                                    </View>
+                                    <View style={{flex:'1 1 16%',margin:0,padding:0,borderBottom:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',alignContent:'center'}}>
+                                        <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderBottom:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>어    음</Text>
                                         </View>
-                                        <View style={{width:'23.4%',margin:0,padding:0,alignItems:'center',justifyContent:'end'}}>
+                                        <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,alignItems:'center',justifyContent:'end'}}>
                                             <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(billData.note)}</Text>
                                         </View>
-                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
+                                    </View>
+                                    <View style={{flex:'1 1 16%',margin:0,padding:0,borderBottom:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',alignContent:'center'}}>
+                                        <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderBottom:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>외상미수금</Text>
                                         </View>
-                                        <View style={{width:'23.4%',margin:0,padding:0,alignItems:'center',justifyContent:'end'}}>
+                                        <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,alignItems:'center',justifyContent:'end'}}>
                                             <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(billData.credit)}</Text>
                                         </View>
-                                        <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
+                                    </View>
+                                    <View style={{flex:'1 1 20%',margin:0,padding:0,borderBottom:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',alignContent:'center'}}>
+                                        <View style={{width:'100%',height:36,margin:0,padding:0,alignItems:'center',justifyContent:'center'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>이 금액일 청구 함.</Text>
                                         </View>
                                     </View>
