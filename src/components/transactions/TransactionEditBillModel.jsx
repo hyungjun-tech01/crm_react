@@ -21,7 +21,7 @@ import { TransactionRepo } from "../../repository/transaction";
 
 import { ConvertCurrency } from "../../constants/functions";
 import MessageModal from "../../constants/MessageModal";
-import TaxBillPrint from "./TaxBillPrint";
+import TransactionBillPrint from "./TransactionBillPrint";
 
 import styles from './Transaction.module.scss';
 import { company_info } from "../../repository/user";
@@ -345,7 +345,7 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
         let vacantCount = 0;
 
         const tempAmountText = typeof data.supply_price === 'number'
-          ? data.supply_price.toString() : '';
+          ? data.supply_price.toString() : data.supply_price;
         const tempVacantCount = 11 - tempAmountText.length;
 
         if(tempVacantCount < 0){
@@ -363,7 +363,7 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
         // Text for Tax ------------------------------------
         let intputTaxText = '';
         const tempTaxText = typeof data.tax_price === 'number'
-          ? data.tax_price.toFixed().toString() : '';
+          ? data.tax_price.toFixed().toString() : data.tax_price;
         if(tempTaxText.length > 10){
           intputTaxText = tempTaxText.slice(-10);
         } else {
@@ -373,9 +373,11 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
           intputTaxText += tempTaxText;
         };
 
+        const isCash = data.payment_type === '현금';
+
         let tempBillData = {
           ...default_bill_data,
-          trans_type: data.is_sale?'매출':'매입',
+          trans_type: data.transaction_type,
           bill_type: data.vat_included?'세금계산서':'계산서',
           show_decimal: data.show_decimal,
           request_type: '청구',
@@ -387,6 +389,9 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
           supply_text: inputAmountText,
           tax_text: intputTaxText,
           vacant_count: vacantCount,
+
+          cash: isCash ? data.paid_money: 0,
+          check: isCash ? 0 : data.paid_money,
         };
 
         setIsTaxBill(data.vat_included);
@@ -1011,7 +1016,7 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
                   </form>
                 </div>
                 <div className="tab-pane show" id="tax-bill-print">
-                  <TaxBillPrint billData={dataForBill} contents={contents}/>
+                  <TransactionBillPrint billData={dataForBill} contents={contents}/>
                 </div>
               </div>
             </div>

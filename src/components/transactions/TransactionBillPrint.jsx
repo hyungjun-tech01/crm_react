@@ -71,14 +71,14 @@ Font.register({
     ]
 });
 
-const TaxBillPrint = (props) => {
+const TransactionBillPrint = (props) => {
     const { billData, contents} = props;
     const [ transactionContents, setTransactionContents ] = useState([]);
     const [ supplier, setSupplier ] = useState({});
     const [ receiver, setReceiver ] = useState({});
 
     useEffect(() => {
-        console.log('TaxBillPrint: ', billData);
+        console.log('TransactionBillPrint: ', billData);
         if(contents && Array.isArray(contents) && contents.length > 0){
             const num_10 = Math.ceil(contents.length / 10) * 10;
             let temp_array = new Array(num_10);
@@ -665,4 +665,4 @@ const TaxBillPrint = (props) => {
     );
 };
 
-export default TaxBillPrint;
+export default TransactionBillPrint;
