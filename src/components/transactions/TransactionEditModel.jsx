@@ -31,17 +31,23 @@ const default_transaction_data = {
   title: '',
   is_sale: true,
   vat_included: true,
-  show_decimal: false,
+  show_decimal: 0,
   valance_prev: 0,
-  supply_price: 0,
-  tax_price: 0,
-  total_price: 0,
-  receipt: 0,
   valance_final: 0,
   receiver: '',
   page_cur: 1,
   page_total: 1,
   page: '1p',
+};
+
+const default_receipt_data = {
+  paid_money: 0,
+  payment_type: '현금',
+  bank_name: '',
+  account_owner: '',
+  account_number: '',
+  card_no: '',
+  card_number: '',
 };
 
 const TransactionEditModel = ({open, close, openBill, setBillData, setBillContents}) => {
@@ -53,7 +59,7 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
 
   //===== [RecoilState] Related with Transaction =====================================
   const currentTransaction = useRecoilValue(atomCurrentTransaction);
-  const { modifyTransaction, setCurrentTransaction } = useRecoilValue(TransactionRepo);
+  const { modifyTransaction } = useRecoilValue(TransactionRepo);
 
 
   //===== [RecoilState] Related with Company =========================================
@@ -68,7 +74,7 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
   const [transactionContents, setTransactionContents] = useState([]);
   const [isSale, setIsSale] = useState(true);
   const [isVatIncluded, setIsVatIncluded] = useState(true);
-  const [showDecimal, setShowDecimal] = useState(false);
+  const [showDecimal, setShowDecimal] = useState(0);
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
   const [selectData, setSelectData] = useState({});
 
@@ -166,17 +172,17 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
     {
       title: t('transaction.supply_price'),
       dataIndex: 'supply_price',
-      render: (text, record) => <>{ConvertCurrency(record.supply_price, dataForTransaction.show_decimal && 4)}</>,
+      render: (text, record) => <>{ConvertCurrency(record.supply_price, dataForTransaction.show_decimal)}</>,
     },
     {
       title: t('transaction.tax_price'),
       dataIndex: 'tax_price',
-      render: (text, record) => <>{ConvertCurrency(record.tax_price, dataForTransaction.show_decimal && 4)}</>,
+      render: (text, record) => <>{ConvertCurrency(record.tax_price, dataForTransaction.show_decimal)}</>,
     },
     {
       title: t('transaction.total_price'),
       dataIndex: 'total_price',
-      render: (text, record) => <>{ConvertCurrency(record.total_price, dataForTransaction.show_decimal && 4)}</>,
+      render: (text, record) => <>{ConvertCurrency(record.total_price, dataForTransaction.show_decimal)}</>,
     },
     {
       title: t('transaction.modified'),
@@ -200,9 +206,9 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
       if(isNaN(ret)) return;
     };
     
-    return showDecimal
-      ? ret?.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,')
-      : ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return showDecimal === 0
+      ? ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+      : ret?.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,');
   }, [showDecimal]);
 
   const handleAmountCalculation = (data) => {
@@ -212,7 +218,13 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
       tax_price += item.tax_price;
       total_price += item.total_price;
     });
-    const valance_final = dataForTransaction.valance_prev + total_price - dataForTransaction.receipt;
+    let tempEdited = { ...transactionChange };
+    if(!tempEdited['supply_price'] || (tempEdited.supply_price !== supply_price)) tempEdited['supply_price'] = supply_price;
+    if(!tempEdited['tax_price'] || (tempEdited.tax_price !== tax_price)) tempEdited['tax_price'] = tax_price;
+    if(!tempEdited['total_price'] || (tempEdited.total_price !== total_price)) tempEdited['total_price'] = supply_price;
+    setTransactionChange(tempEdited);
+
+    const valance_final = Number(dataForTransaction.valance_prev) + total_price - Number(currentTransaction.paid_money);
     const tempData = {
       ...dataForTransaction,
       is_sale: isSale,
@@ -414,15 +426,6 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
   };
 
   const handleStartEditReceipt = () => {
-    if(!orgReceiptModalData['payment_amount']){
-      const tempReceipt = {
-        payment_amount: 0,
-        payment_type: '현금',
-        payment_org: '',
-        payment_code: '',
-      };
-      setOrgReceiptModalData(tempReceipt);
-    };
     setIsReceiptModalOpen(true);
   };
 
@@ -435,13 +438,36 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
     setOrgReceiptModalData(tempOrgData);
     setEditedReceiptModalData({});
     
-    const temp_valance= dataForTransaction.valance_prev + dataForTransaction.total_price - tempOrgData.payment_amount;
+    const temp_valance= Number(dataForTransaction.valance_prev) + Number(currentTransaction.total_price) - Number(tempOrgData.paid_money);
     const tempData={
       ...dataForTransaction,
-      receipt: tempOrgData.payment_amount,
       valance_final: temp_valance,
     };
     setDataForTransaction(tempData);
+
+    let tempEdited = { ...transactionChange };
+    if(currentTransaction.paid_money !== tempOrgData.paid_money){
+      tempEdited['paid_money'] = tempOrgData.paid_money;
+    };
+    if(currentTransaction.payment_type !== tempOrgData.payment_type){
+      tempEdited['payment_type'] = tempOrgData.payment_type;
+    };
+    if(currentTransaction.bank_name !== tempOrgData.bank_name){
+      tempEdited['bank_name'] = tempOrgData.bank_name;
+    };
+    if(currentTransaction.account_owner !== tempOrgData.account_owner){
+      tempEdited['account_owner'] = tempOrgData.account_owner;
+    };
+    if(currentTransaction.account_number !== tempOrgData.account_number){
+      tempEdited['account_number'] = tempOrgData.account_number;
+    };
+    if(currentTransaction.card_name !== tempOrgData.card_name){
+      tempEdited['card_name'] = tempOrgData.card_name;
+    };
+    if(currentTransaction.card_number !== tempOrgData.card_number){
+      tempEdited['card_number'] = tempOrgData.card_number;
+    };
+    setTransactionChange(tempEdited);
   };
 
   const handleReceiptModalCancel = () => {
@@ -456,11 +482,11 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
   const handleInitialize = useCallback(() => {
     setIsSale(true);
     setIsVatIncluded(true);
-    setShowDecimal(false);
+    setShowDecimal(0);
     setDataForTransaction({...default_transaction_data});
     setTransactionChange({});
     setTransactionContents([]);
-    setOrgReceiptModalData({});
+    setOrgReceiptModalData({...default_receipt_data});
     setEditedReceiptModalData({});
     // setCurrentTransaction(defaultTransaction);
     setSelectData({trans_type: trans_types[0], tax_type: 'vat_included', company_selection: null});
@@ -538,7 +564,7 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
         };
       }
       else {
-        setMessage({title: '저장 중 오류', message: `오류가 발생하여 저장하지 못했습니다.\n- ${res}`});
+        setMessage({title: '저장 중 오류', message: `오류가 발생하여 저장하지 못했습니다.`});
         setIsMessageModalOpen(true);
       };
     });
@@ -554,9 +580,14 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
   };
 
   const handleShowDecimal = (e) => {
-    if(showDecimal !== e.target.checked)
-    {
-      setShowDecimal(e.target.checked)
+    if(e.target.checked && showDecimal === 0) {
+      setShowDecimal(4);
+      const tempData = {...dataForTransaction, show_decimal: 4};
+      setDataForTransaction(tempData);
+    } else if(!e.target.checked && showDecimal !== 0) {
+      setShowDecimal(0);
+      const tempData = {...dataForTransaction, show_decimal: 0};
+      setDataForTransaction(tempData);
     };
   };
 
@@ -584,12 +615,17 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
         console.log('[TransactionEditModel] Modify Transaction~', currentTransaction);
         const currentContents = JSON.parse(currentTransaction.transaction_contents);
         setTransactionContents(currentContents);
-  
+        
+        const tempIsSale = !(currentTransaction.transaction_type === '매입' || currentTransaction.transaction_type === 'purchase');
+        setIsSale(tempIsSale);
+
+        const tempIsVatIncluded = currentTransaction.tax_price && currentTransaction.tax_price > 0;
+        setIsVatIncluded(tempIsVatIncluded);
+
         const tempCurrentCompany = companyForSelection.filter(item => item.value.company_code === currentTransaction.company_code);
         const tempData = {
-          trans_type: (currentTransaction.transaction_type === '매입' || currentTransaction.transaction_type === 'purchase')
-            ? trans_types[1] : trans_types[0],
-          tax_type: currentTransaction.tax_price && currentTransaction.tax_price > 0 ? 'vat_included' : 'vat_excluded',
+          trans_type: tempIsSale ? trans_types[0] : trans_types[1],
+          tax_type: tempIsVatIncluded ? 'vat_included' : 'vat_excluded',
           company_selection: tempCurrentCompany.length > 0 ? tempCurrentCompany[0]: null,
         }
         setSelectData(tempData);
@@ -601,6 +637,17 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
         publish_date: currentTransaction.publish_date ? new Date(currentTransaction.publish_date) : null,
       };
       setOrgTransaction(tempTransaction);
+
+      const tempReceiptData = {
+        paid_money: currentTransaction.paid_money,
+        payment_type: currentTransaction.payment_type,
+        bank_name: currentTransaction.bank_name,
+        account_owner: currentTransaction.account_owner,
+        account_number: currentTransaction.account_number,
+        card_no: currentTransaction.card_no,
+        card_number: currentTransaction.card_number,
+      }
+      setOrgReceiptModalData(tempReceiptData);
     };
   }, [open, companyState, orgTransaction, currentTransaction]);
 
@@ -855,10 +902,16 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
                                 formatter={handleFormatter}
                                 parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                                 style={{width:'180px', height:'30px',border:0,textAlign:'end'}}
-                                onChange={(e)=>{
-                                  const value = Number(e.target.value);
+                                onChange={(input)=>{
+                                  const value = Number(input);
                                   if(isNaN(value)) return;
-                                  const temp={...dataForTransaction, valance_prev: value};
+                                  const temp_paid_money = transactionChange['paid_money'] ? transactionChange.paid_money : currentTransaction.paid_money;
+                                  const temp_valance_final = value + Number(currentTransaction.total_price) - Number(temp_paid_money);
+                                  const temp={
+                                    ...dataForTransaction,
+                                    valance_prev: value,
+                                    valance_final: temp_valance_final,
+                                  };
                                   setDataForTransaction(temp);
                                 }}
                               />
@@ -874,7 +927,7 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
                               onClick={handleStartEditReceipt}
                               className={`trans_amt low right ${!isSale && "trans_pur"}`}
                             >
-                              {ConvertCurrency(dataForTransaction.receipt, dataForTransaction.show_decimal && 4)}
+                              {ConvertCurrency(transactionChange['paid_money'] ? transactionChange['paid_money'] : currentTransaction.paid_money, dataForTransaction.show_decimal)}
                             </Col>
                           </Row>
                         </Col>
@@ -886,7 +939,7 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
                           </Row>
                           <Row>
                             <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
-                              {ConvertCurrency(dataForTransaction.supply_price, dataForTransaction.show_decimal && 4)}
+                              {ConvertCurrency(transactionChange['supply_price'] ? transactionChange['supply_price'] : currentTransaction.supply_price, dataForTransaction.show_decimal)}
                             </Col>
                           </Row>
                           <Row>
@@ -896,7 +949,7 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
                           </Row>
                           <Row>
                             <Col flex='auto' className={`trans_amt  low right ${!isSale && "trans_pur"}`}>
-                              {ConvertCurrency(dataForTransaction.valance_final, dataForTransaction.show_decimal && 4)}
+                              {ConvertCurrency(dataForTransaction.valance_final, dataForTransaction.show_decimal)}
                             </Col>
                           </Row>
                         </Col>
@@ -908,7 +961,7 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
                           </Row>
                           <Row>
                             <Col flex='auto' className={`trans_amt right ${!isSale && "trans_pur"}`}>
-                              {ConvertCurrency(dataForTransaction.tax_price, dataForTransaction.show_decimal && 4)}
+                              {ConvertCurrency(transactionChange['tax_price'] ? transactionChange['tax_price'] : currentTransaction.tax_price, dataForTransaction.show_decimal)}
                             </Col>
                           </Row>
                           <Row>
@@ -937,7 +990,7 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
                           </Row>
                           <Row>
                             <Col flex='auto' className={`trans_amt ${!isSale && "trans_pur"}`}>
-                              {ConvertCurrency(dataForTransaction.total_price, dataForTransaction.show_decimal && 4)}
+                              {ConvertCurrency(transactionChange['tax_price'] ? transactionChange['tax_price'] : currentTransaction.tax_price, dataForTransaction.show_decimal)}
                             </Col>
                           </Row>
                           <Row>

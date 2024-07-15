@@ -68,7 +68,7 @@ export const ConvertCurrency = (amount, fixed = 0) => {
     } else if(typeof amount === 'number'){
         ret = amount;
     };
-
+    
     return fixed === 0 
         ? ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
         : ret?.toFixed(fixed).replace(/\d(?=(\d{3})+\.)/g, '$&,');

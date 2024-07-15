@@ -426,7 +426,7 @@ const TransactionPrint = (props) => {
                                         <Text style={[Styles.SupplierText,{fontSize:10}]}>입금</Text>
                                     </View>
                                     <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(data.receipt)}</Text>
+                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(data.paid_money)}</Text>
                                     </View>
                                     <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.SupplierText,{fontSize:10}]}>미수금</Text>
@@ -747,7 +747,7 @@ const TransactionPrint = (props) => {
                                         <Text style={[Styles.ReceiverText,{fontSize:10}]}>입금</Text>
                                     </View>
                                     <View style={{width:'23.3%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
-                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(data.receipt)}</Text>
+                                        <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(data.paid_money)}</Text>
                                     </View>
                                     <View style={{width:'10%',margin:0,padding:0,borderRight:1,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
                                         <Text style={[Styles.ReceiverText,{fontSize:10}]}>미수금</Text>

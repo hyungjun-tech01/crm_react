@@ -38,34 +38,9 @@ const TransactionReceiptModal = (props) => {
     };
     const handleValue = (event) => {
         const target_name = event.target.name;
-        let tempData = {...edited};
-        if(target_name === 'quantity'){
-            tempData[target_name] = event.target.value !== '' ? Number(event.target.value) : 0;
-            if(!edited['list_price']
-                || edited.list_price === ''
-                || edited.list_price === 0
-            ){
-                if(!original.list_price){
-                    tempData['quotation_amount'] = 0;
-                } else {
-                    tempData['quotation_amount'] = Number(original.list_price) * tempData.quantity;
-                }
-            } else {
-                tempData['quotation_amount'] = tempData['quantity'] * Number(edited.list_price);
-            };
-        } else if(target_name === 'list_price'){
-            tempData[target_name] = event.target.value !== '' ? Number(event.target.value) : 0;
-            if(!edited['quantity'] || edited.quantity ==='' || edited.quantity === 0){
-                if(!original.quantity){
-                    tempData['quotation_amount'] = 0;
-                } else {
-                    tempData['quotation_amount'] = Number(original.quantity) * tempData.list_price;
-                }
-            } else {
-                tempData['quotation_amount'] = tempData['list_price'] * Number(edited.quantity);
-            };
-        } else {
-            tempData[target_name] = event.target.value;
+        const tempData = {
+            ...edited,
+            [target_name]: event.target.value,
         };
         handleEdited(tempData);
     };
