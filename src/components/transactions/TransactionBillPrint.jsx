@@ -259,113 +259,113 @@ const TransactionBillPrint = (props) => {
                             </View>
                         </View>
                         {/* 금액 표시 부분 */}
-                        <View style={{width:'100%',margin:0,padding:0,border:1,borderColor:'#0000ff',flexDirection:'row',flexGrow:0}}>
-                            <View style={{flex:'1 1 10%', display:'flex',border:1,borderColor:'#0000ff',flexDirection:'column'}}>
-                                <View style={{textAlign:'center',borderBottom:1,borderColor:'#0000ff',}}>
+                        <View style={{width:'100%',margin:0,padding:0,border:0.6,borderColor:'#0000ff',flexDirection:'row',flexGrow:0}}>
+                            <View style={{flex:'1 1 10%', display:'flex',border:0.6,borderColor:'#0000ff',flexDirection:'column'}}>
+                                <View style={{textAlign:'center',borderBottom:0.6,borderColor:'#0000ff',}}>
                                     <Text style={[Styles.SupplierText,{fontSize:10}]}>작 성</Text>
                                 </View>
-                                <View style={{textAlign:'center',borderBottom:1,borderColor:'#0000ff',}}>
+                                <View style={{textAlign:'center',borderBottom:0.6,borderColor:'#0000ff',}}>
                                     <Text style={[Styles.SupplierText,{fontSize:10}]}>년 월 일</Text>
                                 </View>
                                 <View style={{textAlign:'center'}}>
                                     <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.publish_date}</Text>
                                 </View>
                             </View>
-                            <View style={{flex:'1 1 38%',border:1,borderColor:'#0000ff',display:'flex', flexDirection:'column'}}>
-                                <View style={{width: '100%',textAlign:'center'}}>
+                            <View style={{flex:'1 1 38%',border:0.6,borderColor:'#0000ff',display:'flex', flexDirection:'column'}}>
+                                <View style={{width: '100%',textAlign:'center',borderBottom:0.6,borderColor:'#0000ff'}}>
                                     <Text style={[Styles.SupplierText,{fontSize:10}]}>공 급 가 액</Text>
                                 </View>
                                 <View style={{width: '100%',display:'flex',flexDirection:'row',textAlign:'center'}}>
                                     <View style={{flex:'3 3 21.4%', display:'flex', flexDirection:'column'}}>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>공란</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.vacant_count}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
+                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>백</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.supply_text.at(0)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
+                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>십</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.supply_text.at(1)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
+                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>억</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.supply_text.at(2)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
+                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>천</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.supply_text.at(3)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
+                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>백</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.supply_text.at(4)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
+                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>십</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.supply_text.at(5)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
+                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>만</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.supply_text.at(6)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
+                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>천</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.supply_text.at(7)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
+                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>백</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.supply_text.at(8)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
+                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>십</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.supply_text.at(9)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
+                                    <View style={{flex:'1 1 7.1%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>원</Text>
                                         </View>
                                         <View style={{textAlign:'center'}}>
@@ -375,94 +375,94 @@ const TransactionBillPrint = (props) => {
                                 </View>
                             </View>
                             <View style={{flex:'1 1 27%',border:1,borderColor:'#0000ff',display:'flex',flexDirection:'column'}}>
-                                <View style={{width: '100%',textAlign:'center'}}>
+                                <View style={{width: '100%',textAlign:'center',borderBottom:0.6,borderColor:'#0000ff'}}>
                                     <Text style={[Styles.SupplierText,{fontSize:10}]}>세   액</Text>
                                 </View>
                                 <View style={{width: '100%',display:'flex',flexDirection:'row',textAlign:'center'}}>
-                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
+                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>십</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.tax_text.at(0)}</Text>
+                                        </View>
+                                    </View>
+                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>억</Text>
+                                        </View>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.tax_text.at(1)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
-                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>억</Text>
+                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>천</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.tax_text.at(2)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
-                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>천</Text>
+                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>백</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.tax_text.at(3)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
-                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>백</Text>
+                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>십</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.tax_text.at(4)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
-                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>십</Text>
+                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>만</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.tax_text.at(5)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
-                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>만</Text>
+                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>천</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.tax_text.at(6)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
-                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>천</Text>
+                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>백</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.tax_text.at(7)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
-                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>백</Text>
+                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderRight:0.6,borderColor:'#0000ff'}}>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>십</Text>
                                         </View>
-                                        <View style={{textAlign:'center'}}>
+                                        <View style={{textAlign:'center',borderRight:0.6,borderColor:'#0000ff'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.tax_text.at(8)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
-                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>십</Text>
+                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'column'}}>
+                                        <View style={{textAlign:'center',borderBottom:0.6,borderColor:'#0000ff'}}>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>원</Text>
                                         </View>
                                         <View style={{textAlign:'center'}}>
                                             <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.tax_text.at(9)}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex:'1 1 10%', display:'flex', flexDirection:'row'}}>
-                                        <View style={{textAlign:'center'}}>
-                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>원</Text>
-                                        </View>
-                                        <View style={{textAlign:'center'}}>
-                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.tax_text.at(10)}</Text>
-                                        </View>
-                                    </View>
                                 </View>
                             </View>
                             <View style={{flex:'1 1 25%', display:'flex', flexDirection:'column'}}>
-                                <View style={{textAlign:'center'}}>
+                                <View style={{textAlign:'center',borderBottom:0.6,borderColor:'#0000ff'}}>
                                     <Text style={[Styles.SupplierText,{fontSize:10}]}>비 고</Text>
                                 </View>
                                 <View style={{textAlign:'center'}}>

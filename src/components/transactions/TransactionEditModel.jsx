@@ -225,7 +225,6 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
       || (tempEdited['tax_price'])) tempEdited['tax_price'] = tax_price;
     if((!tempEdited['total_price'] && currentTransaction.total_price !== total_price)
       || (tempEdited['total_price'])) tempEdited['total_price'] = total_price;
-    console.log('handleAmountCal...:', tempEdited);
     setTransactionChange(tempEdited);
 
     const valance_final = Number(dataForTransaction.valance_prev) + total_price - Number(currentTransaction.paid_money);
