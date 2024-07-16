@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { PDFViewer } from '@react-pdf/renderer';
-import { Page, Text, View, Document, StyleSheet, Font } from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet, Font, Svg, Ellipse } from '@react-pdf/renderer';
 import NotoSansRegular from "../../fonts/NotoSansKR-Regular.ttf";
 import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";
@@ -728,10 +728,10 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{width:'30%',height:36,margin:0,padding:0,display:'flex',flexDirection:'column'}}>
                                                 <View style={{width:'100%',margin:0,padding:0}}>
-                                                    <Text style={[Styles.SupplierText,{fontSize:10}]}>영수</Text>
+                                                    <Text style={[Styles.SupplierText,{fontSize:10},billData.request_type!=='청구' && {border:1,borderRadius:6}]}>영수</Text>
                                                 </View>
                                                 <View style={{width:'100%',margin:0,padding:0}}>
-                                                    <Text style={[Styles.SupplierText,{fontSize:10}]}>청구</Text>
+                                                    <Text style={[Styles.SupplierText,{fontSize:10},billData.request_type==='청구' && {border:1,borderRadius:6}]}>청구</Text>
                                                 </View>
                                             </View>
                                             <View style={{width:'20%',height:36,margin:0,padding:0,alignItems:'center',justifyContent:'center'}}>
@@ -1352,10 +1352,10 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{width:'30%',height:36,margin:0,padding:0,display:'flex',flexDirection:'column'}}>
                                                 <View style={{width:'100%',margin:0,padding:0}}>
-                                                    <Text style={[Styles.ReceiverText,{fontSize:10}]}>영수</Text>
+                                                    <Text style={[Styles.ReceiverText,{fontSize:10},billData.request_type!=='청구' && {border:1,borderRadius:6}]}>영수</Text>
                                                 </View>
                                                 <View style={{width:'100%',margin:0,padding:0}}>
-                                                    <Text style={[Styles.ReceiverText,{fontSize:10}]}>청구</Text>
+                                                    <Text style={[Styles.ReceiverText,{fontSize:10},billData.request_type==='청구' && {border:1,borderRadius:6}]}>청구</Text>
                                                 </View>
                                             </View>
                                             <View style={{width:'20%',height:36,margin:0,padding:0,alignItems:'center',justifyContent:'center'}}>

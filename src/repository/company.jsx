@@ -65,6 +65,8 @@ export const CompanyRepo = selector({
                             company_name_en: item.company_name_en,
                             company_zip_code: item.company_zip_code,
                             company_address: item.company_address,
+                            company_phone_number: item.company_phone_number,
+                            company_fax_number: item.company_fax_number,
                             ceo_name: item.ceo_name,
                             business_type: item.business_type,
                             business_item: item.business_item,

@@ -566,7 +566,7 @@ const CompanyPurchaseModel = (props) => {
     return (
         <>
             <div className="row">
-                <div className="card mb-0">
+                <div className="card mb-2">
                     <div className="table-body">
                         <div className="table-responsive">
                             <Table
@@ -615,7 +615,7 @@ const CompanyPurchaseModel = (props) => {
             {isOtherItemSelected &&
                 <>
                     <div className="row">
-                        <div className="card mb-0">
+                        <div className="card mb-2">
                             <div>
                                 <div style={{ fontSize: 15, fontWeight: 600, padding: '0.5rem 0 0 1.0rem' }}>Selected Item</div>
                                 <Space
@@ -667,7 +667,7 @@ const CompanyPurchaseModel = (props) => {
                         </div>
                     </div>
                     <div className="row">
-                        <div className="card mb-0">
+                        <div className="card mb-2">
                             <div className="table-body">
                                 <div className="table-responsive">
                                     <Table

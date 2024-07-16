@@ -19,7 +19,7 @@ const LeadAddModel = (props) => {
     
 
     //===== [RecoilState] Related with Company =============================================
-    const companyState = useRecoilValue(atomCompanyState);
+    const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
     const { loadAllCompanies } = useRecoilValue(CompanyRepo);
     const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
@@ -77,51 +77,37 @@ const LeadAddModel = (props) => {
     }, [cookies.myLationCrmUserId, initializeLeadTemplate, leadChange, modifyLead]);
 
     const handleSelectChange = useCallback((name, selected) => {
-        const modifiedData = {
-            ...leadChange,
-            [name]: selected.value,
+        console.log('[LeadAddModel] handleSelectChange :', selected);
+        let modifiedData = null;
+        if(name === 'company_name') {
+            modifiedData = {
+                ...leadChange,
+                company_code: selected.value.company_code,
+                company_name: selected.value.company_name,
+                company_name_en: selected.value.company_name_en,
+                company_zip_code: selected.value.company_zip_code,
+                company_address: selected.value.company_address,
+                company_phone_number: selected.value.company_phone_number,
+                company_fax_number: selected.value.company_fax_number,
+            };
+            let tempDisabled = {
+                ...disabledItems,
+            };
+            if(selected.value.company_name_en) {
+                tempDisabled['company_name_en'] = true;
+            };
+            if(selected.value.company_address) {
+                tempDisabled['company_address'] = true;
+            };
+            setDisabledItems(tempDisabled);
+        } else {
+            modifiedData = {
+                ...leadChange,
+                [name] : selected.value,
+            };
         };
         setLeadChange(modifiedData);
-    }, [leadChange]);
-
-    const handleSelectCompany = useCallback((value) => {
-        const selected = value.value;
-        let tempLeadChange = {
-            ...leadChange,
-            company_code: selected.company_code,
-            company_name: selected.company_name,
-        };
-        let tempDisabled = {
-            ...disabledItems,
-        };
-        if(selected.company_name_en) {
-            tempLeadChange['company_name_en'] = selected.company_name_en;
-            tempDisabled['company_name_en'] = true;
-        } else {
-            tempLeadChange['company_name_en'] = leadChange.company_name_en;
-        };
-        if(selected.company_address) {
-            tempLeadChange['company_address'] = selected.company_address;
-            tempDisabled['company_address'] = true;
-        } else {
-            tempLeadChange['company_address'] = leadChange.company_address;
-        };
-        if(selected.company_zip_code) {
-            tempLeadChange['company_zip_code'] = selected.company_zip_code;
-        } else {
-            tempLeadChange['company_zip_code'] = leadChange.company_zip_code;
-        };
-        if(selected.region) {
-            tempLeadChange['region'] = selected.region;
-            tempDisabled['region'] = true;
-        } else {
-            tempLeadChange['region'] = leadChange.region;
-        };
-
-        setLeadChange(tempLeadChange);
-        setDisabledItems(tempDisabled);
-
-    }, [disabledItems, leadChange]);
+    }, [leadChange, disabledItems]);
 
     useEffect(() => {
         if (init) {
@@ -132,8 +118,9 @@ const LeadAddModel = (props) => {
     }, [init, handleInit, initializeLeadTemplate]);
 
     useEffect(() => {
-        if ((companyState & 1) === 0) {
+        if ((companyState & 3) === 0) {
             console.log('[LeadAddModel] loading company data!');
+            setCompanyState(2);
             loadAllCompanies();
         };
 
@@ -141,8 +128,7 @@ const LeadAddModel = (props) => {
 
     useEffect(() => {
         if ((userState & 3) === 0) {
-            const tempUserState = userState | (1 << 1); //change it to pending state
-            setUserState(tempUserState);
+            setUserState(2);
             loadAllUsers();
         }
     }, [userState, loadAllUsers ])
@@ -217,9 +203,10 @@ const LeadAddModel = (props) => {
                                         <AddBasicItem
                                             title={t('company.company_name')}
                                             type='select'
+                                            name='company_name'
                                             defaultValue={leadChange.company_name}
                                             options={companyForSelection}
-                                            onChange={handleSelectCompany}
+                                            onChange={handleSelectChange}
                                         />
                                         <AddBasicItem
                                             title={t('company.company_name_eng')}
