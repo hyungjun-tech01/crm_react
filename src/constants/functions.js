@@ -33,7 +33,7 @@ export const compareText = (text1, text2) => {
     return 0;
 };
 
-export const formatDate = (date_value) => {
+export const formatDate = (date_value, type=0) => {
     if(date_value === undefined || date_value === null) return "";
     
     let  converted = null;
@@ -44,6 +44,11 @@ export const formatDate = (date_value) => {
     }
     const month = converted.getMonth() + 1;
     const date = converted.getDate();
+    if(type === 1){
+        return converted.getFullYear()
+        + "-" + (month < 10 ? "0" + month.toString() : month.toString())
+        + "-" + (date < 10 ? "0" + date.toString() : date.toString());    
+    }
     return converted.getFullYear()
           + "." + (month < 10 ? "0" + month.toString() : month.toString())
           + "." + (date < 10 ? "0" + date.toString() : date.toString());
