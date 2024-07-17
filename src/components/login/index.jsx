@@ -1,16 +1,50 @@
 import React, { useCallback, useState } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useCookies } from "react-cookie";
+import { useTranslation } from "react-i18next";
 import { Link, useHistory } from "react-router-dom";
 import { useRecoilState } from "recoil";
+import { Alert } from 'antd';
 import LOGO from "../../assets/images/nodeData.png";
 import priorLOGO from "../../assets/images/priorNodeData.png"
 import { apiLoginValidate } from "../../repository/user.jsx";
 import {atomCurrentUser} from "../../atoms/atomsUser.jsx";
-import { useTranslation } from "react-i18next";
+
+const createMessage = (error) => {
+  if (!error) {
+    return error;
+  }
+  switch (error.message) {
+    case 'Invalid email or password':
+      return {
+        ...error,        
+        type: 'error',
+        description: 'login.invalidEmailOrUsername',
+      };
+    case 'Failed to fetch':
+      return {
+        ...error,
+        type: 'warning',
+        description: 'login.noInternetConnection',
+      };
+    case 'Network request failed':
+      return {
+        ...error,    
+        type: 'warning',
+        description: 'login.serverConnectionFailed',
+      };
+    default:
+      return {
+        ...error,
+        type: 'warning',
+        description: 'login.unknownError',
+      };
+  }
+};
 
 const Login = () => {
-  const [ cookies, setCookie ] = useCookies([
+  const { t } = useTranslation();
+  const [ cookies, setCookie, removeCookie ] = useCookies([
     "myLationCrmUserId",
     "myLationCrmUserName",
     "myLationCrmAuthToken",
@@ -19,7 +53,12 @@ const Login = () => {
   const history = useHistory();
   const [loginUserId, setLoginUserId] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
-  const { t } = useTranslation();
+  const [loginError, setLoginError] = useState({message:"", type:"", description:""});
+
+  const onMessageDismiss = () => {
+    setLoginError({message:"", type:"", description:""});
+    document.getElementById('loginForm').reset();
+  };
 
 
   // event.preventDefault() 주로 사용되는 경우는
@@ -38,7 +77,6 @@ const Login = () => {
 
   const handleCheckLogin = useCallback((event) => {
     event.preventDefault();
-    console.log("Login index", loginUserId, loginPassword);
     const response = apiLoginValidate(loginUserId, loginPassword);
     response.then((res) => {
       console.log("res", res);
@@ -47,8 +85,12 @@ const Login = () => {
         setCookie("myLationCrmUserName", res.userName);
         setCookie("myLationCrmAuthToken", res.token);
         setCurrentUser(res);
-        console.log(currentUser);
         history.push("/");
+      } else {
+        setLoginError(createMessage(res));          
+        removeCookie('UserId');
+        removeCookie('UserName');
+        removeCookie('AuthToken');
       }
     });
   },[loginUserId, loginPassword]);
@@ -60,10 +102,10 @@ const Login = () => {
         {/* <div className="page-wrapper"> */}
           <Helmet>
             <title>Login - CRMS admin template</title>
-            <meta name="description" content="Reactify Blank Page" />
+            <meta name="description" description="Reactify Blank Page" />
           </Helmet>
           <div className="main-wrapper">
-            <div className="account-content">
+            <div className="account-description">
               <div className="container">
                 {/* Account Logo */}
                 <div className="account-logo">
@@ -79,7 +121,7 @@ const Login = () => {
                   <div className="account-wrapper">
                     <h3 className="account-title">{t('login.login')}</h3>
                     {/* Account Form */}
-                    <form>
+                    <form id='loginForm'>
                       <div className="form-group">
                         <label>{t('login.userId')}</label>
                         <input
@@ -89,7 +131,7 @@ const Login = () => {
                           onChange={(e) => setLoginUserId(e.target.value)}
                         />
                       </div>
-                      <div className="form-group">
+                      <div className="form-group mb-2">
                         <div className="row">
                           <div className="col">
                             <label>{t('login.password')}</label>
@@ -107,7 +149,18 @@ const Login = () => {
                           onChange={(e) => setLoginPassword(e.target.value)}
                         />
                       </div>
-                      <div className="form-group text-center">
+                      {loginError.message==="" ? "" : (
+                          <Alert
+                            message={loginError.message}
+                            type={loginError.type}
+                            showIcon
+                            closable
+                            description={t(`${loginError.description}`)}
+                            afterClose={onMessageDismiss}
+                          />
+                        )
+                      }
+                      <div className="form-group text-center mt-2">
                         {/* <Link onClick = {()=>handleCheckLogin()} to="/" className="btn btn-primary account-btn"> */}
                         <button
                           onClick={handleCheckLogin}
