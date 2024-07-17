@@ -69,7 +69,7 @@ export const defaultLead = {
     mobile_number: null,
     email: null,
     homepage: null,
-    group_: null,
+    lead_group: null,
     region: null,
     sales_resource: null,
     application_engineer: null,
@@ -84,6 +84,7 @@ export const defaultLead = {
     company_phone_number: null,
     company_fax_number: null,
     //-----Etc info --------------
+    memo: null,
     counter: 0,
     create_user: null,
     create_date: null,

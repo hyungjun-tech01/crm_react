@@ -195,7 +195,6 @@ const LeadAddModel = (props) => {
                                             name='region'
                                             defaultValue={leadChange.region}
                                             options={option_locations.ko}
-                                            disabled={(disabledItems && disabledItems['region']) ? disabledItems.region : false}
                                             onChange={handleSelectChange}
                                         />
                                     </div>
@@ -238,7 +237,7 @@ const LeadAddModel = (props) => {
                                             title={t('company.phone_number')}
                                             type='text'
                                             name="company_phone_number"
-                                            defaultValue={leadChange.phone_number}
+                                            defaultValue={leadChange.company_phone_number}
                                             onChange={handleLeadChange}
                                         />
                                         <AddBasicItem
@@ -319,9 +318,10 @@ const LeadAddModel = (props) => {
                                         <AddBasicItem
                                             title={t('common.memo')}
                                             type='textarea'
+                                            name="memo"
+                                            defaultValue={leadChange.memo}
                                             long
                                             row_no={3}
-                                            name="memo"
                                             onChange={handleLeadChange}
                                         />
                                     </div>
