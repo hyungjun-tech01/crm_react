@@ -82,10 +82,10 @@ const Purchase = () => {
       sorter: (a, b) => compareText(a.company_name, b.company_name),
     },
     {
-      title: t('company.company_name_eng'),
-      dataIndex: "company_name_eng",
+      title: t('company.company_name_en'),
+      dataIndex: "company_name_en",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => compareText(a.company_name_eng, b.company_name_eng),
+      sorter: (a, b) => compareText(a.company_name_en, b.company_name_en),
     },
     {
       title: t('purchase.product_name'),
@@ -155,7 +155,7 @@ const Purchase = () => {
           return {
             ...purchase,
             company_name: allCompanyData[foundIdx].company_name,
-            company_name_eng: allCompanyData[foundIdx].company_name_eng,
+            company_name_en: allCompanyData[foundIdx].company_name_en,
             ma_remain_date: remain_date,
           }
         } else {

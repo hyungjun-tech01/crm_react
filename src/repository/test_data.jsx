@@ -13,7 +13,7 @@ export const data_company = [
     customer_code: "",
     business_code: "",
     company_number: "",
-    group_: "",
+    group: "",
     relationship: "",
     registration_date: null,
     head_quater_responsible: "",

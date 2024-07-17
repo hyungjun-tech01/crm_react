@@ -198,7 +198,7 @@ const PurchaseDetailsModel = (props) => {
             modify_user: cookies.myLationCrmUserId,
           };
           delete modifiedPurchase.company_name;
-          delete modifiedPurchase.company_name_eng;
+          delete modifiedPurchase.company_name_en;
           delete modifiedPurchase.ma_remain_date;
 
           const res_data = modifyPurchase(modifiedPurchase);

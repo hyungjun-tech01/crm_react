@@ -270,9 +270,9 @@ const CompanyDetailsModel = ({openTransaction}) => {
                 </div>
               </div>
               <DetailTitleItem
-                original={selectedCompany.company_name_eng}
-                name='company_name_eng'
-                title={t('company.company_name_eng')}
+                original={selectedCompany.company_name_en}
+                name='company_name_en'
+                title={t('company.company_name_en')}
                 onEditing={handleDetailChange}
               />
               <DetailTitleItem

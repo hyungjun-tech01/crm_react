@@ -5,11 +5,11 @@ import { atom } from 'recoil';
 export const defaultCompany = {
     company_code: null,
     company_number: null,
-    group_: null,
+    company_group: null,
     company_scale: null,
     deal_type: null,
     company_name: null,
-    company_name_eng: null,
+    company_name_en: null,
     business_registration_code: null,
     establishment_date: null,
     closure_date: null,

@@ -13,7 +13,7 @@ const BASE_PATH = Paths.BASE_PATH;
 
 export const companyColumn = [
      { value: 'company_name', label: '회사명'},
-     { value: 'company_name_eng', label: '영문회사명'},
+     { value: 'company_name_en', label: '영문회사명'},
      { value: 'ceo_name', label: '대표자명'},
      { value: 'business_registration_code', label: '사업자번호'},
      { value: 'business_type', label: '업태'},

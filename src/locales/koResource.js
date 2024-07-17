@@ -50,7 +50,7 @@ const koResource = {
             deal_type_sales: '매출',
             deal_type_purchase: '매입',
             deal_type_etc: '기타',
-            company_name_eng:'영문회사명',
+            company_name_en:'영문회사명',
             engineer:'기술담당',
             establishment_date   : '창업일',
             fax_number : '업체팩스번호',
