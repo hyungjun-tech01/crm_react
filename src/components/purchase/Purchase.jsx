@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
@@ -24,13 +24,13 @@ const Purchase = () => {
 
 
   //===== [RecoilState] Related with Company =============================================
-  const companyState = useRecoilValue(atomCompanyState);
+  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Purchase ============================================
-  const purchaseState = useRecoilValue(atomPurchaseState);
+  const [purchaseState, setPurchaseState] = useRecoilState(atomPurchaseState);
   const allPurchaseData = useRecoilValue(atomAllPurchases);
   const filteredPurchase = useRecoilValue(atomFilteredPurchase);
   const { loadAllPurchases, filterPurchases } = useRecoilValue(PurchaseRepo);
@@ -133,10 +133,12 @@ const Purchase = () => {
   //===== useEffect functions ==========================================
   useEffect(() => {
     console.log('Purchase called!');
-    if((companyState & 1) === 0) {
+    if((companyState & 3) === 0) {
+      setCompanyState(2);
       loadAllCompanies();
     };
-    if((purchaseState & 1) === 0) {
+    if((purchaseState & 3) === 0) {
+      setPurchaseState(2);
       loadAllPurchases();
     };
     if(((companyState & 1) === 1) && ((purchaseState & 1) === 1)) {

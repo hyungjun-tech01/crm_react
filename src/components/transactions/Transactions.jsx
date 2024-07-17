@@ -27,18 +27,25 @@ import { useTranslation } from "react-i18next";
 
 const Transactions = () => {
   const { t } = useTranslation();
+
+  //===== [RecoilState] Related with Company ==========================================
   const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
-  const [transactionState, setTransactionState] = useRecoilState(atomTransactionState);
   const allCompanyData = useRecoilValue(atomAllCompanies);
+  const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
+
+
+  //===== [RecoilState] Related with Transaction ======================================
+  const [transactionState, setTransactionState] = useRecoilState(atomTransactionState);
   const allTransactionData = useRecoilValue(atomAllTransactions);
   const filteredTransaction= useRecoilValue(atomFilteredTransaction);
-  const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const { loadAllTransactions, setCurrentTransaction , filterTransactions} = useRecoilValue(TransactionRepo);
+
+
+  //===== Handles to edit this ========================================================
   const [ openTransaction, setOpenTransaction ] = useState(false);
   const [ openBill, setOpenBill ] = useState(false);
   const [ billData, setBillData ] = useState(null);
   const [ billContents, setBillContents ] = useState(null);
-
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);

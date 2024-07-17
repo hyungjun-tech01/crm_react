@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
@@ -26,20 +26,34 @@ import { useTranslation } from "react-i18next";
 import LeadAddModel from "./LeadAddMdel";
 
 const Leads = () => {
-  const companyState = useRecoilValue(atomCompanyState);
-  const leadState = useRecoilValue(atomLeadState);
-  
+  const { t } = useTranslation();
+
+  //===== [RecoilState] Related with Company ==========================================
+  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
+  const { loadAllCompanies , setCurrentCompany} = useRecoilValue(CompanyRepo);
+
+
+  //===== [RecoilState] Related with Lead =============================================
+  const [leadState, setLeadState] = useRecoilState(atomLeadState);
   const allLeadData = useRecoilValue(atomAllLeads);
   const filteredLead = useRecoilValue(atomFilteredLead);
-  const { loadAllCompanies , setCurrentCompany} = useRecoilValue(CompanyRepo);
-  const { loadCompanyConsultings} = useRecoilValue(ConsultingRepo);
-  const { loadCompanyQuotations} = useRecoilValue(QuotationRepo);
-  const { loadCompanyPurchases }  = useRecoilValue(PurchaseRepo);
-
   const { loadAllLeads, setCurrentLead, filterLeads } = useRecoilValue(LeadRepo);
 
+
+  //===== [RecoilState] Related with Consulting =======================================
+  const { loadCompanyConsultings} = useRecoilValue(ConsultingRepo);
+
+
+  //===== [RecoilState] Related with Quotation ========================================
+  const { loadCompanyQuotations} = useRecoilValue(QuotationRepo);
+
+
+  //===== [RecoilState] Related with Purchase =========================================
+  const { loadCompanyPurchases }  = useRecoilValue(PurchaseRepo);
+
+
+  //===== Handles to this =============================================================
   const [ initToAddLead, setInitToAddLead ] = useState(false);
-  const { t } = useTranslation();
 
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
@@ -289,10 +303,12 @@ const Leads = () => {
 
   useEffect(() => {
     console.log('lead called!');
-    if((companyState & 1) === 0) {
+    if((companyState & 3) === 0) {
+      setCompanyState(2);
       loadAllCompanies();
     };
-    if((leadState & 1) === 0) {
+    if((leadState & 3) === 0) {
+      setLeadState(2);
       loadAllLeads();
     };
   }, [allLeadData, companyState, leadState, loadAllCompanies, loadAllLeads]);

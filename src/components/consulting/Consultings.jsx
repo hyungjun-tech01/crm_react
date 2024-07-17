@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
@@ -32,19 +32,19 @@ const Consultings = () => {
 
 
   //===== [RecoilState] Related with Consulting =======================================
-  const consultingState = useRecoilValue(atomConsultingState);
+  const [consultingState, setConsultingState] = useRecoilState(atomConsultingState);
   const allConsultingData = useRecoilValue(atomAllConsultings);
   const filteredConsulting = useRecoilValue(atomFilteredConsulting);
   const { loadAllConsultings, setCurrentConsulting, filterConsultingOri } = useRecoilValue(ConsultingRepo);
 
 
   //===== [RecoilState] Related with Company ==========================================
-  const companyState = useRecoilValue(atomCompanyState);
+  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
   const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Lead =============================================
-  const leadState = useRecoilValue(atomLeadState);
+  const [leadState, setLeadState] = useRecoilState(atomLeadState);
   const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
 
 
@@ -154,20 +154,23 @@ const Consultings = () => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    if ((companyState & 1) === 0) {
+    if ((companyState & 3) === 0) {
       console.log('[Consulting] load all companies!');
+      setCompanyState(2);
       loadAllCompanies();
     };
   }, [companyState, loadAllCompanies]);
 
   useEffect(() => {
-    if ((leadState & 1) === 0) {
+    if ((leadState & 3) === 0) {
+      setLeadState(2);
       loadAllLeads();
     };
   }, [leadState, loadAllLeads]);
 
   useEffect(() => {
-    if ((consultingState & 1) === 0) {
+    if ((consultingState & 3) === 0) {
+      setConsultingState(2);
       loadAllConsultings();
     };
   }, [consultingState, loadAllConsultings]);

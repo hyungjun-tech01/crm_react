@@ -7,6 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { defaultConsulting,
   atomLeadsForSelection,
   atomLeadState,
+  atomCurrentLead,
 } from "../../atoms/atoms";
 import { atomUserState,
   atomUsersForSelection,
@@ -37,9 +38,10 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
 
 
   //===== [RecoilState] Related with Lead =============================================
-  const leadsState = useRecoilValue(atomLeadState);
+  const [leadsState, setLeadsState] = useRecoilState(atomLeadState);
+  const currentLead = useRecoilValue(atomCurrentLead);
   const leadsForSelection = useRecoilValue(atomLeadsForSelection);
-  const { loadAllLeads } = useRecoilValue(LeadRepo);
+  const { loadAllLeads, } = useRecoilValue(LeadRepo);
 
 
   //===== [RecoilState] Related with Users ============================================
@@ -146,15 +148,15 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    if ((leadsState & 1) === 0) {
+    if ((leadsState & 3) === 0) {
+      setLeadsState(2);
       loadAllLeads();
     };
   }, [leadsState, loadAllLeads]);
 
   useEffect(() => {
     if ((userState & 3) === 0) {
-      const tempUserState = userState | (1 << 1); //change it to pending state
-      setUserState(tempUserState);
+      setUserState(2);
       loadAllUsers();
     } else {
       if (init) {

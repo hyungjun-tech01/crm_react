@@ -11,7 +11,7 @@ import ProjectDashboard from "./components/dashboard/projectdashboard";
 import LeadDashboard from "./components/dashboard/leaddashboard";
 //main
 import Companies from "./components/company/Companies";
-import Leads from "./components/leads/index.jsx";
+import Leads from "./components/leads/Leads.jsx";
 import Consultings from "./components/consulting/Consultings.jsx";
 import Transactions from "./components/transactions/Transactions.jsx";
 import Quotations from "./components/quotations/Quotations.jsx";

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
@@ -27,20 +27,31 @@ import { compareCompanyName, compareText, ConvertCurrency } from "../../constant
 import { useTranslation } from "react-i18next";
 
 const Quotations = () => {
-  const companyState = useRecoilValue(atomCompanyState);
-  const leadState = useRecoilValue(atomLeadState);
-  const quotationState = useRecoilValue(atomQuotationState);
+  const { t } = useTranslation();
+
+  //===== [RecoilState] Related with Company ==========================================
+  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
+  const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
+
+
+  //===== [RecoilState] Related with Lead =============================================
+  const [leadState, setLeadState] = useRecoilState(atomLeadState);
+  const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
+
+
+  //===== [RecoilState] Related with Quotation ========================================
+  const [quotationState, setQuotationState] = useRecoilState(atomQuotationState);
   const allQuotationData = useRecoilValue(atomAllQuotations);
   const filteredQuotation = useRecoilValue(atomFilteredQuotation);
-  const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
-  const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
   const { loadAllQuotations, setCurrentQuotation, filterQuotations } = useRecoilValue(QuotationRepo);
+
+
+  //===== Handles to edit this ========================================================
   const [initAddNewQuotation, setInitAddNewQuotation] = useState(false);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
 
-  const { t } = useTranslation();
 
   const [statusSearch, setStatusSearch] = useState('common.all');
 
@@ -196,13 +207,16 @@ const Quotations = () => {
 
   useEffect(() => {
     console.log('Quotation called!');
-    if ((companyState & 1) === 0) {
+    if ((companyState & 3) === 0) {
+      setCompanyState(2);
       loadAllCompanies();
     };
-    if ((leadState & 1) === 0) {
+    if ((leadState & 3) === 0) {
+      setLeadState(2);
       loadAllLeads();
     };
-    if ((quotationState & 1) === 0) {
+    if ((quotationState & 3) === 0) {
+      setQuotationState(2);
       loadAllQuotations();
     };
   }, [companyState, leadState, quotationState, loadAllCompanies, loadAllLeads, loadAllQuotations]);
