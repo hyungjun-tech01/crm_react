@@ -7,11 +7,12 @@ import { ItemRender, ShowTotal } from "../paginationfunction";
 import { formatDate } from "../../constants/functions";
 import { Add } from "@mui/icons-material";
 
+import { defaultLead } from "../../atoms/atoms";
 import { ConsultingRepo } from "../../repository/consulting";
 
 
 const LeadConsultingModel = (props) => {
-    const { consultings, handleAddConsulting } = props;
+    const { consultings } = props;
     const { t } = useTranslation();
 
 
@@ -23,7 +24,7 @@ const LeadConsultingModel = (props) => {
     const [selectedKeys, setSelectedRowKeys] = useState([]);
     
     const transferToOtherModal = (id) => {
-        handleAddConsulting(true);
+        setCurrentConsulting(defaultLead);
         let myModal = new bootstrap.Modal(document.getElementById(id), {
             keyboard: false
         });
@@ -63,7 +64,7 @@ const LeadConsultingModel = (props) => {
         },
         {
             title: t('company.salesman'),
-            dataIndex: "sales_representati",
+            dataIndex: "sales_representative",
             render: (text, record) => <>{text}</>,
         },
         {

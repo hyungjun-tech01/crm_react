@@ -8,6 +8,7 @@ import { defaultConsulting,
   atomLeadsForSelection,
   atomLeadState,
   atomCurrentLead,
+  defaultLead,
 } from "../../atoms/atoms";
 import { atomUserState,
   atomUsersForSelection,
@@ -28,7 +29,7 @@ import { formatDate } from "../../constants/functions";
 import AddBasicItem from "../../constants/AddBasicItem";
 
 
-const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
+const ConsultingAddModel = () => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId", "myLationCrmUserName"]);
 
@@ -54,15 +55,16 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
 
   //===== Handles to edit 'ConsultingAddModel' ========================================
   const [consultingChange, setConsultingChange] = useState({ ...defaultConsulting });
+  const [loaded, setLoaded] = useState(0);
 
   const initializeConsultingTemplate = useCallback(() => {
-    document.querySelector("#add_new_consulting_form").reset();
+    // document.querySelector("#add_new_consulting_form").reset();
 
     // set Receipt date -------------
     const tempDate = new Date();
 
-    if (leadCode && leadCode !=='') {
-      const foundIdx = leadsForSelection.findIndex(item => item.value.lead_code === leadCode);
+    if (currentLead !== defaultLead) {
+      const foundIdx = leadsForSelection.findIndex(item => item.value.lead_code === currentLead.lead_code);
       if (foundIdx !== -1) {
         const found_lead_info = leadsForSelection.at(foundIdx);
         setConsultingChange({
@@ -77,7 +79,7 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
         receipt_date: tempDate,
       });
     };
-  }, [cookies.myLationCrmUserName, leadCode, leadsForSelection]);
+  }, [cookies.myLationCrmUserName, leadsForSelection]);
 
   const handleDateChange = (name, date) => {
     const modifiedData = {
@@ -152,22 +154,18 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
       setLeadsState(2);
       loadAllLeads();
     };
-  }, [leadsState, loadAllLeads]);
-
-  useEffect(() => {
     if ((userState & 3) === 0) {
       setUserState(2);
       loadAllUsers();
-    } else {
-      if (init) {
-        console.log('[ConsultingAddModel] init');
-        initializeConsultingTemplate();
-        if (handleInit) handleInit(!init);
-      };
     };
-  }, [handleInit, init, initializeConsultingTemplate, loadAllUsers, userState]);
+    if (((leadsState & 1) === 0) && ((userState & 1) === 0)) {
+      initializeConsultingTemplate();
+    };
+  }, [leadsState, userState]);
 
-  
+
+  if((userState & 1) !== 1) return null;
+
   return (
     <div
       className="modal right fade"
@@ -259,9 +257,9 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
                         </tr>
                         <tr>
                           <td><b>{t('lead.mobile')}</b></td>
-                          <td>{consultingChange.mobile}</td>
+                          <td>{consultingChange.mobile_number}</td>
                           <td><b>{t('common.phone_no')}</b></td>
-                          <td>{consultingChange.phone}</td>
+                          <td>{consultingChange.phone_number}</td>
                         </tr>
                         <tr>
                           <td><b>{t('lead.fax_number')}</b></td>
@@ -278,8 +276,8 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
                 <AddBasicItem
                   title={t('company.salesman')}
                   type='select'
-                  name='sales_representati'
-                  defaultValue={consultingChange.sales_representati}
+                  name='sales_representative'
+                  defaultValue={consultingChange.sales_representative}
                   options={salespersonsForSelection}
                   onChange={handleSelectChange}
                 />
@@ -330,7 +328,7 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
                 />
               </div>
               <div className="text-center">
-                {(leadCode && leadCode !=='') ?
+                {(currentLead !== defaultLead) ?
                   <button
                     type="button"
                     className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
@@ -349,7 +347,7 @@ const ConsultingAddModel = ({ init, handleInit, leadCode }) => {
                   </button>
                 }
                 &nbsp;&nbsp;
-                {(leadCode && leadCode !=='') ?
+                {(currentLead !== defaultLead) ?
                   <button
                     type="button"
                     className="btn btn-secondary btn-rounded"

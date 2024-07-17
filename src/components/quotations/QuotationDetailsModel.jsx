@@ -37,15 +37,15 @@ const QuotationDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Quotation ========================================
-  const quotationState = useRecoilValue(atomQuotationState);
+  const [quotationState, setQuotationState] = useRecoilState(atomQuotationState);
   const selectedQuotation = useRecoilValue(atomCurrentQuotation);
   const { modifyQuotation, setCurrentQuotation } = useRecoilValue(QuotationRepo);
 
   //===== [RecoilState] Related with Product ==========================================
-  const productClassState = useRecoilValue(atomProductClassListState);
+  const [productClassState, setProductClassState] = useRecoilState(atomProductClassListState);
   const allProductClassList = useRecoilValue(atomProductClassList);
   const { loadAllProductClassList } = useRecoilValue(ProductClassListRepo);
-  const productState = useRecoilValue(atomProductsState);
+  const [productState, setProductState] = useRecoilState(atomProductsState);
   const allProducts = useRecoilValue(atomAllProducts);
   const { loadAllProducts } = useRecoilValue(ProductRepo);
   const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
@@ -439,8 +439,7 @@ const QuotationDetailsModel = () => {
 
   useEffect(() => {
     if ((userState & 3) === 0) {
-      const tempUserState = userState | (1 << 1); //change it to pending state
-      setUserState(tempUserState);
+      setUserState(2);
       loadAllUsers();
     }
   }, [loadAllUsers, userState]);
@@ -448,12 +447,14 @@ const QuotationDetailsModel = () => {
   // ----- useEffect for Production -----------------------------------
   useEffect(() => {
     console.log('[PurchaseAddModel] useEffect / Production');
-    if ((productClassState & 1) === 0) {
-        console.log('[PurchaseAddModel] loadAllProductClassList');
+    if ((productClassState & 3) === 0) {
+        console.log('[QuotationDetailsModel] loadAllProductClassList');
+        setProductClassState(2);
         loadAllProductClassList();
     };
-    if ((productState & 1) === 0) {
-        console.log('[PurchaseAddModel] loadAllProducts');
+    if ((productState & 3) === 0) {
+        console.log('[QuotationDetailsModel] loadAllProducts');
+        setProductState(2);
         loadAllProducts();
     };
     if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {

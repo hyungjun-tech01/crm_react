@@ -46,7 +46,7 @@ const LeadDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Company =======================================
-  const companyState = useRecoilValue(atomCompanyState);
+  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
   const allCompanies = useRecoilValue(atomAllCompanies);
   const currentCompany = useRecoilValue(atomCurrentCompany);
   const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
@@ -54,20 +54,20 @@ const LeadDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Purchase =======================================
-  const purchaseState = useRecoilValue(atomPurchaseState);
+  const [purchaseState, setPurchaseState] = useRecoilState(atomPurchaseState);
   const allPurchases = useRecoilValue(atomAllPurchases);
   const { loadAllPurchases } = useRecoilValue(PurchaseRepo);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
 
   //===== [RecoilState] Related with Consulting =======================================
-  const consultingState = useRecoilValue(atomConsultingState);
+  const [consultingState, setConsultingState] = useRecoilState(atomConsultingState);
   const allConsultings = useRecoilValue(atomAllConsultings);
   const { loadAllConsultings } = useRecoilValue(ConsultingRepo);
 
 
   //===== [RecoilState] Related with Quotation ========================================
-  const quotationState = useRecoilValue(atomQuotationState);
+  const [quotationState, setQuotationState] = useRecoilState(atomQuotationState);
   const allQuotations = useRecoilValue(atomAllQuotations);
   const { loadAllQuotations } = useRecoilValue(QuotationRepo);
 
@@ -249,7 +249,6 @@ const LeadDetailsModel = () => {
 
   //===== Handles to edit 'Consulting Details' ===============================================
   const [consultingsByLead, setConsultingsByLead] = useState([]);
-  const [initAddConsulting, setInitAddConsulting] = useState(false);
 
 
   //===== Handles to edit 'Quotation Details' ===============================================
@@ -314,15 +313,17 @@ const LeadDetailsModel = () => {
   }, [selectedLead, currentLeadCode, companyState, allCompanies, setCurrentCompany, loadCompanyMAContracts]);
 
   useEffect(() => {
-    if ((companyState & 1) === 0) {
+    if ((companyState & 3) === 0) {
       console.log('[LeadDetailsModel] loadAllCompanies');
+      setCompanyState(2);
       loadAllCompanies();
     };
   }, [companyState, loadAllCompanies]);
 
   useEffect(() => {
-    if ((purchaseState & 1) === 0) {
+    if ((purchaseState & 3) === 0) {
       console.log('[LeadDetailModel] loadAllPurchases');
+      setPurchaseState(2);
       loadAllPurchases();
     } else {
       const tempCompanyPurchases = allPurchases.filter(purchase => purchase.company_code === currentCompany.company_code);
@@ -340,8 +341,9 @@ const LeadDetailsModel = () => {
   }, [purchaseState, allPurchases, purchasesByCompany, loadAllPurchases, currentCompany.company_code]);
 
   useEffect(() => {
-    if ((consultingState & 1) === 0) {
+    if ((consultingState & 3) === 0) {
       console.log('[LeadDetailModel] loadAllConsultings');
+      setConsultingState(2);
       loadAllConsultings();
     } else {
       const tempConsultingByLead = allConsultings.filter(consulting => consulting.lead_code === selectedLead.lead_code);
@@ -352,8 +354,9 @@ const LeadDetailsModel = () => {
   }, [allConsultings, consultingState, consultingsByLead.length, loadAllConsultings, selectedLead.lead_code]);
 
   useEffect(() => {
-    if ((quotationState & 1) === 0) {
-      console.log('[LeadDetailModel] loadAllQuotations');
+    if ((quotationState & 3) === 0) {
+      console.log('[LeadDetailModel] loading quotation data!');
+      setQuotationState(2);
       loadAllQuotations();
     } else {
       const tempQuotationsByLead = allQuotations.filter(item => item.lead_code === selectedLead.lead_code);
@@ -364,16 +367,15 @@ const LeadDetailsModel = () => {
   }, [allQuotations, loadAllQuotations, quotationState, quotationsByLead.length, selectedLead.lead_code]);
 
   useEffect(() => {
-    console.log('[CompanyAddModel] loading user data!');
     if ((userState & 3) === 0) {
-      const tempUserState = userState | (1 << 1); //change it to pending state
-      setUserState(tempUserState);
+      console.log('[LeadDetailModel] loading user data!');
+      setUserState(2);
       loadAllUsers();
   }
   }, [userState, loadAllUsers])
 
   return (
-    <>
+    <>s
       <div
         className="modal right fade"
         id="leads-details"
@@ -568,7 +570,6 @@ const LeadDetailsModel = () => {
                           id="sub-lead-consultings" >
                           <LeadConsultingModel
                             consultings={consultingsByLead}
-                            handleAddConsulting={setInitAddConsulting}
                           />
                         </div>
                         <div className="tab-pane task-related p-0"
@@ -608,7 +609,7 @@ const LeadDetailsModel = () => {
         </div>
         {/* modal-dialog */}
       </div>
-      <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} leadCode={selectedLead.lead_code} />
+      <ConsultingAddModel />
       <ConsultingDetailsModel />
       <QuotationAddModel init={initAddQuotation} handleInit={setInitAddQuotation}  leadCode={selectedLead.lead_code} />
       <QuotationDetailsModel />

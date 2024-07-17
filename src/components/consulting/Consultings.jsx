@@ -12,7 +12,7 @@ import ConsultingDetailsModel from "./ConsultingDetailsModel";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import LeadDetailsModel from "../leads/LeadDetailsModel";
-import ConsultingAddModal from "./ConsultingAddModel";
+import ConsultingAddModel from "./ConsultingAddModel";
 import "react-datepicker/dist/react-datepicker.css";
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
@@ -23,6 +23,7 @@ import {
   atomCompanyState,
   atomLeadState,
   atomConsultingState,
+  defaultLead,
 } from "../../atoms/atoms";
 import { compareCompanyName, compareText, formatDate } from "../../constants/functions";
 
@@ -49,7 +50,6 @@ const Consultings = () => {
 
 
   //===== Handles to deal 'Consultings' ========================================
-  const [initConsultingTemplate, setInitConsultingTemplate] = useState(false);
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
   const [statusSearch, setStatusSearch] = useState('common.all');
@@ -68,8 +68,8 @@ const Consultings = () => {
 
   // --- Functions used for Add New Consulting ------------------------------
   const handleAddNewConsultingClicked = useCallback(() => {
-    setInitConsultingTemplate(true);
-  }, []);
+    setCurrentLead(defaultLead);
+  }, [defaultLead]);
 
   // --- Section for Table ------------------------------
   const columns = [
@@ -306,10 +306,7 @@ const Consultings = () => {
         <CompanyDetailsModel />
         <LeadDetailsModel />
         <ConsultingDetailsModel />
-        <ConsultingAddModal
-          init={initConsultingTemplate}
-          handleInit={setInitConsultingTemplate}
-        />
+        <ConsultingAddModel />
       </div>
     </HelmetProvider>
   );

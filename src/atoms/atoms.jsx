@@ -124,7 +124,7 @@ export const defaultConsulting = {
     request_type: null,
     request_content: null,
     action_content: null,
-    sales_representati: null,
+    sales_representative: null,
     application_engineer: null,
     status: null,
     //-----Company info --------------
