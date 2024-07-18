@@ -32,12 +32,12 @@ export const companyColumn = [
 export const CompanyStateRepo = selector({
     key: "CompanyStateRepository",
     get: ({getCallback}) => {
-        const tryLoadAllCompanies = getCallback(({set, get, snapshot}) => async () => {
+        const tryLoadAllCompanies = getCallback(({set, snapshot}) => async () => {
             const loadStates = await snapshot.getPromise(atomCompanyState);
             if((loadStates & 3) === 0){
-                console.log('Try to load all companines');
+                console.log('[tryLoadAllCompanies] Try to load all companines');
                 set(atomCompanyState, 2);   // state : loading
-                const {loadAllCompanies} = get(CompanyRepo);
+                const {loadAllCompanies} = await snapshot.getPromise(CompanyRepo);
                 const multiQueryCondi = {
                     queryConditions: null,
                     checkedDates: null,
@@ -45,7 +45,7 @@ export const CompanyStateRepo = selector({
                   }
                 loadAllCompanies(multiQueryCondi);
             } else {
-                console.log('All companines are being loaded or already loaded');
+                console.log('[tryLoadAllCompanies] All companines are being loaded or already loaded');
             };
         });
         return {
