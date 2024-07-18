@@ -27,7 +27,6 @@ const Purchase = () => {
   const companyState = useRecoilValue(atomCompanyState);
   const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
-  const { loadAllCompanies } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Purchase ============================================

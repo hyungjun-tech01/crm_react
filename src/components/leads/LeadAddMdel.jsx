@@ -2,9 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
-import { atomCompanyForSelection, defaultLead } from "../../atoms/atoms";
+import { atomCompanyForSelection, atomCompanyState, defaultLead } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
-import { CompanyStateRepo } from "../../repository/company";
 import { UserRepo } from '../../repository/user';
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { option_locations } from "../../constants/constants";
@@ -19,7 +18,7 @@ const LeadAddModel = (props) => {
     
 
     //===== [RecoilState] Related with Company =============================================
-    const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
+    const companyState = useRecoilValue(atomCompanyState);
     const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
@@ -35,6 +34,7 @@ const LeadAddModel = (props) => {
 
     
     //===== Handles to edit 'Lead Add' =====================================================
+    const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
     const [ leadChange, setLeadChange ] = useState(defaultLead);
     const [ disabledItems, setDisabledItems ] = useState({});
 
@@ -117,15 +117,12 @@ const LeadAddModel = (props) => {
     }, [init, handleInit, initializeLeadTemplate]);
 
     useEffect(() => {
-        tryLoadAllCompanies();
-    },[]);
-
-    useEffect(() => {
-        if ((userState & 3) === 0) {
-            setUserState(2);
-            loadAllUsers();
+        if(((companyState & 1) === 1) && ((userState & 1) === 1)) {
+            setIsAllNeededDataLoaded(true);
         }
-    }, [userState, loadAllUsers ])
+    }, [companyState, userState, loadAllUsers ])
+
+    if(!isAllNeededDataLoaded) return null;
 
     return (
         <div

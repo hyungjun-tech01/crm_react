@@ -65,7 +65,6 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
   //===== [RecoilState] Related with Company =========================================
   const [companyState] = useRecoilState(atomCompanyState);
   const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
-  const { loadAllCompanies } = useRecoilValue(CompanyRepo);
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 

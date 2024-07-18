@@ -9,6 +9,26 @@ import { atomProductClassList
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
+export const ProductClassListStateRepo = selector({
+    key: "ProductClassListStateRepository",
+    get: ({getCallback}) => {
+        const tryLoadAllProductClassLists = getCallback(({set, snapshot}) => async () => {
+            const loadStates = await snapshot.getPromise(atomProductClassListState);
+            if((loadStates & 3) === 0){
+                console.log('[tryLoadAllProductClassLists] Try to load all product class lists');
+                set(atomProductClassListState, 2);   // state : loading
+                const {loadAllProductClassList} = await snapshot.getPromise(ProductClassListRepo);
+                loadAllProductClassList();
+            } else {
+                console.log('[tryLoadAllProductClassLists] All product class lists are being loaded or already loaded');
+            };
+        });
+        return {
+            tryLoadAllProductClassLists,
+        }
+    },
+});
+
 export const ProductClassListRepo = selector({
     key: "ProductClassListRepository",
     get: ({getCallback}) => {
@@ -102,6 +122,26 @@ export const ProductTypeOptions = [
     {value:'N(USB)', label: 'N(USB)'},
     {value:'D(Pareller)', label: 'D(Pareller)'},
 ];
+
+export const ProductStateRepo = selector({
+    key: "ProductStateRepository",
+    get: ({getCallback}) => {
+        const tryLoadAllProducts = getCallback(({set, snapshot}) => async () => {
+            const loadStates = await snapshot.getPromise(atomProductsState);
+            if((loadStates & 3) === 0){
+                console.log('[tryLoadAllProducts] Try to load all products');
+                set(atomProductsState, 2);   // state : loading
+                const {loadAllProducts} = await snapshot.getPromise(ProductRepo);
+                  loadAllProducts();
+            } else {
+                console.log('[tryLoadAllProducts] All products are being loaded or already loaded');
+            };
+        });
+        return {
+            tryLoadAllProducts,
+        }
+    },
+});
 
 export const ProductRepo = selector({
     key: "ProductRepository",

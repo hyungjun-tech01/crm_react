@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
@@ -19,17 +19,19 @@ import {
   atomCompanyState,
   atomLeadState,
 } from "../../atoms/atoms";
+import { atomUserState } from "../../atoms/atomsUser";
 import { compareCompanyName, compareText } from "../../constants/functions";
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import { leadColumn } from "../../repository/lead";
 import { useTranslation } from "react-i18next";
 import LeadAddModel from "./LeadAddMdel";
+import { UserRepo } from "../../repository/user";
 
 const Leads = () => {
   const { t } = useTranslation();
 
   //===== [RecoilState] Related with Company ==========================================
-  const setCompanyState = useSetRecoilState(atomCompanyState);
+  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
   const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
   const { setCurrentCompany} = useRecoilValue(CompanyRepo);
 
@@ -53,7 +55,13 @@ const Leads = () => {
   const { loadCompanyPurchases }  = useRecoilValue(PurchaseRepo);
 
 
+  //===== [RecoilState] Related with User ================================================
+  const [userState, setUserState] = useRecoilState(atomUserState);
+  const { loadAllUsers }  = useRecoilValue(UserRepo);
+
+
   //===== Handles to this =============================================================
+  const [ nowLoading, setNowLoading ] = useState(true);
   const [ initToAddLead, setInitToAddLead ] = useState(false);
 
   const [searchCondition, setSearchCondition] = useState("");
@@ -308,7 +316,14 @@ const Leads = () => {
       setLeadState(2);
       loadAllLeads();
     };
-  }, [allLeadData, leadState, loadAllLeads]);
+    if ((userState & 3) === 0) {
+      setUserState(2);
+      loadAllUsers();
+      return;
+  }
+    if(((companyState & 1) === 1) && ((leadState & 1) === 1) && ((userState & 1) === 1))
+      setNowLoading(false);
+  }, [leadState, companyState, userState]);
 
   return (
     <HelmetProvider>
@@ -481,6 +496,7 @@ const Leads = () => {
                     :
                     <Table
                       className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
+                      loading={nowLoading}
                       pagination={{
                         total: filteredLead.length >0 ? filteredLead.length:0,
                         showTotal: ShowTotal,

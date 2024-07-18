@@ -94,6 +94,7 @@ const LeadDetailsModel = () => {
 
 
   //===== Handles to edit 'Lead Details' ===============================================
+  const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
   const [editedDetailValues, setEditedDetailValues] = useState({});
 
   const handleDetailChange = useCallback((e) => {
@@ -287,7 +288,8 @@ const LeadDetailsModel = () => {
 
   //===== useEffect functions ===============================================  
   useEffect(() => {
-    if ((selectedLead !== defaultLead)
+    if (isAllNeededDataLoaded
+      && (selectedLead !== defaultLead)
       && (selectedLead.lead_code !== currentLeadCode)
       && ((companyState & 1) === 1)
     ) {
@@ -310,11 +312,8 @@ const LeadDetailsModel = () => {
         loadCompanyMAContracts(companyByLeadArray[0].company_code);
       };
     };
-  }, [selectedLead, currentLeadCode, companyState, allCompanies, setCurrentCompany, loadCompanyMAContracts]);
+  }, [isAllNeededDataLoaded, selectedLead, currentLeadCode, companyState, allCompanies, setCurrentCompany, loadCompanyMAContracts]);
 
-  useEffect(() => {
-    tryLoadAllCompanies();
-  }, []);
 
   useEffect(() => {
     if ((purchaseState & 3) === 0) {
@@ -363,12 +362,18 @@ const LeadDetailsModel = () => {
   }, [allQuotations, loadAllQuotations, quotationState, quotationsByLead.length, selectedLead.lead_code]);
 
   useEffect(() => {
-    if ((userState & 3) === 0) {
-      console.log('[LeadDetailModel] loading user data!');
-      setUserState(2);
-      loadAllUsers();
+    if (((companyState & 1) === 1) 
+      && ((userState & 1) === 1)
+      && ((purchaseState & 1) === 1)
+      && ((consultingState & 1) === 1)
+      && ((quotationState & 1) === 1))
+    {
+      console.log('[LeadDetailModel] all needed data is loaded');
+      setIsAllNeededDataLoaded(true);
   }
-  }, [userState, loadAllUsers])
+  }, [userState, companyState, purchaseState, consultingState, quotationState]);
+
+  if(!isAllNeededDataLoaded) return null;
 
   return (
     <>s

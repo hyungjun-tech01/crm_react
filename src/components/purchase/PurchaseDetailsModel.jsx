@@ -42,7 +42,6 @@ const PurchaseDetailsModel = (props) => {
   //===== [RecoilState] Related with Company ==========================================
   const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
-  const { loadAllCompanies } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Product ==========================================

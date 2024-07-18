@@ -57,6 +57,7 @@ const ConsultingDetailsModel = () => {
 
 
   //===== Handles to edit 'Consulting Details' ========================================
+  const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
   const [ editedDetailValues, setEditedDetailValues ] = useState(null);
 
   const handleDetailChange = useCallback((e) => {
@@ -172,13 +173,12 @@ const ConsultingDetailsModel = () => {
   }, [consultingState, cookies.myLationCrmUserId, currentConsultingCode, selectedConsulting]);
 
   useEffect(() => {
-    console.log('[CompanyAddModel] loading user data!');
-    if ((userState & 3) === 0) {
-      const tempUserState = userState | (1 << 1); //change it to pending state
-      setUserState(tempUserState);
-      loadAllUsers();
-  }
+    if ((userState & 1) === 1) {
+      setIsAllNeededDataLoaded(true);
+    };
   }, [userState, loadAllUsers])
+
+  if(!isAllNeededDataLoaded) return null;
 
   return (
     <div

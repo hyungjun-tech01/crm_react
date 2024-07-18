@@ -54,6 +54,7 @@ const ConsultingAddModel = () => {
 
 
   //===== Handles to edit 'ConsultingAddModel' ========================================
+  const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
   const [consultingChange, setConsultingChange] = useState({ ...defaultConsulting });
   const [loaded, setLoaded] = useState(0);
 
@@ -150,21 +151,14 @@ const ConsultingAddModel = () => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    if ((leadsState & 3) === 0) {
-      setLeadsState(2);
-      loadAllLeads();
-    };
-    if ((userState & 3) === 0) {
-      setUserState(2);
-      loadAllUsers();
-    };
-    if (((leadsState & 1) === 0) && ((userState & 1) === 0)) {
+    if (((leadsState & 1) === 1) && ((userState & 1) === 1)) {
+      setIsAllNeededDataLoaded(true);
       initializeConsultingTemplate();
     };
   }, [leadsState, userState]);
 
 
-  if((userState & 1) !== 1) return null;
+  if(!isAllNeededDataLoaded) return null;
 
   return (
     <div
