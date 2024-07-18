@@ -21,11 +21,18 @@ import TransactionEditBillModel from "../transactions/TransactionEditBillModel";
 
 
 const Companies = () => {
+  const { t } = useTranslation();
+
+  //===== [RecoilState] Related with Company ==========================================
   const [ companyState, setCompanyState] = useRecoilState(atomCompanyState);
   const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
   const { loadAllCompanies, filterCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const filteredCompany = useRecoilValue(atomFilteredCompany);
+
+
+  //===== Handles to this =============================================================
+  const [ nowLoading, setNowLoading ] = useState(true);
   const [ openTransaction, setOpenTransaction ] = useState(false);
   const [ openBill, setOpenBill ] = useState(false);
   const [ billData, setBillData ] = useState({});
@@ -33,7 +40,6 @@ const Companies = () => {
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
 
-  const { t } = useTranslation();
   const [initToAddCompany, setInitToAddCompany] = useState(false);
 
   const [multiQueryModal, setMultiQueryModal] = useState(false);
@@ -183,7 +189,11 @@ const Companies = () => {
 
   useEffect(() => {
     tryLoadAllCompanies();
-  }, []);
+
+    if((companyState & 1) === 1) {
+      setNowLoading(false);
+    };
+  }, [companyState]);
 
   return (
     <HelmetProvider>
@@ -292,6 +302,7 @@ const Companies = () => {
                           ItemRender: ItemRender,
                         }}
                         className="table"
+                        loading={nowLoading}
                         style={{ overflowX: "auto" }}
                         columns={columns}
                         dataSource={allCompanyData}
@@ -314,6 +325,7 @@ const Companies = () => {
                           ItemRender: ItemRender,
                         }}
                         className="table"
+                        loading={nowLoading}
                         style={{ overflowX: "auto" }}
                         columns={columns}
                         dataSource={filteredCompany.length > 0 ? filteredCompany : null}

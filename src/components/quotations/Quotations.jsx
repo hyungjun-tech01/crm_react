@@ -16,6 +16,7 @@ import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { QuotationRepo } from "../../repository/quotation";
 import {
+  atomCompanyState,
   atomAllQuotations,
   atomFilteredQuotation,
   atomLeadState,
@@ -29,6 +30,7 @@ const Quotations = () => {
   const { t } = useTranslation();
 
   //===== [RecoilState] Related with Company ==========================================
+  const companyState = useRecoilValue(atomCompanyState);
   const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
   const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
@@ -46,6 +48,7 @@ const Quotations = () => {
 
 
   //===== Handles to edit this ========================================================
+  const [ nowLoading, setNowLoading ] = useState(true);
   const [initAddNewQuotation, setInitAddNewQuotation] = useState(false);
 
   const [searchCondition, setSearchCondition] = useState("");
@@ -214,7 +217,13 @@ const Quotations = () => {
       setQuotationState(2);
       loadAllQuotations();
     };
-  }, [leadState, quotationState, loadAllLeads, loadAllQuotations]);
+    if(((companyState & 1) === 1)
+      && ((leadState & 1) === 1)
+      && ((quotationState & 1) === 1)
+    ){
+      setNowLoading(false);
+    };
+  }, [companyState, leadState, quotationState]);
 
   return (
     <HelmetProvider>
@@ -285,6 +294,7 @@ const Quotations = () => {
                           onShowSizeChange: onShowSizeChange,
                           ItemRender: ItemRender,
                         }}
+                        loading={nowLoading}
                         style={{ overflowX: "auto" }}
                         columns={columns}
                         bordered
@@ -312,6 +322,7 @@ const Quotations = () => {
                           onShowSizeChange: onShowSizeChange,
                           ItemRender: ItemRender,
                         }}
+                        loading={nowLoading}
                         style={{ overflowX: "auto" }}
                         columns={columns}
                         bordered

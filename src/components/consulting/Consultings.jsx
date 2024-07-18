@@ -17,6 +17,7 @@ import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { ConsultingRepo } from "../../repository/consulting";
 import {
+  atomCompanyState,
   atomAllConsultings,
   atomFilteredConsulting,
   atomLeadState,
@@ -38,6 +39,7 @@ const Consultings = () => {
 
 
   //===== [RecoilState] Related with Company ==========================================
+  const companyState = useRecoilValue(atomCompanyState);
   const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
   const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
@@ -48,6 +50,7 @@ const Consultings = () => {
 
 
   //===== Handles to deal 'Consultings' ========================================
+  const [ nowLoading, setNowLoading ] = useState(true);
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
   const [statusSearch, setStatusSearch] = useState('common.all');
@@ -153,21 +156,23 @@ const Consultings = () => {
   //===== useEffect functions ==========================================
   useEffect(() => {
     tryLoadAllCompanies();
-  }, []);
 
-  useEffect(() => {
     if ((leadState & 3) === 0) {
       setLeadState(2);
       loadAllLeads();
     };
-  }, [leadState, loadAllLeads]);
-
-  useEffect(() => {
     if ((consultingState & 3) === 0) {
       setConsultingState(2);
       loadAllConsultings();
     };
-  }, [consultingState, loadAllConsultings]);
+    if(((companyState & 1) === 1)
+      && ((leadState & 1) === 1)
+      && ((consultingState & 1) === 1)
+    ){
+      setNowLoading(false);
+    };
+
+  }, [companyState, leadState, consultingState]);
 
 
   return (
@@ -240,6 +245,7 @@ const Consultings = () => {
                           onShowSizeChange: onShowSizeChange,
                           ItemRender: ItemRender,
                         }}
+                        loading={nowLoading}
                         style={{ overflowX: "auto" }}
                         columns={columns}
                         bordered
@@ -267,6 +273,7 @@ const Consultings = () => {
                           onShowSizeChange: onShowSizeChange,
                           ItemRender: ItemRender,
                         }}
+                        loading={nowLoading}
                         style={{ overflowX: "auto" }}
                         columns={columns}
                         bordered

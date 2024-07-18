@@ -319,10 +319,13 @@ const Leads = () => {
     if ((userState & 3) === 0) {
       setUserState(2);
       loadAllUsers();
-      return;
-  }
-    if(((companyState & 1) === 1) && ((leadState & 1) === 1) && ((userState & 1) === 1))
+    };
+    if(((companyState & 1) === 1)
+      && ((leadState & 1) === 1)
+      && ((userState & 1) === 1)
+    ){
       setNowLoading(false);
+    };
   }, [leadState, companyState, userState]);
 
   return (
@@ -465,6 +468,7 @@ const Leads = () => {
                     {searchCondition === "" ? 
                     <Table
                       className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
+                      loading={nowLoading}
                       pagination={{
                         total: allLeadData.length,
                         showTotal: ShowTotal,

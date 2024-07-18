@@ -37,6 +37,7 @@ const Purchase = () => {
 
 
   //===== Handles to deal 'Purcahse' ====================================================
+  const [ nowLoading, setNowLoading ] = useState(true);
   const [ initAddNewPurchase, setInitAddNewPurchase ] = useState(false);
   const [ tableData, setTableData ] = useState([]);
   const [ selectedPurchase, setSelectedPurchase ] = useState(null);
@@ -138,6 +139,7 @@ const Purchase = () => {
       loadAllPurchases();
     };
     if(((companyState & 1) === 1) && ((purchaseState & 1) === 1)) {
+      setNowLoading(false);
       const modifiedData = allPurchaseData.map(purchase => {
         const foundIdx = allCompanyData.findIndex(company => company.company_code === purchase.company_code);
         if(foundIdx !== -1){
@@ -255,6 +257,7 @@ const Purchase = () => {
                         onShowSizeChange: onShowSizeChange,
                         ItemRender: ItemRender,
                       }}
+                      loading={nowLoading}
                       className="table"
                       style={{ overflowX: "auto" }}
                       columns={columns}
@@ -281,6 +284,7 @@ const Purchase = () => {
                         onShowSizeChange: onShowSizeChange,
                         ItemRender: ItemRender,
                       }}
+                      loading={nowLoading}
                       style={{ overflowX: "auto" }}
                       columns={columns}
                       dataSource={filteredPurchase.length >0 ? filteredPurchase : null}

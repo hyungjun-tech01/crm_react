@@ -11,10 +11,10 @@ import CompanyDetailsModel from "../company/CompanyDetailsModel";
 
 import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
-import { atomAllCompanies,
+import {
   atomAllTransactions,
   atomFilteredTransaction,
-  // atomCompanyState,
+  atomCompanyState,
   atomTransactionState,
   defaultTransaction,
 } from "../../atoms/atoms";
@@ -28,9 +28,8 @@ const Transactions = () => {
   const { t } = useTranslation();
 
   //===== [RecoilState] Related with Company ==========================================
-  // const companyState = useRecoilValue(atomCompanyState);
+  const companyState = useRecoilValue(atomCompanyState);
   const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
-  const allCompanyData = useRecoilValue(atomAllCompanies);
   const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
@@ -42,6 +41,7 @@ const Transactions = () => {
 
 
   //===== Handles to edit this ========================================================
+  const [ nowLoading, setNowLoading ] = useState(true);
   const [ openTransaction, setOpenTransaction ] = useState(false);
   const [ openBill, setOpenBill ] = useState(false);
   const [ billData, setBillData ] = useState(null);
@@ -163,7 +163,12 @@ const Transactions = () => {
       setTransactionState(2);
       loadAllTransactions();
     };
-  }, [allCompanyData, allTransactionData, transactionState]);
+    if(((companyState & 1) === 1)
+      && ((transactionState & 1) === 1)
+    ){
+      setNowLoading(false);
+    };
+  }, [ companyState, transactionState]);
 
   return (
     <HelmetProvider>
@@ -232,6 +237,7 @@ const Transactions = () => {
                           onShowSizeChange: onShowSizeChange,
                           ItemRender: ItemRender,
                         }}
+                        loading={nowLoading}
                         style={{ overflowX: "auto" }}
                         columns={columns}
                         bordered
@@ -253,6 +259,7 @@ const Transactions = () => {
                         onShowSizeChange: onShowSizeChange,
                         ItemRender: ItemRender,
                       }}
+                      loading={nowLoading}
                       style={{ overflowX: "auto" }}
                       columns={columns}
                       bordered
