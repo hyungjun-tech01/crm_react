@@ -18,7 +18,7 @@ import {
   defaultMAContract,
 } from "../../atoms/atoms";
 import { PurchaseRepo } from "../../repository/purchase";
-import { CompanyRepo } from "../../repository/company";
+import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
 import { ProductClassListRepo, ProductRepo, ProductTypeOptions } from "../../repository/product";
 import { ContractTypes, MAContractRepo } from "../../repository/ma_contract";
 
@@ -40,7 +40,7 @@ const PurchaseDetailsModel = (props) => {
 
 
   //===== [RecoilState] Related with Company ==========================================
-  const companyState = useRecoilValue(atomCompanyState);
+  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
 
@@ -337,10 +337,8 @@ const PurchaseDetailsModel = (props) => {
   }, [selected, loadPurchaseMAContracts]);
 
   useEffect(() => {
-    if ((companyState & 1) === 0) {
-      loadAllCompanies();
-    }
-  }, [companyState, loadAllCompanies]);
+    tryLoadAllCompanies()
+  }, []);
 
   useEffect(() => {
     console.log('[PurchaseAddModel] useEffect / Production');

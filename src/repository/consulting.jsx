@@ -79,7 +79,7 @@ export const ConsultingRepo = selector({
                     set(atomConsultingState, (loadStates | 1));
                 }
                 catch(err){
-                    console.error(`loadAllCompanies / Error : ${err}`);
+                    console.error(`loadAllConsultings / Error : ${err}`);
                     set(atomConsultingState, 0);
                 };
             };
@@ -103,7 +103,7 @@ export const ConsultingRepo = selector({
                 set(atomCompanyConsultings, data);
             }
             catch(err){
-                console.error(`loadAllCompanies / Error : ${err}`);
+                console.error(`loadAllConsultings / Error : ${err}`);
             };
         });
         const filterConsulting = getCallback(({set, snapshot }) => async (filterText) => {
@@ -252,7 +252,7 @@ export const ConsultingRepo = selector({
                         console.log('atomCurrentConsulting', data,atomCurrentConsulting.company_name);
                     }
                     catch(err){
-                        console.error(`loadAllCompanies / Error : ${err}`);
+                        console.error(`setCurrentConsulting / Error : ${err}`);
                     };
                 }else{
                     const selected_arrary = allConsultings.filter(consulting => consulting.consulting_code === consulting_code);

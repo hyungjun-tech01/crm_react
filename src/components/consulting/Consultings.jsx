@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Table } from "antd";
@@ -14,18 +13,17 @@ import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import LeadDetailsModel from "../leads/LeadDetailsModel";
 import ConsultingAddModel from "./ConsultingAddModel";
 import "react-datepicker/dist/react-datepicker.css";
-import { CompanyRepo } from "../../repository/company";
+import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { ConsultingRepo } from "../../repository/consulting";
 import {
   atomAllConsultings,
   atomFilteredConsulting,
-  atomCompanyState,
   atomLeadState,
   atomConsultingState,
   defaultLead,
 } from "../../atoms/atoms";
-import { compareCompanyName, compareText, formatDate } from "../../constants/functions";
+import { compareCompanyName, compareText } from "../../constants/functions";
 
 
 const Consultings = () => {
@@ -40,8 +38,8 @@ const Consultings = () => {
 
 
   //===== [RecoilState] Related with Company ==========================================
-  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
-  const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
+  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
+  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Lead =============================================
@@ -154,12 +152,8 @@ const Consultings = () => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    if ((companyState & 3) === 0) {
-      console.log('[Consulting] load all companies!');
-      setCompanyState(2);
-      loadAllCompanies();
-    };
-  }, [companyState, loadAllCompanies]);
+    tryLoadAllCompanies();
+  }, []);
 
   useEffect(() => {
     if ((leadState & 3) === 0) {

@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
-import { atomCompanyState, atomCompanyForSelection, defaultLead } from "../../atoms/atoms";
+import { atomCompanyForSelection, defaultLead } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
-import { CompanyRepo } from "../../repository/company";
+import { CompanyStateRepo } from "../../repository/company";
 import { UserRepo } from '../../repository/user';
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { option_locations } from "../../constants/constants";
@@ -19,8 +19,7 @@ const LeadAddModel = (props) => {
     
 
     //===== [RecoilState] Related with Company =============================================
-    const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
-    const { loadAllCompanies } = useRecoilValue(CompanyRepo);
+    const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
     const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
@@ -118,13 +117,8 @@ const LeadAddModel = (props) => {
     }, [init, handleInit, initializeLeadTemplate]);
 
     useEffect(() => {
-        if ((companyState & 3) === 0) {
-            console.log('[LeadAddModel] loading company data!');
-            setCompanyState(2);
-            loadAllCompanies();
-        };
-
-    }, [companyState, loadAllCompanies]);
+        tryLoadAllCompanies();
+    },[]);
 
     useEffect(() => {
         if ((userState & 3) === 0) {

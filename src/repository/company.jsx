@@ -29,6 +29,31 @@ export const companyColumn = [
     { value: '=', label: '='},
 ];
 
+export const CompanyStateRepo = selector({
+    key: "CompanyStateRepository",
+    get: ({getCallback}) => {
+        const tryLoadAllCompanies = getCallback(({set, get, snapshot}) => async () => {
+            const loadStates = await snapshot.getPromise(atomCompanyState);
+            if((loadStates & 3) === 0){
+                console.log('Try to load all companines');
+                set(atomCompanyState, 2);   // state : loading
+                const {loadAllCompanies} = get(CompanyRepo);
+                const multiQueryCondi = {
+                    queryConditions: null,
+                    checkedDates: null,
+                    singleDate: null
+                  }
+                loadAllCompanies(multiQueryCondi);
+            } else {
+                console.log('All companines are being loaded or already loaded');
+            };
+        });
+        return {
+            tryLoadAllCompanies,
+        }
+    },
+});
+
 export const CompanyRepo = selector({
     key: "CompanyRepository",
     get: ({getCallback}) => {

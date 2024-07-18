@@ -11,7 +11,7 @@ import { atomAllPurchases,
   atomPurchaseState,
   atomAllCompanies,
 } from "../../atoms/atoms";
-import { CompanyRepo } from "../../repository/company";
+import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
 import { PurchaseRepo } from "../../repository/purchase";
 import { ConvertCurrency, compareText, formatDate } from "../../constants/functions";
 
@@ -24,7 +24,8 @@ const Purchase = () => {
 
 
   //===== [RecoilState] Related with Company =============================================
-  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
+  const companyState = useRecoilValue(atomCompanyState);
+  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
 
@@ -132,11 +133,7 @@ const Purchase = () => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    console.log('Purchase called!');
-    if((companyState & 3) === 0) {
-      setCompanyState(2);
-      loadAllCompanies();
-    };
+    tryLoadAllCompanies();
     if((purchaseState & 3) === 0) {
       setPurchaseState(2);
       loadAllPurchases();
@@ -164,7 +161,7 @@ const Purchase = () => {
       });
       setTableData(modifiedData);
     };
-  }, [companyState, purchaseState, loadAllCompanies, loadAllPurchases, allPurchaseData, allCompanyData]);
+  }, [companyState, purchaseState, loadAllPurchases, allPurchaseData, allCompanyData]);
 
 
   return (

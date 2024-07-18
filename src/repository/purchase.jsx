@@ -34,7 +34,7 @@ export const PurchaseRepo = selector({
                     set(atomPurchaseState, (loadStates | 1));
                 }
                 catch(err){
-                    console.error(`loadAllCompanies / Error : ${err}`);
+                    console.error(`loadAllPurchases / Error : ${err}`);
                     set(atomPurchaseState, 0);
                 };
             };

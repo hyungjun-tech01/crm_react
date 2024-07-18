@@ -18,7 +18,7 @@ import {
   atomCurrentTransaction,
   defaultTransaction,
 } from "../../atoms/atoms";
-import { CompanyRepo } from "../../repository/company";
+import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
 import { DefaultTransactionContent, TransactionRepo } from "../../repository/transaction";
 
 import { ConvertCurrency, formatDate } from "../../constants/functions";
@@ -63,7 +63,8 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
 
 
   //===== [RecoilState] Related with Company =========================================
-  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
+  const [companyState] = useRecoilState(atomCompanyState);
+  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
   const { loadAllCompanies } = useRecoilValue(CompanyRepo);
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
@@ -599,11 +600,9 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
   useEffect(() => {
     if(!open) return;
     
-    if ((companyState & 3) === 0) {
-      setCompanyState(2);   //pending state
-      loadAllCompanies();
-      return;
-    };
+    tryLoadAllCompanies();
+
+    if ((companyState & 3) === 0) return;
     
     if (Object.keys(orgTransaction).length === 0) {
       

@@ -9,13 +9,12 @@ import "../antdstyle.css";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
 
-import { MoreVert } from '@mui/icons-material';
-import { CompanyRepo } from "../../repository/company";
+import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
 import { atomAllCompanies,
   atomAllTransactions,
   atomFilteredTransaction,
-  atomCompanyState,
+  // atomCompanyState,
   atomTransactionState,
   defaultTransaction,
 } from "../../atoms/atoms";
@@ -29,9 +28,10 @@ const Transactions = () => {
   const { t } = useTranslation();
 
   //===== [RecoilState] Related with Company ==========================================
-  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
+  // const companyState = useRecoilValue(atomCompanyState);
+  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
-  const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
+  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Transaction ======================================
@@ -157,16 +157,13 @@ const Transactions = () => {
   }
 
   useEffect(() => {
-    console.log('Transaction called!');
-    if((companyState & 3) === 0) {
-      setCompanyState(2);
-      loadAllCompanies();
-    };
+    tryLoadAllCompanies();
+
     if((transactionState & 3) === 0) {
       setTransactionState(2);
       loadAllTransactions();
     };
-  }, [allCompanyData, allTransactionData, companyState, transactionState]);
+  }, [allCompanyData, allTransactionData, transactionState]);
 
   return (
     <HelmetProvider>

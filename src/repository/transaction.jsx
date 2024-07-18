@@ -52,7 +52,7 @@ export const TransactionRepo = selector({
                     set(atomTransactionState, (loadStates | 1));
                 }
                 catch (err) {
-                    console.error(`loadAllCompanies / Error : ${err}`);
+                    console.error(`loadAllTransactions / Error : ${err}`);
                     set(atomTransactionState, 0);
                 };
             };

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
@@ -16,7 +16,7 @@ import {
   atomCompanyState,
   atomCompanyForSelection,
 } from "../../atoms/atoms";
-import { CompanyRepo } from "../../repository/company";
+import { CompanyStateRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
 
 import { ConvertCurrency } from "../../constants/functions";
@@ -82,8 +82,8 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
 
 
   //===== [RecoilState] Related with Company =========================================
-  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
-  const { loadAllCompanies } = useRecoilValue(CompanyRepo);
+  const companyState = useRecoilValue(atomCompanyState);
+  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
@@ -321,11 +321,8 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
   useEffect(() => {
     if(!open) return;
 
-    if ((companyState & 3) === 0) {
-      setCompanyState(2);
-      loadAllCompanies();
-    }
-    else {
+    tryLoadAllCompanies();
+    if ((companyState & 1) === 1) {
       if(data) {
         console.log('[TransactionEditBillModel] called! :', data);
         

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
@@ -8,7 +8,7 @@ import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import LeadDetailsModel from "./LeadDetailsModel";
 import { MoreVert } from '@mui/icons-material';
-import { CompanyRepo } from "../../repository/company";
+import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
 import { ConsultingRepo } from "../../repository/consulting";
 import { QuotationRepo } from "../../repository/quotation";
 import { PurchaseRepo } from "../../repository/purchase";
@@ -29,8 +29,9 @@ const Leads = () => {
   const { t } = useTranslation();
 
   //===== [RecoilState] Related with Company ==========================================
-  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
-  const { loadAllCompanies , setCurrentCompany} = useRecoilValue(CompanyRepo);
+  const setCompanyState = useSetRecoilState(atomCompanyState);
+  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
+  const { setCurrentCompany} = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Lead =============================================
@@ -302,16 +303,12 @@ const Leads = () => {
   ];
 
   useEffect(() => {
-    console.log('lead called!');
-    if((companyState & 3) === 0) {
-      setCompanyState(2);
-      loadAllCompanies();
-    };
+    tryLoadAllCompanies();
     if((leadState & 3) === 0) {
       setLeadState(2);
       loadAllLeads();
     };
-  }, [allLeadData, companyState, leadState, loadAllCompanies, loadAllLeads]);
+  }, [allLeadData, leadState, loadAllLeads]);
 
   return (
     <HelmetProvider>

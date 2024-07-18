@@ -43,7 +43,7 @@ export const QuotationRepo = selector({
                     set(atomQuotationState, (loadStates | 1));
                 }
                 catch(err){
-                    console.error(`loadAllCompanies / Error : ${err}`);
+                    console.error(`loadAllQuotations / Error : ${err}`);
                     set(atomQuotationState, 0);
                 };
             };

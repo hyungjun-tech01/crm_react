@@ -31,7 +31,7 @@ export const ProductClassListRepo = selector({
                     set(atomProductClassListState, (loadStates | 1));
                 }
                 catch(err){
-                    console.error(`loadAllCompanies / Error : ${err}`);
+                    console.error(`loadAllProductClassList / Error : ${err}`);
                     set(atomProductClassListState, 0);
                 };
             };
@@ -125,7 +125,7 @@ export const ProductRepo = selector({
                     set(atomProductsState, (loadStates | 1));
                 }
                 catch(err){
-                    console.error(`loadAllCompanies / Error : ${err}`);
+                    console.error(`loadAllProducts / Error : ${err}`);
                     set(atomProductsState, 0);
                 };    
 ;            }

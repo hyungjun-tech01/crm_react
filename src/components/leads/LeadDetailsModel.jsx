@@ -4,7 +4,6 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Avatar, Space, Switch } from "antd";
-import { Edit } from "@mui/icons-material";
 
 import {
   atomCurrentLead, defaultLead,
@@ -14,7 +13,7 @@ import {
   atomQuotationState, atomAllQuotations,
 } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
-import { CompanyRepo } from "../../repository/company";
+import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { UserRepo } from '../../repository/user';
 import { ConsultingRepo } from "../../repository/consulting";
@@ -46,10 +45,11 @@ const LeadDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Company =======================================
-  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
+  const companyState = useRecoilValue(atomCompanyState);
+  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
   const allCompanies = useRecoilValue(atomAllCompanies);
   const currentCompany = useRecoilValue(atomCurrentCompany);
-  const { loadAllCompanies, modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
+  const { modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
@@ -313,12 +313,8 @@ const LeadDetailsModel = () => {
   }, [selectedLead, currentLeadCode, companyState, allCompanies, setCurrentCompany, loadCompanyMAContracts]);
 
   useEffect(() => {
-    if ((companyState & 3) === 0) {
-      console.log('[LeadDetailsModel] loadAllCompanies');
-      setCompanyState(2);
-      loadAllCompanies();
-    };
-  }, [companyState, loadAllCompanies]);
+    tryLoadAllCompanies();
+  }, []);
 
   useEffect(() => {
     if ((purchaseState & 3) === 0) {

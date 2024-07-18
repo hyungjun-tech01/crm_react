@@ -85,7 +85,7 @@ export const LeadRepo = selector({
                 set(atomLeadState, (loadStates | 1));
             }
             catch(err){
-                console.error(`loadAllCompanies / Error : ${err}`);
+                console.error(`loadAllLeads / Error : ${err}`);
                 set(atomLeadState, 0);
             };
         });

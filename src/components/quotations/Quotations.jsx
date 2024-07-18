@@ -12,13 +12,12 @@ import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import LeadDetailsModel from "../leads/LeadDetailsModel";
 
-import { CompanyRepo } from "../../repository/company";
+import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { QuotationRepo } from "../../repository/quotation";
 import {
   atomAllQuotations,
   atomFilteredQuotation,
-  atomCompanyState,
   atomLeadState,
   atomQuotationState,
 } from "../../atoms/atoms";
@@ -30,8 +29,8 @@ const Quotations = () => {
   const { t } = useTranslation();
 
   //===== [RecoilState] Related with Company ==========================================
-  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
-  const { loadAllCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
+  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
+  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Lead =============================================
@@ -206,11 +205,7 @@ const Quotations = () => {
   }, [initAddNewQuotation]);
 
   useEffect(() => {
-    console.log('Quotation called!');
-    if ((companyState & 3) === 0) {
-      setCompanyState(2);
-      loadAllCompanies();
-    };
+    tryLoadAllCompanies();
     if ((leadState & 3) === 0) {
       setLeadState(2);
       loadAllLeads();
@@ -219,7 +214,7 @@ const Quotations = () => {
       setQuotationState(2);
       loadAllQuotations();
     };
-  }, [companyState, leadState, quotationState, loadAllCompanies, loadAllLeads, loadAllQuotations]);
+  }, [leadState, quotationState, loadAllLeads, loadAllQuotations]);
 
   return (
     <HelmetProvider>

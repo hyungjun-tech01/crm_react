@@ -7,7 +7,6 @@ import { ItemRender, ShowTotal } from "../paginationfunction";
 
 import {
     atomCompanyForSelection,
-    atomCompanyState,
     defaultPurchase,
     atomCurrentPurchase,
     atomProductClassList,
@@ -15,10 +14,9 @@ import {
     atomAllProducts,
     atomProductsState,
     atomProductOptions,
-    atomMAContractSet,
     defaultMAContract,
 } from '../../atoms/atoms';
-import { CompanyRepo } from '../../repository/company';
+import { CompanyStateRepo } from '../../repository/company';
 import { PurchaseRepo } from '../../repository/purchase';
 import { MAContractRepo, ContractTypes } from "../../repository/ma_contract";
 import { ProductClassListRepo, ProductRepo, ProductTypeOptions } from '../../repository/product';
@@ -36,9 +34,8 @@ const PurchaseAddModel = (props) => {
 
 
     //===== [RecoilState] Related with Company =============================================
-    const companyState = useRecoilValue(atomCompanyState);
+    const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
     const companyForSelection = useRecoilValue(atomCompanyForSelection);
-    const { loadAllCompanies } = useRecoilValue(CompanyRepo);
 
 
     //===== [RecoilState] Related with Purcahse ============================================
@@ -312,10 +309,8 @@ const PurchaseAddModel = (props) => {
     }, [init, handleInit, initializeAddTemplate]);
 
     useEffect(() => {
-        if ((companyState & 1) === 0 && (companyState & (1 << 1)) === 0) {
-            loadAllCompanies();
-        };
-    }, [companyState, loadAllCompanies]);
+        tryLoadAllCompanies();
+    },[]);
 
     // ----- useEffect for Production -----------------------------------
     useEffect(() => {

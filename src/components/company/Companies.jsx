@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue, useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { useTranslation } from "react-i18next";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
-import { CompanyRepo } from "../../repository/company";
-import { atomAllCompanies, atomFilteredCompany, atomCompanyState } from "../../atoms/atoms";
+import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
+import { atomAllCompanies, atomCompanyState, atomFilteredCompany } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 
 import CompanyAddModel from "./CompanyAddMdel";
@@ -21,7 +21,8 @@ import TransactionEditBillModel from "../transactions/TransactionEditBillModel";
 
 
 const Companies = () => {
-  const [companyState, setCompanyState] = useRecoilState(atomCompanyState);
+  const [ companyState, setCompanyState] = useRecoilState(atomCompanyState);
+  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
   const { loadAllCompanies, filterCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const filteredCompany = useRecoilValue(atomFilteredCompany);
@@ -181,18 +182,8 @@ const Companies = () => {
   }, [setInitToAddCompany]);
 
   useEffect(() => {
-    console.log('Company called!');
-    if ((companyState & 3) === 0) {
-      setCompanyState(2);
-      const multiQueryCondi = {
-        queryConditions: null,
-        checkedDates: null,
-        singleDate: null
-      }
-      loadAllCompanies(multiQueryCondi);
-    };
+    tryLoadAllCompanies();
   }, []);
-  //}, [companyState, loadAllCompanies]);
 
   return (
     <HelmetProvider>
