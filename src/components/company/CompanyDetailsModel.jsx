@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Space, Switch } from "antd";
-import { C_logo,  } from "../imagepath";
-import { option_locations, option_deal_type } from '../../constants/constants';
+import { Space, Spin, Switch } from "antd";
+import { C_logo } from "../imagepath";
+import { option_locations, option_deal_type } from "../../constants/constants";
 
-import { 
+import {
   atomCurrentCompany,
   defaultCompany,
   atomAllPurchases,
@@ -15,113 +15,120 @@ import {
   atomAllTransactions,
   atomTransactionState,
 } from "../../atoms/atoms";
-import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from "../../atoms/atomsUser";
+import {
+  atomUserState,
+  atomEngineersForSelection,
+  atomSalespersonsForSelection,
+} from "../../atoms/atomsUser";
 import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
 import { PurchaseRepo } from "../../repository/purchase";
 import { MAContractRepo } from "../../repository/ma_contract";
-import { UserRepo } from '../../repository/user';
 
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import CompanyPurchaseModel from "./CompanyPurchaseModel";
 import CompanyTransactionModel from "./CompanyTransactionModel";
 
-const CompanyDetailsModel = ({openTransaction}) => {
+const CompanyDetailsModel = ({ openTransaction }) => {
   const { t } = useTranslation();
-  const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+  const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
   //===== [RecoilState] Related with Company ==========================================
   const selectedCompany = useRecoilValue(atomCurrentCompany);
   const { modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
 
-
   //===== [RecoilState] Related with Purchase =========================================
   const [purchaseState, setPurchaseState] = useRecoilState(atomPurchaseState);
   const allPurchases = useRecoilValue(atomAllPurchases);
-  const { loadAllPurchases} = useRecoilValue(PurchaseRepo);
+  const { loadAllPurchases } = useRecoilValue(PurchaseRepo);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
-
   //===== [RecoilState] Related with Transaction ======================================
-  const [transactionState, setTransactionState] = useRecoilState(atomTransactionState);
+  const [transactionState, setTransactionState] =
+    useRecoilState(atomTransactionState);
   const allTransactions = useRecoilValue(atomAllTransactions);
   const { loadAllTransactions } = useRecoilValue(TransactionRepo);
 
-
   //===== [RecoilState] Related with Users ============================================
-  const [userState, setUserState] = useRecoilState(atomUserState);
-  const { loadAllUsers } = useRecoilValue(UserRepo)
+  const userState = useRecoilValue(atomUserState);
   const engineerForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
-
   //===== Handles to deal this component ==============================================
-  const [ isFullScreen, setIsFullScreen ] = useState(false);
-  const [ currentCompanyCode, setCurrentCompanyCode ] = useState('');
+  const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [currentCompanyCode, setCurrentCompanyCode] = useState("");
 
   const handleWindowWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
-    if(checked)
-      localStorage.setItem('isFullScreen', '1');
-    else
-      localStorage.setItem('isFullScreen', '0');
+    if (checked) localStorage.setItem("isFullScreen", "1");
+    else localStorage.setItem("isFullScreen", "0");
   }, []);
 
-
   //===== Handles to edit 'Company Details' ============================================
-  const [ editedDetailValues, setEditedDetailValues ] = useState(null);
-  const [ purchasesByCompany, setPurchasesByCompany] = useState([]);
-  const [ transactionByCompany, setTransactionByCompany] = useState([]);
-  const [ validMACount, setValidMACount ] = useState(0);
+  const [editedDetailValues, setEditedDetailValues] = useState(null);
+  const [purchasesByCompany, setPurchasesByCompany] = useState([]);
+  const [transactionByCompany, setTransactionByCompany] = useState([]);
+  const [validMACount, setValidMACount] = useState(0);
 
-  const handleDetailChange = useCallback((e) => {
-    if(e.target.value !== selectedCompany[e.target.name]){
+  const handleDetailChange = useCallback(
+    (e) => {
+      if (e.target.value !== selectedCompany[e.target.name]) {
+        const tempEdited = {
+          ...editedDetailValues,
+          [e.target.name]: e.target.value,
+        };
+        setEditedDetailValues(tempEdited);
+      } else {
+        if (editedDetailValues[e.target.name]) {
+          delete editedDetailValues[e.target.name];
+        }
+      }
+    },
+    [editedDetailValues, selectedCompany]
+  );
+
+  const handleDetailDateChange = useCallback(
+    (name, date) => {
+      if (date !== new Date(selectedCompany[name])) {
+        const tempEdited = {
+          ...editedDetailValues,
+          [name]: date,
+        };
+        setEditedDetailValues(tempEdited);
+      }
+    },
+    [editedDetailValues, selectedCompany]
+  );
+
+  const handleDetailSelectChange = useCallback(
+    (name, selected) => {
+      if (selected.value !== selectedCompany[name]) {
+        const tempEdited = {
+          ...editedDetailValues,
+          [name]: selected.value,
+        };
+        setEditedDetailValues(tempEdited);
+      }
+    },
+    [editedDetailValues, selectedCompany]
+  );
+
+  const handleDetailAddressChange = useCallback(
+    (obj) => {
       const tempEdited = {
         ...editedDetailValues,
-        [e.target.name]: e.target.value,
+        ...obj,
       };
+      console.log("handleDetailAddressChange :", tempEdited);
       setEditedDetailValues(tempEdited);
-    } else {
-      if(editedDetailValues[e.target.name]){
-        delete editedDetailValues[e.target.name];
-      };
-    }
-  }, [editedDetailValues, selectedCompany]);
-
-  const handleDetailDateChange = useCallback((name, date) => {
-    if(date !== new Date(selectedCompany[name])){
-      const tempEdited = {
-        ...editedDetailValues,
-        [name]: date,
-      };
-      setEditedDetailValues(tempEdited);
-    }
-  }, [editedDetailValues, selectedCompany]);
-
-  const handleDetailSelectChange = useCallback((name, selected) => {
-    if(selected.value !== selectedCompany[name]){
-      const tempEdited = {
-        ...editedDetailValues,
-        [name]: selected.value,
-      };
-      setEditedDetailValues(tempEdited);
-    };
-  }, [editedDetailValues, selectedCompany]);
-
-  const handleDetailAddressChange = useCallback(obj =>{
-    const tempEdited = {
-      ...editedDetailValues,
-      ...obj,
-    };
-    console.log('handleDetailAddressChange :', tempEdited);
-    setEditedDetailValues(tempEdited);
-  }, [editedDetailValues])
+    },
+    [editedDetailValues]
+  );
 
   const handleDetailSave = useCallback(() => {
-    if(editedDetailValues !== null
-      && selectedCompany !== defaultCompany)
-    {
+    if (editedDetailValues !== null && selectedCompany !== defaultCompany) {
       const temp_all_saved = {
         ...editedDetailValues,
         action_type: "UPDATE",
@@ -131,13 +138,18 @@ const CompanyDetailsModel = ({openTransaction}) => {
       if (modifyCompany(temp_all_saved)) {
         console.log(`Succeeded to modify company`);
       } else {
-        console.error('Failed to modify company')
+        console.error("Failed to modify company");
       }
     } else {
       console.log("[ CompanyDetailModel ] No saved data");
-    };
+    }
     setEditedDetailValues(null);
-  }, [cookies.myLationCrmUserId, modifyCompany, editedDetailValues, selectedCompany]);
+  }, [
+    cookies.myLationCrmUserId,
+    modifyCompany,
+    editedDetailValues,
+    selectedCompany,
+  ]);
 
   const handleDetailCancel = useCallback(() => {
     setEditedDetailValues(null);
@@ -146,105 +158,229 @@ const CompanyDetailsModel = ({openTransaction}) => {
   const handleClose = useCallback(() => {
     setEditedDetailValues(null);
     setCurrentCompany();
-    setCurrentCompanyCode('');
+    setCurrentCompanyCode("");
   }, [setCurrentCompany]);
 
   const company_items_info = [
-    {key:'company_address',title:'common.address',detail:{type:'address',extra:'long',key_zip:'company_zip_code',editing:handleDetailAddressChange}},
-    {key:'company_phone_number',title:'common.phone_no',detail:{ type:'label',editing:handleDetailChange}},
-    {key:'company_zip_code',title:'common.zip_code',detail:{ type:'label',editing:handleDetailChange,disabled:true}},
-    {key:'company_fax_number',title:'common.fax_no',detail:{ type:'label',editing:handleDetailChange}},
-    {key:'homepage',title:'company.homepage',detail:{ type:'label',editing:handleDetailChange}},
-    {key:'company_scale',title:'company.company_scale',detail:{ type:'label',editing:handleDetailChange}},
-    {key:'deal_type',title:'company.deal_type',detail: { type:'select',options: option_deal_type.ko,editing:handleDetailSelectChange}},
-    {key:'industry_type',title:'company.industry_type',detail:{ type:'label',editing:handleDetailChange}},
-    {key:'business_type',title:'company.business_type',detail:{ type:'label',editing:handleDetailChange}},
-    {key:'business_item',title:'company.business_item',detail:{ type:'label',editing:handleDetailChange}},
-    {key:'establishment_date',title:'company.establishment_date',detail:{ type:'date',editing:handleDetailDateChange }},
-    {key:'ceo_name',title:'company.ceo_name',detail:{ type:'label',editing:handleDetailChange}},
-    {key:'account_code',title:'company.account_code',detail:{ type:'label',editing:handleDetailChange}},
-    {key:'bank_name',title:'company.bank_name',detail:{ type:'label',editing:handleDetailChange}},
-    {key:'account_owner',title:'company.account_owner',detail:{ type:'label',editing:handleDetailChange}},
-    {key:'sales_resource',title:'company.salesman',detail:{ type:'select',options:salespersonsForSelection,editing:handleDetailSelectChange}},
-    {key:'application_engineer',title:'company.engineer',detail:{ type:'select',options:engineerForSelection, editing:handleDetailSelectChange}},
-    {key:'region',title:'common.region',detail: { type:'select', options: option_locations.ko,editing:handleDetailSelectChange}},
-    {key:'memo',title:'common.memo',detail:{ type:'textarea', extra:'long',editing:handleDetailChange}},
+    {
+      key: "company_address",
+      title: "common.address",
+      detail: {
+        type: "address",
+        extra: "long",
+        key_zip: "company_zip_code",
+        editing: handleDetailAddressChange,
+      },
+    },
+    {
+      key: "company_phone_number",
+      title: "common.phone_no",
+      detail: { type: "label", editing: handleDetailChange },
+    },
+    {
+      key: "company_zip_code",
+      title: "common.zip_code",
+      detail: { type: "label", editing: handleDetailChange, disabled: true },
+    },
+    {
+      key: "company_fax_number",
+      title: "common.fax_no",
+      detail: { type: "label", editing: handleDetailChange },
+    },
+    {
+      key: "homepage",
+      title: "company.homepage",
+      detail: { type: "label", editing: handleDetailChange },
+    },
+    {
+      key: "company_scale",
+      title: "company.company_scale",
+      detail: { type: "label", editing: handleDetailChange },
+    },
+    {
+      key: "deal_type",
+      title: "company.deal_type",
+      detail: {
+        type: "select",
+        options: option_deal_type.ko,
+        editing: handleDetailSelectChange,
+      },
+    },
+    {
+      key: "industry_type",
+      title: "company.industry_type",
+      detail: { type: "label", editing: handleDetailChange },
+    },
+    {
+      key: "business_type",
+      title: "company.business_type",
+      detail: { type: "label", editing: handleDetailChange },
+    },
+    {
+      key: "business_item",
+      title: "company.business_item",
+      detail: { type: "label", editing: handleDetailChange },
+    },
+    {
+      key: "establishment_date",
+      title: "company.establishment_date",
+      detail: { type: "date", editing: handleDetailDateChange },
+    },
+    {
+      key: "ceo_name",
+      title: "company.ceo_name",
+      detail: { type: "label", editing: handleDetailChange },
+    },
+    {
+      key: "account_code",
+      title: "company.account_code",
+      detail: { type: "label", editing: handleDetailChange },
+    },
+    {
+      key: "bank_name",
+      title: "company.bank_name",
+      detail: { type: "label", editing: handleDetailChange },
+    },
+    {
+      key: "account_owner",
+      title: "company.account_owner",
+      detail: { type: "label", editing: handleDetailChange },
+    },
+    {
+      key: "sales_resource",
+      title: "company.salesman",
+      detail: {
+        type: "select",
+        options: salespersonsForSelection,
+        editing: handleDetailSelectChange,
+      },
+    },
+    {
+      key: "application_engineer",
+      title: "company.engineer",
+      detail: {
+        type: "select",
+        options: engineerForSelection,
+        editing: handleDetailSelectChange,
+      },
+    },
+    {
+      key: "region",
+      title: "common.region",
+      detail: {
+        type: "select",
+        options: option_locations.ko,
+        editing: handleDetailSelectChange,
+      },
+    },
+    {
+      key: "memo",
+      title: "common.memo",
+      detail: { type: "textarea", extra: "long", editing: handleDetailChange },
+    },
   ];
-
 
   //===== useEffect for Company ========================================================
   useEffect(() => {
-    console.log('[CompanyDetailModel] useEffect / Company');
-    if((selectedCompany !== defaultCompany)
-      && (selectedCompany.company_code !== currentCompanyCode))
-    {
-      console.log('[CompanyDetailsModel] new company is loaded!');
+    console.log("[CompanyDetailModel] useEffect / Company");
+    if (
+      selectedCompany !== defaultCompany &&
+      selectedCompany.company_code !== currentCompanyCode
+    ) {
+      console.log("[CompanyDetailsModel] new company is loaded!");
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
-      if(detailViewStatus === null){
-        localStorage.setItem("isFullScreen", '0');
+      if (detailViewStatus === null) {
+        localStorage.setItem("isFullScreen", "0");
         setIsFullScreen(false);
-      } else if(detailViewStatus === '0'){
+      } else if (detailViewStatus === "0") {
         setIsFullScreen(false);
       } else {
         setIsFullScreen(true);
-      };
+      }
 
       loadCompanyMAContracts(selectedCompany.company_code);
       setCurrentCompanyCode(selectedCompany.company_code);
-    };
+    }
   }, [selectedCompany, currentCompanyCode, loadCompanyMAContracts]);
-
 
   //===== useEffect for Purchase =======================================================
   useEffect(() => {
-    console.log('[CompanyDetailModel] useEffect / Purchase');
-    if((purchaseState & 3) === 0) {
-      console.log('[CompanyDetailsModel] start loading pruchase');
+    console.log("[CompanyDetailModel] useEffect / Purchase");
+    if ((purchaseState & 3) === 0) {
+      console.log("[CompanyDetailsModel] start loading pruchase");
       setPurchaseState(2);
       loadAllPurchases();
     } else {
-      const tempCompanyPurchases = allPurchases.filter(purchase => purchase.company_code === selectedCompany.company_code);
-      if(purchasesByCompany.length !== tempCompanyPurchases.length) {
-        console.log('[CompanyDetailsModel] set purchasesBycompany / set MA Count');
+      const tempCompanyPurchases = allPurchases.filter(
+        (purchase) => purchase.company_code === selectedCompany.company_code
+      );
+      if (purchasesByCompany.length !== tempCompanyPurchases.length) {
+        console.log(
+          "[CompanyDetailsModel] set purchasesBycompany / set MA Count"
+        );
         setPurchasesByCompany(tempCompanyPurchases);
 
         let valid_count = 0;
-        tempCompanyPurchases.forEach(item => {
-          if(item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now())) valid_count++;
+        tempCompanyPurchases.forEach((item) => {
+          if (item.ma_finish_date && new Date(item.ma_finish_date) > Date.now())
+            valid_count++;
         });
         setValidMACount(valid_count);
-      };
-    };
-  }, [purchaseState, allPurchases, purchasesByCompany, selectedCompany.company_code]);
-
+      }
+    }
+  }, [
+    purchaseState,
+    allPurchases,
+    purchasesByCompany,
+    selectedCompany.company_code,
+  ]);
 
   //===== useEffect for Transaction ====================================================
   useEffect(() => {
-    if((transactionState & 3) === 0) {
-      console.log('[CompanyDetailsModel] start loading transaction');
+    if ((transactionState & 3) === 0) {
+      console.log("[CompanyDetailsModel] start loading transaction");
       setTransactionState(2);
       loadAllTransactions();
     } else {
-      const tempCompanyTransactions = allTransactions.filter(transaction => transaction.company_name === selectedCompany.company_name);
-      if(transactionByCompany.length !== tempCompanyTransactions.length) {
-        console.log('CompanyDetailsModel / update setTransactionByCompany');
+      const tempCompanyTransactions = allTransactions.filter(
+        (transaction) =>
+          transaction.company_name === selectedCompany.company_name
+      );
+      if (transactionByCompany.length !== tempCompanyTransactions.length) {
+        console.log("CompanyDetailsModel / update setTransactionByCompany");
         setTransactionByCompany(tempCompanyTransactions);
-      };
+      }
     }
-  }, [transactionState, allTransactions, transactionByCompany.length, selectedCompany.company_name]);
-
+  }, [
+    transactionState,
+    allTransactions,
+    transactionByCompany.length,
+    selectedCompany.company_name,
+  ]);
 
   //===== useEffect for User ==========================================================
   useEffect(() => {
-    if ((userState & 3) === 0) {
-      setUserState(2); //change it to pending state
-      loadAllUsers();
+    if ((userState & 1) === 1) {
+      setIsAllNeededDataLoaded(true);
     }
-  }, [loadAllUsers, setUserState, userState]);
+  }, [userState]);
 
-  if(selectedCompany === defaultCompany) return;
-  
+  if (!isAllNeededDataLoaded)
+    return (
+      <Spin tip="Loading" size="large">
+        <div
+          style={{
+            padding: 50,
+            background: "rgba(0, 0, 0, 0.05)",
+            borderRadius: 4,
+          }}
+        >
+          Try to load necessary data
+        </div>
+      </Spin>
+    );
+
   return (
     <div
       className="modal right fade"
@@ -254,7 +390,10 @@ const CompanyDetailsModel = ({openTransaction}) => {
       aria-modal="true"
       data-bs-focus="false"
     >
-      <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
+      <div
+        className={isFullScreen ? "modal-fullscreen" : "modal-dialog"}
+        role="document"
+      >
         <div className="modal-content">
           <div className="modal-header">
             <div className="row w-100">
@@ -263,7 +402,9 @@ const CompanyDetailsModel = ({openTransaction}) => {
                   <img src={C_logo} alt="User" className="user-image" />
                 </div>
                 <div>
-                  <p className="mb-0"><b>{t('company.company')}</b></p>
+                  <p className="mb-0">
+                    <b>{t("company.company")}</b>
+                  </p>
                   <span className="modal-title">
                     {selectedCompany.company_name}
                   </span>
@@ -271,23 +412,27 @@ const CompanyDetailsModel = ({openTransaction}) => {
               </div>
               <DetailTitleItem
                 original={selectedCompany.company_name_en}
-                name='company_name_en'
-                title={t('company.company_name_en')}
+                name="company_name_en"
+                title={t("company.company_name_en")}
                 onEditing={handleDetailChange}
               />
               <DetailTitleItem
                 original={selectedCompany.business_registration_code}
-                name='business_registration_code'
-                title={t('company.business_registration_code')}
+                name="business_registration_code"
+                title={t("company.business_registration_code")}
                 onEditing={handleDetailChange}
               />
             </div>
-            <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWindowWidthChange}/>
+            <Switch
+              checkedChildren="full"
+              checked={isFullScreen}
+              onChange={handleWindowWidthChange}
+            />
             <button
               type="button"
               className="btn-close xs-close"
               data-bs-dismiss="modal"
-              onClick={ handleClose }
+              onClick={handleClose}
             />
           </div>
           <div className="modal-body">
@@ -299,7 +444,7 @@ const CompanyDetailsModel = ({openTransaction}) => {
                     to="#company-details-info"
                     data-bs-toggle="tab"
                   >
-                    {t('common.details')}
+                    {t("common.details")}
                   </Link>
                 </li>
                 <li className="nav-item">
@@ -308,7 +453,12 @@ const CompanyDetailsModel = ({openTransaction}) => {
                     to="#company-details-product"
                     data-bs-toggle="tab"
                   >
-                    {t('purchase.product_info') + "(" + validMACount + "/" + purchasesByCompany.length + ")"}
+                    {t("purchase.product_info") +
+                      "(" +
+                      validMACount +
+                      "/" +
+                      purchasesByCompany.length +
+                      ")"}
                   </Link>
                 </li>
                 <li className="nav-item">
@@ -317,7 +467,10 @@ const CompanyDetailsModel = ({openTransaction}) => {
                     to="#company-details-transaction"
                     data-bs-toggle="tab"
                   >
-                    {t('transaction.statement_of_account') + "(" + transactionByCompany.length + ")"}
+                    {t("transaction.statement_of_account") +
+                      "(" +
+                      transactionByCompany.length +
+                      ")"}
                   </Link>
                 </li>
                 <li className="nav-item">
@@ -326,7 +479,7 @@ const CompanyDetailsModel = ({openTransaction}) => {
                     to="#company-details-tax-invoice"
                     data-bs-toggle="tab"
                   >
-                    {t('transaction.tax_bill')}
+                    {t("transaction.tax_bill")}
                   </Link>
                 </li>
                 {/* <li className="nav-item">
@@ -348,10 +501,10 @@ const CompanyDetailsModel = ({openTransaction}) => {
                           align="start"
                           direction="horizontal"
                           size="small"
-                          style={{ display: 'flex', marginBottom: '0.5rem' }}
+                          style={{ display: "flex", marginBottom: "0.5rem" }}
                           wrap
                         >
-                          { company_items_info.map((item, index) => 
+                          {company_items_info.map((item, index) => (
                             <DetailCardItem
                               key={index}
                               title={t(item.title)}
@@ -360,41 +513,52 @@ const CompanyDetailsModel = ({openTransaction}) => {
                               name={item.key}
                               detail={item.detail}
                             />
-                          )}
+                          ))}
                         </Space>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="tab-pane company-details-product" id="company-details-product">
-                  <CompanyPurchaseModel 
+                <div
+                  className="tab-pane company-details-product"
+                  id="company-details-product"
+                >
+                  <CompanyPurchaseModel
                     company={selectedCompany}
                     purchases={purchasesByCompany}
-                    handlePurchase={setPurchasesByCompany} />
+                    handlePurchase={setPurchasesByCompany}
+                  />
                 </div>
-                <div className="tab-pane company-details-transaction" id="company-details-transaction">
-                  <CompanyTransactionModel transactions={transactionByCompany} openTransaction={openTransaction} />
+                <div
+                  className="tab-pane company-details-transaction"
+                  id="company-details-transaction"
+                >
+                  <CompanyTransactionModel
+                    transactions={transactionByCompany}
+                    openTransaction={openTransaction}
+                  />
                 </div>
               </div>
-              { editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&
-                <div className="text-center py-3">
-                  <button
-                    type="button"
-                    className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                    onClick={handleDetailSave}
-                  >
-                    {t('common.save')}
-                  </button>
-                  &nbsp;&nbsp;
-                  <button
-                    type="button"
-                    className="btn btn-secondary btn-rounded"
-                    onClick={handleDetailCancel}
-                  >
-                    {t('common.cancel')}
-                  </button>
-                </div>
-              }
+              {editedDetailValues !== null &&
+                Object.keys(editedDetailValues).length !== 0 && (
+                  <div className="text-center py-3">
+                    <button
+                      type="button"
+                      className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                      onClick={handleDetailSave}
+                    >
+                      {t("common.save")}
+                    </button>
+                    &nbsp;&nbsp;
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-rounded"
+                      onClick={handleDetailCancel}
+                    >
+                      {t("common.cancel")}
+                    </button>
+                  </div>
+                )}
             </div>
           </div>
         </div>

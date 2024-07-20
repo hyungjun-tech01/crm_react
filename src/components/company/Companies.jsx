@@ -9,6 +9,7 @@ import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
 import { atomAllCompanies, atomCompanyState, atomFilteredCompany } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
+import { UserStateRepo } from '../../repository/user';
 
 import CompanyAddModel from "./CompanyAddMdel";
 import CompanyDetailsModel from "./CompanyDetailsModel";
@@ -30,6 +31,9 @@ const Companies = () => {
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const filteredCompany = useRecoilValue(atomFilteredCompany);
 
+
+  //===== [RecoilState] Related with User =============================================
+  const { tryLoadAllUsers } = useRecoilValue(UserStateRepo);
 
   //===== Handles to this =============================================================
   const [ nowLoading, setNowLoading ] = useState(true);
@@ -189,6 +193,7 @@ const Companies = () => {
 
   useEffect(() => {
     tryLoadAllCompanies();
+    tryLoadAllUsers();
 
     if((companyState & 1) === 1) {
       setNowLoading(false);
