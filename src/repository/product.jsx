@@ -19,8 +19,6 @@ export const ProductClassListStateRepo = selector({
                 set(atomProductClassListState, 2);   // state : loading
                 const {loadAllProductClassList} = await snapshot.getPromise(ProductClassListRepo);
                 loadAllProductClassList();
-            } else {
-                console.log('[tryLoadAllProductClassLists] All product class lists are being loaded or already loaded');
             };
         });
         return {
@@ -133,8 +131,6 @@ export const ProductStateRepo = selector({
                 set(atomProductsState, 2);   // state : loading
                 const {loadAllProducts} = await snapshot.getPromise(ProductRepo);
                   loadAllProducts();
-            } else {
-                console.log('[tryLoadAllProducts] All products are being loaded or already loaded');
             };
         });
         return {

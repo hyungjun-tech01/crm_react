@@ -57,6 +57,24 @@ export const ConsultingTimeTypes = [
     { value: '2시간 이상', label: '2시간 이상'},
 ];
 
+export const ConsultingStateRepo = selector({
+    key: "ConsultingStateRepository",
+    get: ({getCallback}) => {
+        const tryLoadAllConsultings = getCallback(({set, snapshot}) => async () => {
+            const loadStates = await snapshot.getPromise(atomConsultingState);
+            if((loadStates & 3) === 0){
+                console.log('[tryLoadAllConsultings] Try to load all users');
+                set(atomConsultingState, 2);   // state : loading
+                const {loadAllConsultings} = await snapshot.getPromise(ConsultingRepo);
+                loadAllConsultings();
+            };
+        });
+        return {
+            tryLoadAllConsultings,
+        }
+    },
+});
+
 export const ConsultingRepo = selector({
     key: "ConsultingRepository",
     get: ({getCallback}) => {

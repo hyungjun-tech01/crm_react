@@ -37,6 +37,24 @@ export const LeadStatusSelection = [
     { value: 'Converted', label: 'Converted'},
 ];
 
+export const LeadStateRepo = selector({
+    key: "LeadStateRepository",
+    get: ({getCallback}) => {
+        const tryLoadAllLeads = getCallback(({set, snapshot}) => async () => {
+            const loadStates = await snapshot.getPromise(atomLeadState);
+            if((loadStates & 3) === 0){
+                console.log('[tryLoadAllCompanies] Try to load all companines');
+                set(atomLeadState, 2);   // state : loading
+                const {loadAllLeads} = await snapshot.getPromise(LeadRepo);
+                loadAllLeads();
+            };
+        });
+        return {
+            tryLoadAllLeads,
+        }
+    },
+});
+
 export const LeadRepo = selector({
     key: "LeadRepository",
     get: ({getCallback}) => {

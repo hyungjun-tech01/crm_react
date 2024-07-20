@@ -21,6 +21,24 @@ export const QuotationSendTypes = [
     { value: 'E-Mail', label: 'Email'},
 ];
 
+export const QuotationStateRepo = selector({
+    key: "QuotationStateRepository",
+    get: ({getCallback}) => {
+        const tryLoadAllQuotations = getCallback(({set, snapshot}) => async () => {
+            const loadStates = await snapshot.getPromise(atomQuotationState);
+            if((loadStates & 3) === 0){
+                console.log('[tryLoadAllQuotations] Try to load all users');
+                set(atomQuotationState, 2);   // state : loading
+                const {loadAllQuotations} = await snapshot.getPromise(QuotationRepo);
+                loadAllQuotations();
+            };
+        });
+        return {
+            tryLoadAllQuotations,
+        }
+    },
+});
+
 export const QuotationRepo = selector({
     key: "QuotationRepository",
     get: ({getCallback}) => {

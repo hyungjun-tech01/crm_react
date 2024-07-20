@@ -11,6 +11,23 @@ import { atomCurrentPurchase
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
+export const PurchaseStateRepo = selector({
+    key: "PurchaseStateRepository",
+    get: ({getCallback}) => {
+        const tryLoadAllPurchases = getCallback(({set, snapshot}) => async () => {
+            const loadStates = await snapshot.getPromise(atomPurchaseState);
+            if((loadStates & 3) === 0){
+                console.log('[tryLoadAllPurchases] Try to load all users');
+                set(atomPurchaseState, 2);   // state : loading
+                const {loadAllPurchases} = await snapshot.getPromise(PurchaseRepo);
+                loadAllPurchases();
+            };
+        });
+        return {
+            tryLoadAllPurchases,
+        }
+    },
+});
 
 export const PurchaseRepo = selector({
     key: "PurchaseRepository",

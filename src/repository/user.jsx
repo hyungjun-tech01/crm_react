@@ -69,6 +69,23 @@ export async function apiRegister(userId, userName, Email, password) {
     }
 }
 
+export const UserStateRepo = selector({
+    key: "UserStateRepository",
+    get: ({getCallback}) => {
+        const tryLoadAllUsers = getCallback(({set, snapshot}) => async () => {
+            const loadStates = await snapshot.getPromise(atomUserState);
+            if((loadStates & 3) === 0){
+                console.log('[tryLoadAllUsers] Try to load all users');
+                set(atomUserState, 2);   // state : loading
+                const {loadAllUsers} = await snapshot.getPromise(UserRepo);
+                loadAllUsers();
+            };
+        });
+        return {
+            tryLoadAllUsers,
+        }
+    },
+});
 
 export const UserRepo = selector({
     key: "UserRepository",
@@ -137,7 +154,7 @@ export const UserRepo = selector({
         /////////////////////modify User /////////////////////////////
         const modifyUser = getCallback(({ set, snapshot }) => async (newUser) => {
             const input_json = JSON.stringify(newUser);
-            console.log(`[ modifyCompany ] input : `, input_json);
+            console.log(`[ modifyUser ] input : `, input_json);
             try {
                 const response = await fetch(`${BASE_PATH}/modifyUser`, {
                     method: "POST",

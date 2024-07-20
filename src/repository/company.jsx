@@ -44,8 +44,6 @@ export const CompanyStateRepo = selector({
                     singleDate: null
                   }
                 loadAllCompanies(multiQueryCondi);
-            } else {
-                console.log('[tryLoadAllCompanies] All companines are being loaded or already loaded');
             };
         });
         return {

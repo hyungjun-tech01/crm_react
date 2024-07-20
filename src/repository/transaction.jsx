@@ -32,6 +32,24 @@ export const DefaultTransactionContent = {
     modify_date: null,
 };
 
+export const TransactionStateRepo = selector({
+    key: "TransactionStateRepository",
+    get: ({getCallback}) => {
+        const tryLoadAllTransactions = getCallback(({set, snapshot}) => async () => {
+            const loadStates = await snapshot.getPromise(atomTransactionState);
+            if((loadStates & 3) === 0){
+                console.log('[tryLoadAllTransactions] Try to load all users');
+                set(atomTransactionState, 2);   // state : loading
+                const {loadAllTransactions} = await snapshot.getPromise(TransactionRepo);
+                loadAllTransactions();
+            };
+        });
+        return {
+            tryLoadAllTransactions,
+        }
+    },
+});
+
 export const TransactionRepo = selector({
     key: "TransactionRepository",
     get: ({ getCallback }) => {
