@@ -9,7 +9,7 @@ import {
     atomProductOptions,
     atomAllProducts,
 } from "../../atoms/atoms";
-import { ProductClassListRepo, ProductRepo } from "../../repository/product";
+import { ProductClassListStateRepo, ProductStateRepo } from "../../repository/product";
 
 import DetailCardItem from '../../constants/DetailCardItem';
 
@@ -19,12 +19,12 @@ const QuotationContentModal = (props) => {
 
 
     //===== [RecoilState] Related with Product ==========================================
-    const [productClassState, setProductClassState] = useRecoilState(atomProductClassListState);
+    const { tryLoadAllProductClassLists } = useRecoilValue(ProductClassListStateRepo);
+    const productClassState = useRecoilValue(atomProductClassListState);
     const allProductClassList = useRecoilValue(atomProductClassList);
-    const { loadAllProductClassList } = useRecoilValue(ProductClassListRepo);
-    const [productState, setProductState] = useRecoilState(atomProductsState);
+    const { tryLoadAllProducts } = useRecoilValue(ProductStateRepo);
+    const productState = useRecoilValue(atomProductsState);
     const allProducts = useRecoilValue(atomAllProducts);
-    const { loadAllProducts } = useRecoilValue(ProductRepo);
     const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
 
 
@@ -132,17 +132,12 @@ const QuotationContentModal = (props) => {
 
     // ----- useEffect for Production -----------------------------------
     useEffect(() => {
-        if ((productClassState & 3) === 0) {
-            console.log('[QuotationContentModal] loadAllProductClassList');
-            setProductClassState(2);
-            loadAllProductClassList();
-        };
-        if ((productState & 3) === 0) {
-            console.log('[QuotationContentModal] loadAllProducts');
-            setProductState(2);
-            loadAllProducts();
-        };
-        if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
+        tryLoadAllProductClassLists();
+        tryLoadAllProducts();
+        if (((productClassState & 1) === 1)
+            && ((productState & 1) === 1)
+            && (productOptions.length === 0)
+        ) {
             const productOptionsValue = allProductClassList.map(proClass => {
                 const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
                 const subOptions = foundProducts.map(item => {
@@ -167,7 +162,7 @@ const QuotationContentModal = (props) => {
             setProductOptions(productOptionsValue);
         };
         setShowDetailDesc(original.detail_desc_on_off === '있음');
-    }, [allProductClassList, allProducts, loadAllProductClassList, loadAllProducts, productClassState, productOptions, productState, setProductOptions, original.detail_desc_on_off]);
+    }, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions, original.detail_desc_on_off]);
 
 
     return (

@@ -9,7 +9,7 @@ import {
     atomProductOptions,
     atomAllProducts,
 } from "../../atoms/atoms";
-import { ProductClassListRepo, ProductRepo } from "../../repository/product";
+import { ProductClassListStateRepo, ProductClassListRepo, ProductStateRepo, ProductRepo } from "../../repository/product";
 
 import DetailCardItem from '../../constants/DetailCardItem';
 
@@ -19,12 +19,12 @@ const TransactionContentModal = (props) => {
 
 
     //===== [RecoilState] Related with Product ==========================================
+    const { tryLoadAllProductClassLists } = useRecoilValue(ProductClassListStateRepo);
     const productClassState = useRecoilValue(atomProductClassListState);
     const allProductClassList = useRecoilValue(atomProductClassList);
-    const { loadAllProductClassList } = useRecoilValue(ProductClassListRepo);
+    const { tryLoadAllProducts } = useRecoilValue(ProductStateRepo);
     const productState = useRecoilValue(atomProductsState);
     const allProducts = useRecoilValue(atomAllProducts);
-    const { loadAllProducts } = useRecoilValue(ProductRepo);
     const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
 
 
@@ -94,15 +94,12 @@ const TransactionContentModal = (props) => {
 
     // ----- useEffect for Production -----------------------------------
     useEffect(() => {
-        if ((productClassState & 1) === 0) {
-            console.log('[PurchaseAddModel] loadAllProductClassList');
-            loadAllProductClassList();
-        };
-        if ((productState & 1) === 0) {
-            console.log('[PurchaseAddModel] loadAllProducts');
-            loadAllProducts();
-        };
-        if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
+        tryLoadAllProductClassLists();
+        tryLoadAllProducts();
+        if (((productClassState & 1) === 1)
+            && ((productState & 1) === 1)
+            && (productOptions.length === 0)
+        ) {
             const productOptionsValue = allProductClassList.map(proClass => {
                 const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
                 const subOptions = foundProducts.map(item => {
@@ -127,7 +124,7 @@ const TransactionContentModal = (props) => {
             });
             setProductOptions(productOptionsValue);
         };
-    }, [allProductClassList, allProducts, loadAllProductClassList, loadAllProducts, productClassState, productOptions, productState, setProductOptions, original.detail_desc_on_off]);
+    }, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions, original.detail_desc_on_off]);
 
 
     return (

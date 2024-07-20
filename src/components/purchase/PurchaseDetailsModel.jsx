@@ -18,8 +18,13 @@ import {
   defaultMAContract,
 } from "../../atoms/atoms";
 import { PurchaseRepo } from "../../repository/purchase";
-import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
-import { ProductClassListRepo, ProductRepo, ProductTypeOptions } from "../../repository/product";
+import { CompanyStateRepo } from "../../repository/company";
+import { ProductClassListStateRepo,
+  ProductClassListRepo,
+  ProductStateRepo,
+  ProductRepo,
+  ProductTypeOptions
+} from "../../repository/product";
 import { ContractTypes, MAContractRepo } from "../../repository/ma_contract";
 
 import DetailCardItem from "../../constants/DetailCardItem";
@@ -45,12 +50,12 @@ const PurchaseDetailsModel = (props) => {
 
 
   //===== [RecoilState] Related with Product ==========================================
+  const { tryLoadAllProductClassLists } = useRecoilValue(ProductClassListStateRepo);
   const productClassState = useRecoilValue(atomProductClassListState);
   const allProductClassList = useRecoilValue(atomProductClassList);
-  const { loadAllProductClassList } = useRecoilValue(ProductClassListRepo);
+  const { tryLoadAllProducts } = useRecoilValue(ProductStateRepo);
   const productState = useRecoilValue(atomProductsState);
   const allProducts = useRecoilValue(atomAllProducts);
-  const { loadAllProducts } = useRecoilValue(ProductRepo);
   const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
 
 
@@ -340,16 +345,12 @@ const PurchaseDetailsModel = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log('[PurchaseAddModel] useEffect / Production');
-    if ((productClassState & 1) === 0) {
-      console.log('[PurchaseAddModel] loadAllProductClassList');
-      loadAllProductClassList();
-    };
-    if ((productState & 1) === 0) {
-      console.log('[PurchaseAddModel] loadAllProducts');
-      loadAllProducts();
-    };
-    if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
+    tryLoadAllProductClassLists();
+    tryLoadAllProducts();
+    if (((productClassState & 1) === 1)
+      && ((productState & 1) === 1)
+      && (productOptions.length === 0)
+    ) {
       console.log('[PurchaseAddModel] set companies for selection');
       const productOptionsValue = allProductClassList.map(proClass => {
         const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
@@ -374,7 +375,7 @@ const PurchaseDetailsModel = (props) => {
       });
       setProductOptions(productOptionsValue);
     };
-  }, [allProductClassList, allProducts, loadAllProductClassList, loadAllProducts, productClassState, productOptions, productState, setProductOptions]);
+  }, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions]);
 
   return (
     <>
