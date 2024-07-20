@@ -16,7 +16,7 @@ import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection 
 import { CompanyRepo } from "../../repository/company";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { ConsultingStateRepo } from "../../repository/consulting";
-import { QuotationRepo } from "../../repository/quotation";
+import { QuotationStateRepo, QuotationRepo } from "../../repository/quotation";
 import { PurchaseStateRepo, PurchaseRepo } from "../../repository/purchase";
 import { MAContractRepo } from "../../repository/ma_contract";
 
@@ -55,7 +55,6 @@ const LeadDetailsModel = () => {
   const purchaseState = useRecoilValue(atomPurchaseState);
   const { tryLoadAllPurchases } = useRecoilValue(PurchaseStateRepo)
   const allPurchases = useRecoilValue(atomAllPurchases);
-  const { loadAllPurchases } = useRecoilValue(PurchaseRepo);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
 
@@ -67,7 +66,7 @@ const LeadDetailsModel = () => {
 
   //===== [RecoilState] Related with Quotation ========================================
   const quotationState = useRecoilState(atomQuotationState);
-  const { tryLoadAllQuotations } = useRecoilValue(ConsultingStateRepo);
+  const { tryLoadAllQuotations } = useRecoilValue(QuotationStateRepo);
   const allQuotations = useRecoilValue(atomAllQuotations);
 
 

@@ -84,7 +84,8 @@ const Consultings = () => {
     {
       title: t('consulting.receipt_date'),
       dataIndex: 'receipt_date',
-      render: (text, record) => <>{text === null  ? '':text.toString()}</>,
+      render: (text, record) => 
+        <>{record === null  ? '' : new Date(text).toLocaleString('ko-KR', {timeZone:'UTC'})}</>,
     },
     {
       title: t('consulting.receiver'),
