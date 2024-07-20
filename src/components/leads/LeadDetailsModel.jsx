@@ -13,12 +13,11 @@ import {
   atomQuotationState, atomAllQuotations,
 } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
-import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
+import { CompanyRepo } from "../../repository/company";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
-import { UserRepo } from '../../repository/user';
-import { ConsultingRepo } from "../../repository/consulting";
+import { ConsultingStateRepo } from "../../repository/consulting";
 import { QuotationRepo } from "../../repository/quotation";
-import { PurchaseRepo } from "../../repository/purchase";
+import { PurchaseStateRepo, PurchaseRepo } from "../../repository/purchase";
 import { MAContractRepo } from "../../repository/ma_contract";
 
 import CompanyPurchaseModel from "../company/CompanyPurchaseModel";
@@ -46,7 +45,6 @@ const LeadDetailsModel = () => {
 
   //===== [RecoilState] Related with Company =======================================
   const companyState = useRecoilValue(atomCompanyState);
-  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
   const allCompanies = useRecoilValue(atomAllCompanies);
   const currentCompany = useRecoilValue(atomCurrentCompany);
   const { modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
@@ -54,27 +52,27 @@ const LeadDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Purchase =======================================
-  const [purchaseState, setPurchaseState] = useRecoilState(atomPurchaseState);
+  const purchaseState = useRecoilValue(atomPurchaseState);
+  const { tryLoadAllPurchases } = useRecoilValue(PurchaseStateRepo)
   const allPurchases = useRecoilValue(atomAllPurchases);
   const { loadAllPurchases } = useRecoilValue(PurchaseRepo);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
 
   //===== [RecoilState] Related with Consulting =======================================
-  const [consultingState, setConsultingState] = useRecoilState(atomConsultingState);
+  const consultingState = useRecoilValue(atomConsultingState);
+  const { tryLoadAllConsultings } = useRecoilValue(ConsultingStateRepo);
   const allConsultings = useRecoilValue(atomAllConsultings);
-  const { loadAllConsultings } = useRecoilValue(ConsultingRepo);
 
 
   //===== [RecoilState] Related with Quotation ========================================
-  const [quotationState, setQuotationState] = useRecoilState(atomQuotationState);
+  const quotationState = useRecoilState(atomQuotationState);
+  const { tryLoadAllQuotations } = useRecoilValue(ConsultingStateRepo);
   const allQuotations = useRecoilValue(atomAllQuotations);
-  const { loadAllQuotations } = useRecoilValue(QuotationRepo);
 
 
   //===== [RecoilState] Related with Users ==========================================
-  const [userState, setUserState] = useRecoilState(atomUserState);
-  const { loadAllUsers } = useRecoilValue(UserRepo)
+  const userState = useRecoilState(atomUserState);
   const engineersForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
@@ -314,13 +312,9 @@ const LeadDetailsModel = () => {
     };
   }, [isAllNeededDataLoaded, selectedLead, currentLeadCode, companyState, allCompanies, setCurrentCompany, loadCompanyMAContracts]);
 
-
   useEffect(() => {
-    if ((purchaseState & 3) === 0) {
-      console.log('[LeadDetailModel] loadAllPurchases');
-      setPurchaseState(2);
-      loadAllPurchases();
-    } else {
+    tryLoadAllPurchases();
+    if ((purchaseState & 1) === 1) {
       const tempCompanyPurchases = allPurchases.filter(purchase => purchase.company_code === currentCompany.company_code);
       if (purchasesByCompany.length !== tempCompanyPurchases.length) {
         console.log('[CompanyDetailsModel] set purchasesBycompany / set MA Count');
@@ -333,33 +327,27 @@ const LeadDetailsModel = () => {
         setValidMACount(valid_count);
       };
     };
-  }, [purchaseState, allPurchases, purchasesByCompany, loadAllPurchases, currentCompany.company_code]);
+  }, [purchaseState, allPurchases, purchasesByCompany, currentCompany.company_code]);
 
   useEffect(() => {
-    if ((consultingState & 3) === 0) {
-      console.log('[LeadDetailModel] loadAllConsultings');
-      setConsultingState(2);
-      loadAllConsultings();
-    } else {
+    tryLoadAllConsultings();
+    if ((consultingState & 1) === 1) {
       const tempConsultingByLead = allConsultings.filter(consulting => consulting.lead_code === selectedLead.lead_code);
       if (consultingsByLead.length !== tempConsultingByLead.length) {
         setConsultingsByLead(tempConsultingByLead);
       };
     };
-  }, [allConsultings, consultingState, consultingsByLead.length, loadAllConsultings, selectedLead.lead_code]);
+  }, [allConsultings, consultingState, consultingsByLead.length, selectedLead.lead_code]);
 
   useEffect(() => {
+    tryLoadAllQuotations();
     if ((quotationState & 3) === 0) {
-      console.log('[LeadDetailModel] loading quotation data!');
-      setQuotationState(2);
-      loadAllQuotations();
-    } else {
       const tempQuotationsByLead = allQuotations.filter(item => item.lead_code === selectedLead.lead_code);
       if(quotationsByLead.length !== tempQuotationsByLead.length) {
         setQuotationsByLead(tempQuotationsByLead);
       };
     };
-  }, [allQuotations, loadAllQuotations, quotationState, quotationsByLead.length, selectedLead.lead_code]);
+  }, [allQuotations, quotationState, quotationsByLead.length, selectedLead.lead_code]);
 
   useEffect(() => {
     if (((companyState & 1) === 1) 
@@ -373,10 +361,9 @@ const LeadDetailsModel = () => {
   }
   }, [userState, companyState, purchaseState, consultingState, quotationState]);
 
-  if(!isAllNeededDataLoaded) return null;
 
   return (
-    <>s
+    <>
       <div
         className="modal right fade"
         id="leads-details"

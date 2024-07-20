@@ -12,7 +12,7 @@ import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
 import { ConsultingRepo } from "../../repository/consulting";
 import { QuotationRepo } from "../../repository/quotation";
 import { PurchaseRepo } from "../../repository/purchase";
-import { LeadRepo } from "../../repository/lead";
+import { LeadRepo, LeadStateRepo } from "../../repository/lead";
 import { 
   atomAllLeads,
   atomFilteredLead,
@@ -25,7 +25,7 @@ import MultiQueryModal from "../../constants/MultiQueryModal";
 import { leadColumn } from "../../repository/lead";
 import { useTranslation } from "react-i18next";
 import LeadAddModel from "./LeadAddMdel";
-import { UserRepo } from "../../repository/user";
+import { UserStateRepo } from "../../repository/user";
 
 const Leads = () => {
   const { t } = useTranslation();
@@ -37,7 +37,8 @@ const Leads = () => {
 
 
   //===== [RecoilState] Related with Lead =============================================
-  const [leadState, setLeadState] = useRecoilState(atomLeadState);
+  const leadState = useRecoilValue(atomLeadState);
+  const { tryLoadAllLeads } = useRecoilValue(LeadStateRepo);
   const allLeadData = useRecoilValue(atomAllLeads);
   const filteredLead = useRecoilValue(atomFilteredLead);
   const { loadAllLeads, setCurrentLead, filterLeads } = useRecoilValue(LeadRepo);
@@ -56,8 +57,8 @@ const Leads = () => {
 
 
   //===== [RecoilState] Related with User ================================================
-  const [userState, setUserState] = useRecoilState(atomUserState);
-  const { loadAllUsers }  = useRecoilValue(UserRepo);
+  const userState = useRecoilState(atomUserState);
+  const { tryLoadAllUsers } = useRecoilValue(UserStateRepo);
 
 
   //===== Handles to this =============================================================
@@ -312,14 +313,9 @@ const Leads = () => {
 
   useEffect(() => {
     tryLoadAllCompanies();
-    if((leadState & 3) === 0) {
-      setLeadState(2);
-      loadAllLeads();
-    };
-    if ((userState & 3) === 0) {
-      setUserState(2);
-      loadAllUsers();
-    };
+    tryLoadAllLeads();
+    tryLoadAllUsers();
+
     if(((companyState & 1) === 1)
       && ((leadState & 1) === 1)
       && ((userState & 1) === 1)

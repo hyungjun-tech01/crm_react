@@ -120,9 +120,8 @@ const LeadAddModel = (props) => {
         if(((companyState & 1) === 1) && ((userState & 1) === 1)) {
             setIsAllNeededDataLoaded(true);
         }
-    }, [companyState, userState, loadAllUsers ])
+    }, [companyState, userState ])
 
-    if(!isAllNeededDataLoaded) return null;
 
     return (
         <div
