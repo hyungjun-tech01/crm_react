@@ -26,7 +26,6 @@ import {
 } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 
-
 const Consultings = () => {
   const { t } = useTranslation();
 
@@ -77,7 +76,7 @@ const Consultings = () => {
     {
       title: t('consulting.receipt_date'),
       dataIndex: 'receipt_date',
-      render: (text, record) => <>{text}</>,
+      render: (text, record) => <>{text === null  ? '':text.toString()}</>,
     },
     {
       title: t('consulting.receiver'),
