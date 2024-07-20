@@ -49,7 +49,7 @@ const enResource = {
             deal_type_sales: 'Sales',
             deal_type_purchase: 'Purchase',
             deal_type_etc: 'Etc',
-            company_name_eng:'English Company Name',
+            company_name_en:'English Company Name',
             engineer:'Engineer',
             establishment_date   : 'Establishment',
             fax_number : 'Company Fax Number',
