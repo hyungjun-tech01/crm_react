@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "react-datepicker/dist/react-datepicker.css";
+import { Spin } from 'antd';
 
 import { defaultConsulting,
   atomLeadsForSelection,
@@ -15,7 +16,6 @@ import { atomUserState,
   atomEngineersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
-import { LeadRepo } from "../../repository/lead";
 import {
   ConsultingRepo,
   ConsultingTypes,
@@ -23,9 +23,7 @@ import {
   ConsultingTimeTypes,
   ProductTypes
 } from "../../repository/consulting";
-import { UserRepo } from '../../repository/user';
 
-import { formatDate } from "../../constants/functions";
 import AddBasicItem from "../../constants/AddBasicItem";
 
 
@@ -39,15 +37,13 @@ const ConsultingAddModel = () => {
 
 
   //===== [RecoilState] Related with Lead =============================================
-  const [leadsState, setLeadsState] = useRecoilState(atomLeadState);
+  const leadsState = useRecoilValue(atomLeadState);
   const currentLead = useRecoilValue(atomCurrentLead);
   const leadsForSelection = useRecoilValue(atomLeadsForSelection);
-  const { loadAllLeads, } = useRecoilValue(LeadRepo);
 
 
   //===== [RecoilState] Related with Users ============================================
-  const [userState, setUserState] = useRecoilState(atomUserState);
-  const { loadAllUsers } = useRecoilValue(UserRepo)
+  const userState = useRecoilValue(atomUserState);
   const usersForSelection = useRecoilValue(atomUsersForSelection);
   const engineersForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
@@ -56,7 +52,6 @@ const ConsultingAddModel = () => {
   //===== Handles to edit 'ConsultingAddModel' ========================================
   const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
   const [consultingChange, setConsultingChange] = useState({ ...defaultConsulting });
-  const [loaded, setLoaded] = useState(0);
 
   const initializeConsultingTemplate = useCallback(() => {
     // document.querySelector("#add_new_consulting_form").reset();
@@ -157,8 +152,20 @@ const ConsultingAddModel = () => {
     };
   }, [leadsState, userState]);
 
-
-  if(!isAllNeededDataLoaded) return null;
+  if (!isAllNeededDataLoaded)
+    return (
+      <Spin tip="Loading" size="large">
+        <div
+          style={{
+            padding: 50,
+            background: "rgba(0, 0, 0, 0.05)",
+            borderRadius: 4,
+          }}
+        >
+          Try to load necessary data
+        </div>
+      </Spin>
+    );
 
   return (
     <div

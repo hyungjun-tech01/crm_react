@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Space, Switch } from "antd";
+import { Space, Spin, Switch } from "antd";
 
 import { atomUserState,
   atomUsersForSelection,
@@ -36,7 +36,7 @@ const ConsultingDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Users ==========================================
-  const [userState, setUserState] = useRecoilState(atomUserState);
+  const userState = useRecoilValue(atomUserState);
   const { loadAllUsers } = useRecoilValue(UserRepo)
   const usersForSelection = useRecoilValue(atomUsersForSelection);
   const engineersForSelection = useRecoilValue(atomEngineersForSelection);
@@ -176,9 +176,22 @@ const ConsultingDetailsModel = () => {
     if ((userState & 1) === 1) {
       setIsAllNeededDataLoaded(true);
     };
-  }, [userState, loadAllUsers])
+  }, [userState])
 
-  if(!isAllNeededDataLoaded) return null;
+  if (!isAllNeededDataLoaded)
+    return (
+      <Spin tip="Loading" size="large">
+        <div
+          style={{
+            padding: 50,
+            background: "rgba(0, 0, 0, 0.05)",
+            borderRadius: 4,
+          }}
+        >
+          Try to load necessary data
+        </div>
+      </Spin>
+    );
 
   return (
     <div

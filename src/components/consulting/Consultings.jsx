@@ -14,8 +14,9 @@ import LeadDetailsModel from "../leads/LeadDetailsModel";
 import ConsultingAddModel from "./ConsultingAddModel";
 import "react-datepicker/dist/react-datepicker.css";
 import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
-import { LeadRepo } from "../../repository/lead";
-import { ConsultingRepo } from "../../repository/consulting";
+import { LeadStateRepo, LeadRepo } from "../../repository/lead";
+import { ConsultingRepo, ConsultingStateRepo } from "../../repository/consulting";
+import { UserStateRepo } from "../../repository/user";
 import {
   atomCompanyState,
   atomAllConsultings,
@@ -32,7 +33,8 @@ const Consultings = () => {
 
 
   //===== [RecoilState] Related with Consulting =======================================
-  const [consultingState, setConsultingState] = useRecoilState(atomConsultingState);
+  const consultingState = useRecoilValue(atomConsultingState);
+  const { tryLoadAllConsultings } = useRecoilValue(ConsultingStateRepo);
   const allConsultingData = useRecoilValue(atomAllConsultings);
   const filteredConsulting = useRecoilValue(atomFilteredConsulting);
   const { loadAllConsultings, setCurrentConsulting, filterConsultingOri } = useRecoilValue(ConsultingRepo);
@@ -45,8 +47,14 @@ const Consultings = () => {
 
 
   //===== [RecoilState] Related with Lead =============================================
-  const [leadState, setLeadState] = useRecoilState(atomLeadState);
-  const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
+  const leadState = useRecoilValue(atomLeadState);
+  const { tryLoadAllLeads } = useRecoilValue(LeadStateRepo);
+  const { setCurrentLead } = useRecoilValue(LeadRepo);
+
+
+  //===== [RecoilState] Related with User =============================================
+  const userState = useRecoilValue(atomLeadState);
+  const { tryLoadAllUsers } = useRecoilValue(UserStateRepo);
 
 
   //===== Handles to deal 'Consultings' ========================================
@@ -156,23 +164,19 @@ const Consultings = () => {
   //===== useEffect functions ==========================================
   useEffect(() => {
     tryLoadAllCompanies();
+    tryLoadAllLeads();
+    tryLoadAllConsultings();
+    tryLoadAllUsers();
 
-    if ((leadState & 3) === 0) {
-      setLeadState(2);
-      loadAllLeads();
-    };
-    if ((consultingState & 3) === 0) {
-      setConsultingState(2);
-      loadAllConsultings();
-    };
     if(((companyState & 1) === 1)
       && ((leadState & 1) === 1)
       && ((consultingState & 1) === 1)
+      && ((userState & 1) === 1)
     ){
       setNowLoading(false);
     };
 
-  }, [companyState, leadState, consultingState]);
+  }, [companyState, leadState, consultingState, userState]);
 
 
   return (
