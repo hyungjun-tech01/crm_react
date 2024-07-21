@@ -597,7 +597,7 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
 
   //===== useEffect ==============================================================
   useEffect(() => {
-    if(!open) return;
+    // if(!open) return;
     
     tryLoadAllCompanies();
 
@@ -656,7 +656,7 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
     };
   }, [open, companyState, orgTransaction, currentTransaction]);
 
-  if(!open) return;
+  // if(!open) return;
 
   return (
     <div
