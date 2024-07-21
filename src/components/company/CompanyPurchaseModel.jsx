@@ -20,12 +20,7 @@ import {
 } from "../../atoms/atoms";
 import { PurchaseRepo } from "../../repository/purchase";
 import { MAContractRepo } from "../../repository/ma_contract";
-import { ProductClassListStateRepo,
-    ProductClassListRepo,
-    ProductStateRepo,
-    ProductRepo,
-    ProductTypeOptions
-} from "../../repository/product";
+import { ProductClassListRepo, ProductRepo, ProductTypeOptions } from "../../repository/product";
 
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailSubModal from '../../constants/DetailSubModal';
@@ -33,28 +28,22 @@ import DetailSubModal from '../../constants/DetailSubModal';
 
 const CompanyPurchaseModel = (props) => {
     const { company, purchases, handlePurchase } = props;
-    const { t } = useTranslation();
-    const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
-
-
-    //===== [RecoilState] Related with Product ==========================================
-    const productClassState = useRecoilValue(atomProductClassListState);
-    const productState = useRecoilValue(atomProductsState);
+    const [productClassState, setProductClassState] = useRecoilState(atomProductClassListState);
+    const [productState, setProductState] = useRecoilState(atomProductsState);
     const currentPurchase = useRecoilValue(atomCurrentPurchase);
-    const { tryLoadAllProductClassLists } = useRecoilValue(ProductClassListStateRepo);
-    const allProductClassList = useRecoilValue(atomProductClassList);
-    const { tryLoadAllProducts } = useRecoilValue(ProductStateRepo);
-    const allProducts = useRecoilValue(atomAllProducts);
-    const [ productOptions, setProductOptions ] = useRecoilState(atomProductOptions);
-
-    
-    //===== [RecoilState] Related with Purchase ==========================================
     const { modifyPurchase, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
     const companyMAContracts = useRecoilValue(atomMAContractSet);
     const { modifyMAContract } = useRecoilValue(MAContractRepo);
 
+    const allProductClassList = useRecoilValue(atomProductClassList);
+    const { loadAllProductClassList } = useRecoilValue(ProductClassListRepo);
+    const allProducts = useRecoilValue(atomAllProducts);
+    const { loadAllProducts } = useRecoilValue(ProductRepo);
+    const [ productOptions, setProductOptions ] = useRecoilState(atomProductOptions);
 
-    //===== Handles to this =============================================================
+    const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+    const { t } = useTranslation();
+
     const [ isSubModalOpen, setIsSubModalOpen ] = useState(false);
     const [ subModalSetting, setSubModalSetting] = useState({ title: '' })
 
@@ -536,12 +525,17 @@ const CompanyPurchaseModel = (props) => {
 
     // ----- useEffect for Production -----------------------------------
     useEffect(() => {
-        tryLoadAllProductClassLists();
-        tryLoadAllProducts();
-        if (((productClassState & 1) === 1)
-            && ((productState & 1) === 1)
-            && (productOptions.length === 0)
-        ) {
+        if ((productClassState & 3) === 0) {
+            console.log('[CompanyPurchaseModel] start loading product class list');
+            setProductClassState(2);
+            loadAllProductClassList();
+        };
+        if ((productState & 3) === 0) {
+            console.log('[CompanyPurchaseModel] start loading product list');
+            setProductState(2);
+            loadAllProducts();
+        };
+        if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
             console.log("Check Product Options\n - ", productOptions);
             const productOptionsValue = allProductClassList.map(proClass => {
                 const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
@@ -566,7 +560,7 @@ const CompanyPurchaseModel = (props) => {
             });
             setProductOptions(productOptionsValue);
         };
-    }, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions]);
+    }, [allProductClassList, allProducts, loadAllProductClassList, loadAllProducts, productClassState, productOptions, productState, setProductOptions]);
 
 
     return (

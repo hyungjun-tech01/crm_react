@@ -18,7 +18,7 @@ import { atomUserState,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
 import { QuotationRepo, QuotationSendTypes, QuotationTypes } from "../../repository/quotation";
-import { ProductClassListStateRepo, ProductClassListRepo, ProductStateRepo, ProductRepo } from "../../repository/product";
+import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 import { UserRepo } from '../../repository/user';
 
 import DetailLabelItem from "../../constants/DetailLabelItem";
@@ -42,12 +42,12 @@ const QuotationDetailsModel = () => {
   const { modifyQuotation, setCurrentQuotation } = useRecoilValue(QuotationRepo);
 
   //===== [RecoilState] Related with Product ==========================================
-  const { tryLoadAllProductClassLists } = useRecoilValue(ProductClassListStateRepo);
   const [productClassState, setProductClassState] = useRecoilState(atomProductClassListState);
   const allProductClassList = useRecoilValue(atomProductClassList);
-  const { tryLoadAllProducts } = useRecoilValue(ProductStateRepo);
+  const { loadAllProductClassList } = useRecoilValue(ProductClassListRepo);
   const [productState, setProductState] = useRecoilState(atomProductsState);
   const allProducts = useRecoilValue(atomAllProducts);
+  const { loadAllProducts } = useRecoilValue(ProductRepo);
   const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
 
 
@@ -446,12 +446,18 @@ const QuotationDetailsModel = () => {
 
   // ----- useEffect for Production -----------------------------------
   useEffect(() => {
-    tryLoadAllProductClassLists();
-    tryLoadAllProducts();
-    if (((productClassState & 1) === 1)
-      && ((productState & 1) === 1)
-      && (productOptions.length === 0)
-    ) {
+    console.log('[PurchaseAddModel] useEffect / Production');
+    if ((productClassState & 3) === 0) {
+        console.log('[QuotationDetailsModel] loadAllProductClassList');
+        setProductClassState(2);
+        loadAllProductClassList();
+    };
+    if ((productState & 3) === 0) {
+        console.log('[QuotationDetailsModel] loadAllProducts');
+        setProductState(2);
+        loadAllProducts();
+    };
+    if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
         console.log('[PurchaseAddModel] set companies for selection');
         const productOptionsValue = allProductClassList.map(proClass => {
             const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
@@ -476,7 +482,7 @@ const QuotationDetailsModel = () => {
         });
         setProductOptions(productOptionsValue);
     };
-}, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions]);
+}, [allProductClassList, allProducts, loadAllProductClassList, loadAllProducts, productClassState, productOptions, productState, setProductOptions]);
 
   return (
     <>
