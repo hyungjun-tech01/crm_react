@@ -19,12 +19,7 @@ import {
 import { CompanyStateRepo } from '../../repository/company';
 import { PurchaseRepo } from '../../repository/purchase';
 import { MAContractRepo, ContractTypes } from "../../repository/ma_contract";
-import { ProductClassListStateRepo,
-    ProductClassListRepo,
-    ProductStateRepo,
-    ProductRepo,
-    ProductTypeOptions 
-} from '../../repository/product';
+import { ProductClassListRepo, ProductRepo, ProductTypeOptions } from '../../repository/product';
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import DetailSubModal from '../../constants/DetailSubModal';
@@ -49,12 +44,12 @@ const PurchaseAddModel = (props) => {
 
 
     //===== [RecoilState] Related with Product =============================================
-    const { tryLoadAllProductClassLists } = useRecoilValue(ProductClassListStateRepo);
     const productClassState = useRecoilValue(atomProductClassListState);
     const allProductClassList = useRecoilValue(atomProductClassList);
-    const { tryLoadAllProducts } = useRecoilValue(ProductStateRepo);
+    const { loadAllProductClassList } = useRecoilValue(ProductClassListRepo);
     const productState = useRecoilValue(atomProductsState);
     const allProducts = useRecoilValue(atomAllProducts);
+    const { loadAllProducts } = useRecoilValue(ProductRepo);
     const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
 
 
@@ -319,13 +314,17 @@ const PurchaseAddModel = (props) => {
 
     // ----- useEffect for Production -----------------------------------
     useEffect(() => {
-        tryLoadAllProductClassLists();
-        tryLoadAllProducts();
-        if (((productClassState & 1) === 1)
-            && ((productState & 1) === 1)
-            && (productOptions.length === 0)
-        ) {
-            console.log('[PurchaseAddModel] set product for selection');
+        console.log('[PurchaseAddModel] useEffect / Production');
+        if ((productClassState & 1) === 0) {
+            console.log('[PurchaseAddModel] loadAllProductClassList');
+            loadAllProductClassList();
+        };
+        if ((productState & 1) === 0) {
+            console.log('[PurchaseAddModel] loadAllProducts');
+            loadAllProducts();
+        };
+        if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
+            console.log('[PurchaseAddModel] set companies for selection');
             const productOptionsValue = allProductClassList.map(proClass => {
                 const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
                 const subOptions = foundProducts.map(item => {
@@ -349,7 +348,7 @@ const PurchaseAddModel = (props) => {
             });
             setProductOptions(productOptionsValue);
         };
-    }, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions]);
+    }, [allProductClassList, allProducts, loadAllProductClassList, loadAllProducts, productClassState, productOptions, productState, setProductOptions]);
 
     return (
         <div
