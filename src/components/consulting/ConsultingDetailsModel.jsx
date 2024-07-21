@@ -178,20 +178,20 @@ const ConsultingDetailsModel = () => {
     };
   }, [userState])
 
-  // if (!isAllNeededDataLoaded)
-  //   return (
-  //     <Spin tip="Loading" size="large">
-  //       <div
-  //         style={{
-  //           padding: 50,
-  //           background: "rgba(0, 0, 0, 0.05)",
-  //           borderRadius: 4,
-  //         }}
-  //       >
-  //         Try to load necessary data
-  //       </div>
-  //     </Spin>
-  //   );
+  if (!isAllNeededDataLoaded)
+    return (
+      <Spin tip="Loading" size="large">
+        <div
+          style={{
+            padding: 50,
+            background: "rgba(0, 0, 0, 0.05)",
+            borderRadius: 4,
+          }}
+        >
+          Try to load necessary data
+        </div>
+      </Spin>
+    );
 
   return (
     <div
