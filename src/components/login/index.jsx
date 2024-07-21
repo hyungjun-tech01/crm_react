@@ -137,9 +137,11 @@ const Login = () => {
                             <label>{t('login.password')}</label>
                           </div>
                           <div className="col-auto">
+                            {/*
                             <Link className="text-muted" to="/forgot-password">
                               {t('login.forgotPassword')}
                             </Link>
+                            */}
                           </div>
                         </div>
                         <input

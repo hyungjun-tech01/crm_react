@@ -58,11 +58,13 @@ const Companies = () => {
   const today = new Date();
   const oneMonthAgo = new Date();
   oneMonthAgo.setMonth(today.getMonth() - 1);
+  const oneYearAgo = new Date();
+  oneYearAgo.setMonth(today.getMonth()-12);
 
   // from date + to date picking 만들기 
 
   const initialState = {
-    registration_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
+    registration_date: { fromDate: oneYearAgo, toDate: today, checked: true },
     delivery_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
     hq_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
     ma_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
@@ -71,7 +73,7 @@ const Companies = () => {
   const [dates, setDates] = useState(initialState);
 
   const dateRangeSettings = [
-    { label: t('purchase.registration_date'), stateKey: 'registration_date', checked: false },
+    { label: t('purchase.registration_date'), stateKey: 'registration_date', checked: true },
     { label: t('purchase.delivery_date'), stateKey: 'delivery_date', checked: false },
     { label: t('purchase.hq_finish_date'), stateKey: 'hq_finish_date', checked: false },
     { label: t('purchase.ma_finish_date'), stateKey: 'ma_finish_date', checked: false },
@@ -192,7 +194,30 @@ const Companies = () => {
   }, [setInitToAddCompany]);
 
   useEffect(() => {
-    tryLoadAllCompanies();
+
+    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+      label: key,
+      fromDate: dates[key].fromDate,
+      toDate: dates[key].toDate,
+      checked: dates[key].checked,
+    }));
+
+    console.log("checkedDates", checkedDates);
+
+    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+      label: key,
+      fromDate: dates[key].fromDate,
+      checked: dates[key].checked,
+    }));
+
+    const multiQueryCondi = {
+      queryConditions: queryConditions,
+      checkedDates: checkedDates,
+      singleDate: checkedSingleDates
+    }
+
+    loadAllCompanies(multiQueryCondi);
+    //tryLoadAllCompanies();
     tryLoadAllUsers();
 
     if((companyState & 1) === 1) {

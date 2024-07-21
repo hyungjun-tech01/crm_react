@@ -46,7 +46,15 @@ export const LeadStateRepo = selector({
                 console.log('[tryLoadAllCompanies] Try to load all companines');
                 set(atomLeadState, 2);   // state : loading
                 const {loadAllLeads} = await snapshot.getPromise(LeadRepo);
-                loadAllLeads();
+
+                const multiQueryCondi = {
+                    queryConditions: null,
+                    checkedDates: null,
+                    singleDate: null
+                }
+                loadAllLeads(multiQueryCondi);
+
+                //loadAllLeads();
             };
         });
         return {
@@ -58,9 +66,16 @@ export const LeadStateRepo = selector({
 export const LeadRepo = selector({
     key: "LeadRepository",
     get: ({getCallback}) => {
-        const loadAllLeads = getCallback(({set, snapshot}) => async () => {
+        const loadAllLeads = getCallback(({set, snapshot}) => async (multiQueryCondi) => {
+            const input_json = JSON.stringify(multiQueryCondi);
             try{
-                const response = await fetch(`${BASE_PATH}/leads`);
+                //const response = await fetch(`${BASE_PATH}/leads`);
+                const response = await fetch(`${BASE_PATH}/leads`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+
                 const data = await response.json();
                 if(data.message){
                     console.log('loadAllLeads message:', data.message);

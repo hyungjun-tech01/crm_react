@@ -325,7 +325,7 @@ const PurchaseAddModel = (props) => {
             && ((productState & 1) === 1)
             && (productOptions.length === 0)
         ) {
-            console.log('[PurchaseAddModel] set companies for selection');
+            console.log('[PurchaseAddModel] set product for selection');
             const productOptionsValue = allProductClassList.map(proClass => {
                 const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
                 const subOptions = foundProducts.map(item => {

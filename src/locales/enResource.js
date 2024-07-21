@@ -99,6 +99,7 @@ const enResource = {
             attempted_contact:'Attempted Contact',
             contact:'Contact',
             converted:'Converted',
+            lead_multi_query:'Lead Multi Query',
         },
         consulting:{
             action_content: 'Consulting Conclusion',

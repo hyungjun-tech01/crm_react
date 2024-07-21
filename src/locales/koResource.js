@@ -99,6 +99,7 @@ const koResource = {
             purchase_product:'구매 제품',
             quotation_history:'견적 이력',
             zip_code:'고객우편번호',
+            lead_multi_query:'고객 다중검색'
         },
         consulting:{
             action_content: '상담 결과',

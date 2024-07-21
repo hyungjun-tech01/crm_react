@@ -84,13 +84,13 @@ const Leads = () => {
   // from date + to date picking 만들기 
 
   const initialState = {
-    registration_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
+    registration_date: { fromDate: oneMonthAgo, toDate: today, checked: true },
   }
 
   const [dates, setDates] = useState(initialState);
 
   const dateRangeSettings = [
-    { label: t('purchase.registration_date'), stateKey: 'registration_date', checked: false },
+    { label: t('purchase.registration_date'), stateKey: 'registration_date', checked: true },
   ];
 
     // from date date 1개짜리 picking 만들기 
@@ -135,8 +135,7 @@ const Leads = () => {
       singleDate:checkedSingleDates
     }
 
-     // loadAllCompanies(multiQueryCondi);
-
+    loadAllLeads(multiQueryCondi);
      
   };
   const handleMultiQueryModalCancel = () => {
@@ -313,7 +312,29 @@ const Leads = () => {
 
   useEffect(() => {
     tryLoadAllCompanies();
+
+    // const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+    //   label: key,
+    //   fromDate: dates[key].fromDate,
+    //   toDate: dates[key].toDate,
+    //   checked: dates[key].checked,
+    // }));
+
+
+    // const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+    // label: key,
+    // fromDate: dates[key].fromDate,
+    // checked: dates[key].checked,
+    // }));
+  
+    // const multiQueryCondi = {
+    // queryConditions:queryConditions,
+    // checkedDates:checkedDates,
+    // singleDate:checkedSingleDates
+    // }
+    // loadAllLeads(multiQueryCondi);
     tryLoadAllLeads();
+
     tryLoadAllUsers();
 
     if(((companyState & 1) === 1)
@@ -368,7 +389,7 @@ const Leads = () => {
                       id="multi-company-query"
                       onClick={handleMultiQueryModal}
                   >
-                      {t('company.company_multi_query')}
+                      {t('lead.lead_multi_query')}
                   </button>                
               </div>
 
