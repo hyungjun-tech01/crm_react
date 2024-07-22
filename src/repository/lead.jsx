@@ -42,12 +42,12 @@ export const LeadRepo = selector({
     key: "LeadRepository",
     get: ({getCallback}) => {
         /////////////////////try to load all Leads /////////////////////////////
-        const tryLoadAllLeads = getCallback(({ set, snapshot }) => async () => {
+        const tryLoadAllLeads = getCallback(({ set, snapshot }) => async (multiQueryCondi) => {
             const loadStates = await snapshot.getPromise(atomLeadState);
             if((loadStates & 3) === 0){
                 console.log('[tryLoadAllLeads] Try to load all Leads');
                 set(atomLeadState, (loadStates | 2));   // state : loading
-                const ret = await loadAllLeads();
+                const ret = await loadAllLeads(multiQueryCondi);
                 if(ret){
                     // succeeded to load
                     set(atomLeadState, (loadStates | 3));

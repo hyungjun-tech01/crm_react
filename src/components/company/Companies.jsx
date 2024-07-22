@@ -46,6 +46,7 @@ const Companies = () => {
   const [ billContents, setBillContents ] = useState({});
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
+  const [ expanded, setExpaned ] = useState(false);
 
   const [initToAddCompany, setInitToAddCompany] = useState(false);
 
@@ -136,6 +137,37 @@ const Companies = () => {
     setSearchCondition(newValue);
     filterCompanies(statusSearch, newValue);
   };
+
+  const handleStatusSearch = (newValue) => {
+    setStatusSearch(newValue);
+    //loadAllCompanies();
+    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+      label: key,
+      fromDate: dates[key].fromDate,
+      toDate: dates[key].toDate,
+      checked: dates[key].checked,
+    }));
+
+    // console.log("checkedDates", checkedDates);
+
+    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+      label: key,
+      fromDate: dates[key].fromDate,
+      checked: dates[key].checked,
+    }));
+
+    const multiQueryCondi = {
+      queryConditions: queryConditions,
+      checkedDates: checkedDates,
+      singleDate: checkedSingleDates
+    }
+
+    // loadAllCompanies(multiQueryCondi);
+    tryLoadAllCompanies(multiQueryCondi);
+
+    setExpaned(false);
+    setSearchCondition("");
+  }
 
   // --- Functions used for Table ------------------------------
   const handleClickCompanyName = useCallback((id) => {
@@ -237,7 +269,7 @@ const Companies = () => {
           {/* Page Header */}
           <div className="page-header pt-3 mb-0 ">
             <div className="row">
-              {/*
+              
                <div className="text-start" style={{width:'120px'}}>
                   <div className="dropdown">
                     <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.all'):t(statusSearch)}</button>
@@ -251,7 +283,7 @@ const Companies = () => {
                       </div>
                   </div>
                 </div> 
-                */}
+                
 
               <div className="col text-start" style={{ width: '300px' }}>
                 <input
