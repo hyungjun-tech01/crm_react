@@ -14,13 +14,13 @@ export const ProductClassListRepo = selector({
     key: "ProductClassListRepository",
     get: ({getCallback}) => {
         /////////////////////try to load all ProductClassLists /////////////////////////////
-        const tryLoadAllProductClassLists = getCallback(({ set, snapshot }) => async () => {
+        const tryLoadAllProductClassList = getCallback(({ set, snapshot }) => async () => {
             const loadStates = await snapshot.getPromise(atomProductClassListState);
             if((loadStates & 3) === 0){
-                console.log('[tryLoadAllProductClassLists] Try to load all ProductClassLists');
+                console.log('[tryLoadAllProductClassList] Try to load all ProductClassLists');
                 set(atomProductClassListState, (loadStates | 2));   // state : loading
-                const {loadAllProductClassLists} = await snapshot.getPromise(ProductClassListRepo);
-                const ret = await loadAllProductClassLists();
+                const { loadAllProductClassList } = await snapshot.getPromise(ProductClassListRepo);
+                const ret = await loadAllProductClassList();
                 if(ret){
                     // succeeded to load
                     set(atomProductClassListState, (loadStates | 3));
@@ -100,7 +100,7 @@ export const ProductClassListRepo = selector({
             };
         });
         return {
-            tryLoadAllProductClassLists,
+            tryLoadAllProductClassList,
             loadAllProductClassList,
             modifyProductClass,
         };

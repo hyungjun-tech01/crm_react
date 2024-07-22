@@ -78,7 +78,6 @@ export const UserRepo = selector({
             if((loadStates & 3) === 0){
                 console.log('[tryLoadAllUsers] Try to load all users');
                 set(atomUserState, (loadStates | 2));   // state : loading
-                const {loadAllUsers} = await snapshot.getPromise(UserRepo);
                 const ret = await loadAllUsers();
                 if(ret){
                     // succeeded to load

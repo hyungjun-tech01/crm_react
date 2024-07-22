@@ -21,7 +21,6 @@ export const PurchaseRepo = selector({
             if((loadStates & 3) === 0){
                 console.log('[tryLoadAllPurchases] Try to load all Purchases');
                 set(atomPurchaseState, (loadStates | 2));   // state : loading
-                const {loadAllPurchases} = await snapshot.getPromise(PurchaseRepo);
                 const ret = await loadAllPurchases();
                 if(ret){
                     // succeeded to load

@@ -47,7 +47,6 @@ export const LeadRepo = selector({
             if((loadStates & 3) === 0){
                 console.log('[tryLoadAllLeads] Try to load all Leads');
                 set(atomLeadState, (loadStates | 2));   // state : loading
-                const {loadAllLeads} = await snapshot.getPromise(LeadRepo);
                 const ret = await loadAllLeads();
                 if(ret){
                     // succeeded to load

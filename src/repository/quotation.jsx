@@ -31,7 +31,6 @@ export const QuotationRepo = selector({
             if((loadStates & 3) === 0){
                 console.log('[tryLoadAllQuotations] Try to load all Quotations');
                 set(atomQuotationState, (loadStates | 2));   // state : loading
-                const {loadAllQuotations} = await snapshot.getPromise(QuotationRepo);
                 const ret = await loadAllQuotations();
                 if(ret){
                     // succeeded to load
@@ -222,6 +221,7 @@ export const QuotationRepo = selector({
             };
         });
         return {
+            tryLoadAllQuotations,
             loadAllQuotations,
             modifyQuotation,
             setCurrentQuotation,

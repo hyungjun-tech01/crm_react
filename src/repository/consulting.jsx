@@ -67,7 +67,6 @@ export const ConsultingRepo = selector({
             if((loadStates & 3) === 0){
                 console.log('[tryLoadAllConsultings] Try to load all Consultings');
                 set(atomConsultingState, (loadStates | 2));   // state : loading
-                const {loadAllConsultings} = await snapshot.getPromise(ConsultingRepo);
                 const ret = await loadAllConsultings();
                 if(ret){
                     // succeeded to load

@@ -42,7 +42,6 @@ export const TransactionRepo = selector({
             if((loadStates & 3) === 0){
                 console.log('[tryLoadAllTransactions] Try to load all Transactions');
                 set(atomTransactionState, (loadStates | 2));   // state : loading
-                const {loadAllTransactions} = await snapshot.getPromise(TransactionRepo);
                 const ret = await loadAllTransactions();
                 if(ret){
                     // succeeded to load
