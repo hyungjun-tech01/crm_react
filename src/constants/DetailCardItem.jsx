@@ -194,9 +194,9 @@ const DetailCardItem = (props) => {
     
     const currentValue = (edited && (edited[name] !== undefined) && (edited[name] !== null))
             ? edited[name]
-            : (defaultValue === null ? null :
+            : (defaultValue === null ? "" :
                 (detail.type === 'date'
-                    ? ((new Date(defaultValue)).toString() === 'Invalid Date' ? null : new Date(defaultValue))
+                    ? ((new Date(defaultValue)).toString() === 'Invalid Date' ? "" : new Date(defaultValue))
                     : defaultValue
                 ));
 
