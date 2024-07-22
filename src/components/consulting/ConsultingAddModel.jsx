@@ -147,18 +147,17 @@ const ConsultingAddModel = (props) => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    if (init) {
-        console.log('[LeadAddModel] initialize!');
-        initializeConsultingTemplate();
-        handleInit(!init);
-    };
-}, [init, handleInit, initializeConsultingTemplate]);
-
-  useEffect(() => {
     if (((leadsState & 1) === 1) && ((userState & 1) === 1)) {
       setIsAllNeededDataLoaded(true);
+      if (init) {
+        console.log('[ConsultingAddModel] initialize!');
+        if(handleInit) handleInit(!init);
+        setTimeout(()=>{
+          initializeConsultingTemplate();
+        }, 500);
+      };
     };
-  }, [leadsState, userState]);
+  }, [leadsState, userState, init]);
 
   if (!isAllNeededDataLoaded)
     return (

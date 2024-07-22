@@ -716,18 +716,16 @@ const QuotationAddModel = (props) => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    if (init) {
-      initializeQuotationTemplate();
-    } else {
-      if (handleInit) handleInit(!init);
-    };
-  }, [handleInit, init, initializeQuotationTemplate]);
-
-  useEffect(() => {
     if (((leadsState & 1) === 1) && ((userState & 1) === 1)) {
       setIsAllNeededDataLoaded(true);
+      if (init) {
+        if (handleInit) handleInit(!init);
+        setTimeout(()=>{
+          initializeQuotationTemplate();
+        }, 500);
+      };
     };
-  }, [leadsState, userState]);
+  }, [leadsState, userState, init]);
 
   if (!isAllNeededDataLoaded)
     return (

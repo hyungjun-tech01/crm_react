@@ -35,10 +35,6 @@ const DetailSubModal = (props) => {
         handleEdited(tempData);
     };
 
-    useEffect(() => {
-        console.log('[DetailSubModal] check data: ', original);
-    }, [original]);
-
     return (
         <Modal
             title={title}

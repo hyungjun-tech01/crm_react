@@ -108,18 +108,17 @@ const LeadAddModel = (props) => {
     }, [leadChange, disabledItems]);
 
     useEffect(() => {
-        if (init) {
-            console.log('[LeadAddModel] initialize!');
-            initializeLeadTemplate();
-            handleInit(!init);
-        };
-    }, [init, handleInit, initializeLeadTemplate]);
-
-    useEffect(() => {
         if(((companyState & 1) === 1) && ((userState & 1) === 1)) {
             setIsAllNeededDataLoaded(true);
+            if (init) {
+                console.log('[LeadAddModel] initialize!');
+                if(handleInit) handleInit(!init);
+                setTimeout(()=>{
+                    initializeLeadTemplate();
+                }, 500);
+            };
         }
-    }, [companyState, userState ])
+    }, [companyState, userState, init ])
 
     if (!isAllNeededDataLoaded)
         return (

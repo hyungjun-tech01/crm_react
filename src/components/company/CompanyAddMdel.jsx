@@ -118,18 +118,17 @@ const CompanyAddModel = (props) => {
   );
 
   useEffect(() => {
-    if (init) {
-      console.log("[CompanyAddModel] initialzie!");
-      initializeCompanyTemplate();
-      handleInit(!init);
-    }
-  }, [handleInit, init, initializeCompanyTemplate]);
-
-  useEffect(() => {
-    if ((userState & 1) === 0) {
+    if ((userState & 1) === 1) {
       setIsAllNeededDataLoaded(true);
+      if (init) {
+        console.log("[CompanyAddModel] initialzie!");
+        if(handleInit) handleInit(!init);
+        setTimeout(()=>{
+          initializeCompanyTemplate();
+        }, 500);
+      };
     }
-  }, [userState]);
+  }, [userState, init]);
 
   if (!isAllNeededDataLoaded)
     return (

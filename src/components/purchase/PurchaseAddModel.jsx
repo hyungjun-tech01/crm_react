@@ -296,21 +296,20 @@ const PurchaseAddModel = (props) => {
 
     //===== useEffect functions ===========================================================
     useEffect(() => {
-        if (init) {
-            console.log('[PurchaseAddModel] initialize!');
-            initializeAddTemplate();
-            handleInit(!init);
-        };
-    }, [init, handleInit, initializeAddTemplate]);
-
-    useEffect(() => {
         if (((companyState & 1) === 1)
             && ((productClassState & 1) === 1)
             && ((productState & 1) === 1)
         ) {
             setIsAllNeededDataLoaded(true);
+            if (init) {
+                console.log('[PurchaseAddModel] initialize!');
+                if(handleInit) handleInit(!init);
+                setTimeout(()=>{
+                    initializeAddTemplate();
+                }, 500);
+            };
         };
-    }, [companyState, productClassState, productState]);
+    }, [companyState, productClassState, productState, init]);
 
     if (!isAllNeededDataLoaded)
         return (

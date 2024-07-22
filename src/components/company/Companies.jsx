@@ -221,7 +221,7 @@ const Companies = () => {
     tryLoadAllCompanies(multiQueryCondi);
     tryLoadAllUsers();
 
-    if((companyState & 1) === 1) {
+    if(((companyState & 1) === 1) && ((userState & 1) === 1)){
       setNowLoading(false);
     };
   }, [companyState, userState]);
