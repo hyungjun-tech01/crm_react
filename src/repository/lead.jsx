@@ -37,39 +37,31 @@ export const LeadStatusSelection = [
     { value: 'Converted', label: 'Converted'},
 ];
 
-export const LeadStateRepo = selector({
-    key: "LeadStateRepository",
-    get: ({getCallback}) => {
-        const tryLoadAllLeads = getCallback(({set, snapshot}) => async () => {
-            const loadStates = await snapshot.getPromise(atomLeadState);
-            if((loadStates & 3) === 0){
-                console.log('[tryLoadAllCompanies] Try to load all companines');
-                set(atomLeadState, 2);   // state : loading
-                const {loadAllLeads} = await snapshot.getPromise(LeadRepo);
-
-                const multiQueryCondi = {
-                    queryConditions: null,
-                    checkedDates: null,
-                    singleDate: null
-                }
-                loadAllLeads(multiQueryCondi);
-
-                //loadAllLeads();
-            };
-        });
-        return {
-            tryLoadAllLeads,
-        }
-    },
-});
 
 export const LeadRepo = selector({
     key: "LeadRepository",
     get: ({getCallback}) => {
-        const loadAllLeads = getCallback(({set, snapshot}) => async (multiQueryCondi) => {
+        /////////////////////try to load all Leads /////////////////////////////
+        const tryLoadAllLeads = getCallback(({ set, snapshot }) => async () => {
+            const loadStates = await snapshot.getPromise(atomLeadState);
+            if((loadStates & 3) === 0){
+                console.log('[tryLoadAllLeads] Try to load all Leads');
+                set(atomLeadState, (loadStates | 2));   // state : loading
+                const {loadAllLeads} = await snapshot.getPromise(LeadRepo);
+                const ret = await loadAllLeads();
+                if(ret){
+                    // succeeded to load
+                    set(atomLeadState, (loadStates | 3));
+                } else {
+                    // failed to load
+                    set(atomLeadState, 0);
+                };
+            }
+        });
+        const loadAllLeads = getCallback(({set}) => async (multiQueryCondi) => {
             const input_json = JSON.stringify(multiQueryCondi);
             try{
-                //const response = await fetch(`${BASE_PATH}/leads`);
+                console.log('[LeadRepository] Try loading all')
                 const response = await fetch(`${BASE_PATH}/leads`, {
                     method: "POST",
                     headers:{'Content-Type':'application/json'},
@@ -81,11 +73,9 @@ export const LeadRepo = selector({
                     console.log('loadAllLeads message:', data.message);
                     set(atomAllLeads, []);
                     set(atomLeadsForSelection, []);
-                    set(atomLeadState, 0);
-                    return;
+                    return false;
                 }
                 set(atomAllLeads, data);
-                // set(atomFilteredLead, atomAllLeads); <-- Temporary not use
                 const tempLeadsForSelection = data.map(lead => ({
                     label: lead.lead_name + " / " + lead.company_name,
                     value: {
@@ -112,14 +102,11 @@ export const LeadRepo = selector({
                     return 0;
                   });
                 set(atomLeadsForSelection, tempLeadsForSelection);
-
-                // Change loading state
-                const loadStates = await snapshot.getPromise(atomLeadState);
-                set(atomLeadState, (loadStates | 1));
+                return true;
             }
             catch(err){
                 console.error(`loadAllLeads / Error : ${err}`);
-                set(atomLeadState, 0);
+                return false;
             };
         });
         const filterLeads = getCallback(({set, snapshot }) => async (itemName, filterText) => {
@@ -244,6 +231,7 @@ export const LeadRepo = selector({
             };
         });
         return {
+            tryLoadAllLeads,
             loadAllLeads,
             modifyLead,
             setCurrentLead,

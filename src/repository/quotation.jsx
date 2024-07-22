@@ -21,49 +21,43 @@ export const QuotationSendTypes = [
     { value: 'E-Mail', label: 'Email'},
 ];
 
-export const QuotationStateRepo = selector({
-    key: "QuotationStateRepository",
-    get: ({getCallback}) => {
-        const tryLoadAllQuotations = getCallback(({set, snapshot}) => async () => {
-            const loadStates = await snapshot.getPromise(atomQuotationState);
-            if((loadStates & 3) === 0){
-                console.log('[tryLoadAllQuotations] Try to load all users');
-                set(atomQuotationState, 2);   // state : loading
-                const {loadAllQuotations} = await snapshot.getPromise(QuotationRepo);
-                loadAllQuotations();
-            };
-        });
-        return {
-            tryLoadAllQuotations,
-        }
-    },
-});
 
 export const QuotationRepo = selector({
     key: "QuotationRepository",
     get: ({getCallback}) => {
-        const loadAllQuotations = getCallback(({set, snapshot}) => async () => {
-            // It is possible that this function might be called by more than two componets almost at the same time.
-            // So, to prevent this function from being executed again and again, check the loading state at first.
+        /////////////////////try to load all Quotations /////////////////////////////
+        const tryLoadAllQuotations = getCallback(({ set, snapshot }) => async () => {
             const loadStates = await snapshot.getPromise(atomQuotationState);
-            if((loadStates & 1) === 0){
-                try{
-                    console.log('[QuotationRepository] Try loading all')
-                    const response = await fetch(`${BASE_PATH}/quotations`);
-                    const data = await response.json();
-                    if(data.message){
-                        console.log('loadAllQuotations message:', data.message);
-                        set(atomAllQuotations, []);
-                        set(atomQuotationState, 0);
-                        return;
-                    }
-                    set(atomAllQuotations, data);
-                    set(atomQuotationState, (loadStates | 1));
-                }
-                catch(err){
-                    console.error(`loadAllQuotations / Error : ${err}`);
+            if((loadStates & 3) === 0){
+                console.log('[tryLoadAllQuotations] Try to load all Quotations');
+                set(atomQuotationState, (loadStates | 2));   // state : loading
+                const {loadAllQuotations} = await snapshot.getPromise(QuotationRepo);
+                const ret = await loadAllQuotations();
+                if(ret){
+                    // succeeded to load
+                    set(atomQuotationState, (loadStates | 3));
+                } else {
+                    // failed to load
                     set(atomQuotationState, 0);
                 };
+            }
+        });
+        const loadAllQuotations = getCallback(({set}) => async () => {
+            try{
+                console.log('[QuotationRepository] Try loading all')
+                const response = await fetch(`${BASE_PATH}/quotations`);
+                const data = await response.json();
+                if(data.message){
+                    console.log('loadAllQuotations message:', data.message);
+                    set(atomAllQuotations, []);
+                    return false;
+                }
+                set(atomAllQuotations, data);
+                return true;
+            }
+            catch(err){
+                console.error(`loadAllQuotations / Error : ${err}`);
+                return false;
             };
         });
         

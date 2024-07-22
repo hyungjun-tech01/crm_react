@@ -69,43 +69,38 @@ export async function apiRegister(userId, userName, Email, password) {
     }
 }
 
-export const UserStateRepo = selector({
-    key: "UserStateRepository",
-    get: ({getCallback}) => {
-        const tryLoadAllUsers = getCallback(({set, snapshot}) => async () => {
-            const loadStates = await snapshot.getPromise(atomUserState);
-            if((loadStates & 3) === 0){
-                console.log('[tryLoadAllUsers] Try to load all users');
-                set(atomUserState, 2);   // state : loading
-                const {loadAllUsers} = await snapshot.getPromise(UserRepo);
-                loadAllUsers();
-            };
-        });
-        return {
-            tryLoadAllUsers,
-        }
-    },
-});
-
 export const UserRepo = selector({
     key: "UserRepository",
     get: ({ getCallback }) => {
+        /////////////////////try to load all Users /////////////////////////////
+        const tryLoadAllUsers = getCallback(({ set, snapshot }) => async () => {
+            const loadStates = await snapshot.getPromise(atomUserState);
+            if((loadStates & 3) === 0){
+                console.log('[tryLoadAllUsers] Try to load all users');
+                set(atomUserState, (loadStates | 2));   // state : loading
+                const {loadAllUsers} = await snapshot.getPromise(UserRepo);
+                const ret = await loadAllUsers();
+                if(ret){
+                    // succeeded to load
+                    set(atomUserState, (loadStates | 3));
+                } else {
+                    // failed to load
+                    set(atomUserState, 0);
+                };
+            }
+        });
         /////////////////////load all Users /////////////////////////////
-        const loadAllUsers = getCallback(({ set, snapshot }) => async () => {
+        const loadAllUsers = getCallback(({ set }) => async () => {
             try {
+                console.log('[UserRepository] Try loading all');
                 const response = await fetch(`${BASE_PATH}/getallusers`);
                 const data = await response.json();
                 if (data.message) {
                     console.log('loadUsers message:', data.message);
                     set(atomAllUsers, []);
-                    set(atomUserState, 0);
-                    return;
+                    return false;
                 }
                 set(atomAllUsers, data);
-
-                //----- Change loading state -----------------------------------
-                const loadStates = await snapshot.getPromise(atomUserState);
-                set(atomUserState, (loadStates | 1));
 
                 //----- Store SR, AE data -----------------------------------
                 const workingUsers = data.filter(user => user.isWork === 'Y');
@@ -121,10 +116,11 @@ export const UserRepo = selector({
                 const engineers = workingUsers.filter(user => user.jobType === 'AE')
                     .map(user => ({ label: user.userName, value: user.userName }));
                 set(atomEngineersForSelection, engineers);
+                return true;
             }
             catch (err) {
                 console.error(`loadUsers / Error : ${err}`);
-                set(atomUserState, 0);
+                return false;
             };
         });
         /////////////////////load Users /////////////////////////////
@@ -260,6 +256,7 @@ export const UserRepo = selector({
             };
         });
         return {
+            tryLoadAllUsers,
             loadUsers,
             modifyUser,
             setCurrentUser,

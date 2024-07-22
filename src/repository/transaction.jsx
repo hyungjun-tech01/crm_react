@@ -32,47 +32,43 @@ export const DefaultTransactionContent = {
     modify_date: null,
 };
 
-export const TransactionStateRepo = selector({
-    key: "TransactionStateRepository",
-    get: ({getCallback}) => {
-        const tryLoadAllTransactions = getCallback(({set, snapshot}) => async () => {
-            const loadStates = await snapshot.getPromise(atomTransactionState);
-            if((loadStates & 3) === 0){
-                console.log('[tryLoadAllTransactions] Try to load all users');
-                set(atomTransactionState, 2);   // state : loading
-                const {loadAllTransactions} = await snapshot.getPromise(TransactionRepo);
-                loadAllTransactions();
-            };
-        });
-        return {
-            tryLoadAllTransactions,
-        }
-    },
-});
 
 export const TransactionRepo = selector({
     key: "TransactionRepository",
     get: ({ getCallback }) => {
-        const loadAllTransactions = getCallback(({ set, snapshot }) => async () => {
+        /////////////////////try to load all Transactions /////////////////////////////
+        const tryLoadAllTransactions = getCallback(({ set, snapshot }) => async () => {
             const loadStates = await snapshot.getPromise(atomTransactionState);
-            if ((loadStates & 1) === 0) {
-                try {
-                    console.log('[TransactionRepository] Try loading all')
-                    const response = await fetch(`${BASE_PATH}/transactions`);
-                    const data = await response.json();
-                    if (data.message) {
-                        console.log('loadAllTransactions message:', data.message);
-                        set(atomAllTransactions, []);
-                        set(atomTransactionState, 0);
-                        return;
-                    }
-                    set(atomAllTransactions, data);
-                    set(atomTransactionState, (loadStates | 1));
-                }
-                catch (err) {
-                    console.error(`loadAllTransactions / Error : ${err}`);
+            if((loadStates & 3) === 0){
+                console.log('[tryLoadAllTransactions] Try to load all Transactions');
+                set(atomTransactionState, (loadStates | 2));   // state : loading
+                const {loadAllTransactions} = await snapshot.getPromise(TransactionRepo);
+                const ret = await loadAllTransactions();
+                if(ret){
+                    // succeeded to load
+                    set(atomTransactionState, (loadStates | 3));
+                } else {
+                    // failed to load
                     set(atomTransactionState, 0);
                 };
+            }
+        });
+        const loadAllTransactions = getCallback(({ set }) => async () => {
+            try {
+                console.log('[TransactionRepository] Try loading all')
+                const response = await fetch(`${BASE_PATH}/transactions`);
+                const data = await response.json();
+                if (data.message) {
+                    console.log('loadAllTransactions message:', data.message);
+                    set(atomAllTransactions, []);
+                    return false;
+                }
+                set(atomAllTransactions, data);
+                return true;
+            }
+            catch (err) {
+                console.error(`loadAllTransactions / Error : ${err}`);
+                return false;
             };
         });
         const filterTransactions = getCallback(({ set, snapshot }) => async (itemName, filterText) => {
@@ -180,6 +176,7 @@ export const TransactionRepo = selector({
             };
         });
         return {
+            tryLoadAllTransactions,
             loadAllTransactions,
             modifyTransaction,
             setCurrentTransaction,

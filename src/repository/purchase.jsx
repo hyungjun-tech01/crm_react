@@ -11,49 +11,43 @@ import { atomCurrentPurchase
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
-export const PurchaseStateRepo = selector({
-    key: "PurchaseStateRepository",
-    get: ({getCallback}) => {
-        const tryLoadAllPurchases = getCallback(({set, snapshot}) => async () => {
-            const loadStates = await snapshot.getPromise(atomPurchaseState);
-            if((loadStates & 3) === 0){
-                console.log('[tryLoadAllPurchases] Try to load all users');
-                set(atomPurchaseState, 2);   // state : loading
-                const {loadAllPurchases} = await snapshot.getPromise(PurchaseRepo);
-                loadAllPurchases();
-            };
-        });
-        return {
-            tryLoadAllPurchases,
-        }
-    },
-});
 
 export const PurchaseRepo = selector({
     key: "PurchaseRepository",
     get: ({getCallback}) => {
-        const loadAllPurchases = getCallback(({set, snapshot}) => async () => {
-            // It is possible that this function might be called by more than two componets almost at the same time.
-            // So, to prevent this function from being executed again and again, check the loading state at first.
+        /////////////////////try to load all Purchases /////////////////////////////
+        const tryLoadAllPurchases = getCallback(({ set, snapshot }) => async () => {
             const loadStates = await snapshot.getPromise(atomPurchaseState);
-            if((loadStates & 1) === 0){
-                try{
-                    console.log('[PurchaseRepository] Try loading all')
-                    const response = await fetch(`${BASE_PATH}/purchases`);
-                    const data = await response.json();
-                    if(data.message){
-                        console.log('loadAllPurchases message:', data.message);
-                        set(atomAllPurchases, []);
-                        set(atomPurchaseState, 0);
-                        return;
-                    }
-                    set(atomAllPurchases, data);
-                    set(atomPurchaseState, (loadStates | 1));
-                }
-                catch(err){
-                    console.error(`loadAllPurchases / Error : ${err}`);
+            if((loadStates & 3) === 0){
+                console.log('[tryLoadAllPurchases] Try to load all Purchases');
+                set(atomPurchaseState, (loadStates | 2));   // state : loading
+                const {loadAllPurchases} = await snapshot.getPromise(PurchaseRepo);
+                const ret = await loadAllPurchases();
+                if(ret){
+                    // succeeded to load
+                    set(atomPurchaseState, (loadStates | 3));
+                } else {
+                    // failed to load
                     set(atomPurchaseState, 0);
                 };
+            }
+        });
+        const loadAllPurchases = getCallback(({set}) => async () => {
+            try{
+                console.log('[PurchaseRepository] Try loading all')
+                const response = await fetch(`${BASE_PATH}/purchases`);
+                const data = await response.json();
+                if(data.message){
+                    console.log('loadAllPurchases message:', data.message);
+                    set(atomAllPurchases, []);
+                    return false;
+                }
+                set(atomAllPurchases, data);
+                return true;
+            }
+            catch(err){
+                console.error(`loadAllPurchases / Error : ${err}`);
+                return false;
             };
         });
         const loadCompanyPurchases = getCallback(({set}) => async (company_code) => {
@@ -211,6 +205,7 @@ export const PurchaseRepo = selector({
             };
         });
         return {
+            tryLoadAllPurchases,
             loadAllPurchases,
             loadCompanyPurchases,
             modifyPurchase,

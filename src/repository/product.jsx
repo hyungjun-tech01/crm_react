@@ -9,49 +9,43 @@ import { atomProductClassList
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
-export const ProductClassListStateRepo = selector({
-    key: "ProductClassListStateRepository",
-    get: ({getCallback}) => {
-        const tryLoadAllProductClassLists = getCallback(({set, snapshot}) => async () => {
-            const loadStates = await snapshot.getPromise(atomProductClassListState);
-            if((loadStates & 3) === 0){
-                console.log('[tryLoadAllProductClassLists] Try to load all product class lists');
-                set(atomProductClassListState, 2);   // state : loading
-                const {loadAllProductClassList} = await snapshot.getPromise(ProductClassListRepo);
-                loadAllProductClassList();
-            };
-        });
-        return {
-            tryLoadAllProductClassLists,
-        }
-    },
-});
 
 export const ProductClassListRepo = selector({
     key: "ProductClassListRepository",
     get: ({getCallback}) => {
-        const loadAllProductClassList = getCallback(({set, snapshot}) => async () => {
-            // It is possible that this function might be called by more than two componets almost at the same time.
-            // So, to prevent this function from being executed again and again, check the loading state at first.
+        /////////////////////try to load all ProductClassLists /////////////////////////////
+        const tryLoadAllProductClassLists = getCallback(({ set, snapshot }) => async () => {
             const loadStates = await snapshot.getPromise(atomProductClassListState);
-            if((loadStates & 1) === 0){
-                try{
-                    console.log('[ProductClassListRepository] Try loading all');
-                    const response = await fetch(`${BASE_PATH}/productClass`);
-                    const data = await response.json();
-                    if(data.message){
-                        console.log('loadAllProductClassList message:', data.message);
-                        set(atomProductClassList, []);
-                        set(atomProductClassListState, 0);
-                        return;
-                    }
-                    set(atomProductClassList, data);
-                    set(atomProductClassListState, (loadStates | 1));
-                }
-                catch(err){
-                    console.error(`loadAllProductClassList / Error : ${err}`);
+            if((loadStates & 3) === 0){
+                console.log('[tryLoadAllProductClassLists] Try to load all ProductClassLists');
+                set(atomProductClassListState, (loadStates | 2));   // state : loading
+                const {loadAllProductClassLists} = await snapshot.getPromise(ProductClassListRepo);
+                const ret = await loadAllProductClassLists();
+                if(ret){
+                    // succeeded to load
+                    set(atomProductClassListState, (loadStates | 3));
+                } else {
+                    // failed to load
                     set(atomProductClassListState, 0);
                 };
+            }
+        });
+        const loadAllProductClassList = getCallback(({set}) => async () => {
+            try{
+                console.log('[ProductClassListRepository] Try loading all');
+                const response = await fetch(`${BASE_PATH}/productClass`);
+                const data = await response.json();
+                if(data.message){
+                    console.log('loadAllProductClassList message:', data.message);
+                    set(atomProductClassList, []);
+                    return false;
+                }
+                set(atomProductClassList, data);
+                return true;
+            }
+            catch(err){
+                console.error(`loadAllProductClassList / Error : ${err}`);
+                return false;
             };
         });
         const modifyProductClass = getCallback(({set, snapshot}) => async (newProductClass) => {
@@ -106,6 +100,7 @@ export const ProductClassListRepo = selector({
             };
         });
         return {
+            tryLoadAllProductClassLists,
             loadAllProductClassList,
             modifyProductClass,
         };
@@ -121,50 +116,45 @@ export const ProductTypeOptions = [
     {value:'D(Pareller)', label: 'D(Pareller)'},
 ];
 
-export const ProductStateRepo = selector({
-    key: "ProductStateRepository",
-    get: ({getCallback}) => {
-        const tryLoadAllProducts = getCallback(({set, snapshot}) => async () => {
-            const loadStates = await snapshot.getPromise(atomProductsState);
-            if((loadStates & 3) === 0){
-                console.log('[tryLoadAllProducts] Try to load all products');
-                set(atomProductsState, 2);   // state : loading
-                const {loadAllProducts} = await snapshot.getPromise(ProductRepo);
-                  loadAllProducts();
-            };
-        });
-        return {
-            tryLoadAllProducts,
-        }
-    },
-});
 
 export const ProductRepo = selector({
     key: "ProductRepository",
     get: ({getCallback}) => {
-        const loadAllProducts = getCallback(({set, snapshot}) => async () => {
-            // It is possible that this function might be called by more than two componets almost at the same time.
-            // So, to prevent this function from being executed again and again, check the loading state at first.
+        /////////////////////try to load all Products /////////////////////////////
+        const tryLoadAllProducts = getCallback(({ set, snapshot }) => async () => {
             const loadStates = await snapshot.getPromise(atomProductsState);
-            if((loadStates & 1) === 0){
-                try{
-                    console.log('[ProductRepository] Try loading all')
-                    const response = await fetch(`${BASE_PATH}/product`);
-                    const data = await response.json();
-                    if(data.message){
-                        console.log('loadAllProducts message:', data.message);
-                        set(atomAllProducts, []);
-                        set(atomProductsState, 0);
-                        return;
-                    }
-                    set(atomAllProducts, data);
-                    set(atomProductsState, (loadStates | 1));
-                }
-                catch(err){
-                    console.error(`loadAllProducts / Error : ${err}`);
+            if((loadStates & 3) === 0){
+                console.log('[tryLoadAllProducts] Try to load all Products');
+                set(atomProductsState, (loadStates | 2));   // state : loading
+                const {loadAllProducts} = await snapshot.getPromise(ProductRepo);
+                const ret = await loadAllProducts();
+                if(ret){
+                    // succeeded to load
+                    set(atomProductsState, (loadStates | 3));
+                } else {
+                    // failed to load
                     set(atomProductsState, 0);
-                };    
-;            }
+                };
+            }
+        });
+        const loadAllProducts = getCallback(({set}) => async () => {
+            try{
+                console.log('[ProductRepository] Try loading all')
+                const response = await fetch(`${BASE_PATH}/product`);
+                const data = await response.json();
+                if(data.message){
+                    console.log('loadAllProducts message:', data.message);
+                    set(atomAllProducts, []);
+                    set(atomProductsState, 0);
+                    return false;
+                }
+                set(atomAllProducts, data);
+                return true;
+            }
+            catch(err){
+                console.error(`loadAllProducts / Error : ${err}`);
+                return false;
+            };
         });
         const modifyProduct = getCallback(({set, snapshot}) => async (newProduct) => {
             const input_json = JSON.stringify(newProduct);
@@ -218,6 +208,7 @@ export const ProductRepo = selector({
             };
         });
         return {
+            tryLoadAllProducts,
             loadAllProducts,
             modifyProduct,
         };
