@@ -159,6 +159,19 @@ const Leads = () => {
     setInitToAddLead(true);
   }, [setInitToAddLead]);
 
+  const handleClickLeadName = useCallback((leadCode, companyCode) => {
+    console.log("[Lead] set current lead : ", leadCode);
+    setCurrentLead(leadCode);
+    setCurrentCompany(companyCode);   // 현재 company 세팅 
+    loadCompanyConsultings(companyCode);  // 현재 company에 해당하는 consulting 조회 
+    loadCompanyQuotations(companyCode);  // 현재 company에 해당하는 quotation 조회 
+    loadCompanyPurchases(companyCode);  // 현재 company에 해당하는 purchase 조회 
+    let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
+      keyboard: false
+    });
+    myModal.show();
+  }, []);
+
 
   const [ expanded, setExpaned ] = useState(false);
 
@@ -172,19 +185,16 @@ const Leads = () => {
             <span className="person-circle-a person-circle">
               {text ? text.charAt(0) : '?'}
             </span>
-          </a>
-          <a href="#"
-            data-bs-toggle="modal"
-            data-bs-target="#leads-details"
-            onClick={()=>{
+            <span onClick={()=>{
               console.log("[Lead] set current lead : ", record.lead_code);
               setCurrentLead(record.lead_code);
               setCurrentCompany(record.company_code);   // 현재 company 세팅 
               loadCompanyConsultings(record.company_code);  // 현재 company에 해당하는 consulting 조회 
               loadCompanyQuotations(record.company_code);  // 현재 company에 해당하는 quotation 조회 
               loadCompanyPurchases(record.company_code);  // 현재 company에 해당하는 purchase 조회 
-          }}>
-            {text}
+            }}>
+              {text}
+            </span>
           </a>
         </>
       ),
@@ -498,16 +508,7 @@ const Leads = () => {
                       onRow={(record, rowIndex) => {
                         return {
                           onClick: (event) => {
-                              console.log("[Lead] set current lead : ", record.lead_code);
-                              setCurrentLead(record.lead_code);
-                              setCurrentCompany(record.company_code);   // 현재 company 세팅 
-                              loadCompanyConsultings(record.company_code);  // 현재 company에 해당하는 consulting 조회 
-                              loadCompanyQuotations(record.company_code);  // 현재 company에 해당하는 quotation 조회 
-                              loadCompanyPurchases(record.company_code);  // 현재 company에 해당하는 purchase 조회 
-                              let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
-                                keyboard: false
-                              });
-                              myModal.show();
+                            handleClickLeadName(record.lead_code, record.company_code);
                           }, // double click row
                         };
                       }}
@@ -530,17 +531,8 @@ const Leads = () => {
                       onRow={(record, rowIndex) => {
                         return {
                           onClick: (event) => {
-                              console.log("[Lead] set current lead : ", record.lead_code);
-                              setCurrentLead(record.lead_code);
-                              setCurrentCompany(record.company_code);   // 현재 company 세팅 
-                              loadCompanyConsultings(record.company_code);  // 현재 company에 해당하는 consulting 조회 
-                              loadCompanyQuotations(record.company_code);  // 현재 company에 해당하는 quotation 조회 
-                              loadCompanyPurchases(record.company_code);  // 현재 company에 해당하는 purchase 조회 
-                              let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
-                                keyboard: false
-                              })
-                              myModal.show();
-                          }, // double click row
+                            handleClickLeadName(record.lead_code, record.company_code);
+                          },
                         };
                       }}
                     /> 
