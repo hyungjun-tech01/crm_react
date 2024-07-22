@@ -243,7 +243,7 @@ const koResource = {
             receipt_date:'입고일',
             register:'등록자',
             registration_code:'등록코드',
-            registration_date:'등록일',
+            registration_date:'구매제품 등록일',
             serial_number:'기번',
             type:'구매유형',
         },

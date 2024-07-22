@@ -126,7 +126,8 @@ const Companies = () => {
       singleDate: checkedSingleDates
     }
 
-    loadAllCompanies(multiQueryCondi);
+    //loadAllCompanies(multiQueryCondi);
+    tryLoadAllCompanies(multiQueryCondi);
   };
 
   const handleMultiQueryModalCancel = () => {
