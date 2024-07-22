@@ -27,8 +27,7 @@ const Companies = () => {
 
   //===== [RecoilState] Related with Company ==========================================
   const [ companyState, setCompanyState] = useRecoilState(atomCompanyState);
-  const { tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
-  const { loadAllCompanies, filterCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
+  const { tryLoadAllCompanies, filterCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const filteredCompany = useRecoilValue(atomFilteredCompany);
 
