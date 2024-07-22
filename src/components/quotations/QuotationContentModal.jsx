@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
-import { Button, Modal } from 'antd';
+import { Button, Modal, Spin } from 'antd';
 import {
     atomProductClassList,
     atomProductClassListState,
@@ -16,7 +16,7 @@ import DetailCardItem from '../../constants/DetailCardItem';
 const QuotationContentModal = (props) => {
     const { setting, open, original, edited, handleEdited, handleOk, handleCancel } = props;
     const [t] = useTranslation();
-
+    const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
 
     //===== [RecoilState] Related with Product ==========================================
     const [productClassState, setProductClassState] = useRecoilState(atomProductClassListState);
@@ -29,23 +29,29 @@ const QuotationContentModal = (props) => {
 
 
     //===== Handles to edit 'Contents' ==================================================
-    const [ showDetailDesc, setShowDetailDesc ] = useState(false);
-    const [ tempDetailSpec, setTempDetailSpec ] = useState('');
+    const [showDetailDesc, setShowDetailDesc] = useState(false);
+    const [tempDetailSpec, setTempDetailSpec] = useState('');
 
-    const detail_spec_desc_select = [{label:t('common.na'), value:'없음'}, {label:t('common.avail'), value:'있음'}]
-    const content_items = showDetailDesc ? 
+    const detail_spec_desc_select = [{ label: t('common.na'), value: '없음' }, { label: t('common.avail'), value: '있음' }]
+    const content_items = showDetailDesc ?
         [
-            { name: 'product_name', title: t('purchase.product_name'), detail: {
-                type: 'select', options: productOptions, group: 'product_class_name', extra: 'long' } },
+            {
+                name: 'product_name', title: t('purchase.product_name'), detail: {
+                    type: 'select', options: productOptions, group: 'product_class_name', extra: 'long'
+                }
+            },
             { name: 'detail_desc_on_off', title: t('quotation.detail_desc_on_off'), detail: { type: 'select', options: detail_spec_desc_select, extra: 'long' } },
-            { name: 'detail_desc', title: t('quotation.detail_desc'), detail: { type: 'textarea', row_no:  8, extra: 'long' } },
+            { name: 'detail_desc', title: t('quotation.detail_desc'), detail: { type: 'textarea', row_no: 8, extra: 'long' } },
             { name: 'quantity', title: t('common.quantity'), detail: { type: 'label', extra: 'long' } },
             { name: 'list_price', title: t('quotation.list_price'), detail: { type: 'label', extra: 'long', price: true, decimal: setting.show_decimal } },
             { name: 'quotation_amount', title: t('quotation.quotation_amount'), detail: { type: 'label', extra: 'long', disabled: true, price: true, decimal: setting.show_decimal } },
         ] :
         [
-            { name: 'product_name', title: t('purchase.product_name'), detail: {
-                type: 'select', options: productOptions, group: 'product_class_name', extra: 'long' } },
+            {
+                name: 'product_name', title: t('purchase.product_name'), detail: {
+                    type: 'select', options: productOptions, group: 'product_class_name', extra: 'long'
+                }
+            },
             { name: 'detail_desc_on_off', title: t('quotation.detail_desc_on_off'), detail: { type: 'select', options: detail_spec_desc_select, extra: 'long' } },
             { name: 'quantity', title: t('common.quantity'), detail: { type: 'label', extra: 'long' } },
             { name: 'list_price', title: t('quotation.list_price'), detail: { type: 'label', extra: 'long', price: true, decimal: setting.show_decimal } },
@@ -60,8 +66,8 @@ const QuotationContentModal = (props) => {
         handleEdited(tempData)
     };
     const handleSelect = (name, value) => {
-        let tempData = {...edited};
-        switch(name){
+        let tempData = { ...edited };
+        switch (name) {
             case 'product_name':
                 tempData['product_code'] = value.value.product_code;
                 tempData['product_class_name'] = value.value.product_class_name;
@@ -70,17 +76,17 @@ const QuotationContentModal = (props) => {
                 tempData['reseller_price'] = Number(value.value.reseller_price);
                 tempData['list_price'] = setting.unit_vat_included ? Number(value.value.list_price) / 1.1 : Number(value.value.list_price);
                 tempData['org_unit_prce'] = Number(value.value.list_price);
-                    
+
                 setTempDetailSpec(value.value.detail_desc);
-                if(showDetailDesc){
+                if (showDetailDesc) {
                     tempData['detail_desc'] = value.value.detail_desc;
                 };
                 break;
             case 'detail_desc_on_off':
                 setShowDetailDesc(value.value);
-                tempData['detail_desc_on_off'] =  value.value;
+                tempData['detail_desc_on_off'] = value.value;
 
-                if(value.value === '있음'){
+                if (value.value === '있음') {
                     tempData['detail_desc'] = tempDetailSpec;
                 } else {
                     delete tempData.detail_desc;;
@@ -97,14 +103,14 @@ const QuotationContentModal = (props) => {
     };
     const handleValue = (event) => {
         const target_name = event.target.name;
-        let tempData = {...edited};
-        if(target_name === 'quantity'){
+        let tempData = { ...edited };
+        if (target_name === 'quantity') {
             tempData[target_name] = event.target.value !== '' ? Number(event.target.value) : 0;
-            if(!edited['list_price']
+            if (!edited['list_price']
                 || edited.list_price === ''
                 || edited.list_price === 0
-            ){
-                if(!original.list_price){
+            ) {
+                if (!original.list_price) {
                     tempData['quotation_amount'] = 0;
                 } else {
                     tempData['quotation_amount'] = Number(original.list_price) * tempData.quantity;
@@ -112,10 +118,10 @@ const QuotationContentModal = (props) => {
             } else {
                 tempData['quotation_amount'] = tempData['quantity'] * Number(edited.list_price);
             };
-        } else if(target_name === 'list_price'){
+        } else if (target_name === 'list_price') {
             tempData[target_name] = event.target.value !== '' ? Number(event.target.value) : 0;
-            if(!edited['quantity'] || edited.quantity ==='' || edited.quantity === 0){
-                if(!original.quantity){
+            if (!edited['quantity'] || edited.quantity === '' || edited.quantity === 0) {
+                if (!original.quantity) {
                     tempData['quotation_amount'] = 0;
                 } else {
                     tempData['quotation_amount'] = Number(original.quantity) * tempData.list_price;
@@ -132,23 +138,14 @@ const QuotationContentModal = (props) => {
 
     // ----- useEffect for Production -----------------------------------
     useEffect(() => {
-        if ((productClassState & 3) === 0) {
-            console.log('[QuotationContentModal] loadAllProductClassList');
-            setProductClassState(2);
-            loadAllProductClassList();
-        };
-        if ((productState & 3) === 0) {
-            console.log('[QuotationContentModal] loadAllProducts');
-            setProductState(2);
-            loadAllProducts();
-        };
         if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
             const productOptionsValue = allProductClassList.map(proClass => {
                 const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
                 const subOptions = foundProducts.map(item => {
                     return {
                         label: <span>{item.product_name}</span>,
-                        value: { product_code: item.product_code,
+                        value: {
+                            product_code: item.product_code,
                             product_name: item.product_name,
                             product_class_name: item.product_class_name,
                             detail_desc: item.detail_desc,
@@ -165,10 +162,25 @@ const QuotationContentModal = (props) => {
                 };
             });
             setProductOptions(productOptionsValue);
+            setIsAllNeededDataLoaded(true);
         };
         setShowDetailDesc(original.detail_desc_on_off === '있음');
-    }, [allProductClassList, allProducts, loadAllProductClassList, loadAllProducts, productClassState, productOptions, productState, setProductOptions, original.detail_desc_on_off]);
+    }, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions, original.detail_desc_on_off]);
 
+    if (!isAllNeededDataLoaded)
+        return (
+            <Spin tip="Loading" size="large">
+                <div
+                    style={{
+                        padding: 50,
+                        background: "rgba(0, 0, 0, 0.05)",
+                        borderRadius: 4,
+                    }}
+                >
+                    [Content of quotation] Try to load necessary data
+                </div>
+            </Spin>
+        );
 
     return (
         <Modal

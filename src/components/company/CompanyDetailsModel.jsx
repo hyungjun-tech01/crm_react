@@ -34,26 +34,30 @@ const CompanyDetailsModel = ({ openTransaction }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
+
   //===== [RecoilState] Related with Company ==========================================
   const selectedCompany = useRecoilValue(atomCurrentCompany);
   const { modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
 
+
   //===== [RecoilState] Related with Purchase =========================================
-  const [purchaseState, setPurchaseState] = useRecoilState(atomPurchaseState);
+  const purchaseState = useRecoilValue(atomPurchaseState);
+  const { tryLoadAllPurchases } = useRecoilValue(PurchaseRepo);
   const allPurchases = useRecoilValue(atomAllPurchases);
-  const { loadAllPurchases } = useRecoilValue(PurchaseRepo);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
+
   //===== [RecoilState] Related with Transaction ======================================
-  const [transactionState, setTransactionState] =
-    useRecoilState(atomTransactionState);
+  const transactionState = useRecoilValue(atomTransactionState);
+  const { tryLoadAllTransactions } = useRecoilValue(TransactionRepo);
   const allTransactions = useRecoilValue(atomAllTransactions);
-  const { loadAllTransactions } = useRecoilValue(TransactionRepo);
+
 
   //===== [RecoilState] Related with Users ============================================
   const userState = useRecoilValue(atomUserState);
   const engineerForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
+
 
   //===== Handles to deal this component ==============================================
   const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
@@ -65,6 +69,7 @@ const CompanyDetailsModel = ({ openTransaction }) => {
     if (checked) localStorage.setItem("isFullScreen", "1");
     else localStorage.setItem("isFullScreen", "0");
   }, []);
+
 
   //===== Handles to edit 'Company Details' ============================================
   const [editedDetailValues, setEditedDetailValues] = useState(null);
@@ -306,12 +311,9 @@ const CompanyDetailsModel = ({ openTransaction }) => {
 
   //===== useEffect for Purchase =======================================================
   useEffect(() => {
-    console.log("[CompanyDetailModel] useEffect / Purchase");
-    if ((purchaseState & 3) === 0) {
-      console.log("[CompanyDetailsModel] start loading pruchase");
-      setPurchaseState(2);
-      loadAllPurchases();
-    } else {
+    tryLoadAllPurchases();
+    if ((purchaseState & 1) === 1) {
+      console.log("[CompanyDetailModel] useEffect / Purchase");
       const tempCompanyPurchases = allPurchases.filter(
         (purchase) => purchase.company_code === selectedCompany.company_code
       );
@@ -338,11 +340,8 @@ const CompanyDetailsModel = ({ openTransaction }) => {
 
   //===== useEffect for Transaction ====================================================
   useEffect(() => {
-    if ((transactionState & 3) === 0) {
-      console.log("[CompanyDetailsModel] start loading transaction");
-      setTransactionState(2);
-      loadAllTransactions();
-    } else {
+    tryLoadAllTransactions();
+    if ((transactionState & 1) === 1) {
       const tempCompanyTransactions = allTransactions.filter(
         (transaction) =>
           transaction.company_name === selectedCompany.company_name
@@ -361,6 +360,7 @@ const CompanyDetailsModel = ({ openTransaction }) => {
 
   //===== useEffect for User ==========================================================
   useEffect(() => {
+    console.log('[CompanyDetailsModel] useEffect / userState :', userState);
     if ((userState & 1) === 1) {
       setIsAllNeededDataLoaded(true);
     }
@@ -376,7 +376,7 @@ const CompanyDetailsModel = ({ openTransaction }) => {
             borderRadius: 4,
           }}
         >
-          Try to load necessary data
+          [CompanyDetailsModel] Try to load necessary data
         </div>
       </Spin>
     );

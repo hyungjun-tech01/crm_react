@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Space, Switch, Table } from "antd";
+import { Space, Spin, Switch, Table } from "antd";
 import { Add } from "@mui/icons-material";
 
 import {
@@ -18,8 +18,7 @@ import {
   defaultMAContract,
 } from "../../atoms/atoms";
 import { PurchaseRepo } from "../../repository/purchase";
-import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
-import { ProductClassListRepo, ProductRepo, ProductTypeOptions } from "../../repository/product";
+import { ProductTypeOptions } from "../../repository/product";
 import { ContractTypes, MAContractRepo } from "../../repository/ma_contract";
 
 import DetailCardItem from "../../constants/DetailCardItem";
@@ -40,18 +39,14 @@ const PurchaseDetailsModel = (props) => {
 
 
   //===== [RecoilState] Related with Company ==========================================
-  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
+  const companyState = useRecoilValue(atomCompanyState);
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
   //===== [RecoilState] Related with Product ==========================================
   const productClassState = useRecoilValue(atomProductClassListState);
-  const allProductClassList = useRecoilValue(atomProductClassList);
-  const { loadAllProductClassList } = useRecoilValue(ProductClassListRepo);
   const productState = useRecoilValue(atomProductsState);
-  const allProducts = useRecoilValue(atomAllProducts);
-  const { loadAllProducts } = useRecoilValue(ProductRepo);
-  const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
+  const productOptions = useRecoilValue(atomProductOptions);
 
 
   //===== [RecoilState] Related with MA Contract ======================================
@@ -72,6 +67,7 @@ const PurchaseDetailsModel = (props) => {
 
 
   //===== Handles to edit 'Purchase Details' ==========================================
+  const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
   const [editedDetailValues, setEditedDetailValues] = useState({});
 
   const handleDetailChange = useCallback((e) => {
@@ -335,46 +331,30 @@ const PurchaseDetailsModel = (props) => {
     };
   }, [selected, loadPurchaseMAContracts]);
 
-  useEffect(() => {
-    tryLoadAllCompanies()
-  }, []);
 
   useEffect(() => {
-    console.log('[PurchaseAddModel] useEffect / Production');
-    if ((productClassState & 1) === 0) {
-      console.log('[PurchaseAddModel] loadAllProductClassList');
-      loadAllProductClassList();
+    if (((companyState & 1) === 1)
+      && ((productClassState & 1) === 1)
+      && ((productState & 1) === 1)
+    ) {
+      setIsAllNeededDataLoaded(true);
     };
-    if ((productState & 1) === 0) {
-      console.log('[PurchaseAddModel] loadAllProducts');
-      loadAllProducts();
-    };
-    if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
-      console.log('[PurchaseAddModel] set companies for selection');
-      const productOptionsValue = allProductClassList.map(proClass => {
-        const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
-        const subOptions = foundProducts.map(item => {
-          return {
-            label: <span>{item.product_name}</span>,
-            value: { product_code: item.product_code,
-              product_name: item.product_name,
-              product_class_name: item.product_class_name,
-              detail_desc: item.detail_desc,
-              cost_price: item.const_price,
-              reseller_price: item.reseller_price,
-              list_price: item.list_price,
-          }
-          }
-        });
-        return {
-          label: <span>{proClass.product_class_name}</span>,
-          title: proClass.product_class_name,
-          options: subOptions,
-        };
-      });
-      setProductOptions(productOptionsValue);
-    };
-  }, [allProductClassList, allProducts, loadAllProductClassList, loadAllProducts, productClassState, productOptions, productState, setProductOptions]);
+  }, [companyState, productClassState, productState]);
+
+  if (!isAllNeededDataLoaded)
+    return (
+      <Spin tip="Loading" size="large">
+        <div
+          style={{
+            padding: 50,
+            background: "rgba(0, 0, 0, 0.05)",
+            borderRadius: 4,
+          }}
+        >
+          [Show Details of selected Purchase] Try to load necessary data
+        </div>
+      </Spin>
+    );
 
   return (
     <>

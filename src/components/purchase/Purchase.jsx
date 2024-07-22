@@ -10,9 +10,15 @@ import { atomAllPurchases,
   atomCompanyState,
   atomPurchaseState,
   atomAllCompanies,
+  atomProductClassListState,
+  atomProductClassList,
+  atomProductsState,
+  atomAllProducts,
+  atomProductOptions
 } from "../../atoms/atoms";
-import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
+import { CompanyRepo } from "../../repository/company";
 import { PurchaseRepo } from "../../repository/purchase";
+import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 import { ConvertCurrency, compareText, formatDate } from "../../constants/functions";
 
 import PurchaseAddModel from "./PurchaseAddModel";
@@ -25,15 +31,25 @@ const Purchase = () => {
 
   //===== [RecoilState] Related with Company =============================================
   const companyState = useRecoilValue(atomCompanyState);
-  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
+  const { tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
 
 
   //===== [RecoilState] Related with Purchase ============================================
-  const [purchaseState, setPurchaseState] = useRecoilState(atomPurchaseState);
+  const purchaseState = useRecoilValue(atomPurchaseState);
   const allPurchaseData = useRecoilValue(atomAllPurchases);
   const filteredPurchase = useRecoilValue(atomFilteredPurchase);
-  const { loadAllPurchases, filterPurchases } = useRecoilValue(PurchaseRepo);
+  const { tryLoadAllPurchases, filterPurchases } = useRecoilValue(PurchaseRepo);
+  
+
+  //===== [RecoilState] Related with Product =============================================
+  const productClassState = useRecoilValue(atomProductClassListState);
+  const allProductClassList = useRecoilValue(atomProductClassList);
+  const { tryLoadAllProductClassList } = useRecoilValue(ProductClassListRepo);
+  const productState = useRecoilValue(atomProductsState);
+  const allProducts = useRecoilValue(atomAllProducts);
+  const { tryLoadAllProducts } = useRecoilValue(ProductRepo);
+  const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
 
 
   //===== Handles to deal 'Purcahse' ====================================================
@@ -48,7 +64,7 @@ const Purchase = () => {
 
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
-    loadAllPurchases();
+    tryLoadAllPurchases();
 
     setExpaned(false);
     setSearchCondition("");
@@ -134,10 +150,8 @@ const Purchase = () => {
   //===== useEffect functions ==========================================
   useEffect(() => {
     tryLoadAllCompanies();
-    if((purchaseState & 3) === 0) {
-      setPurchaseState(2);
-      loadAllPurchases();
-    };
+    tryLoadAllPurchases();
+
     if(((companyState & 1) === 1) && ((purchaseState & 1) === 1)) {
       setNowLoading(false);
       const modifiedData = allPurchaseData.map(purchase => {
@@ -162,7 +176,38 @@ const Purchase = () => {
       });
       setTableData(modifiedData);
     };
-  }, [companyState, purchaseState, loadAllPurchases, allPurchaseData, allCompanyData]);
+  }, [companyState, purchaseState, allPurchaseData, allCompanyData]);
+
+  // ----- useEffect for Production -----------------------------------
+  useEffect(() => {
+    tryLoadAllProductClassList();
+    tryLoadAllProducts();
+    if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
+        console.log('[Purchase] set product options for selection');
+        const productOptionsValue = allProductClassList.map(proClass => {
+            const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
+            const subOptions = foundProducts.map(item => {
+                return {
+                    label: <span>{item.product_name}</span>,
+                    value: { product_code: item.product_code,
+                        product_name: item.product_name,
+                        product_class_name: item.product_class_name,
+                        detail_desc: item.detail_desc,
+                        cost_price: item.const_price,
+                        reseller_price: item.reseller_price,
+                        list_price: item.list_price,
+                    }
+                }
+            });
+            return {
+                label: <span>{proClass.product_class_name}</span>,
+                title: proClass.product_class_name,
+                options: subOptions,
+            };
+        });
+        setProductOptions(productOptionsValue);
+    };
+}, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions]);
 
 
   return (

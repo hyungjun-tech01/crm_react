@@ -28,22 +28,28 @@ import DetailSubModal from '../../constants/DetailSubModal';
 
 const CompanyPurchaseModel = (props) => {
     const { company, purchases, handlePurchase } = props;
-    const [productClassState, setProductClassState] = useRecoilState(atomProductClassListState);
-    const [productState, setProductState] = useRecoilState(atomProductsState);
+    const { t } = useTranslation();
+    const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+
+
+    //===== [RecoilState] Related with Product ==========================================
+    const productClassState = useRecoilValue(atomProductClassListState);
+    const { tryLoadAllProductClassList } = useRecoilValue(ProductClassListRepo);
+    const allProductClassList = useRecoilValue(atomProductClassList);
+    const productState = useRecoilValue(atomProductsState);
+    const allProducts = useRecoilValue(atomAllProducts);
+    const { tryLoadAllProducts } = useRecoilValue(ProductRepo);
+    const [ productOptions, setProductOptions ] = useRecoilState(atomProductOptions);
+
+
+    //===== [RecoilState] Related with Purchase =========================================
     const currentPurchase = useRecoilValue(atomCurrentPurchase);
     const { modifyPurchase, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
     const companyMAContracts = useRecoilValue(atomMAContractSet);
     const { modifyMAContract } = useRecoilValue(MAContractRepo);
 
-    const allProductClassList = useRecoilValue(atomProductClassList);
-    const { loadAllProductClassList } = useRecoilValue(ProductClassListRepo);
-    const allProducts = useRecoilValue(atomAllProducts);
-    const { loadAllProducts } = useRecoilValue(ProductRepo);
-    const [ productOptions, setProductOptions ] = useRecoilState(atomProductOptions);
 
-    const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
-    const { t } = useTranslation();
-
+    //===== Handles to this =============================================================
     const [ isSubModalOpen, setIsSubModalOpen ] = useState(false);
     const [ subModalSetting, setSubModalSetting] = useState({ title: '' })
 
@@ -53,7 +59,6 @@ const CompanyPurchaseModel = (props) => {
     const [isOtherItemSelected, setIsOtherItemSelected] = useState(false);
 
     const [selectedPurchaseRowKeys, setSelectedPurchaseRowKeys] = useState([]);
-
 
     const handleOtherItemChange = useCallback(e => {
         const tempEdited = {
@@ -525,16 +530,8 @@ const CompanyPurchaseModel = (props) => {
 
     // ----- useEffect for Production -----------------------------------
     useEffect(() => {
-        if ((productClassState & 3) === 0) {
-            console.log('[CompanyPurchaseModel] start loading product class list');
-            setProductClassState(2);
-            loadAllProductClassList();
-        };
-        if ((productState & 3) === 0) {
-            console.log('[CompanyPurchaseModel] start loading product list');
-            setProductState(2);
-            loadAllProducts();
-        };
+        tryLoadAllProductClassList();
+        tryLoadAllProducts();
         if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
             console.log("Check Product Options\n - ", productOptions);
             const productOptionsValue = allProductClassList.map(proClass => {
@@ -560,7 +557,7 @@ const CompanyPurchaseModel = (props) => {
             });
             setProductOptions(productOptionsValue);
         };
-    }, [allProductClassList, allProducts, loadAllProductClassList, loadAllProducts, productClassState, productOptions, productState, setProductOptions]);
+    }, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions]);
 
 
     return (

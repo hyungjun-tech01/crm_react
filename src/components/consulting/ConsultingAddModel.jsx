@@ -27,7 +27,8 @@ import {
 import AddBasicItem from "../../constants/AddBasicItem";
 
 
-const ConsultingAddModel = () => {
+const ConsultingAddModel = (props) => {
+  const { init, handleInit, leadCode } = props;
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId", "myLationCrmUserName"]);
 
@@ -146,9 +147,16 @@ const ConsultingAddModel = () => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
+    if (init) {
+        console.log('[LeadAddModel] initialize!');
+        initializeConsultingTemplate();
+        handleInit(!init);
+    };
+}, [init, handleInit, initializeConsultingTemplate]);
+
+  useEffect(() => {
     if (((leadsState & 1) === 1) && ((userState & 1) === 1)) {
       setIsAllNeededDataLoaded(true);
-      initializeConsultingTemplate();
     };
   }, [leadsState, userState]);
 
@@ -162,7 +170,7 @@ const ConsultingAddModel = () => {
             borderRadius: 4,
           }}
         >
-          Try to load necessary data
+          [Add new consulting] Try to load necessary data
         </div>
       </Spin>
     );

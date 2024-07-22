@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
@@ -12,9 +12,10 @@ import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import LeadDetailsModel from "../leads/LeadDetailsModel";
 
-import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
+import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { QuotationRepo } from "../../repository/quotation";
+import { UserRepo } from "../../repository/user";
 import {
   atomCompanyState,
   atomAllQuotations,
@@ -22,6 +23,7 @@ import {
   atomLeadState,
   atomQuotationState,
 } from "../../atoms/atoms";
+import { atomUserState } from "../../atoms/atomsUser";
 import { compareCompanyName, compareText, ConvertCurrency } from "../../constants/functions";
 
 import { useTranslation } from "react-i18next";
@@ -31,20 +33,25 @@ const Quotations = () => {
 
   //===== [RecoilState] Related with Company ==========================================
   const companyState = useRecoilValue(atomCompanyState);
-  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
+  const { tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
   const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Lead =============================================
-  const [leadState, setLeadState] = useRecoilState(atomLeadState);
-  const { loadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
+  const leadState = useRecoilValue(atomLeadState);
+  const { tryLoadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
 
 
   //===== [RecoilState] Related with Quotation ========================================
-  const [quotationState, setQuotationState] = useRecoilState(atomQuotationState);
+  const quotationState = useRecoilValue(atomQuotationState);
   const allQuotationData = useRecoilValue(atomAllQuotations);
   const filteredQuotation = useRecoilValue(atomFilteredQuotation);
-  const { loadAllQuotations, setCurrentQuotation, filterQuotations } = useRecoilValue(QuotationRepo);
+  const { tryLoadAllQuotations, setCurrentQuotation, filterQuotations } = useRecoilValue(QuotationRepo);
+
+
+  //===== [RecoilState] Related with Lead =============================================
+  const userState = useRecoilValue(atomUserState);
+  const { tryLoadAllUsers } = useRecoilValue(UserRepo);
 
 
   //===== Handles to edit this ========================================================
@@ -59,7 +66,7 @@ const Quotations = () => {
 
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
-    loadAllQuotations();
+    tryLoadAllQuotations();
 
     setExpaned(false);
     setSearchCondition("");
@@ -209,21 +216,18 @@ const Quotations = () => {
 
   useEffect(() => {
     tryLoadAllCompanies();
-    if ((leadState & 3) === 0) {
-      setLeadState(2);
-      loadAllLeads();
-    };
-    if ((quotationState & 3) === 0) {
-      setQuotationState(2);
-      loadAllQuotations();
-    };
+    tryLoadAllLeads();
+    tryLoadAllQuotations();
+    tryLoadAllUsers();
+    
     if(((companyState & 1) === 1)
       && ((leadState & 1) === 1)
       && ((quotationState & 1) === 1)
+      && ((userState & 1) === 1)
     ){
       setNowLoading(false);
     };
-  }, [companyState, leadState, quotationState]);
+  }, [companyState, leadState, quotationState, userState]);
 
   return (
     <HelmetProvider>
@@ -350,7 +354,6 @@ const Quotations = () => {
           {/* /Content End */}
         </div>
         {/* /Page Content */}
-        <QuotationAddModel init={initAddNewQuotation} handleInit={setInitAddNewQuotation} />
         {/* modal */}
         {/* cchange pipeline stage Modal */}
         <div className="modal" id="pipeline-stage">
@@ -399,6 +402,7 @@ const Quotations = () => {
         <SystemUserModel />
         <CompanyDetailsModel />
         <LeadDetailsModel />
+        <QuotationAddModel init={initAddNewQuotation} handleInit={setInitAddNewQuotation} />
         <QuotationDetailsModel />
       </div>
     </HelmetProvider>

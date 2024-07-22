@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useTranslation } from "react-i18next";
+import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Table } from "antd";
@@ -9,7 +10,7 @@ import "../antdstyle.css";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
 
-import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
+import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
 import {
   atomAllTransactions,
@@ -18,10 +19,11 @@ import {
   atomTransactionState,
   defaultTransaction,
 } from "../../atoms/atoms";
+import { atomUserState } from "../../atoms/atomsUser";
+import { UserRepo } from "../../repository/user";
 import { compareCompanyName , compareText, ConvertCurrency } from "../../constants/functions";
 import TransactionEditModel from "./TransactionEditModel";
 import TransactionEditBillModel from "./TransactionEditBillModel";
-import { useTranslation } from "react-i18next";
 
 
 const Transactions = () => {
@@ -29,16 +31,20 @@ const Transactions = () => {
 
   //===== [RecoilState] Related with Company ==========================================
   const companyState = useRecoilValue(atomCompanyState);
-  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
+  const { tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
   const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Transaction ======================================
-  const [transactionState, setTransactionState] = useRecoilState(atomTransactionState);
+  const transactionState = useRecoilValue(atomTransactionState);
   const allTransactionData = useRecoilValue(atomAllTransactions);
   const filteredTransaction= useRecoilValue(atomFilteredTransaction);
-  const { loadAllTransactions, setCurrentTransaction , filterTransactions} = useRecoilValue(TransactionRepo);
+  const { tryLoadAllTransactions, setCurrentTransaction , filterTransactions} = useRecoilValue(TransactionRepo);
 
+
+  //===== [RecoilState] Related with User =============================================
+  const userState = useRecoilValue(atomUserState);
+  const { tryLoadAllUsers } = useRecoilValue(UserRepo);
 
   //===== Handles to edit this ========================================================
   const [ nowLoading, setNowLoading ] = useState(true);
@@ -54,7 +60,7 @@ const Transactions = () => {
 
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
-    loadAllTransactions();
+    tryLoadAllTransactions();
 
     setExpaned(false);
     setSearchCondition("");
@@ -158,17 +164,16 @@ const Transactions = () => {
 
   useEffect(() => {
     tryLoadAllCompanies();
+    tryLoadAllTransactions();
+    tryLoadAllUsers();
 
-    if((transactionState & 3) === 0) {
-      setTransactionState(2);
-      loadAllTransactions();
-    };
     if(((companyState & 1) === 1)
       && ((transactionState & 1) === 1)
+      && ((userState & 1) === 1)
     ){
       setNowLoading(false);
     };
-  }, [ companyState, transactionState]);
+  }, [ companyState, transactionState, userState ]);
 
   return (
     <HelmetProvider>

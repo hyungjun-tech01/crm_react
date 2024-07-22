@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "antd/dist/reset.css";
-import { Checkbox, InputNumber, Space, Table } from 'antd';
+import { Checkbox, InputNumber, Space, Spin, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
-import { AddBoxOutlined, ModeEdit, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
+import { AddBoxOutlined, IndeterminateCheckBoxOutlined } from '@mui/icons-material';
 import { option_locations } from '../../constants/constants';
 
 import {
@@ -19,8 +19,6 @@ import {
   atomUsersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
-import { UserRepo } from '../../repository/user';
-import { LeadRepo } from "../../repository/lead";
 import { QuotationRepo, QuotationTypes, QuotationSendTypes } from "../../repository/quotation";
 
 import AddBasicItem from "../../constants/AddBasicItem";
@@ -46,17 +44,16 @@ const QuotationAddModel = (props) => {
   //===== [RecoilState] Related with Lead ============================================
   const leadsState = useRecoilValue(atomLeadState);
   const leadsForSelection = useRecoilValue(atomLeadsForSelection);
-  const { loadAllLeads } = useRecoilValue(LeadRepo);
 
 
   //===== [RecoilState] Related with Users ===========================================
-  const [userState, setUserState] = useRecoilState(atomUserState);
-  const { loadAllUsers } = useRecoilValue(UserRepo)
+  const userState = useRecoilValue(atomUserState);
   const usersForSelection = useRecoilValue(atomUsersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
 
   //===== Handles to edit 'QuotationAddModel' ========================================
+  const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
   const [quotationChange, setQuotationChange] = useState({ ...defaultQuotation });
   const [quotationContents, setQuotationContents] = useState([]);
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
@@ -719,25 +716,33 @@ const QuotationAddModel = (props) => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    if ((userState & 3) === 0) {
-      const tempUserState = userState | (1 << 1); //change it to pending state
-      setUserState(tempUserState);
-      loadAllUsers();
+    if (init) {
+      initializeQuotationTemplate();
     } else {
-      if (init) {
-        initializeQuotationTemplate();
-      } else {
-        if (handleInit) handleInit(!init);
-      };
+      if (handleInit) handleInit(!init);
     };
-  }, [handleInit, init, initializeQuotationTemplate, loadAllUsers, userState]);
+  }, [handleInit, init, initializeQuotationTemplate]);
 
   useEffect(() => {
-    if ((leadsState & 1) === 0) {
-      loadAllLeads();
+    if (((leadsState & 1) === 1) && ((userState & 1) === 1)) {
+      setIsAllNeededDataLoaded(true);
     };
-  }, [leadsState, loadAllLeads]);
-  
+  }, [leadsState, userState]);
+
+  if (!isAllNeededDataLoaded)
+    return (
+      <Spin tip="Loading" size="large">
+        <div
+          style={{
+            padding: 50,
+            background: "rgba(0, 0, 0, 0.05)",
+            borderRadius: 4,
+          }}
+        >
+          [Show Details of selected Lead] Try to load necessary data
+        </div>
+      </Spin>
+    );
 
   return (
     <div

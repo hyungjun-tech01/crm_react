@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Collapse, Space, Switch } from "antd";
+import { Collapse, Space, Spin, Switch } from "antd";
 import { atomCurrentQuotation,
   defaultQuotation,
   atomQuotationState,
@@ -19,7 +19,6 @@ import { atomUserState,
 } from '../../atoms/atomsUser';
 import { QuotationRepo, QuotationSendTypes, QuotationTypes } from "../../repository/quotation";
 import { ProductClassListRepo, ProductRepo } from "../../repository/product";
-import { UserRepo } from '../../repository/user';
 
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
@@ -37,28 +36,29 @@ const QuotationDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Quotation ========================================
-  const [quotationState, setQuotationState] = useRecoilState(atomQuotationState);
+  const quotationState = useRecoilValue(atomQuotationState);
   const selectedQuotation = useRecoilValue(atomCurrentQuotation);
   const { modifyQuotation, setCurrentQuotation } = useRecoilValue(QuotationRepo);
 
+  
   //===== [RecoilState] Related with Product ==========================================
-  const [productClassState, setProductClassState] = useRecoilState(atomProductClassListState);
+  const productClassState = useRecoilValue(atomProductClassListState);
   const allProductClassList = useRecoilValue(atomProductClassList);
-  const { loadAllProductClassList } = useRecoilValue(ProductClassListRepo);
-  const [productState, setProductState] = useRecoilState(atomProductsState);
+  const productState = useRecoilValue(atomProductsState);
   const allProducts = useRecoilValue(atomAllProducts);
-  const { loadAllProducts } = useRecoilValue(ProductRepo);
   const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
+  const { tryLoadAllProductClassList } = useRecoilValue(ProductClassListRepo);
+  const { tryLoadAllProducts } = useRecoilValue(ProductRepo);
 
 
   //===== [RecoilState] Related with Users ============================================
-  const [userState, setUserState] = useRecoilState(atomUserState);
-  const { loadAllUsers } = useRecoilValue(UserRepo)
+  const userState = useRecoilValue(atomUserState);
   const usersForSelection = useRecoilValue(atomUsersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
 
   //===== Handles to deal this component ==============================================
+  const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
   const [ isFullScreen, setIsFullScreen ] = useState(false);
   const [ currentQuotationCode, setCurrentQuotationCode ] = useState('');
 
@@ -397,7 +397,6 @@ const QuotationDetailsModel = () => {
   useEffect(() => {
     if((selectedQuotation !== defaultQuotation)
       && (selectedQuotation.quotation_code !== currentQuotationCode)
-    && ((quotationState & 1) === 1)
     ){
       console.log('[QuotationDetailsModel] useEffect / quotation!');
 
@@ -437,27 +436,17 @@ const QuotationDetailsModel = () => {
     setCurrentQuotationCode(selectedQuotation.quotation_code);
   }, [selectedQuotation, editedDetailValues, currentQuotationCode, quotationState]);
 
-  useEffect(() => {
-    if ((userState & 3) === 0) {
-      setUserState(2);
-      loadAllUsers();
-    }
-  }, [loadAllUsers, userState]);
 
   // ----- useEffect for Production -----------------------------------
   useEffect(() => {
-    console.log('[PurchaseAddModel] useEffect / Production');
-    if ((productClassState & 3) === 0) {
-        console.log('[QuotationDetailsModel] loadAllProductClassList');
-        setProductClassState(2);
-        loadAllProductClassList();
-    };
-    if ((productState & 3) === 0) {
-        console.log('[QuotationDetailsModel] loadAllProducts');
-        setProductState(2);
-        loadAllProducts();
-    };
-    if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
+    tryLoadAllProductClassList();
+    tryLoadAllProducts();
+    if (((userState & 1) === 1)
+      && ((quotationState & 1) === 1)
+      && ((productClassState & 1) === 1)
+      && ((productState & 1) === 1)
+    ) {
+      if((productOptions.length === 0)) {
         console.log('[PurchaseAddModel] set companies for selection');
         const productOptionsValue = allProductClassList.map(proClass => {
             const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
@@ -481,8 +470,27 @@ const QuotationDetailsModel = () => {
             };
         });
         setProductOptions(productOptionsValue);
+      }
+        
+      console.log('[QuotationDetailsModel] all needed data is loaded');
+      setIsAllNeededDataLoaded(true);
     };
-}, [allProductClassList, allProducts, loadAllProductClassList, loadAllProducts, productClassState, productOptions, productState, setProductOptions]);
+}, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions, userState, quotationState]);
+
+if (!isAllNeededDataLoaded)
+  return (
+    <Spin tip="Loading" size="large">
+      <div
+        style={{
+          padding: 50,
+          background: "rgba(0, 0, 0, 0.05)",
+          borderRadius: 4,
+        }}
+      >
+        [Show Details of selected Lead] Try to load necessary data
+      </div>
+    </Spin>
+  );
 
   return (
     <>

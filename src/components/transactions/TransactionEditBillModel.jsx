@@ -5,7 +5,7 @@ import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "antd/dist/reset.css";
-import { Checkbox, Input, Table } from 'antd';
+import { Checkbox, Input, Spin, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import DatePicker from "react-datepicker";
@@ -16,7 +16,7 @@ import {
   atomCompanyState,
   atomCompanyForSelection,
 } from "../../atoms/atoms";
-import { CompanyStateRepo } from "../../repository/company";
+import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
 
 import { ConvertCurrency } from "../../constants/functions";
@@ -83,7 +83,6 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
 
   //===== [RecoilState] Related with Company =========================================
   const companyState = useRecoilValue(atomCompanyState);
-  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
@@ -321,7 +320,6 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
   useEffect(() => {
     if(!open) return;
 
-    tryLoadAllCompanies();
     if ((companyState & 1) === 1) {
       if(data) {
         console.log('[TransactionEditBillModel] called! :', data);
@@ -426,7 +424,9 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
 
   }, [contents, data, companyState]);
 
-  if(!open) return;
+  if(!open) return (
+      <div>&nbsp;</div>
+  );
 
   return (
     <div

@@ -11,9 +11,13 @@ import { TransactionRepo } from "../../repository/transaction";
 
 const CompanyTransactionModel = (props) => {
     const { transactions, openTransaction } = props;
-    const { setCurrentTransaction } = useRecoilValue(TransactionRepo);
     const { t } = useTranslation();
 
+
+    //===== [RecoilState] Related with Transaction ======================================
+    const { setCurrentTransaction } = useRecoilValue(TransactionRepo);
+
+    
     // --- Variables for only Transaction ------------------------------------------------
     const [selectedTransactionRowKeys, setSelectedTransactionRowKeys] = useState([]);
 

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Spin, Switch } from "antd";
@@ -18,7 +18,6 @@ import {
   ConsultingTimeTypes,
   ProductTypes
 } from "../../repository/consulting";
-import { UserRepo } from "../../repository/user";
 
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
@@ -37,7 +36,6 @@ const ConsultingDetailsModel = () => {
 
   //===== [RecoilState] Related with Users ==========================================
   const userState = useRecoilValue(atomUserState);
-  const { loadAllUsers } = useRecoilValue(UserRepo)
   const usersForSelection = useRecoilValue(atomUsersForSelection);
   const engineersForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
@@ -156,7 +154,6 @@ const ConsultingDetailsModel = () => {
   useEffect(() => {
     if((selectedConsulting !== defaultConsulting)
       && (selectedConsulting.consulting_code !== currentConsultingCode)
-      && ((consultingState & 1) === 1)
     ){
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if(detailViewStatus === null){
@@ -173,10 +170,10 @@ const ConsultingDetailsModel = () => {
   }, [consultingState, cookies.myLationCrmUserId, currentConsultingCode, selectedConsulting]);
 
   useEffect(() => {
-    if ((userState & 1) === 1) {
+    if (((userState & 1) === 1) && ((consultingState & 1) === 1)) {
       setIsAllNeededDataLoaded(true);
     };
-  }, [userState])
+  }, [userState, consultingState])
 
   if (!isAllNeededDataLoaded)
     return (
@@ -188,7 +185,7 @@ const ConsultingDetailsModel = () => {
             borderRadius: 4,
           }}
         >
-          Try to load necessary data
+          [Show details of selected consulting] Try to load necessary data
         </div>
       </Spin>
     );

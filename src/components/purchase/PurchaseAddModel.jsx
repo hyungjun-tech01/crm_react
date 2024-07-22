@@ -1,25 +1,23 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
-import { Table } from 'antd';
+import { Spin, Table } from 'antd';
 import { ItemRender, ShowTotal } from "../paginationfunction";
 
 import {
+    atomCompanyState,
     atomCompanyForSelection,
     defaultPurchase,
     atomCurrentPurchase,
-    atomProductClassList,
+    defaultMAContract,
     atomProductClassListState,
-    atomAllProducts,
     atomProductsState,
     atomProductOptions,
-    defaultMAContract,
 } from '../../atoms/atoms';
-import { CompanyStateRepo } from '../../repository/company';
 import { PurchaseRepo } from '../../repository/purchase';
+import { ProductRepo } from '../../repository/product';
 import { MAContractRepo, ContractTypes } from "../../repository/ma_contract";
-import { ProductClassListRepo, ProductRepo, ProductTypeOptions } from '../../repository/product';
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import DetailSubModal from '../../constants/DetailSubModal';
@@ -34,7 +32,7 @@ const PurchaseAddModel = (props) => {
 
 
     //===== [RecoilState] Related with Company =============================================
-    const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
+    const companyState = useRecoilValue(atomCompanyState);
     const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
@@ -43,25 +41,22 @@ const PurchaseAddModel = (props) => {
     const { modifyPurchase, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
 
 
-    //===== [RecoilState] Related with Product =============================================
-    const productClassState = useRecoilValue(atomProductClassListState);
-    const allProductClassList = useRecoilValue(atomProductClassList);
-    const { loadAllProductClassList } = useRecoilValue(ProductClassListRepo);
-    const productState = useRecoilValue(atomProductsState);
-    const allProducts = useRecoilValue(atomAllProducts);
-    const { loadAllProducts } = useRecoilValue(ProductRepo);
-    const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
-
-
     //===== [RecoilState] Related with MA Contract =========================================
     const { modifyMAContract, setCurrentMAContract } = useRecoilValue(MAContractRepo);
 
 
+    //===== [RecoilState] Related with Product =============================================
+    const productClassState = useRecoilValue(atomProductClassListState);
+    const productState = useRecoilValue(atomProductsState);
+    const productOptions = useRecoilValue(atomProductOptions);
+    const { ProductTypeOptions } = useRecoilValue(ProductRepo);
+
     //===== Handles to edit 'Purchase Add' =================================================
-    const [ addChange, setAddChange ] = useState({});
-    const [ companyData, setCompanyData ] = useState({ company_name: '', company_code: '' });
-    const [ needInit, setNeedInit ] = useState(false);
-    
+    const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
+    const [addChange, setAddChange] = useState({});
+    const [companyData, setCompanyData] = useState({ company_name: '', company_code: '' });
+    const [needInit, setNeedInit] = useState(false);
+
     const initializeAddTemplate = useCallback(() => {
         setCurrentPurchase();   // initialize current purchase
         setAddChange({
@@ -135,7 +130,7 @@ const PurchaseAddModel = (props) => {
         console.log(`[ handleAddNewPurchase ]`, newPurchaseData);
         const res_data = modifyPurchase(newPurchaseData);
         res_data.then((res) => {
-            if(res.result) {
+            if (res.result) {
                 setCurrentPurchase(res.code);
                 setNeedInit(true);
             } else {
@@ -146,13 +141,13 @@ const PurchaseAddModel = (props) => {
 
 
     //===== Handles to edit 'MA contract' =================================================
-    const [ isSubModalOpen, setIsSubModalOpen ] = useState(false);
-    const [ subModalSetting, setSubModalSetting ] = useState({ title: '' })
-    const [ contractLists, setContractLists ] = useState([]);
-    const [ selectedMAContractRowKeys, setSelectedMAContractRowKeys ] = useState([]);
-    const [ orgSubModalValues, setOrgSubModalValues ] = useState({});
-    const [ editedSubModalValues, setEditedSubModalValues ] = useState({});
-    
+    const [isSubModalOpen, setIsSubModalOpen] = useState(false);
+    const [subModalSetting, setSubModalSetting] = useState({ title: '' })
+    const [contractLists, setContractLists] = useState([]);
+    const [selectedMAContractRowKeys, setSelectedMAContractRowKeys] = useState([]);
+    const [orgSubModalValues, setOrgSubModalValues] = useState({});
+    const [editedSubModalValues, setEditedSubModalValues] = useState({});
+
     const columns_ma_contract = [
         {
             title: t('contract.contract_date'),
@@ -201,7 +196,7 @@ const PurchaseAddModel = (props) => {
             className: "checkbox-red",
         }),
     };
-    
+
     const ma_contract_items = [
         { name: 'ma_contract_date', title: t('contract.contract_date'), detail: { type: 'date' } },
         { name: 'ma_finish_date', title: t('contract.end_date'), detail: { type: 'date' } },
@@ -215,7 +210,7 @@ const PurchaseAddModel = (props) => {
             ...orgSubModalValues,
             ...editedSubModalValues,
         };
-        if(!finalData.ma_finish_date) {
+        if (!finalData.ma_finish_date) {
             console.error('[PurchaseAddModel] no end date!');
             return;
         };
@@ -227,8 +222,8 @@ const PurchaseAddModel = (props) => {
                 setContractLists(updatedContracts);
 
                 // Update MA Contract end date
-                if(currentPurchase.purchase_code
-                    && (!currentPurchase.ma_finish_date || (new Date(currentPurchase.ma_finish_date) < finalData.ma_finish_date))){
+                if (currentPurchase.purchase_code
+                    && (!currentPurchase.ma_finish_date || (new Date(currentPurchase.ma_finish_date) < finalData.ma_finish_date))) {
                     const modifiedPurchase = {
                         ...currentPurchase,
                         ma_finish_date: finalData.ma_finish_date,
@@ -237,7 +232,7 @@ const PurchaseAddModel = (props) => {
                     };
                     const res_data = modifyPurchase(modifiedPurchase);
                     res_data.then(res => {
-                        if(res.result){
+                        if (res.result) {
                             console.log('Succeeded to update MA end date');
                             const updateAddChange = {
                                 ...addChange,
@@ -309,46 +304,28 @@ const PurchaseAddModel = (props) => {
     }, [init, handleInit, initializeAddTemplate]);
 
     useEffect(() => {
-        tryLoadAllCompanies();
-    },[]);
+        if (((companyState & 1) === 1)
+            && ((productClassState & 1) === 1)
+            && ((productState & 1) === 1)
+        ) {
+            setIsAllNeededDataLoaded(true);
+        };
+    }, [companyState, productClassState, productState]);
 
-    // ----- useEffect for Production -----------------------------------
-    useEffect(() => {
-        console.log('[PurchaseAddModel] useEffect / Production');
-        if ((productClassState & 1) === 0) {
-            console.log('[PurchaseAddModel] loadAllProductClassList');
-            loadAllProductClassList();
-        };
-        if ((productState & 1) === 0) {
-            console.log('[PurchaseAddModel] loadAllProducts');
-            loadAllProducts();
-        };
-        if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
-            console.log('[PurchaseAddModel] set companies for selection');
-            const productOptionsValue = allProductClassList.map(proClass => {
-                const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
-                const subOptions = foundProducts.map(item => {
-                    return {
-                        label: <span>{item.product_name}</span>,
-                        value: { product_code: item.product_code,
-                            product_name: item.product_name,
-                            product_class_name: item.product_class_name,
-                            detail_desc: item.detail_desc,
-                            cost_price: item.const_price,
-                            reseller_price: item.reseller_price,
-                            list_price: item.list_price,
-                        }
-                    }
-                });
-                return {
-                    label: <span>{proClass.product_class_name}</span>,
-                    title: proClass.product_class_name,
-                    options: subOptions,
-                };
-            });
-            setProductOptions(productOptionsValue);
-        };
-    }, [allProductClassList, allProducts, loadAllProductClassList, loadAllProducts, productClassState, productOptions, productState, setProductOptions]);
+    if (!isAllNeededDataLoaded)
+        return (
+            <Spin tip="Loading" size="large">
+                <div
+                    style={{
+                        padding: 50,
+                        background: "rgba(0, 0, 0, 0.05)",
+                        borderRadius: 4,
+                    }}
+                >
+                    [Show Details of selected Purchase] Try to load necessary data
+                </div>
+            </Spin>
+        );
 
     return (
         <div
@@ -519,14 +496,14 @@ const PurchaseAddModel = (props) => {
                                         />
                                     </div>
                                     <div className="text-center py-3">
-                                        { needInit ? 
+                                        {needInit ?
                                             <button
                                                 type="button"
                                                 className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
                                                 onClick={initializeAddTemplate}
                                             >
                                                 {t('common.initialize')}
-                                                </button>
+                                            </button>
                                             :
                                             <button
                                                 type="button"
@@ -548,7 +525,7 @@ const PurchaseAddModel = (props) => {
                                 </form>
                             </div>
                         </div>
-                        { (currentPurchase.purchase_code) &&
+                        {(currentPurchase.purchase_code) &&
                             <div className="row">
                                 <div className="card mb-0">
                                     <div className="table-body">

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
@@ -13,10 +13,10 @@ import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import LeadDetailsModel from "../leads/LeadDetailsModel";
 import ConsultingAddModel from "./ConsultingAddModel";
 import "react-datepicker/dist/react-datepicker.css";
-import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
-import { LeadStateRepo, LeadRepo } from "../../repository/lead";
-import { ConsultingRepo, ConsultingStateRepo } from "../../repository/consulting";
-import { UserStateRepo } from "../../repository/user";
+import { CompanyRepo } from "../../repository/company";
+import { LeadRepo } from "../../repository/lead";
+import { ConsultingRepo } from "../../repository/consulting";
+import { UserRepo } from "../../repository/user";
 import {
   atomCompanyState,
   atomAllConsultings,
@@ -33,31 +33,30 @@ const Consultings = () => {
 
   //===== [RecoilState] Related with Consulting =======================================
   const consultingState = useRecoilValue(atomConsultingState);
-  const { tryLoadAllConsultings } = useRecoilValue(ConsultingStateRepo);
   const allConsultingData = useRecoilValue(atomAllConsultings);
   const filteredConsulting = useRecoilValue(atomFilteredConsulting);
-  const { loadAllConsultings, setCurrentConsulting, filterConsultingOri } = useRecoilValue(ConsultingRepo);
+  const { tryLoadAllConsultings, loadAllConsultings, setCurrentConsulting, filterConsultingOri } = useRecoilValue(ConsultingRepo);
 
 
   //===== [RecoilState] Related with Company ==========================================
   const companyState = useRecoilValue(atomCompanyState);
-  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
+  const { tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
   const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Lead =============================================
   const leadState = useRecoilValue(atomLeadState);
-  const { tryLoadAllLeads } = useRecoilValue(LeadStateRepo);
-  const { setCurrentLead } = useRecoilValue(LeadRepo);
+  const { tryLoadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
 
 
   //===== [RecoilState] Related with User =============================================
   const userState = useRecoilValue(atomLeadState);
-  const { tryLoadAllUsers } = useRecoilValue(UserStateRepo);
+  const { tryLoadAllUsers } = useRecoilValue(UserRepo);
 
 
   //===== Handles to deal 'Consultings' ========================================
   const [ nowLoading, setNowLoading ] = useState(true);
+  const [initAddConsulting, setInitAddConsulting] = useState(false);
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
   const [statusSearch, setStatusSearch] = useState('common.all');
@@ -77,6 +76,7 @@ const Consultings = () => {
   // --- Functions used for Add New Consulting ------------------------------
   const handleAddNewConsultingClicked = useCallback(() => {
     setCurrentLead(defaultLead);
+    setInitAddConsulting(true);
   }, [defaultLead]);
 
   // --- Section for Table ------------------------------
@@ -311,7 +311,7 @@ const Consultings = () => {
         <CompanyDetailsModel />
         <LeadDetailsModel />
         <ConsultingDetailsModel />
-        <ConsultingAddModel />
+        <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} />
       </div>
     </HelmetProvider>
   );

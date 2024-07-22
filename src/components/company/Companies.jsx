@@ -6,10 +6,10 @@ import { useTranslation } from "react-i18next";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
-import { CompanyRepo, CompanyStateRepo } from "../../repository/company";
+import { CompanyRepo } from "../../repository/company";
 import { atomAllCompanies, atomCompanyState, atomFilteredCompany } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
-import { UserStateRepo } from '../../repository/user';
+import { UserRepo } from '../../repository/user';
 
 import CompanyAddModel from "./CompanyAddMdel";
 import CompanyDetailsModel from "./CompanyDetailsModel";
@@ -17,6 +17,7 @@ import MultiQueryModal from "../../constants/MultiQueryModal";
 import { companyColumn } from "../../repository/company";
 import TransactionEditModel from "../transactions/TransactionEditModel";
 import TransactionEditBillModel from "../transactions/TransactionEditBillModel";
+import { atomUserState } from "../../atoms/atomsUser";
 
 // import { MoreVert } from '@mui/icons-material';
 
@@ -26,14 +27,16 @@ const Companies = () => {
 
   //===== [RecoilState] Related with Company ==========================================
   const [ companyState, setCompanyState] = useRecoilState(atomCompanyState);
-  const { tryLoadAllCompanies } = useRecoilValue(CompanyStateRepo);
+  const { tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
   const { loadAllCompanies, filterCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const filteredCompany = useRecoilValue(atomFilteredCompany);
 
 
   //===== [RecoilState] Related with User =============================================
-  const { tryLoadAllUsers } = useRecoilValue(UserStateRepo);
+  const userState = useRecoilValue(atomUserState);
+  const { tryLoadAllUsers } = useRecoilValue(UserRepo);
+
 
   //===== Handles to this =============================================================
   const [ nowLoading, setNowLoading ] = useState(true);
@@ -109,8 +112,6 @@ const Companies = () => {
       toDate: dates[key].toDate,
       checked: dates[key].checked,
     }));
-
-    console.log("checkedDates", checkedDates);
 
     const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
       label: key,
@@ -202,7 +203,7 @@ const Companies = () => {
       checked: dates[key].checked,
     }));
 
-    console.log("checkedDates", checkedDates);
+    // console.log("checkedDates", checkedDates);
 
     const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
       label: key,
@@ -216,14 +217,14 @@ const Companies = () => {
       singleDate: checkedSingleDates
     }
 
-    loadAllCompanies(multiQueryCondi);
-    //tryLoadAllCompanies();
+    // loadAllCompanies(multiQueryCondi);
+    tryLoadAllCompanies(multiQueryCondi);
     tryLoadAllUsers();
 
     if((companyState & 1) === 1) {
       setNowLoading(false);
     };
-  }, [companyState]);
+  }, [companyState, userState]);
 
   return (
     <HelmetProvider>

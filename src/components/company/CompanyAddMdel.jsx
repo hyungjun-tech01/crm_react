@@ -141,7 +141,7 @@ const CompanyAddModel = (props) => {
             borderRadius: 4,
           }}
         >
-            Try to load necessary data
+            [CompanyAddModel] Try to load necessary data
         </div>
       </Spin>
     );

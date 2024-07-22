@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Avatar, Space, Switch } from "antd";
+import { Avatar, Space, Spin, Switch } from "antd";
 
 import {
   atomCurrentLead, defaultLead,
@@ -15,9 +15,9 @@ import {
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo } from "../../repository/company";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
-import { ConsultingStateRepo } from "../../repository/consulting";
-import { QuotationStateRepo, QuotationRepo } from "../../repository/quotation";
-import { PurchaseStateRepo, PurchaseRepo } from "../../repository/purchase";
+import { ConsultingRepo } from "../../repository/consulting";
+import { QuotationRepo } from "../../repository/quotation";
+import { PurchaseRepo } from "../../repository/purchase";
 import { MAContractRepo } from "../../repository/ma_contract";
 
 import CompanyPurchaseModel from "../company/CompanyPurchaseModel";
@@ -53,25 +53,25 @@ const LeadDetailsModel = () => {
 
   //===== [RecoilState] Related with Purchase =======================================
   const purchaseState = useRecoilValue(atomPurchaseState);
-  const { tryLoadAllPurchases } = useRecoilValue(PurchaseStateRepo)
+  const { tryLoadAllPurchases } = useRecoilValue(PurchaseRepo)
   const allPurchases = useRecoilValue(atomAllPurchases);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
 
   //===== [RecoilState] Related with Consulting =======================================
   const consultingState = useRecoilValue(atomConsultingState);
-  const { tryLoadAllConsultings } = useRecoilValue(ConsultingStateRepo);
+  const { tryLoadAllConsultings } = useRecoilValue(ConsultingRepo);
   const allConsultings = useRecoilValue(atomAllConsultings);
 
 
   //===== [RecoilState] Related with Quotation ========================================
-  const quotationState = useRecoilState(atomQuotationState);
-  const { tryLoadAllQuotations } = useRecoilValue(QuotationStateRepo);
+  const quotationState = useRecoilValue(atomQuotationState);
+  const { tryLoadAllQuotations } = useRecoilValue(QuotationRepo);
   const allQuotations = useRecoilValue(atomAllQuotations);
 
 
   //===== [RecoilState] Related with Users ==========================================
-  const userState = useRecoilState(atomUserState);
+  const userState = useRecoilValue(atomUserState);
   const engineersForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
@@ -247,7 +247,7 @@ const LeadDetailsModel = () => {
 
   //===== Handles to edit 'Consulting Details' ===============================================
   const [consultingsByLead, setConsultingsByLead] = useState([]);
-
+  const [initAddConsulting, setInitAddConsulting] = useState(false);
 
   //===== Handles to edit 'Quotation Details' ===============================================
   const [quotationsByLead, setQuotationsByLead] = useState([]);
@@ -340,13 +340,13 @@ const LeadDetailsModel = () => {
 
   useEffect(() => {
     tryLoadAllQuotations();
-    if ((quotationState & 3) === 0) {
+    if ((quotationState & 1) === 1) {
       const tempQuotationsByLead = allQuotations.filter(item => item.lead_code === selectedLead.lead_code);
       if(quotationsByLead.length !== tempQuotationsByLead.length) {
         setQuotationsByLead(tempQuotationsByLead);
       };
     };
-  }, [allQuotations, quotationState, quotationsByLead.length, selectedLead.lead_code]);
+  }, [allQuotations, quotationState, quotationsByLead, selectedLead.lead_code]);
 
   useEffect(() => {
     if (((companyState & 1) === 1) 
@@ -360,6 +360,20 @@ const LeadDetailsModel = () => {
   }
   }, [userState, companyState, purchaseState, consultingState, quotationState]);
 
+  if (!isAllNeededDataLoaded)
+    return (
+      <Spin tip="Loading" size="large">
+        <div
+          style={{
+            padding: 50,
+            background: "rgba(0, 0, 0, 0.05)",
+            borderRadius: 4,
+          }}
+        >
+          [Show Details of selected Lead] Try to load necessary data
+        </div>
+      </Spin>
+    );
 
   return (
     <>
@@ -597,8 +611,8 @@ const LeadDetailsModel = () => {
         {/* modal-dialog */}
       </div>
       <ConsultingAddModel />
-      <ConsultingDetailsModel />
-      <QuotationAddModel init={initAddQuotation} handleInit={setInitAddQuotation}  leadCode={selectedLead.lead_code} />
+      <ConsultingDetailsModel init={initAddConsulting} handleInit={setInitAddConsulting} leadCode={selectedLead.lead_code}/>
+      <QuotationAddModel init={initAddQuotation} handleInit={setInitAddQuotation} leadCode={selectedLead.lead_code} />
       <QuotationDetailsModel />
     </>
   );
