@@ -77,13 +77,15 @@ const Leads = () => {
   ]);
 
   const today = new Date();
+  const oneYearAgo = new Date();
   const oneMonthAgo = new Date();
   oneMonthAgo.setMonth(today.getMonth() - 1);
+  oneYearAgo.setMonth(today.getMonth() - 12);
 
   // from date + to date picking 만들기 
 
   const initialState = {
-    registration_date: { fromDate: oneMonthAgo, toDate: today, checked: true },
+    registration_date: { fromDate: oneYearAgo, toDate: today, checked: true },
   }
 
   const [dates, setDates] = useState(initialState);
@@ -124,8 +126,8 @@ const Leads = () => {
 
     const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
       label: key,
-      fromDate: dates[key].fromDate,
-      checked: dates[key].checked,
+      fromDate: singleDate[key].fromDate,
+      checked: singleDate[key].checked,
     }));
     
     const multiQueryCondi = {
@@ -134,7 +136,9 @@ const Leads = () => {
       singleDate:checkedSingleDates
     }
 
-    loadAllLeads(multiQueryCondi);
+    console.log('multiQueryCondi',multiQueryCondi);
+    tryLoadAllLeads(multiQueryCondi);   
+    //loadAllLeads(multiQueryCondi);
      
   };
   const handleMultiQueryModalCancel = () => {
@@ -149,7 +153,29 @@ const Leads = () => {
 
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
-    loadAllLeads();
+
+    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+      label: key,
+      fromDate: dates[key].fromDate,
+      toDate: dates[key].toDate,
+      checked: dates[key].checked,
+    }));
+
+
+    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+    label: key,
+    fromDate: singleDate[key].fromDate,
+    checked: singleDate[key].checked,
+    }));
+  
+    const multiQueryCondi = {
+    queryConditions:queryConditions,
+    checkedDates:checkedDates,
+    singleDate:checkedSingleDates
+    }
+    tryLoadAllLeads(multiQueryCondi);    
+
+    //loadAllLeads();
 
     setExpaned(false);
     setSearchCondition("");
@@ -312,27 +338,28 @@ const Leads = () => {
   useEffect(() => {
     tryLoadAllCompanies();
 
-    // const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
-    //   label: key,
-    //   fromDate: dates[key].fromDate,
-    //   toDate: dates[key].toDate,
-    //   checked: dates[key].checked,
-    // }));
+    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+      label: key,
+      fromDate: dates[key].fromDate,
+      toDate: dates[key].toDate,
+      checked: dates[key].checked,
+    }));
 
 
-    // const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
-    // label: key,
-    // fromDate: dates[key].fromDate,
-    // checked: dates[key].checked,
-    // }));
+    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+    label: key,
+    fromDate: singleDate[key].fromDate,
+    checked: singleDate[key].checked,
+    }));
   
-    // const multiQueryCondi = {
-    // queryConditions:queryConditions,
-    // checkedDates:checkedDates,
-    // singleDate:checkedSingleDates
-    // }
+    const multiQueryCondi = {
+    queryConditions:queryConditions,
+    checkedDates:checkedDates,
+    singleDate:checkedSingleDates
+    }
+    tryLoadAllLeads(multiQueryCondi);
     // loadAllLeads(multiQueryCondi);
-    tryLoadAllLeads();
+    // tryLoadAllLeads();
     tryLoadAllUsers();
 
     if(((companyState & 1) === 1)

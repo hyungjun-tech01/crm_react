@@ -115,8 +115,8 @@ const Companies = () => {
 
     const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
       label: key,
-      fromDate: dates[key].fromDate,
-      checked: dates[key].checked,
+      fromDate: singleDate[key].fromDate,
+      checked: singleDate[key].checked,
     }));
 
     const multiQueryCondi = {
@@ -152,8 +152,8 @@ const Companies = () => {
 
     const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
       label: key,
-      fromDate: dates[key].fromDate,
-      checked: dates[key].checked,
+      fromDate: singleDate[key].fromDate,
+      checked: singleDate[key].checked,
     }));
 
     const multiQueryCondi = {
@@ -239,8 +239,8 @@ const Companies = () => {
 
     const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
       label: key,
-      fromDate: dates[key].fromDate,
-      checked: dates[key].checked,
+      fromDate: singleDate[key].fromDate,
+      checked: singleDate[key].checked,
     }));
 
     const multiQueryCondi = {

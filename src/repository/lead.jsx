@@ -105,6 +105,8 @@ export const LeadRepo = selector({
             }
             catch(err){
                 console.error(`loadAllLeads / Error : ${err}`);
+                set(atomAllLeads, []);
+                set(atomLeadsForSelection, []);
                 return false;
             };
         });
