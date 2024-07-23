@@ -533,7 +533,6 @@ const CompanyPurchaseModel = (props) => {
         tryLoadAllProductClassList();
         tryLoadAllProducts();
         if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
-            console.log("Check Product Options\n - ", productOptions);
             const productOptionsValue = allProductClassList.map(proClass => {
                 const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
                 const subOptions = foundProducts.map(item => {

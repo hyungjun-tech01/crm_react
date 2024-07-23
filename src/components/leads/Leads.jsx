@@ -185,6 +185,19 @@ const Leads = () => {
     setInitToAddLead(true);
   }, [setInitToAddLead]);
 
+  const handleClickLeadName = useCallback((leadCode, companyCode) => {
+    console.log("[Lead] set current lead : ", leadCode);
+    setCurrentLead(leadCode);
+    setCurrentCompany(companyCode);   // 현재 company 세팅 
+    loadCompanyConsultings(companyCode);  // 현재 company에 해당하는 consulting 조회 
+    loadCompanyQuotations(companyCode);  // 현재 company에 해당하는 quotation 조회 
+    loadCompanyPurchases(companyCode);  // 현재 company에 해당하는 purchase 조회 
+    let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
+      keyboard: false
+    });
+    myModal.show();
+  }, []);
+
 
   const [ expanded, setExpaned ] = useState(false);
 
@@ -194,24 +207,12 @@ const Leads = () => {
       dataIndex: "lead_name",
       render: (text, record) => (
         <>
-          <a href="#">
-            <span className="person-circle-a person-circle">
-              {text ? text.charAt(0) : '?'}
-            </span>
-          </a>
-          <a href="#"
-            data-bs-toggle="modal"
-            data-bs-target="#leads-details"
-            onClick={()=>{
-              console.log("[Lead] set current lead : ", record.lead_code);
-              setCurrentLead(record.lead_code);
-              setCurrentCompany(record.company_code);   // 현재 company 세팅 
-              loadCompanyConsultings(record.company_code);  // 현재 company에 해당하는 consulting 조회 
-              loadCompanyQuotations(record.company_code);  // 현재 company에 해당하는 quotation 조회 
-              loadCompanyPurchases(record.company_code);  // 현재 company에 해당하는 purchase 조회 
-          }}>
+          <span className="person-circle-a person-circle">
+            {text ? text.charAt(0) : '?'}
+          </span>
+          <span style={{color:'#0d6efd'}}>
             {text}
-          </a>
+          </span>
         </>
       ),
       sorter: (a, b) => compareText(a.lead_name, b.lead_name),
@@ -272,67 +273,66 @@ const Leads = () => {
     //   ),
     //   sorter: (a, b) => a.status.length - b.status.length,
     // },
-
-    {
-      title: t('lead.actions'),
-      dataIndex: "status_",
-      render: (text, record) => (
-        <div className="dropdown dropdown-action">
-          <a
-            href="#"
-            className="action-icon dropdown-toggle"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            <MoreVert />
-          </a>
-          <div className="dropdown-menu dropdown-menu-right">
-            <a className="dropdown-item" href="#">
-              Edit This Lead
-            </a>
-            <a className="dropdown-item" href="#">
-              Change Lead Image
-            </a>
-            <a className="dropdown-item" href="#">
-              Delete This Lead
-            </a>
-            <a className="dropdown-item" href="#">
-              Email This Lead
-            </a>
-            <a className="dropdown-item" href="#">
-              Clone This Lead
-            </a>
-            <a className="dropdown-item" href="#">
-              Change Record Owner
-            </a>
-            <a className="dropdown-item" href="#">
-              Generate Merge Document
-            </a>
-            <a className="dropdown-item" href="#">
-              Change Lead to Contact
-            </a>
-            <a className="dropdown-item" href="#">
-              Convert Lead
-            </a>
-            <a className="dropdown-item" href="#">
-              Print This Lead
-            </a>
-            <a className="dropdown-item" href="#">
-              Merge Into Lead
-            </a>
-            <a className="dropdown-item" href="#">
-              SmartMerge Lead
-            </a>
-            <a className="dropdown-item" href="#">
-              Add Activity Set To Lead
-            </a>
-            <a className="dropdown-item" href="#">
-              Add New Event For Lead
-            </a>
-          </div>
-        </div>
-      ),
-    },
+    // {
+    //   title: t('lead.actions'),
+    //   dataIndex: "status_",
+    //   render: (text, record) => (
+    //     <div className="dropdown dropdown-action">
+    //       <a
+    //         href="#"
+    //         className="action-icon dropdown-toggle"
+    //         data-bs-toggle="dropdown"
+    //         aria-expanded="false"
+    //       >
+    //         <MoreVert />
+    //       </a>
+    //       <div className="dropdown-menu dropdown-menu-right">
+    //         <a className="dropdown-item" href="#">
+    //           Edit This Lead
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Change Lead Image
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Delete This Lead
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Email This Lead
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Clone This Lead
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Change Record Owner
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Generate Merge Document
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Change Lead to Contact
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Convert Lead
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Print This Lead
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Merge Into Lead
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           SmartMerge Lead
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Add Activity Set To Lead
+    //         </a>
+    //         <a className="dropdown-item" href="#">
+    //           Add New Event For Lead
+    //         </a>
+    //       </div>
+    //     </div>
+    //   ),
+    // },
   ];
 
   useEffect(() => {
@@ -524,17 +524,8 @@ const Leads = () => {
                       rowKey={(record) => record.lead_code}
                       onRow={(record, rowIndex) => {
                         return {
-                          onClick: (event) => {
-                              console.log("[Lead] set current lead : ", record.lead_code);
-                              setCurrentLead(record.lead_code);
-                              setCurrentCompany(record.company_code);   // 현재 company 세팅 
-                              loadCompanyConsultings(record.company_code);  // 현재 company에 해당하는 consulting 조회 
-                              loadCompanyQuotations(record.company_code);  // 현재 company에 해당하는 quotation 조회 
-                              loadCompanyPurchases(record.company_code);  // 현재 company에 해당하는 purchase 조회 
-                              let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
-                                keyboard: false
-                              });
-                              myModal.show();
+                          onClick: () => {
+                            handleClickLeadName(record.lead_code, record.company_code);
                           }, // double click row
                         };
                       }}
@@ -556,18 +547,9 @@ const Leads = () => {
                       rowKey={(record) => record.lead_code}
                       onRow={(record, rowIndex) => {
                         return {
-                          onClick: (event) => {
-                              console.log("[Lead] set current lead : ", record.lead_code);
-                              setCurrentLead(record.lead_code);
-                              setCurrentCompany(record.company_code);   // 현재 company 세팅 
-                              loadCompanyConsultings(record.company_code);  // 현재 company에 해당하는 consulting 조회 
-                              loadCompanyQuotations(record.company_code);  // 현재 company에 해당하는 quotation 조회 
-                              loadCompanyPurchases(record.company_code);  // 현재 company에 해당하는 purchase 조회 
-                              let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
-                                keyboard: false
-                              })
-                              myModal.show();
-                          }, // double click row
+                          onClick: () => {
+                            handleClickLeadName(record.lead_code, record.company_code);
+                          },
                         };
                       }}
                     /> 

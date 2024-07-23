@@ -27,8 +27,7 @@ const Companies = () => {
 
   //===== [RecoilState] Related with Company ==========================================
   const [ companyState, setCompanyState] = useRecoilState(atomCompanyState);
-  const { tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
-  const { loadAllCompanies, filterCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
+  const { tryLoadAllCompanies, filterCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const filteredCompany = useRecoilValue(atomFilteredCompany);
 
@@ -187,12 +186,12 @@ const Companies = () => {
       dataIndex: "company_name",
       render: (text, record) => (
         <>
-          <a href="#" className="person-circle-a person-circle">
+          <span className="person-circle-a person-circle">
             {text.charAt(0)}
-          </a>
-          <a href="#" onClick={() => { handleClickCompanyName(record.company_code); }}>
+          </span>
+          <span style={{color:'#0d6efd'}}>
             {text}
-          </a>
+          </span>
         </>
       ),
       sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
@@ -373,7 +372,7 @@ const Companies = () => {
                         rowKey={(record) => record.company_code}
                         onRow={(record, rowIndex) => {
                           return {
-                            onClick: (event) => {
+                            onClick: () => {
                               handleClickCompanyName(record.company_code);
                             },
                           };
@@ -396,7 +395,7 @@ const Companies = () => {
                         rowKey={(record) => record.company_code}
                         onRow={(record, rowIndex) => {
                           return {
-                            onClick: (event) => {
+                            onClick: () => {
                               handleClickCompanyName(record.company_code);
                             },
                           };

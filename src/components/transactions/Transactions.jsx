@@ -29,6 +29,7 @@ import TransactionEditBillModel from "./TransactionEditBillModel";
 const Transactions = () => {
   const { t } = useTranslation();
 
+
   //===== [RecoilState] Related with Company ==========================================
   const companyState = useRecoilValue(atomCompanyState);
   const { tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
@@ -70,6 +71,15 @@ const Transactions = () => {
     setSearchCondition(newValue);
     filterTransactions(statusSearch, newValue);
   };
+
+  const handleClickCompany = useCallback((code) => {
+    console.log("[Consulting] set current company : ", code);
+    setCurrentCompany(code);
+    let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
+      keyboard: false
+    })
+    myModal.show();
+  }, []);
   
   // --- Section for Table ------------------------------
   const columns = [
@@ -92,14 +102,13 @@ const Transactions = () => {
       title: t('company.company_name'),
       dataIndex: "company_name",
       render: (text, record) => (
-        <>
-          <a href="#" data-bs-toggle="modal"
-            data-bs-target="#company-details"
-            onClick={()=>setCurrentCompany(record.company_code)}
-          >
-            {text}
-          </a>
-        </>
+        <div className="table_company" style={{color:'#0d6efd'}}
+          onClick={() => {
+            handleClickCompany(record.company_code);
+          }}
+        >
+          {text}
+        </div>
       ),
       sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
@@ -107,14 +116,13 @@ const Transactions = () => {
       title: t('company.business_registration_code'),
       dataIndex: "business_registration_code",
       render: (text, record) => (
-        <>
-          <a href="#" data-bs-toggle="modal"
-            data-bs-target="#company-details"
-            onClick={()=>setCurrentCompany(record.company_code)}
-          >
-            {text}
-          </a>
-        </>
+        <div className="table_company" style={{color:'#0d6efd'}}
+          onClick={() => {
+            handleClickCompany(record.company_code);
+          }}
+        >
+          {text}
+        </div>
       ),
     },
     {
@@ -251,6 +259,7 @@ const Transactions = () => {
                         onRow={(record, rowIndex) => {
                           return {
                             onClick: (event) => {
+                              if(event.target.className === 'table_company') return;
                               handleOpenTransactoin(record.transaction_code)
                             }, // double click row
                           };
@@ -273,6 +282,7 @@ const Transactions = () => {
                       onRow={(record, rowIndex) => {
                         return {
                           onClick: (event) => {
+                            if(event.target.className === 'table_company') return;
                             handleOpenTransactoin(record.transaction_code)
                           }, // double click row
                         };

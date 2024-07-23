@@ -31,6 +31,7 @@ import { useTranslation } from "react-i18next";
 const Quotations = () => {
   const { t } = useTranslation();
 
+
   //===== [RecoilState] Related with Company ==========================================
   const companyState = useRecoilValue(atomCompanyState);
   const { tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
@@ -77,23 +78,42 @@ const Quotations = () => {
     filterQuotations(statusSearch, newValue);
   };
 
+  const handleClickCompany = useCallback((code) => {
+    console.log("[Consulting] set current company : ", code);
+    setCurrentCompany(code);
+    let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
+      keyboard: false
+    })
+    myModal.show();
+  }, []);
+
+  const handleClickLead = useCallback((code) => {
+    console.log("[Consulting] set current lead : ", code);
+    setCurrentCompany(code);
+    let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
+      keyboard: false
+    })
+    myModal.show();
+  }, []);
+
+  const handleClickQuotation = useCallback((code) => {
+    console.log("[Quotation] set current quotation : ", code);
+    setCurrentQuotation(code);
+    let myModal = new bootstrap.Modal(document.getElementById('quotation-details'), {
+      keyboard: false
+    })
+    myModal.show();
+  }, []);
+
   // --- Section for Table ------------------------------
   const columns = [
     {
       title: t('quotation.quotation_date'),
       dataIndex: "quotation_date",
       render: (text, record) => (
-        <>
-          <a href="#"
-            data-bs-toggle="modal"
-            data-bs-target="#quotation-details"
-            onClick={() => {
-              console.log("[Quotation] set current quotation : ", record.quotation_code);
-              setCurrentQuotation(record.quotation_code);
-            }}>
-            {new Date(text).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' })}
-          </a>
-        </>
+        <div style={{color:'#0d6efd'}}>
+          {new Date(text).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' })}
+        </div>
       ),
       sorter: (a, b) => compareText(a.quotation_date, b.quotation_date),
     },
@@ -101,17 +121,13 @@ const Quotations = () => {
       title: t('company.company_name'),
       dataIndex: "company_name",
       render: (text, record) => (
-        <>
-          <a href="#" data-bs-toggle="modal"
-            data-bs-target="#company-details"
-            onClick={(event) => {
-              console.log("[Quotation] set current company : ", record.company_code);
-              setCurrentCompany(record.company_code);
-            }}
-          >
-            {text}
-          </a>
-        </>
+        <div className="table_company" style={{color:'#0d6efd'}}
+          onClick={() => {
+            handleClickCompany(record.company_code);
+          }}
+        >
+          {text}
+        </div>
       ),
       sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
@@ -119,18 +135,13 @@ const Quotations = () => {
       title: t('lead.full_name'),
       dataIndex: "lead_name",
       render: (text, record) => (
-        <>
-          <a href="#"
-            data-bs-toggle="modal"
-            data-bs-target="#leads-details"
-            onClick={() => {
-              console.log("[Quotation] set current lead : ", record.lead_code);
-              setCurrentLead(record.lead_code);
-            }}
-          >
-            {text}
-          </a>
-        </>
+        <div className="table_lead" style={{color:'#0d6efd'}}
+          onClick={() => {
+            handleClickLead(record.lead_code);
+          }}
+        >
+          {text}
+        </div>
       ),
       sorter: (a, b) => compareText(a.lead_name, b.lead_name),
     },
@@ -143,68 +154,30 @@ const Quotations = () => {
       title: t('common.title'),
       dataIndex: "quotation_title",
       render: (text, record) => (
-        <>
-          <a href="#"
-            data-bs-toggle="modal"
-            data-bs-target="#quotation-details"
-            onClick={() => {
-              console.log("[Quotation] set current quotation : ", record.quotation_code);
-              setCurrentQuotation(record.quotation_code);
-            }}>
-            {text}
-          </a>
-        </>
+        <div style={{color:'#0d6efd'}}>
+          {text}
+        </div>
       ),
     },
     {
       title: t('common.status'),
       dataIndex: "status",
       render: (text, record) => (
-        <>
-          <a href="#"
-            data-bs-toggle="modal"
-            data-bs-target="#quotation-details"
-            onClick={() => {
-              console.log("[Quotation] set current quotation : ", record.quotation_code);
-              setCurrentQuotation(record.quotation_code);
-            }}>
-            {text}
-          </a>
-        </>
+        <>{text}</>
       ),
     },
     {
       title: t('quotation.quotation_amount'),
       dataIndex: "total_quotation_amount",
       render: (text, record) => (
-        <>
-          <a href="#"
-            data-bs-toggle="modal"
-            data-bs-target="#quotation-details"
-            onClick={() => {
-              console.log("[Quotation] set current quotation : ", record.quotation_code);
-              setCurrentQuotation(record.quotation_code);
-            }}>
-            {ConvertCurrency(record.total_quotation_amount)}
-          </a>
-        </>
+        <>{ConvertCurrency(record.total_quotation_amount)}</>
       ),
     },
     {
       title: t('quotation.quotation_manager'),
       dataIndex: "quotation_manager",
       render: (text, record) => (
-        <>
-          <a href="#"
-            data-bs-toggle="modal"
-            data-bs-target="#quotation-details"
-            onClick={() => {
-              console.log("[Quotation] set current quotation : ", record.quotation_code);
-              setCurrentQuotation(record.quotation_code);
-            }}>
-            {text}
-          </a>
-        </>
+        <>{text}</>
       ),
       sorter: (a, b) => compareText(a.quotation_manager, b.quotation_manager),
     },
@@ -307,13 +280,9 @@ const Quotations = () => {
                         onRow={(record, rowIndex) => {
                           return {
                             onClick: (event) => {
-                              console.log("[Quotation] set current quotation : ", record.quotation_code);
-                              setCurrentQuotation(record.quotation_code);
-                              let myModal = new bootstrap.Modal(document.getElementById('quotation-details'), {
-                                keyboard: false
-                              })
-                              myModal.show();
-                            }, // double click row
+                              if(event.target.className === 'table_company' || event.target.className === 'table_lead') return;
+                              handleClickQuotation(record.quotation_code);
+                            },
                           };
                         }}
                       />
@@ -335,13 +304,9 @@ const Quotations = () => {
                         onRow={(record, rowIndex) => {
                           return {
                             onClick: (event) => {
-                              console.log("[Quotation] set current quotation : ", record.quotation_codecode);
-                              setCurrentQuotation(record.quotation_codecode);
-                              let myModal = new bootstrap.Modal(document.getElementById('quotation-details'), {
-                                keyboard: false
-                              })
-                              myModal.show();
-                            }, // double click row
+                              if(event.target.className === 'table_company' || event.target.className === 'table_lead') return;
+                              handleClickQuotation(record.quotation_code);
+                            },
                           };
                         }}
                       />
