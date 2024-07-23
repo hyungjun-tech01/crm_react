@@ -40,7 +40,7 @@ const Quotations = () => {
 
   //===== [RecoilState] Related with Lead =============================================
   const leadState = useRecoilValue(atomLeadState);
-  const { tryLoadAllLeads, setCurrentLead } = useRecoilValue(LeadRepo);
+  const { tryLoadAllLeads } = useRecoilValue(LeadRepo);
 
 
   //===== [RecoilState] Related with Quotation ========================================

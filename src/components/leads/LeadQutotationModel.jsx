@@ -10,7 +10,7 @@ import { Add } from "@mui/icons-material";
 import { QuotationRepo } from "../../repository/quotation";
 
 const LeadQuotationModel = (props) => {
-    const { quotations, handleAddQuotation } = props;
+    const { quotations, handleInitAddQuotation } = props;
     const { t } = useTranslation();
 
 
@@ -22,11 +22,16 @@ const LeadQuotationModel = (props) => {
     const [selectedKeys, setSelectedRowKeys] = useState([]);
     
     const transferToOtherModal = (id) => {
-        handleAddQuotation(true);
         let myModal = new bootstrap.Modal(document.getElementById(id), {
             keyboard: false
         });
         myModal.show();
+    };
+
+    const handleAddNewConsulting = () => {
+        console.log('[LeadQuotationModel] handleAddNewQuotation');
+        handleInitAddQuotation(true);
+        transferToOtherModal('add_quotation');
     };
 
     const columns_quotation = [
@@ -125,7 +130,7 @@ const LeadQuotationModel = (props) => {
                                     }}
                                 >
                                     <div>{t('quotation.quotation_information')}</div>
-                                    <Add onClick={() => transferToOtherModal('add_quotation')} />
+                                    <Add onClick={() => handleAddNewConsulting()} />
                                 </div>
                             }
                             onRow={(record, rowIndex) => {

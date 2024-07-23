@@ -66,7 +66,6 @@ const QuotationAddModel = (props) => {
       const foundIdx = leadsForSelection.findIndex(item => item.value.lead_code === leadCode);
       if (foundIdx !== -1) {
         const found_lead_info = leadsForSelection.at(foundIdx);
-        console.log('[initializeQuotationTemplate] leadsForSelection :', found_lead_info);
         setQuotationChange({
           ...defaultQuotation,
           ...found_lead_info.value,
@@ -705,7 +704,6 @@ const QuotationAddModel = (props) => {
       status: '견적진행', // Temporary
       modify_user: cookies.myLationCrmUserId,
     };
-    console.log(`[ handleAddNewQuotation ]`, newQuotationData);
     const result = modifyQuotation(newQuotationData);
     if (result) {
       initializeQuotationTemplate();

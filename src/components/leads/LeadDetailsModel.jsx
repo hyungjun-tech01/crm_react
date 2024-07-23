@@ -571,13 +571,14 @@ const LeadDetailsModel = () => {
                           id="sub-lead-consultings" >
                           <LeadConsultingModel
                             consultings={consultingsByLead}
+                            handleInitAddConsulting={setInitAddConsulting}
                           />
                         </div>
                         <div className="tab-pane task-related p-0"
                           id="sub-lead-quotation" >
                           <LeadQuotationModel
                             quotations={quotationsByLead}
-                            handleAddQuotation={setInitAddQuotation}
+                            handleInitAddQuotation={setInitAddQuotation}
                           />
                         </div>
                       </div>
@@ -610,8 +611,8 @@ const LeadDetailsModel = () => {
         </div>
         {/* modal-dialog */}
       </div>
-      <ConsultingAddModel />
-      <ConsultingDetailsModel init={initAddConsulting} handleInit={setInitAddConsulting} leadCode={selectedLead.lead_code}/>
+      <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} leadCode={selectedLead.lead_code} />
+      <ConsultingDetailsModel />
       <QuotationAddModel init={initAddQuotation} handleInit={setInitAddQuotation} leadCode={selectedLead.lead_code} />
       <QuotationDetailsModel />
     </>

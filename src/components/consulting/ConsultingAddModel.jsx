@@ -39,7 +39,6 @@ const ConsultingAddModel = (props) => {
 
   //===== [RecoilState] Related with Lead =============================================
   const leadsState = useRecoilValue(atomLeadState);
-  const currentLead = useRecoilValue(atomCurrentLead);
   const leadsForSelection = useRecoilValue(atomLeadsForSelection);
 
 
@@ -55,13 +54,13 @@ const ConsultingAddModel = (props) => {
   const [consultingChange, setConsultingChange] = useState({ ...defaultConsulting });
 
   const initializeConsultingTemplate = useCallback(() => {
-    // document.querySelector("#add_new_consulting_form").reset();
+    document.querySelector("#add_new_consulting_form").reset();
 
     // set Receipt date -------------
     const tempDate = new Date();
 
-    if (currentLead !== defaultLead) {
-      const foundIdx = leadsForSelection.findIndex(item => item.value.lead_code === currentLead.lead_code);
+    if (leadCode && leadCode !== "") {
+      const foundIdx = leadsForSelection.findIndex(item => item.value.lead_code === leadCode);
       if (foundIdx !== -1) {
         const found_lead_info = leadsForSelection.at(foundIdx);
         setConsultingChange({
@@ -76,7 +75,7 @@ const ConsultingAddModel = (props) => {
         receipt_date: tempDate,
       });
     };
-  }, [cookies.myLationCrmUserName, leadsForSelection]);
+  }, [cookies.myLationCrmUserName, leadsForSelection, leadCode]);
 
   const handleDateChange = (name, date) => {
     const modifiedData = {
@@ -336,7 +335,7 @@ const ConsultingAddModel = (props) => {
                 />
               </div>
               <div className="text-center">
-                {(currentLead !== defaultLead) ?
+                {leadCode ?
                   <button
                     type="button"
                     className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
@@ -355,7 +354,7 @@ const ConsultingAddModel = (props) => {
                   </button>
                 }
                 &nbsp;&nbsp;
-                {(currentLead !== defaultLead) ?
+                {leadCode ?
                   <button
                     type="button"
                     className="btn btn-secondary btn-rounded"

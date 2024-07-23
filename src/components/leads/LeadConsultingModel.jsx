@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { ItemRender, ShowTotal } from "../paginationfunction";
-import { formatDate } from "../../constants/functions";
 import { Add } from "@mui/icons-material";
 
 import { defaultLead } from "../../atoms/atoms";
@@ -12,7 +11,7 @@ import { ConsultingRepo } from "../../repository/consulting";
 
 
 const LeadConsultingModel = (props) => {
-    const { consultings } = props;
+    const { consultings, handleInitAddConsulting } = props;
     const { t } = useTranslation();
 
 
@@ -24,11 +23,17 @@ const LeadConsultingModel = (props) => {
     const [selectedKeys, setSelectedRowKeys] = useState([]);
     
     const transferToOtherModal = (id) => {
-        setCurrentConsulting(defaultLead);
         let myModal = new bootstrap.Modal(document.getElementById(id), {
             keyboard: false
         });
         myModal.show();
+    };
+
+    const handleAddNewConsulting = () => {
+        console.log('[LeadConsultingModel] handleAddNewConsulting');
+        setCurrentConsulting();
+        handleInitAddConsulting(true);
+        transferToOtherModal('add_consulting');
     };
     
     const columns_consulting = [
@@ -132,7 +137,7 @@ const LeadConsultingModel = (props) => {
                                     }}
                                 >
                                     <div>{t('consulting.information')}</div>
-                                    <Add onClick={() => transferToOtherModal('add_consulting')} />
+                                    <Add onClick={() => handleAddNewConsulting()} />
                                 </div>
                             }
                             onRow={(record, rowIndex) => {
