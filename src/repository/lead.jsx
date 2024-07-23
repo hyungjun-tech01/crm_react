@@ -60,7 +60,7 @@ export const LeadRepo = selector({
         const loadAllLeads = getCallback(({set}) => async (multiQueryCondi) => {
             const input_json = JSON.stringify(multiQueryCondi);
             try{
-                console.log('[LeadRepository] Try loading all')
+                console.log('[LeadRepository] Try loading all', input_json)
                 const response = await fetch(`${BASE_PATH}/leads`, {
                     method: "POST",
                     headers:{'Content-Type':'application/json'},
