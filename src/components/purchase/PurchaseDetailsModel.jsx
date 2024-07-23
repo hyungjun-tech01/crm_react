@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Spin, Switch, Table } from "antd";
@@ -10,9 +10,7 @@ import {
   atomCompanyState,
   atomCompanyForSelection,
   atomProductClassListState,
-  atomProductClassList,
   atomProductsState,
-  atomAllProducts,
   atomProductOptions,
   atomMAContractSet,
   defaultMAContract,

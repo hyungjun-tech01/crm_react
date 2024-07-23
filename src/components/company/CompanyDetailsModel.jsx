@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Spin, Switch } from "antd";
@@ -29,6 +29,7 @@ import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import CompanyPurchaseModel from "./CompanyPurchaseModel";
 import CompanyTransactionModel from "./CompanyTransactionModel";
+import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
 
 const CompanyDetailsModel = ({ openTransaction }) => {
   const { t } = useTranslation();
@@ -76,6 +77,7 @@ const CompanyDetailsModel = ({ openTransaction }) => {
   const [purchasesByCompany, setPurchasesByCompany] = useState([]);
   const [transactionByCompany, setTransactionByCompany] = useState([]);
   const [validMACount, setValidMACount] = useState(0);
+  const [ selectedPurchase, setSelectedPurchase ] = useState(null);
 
   const handleDetailChange = useCallback(
     (e) => {
@@ -361,10 +363,13 @@ const CompanyDetailsModel = ({ openTransaction }) => {
   //===== useEffect for User ==========================================================
   useEffect(() => {
     console.log('[CompanyDetailsModel] useEffect / userState :', userState);
-    if ((userState & 1) === 1) {
+    if (((purchaseState & 1) === 1)
+      && ((transactionState & 1) === 1)
+      && ((userState & 1) === 1)
+     ){
       setIsAllNeededDataLoaded(true);
     }
-  }, [userState]);
+  }, [purchaseState, transactionState, userState]);
 
   if (!isAllNeededDataLoaded)
     return (
@@ -382,189 +387,192 @@ const CompanyDetailsModel = ({ openTransaction }) => {
     );
 
   return (
-    <div
-      className="modal right fade"
-      id="company-details"
-      tabIndex={-1}
-      role="dialog"
-      aria-modal="true"
-      data-bs-focus="false"
-    >
+    <>
       <div
-        className={isFullScreen ? "modal-fullscreen" : "modal-dialog"}
-        role="document"
+        className="modal right fade"
+        id="company-details"
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        data-bs-focus="false"
       >
-        <div className="modal-content">
-          <div className="modal-header">
-            <div className="row w-100">
-              <div className="col-md-4 account d-flex">
-                <div className="company_img">
-                  <img src={C_logo} alt="User" className="user-image" />
+        <div
+          className={isFullScreen ? "modal-fullscreen" : "modal-dialog"}
+          role="document"
+        >
+          <div className="modal-content">
+            <div className="modal-header">
+              <div className="row w-100">
+                <div className="col-md-4 account d-flex">
+                  <div className="company_img">
+                    <img src={C_logo} alt="User" className="user-image" />
+                  </div>
+                  <div>
+                    <p className="mb-0">
+                      <b>{t("company.company")}</b>
+                    </p>
+                    <span className="modal-title">
+                      {selectedCompany.company_name}
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <p className="mb-0">
-                    <b>{t("company.company")}</b>
-                  </p>
-                  <span className="modal-title">
-                    {selectedCompany.company_name}
-                  </span>
-                </div>
+                <DetailTitleItem
+                  original={selectedCompany.company_name_en}
+                  name="company_name_en"
+                  title={t("company.company_name_en")}
+                  onEditing={handleDetailChange}
+                />
+                <DetailTitleItem
+                  original={selectedCompany.business_registration_code}
+                  name="business_registration_code"
+                  title={t("company.business_registration_code")}
+                  onEditing={handleDetailChange}
+                />
               </div>
-              <DetailTitleItem
-                original={selectedCompany.company_name_en}
-                name="company_name_en"
-                title={t("company.company_name_en")}
-                onEditing={handleDetailChange}
+              <Switch
+                checkedChildren="full"
+                checked={isFullScreen}
+                onChange={handleWindowWidthChange}
               />
-              <DetailTitleItem
-                original={selectedCompany.business_registration_code}
-                name="business_registration_code"
-                title={t("company.business_registration_code")}
-                onEditing={handleDetailChange}
+              <button
+                type="button"
+                className="btn-close xs-close"
+                data-bs-dismiss="modal"
+                onClick={handleClose}
               />
             </div>
-            <Switch
-              checkedChildren="full"
-              checked={isFullScreen}
-              onChange={handleWindowWidthChange}
-            />
-            <button
-              type="button"
-              className="btn-close xs-close"
-              data-bs-dismiss="modal"
-              onClick={handleClose}
-            />
-          </div>
-          <div className="modal-body">
-            <div className="task-infos">
-              <ul className="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified">
-                <li className="nav-item">
-                  <Link
-                    className="nav-link active"
-                    to="#company-details-info"
-                    data-bs-toggle="tab"
-                  >
-                    {t("common.details")}
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link
-                    className="nav-link"
-                    to="#company-details-product"
-                    data-bs-toggle="tab"
-                  >
-                    {t("purchase.product_info") +
-                      "(" +
-                      validMACount +
-                      "/" +
-                      purchasesByCompany.length +
-                      ")"}
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link
-                    className="nav-link"
-                    to="#company-details-transaction"
-                    data-bs-toggle="tab"
-                  >
-                    {t("transaction.statement_of_account") +
-                      "(" +
-                      transactionByCompany.length +
-                      ")"}
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link
-                    className="nav-link"
-                    to="#company-details-tax-invoice"
-                    data-bs-toggle="tab"
-                  >
-                    {t("transaction.tax_bill")}
-                  </Link>
-                </li>
-                {/* <li className="nav-item">
-                  <Link
-                    className="nav-link"
-                    to="#task-news"
-                    data-bs-toggle="tab"
-                  >
-                    News
-                  </Link>
-                </li> */}
-              </ul>
-              <div className="tab-content">
-                <div className="tab-pane show active" id="company-details-info">
-                  <div className="crms-tasks">
-                    <div className="tasks__item crms-task-item">
-                      <div className="row">
-                        <Space
-                          align="start"
-                          direction="horizontal"
-                          size="small"
-                          style={{ display: "flex", marginBottom: "0.5rem" }}
-                          wrap
-                        >
-                          {company_items_info.map((item, index) => (
-                            <DetailCardItem
-                              key={index}
-                              title={t(item.title)}
-                              defaultValue={selectedCompany[item.key]}
-                              edited={editedDetailValues}
-                              name={item.key}
-                              detail={item.detail}
-                            />
-                          ))}
-                        </Space>
+            <div className="modal-body">
+              <div className="task-infos">
+                <ul className="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified">
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link active"
+                      to="#company-details-info"
+                      data-bs-toggle="tab"
+                    >
+                      {t("common.details")}
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link"
+                      to="#company-details-product"
+                      data-bs-toggle="tab"
+                    >
+                      {t("purchase.product_info") +
+                        "(" +
+                        validMACount +
+                        "/" +
+                        purchasesByCompany.length +
+                        ")"}
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link"
+                      to="#company-details-transaction"
+                      data-bs-toggle="tab"
+                    >
+                      {t("transaction.statement_of_account") +
+                        "(" +
+                        transactionByCompany.length +
+                        ")"}
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link"
+                      to="#company-details-tax-invoice"
+                      data-bs-toggle="tab"
+                    >
+                      {t("transaction.tax_bill")}
+                    </Link>
+                  </li>
+                  {/* <li className="nav-item">
+                    <Link
+                      className="nav-link"
+                      to="#task-news"
+                      data-bs-toggle="tab"
+                    >
+                      News
+                    </Link>
+                  </li> */}
+                </ul>
+                <div className="tab-content">
+                  <div className="tab-pane show active" id="company-details-info">
+                    <div className="crms-tasks">
+                      <div className="tasks__item crms-task-item">
+                        <div className="row">
+                          <Space
+                            align="start"
+                            direction="horizontal"
+                            size="small"
+                            style={{ display: "flex", marginBottom: "0.5rem" }}
+                            wrap
+                          >
+                            {company_items_info.map((item, index) => (
+                              <DetailCardItem
+                                key={index}
+                                title={t(item.title)}
+                                defaultValue={selectedCompany[item.key]}
+                                edited={editedDetailValues}
+                                name={item.key}
+                                detail={item.detail}
+                              />
+                            ))}
+                          </Space>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div
-                  className="tab-pane company-details-product"
-                  id="company-details-product"
-                >
-                  <CompanyPurchaseModel
-                    company={selectedCompany}
-                    purchases={purchasesByCompany}
-                    handlePurchase={setPurchasesByCompany}
-                  />
-                </div>
-                <div
-                  className="tab-pane company-details-transaction"
-                  id="company-details-transaction"
-                >
-                  <CompanyTransactionModel
-                    transactions={transactionByCompany}
-                    openTransaction={openTransaction}
-                  />
-                </div>
-              </div>
-              {editedDetailValues !== null &&
-                Object.keys(editedDetailValues).length !== 0 && (
-                  <div className="text-center py-3">
-                    <button
-                      type="button"
-                      className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                      onClick={handleDetailSave}
-                    >
-                      {t("common.save")}
-                    </button>
-                    &nbsp;&nbsp;
-                    <button
-                      type="button"
-                      className="btn btn-secondary btn-rounded"
-                      onClick={handleDetailCancel}
-                    >
-                      {t("common.cancel")}
-                    </button>
+                  <div
+                    className="tab-pane company-details-product"
+                    id="company-details-product"
+                  >
+                    <CompanyPurchaseModel
+                      company={selectedCompany}
+                      purchases={purchasesByCompany}
+                      handlePurchase={setPurchasesByCompany}
+                    />
                   </div>
-                )}
+                  <div
+                    className="tab-pane company-details-transaction"
+                    id="company-details-transaction"
+                  >
+                    <CompanyTransactionModel
+                      transactions={transactionByCompany}
+                      openTransaction={openTransaction}
+                    />
+                  </div>
+                </div>
+                {editedDetailValues !== null &&
+                  Object.keys(editedDetailValues).length !== 0 && (
+                    <div className="text-center py-3">
+                      <button
+                        type="button"
+                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                        onClick={handleDetailSave}
+                      >
+                        {t("common.save")}
+                      </button>
+                      &nbsp;&nbsp;
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-rounded"
+                        onClick={handleDetailCancel}
+                      >
+                        {t("common.cancel")}
+                      </button>
+                    </div>
+                  )}
+              </div>
             </div>
           </div>
+          {/* modal-content */}
         </div>
-        {/* modal-content */}
       </div>
-    </div>
+      <PurchaseDetailsModel selected={selectedPurchase} handleSelected={setSelectedPurchase} />
+    </>
   );
 };
 
