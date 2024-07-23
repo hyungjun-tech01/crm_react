@@ -4,7 +4,6 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Avatar, Space, Spin, Switch } from "antd";
-
 import {
   atomCurrentLead, defaultLead,
   atomAllCompanies, atomCurrentCompany, atomCompanyState, atomCompanyForSelection,
@@ -31,6 +30,7 @@ import LeadConsultingModel from "./LeadConsultingModel";
 import LeadQuotationModel from "./LeadQutotationModel"
 import QuotationAddModel from "../quotations/QuotationAddModel";
 import QuotationDetailsModel from "../quotations/QuotationDetailsModel";
+import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
 
 
 const LeadDetailsModel = () => {
@@ -80,6 +80,7 @@ const LeadDetailsModel = () => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentLeadCode, setCurrentLeadCode] = useState('');
   const [validMACount, setValidMACount] = useState(0);
+  const [ selectedPurchase, setSelectedPurchase ] = useState(null);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -249,6 +250,7 @@ const LeadDetailsModel = () => {
   const [consultingsByLead, setConsultingsByLead] = useState([]);
   const [initAddConsulting, setInitAddConsulting] = useState(false);
 
+
   //===== Handles to edit 'Quotation Details' ===============================================
   const [quotationsByLead, setQuotationsByLead] = useState([]);
   const [initAddQuotation, setInitAddQuotation] = useState(false);
@@ -353,11 +355,11 @@ const LeadDetailsModel = () => {
       && ((userState & 1) === 1)
       && ((purchaseState & 1) === 1)
       && ((consultingState & 1) === 1)
-      && ((quotationState & 1) === 1))
-    {
+      && ((quotationState & 1) === 1)
+    ){
       console.log('[LeadDetailModel] all needed data is loaded');
       setIsAllNeededDataLoaded(true);
-  }
+    };
   }, [userState, companyState, purchaseState, consultingState, quotationState]);
 
   if (!isAllNeededDataLoaded)
@@ -615,6 +617,7 @@ const LeadDetailsModel = () => {
       <ConsultingDetailsModel />
       <QuotationAddModel init={initAddQuotation} handleInit={setInitAddQuotation} leadCode={selectedLead.lead_code} />
       <QuotationDetailsModel />
+      <PurchaseDetailsModel selected={selectedPurchase} handleSelected={setSelectedPurchase} />
     </>
   );
 };
