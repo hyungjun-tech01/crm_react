@@ -529,9 +529,7 @@ const CompanyDetailsModel = ({ openTransaction }) => {
                     id="company-details-product"
                   >
                     <CompanyPurchaseModel
-                      company={selectedCompany}
                       purchases={purchasesByCompany}
-                      handlePurchase={setPurchasesByCompany}
                     />
                   </div>
                   <div

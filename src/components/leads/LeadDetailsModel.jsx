@@ -564,9 +564,7 @@ const LeadDetailsModel = () => {
                         <div className="tab-pane task-related p-0"
                           id="sub-lead-purchases" >
                           <CompanyPurchaseModel
-                            company={currentCompany}
                             purchases={purchasesByCompany}
-                            handlePurchase={setPurchasesByCompany}
                           />
                         </div>
                         <div className="tab-pane task-related p-0"
