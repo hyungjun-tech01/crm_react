@@ -289,7 +289,6 @@ const CompanyDetailsModel = ({ openTransaction }) => {
 
   //===== useEffect for Company ========================================================
   useEffect(() => {
-    console.log("[CompanyDetailModel] useEffect / Company");
     if (
       selectedCompany !== defaultCompany &&
       selectedCompany.company_code !== currentCompanyCode

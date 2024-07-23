@@ -14,6 +14,8 @@ import {
   atomProductOptions,
   atomMAContractSet,
   defaultMAContract,
+  atomCurrentPurchase,
+  defaultPurchase,
 } from "../../atoms/atoms";
 import { PurchaseRepo } from "../../repository/purchase";
 import { ProductTypeOptions } from "../../repository/product";
@@ -26,13 +28,13 @@ import { ItemRender, ShowTotal } from "../paginationfunction";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
 
 
-const PurchaseDetailsModel = (props) => {
-  const { selected, handleSelected } = props;
+const PurchaseDetailsModel = () => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
 
 
   //===== [RecoilState] Related with Purchase =========================================
+  const currentPurchase = useRecoilValue(atomCurrentPurchase);
   const { modifyPurchase, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
 
 
@@ -67,31 +69,32 @@ const PurchaseDetailsModel = (props) => {
   //===== Handles to edit 'Purchase Details' ==========================================
   const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
   const [editedDetailValues, setEditedDetailValues] = useState({});
+  const [currentPurchaseCode, setCurrentPurchaseCode] = useState("");
 
   const handleDetailChange = useCallback((e) => {
-    if (e.target.value !== selected[e.target.name]) {
+    if (e.target.value !== currentPurchase[e.target.name]) {
       const tempEdited = {
         ...editedDetailValues,
         [e.target.name]: e.target.value,
       };
       setEditedDetailValues(tempEdited);
     }
-  }, [editedDetailValues, selected]);
+  }, [editedDetailValues, currentPurchase]);
 
   const handleDetailDateChange = useCallback((name, date) => {
-    if (date !== new Date(selected[name])) {
+    if (date !== new Date(currentPurchase[name])) {
       const tempEdited = {
         ...editedDetailValues,
         [name]: date,
       };
       setEditedDetailValues(tempEdited);
     }
-  }, [editedDetailValues, selected]);
+  }, [editedDetailValues, currentPurchase]);
 
   const handleDetailSelectChange = useCallback((name, selected) => {
     console.log('handleDetailSelectChange / start : ', selected);
 
-    if (selected[name] !== selected.value) {
+    if (currentPurchase[name] !== selected.value) {
       const tempEdited = {
         ...editedDetailValues,
         [name]: selected.value,
@@ -102,12 +105,12 @@ const PurchaseDetailsModel = (props) => {
   }, [editedDetailValues]);
 
   const handleSaveAll = useCallback(() => {
-    if (Object.keys(editedDetailValues).length !== 0 && selected) {
+    if (Object.keys(editedDetailValues).length !== 0 && currentPurchase) {
       const temp_all_saved = {
         ...editedDetailValues,
         action_type: "UPDATE",
         modify_user: cookies.myLationCrmUserId,
-        purchase_code: selected.purchase_code,
+        purchase_code: currentPurchase.purchase_code,
       };
       const res_data = modifyPurchase(temp_all_saved);
       if (res_data.result) {
@@ -123,7 +126,7 @@ const PurchaseDetailsModel = (props) => {
     cookies.myLationCrmUserId,
     modifyPurchase,
     editedDetailValues,
-    selected,
+    currentPurchase,
   ]);
 
   const handleCancelAll = useCallback(() => {
@@ -175,14 +178,14 @@ const PurchaseDetailsModel = (props) => {
         console.log(`[ handleSubModalOk ] update contract`);
 
         // Update MA Contract end date
-        if (selected.purchase_code
-          && (!selected.ma_finish_date || (new Date(selected.ma_finish_date) < finalData.ma_finish_date))) {
+        if (currentPurchase.purchase_code
+          && (!currentPurchase.ma_finish_date || (new Date(currentPurchase.ma_finish_date) < finalData.ma_finish_date))) {
           // Update 'selected'
           const updateSelected = {
-            ...selected,
+            ...currentPurchase,
             ma_finish_date: finalData.ma_finish_date,
           };
-          handleSelected(updateSelected);
+          setCurrentPurchase(updateSelected);
 
           // Update 'purchase' item
           const modifiedPurchase = {
@@ -210,7 +213,7 @@ const PurchaseDetailsModel = (props) => {
 
     setSelectedMAContractRowKeys([]);
     setIsSubModalOpen(false);
-  }, [cookies.myLationCrmUserId, editedSubModalValues, handleSelected, modifyMAContract, modifyPurchase, orgSubModalValues, selected]);
+  }, [cookies.myLationCrmUserId, editedSubModalValues, modifyMAContract, modifyPurchase, orgSubModalValues, currentPurchase]);
 
   const handleSubModalCancel = () => {
     setIsSubModalOpen(false);
@@ -312,8 +315,11 @@ const PurchaseDetailsModel = (props) => {
   ];
 
   useEffect(() => {
-    if (selected) {
-      console.log("[PurchaseDetailsModel] called!");
+    if ((currentPurchase !== defaultPurchase)
+      && (currentPurchase.purchase_code !== currentPurchaseCode)
+   ){
+      console.log("[PurchaseDetailsModel] called!", currentPurchase);
+      console.log("- Check", productOptions);
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {
@@ -325,9 +331,10 @@ const PurchaseDetailsModel = (props) => {
         setIsFullScreen(true);
       };
 
-      loadPurchaseMAContracts(selected.purchase_code);
+      loadPurchaseMAContracts(currentPurchase.purchase_code);
+      setCurrentPurchaseCode(currentPurchase.purchase_code);
     };
-  }, [selected, loadPurchaseMAContracts]);
+  }, [currentPurchase, loadPurchaseMAContracts, currentPurchaseCode]);
 
 
   useEffect(() => {
@@ -366,22 +373,22 @@ const PurchaseDetailsModel = (props) => {
       >
         <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
           <div className="modal-content">
-            {selected &&
+            {(currentPurchase !== defaultPurchase) &&
               <>
                 <div className="modal-header">
                   <div className="row w-100">
                     <DetailTitleItem
-                      original={selected.product_name}
+                      original={currentPurchase.product_name}
                       name='product_name'
                       title={t('purchase.product_name')}
                       size='col-md-6'
                       type='select'
                       options={productOptions}
-                      group={selected.product_class_name}
+                      group={currentPurchase.product_class_name}
                       onEditing={handleDetailSelectChange}
                     />
                     <DetailTitleItem
-                      original={selected.company_name}
+                      original={currentPurchase.company_name}
                       name='company_name'
                       title={t('company.company_name')}
                       size='col-md-4'
@@ -451,7 +458,7 @@ const PurchaseDetailsModel = (props) => {
                                   {purchase_items_info.map((item, index) =>
                                     <DetailCardItem
                                       key={index}
-                                      defaultValue={selected[item.key]}
+                                      defaultValue={currentPurchase[item.key]}
                                       edited={editedDetailValues}
                                       name={item.key}
                                       title={t(item.title)}
@@ -491,7 +498,7 @@ const PurchaseDetailsModel = (props) => {
                                         }}
                                         >
                                           <div>{t('contract.contract_info')}</div>
-                                          <Add onClick={() => handleAddMAContract(selected.company_code, selected.purchase_code)} />
+                                          <Add onClick={() => handleAddMAContract(currentPurchase.company_code, currentPurchase.purchase_code)} />
                                         </div>
                                       }
                                       onRow={(record, rowIndex) => {

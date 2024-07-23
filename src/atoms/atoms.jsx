@@ -390,7 +390,7 @@ export const atomProductClassListState = atom({
 //----- Product  -----------------------------
 export const defaultProduct = {
     product_code : null,
-    product_class_name : null,
+    product_class : null,
     manufacturer : null,
     model_name : null,
     product_name : null,
