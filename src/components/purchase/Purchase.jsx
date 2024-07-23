@@ -23,6 +23,9 @@ import { ConvertCurrency, compareText, formatDate } from "../../constants/functi
 
 import PurchaseAddModel from "./PurchaseAddModel";
 import PurchaseDetailsModel from "./PurchaseDetailsModel";
+import CompanyDetailsModel from "../company/CompanyDetailsModel";
+import { atomUserState } from "../../atoms/atomsUser";
+import { UserRepo } from "../../repository/user";
 
 
 const Purchase = () => {
@@ -31,7 +34,7 @@ const Purchase = () => {
 
   //===== [RecoilState] Related with Company =============================================
   const companyState = useRecoilValue(atomCompanyState);
-  const { tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
+  const { setCurrentCompany, tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
 
 
@@ -50,6 +53,11 @@ const Purchase = () => {
   const allProducts = useRecoilValue(atomAllProducts);
   const { tryLoadAllProducts } = useRecoilValue(ProductRepo);
   const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
+
+
+  //===== [RecoilState] Related with User ================================================
+  const userState = useRecoilValue(atomUserState);
+  const { tryLoadAllUsers } = useRecoilValue(UserRepo);
 
 
   //===== Handles to deal 'Purcahse' ====================================================
@@ -78,12 +86,24 @@ const Purchase = () => {
   // --- Functions used for Table ------------------------------
   const handleClickPurchase = useCallback((data)=>{
     setSelectedPurchase(data);
+    let myModal = new bootstrap.Modal(document.getElementById('purchase-details'), {
+      keyboard: false
+    })
+    myModal.show();
   },[setSelectedPurchase]);
 
   const handleAddNewPurchaseClicked = useCallback(() => {
     setInitAddNewPurchase(true);
   }, []);
 
+  const handleClickCompany = useCallback((code) => {
+    console.log("[Consulting] set current company : ", code);
+    setCurrentCompany(code);
+    let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
+      keyboard: false
+    })
+    myModal.show();
+  }, []);
 
   const columns = [
     {
@@ -95,13 +115,27 @@ const Purchase = () => {
     {
       title: t('company.company_name'),
       dataIndex: "company_name",
-      render: (text, record) => <>{text}</>,
+      render: (text, record) =>
+        <div className="table_company" style={{color:'#0d6efd'}}
+          onClick={() => {
+            handleClickCompany(record.company_code);
+          }}
+        >
+          {text}
+        </div>,
       sorter: (a, b) => compareText(a.company_name, b.company_name),
     },
     {
       title: t('company.company_name_en'),
       dataIndex: "company_name_en",
-      render: (text, record) => <>{text}</>,
+      render: (text, record) =>
+        <div className="table_company" style={{color:'#0d6efd'}}
+          onClick={() => {
+            handleClickCompany(record.company_code);
+          }}
+        >
+          {text}
+        </div>,
       sorter: (a, b) => compareText(a.company_name_en, b.company_name_en),
     },
     {
@@ -120,11 +154,9 @@ const Purchase = () => {
       title: t('purchase.serial_number'),
       dataIndex: "serial_number",
       render: (text, record) =>
-        <>
-          <a href="#" data-bs-toggle="modal" data-bs-target="#purchase-details" onClick={()=>{handleClickPurchase(record);}}>
+        <div style={{color:'#0d6efd'}}>
             {text}
-          </a>
-        </>,
+        </div>,
       sorter: (a, b) => compareText(a.serial_number, b.serial_number),
     },
     {
@@ -151,8 +183,12 @@ const Purchase = () => {
   useEffect(() => {
     tryLoadAllCompanies();
     tryLoadAllPurchases();
+    tryLoadAllUsers();
 
-    if(((companyState & 1) === 1) && ((purchaseState & 1) === 1)) {
+    if(((companyState & 1) === 1)
+      && ((purchaseState & 1) === 1)
+      && ((userState & 1) === 1)
+    ){
       setNowLoading(false);
       const modifiedData = allPurchaseData.map(purchase => {
         const foundIdx = allCompanyData.findIndex(company => company.company_code === purchase.company_code);
@@ -176,7 +212,7 @@ const Purchase = () => {
       });
       setTableData(modifiedData);
     };
-  }, [companyState, purchaseState, allPurchaseData, allCompanyData]);
+  }, [companyState, purchaseState, userState, allPurchaseData, allCompanyData]);
 
   // ----- useEffect for Production -----------------------------------
   useEffect(() => {
@@ -311,12 +347,9 @@ const Purchase = () => {
                       onRow={(record, rowIndex) => {
                         return {
                           onClick: (event) => {
-                            handleClickPurchase(record)
-                            let myModal = new bootstrap.Modal(document.getElementById('purchase-details'), {
-                              keyboard: false
-                            })
-                            myModal.show();
-                          }, // double click row
+                            if(event.target.className === 'table_company') return;
+                            handleClickPurchase(record);
+                          },
                         };
                       }}
                     />
@@ -337,12 +370,9 @@ const Purchase = () => {
                       onRow={(record, rowIndex) => {
                         return {
                           onClick: (event) => {
+                            if(event.target.className === 'table_company') return;
                             handleClickPurchase(record);
-                            let myModal = new bootstrap.Modal(document.getElementById('purchase-details'), {
-                              keyboard: false
-                            })
-                            myModal.show();
-                          }, // double click row
+                          },
                         };
                       }}
                     /> 
@@ -436,6 +466,7 @@ const Purchase = () => {
         {/* Modal */}
         <PurchaseAddModel init={initAddNewPurchase} handleInit={setInitAddNewPurchase} />
         <PurchaseDetailsModel selected={selectedPurchase} handleSelected={setSelectedPurchase} />
+        <CompanyDetailsModel />
       </div>
     </HelmetProvider>
   );

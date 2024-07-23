@@ -79,6 +79,33 @@ const Consultings = () => {
     setInitAddConsulting(true);
   }, [defaultLead]);
 
+  const handleClickConsulting = useCallback((code) => {
+    console.log("[Consulting] set current consulting : ", code);
+    setCurrentConsulting(code);
+    let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
+      keyboard: false
+    })
+    myModal.show();
+  }, []);
+
+  const handleClickCompany = useCallback((code) => {
+    console.log("[Consulting] set current company : ", code);
+    setCurrentCompany(code);
+    let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
+      keyboard: false
+    })
+    myModal.show();
+  }, []);
+
+  const handleClickLead = useCallback((code) => {
+    console.log("[Consulting] set current lead : ", code);
+    setCurrentCompany(code);
+    let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
+      keyboard: false
+    })
+    myModal.show();
+  }, []);
+
   // --- Section for Table ------------------------------
   const columns = [
     {
@@ -96,17 +123,9 @@ const Consultings = () => {
       title: t('consulting.type'),
       dataIndex: "consulting_type",
       render: (text, record) => (
-        <>
-          <a href="#"
-            data-bs-toggle="modal"
-            data-bs-target="#consulting-details"
-            onClick={() => {
-              console.log("[Consulting] set current consulting : ", record.consulting_code);
-              setCurrentConsulting(record.consulting_code);
-            }}>
-            {text}
-          </a>
-        </>
+        <div style={{color:'#0d6efd'}}>
+          {text}
+        </div>
       ),
       sorter: (a, b) => compareText(a.consulting_type, b.consulting_type),
     },
@@ -114,17 +133,13 @@ const Consultings = () => {
       title: t('company.company_name'),
       dataIndex: "company_name",
       render: (text, record) => (
-        <>
-          <a href="#" data-bs-toggle="modal"
-            data-bs-target="#company-details"
-            onClick={(event) => {
-              console.log("[Consulting] set current company : ", record.company_code);
-              setCurrentCompany(record.company_code);
-            }}
-          >
-            {text}
-          </a>
-        </>
+        <div className="table_company" style={{color:'#0d6efd'}}
+          onClick={() => {
+            handleClickCompany(record.company_code);
+          }}
+        >
+          {text}
+        </div>
       ),
       sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
@@ -132,18 +147,13 @@ const Consultings = () => {
       title: t('lead.full_name'),
       dataIndex: "lead_name",
       render: (text, record) => (
-        <>
-          <a href="#"
-            data-bs-toggle="modal"
-            data-bs-target="#leads-details"
-            onClick={() => {
-              console.log("[Consulting] set current lead : ", record.lead_code);
-              setCurrentLead(record.lead_code);
-            }}
-          >
-            {text}
-          </a>
-        </>
+        <div className="table_lead" style={{color:'#0d6efd'}}
+          onClick={() => {
+            handleClickLead(record.lead_code);
+          }}
+        >
+          {text}
+        </div>
       ),
       sorter: (a, b) => compareText(a.lead_name, b.lead_name),
     },
@@ -175,7 +185,6 @@ const Consultings = () => {
     ){
       setNowLoading(false);
     };
-
   }, [companyState, leadState, consultingState, userState]);
 
 
@@ -258,13 +267,9 @@ const Consultings = () => {
                         onRow={(record, rowIndex) => {
                           return {
                             onClick: (event) => {
-                              console.log("[Consulting] set current consulting : ", record.consulting_code);
-                              setCurrentConsulting(record.consulting_code);
-                              let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
-                                keyboard: false
-                              })
-                              myModal.show();
-                            }, // double click row
+                              if(event.target.className === 'table_company' || event.target.className === 'table_lead') return;
+                              handleClickConsulting(record.consulting_code);
+                            },
                           };
                         }}
                       />
@@ -286,13 +291,9 @@ const Consultings = () => {
                         onRow={(record, rowIndex) => {
                           return {
                             onClick: (event) => {
-                              console.log("[Consulting] set current consulting : ", record.consulting_code);
-                              setCurrentConsulting(record.consulting_code);
-                              let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
-                                keyboard: false
-                              })
-                              myModal.show();
-                            }, // double click row
+                              if(event.target.className === 'table_company' || event.target.className === 'table_lead') return;
+                              handleClickConsulting(record.consulting_code);
+                            },
                           };
                         }}
                       />
