@@ -24,7 +24,7 @@ import {
   atomQuotationState,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
-import { compareCompanyName, compareText, ConvertCurrency } from "../../constants/functions";
+import { compareCompanyName, compareText, ConvertCurrency, formatDate } from "../../constants/functions";
 
 import { useTranslation } from "react-i18next";
 
@@ -112,7 +112,7 @@ const Quotations = () => {
       dataIndex: "quotation_date",
       render: (text, record) => (
         <div style={{color:'#0d6efd'}}>
-          {new Date(text).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' })}
+          {formatDate(text)}
         </div>
       ),
       sorter: (a, b) => compareText(a.quotation_date, b.quotation_date),

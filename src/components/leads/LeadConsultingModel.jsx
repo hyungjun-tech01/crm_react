@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
@@ -6,7 +6,6 @@ import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { Add } from "@mui/icons-material";
 
-import { defaultLead } from "../../atoms/atoms";
 import { ConsultingRepo } from "../../repository/consulting";
 
 
@@ -40,7 +39,8 @@ const LeadConsultingModel = (props) => {
         {
             title: t('consulting.receipt_date'),
             dataIndex: 'receipt_date',
-            render: (text, record) => <>{text}</>,
+            render: (text, record) => 
+                <>{record === null  ? '' : new Date(text).toLocaleString('ko-KR', {timeZone:'UTC'})}</>,
         },
         {
             title: t('consulting.receiver'),
@@ -105,6 +105,10 @@ const LeadConsultingModel = (props) => {
             className: "checkbox-red",
         }),
     };
+
+    useEffect(()=>{
+        console.log('[LeadConsultingModel] Maybe consultings are updated');
+    }, [consultings])
 
     return (
         <div className="row">
