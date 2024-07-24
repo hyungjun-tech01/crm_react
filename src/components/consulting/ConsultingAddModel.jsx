@@ -4,14 +4,14 @@ import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "react-datepicker/dist/react-datepicker.css";
 import { Spin } from 'antd';
-
-import { defaultConsulting,
+import * as bootstrap from '../../assets/js/bootstrap.bundle';
+import {
+  defaultConsulting,
   atomLeadsForSelection,
   atomLeadState,
-  atomCurrentLead,
-  defaultLead,
 } from "../../atoms/atoms";
-import { atomUserState,
+import {
+  atomUserState,
   atomUsersForSelection,
   atomEngineersForSelection,
   atomSalespersonsForSelection,
@@ -25,12 +25,15 @@ import {
 } from "../../repository/consulting";
 
 import AddBasicItem from "../../constants/AddBasicItem";
+import MessageModal from "../../constants/MessageModal";
 
 
 const ConsultingAddModel = (props) => {
   const { init, handleInit, leadCode } = props;
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId", "myLationCrmUserName"]);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [message, setMessage] = useState({ title: "", message: "" });
 
 
   //===== [RecoilState] Related with Consulting =======================================
@@ -124,7 +127,8 @@ const ConsultingAddModel = (props) => {
       || consultingChange.lead_name === ''
       || consultingChange.consulting_type === null
     ) {
-      console.log("Necessary information isn't submitted!");
+      setMessage({title:'필요 정보 누락', message:'필요 입력 항목이 누락되었습니다.'});
+      setIsMessageModalOpen(true);
       return;
     };
 
@@ -135,13 +139,17 @@ const ConsultingAddModel = (props) => {
       counter: 0,
       modify_user: cookies.myLationCrmUserId,
     };
-    console.log(`[ handleAddNewConsulting ]`, newConsultingData);
     const result = modifyConsulting(newConsultingData);
-    if (result) {
-      initializeConsultingTemplate();
-      //close modal ?
-    };
-  }, [cookies.myLationCrmUserId, initializeConsultingTemplate, consultingChange, modifyConsulting]);
+    result.then((res) => {
+      if(res) {
+        let thisModal = bootstrap.Modal.getInstance('#add_consulting');
+        if(thisModal) thisModal.hide();
+      } else {
+        setMessage({title:'저장 실패', message:'정보 저장에 실패하였습니다.'});
+        setIsMessageModalOpen(true);
+      };
+    });
+  }, [cookies.myLationCrmUserId, consultingChange, modifyConsulting]);
 
 
   //===== useEffect functions ==========================================
@@ -335,47 +343,32 @@ const ConsultingAddModel = (props) => {
                 />
               </div>
               <div className="text-center">
-                {leadCode ?
-                  <button
-                    type="button"
-                    className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                    onClick={handleAddNewConsulting}
-                  >
-                    {t('common.save')}
-                  </button>
-                  :
-                  <button
-                    type="button"
-                    className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                    data-bs-dismiss="modal"
-                    onClick={handleAddNewConsulting}
-                  >
-                    {t('common.save')}
-                  </button>
-                }
+                <button
+                  type="button"
+                  className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                  onClick={handleAddNewConsulting}
+                >
+                  {t('common.save')}
+                </button>
                 &nbsp;&nbsp;
-                {leadCode ?
-                  <button
-                    type="button"
-                    className="btn btn-secondary btn-rounded"
-                    data-bs-dismiss="modal"
-                  >
-                    {t('common.cancel')}
-                  </button>
-                  :
-                  <button
-                    type="button"
-                    className="btn btn-secondary btn-rounded"
-                    data-bs-dismiss="modal"
-                  >
-                    {t('common.cancel')}
-                  </button>
-                }
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-rounded"
+                  data-bs-dismiss="modal"
+                >
+                  {t('common.cancel')}
+                </button>
               </div>
             </form>
           </div>
         </div>
       </div>
+      <MessageModal
+        title={message.title}
+        message={message.message}
+        open={isMessageModalOpen}
+        handleOk={() => setIsMessageModalOpen(false)}
+      />
     </div>
   );
 };

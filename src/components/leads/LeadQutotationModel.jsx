@@ -36,6 +36,11 @@ const LeadQuotationModel = (props) => {
 
     const columns_quotation = [
         {
+            title: t('quotation.quotation_date'),
+            dataIndex: "quotation_date",
+            render: (text, record) => <>{formatDate(text)}</>,
+        },
+        {
             title: t('common.title'),
             dataIndex: 'quotation_title',
             render: (text, record) => <>{text}</>,
@@ -48,11 +53,6 @@ const LeadQuotationModel = (props) => {
         {
             title: t('quotation.quotation_status'),
             dataIndex: "status",
-            render: (text, record) => <>{text}</>,
-        },
-        {
-            title: t('quotation.quotation_date'),
-            dataIndex: "quotation_date",
             render: (text, record) => <>{text}</>,
         },
         {

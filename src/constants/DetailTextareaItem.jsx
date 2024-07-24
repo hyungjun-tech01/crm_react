@@ -6,7 +6,7 @@ const DetailTextareaItem = (props) => {
     return (
         <tr className='detail-tr'>
             <td className={"detail-td-left " + (no_border && "border-0")}>{title}</td>
-            <td className={no_border && "border-0"} >
+            <td className={no_border ? "border-0" : undefined} >
                 <textarea
                     className="detail-edit-textarea"
                     rows={row_no}

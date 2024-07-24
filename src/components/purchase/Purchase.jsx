@@ -42,7 +42,7 @@ const Purchase = () => {
   const purchaseState = useRecoilValue(atomPurchaseState);
   const allPurchaseData = useRecoilValue(atomAllPurchases);
   const filteredPurchase = useRecoilValue(atomFilteredPurchase);
-  const { tryLoadAllPurchases, filterPurchases } = useRecoilValue(PurchaseRepo);
+  const { tryLoadAllPurchases, filterPurchases, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
   
 
   //===== [RecoilState] Related with Product =============================================
@@ -64,7 +64,6 @@ const Purchase = () => {
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ initAddNewPurchase, setInitAddNewPurchase ] = useState(false);
   const [ tableData, setTableData ] = useState([]);
-  const [ selectedPurchase, setSelectedPurchase ] = useState(null);
   
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -84,13 +83,13 @@ const Purchase = () => {
   };
 
   // --- Functions used for Table ------------------------------
-  const handleClickPurchase = useCallback((data)=>{
-    setSelectedPurchase(data);
+  const handleClickPurchase = useCallback((code)=>{
+    setCurrentPurchase(code);
     let myModal = new bootstrap.Modal(document.getElementById('purchase-details'), {
       keyboard: false
     })
     myModal.show();
-  },[setSelectedPurchase]);
+  },[setCurrentPurchase]);
 
   const handleAddNewPurchaseClicked = useCallback(() => {
     setInitAddNewPurchase(true);
@@ -348,7 +347,7 @@ const Purchase = () => {
                         return {
                           onClick: (event) => {
                             if(event.target.className === 'table_company') return;
-                            handleClickPurchase(record);
+                            handleClickPurchase(record.purchase_code);
                           },
                         };
                       }}
@@ -371,7 +370,7 @@ const Purchase = () => {
                         return {
                           onClick: (event) => {
                             if(event.target.className === 'table_company') return;
-                            handleClickPurchase(record);
+                            handleClickPurchase(record.purchase_code);
                           },
                         };
                       }}
@@ -465,7 +464,7 @@ const Purchase = () => {
         </div>
         {/* Modal */}
         <PurchaseAddModel init={initAddNewPurchase} handleInit={setInitAddNewPurchase} />
-        <PurchaseDetailsModel selected={selectedPurchase} handleSelected={setSelectedPurchase} />
+        <PurchaseDetailsModel />
         <CompanyDetailsModel />
       </div>
     </HelmetProvider>

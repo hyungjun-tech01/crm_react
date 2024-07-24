@@ -25,10 +25,10 @@ const CompanyTransactionModel = (props) => {
         setCurrentTransaction(value.transaction_code);
         openTransaction();
 
-        let oldModal = bootstrap.Modal.getInstance('#company-details');
-        if(oldModal) {
-            oldModal.hide();
-        };
+        // let oldModal = bootstrap.Modal.getInstance('#company-details');
+        // if(oldModal) {
+        //     oldModal.hide();
+        // };
         setTimeout(()=>{
             let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
                 keyboard: false

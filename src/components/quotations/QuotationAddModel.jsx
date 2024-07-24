@@ -2,13 +2,14 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import "antd/dist/reset.css";
 import { Checkbox, InputNumber, Space, Spin, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
-import "../antdstyle.css";
 import { AddBoxOutlined, IndeterminateCheckBoxOutlined } from '@mui/icons-material';
 import { option_locations } from '../../constants/constants';
+import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
+import "antd/dist/reset.css";
+import "../antdstyle.css";
 import {
   atomLeadState,
   atomLeadsForSelection,
@@ -19,10 +20,15 @@ import {
   atomUsersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
-import { QuotationRepo, QuotationTypes, QuotationSendTypes } from "../../repository/quotation";
+import {
+  QuotationRepo,
+  QuotationTypes,
+  QuotationSendTypes
+} from "../../repository/quotation";
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import QuotationContentModal from "./QuotationContentModal";
+import MessageModal from "../../constants/MessageModal";
 
 const default_quotation_content = {
   '1': null, '2': null, '3': null, '4': null, '5': null,
@@ -35,6 +41,8 @@ const QuotationAddModel = (props) => {
   const { init, handleInit, leadCode } = props;
   const [t] = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [message, setMessage] = useState({ title: "", message: "" });
 
 
   //===== [RecoilState] Related with Quotation =======================================
@@ -491,7 +499,8 @@ const QuotationAddModel = (props) => {
   // --- Functions used for editing content ------------------------------
   const handleAddNewContent = useCallback(() => {
     if (!quotationChange.lead_name) {
-      console.log('\t[handleAddNewContent] No lead is selected');
+      setMessage({title:'필요 정보 누락', message:'고객 이름이 누락되었습니다.'});
+      setIsMessageModalOpen(true);
       return;
     };
     
@@ -519,7 +528,8 @@ const QuotationAddModel = (props) => {
 
   const handleModifyContent = useCallback((data) => {
     if (!data) {
-      console.log('\t[handleModifyContent] No Data');
+      setMessage({title:'필요 정보 누락', message:'입력 Data가 없습니다.'});
+      setIsMessageModalOpen(true);
       return;
     };
 
@@ -547,7 +557,8 @@ const QuotationAddModel = (props) => {
 
   const handleDeleteSelectedConetents = useCallback(() => {
     if (selectedContentRowKeys.length === 0) {
-      console.log('\t[handleDeleteSelectedConetents] No row is selected');
+      setMessage({title:'선택 항목 누락', message:'선택한 값이 없습니다.'});
+      setIsMessageModalOpen(true);
       return;
     };
 
@@ -584,7 +595,8 @@ const QuotationAddModel = (props) => {
       ...editedContentModalValues,
     };
     if (!finalData.product_name || !finalData.quotation_amount) {
-      console.log("Inevitable data can't be null");
+      setMessage({title:'필요 항목 누락', message:'필요 값 - 제품명 또는 견적 가격 - 이 없습니다.'});
+      setIsMessageModalOpen(true);
       return;
     };
     console.log('[handleContentModalOk] new content :', );
@@ -682,7 +694,8 @@ const QuotationAddModel = (props) => {
       || quotationChange.quotation_type === null
       || quotationContents.length === 0
     ) {
-      console.log("Necessary information isn't submitted!");
+      setMessage({title:'필요 항목 누락', message:'필요 값이 없습니다.'});
+      setIsMessageModalOpen(true);
       return;
     };
     const newQuotationData = {
@@ -705,11 +718,16 @@ const QuotationAddModel = (props) => {
       modify_user: cookies.myLationCrmUserId,
     };
     const result = modifyQuotation(newQuotationData);
-    if (result) {
-      initializeQuotationTemplate();
-      //close modal ?
-    };
-  }, [ConvertHeaderInfosToString, amountsForContent.cut_off_amount, amountsForContent.dc_amount, amountsForContent.sub_total_amount, amountsForContent.sum_dc_applied, amountsForContent.sum_final, amountsForContent.total_cost_price, amountsForContent.vat_amount, contentColumns, cookies.myLationCrmUserId, initializeQuotationTemplate, modifyQuotation, quotationChange, quotationContents, settingForContent.dc_rate]);
+    result.then((res) => {
+      if(res) {
+        let thisModal = bootstrap.Modal.getInstance('#add_quotation');
+        if(thisModal) thisModal.hide();
+      } else {
+        setMessage({title:'저장 실패', message:'정보 저장에 실패하였습니다.'});
+        setIsMessageModalOpen(true);
+      };
+    });
+  }, [ConvertHeaderInfosToString, amountsForContent.cut_off_amount, amountsForContent.dc_amount, amountsForContent.sub_total_amount, amountsForContent.sum_dc_applied, amountsForContent.sum_final, amountsForContent.total_cost_price, amountsForContent.vat_amount, contentColumns, cookies.myLationCrmUserId, modifyQuotation, quotationChange, quotationContents, settingForContent.dc_rate]);
 
 
   //===== useEffect functions ==========================================
@@ -1229,6 +1247,12 @@ const QuotationAddModel = (props) => {
         handleEdited={handleContentItemChange}
         handleOk={handleContentModalOk}
         handleCancel={handleContentModalCancel}
+      />
+      <MessageModal
+        title={message.title}
+        message={message.message}
+        open={isMessageModalOpen}
+        handleOk={() => setIsMessageModalOpen(false)}
       />
     </div>
   );
