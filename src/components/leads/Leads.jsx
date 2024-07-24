@@ -114,7 +114,7 @@ const Leads = () => {
     setMultiQueryModal(false);
 
     // query condition 세팅 후 query
-    console.log("queryConditions", queryConditions);
+    console.log("handleMultiQueryModalOk", queryConditions);
     
     const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
         label: key,
@@ -137,8 +137,8 @@ const Leads = () => {
     }
 
     console.log('multiQueryCondi',multiQueryCondi);
-    tryLoadAllLeads(multiQueryCondi);   
-    //loadAllLeads(multiQueryCondi);
+    //tryLoadAllLeads(multiQueryCondi);   
+    loadAllLeads(multiQueryCondi);
      
   };
   const handleMultiQueryModalCancel = () => {
