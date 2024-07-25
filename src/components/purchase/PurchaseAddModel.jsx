@@ -16,7 +16,7 @@ import {
     atomProductOptions,
 } from '../../atoms/atoms';
 import { PurchaseRepo } from '../../repository/purchase';
-import { ProductRepo } from '../../repository/product';
+import { ProductTypeOptions } from '../../repository/product';
 import { MAContractRepo, ContractTypes } from "../../repository/ma_contract";
 
 import AddBasicItem from "../../constants/AddBasicItem";
@@ -49,7 +49,6 @@ const PurchaseAddModel = (props) => {
     const productClassState = useRecoilValue(atomProductClassListState);
     const productState = useRecoilValue(atomProductsState);
     const productOptions = useRecoilValue(atomProductOptions);
-    const { ProductTypeOptions } = useRecoilValue(ProductRepo);
 
     //===== Handles to edit 'Purchase Add' =================================================
     const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
