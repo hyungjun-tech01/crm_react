@@ -19,12 +19,12 @@ const QuotationContentModal = (props) => {
     const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
 
     //===== [RecoilState] Related with Product ==========================================
-    const [productClassState, setProductClassState] = useRecoilState(atomProductClassListState);
+    const productClassState = useRecoilValue(atomProductClassListState);
     const allProductClassList = useRecoilValue(atomProductClassList);
-    const { loadAllProductClassList } = useRecoilValue(ProductClassListRepo);
-    const [productState, setProductState] = useRecoilState(atomProductsState);
+    const { tryLoadAllProductClassList } = useRecoilValue(ProductClassListRepo);
+    const productState = useRecoilValue(atomProductsState);
     const allProducts = useRecoilValue(atomAllProducts);
-    const { loadAllProducts } = useRecoilValue(ProductRepo);
+    const { tryLoadAllProducts } = useRecoilValue(ProductRepo);
     const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
 
 
@@ -138,6 +138,8 @@ const QuotationContentModal = (props) => {
 
     // ----- useEffect for Production -----------------------------------
     useEffect(() => {
+        tryLoadAllProductClassList();
+        tryLoadAllProducts();
         if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
             const productOptionsValue = allProductClassList.map(proClass => {
                 const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
