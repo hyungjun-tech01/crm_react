@@ -42,7 +42,7 @@ const AddAddressItem = (props) => {
                     className="add-basic-content"
                     id="add_adress_input"
                     type="text"
-                    defaultValue={edited[key_address]}
+                    value={edited[key_address]}
                     placeholder={title}
                     disabled={disabled ? disabled : false}
                     onChange={handleChange}
