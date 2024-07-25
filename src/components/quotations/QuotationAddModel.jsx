@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Checkbox, InputNumber, Space, Spin, Table } from 'antd';
@@ -13,7 +13,12 @@ import "../antdstyle.css";
 import {
   atomLeadState,
   atomLeadsForSelection,
+  atomProductClassList,
+  atomProductClassListState,
+  atomProductsState,
+  atomProductOptions,
   defaultQuotation,
+  atomAllProducts,
 } from "../../atoms/atoms";
 import {
   atomUserState,
@@ -25,6 +30,7 @@ import {
   QuotationTypes,
   QuotationSendTypes
 } from "../../repository/quotation";
+import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import QuotationContentModal from "./QuotationContentModal";
@@ -52,6 +58,16 @@ const QuotationAddModel = (props) => {
   //===== [RecoilState] Related with Lead ============================================
   const leadsState = useRecoilValue(atomLeadState);
   const leadsForSelection = useRecoilValue(atomLeadsForSelection);
+
+
+  //===== [RecoilState] Related with Product ==========================================
+  const productClassState = useRecoilValue(atomProductClassListState);
+  const allProductClassList = useRecoilValue(atomProductClassList);
+  const productState = useRecoilValue(atomProductsState);
+  const allProducts = useRecoilValue(atomAllProducts);
+  const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
+  const { tryLoadAllProductClassList } = useRecoilValue(ProductClassListRepo);
+  const { tryLoadAllProducts } = useRecoilValue(ProductRepo);
 
 
   //===== [RecoilState] Related with Users ===========================================
@@ -732,8 +748,41 @@ const QuotationAddModel = (props) => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    if (((leadsState & 1) === 1) && ((userState & 1) === 1)) {
+    tryLoadAllProductClassList();
+    tryLoadAllProducts();
+    if (((leadsState & 1) === 1)
+      && ((userState & 1) === 1)
+      && ((productClassState & 1) === 1)
+      && ((productState & 1) === 1)
+    ) {
+      if((productOptions.length === 0)) {
+        console.log('[QuotationAddModel] set products for selection');
+        const productOptionsValue = allProductClassList.map(proClass => {
+            const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
+            const subOptions = foundProducts.map(item => {
+                return {
+                    label: <span>{item.product_name}</span>,
+                    value: { product_code: item.product_code,
+                      product_name: item.product_name,
+                      product_class_name: item.product_class_name,
+                      detail_desc: item.detail_desc,
+                      cost_price: item.const_price,
+                      reseller_price: item.reseller_price,
+                      list_price: item.list_price,
+                  }
+                }
+            });
+            return {
+                label: <span>{proClass.product_class_name}</span>,
+                title: proClass.product_class_name,
+                options: subOptions,
+            };
+        });
+        setProductOptions(productOptionsValue);
+      };
+
       setIsAllNeededDataLoaded(true);
+
       if (init) {
         if (handleInit) handleInit(!init);
         setTimeout(()=>{
@@ -741,7 +790,7 @@ const QuotationAddModel = (props) => {
         }, 500);
       };
     };
-  }, [leadsState, userState, init]);
+  }, [leadsState, userState, productClassState, productState, productOptions, init]);
 
   if (!isAllNeededDataLoaded)
     return (

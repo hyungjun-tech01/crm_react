@@ -140,34 +140,36 @@ const QuotationContentModal = (props) => {
     useEffect(() => {
         tryLoadAllProductClassList();
         tryLoadAllProducts();
-        if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
-            const productOptionsValue = allProductClassList.map(proClass => {
-                const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
-                const subOptions = foundProducts.map(item => {
-                    return {
-                        label: <span>{item.product_name}</span>,
-                        value: {
-                            product_code: item.product_code,
-                            product_name: item.product_name,
-                            product_class_name: item.product_class_name,
-                            detail_desc: item.detail_desc,
-                            cost_price: item.const_price,
-                            reseller_price: item.reseller_price,
-                            list_price: item.list_price,
+        if (((productClassState & 1) === 1) && ((productState & 1) === 1)) {
+            if (productOptions.length === 0) {
+                const productOptionsValue = allProductClassList.map(proClass => {
+                    const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
+                    const subOptions = foundProducts.map(item => {
+                        return {
+                            label: <span>{item.product_name}</span>,
+                            value: {
+                                product_code: item.product_code,
+                                product_name: item.product_name,
+                                product_class_name: item.product_class_name,
+                                detail_desc: item.detail_desc,
+                                cost_price: item.const_price,
+                                reseller_price: item.reseller_price,
+                                list_price: item.list_price,
+                            }
                         }
-                    }
+                    });
+                    return {
+                        label: <span>{proClass.product_class_name}</span>,
+                        title: proClass.product_class_name,
+                        options: subOptions,
+                    };
                 });
-                return {
-                    label: <span>{proClass.product_class_name}</span>,
-                    title: proClass.product_class_name,
-                    options: subOptions,
-                };
-            });
-            setProductOptions(productOptionsValue);
+                setProductOptions(productOptionsValue);
+            };
             setIsAllNeededDataLoaded(true);
         };
         setShowDetailDesc(original.detail_desc_on_off === '있음');
-    }, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions, original.detail_desc_on_off]);
+    }, [allProductClassList, allProducts, productClassState, productOptions, productState, original.detail_desc_on_off]);
 
     if (!isAllNeededDataLoaded)
         return (
@@ -179,7 +181,7 @@ const QuotationContentModal = (props) => {
                         borderRadius: 4,
                     }}
                 >
-                    &nbsp;&nbsp;
+                    &nbsp;&nbsp; 여기가 문제인가???
                 </div>
             </Spin>
         );
