@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Spin, Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { formatDate } from "../../constants/functions";
-import * as bootstrap from '../../assets/plugins/bootstrap/js/bootstrap';
+import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Add } from "@mui/icons-material";
 
 import {
