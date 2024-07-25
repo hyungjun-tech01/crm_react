@@ -110,31 +110,32 @@ const CompanyPurchaseModel = (props) => {
         tryLoadAllProducts();
         if (((productClassState & 1) === 1)
             && ((productState & 1) === 1)
-            && (productOptions.length === 0)
         ){
-            setIsAllNeededDataLoaded(true);
-            const productOptionsValue = allProductClassList.map(proClass => {
-                const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
-                const subOptions = foundProducts.map(item => {
-                    return {
-                        label: <span>{item.product_name}</span>,
-                        value: { product_code: item.product_code,
-                            product_name: item.product_name,
-                            product_class: item.product_class,
-                            detail_desc: item.detail_desc,
-                            cost_price: item.const_price,
-                            reseller_price: item.reseller_price,
-                            list_price: item.list_price,
+            if(productOptions.length === 0) {
+                const productOptionsValue = allProductClassList.map(proClass => {
+                    const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
+                    const subOptions = foundProducts.map(item => {
+                        return {
+                            label: <span>{item.product_name}</span>,
+                            value: { product_code: item.product_code,
+                                product_name: item.product_name,
+                                product_class: item.product_class,
+                                detail_desc: item.detail_desc,
+                                cost_price: item.const_price,
+                                reseller_price: item.reseller_price,
+                                list_price: item.list_price,
+                            }
                         }
-                    }
+                    });
+                    return {
+                        label: <span>{proClass.product_class_name}</span>,
+                        title: proClass.product_class_name,
+                        options: subOptions,
+                    };
                 });
-                return {
-                    label: <span>{proClass.product_class_name}</span>,
-                    title: proClass.product_class_name,
-                    options: subOptions,
-                };
-            });
-            setProductOptions(productOptionsValue);
+                setProductOptions(productOptionsValue);
+            };
+            setIsAllNeededDataLoaded(true);
         };
     }, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions]);
 
