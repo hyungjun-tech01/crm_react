@@ -162,6 +162,10 @@ export const TransactionRepo = selector({
         });
         const setCurrentTransaction = getCallback(({ set, snapshot }) => async (transaction_code) => {
             try {
+                if(transaction_code === undefined || transaction_code === null) {
+                    set(atomCurrentTransaction, defaultTransaction);
+                    return;
+                };
                 const allTransactions = await snapshot.getPromise(atomAllTransactions);
                 const selected_arrary = allTransactions.filter(transaction => transaction.transaction_code === transaction_code);
                 if (selected_arrary.length > 0) {

@@ -155,7 +155,15 @@ const Transactions = () => {
   ];
 
   const handleAddNewTransaction = useCallback(() => {
-    setCurrentTransaction(defaultTransaction);
+    setCurrentTransaction()
+    setOpenTransaction(true);
+
+    setTimeout(()=>{
+      let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
+        keyboard: false
+      })
+      myModal.show();
+    }, 1000);
   }, [setCurrentTransaction]);
 
   const handleOpenTransactoin = (code) => {
@@ -224,8 +232,8 @@ const Transactions = () => {
                     <button
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                       id="add-task"
-                      data-bs-toggle="modal"
-                      data-bs-target="#edit_transaction"
+                      // data-bs-toggle="modal"
+                      // data-bs-target="#edit_transaction"
                       onClick={handleAddNewTransaction}
                     >
                       {t('transaction.add_transaction')}
