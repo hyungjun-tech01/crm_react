@@ -19,7 +19,7 @@ import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 
 
 const CompanyPurchaseModel = (props) => {
-    const { purchases } = props;
+    const { purchases, handleInitAddPurchase } = props;
     const { t } = useTranslation();
 
 
@@ -41,13 +41,23 @@ const CompanyPurchaseModel = (props) => {
     const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
     const [selectedPurchaseRowKeys, setSelectedPurchaseRowKeys] = useState([]);
 
-    const handleSelectPurchase = useCallback((purchase) => {
-        setCurrentPurchase(purchase.purchase_code);
-        let myModal = new bootstrap.Modal(document.getElementById('purchase-details'), {
+    const transferToOtherModal = (id) => {
+        let myModal = new bootstrap.Modal(document.getElementById(id), {
             keyboard: false
-          })
-          myModal.show();
-    }, [ setCurrentPurchase]);
+        });
+        myModal.show();
+    };
+
+    const handleSelectPurchase = (code) => {
+        setCurrentPurchase(code);
+        transferToOtherModal('purchase-details');
+    };
+
+    const handleAddNewPurchase = () => {
+        setCurrentPurchase();
+        handleInitAddPurchase(true);
+        transferToOtherModal('add_purchase');
+    };
 
     const columns_purchase = [
         {
@@ -91,7 +101,7 @@ const CompanyPurchaseModel = (props) => {
             if (selectedRows.length > 0) {
                 // Set data to edit selected purchase ----------------------
                 const selectedValue = selectedRows.at(0);
-                handleSelectPurchase(selectedValue);
+                handleSelectPurchase(selectedValue.purchase_code);
             } else {
                 setCurrentPurchase();
             };
@@ -185,7 +195,7 @@ const CompanyPurchaseModel = (props) => {
                                 }}
                                 >
                                     <div>{t('purchase.information')}</div>
-                                    <Add  />
+                                    <Add  onClick={() => handleAddNewPurchase()}/>
                                 </div>
                             }
                             onRow={(record, rowIndex) => {

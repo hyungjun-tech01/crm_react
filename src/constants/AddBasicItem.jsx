@@ -51,7 +51,7 @@ const AddBasicItem = (props) => {
             const selected = defaultValue
                 ? (typeof options[0].value !== 'object'
                     ? options.filter(item => item.value === defaultValue)[0]
-                    : options.filter(item => item.value[name] === defaultValue))
+                    : options.filter(item => item.value[name] === defaultValue)[0])
                 : null;
             return (
                 <div className={ long ? "col-sm-12" : "col-sm-6"} >

@@ -29,7 +29,6 @@ const LeadConsultingModel = (props) => {
     };
 
     const handleAddNewConsulting = () => {
-        console.log('[LeadConsultingModel] handleAddNewConsulting');
         setCurrentConsulting();
         handleInitAddConsulting(true);
         transferToOtherModal('add_consulting');

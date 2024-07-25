@@ -29,6 +29,7 @@ import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import CompanyPurchaseModel from "./CompanyPurchaseModel";
 import CompanyTransactionModel from "./CompanyTransactionModel";
+import PurchaseAddModel from "../purchase/PurchaseAddModel";
 import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
 
 const CompanyDetailsModel = ({ openTransaction }) => {
@@ -75,9 +76,9 @@ const CompanyDetailsModel = ({ openTransaction }) => {
   //===== Handles to edit 'Company Details' ============================================
   const [editedDetailValues, setEditedDetailValues] = useState(null);
   const [purchasesByCompany, setPurchasesByCompany] = useState([]);
+  const [initAddPurchase, setInitAddPurchase] = useState(false);
   const [transactionByCompany, setTransactionByCompany] = useState([]);
   const [validMACount, setValidMACount] = useState(0);
-  const [ selectedPurchase, setSelectedPurchase ] = useState(null);
 
   const handleDetailChange = useCallback(
     (e) => {
@@ -530,6 +531,7 @@ const CompanyDetailsModel = ({ openTransaction }) => {
                   >
                     <CompanyPurchaseModel
                       purchases={purchasesByCompany}
+                      handleInitAddPurchase={setInitAddPurchase}
                     />
                   </div>
                   <div
@@ -568,7 +570,8 @@ const CompanyDetailsModel = ({ openTransaction }) => {
           {/* modal-content */}
         </div>
       </div>
-      <PurchaseDetailsModel selected={selectedPurchase} handleSelected={setSelectedPurchase} />
+      <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} companyCode={selectedCompany.company_code} />
+      <PurchaseDetailsModel />
     </>
   );
 };

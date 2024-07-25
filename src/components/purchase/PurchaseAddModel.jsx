@@ -26,7 +26,7 @@ import { Add } from "@mui/icons-material";
 
 
 const PurchaseAddModel = (props) => {
-    const { init, handleInit } = props;
+    const { init, handleInit, companyCode } = props;
     const { t } = useTranslation();
     const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
@@ -52,29 +52,40 @@ const PurchaseAddModel = (props) => {
 
     //===== Handles to edit 'Purchase Add' =================================================
     const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
-    const [addChange, setAddChange] = useState({});
+    const [purchaseChange, setPurchaseChange] = useState({});
     const [companyData, setCompanyData] = useState({ company_name: '', company_code: '' });
     const [needInit, setNeedInit] = useState(false);
 
-    const initializeAddTemplate = useCallback(() => {
-        setCurrentPurchase();   // initialize current purchase
-        setAddChange({
-            ...defaultPurchase,
-            company_name: null,
-        });
-        setNeedInit(false);
+    const initializePurchaseTemplate = useCallback(() => {
         document.querySelector("#add_new_purchase_form").reset();
-    }, [setCurrentPurchase]);
+        
+        if(companyCode && companyCode !== "") {
+            const foundIdx = companyForSelection.findIndex(item => item.value.company_code === companyCode);
+            if(foundIdx !== -1) {
+                setPurchaseChange({
+                    company_code: companyCode,
+                });
+                const found_company_info = companyForSelection.at(foundIdx);
+                setCompanyData({
+                    company_code: found_company_info.value.company_code,
+                    company_name: found_company_info.value.company_name,
+                });
+            };
+        } else {
+            setPurchaseChange({});
+        }
+        setNeedInit(false);
+    }, [companyCode, companyForSelection]);
 
-    const handleAddChange = useCallback((e) => {
+    const handleItemChange = useCallback((e) => {
         const modifiedData = {
-            ...addChange,
+            ...purchaseChange,
             [e.target.name]: e.target.value,
         };
-        setAddChange(modifiedData);
-    }, [addChange]);
+        setPurchaseChange(modifiedData);
+    }, [purchaseChange]);
 
-    const handleAddSelectChange = useCallback((name, selected) => {
+    const handleSelectChange = useCallback((name, selected) => {
         let modifiedData = null;
         if (name === 'company_name') {
             const tempCompany = {
@@ -84,44 +95,44 @@ const PurchaseAddModel = (props) => {
             setCompanyData(tempCompany);
 
             modifiedData = {
-                ...addChange,
+                ...purchaseChange,
                 // company_name: selected.value.company_name,
                 company_code: selected.value.company_code,
             };
         }
         else if (name === 'product_name') {
             modifiedData = {
-                ...addChange,
+                ...purchaseChange,
                 product_name: selected.value.product_name,
                 product_class_name: selected.value.product_class_name,
                 product_code: selected.value.product_code,
             };
         } else if (name === 'product_type') {
             modifiedData = {
-                ...addChange,
+                ...purchaseChange,
                 product_type: selected.value,
             };
         };
-        setAddChange(modifiedData);
-    }, [addChange]);
+        setPurchaseChange(modifiedData);
+    }, [purchaseChange]);
 
-    const handleAddDateChange = useCallback((name, date) => {
+    const handleDateChange = useCallback((name, date) => {
         const modifiedData = {
-            ...addChange,
+            ...purchaseChange,
             [name]: date,
         };
-        setAddChange(modifiedData);
-    }, [addChange]);
+        setPurchaseChange(modifiedData);
+    }, [purchaseChange]);
 
     const handleAddNewPurchase = useCallback((event) => {
         // Check data if they are available
-        if (addChange.company_code === null
-            || addChange.product_code === null) {
+        if (purchaseChange.company_code === null
+            || purchaseChange.product_code === null) {
             console.log("Necessary inputs must be available!");
             return;
         };
         const newPurchaseData = {
-            ...addChange,
+            ...purchaseChange,
             action_type: 'ADD',
             modify_user: cookies.myLationCrmUserId,
         };
@@ -136,7 +147,7 @@ const PurchaseAddModel = (props) => {
                 console.log('[PurchaseAddModel] fail to add purchase');
             }
         });
-    }, [addChange, cookies.myLationCrmUserId, modifyPurchase, setCurrentPurchase]);
+    }, [purchaseChange, cookies.myLationCrmUserId, modifyPurchase, setCurrentPurchase]);
 
 
     //===== Handles to edit 'MA contract' =================================================
@@ -234,10 +245,10 @@ const PurchaseAddModel = (props) => {
                         if (res.result) {
                             console.log('Succeeded to update MA end date');
                             const updateAddChange = {
-                                ...addChange,
+                                ...purchaseChange,
                                 ma_finish_date: finalData.ma_finish_date,
                             };
-                            setAddChange(updateAddChange);
+                            setPurchaseChange(updateAddChange);
                         } else {
                             console.log('Fail to update MA end date');
                         };
@@ -250,7 +261,7 @@ const PurchaseAddModel = (props) => {
 
         setSelectedMAContractRowKeys([]);
         setIsSubModalOpen(false);
-    }, [addChange, contractLists, cookies.myLationCrmUserId, currentPurchase, editedSubModalValues, modifyMAContract, modifyPurchase, orgSubModalValues]);
+    }, [purchaseChange, contractLists, cookies.myLationCrmUserId, currentPurchase, editedSubModalValues, modifyMAContract, modifyPurchase, orgSubModalValues]);
 
     const handleSubModalCancel = () => {
         setOrgSubModalValues(null);
@@ -304,7 +315,7 @@ const PurchaseAddModel = (props) => {
                 console.log('[PurchaseAddModel] initialize!');
                 if(handleInit) handleInit(!init);
                 setTimeout(()=>{
-                    initializeAddTemplate();
+                    initializePurchaseTemplate();
                 }, 500);
             };
         };
@@ -365,7 +376,7 @@ const PurchaseAddModel = (props) => {
                                             required
                                             long
                                             options={companyForSelection}
-                                            onChange={handleAddSelectChange}
+                                            onChange={handleSelectChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -373,18 +384,18 @@ const PurchaseAddModel = (props) => {
                                             title={t('purchase.product_name')}
                                             type='select'
                                             name="product_name"
-                                            defaultValue={addChange.product_name}
+                                            defaultValue={purchaseChange.product_name}
                                             required
                                             options={productOptions}
-                                            onChange={handleAddSelectChange}
+                                            onChange={handleSelectChange}
                                         />
                                         <AddBasicItem
                                             title={t('purchase.product_type')}
                                             type='select'
                                             name="product_type"
-                                            defaultValue={addChange.product_type}
+                                            defaultValue={purchaseChange.product_type}
                                             options={ProductTypeOptions}
-                                            onChange={handleAddSelectChange}
+                                            onChange={handleSelectChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -392,15 +403,15 @@ const PurchaseAddModel = (props) => {
                                             title={t('purchase.serial_number')}
                                             type='text'
                                             name="serial_number"
-                                            defaultValue={addChange.serial_number}
-                                            onChange={handleAddChange}
+                                            defaultValue={purchaseChange.serial_number}
+                                            onChange={handleItemChange}
                                         />
                                         <AddBasicItem
                                             title={t('purchase.licence_info')}
                                             type='text'
                                             name="licence_info"
-                                            defaultValue={addChange.licence_info}
-                                            onChange={handleAddChange}
+                                            defaultValue={purchaseChange.licence_info}
+                                            onChange={handleItemChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -408,15 +419,15 @@ const PurchaseAddModel = (props) => {
                                             title={t('purchase.module')}
                                             type='text'
                                             name="module"
-                                            defaultValue={addChange.module}
-                                            onChange={handleAddChange}
+                                            defaultValue={purchaseChange.module}
+                                            onChange={handleItemChange}
                                         />
                                         <AddBasicItem
                                             title={t('common.quantity')}
                                             type='text'
                                             name="quantity"
-                                            defaultValue={addChange.quantity}
-                                            onChange={handleAddChange}
+                                            defaultValue={purchaseChange.quantity}
+                                            onChange={handleItemChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -424,15 +435,15 @@ const PurchaseAddModel = (props) => {
                                             title={t('purchase.receipt_date')}
                                             type='date'
                                             name="receipt_date"
-                                            time={{ data: addChange.receipt_date }}
-                                            onChange={handleAddDateChange}
+                                            time={{ data: purchaseChange.receipt_date }}
+                                            onChange={handleDateChange}
                                         />
                                         <AddBasicItem
                                             title={t('purchase.delivery_date')}
                                             type='date'
                                             name="delivery_date"
-                                            time={{ data: addChange.delivery_date }}
-                                            onChange={handleAddDateChange}
+                                            time={{ data: purchaseChange.delivery_date }}
+                                            onChange={handleDateChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -440,15 +451,15 @@ const PurchaseAddModel = (props) => {
                                             title={t('purchase.hq_finish_date')}
                                             type='date'
                                             name="hq_finish_date"
-                                            time={{ data: addChange.hq_finish_date }}
-                                            onChange={handleAddDateChange}
+                                            time={{ data: purchaseChange.hq_finish_date }}
+                                            onChange={handleDateChange}
                                         />
                                         <AddBasicItem
                                             title={t('purchase.ma_finish_date')}
                                             type='date'
                                             name="ma_finish_date"
-                                            time={{ data: addChange.ma_finish_date }}
-                                            onChange={handleAddDateChange}
+                                            time={{ data: purchaseChange.ma_finish_date }}
+                                            onChange={handleDateChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -456,15 +467,15 @@ const PurchaseAddModel = (props) => {
                                             title={t('purchase.po_number')}
                                             type='text'
                                             name="po_number"
-                                            defaultValue={addChange.po_number}
-                                            onChange={handleAddChange}
+                                            defaultValue={purchaseChange.po_number}
+                                            onChange={handleItemChange}
                                         />
                                         <AddBasicItem
                                             title={t('common.price_1')}
                                             type='text'
                                             name="price"
-                                            defaultValue={addChange.price}
-                                            onChange={handleAddChange}
+                                            defaultValue={purchaseChange.price}
+                                            onChange={handleItemChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -472,15 +483,15 @@ const PurchaseAddModel = (props) => {
                                             title={t('purchase.invoice_no')}
                                             type='text'
                                             name="invoice_number"
-                                            defaultValue={addChange.invoice_number}
-                                            onChange={handleAddChange}
+                                            defaultValue={purchaseChange.invoice_number}
+                                            onChange={handleItemChange}
                                         />
                                         <AddBasicItem
                                             title={t('common.status')}
                                             type='text'
                                             name="status"
-                                            defaultValue={addChange.status}
-                                            onChange={handleAddChange}
+                                            defaultValue={purchaseChange.status}
+                                            onChange={handleItemChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -489,8 +500,8 @@ const PurchaseAddModel = (props) => {
                                             type='textarea'
                                             name="purchase_memo"
                                             long
-                                            defaultValue={addChange.purchase_memo}
-                                            onChange={handleAddChange}
+                                            defaultValue={purchaseChange.purchase_memo}
+                                            onChange={handleItemChange}
                                         />
                                     </div>
                                     <div className="text-center py-3">
@@ -498,7 +509,7 @@ const PurchaseAddModel = (props) => {
                                             <button
                                                 type="button"
                                                 className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                                                onClick={initializeAddTemplate}
+                                                onClick={initializePurchaseTemplate}
                                             >
                                                 {t('common.initialize')}
                                             </button>

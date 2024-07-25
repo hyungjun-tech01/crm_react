@@ -31,6 +31,7 @@ import LeadQuotationModel from "./LeadQutotationModel"
 import QuotationAddModel from "../quotations/QuotationAddModel";
 import QuotationDetailsModel from "../quotations/QuotationDetailsModel";
 import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
+import PurchaseAddModel from "../purchase/PurchaseAddModel";
 
 
 const LeadDetailsModel = () => {
@@ -80,7 +81,6 @@ const LeadDetailsModel = () => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentLeadCode, setCurrentLeadCode] = useState('');
   const [validMACount, setValidMACount] = useState(0);
-  const [ selectedPurchase, setSelectedPurchase ] = useState(null);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -242,20 +242,21 @@ const LeadDetailsModel = () => {
   ];
 
 
-  //===== Handles to edit 'Purchase Details' ===============================================
+  //===== Handles to edit 'Purchase Add/Details' ===============================================
   const [purchasesByCompany, setPurchasesByCompany] = useState([]);
+  const [initAddPurchase, setInitAddPurchase] = useState(false);
 
 
-  //===== Handles to edit 'Consulting Details' ===============================================
+  //===== Handles to edit 'Consulting Add/Details' ===============================================
   const [consultingsByLead, setConsultingsByLead] = useState([]);
   const [initAddConsulting, setInitAddConsulting] = useState(false);
 
 
-  //===== Handles to edit 'Quotation Details' ===============================================
+  //===== Handles to edit 'Quotation Add/Details' ===============================================
   const [quotationsByLead, setQuotationsByLead] = useState([]);
   const [initAddQuotation, setInitAddQuotation] = useState(false);
 
-
+  
   //===== Handles related with Search ===============================================  
   const [searchQuotationCondition, setSearchQuotationCondition] = useState("");
   const [searchPurchaseCondition, setSearchPurchaseCondition] = useState("");
@@ -565,6 +566,7 @@ const LeadDetailsModel = () => {
                           id="sub-lead-purchases" >
                           <CompanyPurchaseModel
                             purchases={purchasesByCompany}
+                            handleInitAddPurchase={setInitAddPurchase}
                           />
                         </div>
                         <div className="tab-pane task-related p-0"
@@ -615,7 +617,8 @@ const LeadDetailsModel = () => {
       <ConsultingDetailsModel />
       <QuotationAddModel init={initAddQuotation} handleInit={setInitAddQuotation} leadCode={selectedLead.lead_code} />
       <QuotationDetailsModel />
-      <PurchaseDetailsModel selected={selectedPurchase} handleSelected={setSelectedPurchase} />
+      <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} companyCode={selectedLead.company_code} />
+      <PurchaseDetailsModel />
     </>
   );
 };
