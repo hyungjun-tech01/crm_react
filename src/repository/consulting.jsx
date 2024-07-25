@@ -57,6 +57,16 @@ export const ConsultingTimeTypes = [
     { value: '2시간 이상', label: '2시간 이상'},
 ];
 
+export const consultingColumn = [
+    { value: 'company_name', label: '회사명'},
+    { value: 'consulting_type', label: '상담 유형'},
+    { value: 'lead_name', label: '고객명'},
+    { value: 'mobile_number', label: '고객휴대전화'},
+    { value: 'region', label: '전화번호'},
+    { value: 'request_content', label: '상담내역'},
+    { value: 'action_content', label: '상담 결과'},
+];
+
 
 export const ConsultingRepo = selector({
     key: "ConsultingRepository",
@@ -77,10 +87,15 @@ export const ConsultingRepo = selector({
                 };
             }
         });
-        const loadAllConsultings = getCallback(({set}) => async () => {
+        const loadAllConsultings = getCallback(({set}) => async (multiQueryCondi) => {
+            const input_json = JSON.stringify(multiQueryCondi);
             try{
                 console.log('[ConsultingRepository] Try loading all')
-                const response = await fetch(`${BASE_PATH}/consultings`);
+                const response = await fetch(`${BASE_PATH}/consultings`,{
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
                 const data = await response.json();
                 if(data.message){
                     console.log('loadAllConsultings message:', data.message);

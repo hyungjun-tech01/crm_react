@@ -13,7 +13,7 @@ const BASE_PATH = Paths.BASE_PATH;
 
 export const leadColumn = [
     { value: 'lead_name', label: '고객명'},
-    { value: 'group_', label: '그룹'},
+    { value: 'lead_group', label: '그룹'},
     { value: 'sales_resource', label: '영업담당자'},
     { value: 'company_name', label: '회사명'},
     { value: 'region', label: '지역'},
