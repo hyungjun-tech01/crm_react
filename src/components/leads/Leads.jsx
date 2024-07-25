@@ -110,7 +110,6 @@ const Leads = () => {
   }
   const handleMultiQueryModalOk = () => {
 
-    setCompanyState(0);
     setMultiQueryModal(false);
 
     // query condition 세팅 후 query
@@ -137,7 +136,6 @@ const Leads = () => {
     }
 
     console.log('multiQueryCondi',multiQueryCondi);
-    //tryLoadAllLeads(multiQueryCondi);   
     loadAllLeads(multiQueryCondi);
      
   };

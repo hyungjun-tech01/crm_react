@@ -120,6 +120,7 @@ const enResource = {
             request_type: 'Request Type',
             status: 'Consulting Status',
             type:'Consulting Type',
+            consulting_multi_query:'Consulting Multi Query',
         },
         quotation : {
             add_content: 'Add Content',

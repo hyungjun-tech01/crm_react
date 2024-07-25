@@ -120,6 +120,7 @@ const koResource = {
             request_type: '요청 유형',
             status: '상담 상태',
             type: '상담 유형',
+            consulting_multi_query:'상담 다중검색',
         },
         quotation : {
             add_content: '항목 추가',

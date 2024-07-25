@@ -24,8 +24,10 @@ import {
   atomLeadState,
   atomConsultingState,
   defaultLead,
-} from "../../atoms/atoms";
+} from "../../atoms/atoms"; 
 import { compareCompanyName, compareText } from "../../constants/functions";
+import MultiQueryModal from "../../constants/MultiQueryModal";
+import { consultingColumn } from "../../repository/consulting";
 
 const Consultings = () => {
   const { t } = useTranslation();
@@ -60,6 +62,84 @@ const Consultings = () => {
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
   const [statusSearch, setStatusSearch] = useState('common.all');
+
+  const [multiQueryModal, setMultiQueryModal] = useState(false);
+
+  const [queryConditions, setQueryConditions] = useState([
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+  ]);
+
+  const today = new Date();
+  const oneYearAgo = new Date();
+  const oneMonthAgo = new Date();
+  oneMonthAgo.setMonth(today.getMonth() - 1);
+  oneYearAgo.setMonth(today.getMonth() - 12);
+
+  // from date + to date picking 만들기 
+
+  const initialState = {
+    registration_date: { fromDate: oneYearAgo, toDate: today, checked: true },
+  }
+
+  const [dates, setDates] = useState(initialState);
+
+  const dateRangeSettings = [
+    { label: t('purchase.registration_date'), stateKey: 'registration_date', checked: true },
+  ];
+
+    // from date date 1개짜리 picking 만들기 
+    const initialSingleDate = {
+      ma_finish_date: { fromDate: oneMonthAgo,  checked: false },  
+    };
+  
+    const [singleDate, setSingleDate] = useState(initialSingleDate);
+  
+    const singleDateSettings = [
+      { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
+    ];
+
+  const handleMultiQueryModal = () => {
+    setMultiQueryModal(true);
+  }
+  const handleMultiQueryModalOk = () => {
+
+    //setCompanyState(0);
+    setMultiQueryModal(false);
+
+    // query condition 세팅 후 query
+    console.log("handleMultiQueryModalOk", queryConditions);
+    
+    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+        label: key,
+        fromDate: dates[key].fromDate,
+        toDate: dates[key].toDate,
+        checked: dates[key].checked,
+    }));
+
+
+    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+      label: key,
+      fromDate: singleDate[key].fromDate,
+      checked: singleDate[key].checked,
+    }));
+    
+    const multiQueryCondi = {
+      queryConditions:queryConditions,
+      checkedDates:checkedDates,
+      singleDate:checkedSingleDates
+    }
+
+    console.log('multiQueryCondi',multiQueryCondi);
+    //tryLoadAllLeads(multiQueryCondi);   
+    //loadAllLeads(multiQueryCondi);
+     
+  };
+  const handleMultiQueryModalCancel = () => {
+    setMultiQueryModal(false);
+  };  
 
   const handleSearchCondition = (newValue) => {
     setSearchCondition(newValue);
@@ -226,6 +306,15 @@ const Consultings = () => {
                   onChange={(e) => handleSearchCondition(e.target.value)}
                 />
               </div>
+              <div className="col text-start" style={{margin:'0px 20px 5px 20px'}}>
+                  <button
+                      className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
+                      id="multi-company-query"
+                      onClick={handleMultiQueryModal}
+                  >
+                      {t('consulting.consulting_multi_query')}
+                  </button>                
+              </div>
               <div className="col text-end">
                 <ul className="list-inline-item pl-0">
                   <li className="list-inline-item">
@@ -313,6 +402,23 @@ const Consultings = () => {
         <LeadDetailsModel />
         <ConsultingDetailsModel />
         <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} />
+        <MultiQueryModal 
+          title= {t('consulting.consulting_multi_query')}
+          open={multiQueryModal}
+          handleOk={handleMultiQueryModalOk}
+          handleCancel={handleMultiQueryModalCancel}
+          companyColumn={consultingColumn}
+          queryConditions={queryConditions}
+          setQueryConditions={setQueryConditions}
+          dates={dates}
+          setDates={setDates}
+          dateRangeSettings={dateRangeSettings}
+          initialState={initialState}
+          singleDate={singleDate}
+          setSingleDate={setSingleDate}
+          singleDateSettings={singleDateSettings}
+          initialSingleDate={initialSingleDate}
+        />  
       </div>
     </HelmetProvider>
   );
