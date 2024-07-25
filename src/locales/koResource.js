@@ -67,6 +67,8 @@ const koResource = {
             phone_number : '회사전화',
             salesman:'영업담당',
             zip_code : '업체우편번호',
+            _loading_add: '신규 업체 추가를 위한 기반 정보를 불러오고 있습니다.',
+            _loading_detail: '업체에 대한 상세 정보를 불러오고 있습니다.',
         },
         lead: {
             actions:'액션',
@@ -89,6 +91,7 @@ const koResource = {
             lead_information:'고객정보',
             lead_manage: '고객관리',
             lead_modified:'고객변경일',
+            lead_multi_query:'고객 다중검색',
             lead_name: '고객 이름',
             lead_sales:'고객영업담당',
             lead_status :'고객상태',
@@ -99,7 +102,8 @@ const koResource = {
             purchase_product:'구매 제품',
             quotation_history:'견적 이력',
             zip_code:'고객우편번호',
-            lead_multi_query:'고객 다중검색'
+            _loading_add: '신규 고객 추가를 위한 기반 정보를 불러오고 있습니다.',
+            _loading_detail: '고객에 대한 상세 정보를 불러오고 있습니다.',
         },
         consulting:{
             action_content: '상담 결과',
@@ -169,6 +173,8 @@ const koResource = {
             vat_excluded: '부가세 별도',
             vat_included: '부가세 포함',
             warranty: '보증기간',
+            _loading_add: '신규 견적 작성을 위한 기반 정보를 불러오고 있습니다.',
+            _loading_detail: '견적에 대한 상세 정보를 불러오고 있습니다.',
         },
         transaction:{
             add_content: '항목 추가',

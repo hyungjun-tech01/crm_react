@@ -753,7 +753,7 @@ const QuotationAddModel = (props) => {
             borderRadius: 4,
           }}
         >
-          [Show Details of selected Lead] Try to load necessary data
+          {t('quotation._loading_add')}
         </div>
       </Spin>
     );

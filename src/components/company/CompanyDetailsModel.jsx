@@ -380,7 +380,7 @@ const CompanyDetailsModel = ({ openTransaction }) => {
             borderRadius: 4,
           }}
         >
-          [CompanyDetailsModel] Try to load necessary data
+          {t('company._loading_detail')}
         </div>
       </Spin>
     );

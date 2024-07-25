@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilValue, useRecoilState } from "recoil";
 import { useTranslation } from "react-i18next";
-import {  Table } from "antd";
+import { Spin, Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
-import { ConvertCurrency, formatDate } from "../../constants/functions";
+import { formatDate } from "../../constants/functions";
 import * as bootstrap from '../../assets/plugins/bootstrap/js/bootstrap';
 import { Add } from "@mui/icons-material";
 
@@ -140,7 +140,17 @@ const CompanyPurchaseModel = (props) => {
 
     if (!isAllNeededDataLoaded)
         return (
-          <></>
+            <Spin tip="Loading" size="large">
+                <div
+                    style={{
+                        padding: 50,
+                        background: "rgba(0, 0, 0, 0.05)",
+                        borderRadius: 4,
+                    }}
+                >
+                    &nbsp;&nbsp;
+                </div>
+            </Spin>
         );
 
     return (

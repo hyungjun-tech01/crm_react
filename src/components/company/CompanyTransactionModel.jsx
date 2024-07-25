@@ -106,7 +106,6 @@ const CompanyTransactionModel = (props) => {
         },
     ];
 
-
     useEffect(() => {
         console.log('[CompanyTransactionModel] called!');
     }, [transactions]);

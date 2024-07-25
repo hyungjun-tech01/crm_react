@@ -130,7 +130,7 @@ const LeadAddModel = (props) => {
                 borderRadius: 4,
               }}
             >
-              [Add New Lead] Try to load necessary data
+              {t('lead._loading_add')}
             </div>
           </Spin>
         );

@@ -372,7 +372,7 @@ const LeadDetailsModel = () => {
             borderRadius: 4,
           }}
         >
-          [Show Details of selected Lead] Try to load necessary data
+          {t('lead._loading_detail')}
         </div>
       </Spin>
     );

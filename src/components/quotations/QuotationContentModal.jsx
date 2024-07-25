@@ -179,7 +179,7 @@ const QuotationContentModal = (props) => {
                         borderRadius: 4,
                     }}
                 >
-                    [Content of quotation] Try to load necessary data
+                    &nbsp;&nbsp;
                 </div>
             </Spin>
         );

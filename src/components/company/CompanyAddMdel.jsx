@@ -140,7 +140,7 @@ const CompanyAddModel = (props) => {
             borderRadius: 4,
           }}
         >
-            [CompanyAddModel] Try to load necessary data
+            {t('company._loading_add')}
         </div>
       </Spin>
     );
