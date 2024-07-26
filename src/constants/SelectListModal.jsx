@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useTranslation } from "react-i18next";
-import { Button, Input, Modal, Spin, Table } from 'antd';
+import { Button, Input, List, Modal, Spin } from 'antd';
 
 import { CompanyRepo } from '../repository/company';
 
@@ -16,7 +16,6 @@ const SelectListModal = (props) => {
     const [ loadingState, setLoadingState ] = useState(false);
     const [ listItems, setListItems ] = useState([]);
     const [ selectedItem, setSelectedItem ] = useState({});
-    const [ selectedKeys, setSelectedRowKeys ] = useState([]);
 
     const handleSearch = (input) => {
         console.log('handleSearch');
@@ -70,35 +69,6 @@ const SelectListModal = (props) => {
         handleClose();
     };
 
-    const columns = [
-        {
-            // title: t('company.company_name'),
-            dataIndex: 'company_name',
-            render: (text, record) => 
-                <>{text}</>,
-        },
-    ];
-
-    const rowSelection = {
-        selectedRowKeys: selectedKeys,
-        type: 'radio',
-        onChange: (selectedRowKeys, selectedRows) => {
-            setSelectedRowKeys(selectedRowKeys);
-
-            if (selectedRows.length > 0) {
-                // Set data to edit selected consulting ----------------------
-                const selectedValue = selectedRows.at(0);
-                handleClickRow(selectedValue);
-                setSelectedRowKeys([]);   //initialize the selected list about contract
-            };
-        },
-        getCheckboxProps: (record) => ({
-            disabled: record.name === "Disabled User", // Column configuration not to be checked
-            name: record.name,
-            className: "checkbox-red",
-        }),
-    };
-
     return (
         <Modal
             title={title}
@@ -145,24 +115,15 @@ const SelectListModal = (props) => {
                         />
                     </Spin>
                     :
-                    <Table
-                        rowSelection={rowSelection}
-                        style={{ overflowX: "auto" }}
-                        columns={columns}
+                    <List
                         dataSource={listItems}
-                        rowKey={(record) => record.company_code}
-                        onRow={(record, rowIndex) => {
-                            return {
-                                onClick: (event) => {
-                                    handleClickRow(record);
-                                }, // click row
-                                onDoubleClick: (event) => {
-                                    handleClickRow(record);
-                                    setSelectedRowKeys([]);   //initialize the selected list about contract
-                                    handleOk();
-                                }, // click row
-                            };
-                        }}
+                        renderItem={(item) => 
+                            <List.Item
+                                onClick={() => handleClickRow(item)}
+                            >
+                                {item[condition.item]}
+                            </List.Item>
+                        }
                     />
                 }
             </div>
