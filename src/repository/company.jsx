@@ -93,38 +93,42 @@ export const CompanyRepo = selector({
                 return false;
             };
         });
-
         const filterCompanies = getCallback(({set, snapshot }) => async (itemName, filterText) => {
             const allCompanyList = await snapshot.getPromise(atomAllCompanies);
             let allCompanies;
 
             if( itemName === 'common.all' ) {
-                allCompanies = allCompanyList.filter(item => (item.company_name &&item.company_name.includes(filterText))||
-                                            (item.company_phone_number &&item.company_phone_number.includes(filterText))||
-                                            (item.company_address &&item.company_address.includes(filterText))||
-                                           (item.sales_resource && item.sales_resource.includes(filterText))  ||
-                                           (item.application_engineer && item.application_engineer.includes(filterText))                       
+                allCompanies = allCompanyList.filter(item =>
+                    (item.company_name && item.company_name.includes(filterText))
+                    || (item.company_phone_number && item.company_phone_number.includes(filterText))
+                    || (item.company_address && item.company_address.includes(filterText))
+                    || (item.sales_resource && item.sales_resource.includes(filterText))
+                    || (item.application_engineer && item.application_engineer.includes(filterText))
                 );
             }else if(itemName === 'company.company_name' ){
-                allCompanies = allCompanyList.filter(item => (item.company_name &&item.company_name.includes(filterText))
+                allCompanies = allCompanyList.filter(item =>
+                    (item.company_name &&item.company_name.includes(filterText))
                 );
             }else if(itemName === 'common.phone_no' ){
-                allCompanies = allCompanyList.filter(item => (item.company_phone_number &&item.company_phone_number.includes(filterText))
+                allCompanies = allCompanyList.filter(item =>
+                    (item.company_phone_number &&item.company_phone_number.includes(filterText))
                 );
             }else if(itemName === 'company.address' ){
-                allCompanies = allCompanyList.filter(item => (item.company_address &&item.company_address.includes(filterText))
+                allCompanies = allCompanyList.filter(item =>
+                    (item.company_address &&item.company_address.includes(filterText))
                 );
             }else if(itemName === 'company.salesman' ){
-                allCompanies = allCompanyList.filter(item => (item.sales_resource &&item.sales_resource.includes(filterText))
+                allCompanies = allCompanyList.filter(item =>
+                    (item.sales_resource &&item.sales_resource.includes(filterText))
                 );
             }else if(itemName === 'company.engineer' ){
-                allCompanies = allCompanyList.filter(item => (item.application_engineer &&item.application_engineer.includes(filterText))
+                allCompanies = allCompanyList.filter(item =>
+                    (item.application_engineer &&item.application_engineer.includes(filterText))
                 );
             }
             set(atomFilteredCompany, allCompanies);
             return true;
         });
-
         const modifyCompany = getCallback(({set, snapshot}) => async (newCompany) => {
             const input_json = JSON.stringify(newCompany);
             console.log(`[ modifyCompany ] input : `, input_json);
@@ -236,12 +240,36 @@ export const CompanyRepo = selector({
                 console.error(`\t[ setCurrentCompany ] Error : ${err}`);
             };
         });
+        const searchCompanies = getCallback(({set, snapshot}) => async (itemName, filterText) => {
+            const query_obj = [{
+                column: itemName, columnQueryCondition: filterText, multiQueryInput:'', andOr: 'And'
+            }];
+            const input_json = JSON.stringify(query_obj);
+            try{
+                const response = await fetch(`${BASE_PATH}/companies`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+
+                const data = await response.json();
+                if(data.message){
+                    console.log('\t[ searchCompanies ] message:', data.message);
+                    return data.message;
+                };
+                return data;
+            } catch(e) {
+                console.log('\t[ searchCompanies ] error occurs on searching');
+                return 'fail to query';
+            };
+        })
         return {
             tryLoadAllCompanies,
             loadAllCompanies,
             filterCompanies,
             modifyCompany,
             setCurrentCompany,
+            searchCompanies,
         };
     }
 });

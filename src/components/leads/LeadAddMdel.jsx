@@ -10,6 +10,7 @@ import { option_locations } from "../../constants/constants";
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddAddressItem from '../../constants/AddAddressItem';
+import AddSearchItem from '../../constants/AddSearchItem';
 
 const LeadAddModel = (props) => {
     const { init, handleInit } = props;
@@ -142,6 +143,7 @@ const LeadAddModel = (props) => {
             tabIndex={-1}
             role="dialog"
             aria-modal="true"
+            data-bs-focus="false"
         >
             <div className="modal-dialog" role="document">
                 <button
@@ -201,13 +203,12 @@ const LeadAddModel = (props) => {
                                         />
                                     </div>
                                     <div className="form-group row">
-                                        <AddBasicItem
+                                        <AddSearchItem
                                             title={t('company.company_name')}
-                                            type='select'
                                             name='company_name'
                                             defaultValue={leadChange.company_name}
-                                            options={companyForSelection}
-                                            onChange={handleSelectChange}
+                                            edited={leadChange}
+                                            setEdited={setLeadChange}
                                         />
                                         <AddBasicItem
                                             title={t('company.company_name_en')}
