@@ -19,7 +19,7 @@ import { atomAllPurchases,
 import { CompanyRepo } from "../../repository/company";
 import { PurchaseRepo } from "../../repository/purchase";
 import { ProductClassListRepo, ProductRepo } from "../../repository/product";
-import { ConvertCurrency, compareText, formatDate } from "../../constants/functions";
+import { compareText, formatDate } from "../../constants/functions";
 
 import PurchaseAddModel from "./PurchaseAddModel";
 import PurchaseDetailsModel from "./PurchaseDetailsModel";

@@ -235,8 +235,6 @@ const Companies = () => {
       checked: dates[key].checked,
     }));
 
-    // console.log("checkedDates", checkedDates);
-
     const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
       label: key,
       fromDate: singleDate[key].fromDate,
@@ -249,7 +247,6 @@ const Companies = () => {
       singleDate: checkedSingleDates
     }
 
-    // loadAllCompanies(multiQueryCondi);
     tryLoadAllCompanies(multiQueryCondi);
     tryLoadAllUsers();
 

@@ -10,6 +10,7 @@ import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import TransactionView from "./TransactionView";
 
+
 const TransactionDetailsModel = () => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);

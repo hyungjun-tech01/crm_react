@@ -13,10 +13,12 @@ import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 
 import DetailCardItem from '../../constants/DetailCardItem';
 
+
 const QuotationContentModal = (props) => {
     const { setting, open, original, edited, handleEdited, handleOk, handleCancel } = props;
     const [t] = useTranslation();
     const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
+    
 
     //===== [RecoilState] Related with Product ==========================================
     const productClassState = useRecoilValue(atomProductClassListState);

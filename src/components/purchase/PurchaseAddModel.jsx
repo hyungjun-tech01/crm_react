@@ -8,7 +8,6 @@ import { ItemRender, ShowTotal } from "../paginationfunction";
 import {
     atomCompanyState,
     atomCompanyForSelection,
-    defaultPurchase,
     atomCurrentPurchase,
     defaultMAContract,
     atomProductClassListState,

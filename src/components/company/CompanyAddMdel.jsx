@@ -43,7 +43,6 @@ const CompanyAddModel = (props) => {
 
   const initializeCompanyTemplate = useCallback(() => {
     setCompanyChange({ ...defaultCompany });
-    // setIsAllNeededDataLoaded(false);
     document.querySelector("#add_new_company_form").reset();
   }, []);
 

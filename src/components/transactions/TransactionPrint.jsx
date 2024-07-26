@@ -72,6 +72,7 @@ Font.register({
     ]
 });
 
+
 const TransactionPrint = (props) => {
     const { data, contents} = props;
     const [ transactionContents, setTransactionContents ] = useState([]);

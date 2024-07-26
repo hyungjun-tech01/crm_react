@@ -209,6 +209,7 @@ Font.register({
     ]
 });
 
+
 const QuotationView = () => {
     const currentQuotation = useRecoilValue(atomCurrentQuotation);
     const [ quotationContents, setQuotationContents ] = useState([]);

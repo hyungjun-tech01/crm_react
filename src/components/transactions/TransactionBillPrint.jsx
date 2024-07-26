@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { PDFViewer } from '@react-pdf/renderer';
-import { Page, Text, View, Document, StyleSheet, Font, Svg, Ellipse } from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet, Font } from '@react-pdf/renderer';
 import NotoSansRegular from "../../fonts/NotoSansKR-Regular.ttf";
 import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";

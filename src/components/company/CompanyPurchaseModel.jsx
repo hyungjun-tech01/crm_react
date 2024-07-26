@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRecoilValue, useRecoilState } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Spin, Table } from "antd";

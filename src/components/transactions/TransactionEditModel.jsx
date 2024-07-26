@@ -6,7 +6,7 @@ import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import "antd/dist/reset.css";
-import { Button, Checkbox, Col, Input, InputNumber, Row, Spin, Table } from 'antd';
+import { Button, Checkbox, Col, Input, InputNumber, Row, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import DatePicker from "react-datepicker";
@@ -64,12 +64,10 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
 
   //===== [RecoilState] Related with Company =========================================
   const [companyState] = useRecoilState(atomCompanyState);
-  const { tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
   //===== Handles to edit 'TransactionEditModel' ======================================
-  const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
   const [orgTransaction, setOrgTransaction] = useState({});
   const [transactionChange, setTransactionChange] = useState({});
   const [transactionContents, setTransactionContents] = useState([]);

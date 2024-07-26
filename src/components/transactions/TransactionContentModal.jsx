@@ -13,6 +13,7 @@ import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 
 import DetailCardItem from '../../constants/DetailCardItem';
 
+
 const TransactionContentModal = (props) => {
     const { setting, open, original, edited, handleEdited, handleOk, handleCancel } = props;
     const [t] = useTranslation();

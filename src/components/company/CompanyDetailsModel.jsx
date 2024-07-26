@@ -32,6 +32,7 @@ import CompanyTransactionModel from "./CompanyTransactionModel";
 import PurchaseAddModel from "../purchase/PurchaseAddModel";
 import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
 
+
 const CompanyDetailsModel = ({ openTransaction }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);

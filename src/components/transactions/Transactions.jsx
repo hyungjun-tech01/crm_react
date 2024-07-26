@@ -17,7 +17,6 @@ import {
   atomFilteredTransaction,
   atomCompanyState,
   atomTransactionState,
-  defaultTransaction,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { UserRepo } from "../../repository/user";

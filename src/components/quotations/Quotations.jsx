@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
+import { useTranslation } from "react-i18next";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
@@ -26,7 +27,6 @@ import {
 import { atomUserState } from "../../atoms/atomsUser";
 import { compareCompanyName, compareText, ConvertCurrency, formatDate } from "../../constants/functions";
 
-import { useTranslation } from "react-i18next";
 
 const Quotations = () => {
   const { t } = useTranslation();

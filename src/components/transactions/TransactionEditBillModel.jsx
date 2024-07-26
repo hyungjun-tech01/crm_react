@@ -5,7 +5,7 @@ import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "antd/dist/reset.css";
-import { Checkbox, Input, Spin, Table } from 'antd';
+import { Checkbox, Input, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import DatePicker from "react-datepicker";
@@ -16,7 +16,6 @@ import {
   atomCompanyState,
   atomCompanyForSelection,
 } from "../../atoms/atoms";
-import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
 
 import { ConvertCurrency } from "../../constants/functions";
