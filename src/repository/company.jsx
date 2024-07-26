@@ -241,17 +241,22 @@ export const CompanyRepo = selector({
             };
         });
         const searchCompanies = getCallback(({set, snapshot}) => async (itemName, filterText) => {
-            const query_obj = [{
-                column: itemName, columnQueryCondition: filterText, multiQueryInput:'', andOr: 'And'
-            }];
+            const query_obj = {
+                queryConditions: [{
+                    column: { value: itemName},
+                    columnQueryCondition: { value: 'like'},
+                    multiQueryInput: filterText,
+                    andOr: 'And',
+                }],
+            };
             const input_json = JSON.stringify(query_obj);
+            
             try{
                 const response = await fetch(`${BASE_PATH}/companies`, {
                     method: "POST",
                     headers:{'Content-Type':'application/json'},
                     body: input_json,
                 });
-
                 const data = await response.json();
                 if(data.message){
                     console.log('\t[ searchCompanies ] message:', data.message);

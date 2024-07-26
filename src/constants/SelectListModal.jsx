@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useTranslation } from "react-i18next";
-import { Button, Input, List, Modal, Spin } from 'antd';
+import { Button, Input, Modal, Spin, Table } from 'antd';
 
 import { CompanyRepo } from '../repository/company';
 
@@ -16,6 +16,7 @@ const SelectListModal = (props) => {
     const [ loadingState, setLoadingState ] = useState(false);
     const [ listItems, setListItems ] = useState([]);
     const [ selectedItem, setSelectedItem ] = useState({});
+    const [ selectedKeys, setSelectedRowKeys ] = useState([]);
 
     const handleSearch = (input) => {
         console.log('handleSearch');
@@ -51,6 +52,10 @@ const SelectListModal = (props) => {
             };
         })
     };
+
+    const handleClickRow = (data) => {
+        console.log('handleClickRow :', data)
+    };
     
     const handleOk = () => {
         if(Object.keys(selectedItem).length > 0){
@@ -63,6 +68,35 @@ const SelectListModal = (props) => {
         setListItems([]);
         setSelectedItem({});
         handleClose();
+    };
+
+    const columns = [
+        {
+            // title: t('company.company_name'),
+            dataIndex: 'company_name',
+            render: (text, record) => 
+                <>{text}</>,
+        },
+    ];
+
+    const rowSelection = {
+        selectedRowKeys: selectedKeys,
+        type: 'radio',
+        onChange: (selectedRowKeys, selectedRows) => {
+            setSelectedRowKeys(selectedRowKeys);
+
+            if (selectedRows.length > 0) {
+                // Set data to edit selected consulting ----------------------
+                const selectedValue = selectedRows.at(0);
+                handleClickRow(selectedValue);
+                setSelectedRowKeys([]);   //initialize the selected list about contract
+            };
+        },
+        getCheckboxProps: (record) => ({
+            disabled: record.name === "Disabled User", // Column configuration not to be checked
+            name: record.name,
+            className: "checkbox-red",
+        }),
     };
 
     return (
@@ -79,17 +113,16 @@ const SelectListModal = (props) => {
                     Submit
                 </Button>,
             ]}
-            style={{ top: 120, width: 360 }}
+            width={520}
+            style={{ top: 120 }}
             zIndex={2001}
         >
             <Search
                 placeholder={t('comment.input_search_text')}
                 allowClear
-                enterButton
-                size="large"
                 loading={loadingState}
                 onSearch={handleSearch}
-                style={{ width: 340, marginBottom: '0.5rem' }}
+                enterButton
             />
             <div
                 id="scrollableDiv"
@@ -98,18 +131,40 @@ const SelectListModal = (props) => {
                     overflow: 'auto',
                     padding: '0 16px',
                     border: '1px solid rgba(140, 140, 140, 0.35)',
+                    marginTop: '0.5rem'
                 }}
             >
-                <List
-                    dataSource={listItems}
-                    renderItem={(item, index) => (
-                        <List.Item>
-                        <List.Item.Meta
-                        title={item[condition.item]}
+                { loadingState ? 
+                    <Spin tip="Loading" size="large">
+                        <div
+                        style={{
+                            padding: 50,
+                            background: "rgba(0, 0, 0, 0.05)",
+                            borderRadius: 4,
+                        }}
                         />
-                    </List.Item>
-                    )}
-                />
+                    </Spin>
+                    :
+                    <Table
+                        rowSelection={rowSelection}
+                        style={{ overflowX: "auto" }}
+                        columns={columns}
+                        dataSource={listItems}
+                        rowKey={(record) => record.company_code}
+                        onRow={(record, rowIndex) => {
+                            return {
+                                onClick: (event) => {
+                                    handleClickRow(record);
+                                }, // click row
+                                onDoubleClick: (event) => {
+                                    handleClickRow(record);
+                                    setSelectedRowKeys([]);   //initialize the selected list about contract
+                                    handleOk();
+                                }, // click row
+                            };
+                        }}
+                    />
+                }
             </div>
         </Modal>
     );
