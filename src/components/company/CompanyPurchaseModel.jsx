@@ -202,7 +202,7 @@ const CompanyPurchaseModel = (props) => {
                                 return {
                                     onClick: (event) => {
                                         setSelectedPurchaseRowKeys([record.purchase_code]);
-                                        handleSelectPurchase(record);
+                                        handleSelectPurchase(record.purchase_code);
                                     },
                                 };
                             }}
