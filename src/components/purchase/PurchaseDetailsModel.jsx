@@ -53,7 +53,7 @@ const PurchaseDetailsModel = () => {
   const maContractSet = useRecoilValue(atomMAContractSet);
   const { loadPurchaseMAContracts, modifyMAContract, setCurrentMAContract } = useRecoilValue(MAContractRepo);
 
-
+  console.log(maContractSet);
   //===== Handles to deal this component ==============================================
   const [isFullScreen, setIsFullScreen] = useState(false);
 

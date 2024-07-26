@@ -347,7 +347,6 @@ export const atomPurchaseState = atom({
 
 //----- MA Contract ------------------------
 export const defaultMAContract = {
-    action_type : null,
     ma_code : null,
     purchase_code : null,
     ma_company_code : null,
