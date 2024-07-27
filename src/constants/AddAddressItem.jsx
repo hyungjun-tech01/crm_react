@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import ReactDom from 'react-dom';
 import { FiSearch } from "react-icons/fi";
 import PopupPostCode from "./PostCode";
 
@@ -43,14 +42,14 @@ const AddAddressItem = (props) => {
                 <div className="add-basic-btn" onClick={() => {if(!disabled) setIsPopupOpen(!isPopupOpen)}}>
                     <FiSearch />
                 </div>
-                    {isPopupOpen && (
-                        <div style={{position:"absolute",top:"45px",right:"650px"}} >
-                            <PopupPostCode
-                                onSetData={handleData}
-                                onClose={() => setIsPopupOpen(false)}
-                            />
-                        </div>
-                    )}
+                {isPopupOpen && (
+                    <div style={{position:"absolute",top:"45px",right:"650px"}} >
+                        <PopupPostCode
+                            onSetData={handleData}
+                            onClose={() => setIsPopupOpen(false)}
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );

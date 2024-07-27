@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import ReactDom from 'react-dom';
 import { Input } from 'antd';
 import Select from 'react-select';
 import DatePicker from "react-datepicker";
@@ -8,10 +7,6 @@ import { FiSearch } from "react-icons/fi";
 
 import PopupPostCode from "./PostCode";
 
-const PopupDom = ({ children }) => {
-    const el = document.getElementById('popupDom2');
-    return ReactDom.createPortal(children, el);
-};
 
 const DateInput = (props) => {
     const { name, addonBefore, onChange, format, showTime, style, value, disabled } = props;
@@ -173,16 +168,14 @@ const AddressInput = (props) => {
                     >
                         <FiSearch />
                     </div>
-                    <div id="popupDom2">
-                        {isPopupOpen && (
-                            <PopupDom>
-                                <PopupPostCode
-                                    onSetData={handleData}
-                                    onClose={() => setIsPopupOpen(false)}
-                                />
-                            </PopupDom>
-                        )}
-                    </div>
+                    {isPopupOpen && (
+                        <div style={{position:"absolute",top:"45px",right:"650px"}} >
+                            <PopupPostCode
+                                onSetData={handleData}
+                                onClose={() => setIsPopupOpen(false)}
+                            />
+                        </div>
+                    )}
                 </span>
             </span>
         </div>
