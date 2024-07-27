@@ -25,6 +25,7 @@ import {
 } from "../../repository/consulting";
 
 import AddBasicItem from "../../constants/AddBasicItem";
+import AddSearchItem from "../../constants/AddSearchItem";
 import MessageModal from "../../constants/MessageModal";
 
 
@@ -249,14 +250,14 @@ const ConsultingAddModel = (props) => {
                 />
               </div>
               <div className="form-group row">
-                <AddBasicItem
+                <AddSearchItem
                   title={t('lead.lead_name')}
-                  type='select'
+                  category='consulting'
                   name='lead_name'
-                  defaultValue={consultingChange.lead_name}
-                  options={leadsForSelection}
                   required
-                  onChange={handleSelectChange}
+                  defaultValue={consultingChange.lead_name}
+                  edited={consultingChange}
+                  setEdited={setConsultingChange}
                 />
               </div>
               {(consultingChange.lead_name !== null) &&

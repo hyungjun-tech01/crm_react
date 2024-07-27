@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Button, Input, List, Modal, Spin } from 'antd';
 import classNames from 'classnames';
 import { CompanyRepo } from '../repository/company';
+import { LeadRepo } from '../repository/lead';
 import styles from './SelectListModal.module.scss';
 import { FiSearch } from 'react-icons/fi';
 
@@ -14,6 +15,7 @@ const SelectListModal = (props) => {
     const { t } = useTranslation();
 
     const { searchCompanies } = useRecoilValue(CompanyRepo);
+    const { searchLeads } = useRecoilValue(LeadRepo);
 
     const [ inputText, setInputText ] = useState('');
     const [ loadingState, setLoadingState ] = useState(false);
@@ -23,7 +25,6 @@ const SelectListModal = (props) => {
     const inputRef = useRef(null);
 
     const handleSearch = (input) => {
-        console.log('handleSearch');
         if(!condition || !condition['category'] || !condition['item']) {
             console.log('Input data is not proper');
             return;
@@ -36,6 +37,10 @@ const SelectListModal = (props) => {
             case 'company':
                 if(condition.item === 'company_name')
                     response = searchCompanies(condition.item, input);
+                break;
+            case 'consulting':
+                if(condition.item === 'lead_name')
+                    response = searchLeads(condition.item, input);
                 break;
             case 'purchase':
                 if(condition.item === 'company_name')
@@ -57,7 +62,21 @@ const SelectListModal = (props) => {
             };
             if(Array.isArray(res)){
                 console.log('Succeeded to search :', res);
-                const tempItems = res.map((item, idx) => ({ ...item, index: idx}));
+                let tempItems = null;
+                if(condition.item === 'lead_name') {
+                    tempItems = res.map((item, idx) => ({
+                        ...item,
+                        index: idx,
+                        component: <div>{item.lead_name} | {item.company_name}</div>,
+                    }));
+                } else {
+                    tempItems = res.map((item, idx) => ({
+                        ...item,
+                        index: idx,
+                        component: <div>{item[condition.item]}</div>,
+                    }));
+                };
+                
                 setListItems(tempItems);
                 setLoadingState(false);
             };
@@ -65,7 +84,6 @@ const SelectListModal = (props) => {
     };
 
     const handleClickRow = (data) => {
-        console.log('handleClickRow :', data);
         let modifiedData = {index: data.index};
         switch(condition.category)
         {
@@ -79,6 +97,19 @@ const SelectListModal = (props) => {
                     modifiedData['company_address'] = data.company_address;
                     modifiedData['company_phone_number'] = data.company_phone_number;
                     modifiedData['company_fax_number'] = data.company_fax_number;
+                };
+                break;
+            case 'consulting':
+                if(condition.item === 'lead_name') {
+                    modifiedData['company_code'] = data.company_code;
+                    modifiedData['company_name'] = data.company_name;
+                    modifiedData['lead_code'] = data.lead_code;
+                    modifiedData['lead_name'] = data.lead_name;
+                    modifiedData['department'] = data.department;
+                    modifiedData['position'] = data.position;
+                    modifiedData['mobile_number'] = data.mobile_number;
+                    modifiedData['phone_number'] = data.phone_number;
+                    modifiedData['email'] = data.email;
                 };
                 break;
             case 'purchase':
@@ -168,7 +199,7 @@ const SelectListModal = (props) => {
                                 onClick={() => handleClickRow(item)}
                                 onDoubleClick={()=>{handleClickRow(item);handleOk();}}
                             >
-                                {item[condition.item]}
+                                {item.component}
                             </List.Item>
                         }
                     />

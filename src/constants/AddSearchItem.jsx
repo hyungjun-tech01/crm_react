@@ -38,6 +38,7 @@ const AddSearchItem = (props) => {
                 open={isPopupOpen}
                 handleChange={(data) => {
                     delete data.index;
+                    delete data.component;
                     setEdited({
                         ...edited,
                         ...data,

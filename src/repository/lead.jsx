@@ -231,12 +231,41 @@ export const LeadRepo = selector({
                 console.error(`setCurrentLead / Error : ${err}`);
             };
         });
+        const searchLeads = getCallback(({set, snapshot}) => async (itemName, filterText) => {
+            const query_obj = {
+                queryConditions: [{
+                    column: { value: itemName},
+                    columnQueryCondition: { value: 'like'},
+                    multiQueryInput: filterText,
+                    andOr: 'And',
+                }],
+            };
+            const input_json = JSON.stringify(query_obj);
+            
+            try{
+                const response = await fetch(`${BASE_PATH}/leads`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+                const data = await response.json();
+                if(data.message){
+                    console.log('\t[ searchLeads ] message:', data.message);
+                    return data.message;
+                };
+                return data;
+            } catch(e) {
+                console.log('\t[ searchLeads ] error occurs on searching');
+                return 'fail to query';
+            };
+        });
         return {
             tryLoadAllLeads,
             loadAllLeads,
             modifyLead,
             setCurrentLead,
             filterLeads,
+            searchLeads,
         };
     }
 });

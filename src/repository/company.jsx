@@ -267,7 +267,7 @@ export const CompanyRepo = selector({
                 console.log('\t[ searchCompanies ] error occurs on searching');
                 return 'fail to query';
             };
-        })
+        });
         return {
             tryLoadAllCompanies,
             loadAllCompanies,
