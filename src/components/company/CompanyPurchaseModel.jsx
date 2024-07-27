@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRecoilValue, useRecoilState } from "recoil";
 import { useTranslation } from "react-i18next";
-import { Spin, Table } from "antd";
+import { Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { formatDate } from "../../constants/functions";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
@@ -150,19 +150,7 @@ const CompanyPurchaseModel = (props) => {
     }, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions]);
 
     if (!isAllNeededDataLoaded)
-        return (
-            <Spin tip="Loading" size="large">
-                <div
-                    style={{
-                        padding: 50,
-                        background: "rgba(0, 0, 0, 0.05)",
-                        borderRadius: 4,
-                    }}
-                >
-                    &nbsp;&nbsp;
-                </div>
-            </Spin>
-        );
+        return <div>&nbsp;</div>;
 
     return (
         <div className="row">

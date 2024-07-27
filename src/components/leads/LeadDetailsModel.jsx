@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Avatar, Space, Spin, Switch } from "antd";
+import { Avatar, Space, Switch } from "antd";
 import {
   atomCurrentLead, defaultLead,
   atomAllCompanies, atomCurrentCompany, atomCompanyState, atomCompanyForSelection,
@@ -364,19 +364,7 @@ const LeadDetailsModel = () => {
   }, [userState, companyState, purchaseState, consultingState, quotationState]);
 
   if (!isAllNeededDataLoaded)
-    return (
-      <Spin tip="Loading" size="large">
-        <div
-          style={{
-            padding: 50,
-            background: "rgba(0, 0, 0, 0.05)",
-            borderRadius: 4,
-          }}
-        >
-          {t('lead._loading_detail')}
-        </div>
-      </Spin>
-    );
+    return <div>&nbsp;</div>;
 
   return (
     <>

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Checkbox, InputNumber, Space, Spin, Table } from 'antd';
+import { Checkbox, InputNumber, Space, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { AddBoxOutlined, IndeterminateCheckBoxOutlined } from '@mui/icons-material';
 import { option_locations } from '../../constants/constants';
@@ -793,19 +793,7 @@ const QuotationAddModel = (props) => {
   }, [leadsState, userState, productClassState, productState, productOptions, init]);
 
   if (!isAllNeededDataLoaded)
-    return (
-      <Spin tip="Loading" size="large">
-        <div
-          style={{
-            padding: 50,
-            background: "rgba(0, 0, 0, 0.05)",
-            borderRadius: 4,
-          }}
-        >
-          {t('quotation._loading_add')}
-        </div>
-      </Spin>
-    );
+    return <div>&nbsp;</div>;
 
   return (
     <div

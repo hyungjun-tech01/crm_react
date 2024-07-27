@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
-import { Spin, Table } from 'antd';
+import { Table } from 'antd';
 import { ItemRender, ShowTotal } from "../paginationfunction";
 
 import {
@@ -321,19 +321,7 @@ const PurchaseAddModel = (props) => {
     }, [companyState, productClassState, productState, init]);
 
     if (!isAllNeededDataLoaded)
-        return (
-            <Spin tip="Loading" size="large">
-                <div
-                    style={{
-                        padding: 50,
-                        background: "rgba(0, 0, 0, 0.05)",
-                        borderRadius: 4,
-                    }}
-                >
-                    [Show Details of selected Purchase] Try to load necessary data
-                </div>
-            </Spin>
-        );
+        return <div>&nbsp;</div>;
 
     return (
         <div

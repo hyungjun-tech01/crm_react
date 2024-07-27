@@ -14,7 +14,6 @@ import {
   option_deal_type,
   option_industry_type,
 } from "../../constants/constants";
-import { Spin } from 'antd';
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddAddressItem from "../../constants/AddAddressItem";
@@ -130,19 +129,7 @@ const CompanyAddModel = (props) => {
   }, [userState, init]);
 
   if (!isAllNeededDataLoaded)
-    return (
-      <Spin tip="Loading" size="large">
-        <div
-          style={{
-            padding: 50,
-            background: "rgba(0, 0, 0, 0.05)",
-            borderRadius: 4,
-          }}
-        >
-            {t('company._loading_add')}
-        </div>
-      </Spin>
-    );
+    return <div>&nbsp;</div>;
 
   return (
     <div

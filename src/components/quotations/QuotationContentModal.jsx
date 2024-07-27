@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
-import { Button, Modal, Spin } from 'antd';
+import { Button, Modal } from 'antd';
 import {
     atomProductClassList,
     atomProductClassListState,
@@ -174,19 +174,7 @@ const QuotationContentModal = (props) => {
     }, [allProductClassList, allProducts, productClassState, productOptions, productState, original.detail_desc_on_off]);
 
     if (!isAllNeededDataLoaded)
-        return (
-            <Spin tip="Loading" size="large">
-                <div
-                    style={{
-                        padding: 50,
-                        background: "rgba(0, 0, 0, 0.05)",
-                        borderRadius: 4,
-                    }}
-                >
-                    &nbsp;&nbsp; 여기가 문제인가???
-                </div>
-            </Spin>
-        );
+        return <div>&nbsp;</div>;
 
     return (
         <Modal
