@@ -5,8 +5,9 @@ import { Button, Input, List, Modal, Spin } from 'antd';
 import classNames from 'classnames';
 import { CompanyRepo } from '../repository/company';
 import styles from './SelectListModal.module.scss';
+import { FiSearch } from 'react-icons/fi';
 
-const { Search } = Input;
+// const { Search } = Input;
 
 const SelectListModal = (props) => {
     const { title, condition, open, handleChange, handleClose } = props;
@@ -14,6 +15,7 @@ const SelectListModal = (props) => {
 
     const { searchCompanies } = useRecoilValue(CompanyRepo);
 
+    const [ inputText, setInputText ] = useState('');
     const [ loadingState, setLoadingState ] = useState(false);
     const [ listItems, setListItems ] = useState([]);
     const [ selectedItem, setSelectedItem ] = useState(null);
@@ -90,12 +92,12 @@ const SelectListModal = (props) => {
             style={{ top: 120 }}
             zIndex={2001}
         >
-            <Search
+            <Input
                 placeholder={t('comment.input_search_text')}
                 allowClear
-                loading={loadingState}
-                onSearch={handleSearch}
-                enterButton
+                addonAfter={<div><FiSearch onClick={(e) => handleSearch(inputText)} /></div>}
+                onChange={(e) => setInputText(e.target.value)}
+                onPressEnter={(e) => handleSearch(inputText)}
             />
             <div
                 id="scrollableDiv"
