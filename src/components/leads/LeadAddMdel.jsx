@@ -204,6 +204,7 @@ const LeadAddModel = (props) => {
                                     <div className="form-group row">
                                         <AddSearchItem
                                             title={t('company.company_name')}
+                                            category='company'
                                             name='company_name'
                                             defaultValue={leadChange.company_name}
                                             edited={leadChange}

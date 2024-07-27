@@ -19,6 +19,7 @@ import { ProductTypeOptions } from '../../repository/product';
 import { MAContractRepo, ContractTypes } from "../../repository/ma_contract";
 
 import AddBasicItem from "../../constants/AddBasicItem";
+import AddSearchItem from '../../constants/AddSearchItem';
 import DetailSubModal from '../../constants/DetailSubModal';
 import { ConvertCurrency, formatDate } from '../../constants/functions';
 import { Add } from "@mui/icons-material";
@@ -367,15 +368,15 @@ const PurchaseAddModel = (props) => {
                             <div className="col-md-12">
                                 <form id="add_new_purchase_form">
                                     <div className="form-group row">
-                                        <AddBasicItem
+                                        <AddSearchItem
                                             title={t('company.company_name')}
-                                            type='select'
-                                            name="company_name"
-                                            defaultValue={companyData.company_name}
+                                            category='purchase'
+                                            name='company_name'
+                                            defaultValue={purchaseChange.company_name}
                                             required
                                             long
-                                            options={companyForSelection}
-                                            onChange={handleSelectChange}
+                                            edited={companyData}
+                                            setEdited={setCompanyData}
                                         />
                                     </div>
                                     <div className="form-group row">

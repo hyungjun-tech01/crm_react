@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useTranslation } from "react-i18next";
 import { Button, Input, List, Modal, Spin } from 'antd';
@@ -20,6 +20,8 @@ const SelectListModal = (props) => {
     const [ listItems, setListItems ] = useState([]);
     const [ selectedItem, setSelectedItem ] = useState(null);
 
+    const inputRef = useRef(null);
+
     const handleSearch = (input) => {
         console.log('handleSearch');
         if(!condition || !condition['category'] || !condition['item']) {
@@ -27,11 +29,17 @@ const SelectListModal = (props) => {
             return;
         };
         setLoadingState(true);
+
         let response = null;
         switch(condition.category)
         {
             case 'company':
-                response = searchCompanies(condition.item, input);
+                if(condition.item === 'company_name')
+                    response = searchCompanies(condition.item, input);
+                break;
+            case 'purchase':
+                if(condition.item === 'company_name')
+                    response = searchCompanies(condition.item, input);
                 break;
             default:
                 break;
@@ -57,8 +65,32 @@ const SelectListModal = (props) => {
     };
 
     const handleClickRow = (data) => {
-        console.log('handleClickRow :', data)
-        setSelectedItem(data);
+        console.log('handleClickRow :', data);
+        let modifiedData = {index: data.index};
+        switch(condition.category)
+        {
+            case 'company':
+                if(condition.item === 'company_name') {
+                    modifiedData['company_code'] = data.company_code;
+                    modifiedData['company_index'] = data.company_index;
+                    modifiedData['company_name'] = data.company_name;
+                    modifiedData['company_name_en'] = data.company_name_en;
+                    modifiedData['company_zip_code'] = data.company_zip_code;
+                    modifiedData['company_address'] = data.company_address;
+                    modifiedData['company_phone_number'] = data.company_phone_number;
+                    modifiedData['company_fax_number'] = data.company_fax_number;
+                };
+                break;
+            case 'purchase':
+                if(condition.item === 'company_name') {
+                    modifiedData['company_code'] = data.company_code;
+                    modifiedData['company_name'] = data.company_name;
+                };
+                break;
+            default:
+                break;
+        };
+        setSelectedItem(modifiedData);
     };
     
     const handleOk = () => {
@@ -73,6 +105,12 @@ const SelectListModal = (props) => {
         setSelectedItem({});
         handleClose();
     };
+
+    useEffect(() => {
+        if(inputRef.current !== null) {
+            inputRef.current.focus();
+        };
+    }, []);
 
     return (
         <Modal
@@ -93,6 +131,7 @@ const SelectListModal = (props) => {
             zIndex={2001}
         >
             <Input
+                ref={inputRef}
                 placeholder={t('comment.input_search_text')}
                 allowClear
                 addonAfter={<div><FiSearch onClick={(e) => handleSearch(inputText)} /></div>}
@@ -127,6 +166,7 @@ const SelectListModal = (props) => {
                                 className={(selectedItem && (item.index === selectedItem.index)) ?
                                     classNames(styles.ListRow, styles.selected) : styles.ListRow }
                                 onClick={() => handleClickRow(item)}
+                                onDoubleClick={()=>{handleClickRow(item);handleOk();}}
                             >
                                 {item[condition.item]}
                             </List.Item>
