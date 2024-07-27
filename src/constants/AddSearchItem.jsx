@@ -29,13 +29,15 @@ const AddSearchItem = (props) => {
             </div>
             <SelectListModal
                 title={t('company.search_name')}
-                condition={{category:'company',item:'company_name'}}
+                condition={{category:'company', item:'company_name'}}
                 open={isPopupOpen}
                 handleChange={(data) => {
+                    delete data.index;
                     setEdited({
                         ...edited,
                         ...data,
-                })}}
+                    })
+                }}
                 handleClose={()=>setIsPopupOpen(false)}
             />
         </div>

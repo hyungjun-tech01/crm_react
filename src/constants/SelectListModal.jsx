@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useTranslation } from "react-i18next";
 import { Button, Input, List, Modal, Spin } from 'antd';
-
+import classNames from 'classnames';
 import { CompanyRepo } from '../repository/company';
+import styles from './SelectListModal.module.scss';
 
 const { Search } = Input;
 
@@ -15,7 +16,7 @@ const SelectListModal = (props) => {
 
     const [ loadingState, setLoadingState ] = useState(false);
     const [ listItems, setListItems ] = useState([]);
-    const [ selectedItem, setSelectedItem ] = useState({});
+    const [ selectedItem, setSelectedItem ] = useState(null);
 
     const handleSearch = (input) => {
         console.log('handleSearch');
@@ -46,7 +47,8 @@ const SelectListModal = (props) => {
             };
             if(Array.isArray(res)){
                 console.log('Succeeded to search :', res);
-                setListItems(res);
+                const tempItems = res.map((item, idx) => ({ ...item, index: idx}));
+                setListItems(tempItems);
                 setLoadingState(false);
             };
         })
@@ -54,6 +56,7 @@ const SelectListModal = (props) => {
 
     const handleClickRow = (data) => {
         console.log('handleClickRow :', data)
+        setSelectedItem(data);
     };
     
     const handleOk = () => {
@@ -99,7 +102,7 @@ const SelectListModal = (props) => {
                 style={{
                     height: 400,
                     overflow: 'auto',
-                    padding: '0 16px',
+                    padding: '0',
                     border: '1px solid rgba(140, 140, 140, 0.35)',
                     marginTop: '0.5rem'
                 }}
@@ -119,6 +122,8 @@ const SelectListModal = (props) => {
                         dataSource={listItems}
                         renderItem={(item) => 
                             <List.Item
+                                className={(selectedItem && (item.index === selectedItem.index)) ?
+                                    classNames(styles.ListRow, styles.selected) : styles.ListRow }
                                 onClick={() => handleClickRow(item)}
                             >
                                 {item[condition.item]}

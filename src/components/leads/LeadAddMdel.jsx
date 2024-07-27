@@ -3,7 +3,7 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
 import { Spin } from 'antd';
-import { atomCompanyForSelection, atomCompanyState, defaultLead } from "../../atoms/atoms";
+import { defaultLead } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { option_locations } from "../../constants/constants";
@@ -19,8 +19,7 @@ const LeadAddModel = (props) => {
     
 
     //===== [RecoilState] Related with Company =============================================
-    const companyState = useRecoilValue(atomCompanyState);
-    const companyForSelection = useRecoilValue(atomCompanyForSelection);
+    // const companyState = useRecoilValue(atomCompanyState);
 
 
     //===== [RecoilState] Related with Lead ================================================
@@ -35,11 +34,11 @@ const LeadAddModel = (props) => {
     
     //===== Handles to edit 'Lead Add' =====================================================
     const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
-    const [ leadChange, setLeadChange ] = useState(defaultLead);
+    const [ leadChange, setLeadChange ] = useState({...defaultLead});
     const [ disabledItems, setDisabledItems ] = useState({});
 
     const initializeLeadTemplate = useCallback(() => {
-        setLeadChange(defaultLead);
+        setLeadChange({...defaultLead});
         setDisabledItems({});
         document.querySelector("#add_new_lead_form").reset();
     }, []);
@@ -109,7 +108,7 @@ const LeadAddModel = (props) => {
     }, [leadChange, disabledItems]);
 
     useEffect(() => {
-        if(((companyState & 1) === 1) && ((userState & 1) === 1)) {
+        if(((userState & 1) === 1)) {
             setIsAllNeededDataLoaded(true);
             if (init) {
                 console.log('[LeadAddModel] initialize!');
@@ -119,7 +118,7 @@ const LeadAddModel = (props) => {
                 }, 500);
             };
         }
-    }, [companyState, userState, init ])
+    }, [ userState, init ])
 
     if (!isAllNeededDataLoaded)
         return (

@@ -18,7 +18,6 @@ import {
   atomCurrentTransaction,
   defaultTransaction,
 } from "../../atoms/atoms";
-import { CompanyRepo } from "../../repository/company";
 import { DefaultTransactionContent, TransactionRepo } from "../../repository/transaction";
 
 import { ConvertCurrency, formatDate } from "../../constants/functions";
