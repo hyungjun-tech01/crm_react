@@ -76,36 +76,12 @@ const LeadAddModel = (props) => {
 
     const handleSelectChange = useCallback((name, selected) => {
         console.log('[LeadAddModel] handleSelectChange :', selected);
-        let modifiedData = null;
-        if(name === 'company_name') {
-            modifiedData = {
-                ...leadChange,
-                company_code: selected.value.company_code,
-                company_name: selected.value.company_name,
-                company_name_en: selected.value.company_name_en,
-                company_zip_code: selected.value.company_zip_code,
-                company_address: selected.value.company_address,
-                company_phone_number: selected.value.company_phone_number,
-                company_fax_number: selected.value.company_fax_number,
-            };
-            let tempDisabled = {
-                ...disabledItems,
-            };
-            if(selected.value.company_name_en) {
-                tempDisabled['company_name_en'] = true;
-            };
-            if(selected.value.company_address) {
-                tempDisabled['company_address'] = true;
-            };
-            setDisabledItems(tempDisabled);
-        } else {
-            modifiedData = {
-                ...leadChange,
-                [name] : selected.value,
-            };
+        const modifiedData = {
+            ...leadChange,
+            [name] : selected.value,
         };
         setLeadChange(modifiedData);
-    }, [leadChange, disabledItems]);
+    }, [leadChange]);
 
     useEffect(() => {
         if(((userState & 1) === 1)) {

@@ -33,6 +33,7 @@ import {
 import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 
 import AddBasicItem from "../../constants/AddBasicItem";
+import AddSearchItem from "../../constants/AddSearchItem";
 import QuotationContentModal from "./QuotationContentModal";
 import MessageModal from "../../constants/MessageModal";
 
@@ -124,27 +125,10 @@ const QuotationAddModel = (props) => {
   };
 
   const handleSelectChange = useCallback((name, selected) => {
-    let modifiedData = null;
-    if (name === 'lead_name') {
-      modifiedData = {
-        ...quotationChange,
-        lead_code: selected.value.lead_code,
-        lead_name: selected.value.lead_name,
-        department: selected.value.department,
-        position: selected.value.position,
-        mobile_number: selected.value.mobile_number,
-        phone_number: selected.value.phone_number,
-        email: selected.value.email,
-        company_name: selected.value.company_name,
-        company_code: selected.value.company_code,
-      };
-    } else {
-      modifiedData = {
-        ...quotationChange,
-        [name]: selected.value,
-      };
+    const modifiedData = {
+      ...quotationChange,
+      [name]: selected.value,
     };
-
     setQuotationChange(modifiedData);
   }, [quotationChange]);
 
@@ -840,14 +824,14 @@ const QuotationAddModel = (props) => {
           <div className="modal-body">
             <form className="forms-sampme" id="add_new_quotation_form">
               <div className="form-group row">
-                <AddBasicItem
+                <AddSearchItem
                   title={t('lead.lead_name')}
-                  type='select'
+                  category='quotation'
                   name='lead_name'
-                  defaultValue={quotationChange.lead_name}
-                  options={leadsForSelection}
                   required
-                  onChange={handleSelectChange}
+                  defaultValue={quotationChange.lead_name}
+                  edited={quotationChange}
+                  setEdited={setQuotationChange}
                 />
               </div>
               {(quotationChange.lead_name !== null) &&

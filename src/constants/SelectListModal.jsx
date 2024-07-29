@@ -100,6 +100,7 @@ const SelectListModal = (props) => {
                 };
                 break;
             case 'consulting':
+            case 'quotation':
                 if(condition.item === 'lead_name') {
                     modifiedData['company_code'] = data.company_code;
                     modifiedData['company_name'] = data.company_name;

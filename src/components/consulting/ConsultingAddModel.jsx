@@ -98,27 +98,10 @@ const ConsultingAddModel = (props) => {
   }, [consultingChange]);
 
   const handleSelectChange = useCallback((name, selected) => {
-    let modifiedData = null;
-    if (name === 'lead_name') {
-      modifiedData = {
-        ...consultingChange,
-        lead_code: selected.value.lead_code,
-        lead_name: selected.value.lead_name,
-        department: selected.value.department,
-        position: selected.value.position,
-        mobile_number: selected.value.mobile_number,
-        phone_number: selected.value.phone_number,
-        email: selected.value.email,
-        company_name: selected.value.company_name,
-        company_code: selected.value.company_code,
-      };
-    } else {
-      modifiedData = {
-        ...consultingChange,
-        [name]: selected.value,
-      };
+    const modifiedData = {
+      ...consultingChange,
+      [name]: selected.value,
     };
-
     setConsultingChange(modifiedData);
   }, [consultingChange]);
 
