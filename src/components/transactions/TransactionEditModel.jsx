@@ -19,7 +19,7 @@ import {
   defaultTransaction,
 } from "../../atoms/atoms";
 import { DefaultTransactionContent, TransactionRepo } from "../../repository/transaction";
-
+import AddSearchItem from "../../constants/AddSearchItem";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
 import TransactionContentModal from "./TransactionContentModal";
 import TransactionReceiptModal from "./TransactionReceiptModal";
@@ -741,13 +741,14 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
                                 </Col>
                                 <Col>{t('transaction.publish_date')} : </Col>
                               </Row>
-                              <Row style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
-                                <Col>
-                                  <Select
-                                    className="trans_select"
-                                    value={selectData.company_selection}
-                                    onChange={selected => handleSelectChange('company_name', selected)}
-                                    options={companyForSelection}
+                              <Row justify="start" style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
+                                <Col span={16}>
+                                  <AddSearchItem
+                                    category='transaction'
+                                    name='company_name'
+                                    defaultValue={transactionChange.company_name}
+                                    edited={transactionChange}
+                                    setEdited={setTransactionChange}
                                   />
                                 </Col>
                               </Row>

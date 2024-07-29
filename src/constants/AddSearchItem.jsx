@@ -8,20 +8,31 @@ const AddSearchItem = (props) => {
     const { title, category, name, defaultValue, edited, setEdited, long, required, disabled, } = props;
     const { t } = useTranslation();
     const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [ styleName, setStyleName ] = useState('add-basic-content');
+    const [ styleLong, setStyleLong ] = useState('col-sm-6');
 
     useEffect(() => {
-
-    }, []);
+        if(!title) {
+            setStyleName('add-search');
+            setStyleLong('col=sm-12');
+        }
+        else if(long) {
+            setStyleName('add-long-content');
+            setStyleLong('col=sm-12');
+        };
+    }, [title, long]);
 
     return (
-        <div className={ long ? "col-sm-12" : "col-sm-6"} >
+        <div className={ styleLong } >
             <div className="add-basic-item">
-                <div className="add-basic-title" >
-                    {title}
-                    {required && <span className="text-danger">*</span>}
-                </div>
+                {title !== undefined && title !== null && (
+                    <div className="add-basic-title" >
+                        {title}
+                        {required && <span className="text-danger">*</span>}
+                    </div>
+                )}
                 <input
-                    className={ long ? "add-long-content" : "add-basic-content"}
+                    className={styleName}
                     id="add_adress_input"
                     type="text"
                     value={edited[name] ? edited[name] : (defaultValue ? defaultValue : '')}

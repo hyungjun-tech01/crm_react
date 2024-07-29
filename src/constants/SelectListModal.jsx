@@ -35,16 +35,15 @@ const SelectListModal = (props) => {
         switch(condition.category)
         {
             case 'company':
+            case 'transaction':
+            case 'purchase':
                 if(condition.item === 'company_name')
                     response = searchCompanies(condition.item, input);
                 break;
             case 'consulting':
+            case 'quotation':
                 if(condition.item === 'lead_name')
                     response = searchLeads(condition.item, input);
-                break;
-            case 'purchase':
-                if(condition.item === 'company_name')
-                    response = searchCompanies(condition.item, input);
                 break;
             default:
                 break;
@@ -111,6 +110,17 @@ const SelectListModal = (props) => {
                     modifiedData['mobile_number'] = data.mobile_number;
                     modifiedData['phone_number'] = data.phone_number;
                     modifiedData['email'] = data.email;
+                };
+                break;
+            case 'transaction':
+                if(condition.item === 'company_name') {
+                    modifiedData['company_code'] = data.company_code;
+                    modifiedData['company_name'] = data.company_name;
+                    modifiedData['company_address'] = data.company_address;
+                    modifiedData['ceo_name'] = data.ceo_name;
+                    modifiedData['business_type'] = data.business_type;
+                    modifiedData['business_item'] = data.business_item;
+                    modifiedData['business_registration_code'] = data.business_registration_code;
                 };
                 break;
             case 'purchase':
