@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Space, Spin, Switch, Table } from "antd";
+import { Space, Switch, Table } from "antd";
 import { Add } from "@mui/icons-material";
 
 import {
@@ -53,7 +53,7 @@ const PurchaseDetailsModel = () => {
   const maContractSet = useRecoilValue(atomMAContractSet);
   const { loadPurchaseMAContracts, modifyMAContract, setCurrentMAContract } = useRecoilValue(MAContractRepo);
 
-
+  console.log(maContractSet);
   //===== Handles to deal this component ==============================================
   const [isFullScreen, setIsFullScreen] = useState(false);
 
@@ -347,19 +347,7 @@ const PurchaseDetailsModel = () => {
   }, [companyState, productClassState, productState]);
 
   if (!isAllNeededDataLoaded)
-    return (
-      <Spin tip="Loading" size="large">
-        <div
-          style={{
-            padding: 50,
-            background: "rgba(0, 0, 0, 0.05)",
-            borderRadius: 4,
-          }}
-        >
-          [Show Details of selected Purchase] Try to load necessary data
-        </div>
-      </Spin>
-    );
+    return <div>&nbsp;</div>;
 
   return (
     <>

@@ -1,11 +1,12 @@
 import React from 'react';
-import { selector } from "recoil";
+import { selector , useRecoilValue} from "recoil";
 import { atomMAContractSet
     , atomCurrentMAContract
     , defaultMAContract
     , atomMAContractState
 } from '../atoms/atoms';
 import Paths from "../constants/Paths";
+
 const BASE_PATH = Paths.BASE_PATH;
 
 
@@ -16,10 +17,10 @@ export const ContractTypes=[
     {label: 'ASC', value: 'ASC'},
 ];
 
-
 export const MAContractRepo = selector({
     key: "MAContractRepository",
     get: ({getCallback}) => {
+        
         const loadCompanyMAContracts = getCallback(({set, snapshot}) => async (code) => {
             const input_json = JSON.stringify({company_code: code});
             console.log(`[ loadCompanyMAContracts ] input : `, input_json);
@@ -128,13 +129,13 @@ export const MAContractRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCurrentMAContract, modifiedMAContract);
-                    const foundIdx = atomMAContractSet.findIndex(contract => 
+                    const foundIdx = companyMAContracts.findIndex(contract => 
                         contract.ma_code === modifiedMAContract.ma_code);
                     if(foundIdx !== -1){
                         const updatedCompanyContracts = [
-                            ...atomMAContractSet.slice(0, foundIdx),
+                            ...companyMAContracts.slice(0, foundIdx),
                             modifiedMAContract,
-                            ...atomMAContractSet.slice(foundIdx + 1,),
+                            ...companyMAContracts.slice(foundIdx + 1,),
                         ];
                         set(atomMAContractSet, updatedCompanyContracts);
                         return modifiedMAContract;

@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
-import { Spin } from 'antd';
-import { defaultLead } from "../../atoms/atoms";
+import { atomCompanyForSelection, atomCompanyState, defaultLead } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { option_locations } from "../../constants/constants";
@@ -97,19 +96,7 @@ const LeadAddModel = (props) => {
     }, [ userState, init ])
 
     if (!isAllNeededDataLoaded)
-        return (
-          <Spin tip="Loading" size="large">
-            <div
-              style={{
-                padding: 50,
-                background: "rgba(0, 0, 0, 0.05)",
-                borderRadius: 4,
-              }}
-            >
-              {t('lead._loading_add')}
-            </div>
-          </Spin>
-        );
+        return <div>&nbsp;</div>;
 
     return (
         <div

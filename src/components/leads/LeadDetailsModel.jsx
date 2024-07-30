@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Avatar, Space, Spin, Switch } from "antd";
+import { Avatar, Space, Switch } from "antd";
 import {
   atomCurrentLead, defaultLead,
   atomAllCompanies, atomCurrentCompany, atomCompanyState, atomCompanyForSelection,
@@ -148,6 +148,17 @@ const LeadDetailsModel = () => {
     };
   }, [editedDetailValues, selectedLead]);
 
+  const handleDetailAddressChange = useCallback((obj) => {
+      const tempEdited = {
+        ...editedDetailValues,
+        ...obj,
+      };
+      console.log("handleDetailAddressChange :", tempEdited);
+      setEditedDetailValues(tempEdited);
+    },
+    [editedDetailValues]
+  );
+
   const handleChangeStatus = (newStatus) => {
     const tempEdited = {
       status: newStatus,
@@ -233,8 +244,8 @@ const LeadDetailsModel = () => {
     { key: 'company_fax_number', title: 'company.fax_number', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'email', title: 'lead.email', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'homepage', title: 'lead.homepage', detail: { type: 'label', editing: handleDetailChange } },
-    { key: 'company_zip_code', title: 'company.zip_code', detail: { type: 'label', editing: handleDetailChange } },
-    { key: 'company_address', title: 'company.address', detail: { type: 'label', extra: 'long', editing: handleDetailChange } },
+    { key: 'company_zip_code', title: 'company.zip_code', detail: { type: 'label', editing: handleDetailChange, disabled: true } },
+    { key: 'company_address', title: 'company.address', detail: { type: 'address', extra: 'long', key_zip: "company_zip_code", editing: handleDetailAddressChange, } },
     { key: 'sales_resource', title: 'lead.lead_sales', detail: { type: 'select', options: salespersonsForSelection, editing: handleDetailSelectChange } },
     { key: 'application_engineer', title: 'company.engineer', detail: { type: 'select', options: engineersForSelection, editing: handleDetailSelectChange } },
     { key: 'create_date', title: 'common.regist_date', detail: { type: 'date', editing: handleDetailDateChange } },
@@ -364,19 +375,7 @@ const LeadDetailsModel = () => {
   }, [userState, companyState, purchaseState, consultingState, quotationState]);
 
   if (!isAllNeededDataLoaded)
-    return (
-      <Spin tip="Loading" size="large">
-        <div
-          style={{
-            padding: 50,
-            background: "rgba(0, 0, 0, 0.05)",
-            borderRadius: 4,
-          }}
-        >
-          {t('lead._loading_detail')}
-        </div>
-      </Spin>
-    );
+    return <div>&nbsp;</div>;
 
   return (
     <>

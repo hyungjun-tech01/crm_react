@@ -8,7 +8,6 @@ import "antd/dist/reset.css";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import SystemUserModel from "../task/SystemUserModel";
-import CompanyDetailsModel from "../company/CompanyDetailsModel";
 
 import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
@@ -71,15 +70,6 @@ const Transactions = () => {
     filterTransactions(statusSearch, newValue);
   };
 
-  const handleClickCompany = useCallback((code) => {
-    console.log("[Consulting] set current company : ", code);
-    setCurrentCompany(code);
-    let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
-      keyboard: false
-    })
-    myModal.show();
-  }, []);
-  
   // --- Section for Table ------------------------------
   const columns = [
     {
@@ -100,29 +90,13 @@ const Transactions = () => {
     {
       title: t('company.company_name'),
       dataIndex: "company_name",
-      render: (text, record) => (
-        <div className="table_company" style={{color:'#0d6efd'}}
-          onClick={() => {
-            handleClickCompany(record.company_code);
-          }}
-        >
-          {text}
-        </div>
-      ),
+      render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
     {
       title: t('company.business_registration_code'),
       dataIndex: "business_registration_code",
-      render: (text, record) => (
-        <div className="table_company" style={{color:'#0d6efd'}}
-          onClick={() => {
-            handleClickCompany(record.company_code);
-          }}
-        >
-          {text}
-        </div>
-      ),
+      render: (text, record) => <>{text}</>,
     },
     {
       title: t('transaction.supply_price'),
@@ -305,7 +279,6 @@ const Transactions = () => {
         </div>
         {/* modal */}
         <SystemUserModel />
-        <CompanyDetailsModel />
         <TransactionEditModel
           open={openTransaction}
           close={()=>setOpenTransaction(false)}

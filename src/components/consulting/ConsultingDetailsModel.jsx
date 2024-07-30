@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Space, Spin, Switch } from "antd";
+import { Space, Switch } from "antd";
 
 import { atomUserState,
   atomUsersForSelection,
@@ -176,19 +176,7 @@ const ConsultingDetailsModel = () => {
   }, [userState, consultingState])
 
   if (!isAllNeededDataLoaded)
-    return (
-      <Spin tip="Loading" size="large">
-        <div
-          style={{
-            padding: 50,
-            background: "rgba(0, 0, 0, 0.05)",
-            borderRadius: 4,
-          }}
-        >
-          [Show details of selected consulting] Try to load necessary data
-        </div>
-      </Spin>
-    );
+    return <div>&nbsp;</div>;
 
   return (
     <div

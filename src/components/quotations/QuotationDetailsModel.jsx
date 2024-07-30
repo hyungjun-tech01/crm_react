@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Collapse, Space, Spin, Switch } from "antd";
+import { Collapse, Space, Switch } from "antd";
 import { atomCurrentQuotation,
   defaultQuotation,
   atomQuotationState,
@@ -479,19 +479,7 @@ const QuotationDetailsModel = () => {
 }, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions, userState, quotationState]);
 
 if (!isAllNeededDataLoaded)
-  return (
-    <Spin tip="Loading" size="large">
-      <div
-        style={{
-          padding: 50,
-          background: "rgba(0, 0, 0, 0.05)",
-          borderRadius: 4,
-        }}
-      >
-        {t('quotation._loading_detail')}
-      </div>
-    </Spin>
-  );
+  return <div>&nbsp;</div>;
 
   return (
     <>
