@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Avatar, Space, Switch } from "antd";
 import {
   atomCurrentLead, defaultLead,
-  atomAllCompanies, atomCurrentCompany, atomCompanyState, atomCompanyForSelection,
+  atomAllCompanyObj, atomCurrentCompany, atomCompanyState, atomCompanyForSelection,
   atomPurchaseState, atomAllPurchases,
   atomConsultingState, atomAllConsultings,
   atomQuotationState, atomAllQuotations,
@@ -46,7 +46,7 @@ const LeadDetailsModel = () => {
 
   //===== [RecoilState] Related with Company =======================================
   const companyState = useRecoilValue(atomCompanyState);
-  const allCompanies = useRecoilValue(atomAllCompanies);
+  const allCompanies = useRecoilValue(atomAllCompanyObj);
   const currentCompany = useRecoilValue(atomCurrentCompany);
   const { modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
   const companyForSelection = useRecoilValue(atomCompanyForSelection);

@@ -7,7 +7,7 @@ import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { CompanyRepo } from "../../repository/company";
-import { atomAllCompanies, atomCompanyState, atomFilteredCompany } from "../../atoms/atoms";
+import { atomAllCompanyObj, atomCompanyState, atomFilteredCompanyArray } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 import { UserRepo } from '../../repository/user';
 
@@ -28,8 +28,8 @@ const Companies = () => {
   //===== [RecoilState] Related with Company ==========================================
   const [ companyState, setCompanyState] = useRecoilState(atomCompanyState);
   const { tryLoadAllCompanies, filterCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
-  const allCompanyData = useRecoilValue(atomAllCompanies);
-  const filteredCompany = useRecoilValue(atomFilteredCompany);
+  const allCompanyData = useRecoilValue(atomAllCompanyObj);
+  const filteredCompany = useRecoilValue(atomFilteredCompanyArray);
 
 
   //===== [RecoilState] Related with User =============================================

@@ -9,7 +9,7 @@ import { atomAllPurchases,
   atomFilteredPurchase,
   atomCompanyState,
   atomPurchaseState,
-  atomAllCompanies,
+  atomAllCompanyObj,
   atomProductClassListState,
   atomProductClassList,
   atomProductsState,
@@ -35,7 +35,7 @@ const Purchase = () => {
   //===== [RecoilState] Related with Company =============================================
   const companyState = useRecoilValue(atomCompanyState);
   const { setCurrentCompany, tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
-  const allCompanyData = useRecoilValue(atomAllCompanies);
+  const allCompanyData = useRecoilValue(atomAllCompanyObj);
 
 
   //===== [RecoilState] Related with Purchase ============================================

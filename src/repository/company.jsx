@@ -1,7 +1,7 @@
 import React from 'react';
 import { selector } from "recoil";
 import { atomCurrentCompany
-    , atomAllCompanies
+    , atomAllCompanyObj
     , atomFilteredCompany
     , defaultCompany
     , atomCompanyState,
@@ -61,11 +61,15 @@ export const CompanyRepo = selector({
                 const data = await response.json();
                 if(data.message){
                     console.log('\t[ loadAllCompanies ] message:', data.message);
-                    set(atomAllCompanies, []);
+                    set(atomAllCompanyObj, {});
                     set(atomCompanyForSelection, []);
                     return false;
-                }
-                set(atomAllCompanies, data);
+                };
+                let allCompanies = {};
+                data.forEach(item => {
+                    allCompanies[item.company_code] = item;
+                });
+                set(atomAllCompanyObj, allCompanies);
                 const tempCompanySelection = data.map(item => ({
                     value: {
                         company_code: item.company_code,
@@ -88,14 +92,15 @@ export const CompanyRepo = selector({
             }
             catch(err){
                 console.error(`\t[ loadAllCompanies ] Error : ${err}`);
-                set(atomAllCompanies, []);
-                set(atomCompanyForSelection, []);
+                set(atomAllCompanyObj, {});
+                // set(atomCompanyForSelection, []);
                 return false;
             };
         });
         const filterCompanies = getCallback(({set, snapshot }) => async (itemName, filterText) => {
-            const allCompanyList = await snapshot.getPromise(atomAllCompanies);
-            let allCompanies;
+            const allCompanyData = await snapshot.getPromise(atomAllCompanyObj);
+            const allCompanyList = Object.values(allCompanyData);
+            let allCompanies = [];
 
             if( itemName === 'common.all' ) {
                 allCompanies = allCompanyList.filter(item =>
@@ -144,8 +149,8 @@ export const CompanyRepo = selector({
                     return false;
                 };
 
-                const allCompany = await snapshot.getPromise(atomAllCompanies);
-                const allCompanySelection = await snapshot.getPromise(atomCompanyForSelection);
+                const allCompany = await snapshot.getPromise(atomAllCompanyObj);
+                // const allCompanySelection = await snapshot.getPromise(atomCompanyForSelection);
                 if(newCompany.action_type === 'ADD'){
                     delete newCompany.action_type;
                     const updatedNewCompany = {
@@ -156,18 +161,22 @@ export const CompanyRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomAllCompanies, [updatedNewCompany, ...allCompany]);
-                    set(atomCompanyForSelection, allCompanySelection.concat({
-                        value: {
-                            company_code: updatedNewCompany.company_code,
-                            company_name: updatedNewCompany.company_name,
-                            company_name_en: updatedNewCompany.company_name_en,
-                            company_zip_code: updatedNewCompany.company_zip_code,
-                            company_address: updatedNewCompany.company_address,
-                            region: updatedNewCompany.region,
-                        },
-                        label: updatedNewCompany.company_name,
-                    }));
+                    const updatedAllCompanies = {
+                        ...allCompany,
+                        [data.out_company_code]: updatedNewCompany,
+                    };
+                    set(atomAllCompanyObj, updatedAllCompanies);
+                    // set(atomCompanyForSelection, allCompanySelection.concat({
+                    //     value: {
+                    //         company_code: updatedNewCompany.company_code,
+                    //         company_name: updatedNewCompany.company_name,
+                    //         company_name_en: updatedNewCompany.company_name_en,
+                    //         company_zip_code: updatedNewCompany.company_zip_code,
+                    //         company_address: updatedNewCompany.company_address,
+                    //         region: updatedNewCompany.region,
+                    //     },
+                    //     label: updatedNewCompany.company_name,
+                    // }));
                     return true;
                 } else if(newCompany.action_type === 'UPDATE'){
                     const currentCompany = await snapshot.getPromise(atomCurrentCompany);
@@ -181,42 +190,34 @@ export const CompanyRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCurrentCompany, modifiedCompany);
-                    const foundIdx = allCompany.findIndex(company => 
-                        company.company_code === modifiedCompany.company_code);
-                    if(foundIdx !== -1){
-                        const updatedAllCompanies = [
-                            ...allCompany.slice(0, foundIdx),
-                            modifiedCompany,
-                            ...allCompany.slice(foundIdx + 1,),
-                        ];
-                        set(atomAllCompanies, updatedAllCompanies);
-                        const foundSelIdx = allCompanySelection.findIndex(item => 
-                            item.value.company_code === modifiedCompany.company_code);
-                        if(foundSelIdx !== -1){
-                            const updatedCompanySelection = [
-                                ...allCompanySelection.slice(0, foundSelIdx),
-                                {
-                                    value: {
-                                        company_code: modifiedCompany.company_code,
-                                        company_name: modifiedCompany.company_name,
-                                        company_name_en: modifiedCompany.company_name_en,
-                                        company_zip_code: modifiedCompany.company_zip_code,
-                                        company_address: modifiedCompany.company_address,
-                                        region: modifiedCompany.region,
-                                    },
-                                    label: modifiedCompany.company_name,
-                                },
-                                ...allCompanySelection.slice(foundSelIdx + 1, ),
-                            ]
-                            set(atomCompanyForSelection, updatedCompanySelection);
-                        } else {
-                            console.log('\t[ modifyCompany / modify selection ] Impossible case~~!!');    
-                        }
-                        return true;
-                    } else {
-                        console.log('\t[ modifyCompany ] No specified company is found');
-                        return false;
+                    const updatedAllCompanies = {
+                        ...allCompany,
+                        [modifiedCompany.company_code] : modifiedCompany,
                     };
+                    set(atomAllCompanyObj, updatedAllCompanies);
+                    // const foundSelIdx = allCompanySelection.findIndex(item => 
+                    //     item.value.company_code === modifiedCompany.company_code);
+                    // if(foundSelIdx !== -1){
+                    //     const updatedCompanySelection = [
+                    //         ...allCompanySelection.slice(0, foundSelIdx),
+                    //         {
+                    //             value: {
+                    //                 company_code: modifiedCompany.company_code,
+                    //                 company_name: modifiedCompany.company_name,
+                    //                 company_name_en: modifiedCompany.company_name_en,
+                    //                 company_zip_code: modifiedCompany.company_zip_code,
+                    //                 company_address: modifiedCompany.company_address,
+                    //                 region: modifiedCompany.region,
+                    //             },
+                    //             label: modifiedCompany.company_name,
+                    //         },
+                    //         ...allCompanySelection.slice(foundSelIdx + 1, ),
+                    //     ]
+                    //     set(atomCompanyForSelection, updatedCompanySelection);
+                    // } else {
+                    //     console.log('\t[ modifyCompany / modify selection ] Impossible case~~!!');    
+                    // }
+                    return true;
                 }
             }
             catch(err){
@@ -230,11 +231,13 @@ export const CompanyRepo = selector({
                     set(atomCurrentCompany, defaultCompany);
                     return;
                 };
-                const allCompanies = await snapshot.getPromise(atomAllCompanies);
-                const selected_array = allCompanies.filter(company => company.company_code === company_code);
-                if(selected_array.length > 0){
-                    set(atomCurrentCompany, selected_array[0]);
-                }
+                const allCompanies = await snapshot.getPromise(atomAllCompanyObj);
+                if(allCompanies[company_code]){
+                    set(atomCurrentCompany, allCompanies[company_code]);
+                } else {
+                    set(atomCurrentCompany, defaultCompany);
+                    return;
+                };
             }
             catch(err){
                 console.error(`\t[ setCurrentCompany ] Error : ${err}`);

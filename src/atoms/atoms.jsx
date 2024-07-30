@@ -39,12 +39,12 @@ export const atomCurrentCompany = atom({
     key: "currentCompany",
     default: defaultCompany,
 });
-export const atomAllCompanies = atom({
-    key: "allCompanies",
-    default: [],
+export const atomAllCompanyObj = atom({
+    key: "allCompanyObj",
+    default: {},
 });
-export const atomFilteredCompany = atom({
-    key: "filteredCompanies",
+export const atomFilteredCompanyArray = atom({
+    key: "filteredCompanyArray",
     default: [],
 });
 export const atomCompanyState = atom({
@@ -97,11 +97,11 @@ export const atomCurrentLead = atom({
 });
 export const atomAllLeads = atom({
     key: "allLeads",
-    default: [],
+    default: {},
 });
 export const atomFilteredLead  = atom({
     key: "filteredLeads",
-    default: [],
+    default: {},
 });
 export const atomLeadState = atom({
     key: "leadState",
@@ -150,15 +150,15 @@ export const atomCurrentConsulting = atom({
 });
 export const atomAllConsultings = atom({
     key: "allConsultings",
-    default: [],
+    default: {},
 });
 export const atomCompanyConsultings = atom({
     key: "companyConsultings",
-    default: [],
+    default: {},
 });
 export const atomFilteredConsulting = atom({
     key: "filteredConsultings",
-    default: [],
+    default: {},
 });
 export const atomConsultingState = atom({
     key: "consultingState",
@@ -226,15 +226,15 @@ export const atomCurrentQuotation = atom({
 });
 export const atomAllQuotations = atom({
     key: "allQuotations",
-    default: [],
+    default: {},
 });
 export const atomCompanyQuotations = atom({
     key: "companyQuotations",
-    default: [],
+    default: {},
 });
 export const atomFilteredQuotation = atom({
     key: "filteredQuotations",
-    default: [],
+    default: {},
 });
 export const atomQuotationState = atom({
     key: "quotationState",
@@ -280,11 +280,11 @@ export const atomCurrentTransaction = atom({
 });
 export const atomAllTransactions = atom({
     key: "allTransactions",
-    default: [],
+    default: {},
 });
 export const atomFilteredTransaction = atom({
     key: "allFilteredTransactions",
-    default: [],
+    default: {},
 });
 export const atomTransactionState = atom({
     key: "transactionState",
@@ -330,15 +330,15 @@ export const atomCurrentPurchase = atom({
 });
 export const atomAllPurchases = atom({
     key: "allPurchases",
-    default: [],
+    default: {},
 });
 export const atomCompanyPurchases = atom({
     key: "companyPurchases",
-    default: [],
+    default: {},
 });
 export const atomFilteredPurchase = atom({
     key: "allFilteredPurchases",
-    default: [],
+    default: {},
 });
 export const atomPurchaseState = atom({
     key: "purchaseState",

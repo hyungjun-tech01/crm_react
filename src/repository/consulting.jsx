@@ -99,14 +99,19 @@ export const ConsultingRepo = selector({
                 const data = await response.json();
                 if(data.message){
                     console.log('loadAllConsultings message:', data.message);
-                    set(atomAllConsultings, []);
+                    set(atomAllConsultings, {});
                     return false;
                 }
-                set(atomAllConsultings, data);
+                let allconsultings = {};
+                data.forEach(item => {
+                    allconsultings[data.consulting_code] = data;
+                });
+                set(atomAllConsultings, allconsultings);
                 return true;
             }
             catch(err){
                 console.error(`loadAllConsultings / Error : ${err}`);
+                set(atomAllConsultings, {});
                 return false;
             };
         });

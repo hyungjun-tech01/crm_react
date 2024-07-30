@@ -70,11 +70,15 @@ export const LeadRepo = selector({
                 const data = await response.json();
                 if(data.message){
                     console.log('loadAllLeads message:', data.message);
-                    set(atomAllLeads, []);
+                    set(atomAllLeads, {});
                     set(atomLeadsForSelection, []);
                     return false;
-                }
-                set(atomAllLeads, data);
+                };
+                let allleads = {};
+                data.forEach(item => {
+                    allleads[data.lead_code] = data;
+                });
+                set(atomAllLeads, allleads);
                 const tempLeadsForSelection = data.map(lead => ({
                     label: lead.lead_name + " / " + lead.company_name,
                     value: {
