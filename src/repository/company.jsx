@@ -2,10 +2,9 @@ import React from 'react';
 import { selector } from "recoil";
 import { atomCurrentCompany
     , atomAllCompanyObj
-    , atomFilteredCompany
+    , atomFilteredCompanyArray
     , defaultCompany
     , atomCompanyState,
-    atomCompanyForSelection
 } from '../atoms/atoms';
 import Paths from "../constants/Paths";
 
@@ -62,38 +61,21 @@ export const CompanyRepo = selector({
                 if(data.message){
                     console.log('\t[ loadAllCompanies ] message:', data.message);
                     set(atomAllCompanyObj, {});
-                    set(atomCompanyForSelection, []);
                     return false;
                 };
                 let allCompanies = {};
+                let filteredCompany = [];
                 data.forEach(item => {
                     allCompanies[item.company_code] = item;
+                    filteredCompany.push(item);
                 });
                 set(atomAllCompanyObj, allCompanies);
-                const tempCompanySelection = data.map(item => ({
-                    value: {
-                        company_code: item.company_code,
-                        company_name: item.company_name,
-                        company_name_en: item.company_name_en,
-                        company_zip_code: item.company_zip_code,
-                        company_address: item.company_address,
-                        company_phone_number: item.company_phone_number,
-                        company_fax_number: item.company_fax_number,
-                        ceo_name: item.ceo_name,
-                        business_type: item.business_type,
-                        business_item: item.business_item,
-                        business_registration_code: item.business_registration_code,
-                        region: item.region,
-                    },
-                    label: item.company_name,
-                }));
-                set(atomCompanyForSelection, tempCompanySelection);
+                set(atomFilteredCompanyArray, filteredCompany);
                 return true;
             }
             catch(err){
                 console.error(`\t[ loadAllCompanies ] Error : ${err}`);
                 set(atomAllCompanyObj, {});
-                // set(atomCompanyForSelection, []);
                 return false;
             };
         });
@@ -131,7 +113,7 @@ export const CompanyRepo = selector({
                     (item.application_engineer &&item.application_engineer.includes(filterText))
                 );
             }
-            set(atomFilteredCompany, allCompanies);
+            set(atomFilteredCompanyArray, allCompanies);
             return true;
         });
         const modifyCompany = getCallback(({set, snapshot}) => async (newCompany) => {
@@ -150,7 +132,6 @@ export const CompanyRepo = selector({
                 };
 
                 const allCompany = await snapshot.getPromise(atomAllCompanyObj);
-                // const allCompanySelection = await snapshot.getPromise(atomCompanyForSelection);
                 if(newCompany.action_type === 'ADD'){
                     delete newCompany.action_type;
                     const updatedNewCompany = {
@@ -166,17 +147,6 @@ export const CompanyRepo = selector({
                         [data.out_company_code]: updatedNewCompany,
                     };
                     set(atomAllCompanyObj, updatedAllCompanies);
-                    // set(atomCompanyForSelection, allCompanySelection.concat({
-                    //     value: {
-                    //         company_code: updatedNewCompany.company_code,
-                    //         company_name: updatedNewCompany.company_name,
-                    //         company_name_en: updatedNewCompany.company_name_en,
-                    //         company_zip_code: updatedNewCompany.company_zip_code,
-                    //         company_address: updatedNewCompany.company_address,
-                    //         region: updatedNewCompany.region,
-                    //     },
-                    //     label: updatedNewCompany.company_name,
-                    // }));
                     return true;
                 } else if(newCompany.action_type === 'UPDATE'){
                     const currentCompany = await snapshot.getPromise(atomCurrentCompany);
@@ -195,28 +165,6 @@ export const CompanyRepo = selector({
                         [modifiedCompany.company_code] : modifiedCompany,
                     };
                     set(atomAllCompanyObj, updatedAllCompanies);
-                    // const foundSelIdx = allCompanySelection.findIndex(item => 
-                    //     item.value.company_code === modifiedCompany.company_code);
-                    // if(foundSelIdx !== -1){
-                    //     const updatedCompanySelection = [
-                    //         ...allCompanySelection.slice(0, foundSelIdx),
-                    //         {
-                    //             value: {
-                    //                 company_code: modifiedCompany.company_code,
-                    //                 company_name: modifiedCompany.company_name,
-                    //                 company_name_en: modifiedCompany.company_name_en,
-                    //                 company_zip_code: modifiedCompany.company_zip_code,
-                    //                 company_address: modifiedCompany.company_address,
-                    //                 region: modifiedCompany.region,
-                    //             },
-                    //             label: modifiedCompany.company_name,
-                    //         },
-                    //         ...allCompanySelection.slice(foundSelIdx + 1, ),
-                    //     ]
-                    //     set(atomCompanyForSelection, updatedCompanySelection);
-                    // } else {
-                    //     console.log('\t[ modifyCompany / modify selection ] Impossible case~~!!');    
-                    // }
                     return true;
                 }
             }
@@ -244,6 +192,8 @@ export const CompanyRepo = selector({
             };
         });
         const searchCompanies = getCallback(({set, snapshot}) => async (itemName, filterText) => {
+            // At first, request data to server
+            let foundInServer = {};
             const query_obj = {
                 queryConditions: [{
                     column: { value: itemName},
@@ -263,13 +213,34 @@ export const CompanyRepo = selector({
                 const data = await response.json();
                 if(data.message){
                     console.log('\t[ searchCompanies ] message:', data.message);
-                    return data.message;
+                } else {
+                    for(const item of data) {
+                        foundInServer[item.company_code] = item;
+                    }
                 };
-                return data;
             } catch(e) {
                 console.log('\t[ searchCompanies ] error occurs on searching');
-                return 'fail to query';
             };
+
+            // Then, update all company obj
+            const allCompanyData = await snapshot.getPromise(atomAllCompanyObj);
+            const updatedAllCompanyData = {
+                ...allCompanyData,
+                ...foundInServer,
+            };
+            set(atomAllCompanyObj, updatedAllCompanyData);
+
+            // Next, look for this updated data
+            const updatedList = Object.values(updatedAllCompanyData);
+            const foundCompanies = updatedList.filter(item =>
+                (item[itemName] && item[itemName].includes(filterText)))
+                .sort((a, b) => {
+                    if(a.company_name > b.company_name) return 1;
+                    if(a.company_name < b.company_name) return -1;
+                    return 0;
+                });
+            
+            return foundCompanies;
         });
         return {
             tryLoadAllCompanies,

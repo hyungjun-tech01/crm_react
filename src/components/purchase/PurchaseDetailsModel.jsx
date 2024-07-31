@@ -53,7 +53,7 @@ const PurchaseDetailsModel = () => {
   const maContractSet = useRecoilValue(atomMAContractSet);
   const { loadPurchaseMAContracts, modifyMAContract, setCurrentMAContract } = useRecoilValue(MAContractRepo);
 
-  console.log(maContractSet);
+  
   //===== Handles to deal this component ==============================================
   const [isFullScreen, setIsFullScreen] = useState(false);
 
@@ -336,7 +336,6 @@ const PurchaseDetailsModel = () => {
     };
   }, [currentPurchase, loadPurchaseMAContracts, currentPurchaseCode]);
 
-
   useEffect(() => {
     if (((companyState & 1) === 1)
       && ((productClassState & 1) === 1)
@@ -375,7 +374,7 @@ const PurchaseDetailsModel = () => {
                       group={currentPurchase.product_class_name}
                       onEditing={handleDetailSelectChange}
                     />
-                    <DetailTitleItem
+                    {/* <DetailTitleItem
                       original={currentPurchase.company_name}
                       name='company_name'
                       title={t('company.company_name')}
@@ -383,7 +382,15 @@ const PurchaseDetailsModel = () => {
                       type='select'
                       options={companyForSelection}
                       onEditing={handleDetailChange}
-                    />
+                    /> */}
+                    <div className='col-md-4'>
+                      <span><b>{t('company.company_name')}</b></span>
+                      <div style={{display: 'flex'}}>
+                        <label className='detail-title-input'>
+                          {currentPurchase.company_name}
+                        </label>
+                      </div>
+                  </div>
                   </div>
                   <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange} />
                   <button

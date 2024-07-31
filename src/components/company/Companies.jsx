@@ -7,7 +7,7 @@ import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { CompanyRepo } from "../../repository/company";
-import { atomAllCompanyObj, atomCompanyState, atomFilteredCompanyArray } from "../../atoms/atoms";
+import { atomCompanyState, atomFilteredCompanyArray } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 import { UserRepo } from '../../repository/user';
 
@@ -28,7 +28,6 @@ const Companies = () => {
   //===== [RecoilState] Related with Company ==========================================
   const [ companyState, setCompanyState] = useRecoilState(atomCompanyState);
   const { tryLoadAllCompanies, filterCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
-  const allCompanyData = useRecoilValue(atomAllCompanyObj);
   const filteredCompany = useRecoilValue(atomFilteredCompanyArray);
 
 
@@ -352,53 +351,28 @@ const Companies = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive">
-                    {searchCondition === "" ?
-                      <Table
-                        pagination={{
-                          total: allCompanyData.length,
-                          showTotal: ShowTotal,
-                          showSizeChanger: true,
-                          onShowSizeChange: onShowSizeChange,
-                          ItemRender: ItemRender,
-                        }}
-                        className="table"
-                        loading={nowLoading}
-                        style={{ overflowX: "auto" }}
-                        columns={columns}
-                        dataSource={allCompanyData}
-                        rowKey={(record) => record.company_code}
-                        onRow={(record, rowIndex) => {
-                          return {
-                            onClick: () => {
-                              handleClickCompanyName(record.company_code);
-                            },
-                          };
-                        }}
-                      />
-                      :
-                      <Table
-                        pagination={{
-                          total: filteredCompany.length > 0 ? filteredCompany.length : 0,
-                          showTotal: ShowTotal,
-                          showSizeChanger: true,
-                          onShowSizeChange: onShowSizeChange,
-                          ItemRender: ItemRender,
-                        }}
-                        className="table"
-                        loading={nowLoading}
-                        style={{ overflowX: "auto" }}
-                        columns={columns}
-                        dataSource={filteredCompany.length > 0 ? filteredCompany : null}
-                        rowKey={(record) => record.company_code}
-                        onRow={(record, rowIndex) => {
-                          return {
-                            onClick: () => {
-                              handleClickCompanyName(record.company_code);
-                            },
-                          };
-                        }}
-                      />
-                    }
+                    <Table
+                      pagination={{
+                        total: filteredCompany.length > 0 ? filteredCompany.length : 0,
+                        showTotal: ShowTotal,
+                        showSizeChanger: true,
+                        onShowSizeChange: onShowSizeChange,
+                        ItemRender: ItemRender,
+                      }}
+                      className="table"
+                      loading={nowLoading}
+                      style={{ overflowX: "auto" }}
+                      columns={columns}
+                      dataSource={filteredCompany.length > 0 ? filteredCompany : null}
+                      rowKey={(record) => record.company_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onClick: () => {
+                            handleClickCompanyName(record.company_code);
+                          },
+                        };
+                      }}
+                    />
                   </div>
                 </div>
               </div>
