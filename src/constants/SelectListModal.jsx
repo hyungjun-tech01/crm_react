@@ -48,37 +48,30 @@ const SelectListModal = (props) => {
             default:
                 break;
         };
-        if(response === null) {
-            console.log('Search result is null');
-            setLoadingState(false);
-            return;
-        };
         response.then( res => {
-            if(typeof res === 'string') {
-                console.log('Fail to search :', res);
+            if(res.result === false) {
+                console.log('Fail to search :', res.message);
                 setLoadingState(false);
                 return;
             };
-            if(Array.isArray(res)){
-                console.log('Succeeded to search :', res);
-                let tempItems = null;
-                if(condition.item === 'lead_name') {
-                    tempItems = res.map((item, idx) => ({
-                        ...item,
-                        index: idx,
-                        component: <div>{item.lead_name} | {item.company_name}</div>,
-                    }));
-                } else {
-                    tempItems = res.map((item, idx) => ({
-                        ...item,
-                        index: idx,
-                        component: <div>{item[condition.item]}</div>,
-                    }));
-                };
-                
-                setListItems(tempItems);
-                setLoadingState(false);
+
+            let tempItems = null;
+            if(condition.item === 'lead_name') {
+                tempItems = res.data.map((item, idx) => ({
+                    ...item,
+                    index: idx,
+                    component: <div>{item.lead_name} | {item.company_name}</div>,
+                }));
+            } else {
+                tempItems = res.data.map((item, idx) => ({
+                    ...item,
+                    index: idx,
+                    component: <div>{item[condition.item]}</div>,
+                }));
             };
+            
+            setListItems(tempItems);
+            setLoadingState(false);
         })
     };
 

@@ -19,8 +19,8 @@ import { ConsultingRepo } from "../../repository/consulting";
 import { UserRepo } from "../../repository/user";
 import {
   atomCompanyState,
-  atomAllConsultings,
-  atomFilteredConsulting,
+  atomAllConsultingObj,
+  atomFilteredConsultingArray,
   atomLeadState,
   atomConsultingState,
   defaultLead,
@@ -35,8 +35,7 @@ const Consultings = () => {
 
   //===== [RecoilState] Related with Consulting =======================================
   const consultingState = useRecoilValue(atomConsultingState);
-  const allConsultingData = useRecoilValue(atomAllConsultings);
-  const filteredConsulting = useRecoilValue(atomFilteredConsulting);
+  const filteredConsulting = useRecoilValue(atomFilteredConsultingArray);
   const { tryLoadAllConsultings, loadAllConsultings, setCurrentConsulting, filterConsultingOri } = useRecoilValue(ConsultingRepo);
 
 
@@ -62,9 +61,7 @@ const Consultings = () => {
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
   const [statusSearch, setStatusSearch] = useState('common.all');
-
   const [multiQueryModal, setMultiQueryModal] = useState(false);
-
   const [queryConditions, setQueryConditions] = useState([
     { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
     { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
@@ -90,16 +87,16 @@ const Consultings = () => {
     { label: t('purchase.registration_date'), stateKey: 'registration_date', checked: true },
   ];
 
-    // from date date 1개짜리 picking 만들기 
-    const initialSingleDate = {
-      ma_finish_date: { fromDate: oneMonthAgo,  checked: false },  
-    };
+  // from date date 1개짜리 picking 만들기 
+  const initialSingleDate = {
+    ma_finish_date: { fromDate: oneMonthAgo,  checked: false },  
+  };
   
-    const [singleDate, setSingleDate] = useState(initialSingleDate);
-  
-    const singleDateSettings = [
-      { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
-    ];
+  const [singleDate, setSingleDate] = useState(initialSingleDate);
+
+  const singleDateSettings = [
+    { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
+  ];
 
   const handleMultiQueryModal = () => {
     setMultiQueryModal(true);
@@ -157,7 +154,7 @@ const Consultings = () => {
   const handleAddNewConsultingClicked = useCallback(() => {
     setCurrentLead(defaultLead);
     setInitAddConsulting(true);
-  }, [defaultLead]);
+  }, []);
 
   const handleClickConsulting = useCallback((code) => {
     console.log("[Consulting] set current consulting : ", code);
@@ -338,55 +335,29 @@ const Consultings = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive activity-tables">
-                    {searchCondition === "" ?
-                      <Table
-                        pagination={{
-                          total: allConsultingData.length,
-                          showTotal: ShowTotal,
-                          showSizeChanger: true,
-                          onShowSizeChange: onShowSizeChange,
-                          ItemRender: ItemRender,
-                        }}
-                        loading={nowLoading}
-                        style={{ overflowX: "auto" }}
-                        columns={columns}
-                        bordered
-                        dataSource={allConsultingData}
-                        rowKey={(record) => record.consulting_code}
-                        onRow={(record, rowIndex) => {
-                          return {
-                            onClick: (event) => {
-                              if(event.target.className === 'table_company' || event.target.className === 'table_lead') return;
-                              handleClickConsulting(record.consulting_code);
-                            },
-                          };
-                        }}
-                      />
-                      :
-                      <Table
-                        pagination={{
-                          total: filteredConsulting.length > 0 ? filteredConsulting.length : 0,
-                          showTotal: ShowTotal,
-                          showSizeChanger: true,
-                          onShowSizeChange: onShowSizeChange,
-                          ItemRender: ItemRender,
-                        }}
-                        loading={nowLoading}
-                        style={{ overflowX: "auto" }}
-                        columns={columns}
-                        bordered
-                        dataSource={filteredConsulting.length > 0 ? filteredConsulting : null}
-                        rowKey={(record) => record.consulting_code}
-                        onRow={(record, rowIndex) => {
-                          return {
-                            onClick: (event) => {
-                              if(event.target.className === 'table_company' || event.target.className === 'table_lead') return;
-                              handleClickConsulting(record.consulting_code);
-                            },
-                          };
-                        }}
-                      />
-                    }
+                    <Table
+                      pagination={{
+                        total: filteredConsulting.length > 0 ? filteredConsulting.length : 0,
+                        showTotal: ShowTotal,
+                        showSizeChanger: true,
+                        onShowSizeChange: onShowSizeChange,
+                        ItemRender: ItemRender,
+                      }}
+                      loading={nowLoading}
+                      style={{ overflowX: "auto" }}
+                      columns={columns}
+                      bordered
+                      dataSource={filteredConsulting.length > 0 ? filteredConsulting : null}
+                      rowKey={(record) => record.consulting_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onClick: (event) => {
+                            if(event.target.className === 'table_company' || event.target.className === 'table_lead') return;
+                            handleClickConsulting(record.consulting_code);
+                          },
+                        };
+                      }}
+                    />
                   </div>
                 </div>
               </div>

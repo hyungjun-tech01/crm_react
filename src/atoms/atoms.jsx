@@ -95,21 +95,17 @@ export const atomCurrentLead = atom({
     key: "currentLead",
     default: defaultLead,
 });
-export const atomAllLeads = atom({
-    key: "allLeads",
+export const atomAllLeadObj = atom({
+    key: "allLeadObj",
     default: {},
 });
-export const atomFilteredLead  = atom({
-    key: "filteredLeads",
+export const atomFilteredLeadArray  = atom({
+    key: "filteredLeadArray",
     default: {},
 });
 export const atomLeadState = atom({
     key: "leadState",
     default: 0,
-});
-export const atomLeadsForSelection = atom({
-    key: "leadsForSelection",
-    default: [],
 });
 
 //----- Consulting ------------------------
@@ -148,17 +144,17 @@ export const atomCurrentConsulting = atom({
     key: "currentConsulting",
     default: defaultConsulting,
 });
-export const atomAllConsultings = atom({
+export const atomAllConsultingObj = atom({
     key: "allConsultings",
     default: {},
 });
 export const atomCompanyConsultings = atom({
     key: "companyConsultings",
-    default: {},
+    default: [],
 });
-export const atomFilteredConsulting = atom({
+export const atomFilteredConsultingArray = atom({
     key: "filteredConsultings",
-    default: {},
+    default: [],
 });
 export const atomConsultingState = atom({
     key: "consultingState",

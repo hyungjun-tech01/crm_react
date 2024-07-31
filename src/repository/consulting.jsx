@@ -1,10 +1,10 @@
 import React from 'react';
 import { selector } from "recoil";
 import { atomCurrentConsulting
-    , atomAllConsultings
+    , atomAllConsultingObj
     , defaultConsulting
     , atomCompanyConsultings
-    , atomFilteredConsulting
+    , atomFilteredConsultingArray
     , atomConsultingState
 } from '../atoms/atoms';
 
@@ -99,25 +99,29 @@ export const ConsultingRepo = selector({
                 const data = await response.json();
                 if(data.message){
                     console.log('loadAllConsultings message:', data.message);
-                    set(atomAllConsultings, {});
+                    set(atomAllConsultingObj, {});
+                    set(atomFilteredConsultingArray, []);
                     return false;
                 }
                 let allconsultings = {};
+                let filteredConsultings = [];
                 data.forEach(item => {
-                    allconsultings[data.consulting_code] = data;
+                    allconsultings[item.consulting_code] = item;
+                    filteredConsultings.push(item);
                 });
-                set(atomAllConsultings, allconsultings);
+                set(atomAllConsultingObj, allconsultings);
+                set(atomFilteredConsultingArray, filteredConsultings);
                 return true;
             }
             catch(err){
                 console.error(`loadAllConsultings / Error : ${err}`);
-                set(atomAllConsultings, {});
+                set(atomAllConsultingObj, {});
+                set(atomFilteredConsultingArray, []);
                 return false;
             };
         });
-        const loadCompanyConsultings = getCallback(({set}) => async (company_code) => {
+        const loadCompanyConsultings = getCallback(({set, snapshot}) => async (company_code) => {
             const input_json = {company_code:company_code};
-            //JSON.stringify(company_code);
             try{
                 const response = await fetch(`${BASE_PATH}/companyConsultings`, {
                     method: "POST",
@@ -132,6 +136,19 @@ export const ConsultingRepo = selector({
                     return;
                 }
                 set(atomCompanyConsultings, data);
+
+                ///////////////////// update all consulting object ////////////////////////////
+                let foundInServer = {};
+                for(const item of data) {
+                    foundInServer[item.lead_code] = item;
+                };
+
+                const allConsultingData = await snapshot.getPromise(atomAllConsultingObj);
+                const updatedAllConsultingData = {
+                    ...allConsultingData,
+                    ...foundInServer,
+                };
+                set(atomAllConsultingObj, updatedAllConsultingData);
             }
             catch(err){
                 console.error(`loadAllConsultings / Error : ${err}`);
@@ -148,16 +165,17 @@ export const ConsultingRepo = selector({
                 allConsulting = 
                 allConsultingList.filter(item => ( (item.lead_name &&item.lead_name.includes(filterText))||
                                                   (item.receiver && item.receiver.includes(filterText))||
-                                                  (item.consulting_type && item.consulting_type .includes(filterText))
+                                                  (item.consulting_type && item.consulting_type.includes(filterText))
                 ));
             }
            
-            set(atomFilteredConsulting, allConsulting);
+            set(atomFilteredConsultingArray, allConsulting);
             return true;
         });
         const filterConsultingOri = getCallback(({set, snapshot }) => async (itemName, filterText) => {
-            const allConsultingList = await snapshot.getPromise(atomAllConsultings);
-            let  allConsulting ;
+            const allConsultingData = await snapshot.getPromise(atomAllConsultingObj);
+            const allConsultingList = Object.values(allConsultingData);
+            let  allConsulting = [];
             if(itemName === 'common.all'){
                 allConsulting = allConsultingList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))||
                                             (item.receiver && item.receiver.includes(filterText)) ||
@@ -190,7 +208,7 @@ export const ConsultingRepo = selector({
                 allConsulting = allConsultingList.filter(item => (item.action_content &&item.action_content.includes(filterText))
                 );    
             }
-            set(atomFilteredConsulting, allConsulting);
+            set(atomFilteredConsultingArray, allConsulting);
             return true;
         });        
         const modifyConsulting = getCallback(({set, snapshot}) => async (newConsulting) => {
@@ -208,7 +226,7 @@ export const ConsultingRepo = selector({
                     return false;
                 };
 
-                const allConsultings = await snapshot.getPromise(atomAllConsultings);
+                const allConsultings = await snapshot.getPromise(atomAllConsultingObj);
                 if(newConsulting.action_type === 'ADD'){
                     delete newConsulting.action_type;
                     const updatedNewConsulting = {
@@ -219,7 +237,11 @@ export const ConsultingRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomAllConsultings, [updatedNewConsulting, ...allConsultings]);
+                    const updatedAllConsultings = {
+                        ...allConsultings,
+                        [data.out_consulting_code]: updatedNewConsulting,
+                    };
+                    set(atomAllConsultingObj, updatedAllConsultings);
                     return true;
                 } else if(newConsulting.action_type === 'UPDATE'){
                     const currentConsulting = await snapshot.getPromise(atomCurrentConsulting);
@@ -233,20 +255,13 @@ export const ConsultingRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCurrentConsulting, modifiedConsulting);
-                    const foundIdx = allConsultings.findIndex(consulting => 
-                        consulting.consulting_code === modifiedConsulting.consulting_code);
-                    if(foundIdx !== -1){
-                        const updatedAllConsultings = [
-                            ...allConsultings.slice(0, foundIdx),
-                            modifiedConsulting,
-                            ...allConsultings.slice(foundIdx + 1,),
-                        ];
-                        set(atomAllConsultings, updatedAllConsultings);
-                        return true;
-                    } else {
-                        console.log('\t[ modifyConsulting ] No specified consulting is found');
-                        return false;
-                    }
+                    
+                    const updatedAllConsultings = {
+                        ...allConsultings,
+                        [modifiedConsulting.consulting_code] : modifiedConsulting,
+                    };
+                    set(atomAllConsultingObj, updatedAllConsultings);
+                    return true;
                 }
             }
             catch(err){
@@ -260,9 +275,9 @@ export const ConsultingRepo = selector({
                     set(atomCurrentConsulting, defaultConsulting);
                     return;
                 };
-                const allConsultings = await snapshot.getPromise(atomAllConsultings);
+                const allConsultings = await snapshot.getPromise(atomAllConsultingObj);
                
-                if(allConsultings.length === 0 ){
+                if(!allConsultings[consulting_code]){
                     // consulting이 없다면 쿼리 
                     const input_json = {consulting_code:consulting_code};
                     //JSON.stringify(company_code);
@@ -276,26 +291,86 @@ export const ConsultingRepo = selector({
                         const data = await response.json();
                         if(data.message){
                             console.log('loadCompanyConsultings message:', data.message);
-                            set(atomCurrentConsulting, input_json);
+                            set(atomCurrentConsulting, defaultConsulting);
                             return;
                         }
                         set(atomCurrentConsulting, data);
                         console.log('atomCurrentConsulting', data,atomCurrentConsulting.company_name);
+                        
+                        // update all consulting obj ---------------------------
+                        const updatedAllConsultings = {
+                            ...allConsultings,
+                            [data.consulting_code] : data,
+                        };
+                        set(atomAllConsultingObj, updatedAllConsultings);
                     }
                     catch(err){
                         console.error(`setCurrentConsulting / Error : ${err}`);
+                        set(atomCurrentConsulting, defaultConsulting);
                     };
                 }else{
-                    const selected_arrary = allConsultings.filter(consulting => consulting.consulting_code === consulting_code);
-                    if(selected_arrary.length > 0){
-                        set(atomCurrentConsulting, selected_arrary[0]);
-                    }
+                    set(atomCurrentConsulting, allConsultings[consulting_code]);
                 }
                 
             }
             catch(err){
                 console.error(`setCurrentConsulting / Error : ${err}`);
+                set(atomCurrentConsulting, defaultConsulting);
             };
+        });
+        const searchConsultings = getCallback(({set, snapshot}) => async (itemName, filterText) => {
+            // At first, request data to server
+            let foundInServer = {};
+            const query_obj = {
+                queryConditions: [{
+                    column: { value: itemName},
+                    columnQueryCondition: { value: 'like'},
+                    multiQueryInput: filterText,
+                    andOr: 'And',
+                }],
+            };
+            const input_json = JSON.stringify(query_obj);
+            try{
+                const response = await fetch(`${BASE_PATH}/consultings`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+                const data = await response.json();
+                if(data.message){
+                    console.log('\t[ searchConsultings ] message:', data.message);
+                    return { result: false, message: data.message};
+                } else {
+                    for(const item of data) {
+                        foundInServer[item.consulting_code] = item;
+                    };
+                };
+            } catch(e) {
+                console.log('\t[ searchConsultings ] error occurs on searching');
+                return { result: false, message: 'fail to query'};
+            };
+
+            // Then, update all Consulting obj
+            const allConsultingData = await snapshot.getPromise(atomAllConsultingObj);
+            const updatedAllConsultingData = {
+                ...allConsultingData,
+                ...foundInServer,
+            };
+            set(atomAllConsultingObj, updatedAllConsultingData);
+
+            // Next, look for this updated data
+            const updatedList = Object.values(updatedAllConsultingData);
+            const foundConsultings = updatedList.filter(item =>
+                (item[itemName] && item[itemName].includes(filterText)))
+                .sort((a, b) => {
+                    const a_time = new Date(a.modify_date);
+                    const b_time = new Date(b.modify_date);
+                    if(a_time > b_time) return 1;
+                    if(a_time < b_time) return -1;
+                    return 0;
+                });
+            
+            return { result: true, data: foundConsultings };
         });
         return {
             tryLoadAllConsultings,
@@ -305,6 +380,7 @@ export const ConsultingRepo = selector({
             loadCompanyConsultings,
             filterConsulting,
             filterConsultingOri,
+            searchConsultings,
         };
     }
 });

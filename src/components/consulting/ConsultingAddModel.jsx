@@ -6,8 +6,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import {
   defaultConsulting,
-  atomLeadsForSelection,
   atomLeadState,
+  atomAllLeadObj,
 } from "../../atoms/atoms";
 import {
   atomUserState,
@@ -42,7 +42,7 @@ const ConsultingAddModel = (props) => {
 
   //===== [RecoilState] Related with Lead =============================================
   const leadsState = useRecoilValue(atomLeadState);
-  const leadsForSelection = useRecoilValue(atomLeadsForSelection);
+  const leadDataObj = useRecoilValue(atomAllLeadObj);
 
 
   //===== [RecoilState] Related with Users ============================================
@@ -63,11 +63,16 @@ const ConsultingAddModel = (props) => {
     const tempDate = new Date();
 
     if (leadCode && leadCode !== "") {
-      const foundIdx = leadsForSelection.findIndex(item => item.value.lead_code === leadCode);
-      if (foundIdx !== -1) {
-        const found_lead_info = leadsForSelection.at(foundIdx);
+      const foundLead = leadDataObj[leadCode];
+      if (foundLead) {
         setConsultingChange({
-          ...found_lead_info.value,
+          lead_code: foundLead.lead_code,
+          lead_name: foundLead.lead_name,
+          department: foundLead.department,
+          position: foundLead.position,
+          mobile_number: foundLead.mobile_number,
+          phone_number: foundLead.phone_number,
+          email: foundLead.email,
           receiver: cookies.myLationCrmUserName,
           receipt_date: tempDate,
         });
@@ -78,7 +83,7 @@ const ConsultingAddModel = (props) => {
         receipt_date: tempDate,
       });
     };
-  }, [cookies.myLationCrmUserName, leadsForSelection, leadCode]);
+  }, [cookies.myLationCrmUserName, leadCode]);
 
   const handleDateChange = (name, date) => {
     const modifiedData = {

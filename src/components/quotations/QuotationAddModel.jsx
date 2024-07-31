@@ -12,13 +12,13 @@ import "antd/dist/reset.css";
 import "../antdstyle.css";
 import {
   atomLeadState,
-  atomLeadsForSelection,
   atomProductClassList,
   atomProductClassListState,
   atomProductsState,
   atomProductOptions,
   defaultQuotation,
   atomAllProducts,
+  atomAllLeadObj,
 } from "../../atoms/atoms";
 import {
   atomUserState,
@@ -58,7 +58,7 @@ const QuotationAddModel = (props) => {
 
   //===== [RecoilState] Related with Lead ============================================
   const leadsState = useRecoilValue(atomLeadState);
-  const leadsForSelection = useRecoilValue(atomLeadsForSelection);
+  const leadDataObj = useRecoilValue(atomAllLeadObj);
 
 
   //===== [RecoilState] Related with Product ==========================================
@@ -88,12 +88,18 @@ const QuotationAddModel = (props) => {
 
     setQuotationContents([]);
     if (leadCode && leadCode !== '') {
-      const foundIdx = leadsForSelection.findIndex(item => item.value.lead_code === leadCode);
-      if (foundIdx !== -1) {
-        const found_lead_info = leadsForSelection.at(foundIdx);
+      const foundLead = leadDataObj[leadCode];
+      if (foundLead) {
         setQuotationChange({
           ...defaultQuotation,
-          ...found_lead_info.value,
+          lead_code: foundLead.lead_code,
+          lead_name: foundLead.lead_name,
+          department: foundLead.department,
+          position: foundLead.position,
+          mobile_number: foundLead.mobile_number,
+          phone_number: foundLead.phone_number,
+          email: foundLead.email,
+          receiver: cookies.myLationCrmUserName,
         });
       };
     } else {
@@ -105,7 +111,7 @@ const QuotationAddModel = (props) => {
     setAmountsForContent({
       sub_total_amount: 0, dc_amount: 0, sum_dc_applied:0, vat_amount:0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
     });
-  }, [leadCode, leadsForSelection]);
+  }, [leadCode, leadDataObj]);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {

@@ -1,11 +1,10 @@
 import React from 'react';
 import { selector } from "recoil";
 import { atomCurrentLead
-    , atomAllLeads
-    , atomFilteredLead
+    , atomAllLeadObj
+    , atomFilteredLeadArray
     , defaultLead
     , atomLeadState
-    , atomLeadsForSelection
 } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
@@ -70,54 +69,31 @@ export const LeadRepo = selector({
                 const data = await response.json();
                 if(data.message){
                     console.log('loadAllLeads message:', data.message);
-                    set(atomAllLeads, {});
-                    set(atomLeadsForSelection, []);
+                    set(atomAllLeadObj, {});
+                    set(atomFilteredLeadArray, []);
                     return false;
                 };
                 let allleads = {};
+                let filteredLeads = []
                 data.forEach(item => {
-                    allleads[data.lead_code] = data;
+                    allleads[item.lead_code] = item;
+                    filteredLeads.push(item);
                 });
-                set(atomAllLeads, allleads);
-                const tempLeadsForSelection = data.map(lead => ({
-                    label: lead.lead_name + " / " + lead.company_name,
-                    value: {
-                        lead_code: lead.lead_code,
-                        lead_name: lead.lead_name,
-                        department: lead.department,
-                        position: lead.position,
-                        mobile_number: lead.mobile_number,
-                        phone_number: lead.company_phone_number,
-                        fax_number: lead.company_fax_number,
-                        email: lead.email,
-                        company_name: lead.company_name,
-                        company_code: lead.company_code,
-                    }
-                }));
-                tempLeadsForSelection.sort((a, b) => {
-                    if (a.label > b.label) {
-                      return 1;
-                    }
-                    if (a.label < b.label) {
-                      return -1;
-                    }
-                    // a must be equal to b
-                    return 0;
-                  });
-                set(atomLeadsForSelection, tempLeadsForSelection);
+                set(atomAllLeadObj, allleads);
+                set(atomFilteredLeadArray, filteredLeads);
                 return true;
             }
             catch(err){
                 console.error(`loadAllLeads / Error : ${err}`);
-                set(atomAllLeads, []);
-                set(atomLeadsForSelection, []);
+                set(atomAllLeadObj, {});
+                set(atomFilteredLeadArray, []);
                 return false;
             };
         });
         const filterLeads = getCallback(({set, snapshot }) => async (itemName, filterText) => {
-            const allLeadList = await snapshot.getPromise(atomAllLeads);
-            let allLeads = null;
-            
+            const allLeadData = await snapshot.getPromise(atomAllLeadObj);
+            const allLeadList = Object.values(allLeadData);
+            let allLeads = [];
             if( itemName === 'common.all' ) {
                 allLeads = allLeadList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))||
                                            (item.company_name && item.company_name.includes(filterText))||
@@ -153,7 +129,7 @@ export const LeadRepo = selector({
                 allLeads = allLeadList.filter(item => (item.sales_resource && item.sales_resource.includes(filterText))
                 );
             }
-            set(atomFilteredLead, allLeads);
+            set(atomFilteredLeadArray, allLeads);
             return true;
         });
         const modifyLead = getCallback(({set, snapshot}) => async (newLead) => {
@@ -171,7 +147,7 @@ export const LeadRepo = selector({
                     return false;
                 };
 
-                const allLeads = await snapshot.getPromise(atomAllLeads);
+                const allLeads = await snapshot.getPromise(atomAllLeadObj);
                 if(newLead.action_type === 'ADD'){
                     delete newLead.action_type;
                     const updatedNewLead = {
@@ -182,7 +158,11 @@ export const LeadRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomAllLeads, [updatedNewLead, ...allLeads]);
+                    const updatedAllLeads = {
+                        ...allLeads,
+                        [data.out_lead_code] : updatedNewLead,
+                    }
+                    set(atomAllLeadObj, updatedAllLeads);
                     return true;
                 } else if(newLead.action_type === 'UPDATE'){
                     const currentLead = await snapshot.getPromise(atomCurrentLead);
@@ -196,20 +176,12 @@ export const LeadRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCurrentLead, modifiedLead);
-                    const foundIdx = allLeads.findIndex(lead => 
-                        lead.lead_code === modifiedLead.lead_code);
-                    if(foundIdx !== -1){
-                        const updatedAllLeads = [
-                            ...allLeads.slice(0, foundIdx),
-                            modifiedLead,
-                            ...allLeads.slice(foundIdx + 1,),
-                        ];
-                        set(atomAllLeads, updatedAllLeads);
-                        return true;
-                    } else {
-                        console.log('\t[ modifyLead ] No specified lead is found');
-                        return false;
-                    }
+                    const updatedAllLeads = {
+                        ...allLeads,
+                        [modifiedLead.lead_code] : modifiedLead,
+                    };
+                    set(atomAllLeadObj, updatedAllLeads);
+                    return true;
                 }
             }
             catch(err){
@@ -223,19 +195,22 @@ export const LeadRepo = selector({
                     set(atomCurrentLead, defaultLead);
                     return;
                 };
-                const allLeads = await snapshot.getPromise(atomAllLeads);
-                const selected_arrary = allLeads.filter(lead => lead.lead_code === lead_code);
-                if(selected_arrary.length > 0){
-                    set(atomCurrentLead, selected_arrary[0]);
+                const allLeads = await snapshot.getPromise(atomAllLeadObj);
+                if(allLeads[lead_code]){
+                    set(atomCurrentLead, allLeads[lead_code]);
                 } else {
                     console.log('\t[ setCurrentLead ] No lead data matched the specified id');
+                    set(atomCurrentLead, defaultLead);
                 }
             }
             catch(err){
                 console.error(`setCurrentLead / Error : ${err}`);
+                set(atomCurrentLead, defaultLead);
             };
         });
         const searchLeads = getCallback(({set, snapshot}) => async (itemName, filterText) => {
+            // At first, request data to server
+            let foundInServer = {};
             const query_obj = {
                 queryConditions: [{
                     column: { value: itemName},
@@ -245,23 +220,46 @@ export const LeadRepo = selector({
                 }],
             };
             const input_json = JSON.stringify(query_obj);
-            
             try{
                 const response = await fetch(`${BASE_PATH}/leads`, {
                     method: "POST",
                     headers:{'Content-Type':'application/json'},
                     body: input_json,
                 });
+
                 const data = await response.json();
                 if(data.message){
                     console.log('\t[ searchLeads ] message:', data.message);
-                    return data.message;
+                    return { result: false, message: data.message};
+                } else {
+                    for(const item of data) {
+                        foundInServer[item.lead_code] = item;
+                    };
                 };
-                return data;
             } catch(e) {
                 console.log('\t[ searchLeads ] error occurs on searching');
-                return 'fail to query';
+                return { result: false, message: 'fail to query'};
             };
+
+            // Then, update all company obj
+            const allLeadData = await snapshot.getPromise(atomAllLeadObj);
+            const updatedAllLeadData = {
+                ...allLeadData,
+                ...foundInServer,
+            };
+            set(atomAllLeadObj, updatedAllLeadData);
+
+            // Next, look for this updated data
+            const updatedList = Object.values(updatedAllLeadData);
+            const foundLeads = updatedList.filter(item =>
+                (item[itemName] && item[itemName].includes(filterText)))
+                .sort((a, b) => {
+                    if(a.lead_name > b.lead_name) return 1;
+                    if(a.lead_name < b.lead_name) return -1;
+                    return 0;
+                });
+            
+            return { result: true, data: foundLeads};
         });
         return {
             tryLoadAllLeads,

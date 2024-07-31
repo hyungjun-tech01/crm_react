@@ -6,9 +6,9 @@ import { useTranslation } from "react-i18next";
 import { Avatar, Space, Switch } from "antd";
 import {
   atomCurrentLead, defaultLead,
-  atomAllCompanyObj, atomCurrentCompany, atomCompanyState, atomCompanyForSelection,
+  atomCurrentCompany, atomCompanyState, atomCompanyForSelection,
   atomPurchaseState, atomAllPurchases,
-  atomConsultingState, atomAllConsultings,
+  atomConsultingState, atomAllConsultingObj,
   atomQuotationState, atomAllQuotations,
 } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
@@ -46,9 +46,8 @@ const LeadDetailsModel = () => {
 
   //===== [RecoilState] Related with Company =======================================
   const companyState = useRecoilValue(atomCompanyState);
-  const allCompanies = useRecoilValue(atomAllCompanyObj);
   const currentCompany = useRecoilValue(atomCurrentCompany);
-  const { modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
+  const { modifyCompany, setCurrentCompany, searchCompanies } = useRecoilValue(CompanyRepo);
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
@@ -61,8 +60,7 @@ const LeadDetailsModel = () => {
 
   //===== [RecoilState] Related with Consulting =======================================
   const consultingState = useRecoilValue(atomConsultingState);
-  const { tryLoadAllConsultings } = useRecoilValue(ConsultingRepo);
-  const allConsultings = useRecoilValue(atomAllConsultings);
+  const { tryLoadAllConsultings, searchConsultings } = useRecoilValue(ConsultingRepo);
 
 
   //===== [RecoilState] Related with Quotation ========================================
@@ -148,7 +146,7 @@ const LeadDetailsModel = () => {
     };
   }, [editedDetailValues, selectedLead]);
 
-  const handleDetailAddressChange = useCallback((obj) => {
+  const handleDetailObjectChange = useCallback((obj) => {
       const tempEdited = {
         ...editedDetailValues,
         ...obj,
@@ -235,7 +233,7 @@ const LeadDetailsModel = () => {
     { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'is_keyman', title: 'lead.is_keyman', detail: { type: 'select', options: KeyManForSelection, editing: handleDetailSelectChange } },
     { key: 'region', title: 'common.region', detail: { type: 'select', options: option_locations.ko, editing: handleDetailSelectChange } },
-    { key: 'company_name', title: 'company.company_name', detail: { type: 'select', options: companyForSelection, key: 'company_name', editing: handleDetailSelectChange } },
+    { key: 'company_name', title: 'company.company_name', detail: { type: 'search', key_name: 'company', editing: handleDetailObjectChange } },
     { key: 'company_name_en', title: 'company.company_name_en', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'department', title: 'lead.department', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
@@ -245,7 +243,7 @@ const LeadDetailsModel = () => {
     { key: 'email', title: 'lead.email', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'homepage', title: 'lead.homepage', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'company_zip_code', title: 'company.zip_code', detail: { type: 'label', editing: handleDetailChange, disabled: true } },
-    { key: 'company_address', title: 'company.address', detail: { type: 'address', extra: 'long', key_zip: "company_zip_code", editing: handleDetailAddressChange, } },
+    { key: 'company_address', title: 'company.address', detail: { type: 'address', extra: 'long', key_zip: "company_zip_code", editing: handleDetailObjectChange, } },
     { key: 'sales_resource', title: 'lead.lead_sales', detail: { type: 'select', options: salespersonsForSelection, editing: handleDetailSelectChange } },
     { key: 'application_engineer', title: 'company.engineer', detail: { type: 'select', options: engineersForSelection, editing: handleDetailSelectChange } },
     { key: 'create_date', title: 'common.regist_date', detail: { type: 'date', editing: handleDetailDateChange } },
@@ -317,13 +315,15 @@ const LeadDetailsModel = () => {
       };
 
       setCurrentLeadCode(selectedLead.company_code);
-      const companyByLeadArray = allCompanies.filter(company => company.company_code === selectedLead.company_code);
-      if (companyByLeadArray.length > 0) {
-        setCurrentCompany(companyByLeadArray[0]);
-        loadCompanyMAContracts(companyByLeadArray[0].company_code);
-      };
+      const companyByLeadArray = searchCompanies('company_code', selectedLead.company_code);
+      companyByLeadArray.then(res => {
+          if(res.result) {
+            setCurrentCompany(res.data[0]);
+            loadCompanyMAContracts(res.data[0].company_code);
+          };
+        });
     };
-  }, [isAllNeededDataLoaded, selectedLead, currentLeadCode, companyState, allCompanies, setCurrentCompany, loadCompanyMAContracts]);
+  }, [isAllNeededDataLoaded, selectedLead, currentLeadCode, companyState, setCurrentCompany, loadCompanyMAContracts]);
 
   useEffect(() => {
     tryLoadAllPurchases();
@@ -345,12 +345,16 @@ const LeadDetailsModel = () => {
   useEffect(() => {
     tryLoadAllConsultings();
     if ((consultingState & 1) === 1) {
-      const tempConsultingByLead = allConsultings.filter(consulting => consulting.lead_code === selectedLead.lead_code);
-      if (consultingsByLead.length !== tempConsultingByLead.length) {
-        setConsultingsByLead(tempConsultingByLead);
-      };
+      const tempConsultingByLead = searchConsultings('lead_code', selectedLead.lead_code);
+      tempConsultingByLead
+        .then(res => {
+          console.log('LeadDetailsModel / useEffect : ', res);
+          if(res.result) {
+            setConsultingsByLead(res.data);
+          }
+        })
     };
-  }, [allConsultings, consultingState, consultingsByLead.length, selectedLead.lead_code]);
+  }, [consultingState, selectedLead.lead_code]);
 
   useEffect(() => {
     tryLoadAllQuotations();

@@ -61,21 +61,23 @@ export const CompanyRepo = selector({
                 if(data.message){
                     console.log('\t[ loadAllCompanies ] message:', data.message);
                     set(atomAllCompanyObj, {});
+                    set(atomFilteredCompanyArray, []);
                     return false;
                 };
                 let allCompanies = {};
-                let filteredCompany = [];
+                let filteredCompanies = [];
                 data.forEach(item => {
                     allCompanies[item.company_code] = item;
-                    filteredCompany.push(item);
+                    filteredCompanies.push(item);
                 });
                 set(atomAllCompanyObj, allCompanies);
-                set(atomFilteredCompanyArray, filteredCompany);
+                set(atomFilteredCompanyArray, filteredCompanies);
                 return true;
             }
             catch(err){
                 console.error(`\t[ loadAllCompanies ] Error : ${err}`);
                 set(atomAllCompanyObj, {});
+                set(atomFilteredCompanyArray, []);
                 return false;
             };
         });
@@ -131,7 +133,7 @@ export const CompanyRepo = selector({
                     return false;
                 };
 
-                const allCompany = await snapshot.getPromise(atomAllCompanyObj);
+                const allCompanies = await snapshot.getPromise(atomAllCompanyObj);
                 if(newCompany.action_type === 'ADD'){
                     delete newCompany.action_type;
                     const updatedNewCompany = {
@@ -143,7 +145,7 @@ export const CompanyRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     const updatedAllCompanies = {
-                        ...allCompany,
+                        ...allCompanies,
                         [data.out_company_code]: updatedNewCompany,
                     };
                     set(atomAllCompanyObj, updatedAllCompanies);
@@ -161,7 +163,7 @@ export const CompanyRepo = selector({
                     };
                     set(atomCurrentCompany, modifiedCompany);
                     const updatedAllCompanies = {
-                        ...allCompany,
+                        ...allCompanies,
                         [modifiedCompany.company_code] : modifiedCompany,
                     };
                     set(atomAllCompanyObj, updatedAllCompanies);
@@ -189,6 +191,7 @@ export const CompanyRepo = selector({
             }
             catch(err){
                 console.error(`\t[ setCurrentCompany ] Error : ${err}`);
+                set(atomCurrentCompany, defaultCompany);
             };
         });
         const searchCompanies = getCallback(({set, snapshot}) => async (itemName, filterText) => {
@@ -203,7 +206,6 @@ export const CompanyRepo = selector({
                 }],
             };
             const input_json = JSON.stringify(query_obj);
-            
             try{
                 const response = await fetch(`${BASE_PATH}/companies`, {
                     method: "POST",
@@ -213,13 +215,15 @@ export const CompanyRepo = selector({
                 const data = await response.json();
                 if(data.message){
                     console.log('\t[ searchCompanies ] message:', data.message);
+                    return { result: false, message: data.message};
                 } else {
                     for(const item of data) {
                         foundInServer[item.company_code] = item;
-                    }
+                    };
                 };
             } catch(e) {
                 console.log('\t[ searchCompanies ] error occurs on searching');
+                return { result: false, message: 'fail to query'};
             };
 
             // Then, update all company obj
@@ -240,7 +244,7 @@ export const CompanyRepo = selector({
                     return 0;
                 });
             
-            return foundCompanies;
+            return { result: true, data: foundCompanies};
         });
         return {
             tryLoadAllCompanies,

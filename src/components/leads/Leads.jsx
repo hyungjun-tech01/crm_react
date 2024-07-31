@@ -13,8 +13,8 @@ import { QuotationRepo } from "../../repository/quotation";
 import { PurchaseRepo } from "../../repository/purchase";
 import { LeadRepo } from "../../repository/lead";
 import { 
-  atomAllLeads,
-  atomFilteredLead,
+  atomAllLeadObj,
+  atomFilteredLeadArray,
   atomCompanyState,
   atomLeadState,
 } from "../../atoms/atoms";
@@ -38,8 +38,7 @@ const Leads = () => {
 
   //===== [RecoilState] Related with Lead =============================================
   const leadState = useRecoilValue(atomLeadState);
-  const allLeadData = useRecoilValue(atomAllLeads);
-  const filteredLead = useRecoilValue(atomFilteredLead);
+  const filteredLead = useRecoilValue(atomFilteredLeadArray);
   const { tryLoadAllLeads, loadAllLeads, setCurrentLead, filterLeads } = useRecoilValue(LeadRepo);
 
 
@@ -505,30 +504,6 @@ const Leads = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive">
-                    {searchCondition === "" ? 
-                    <Table
-                      className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
-                      loading={nowLoading}
-                      pagination={{
-                        total: allLeadData.length,
-                        showTotal: ShowTotal,
-                        showSizeChanger: true,
-                        onShowSizeChange: onShowSizeChange,
-                        ItemRender: ItemRender,
-                      }}
-                      style={{ overflowX: "auto" }}
-                      columns={columns}
-                      dataSource={allLeadData}
-                      rowKey={(record) => record.lead_code}
-                      onRow={(record, rowIndex) => {
-                        return {
-                          onClick: () => {
-                            handleClickLeadName(record.lead_code, record.company_code);
-                          }, // double click row
-                        };
-                      }}
-                    /> 
-                    :
                     <Table
                       className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
                       loading={nowLoading}
@@ -550,8 +525,7 @@ const Leads = () => {
                           },
                         };
                       }}
-                    /> 
-                    }
+                    />
                   </div>
                 </div>
               </div>
