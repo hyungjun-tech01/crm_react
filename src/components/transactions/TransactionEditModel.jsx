@@ -241,11 +241,13 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
   };
   
   const handleStartAddContent = () => {
-    if(!transactionChange['company_code']) return;
+    console.log('transaction add');
+    //if(!transactionChange['company_code']) return;
     const tempData = {
       ...dataForTransaction,
       title: t('quotation.add_content'),
     };
+    console.log('transaction add');
     setDataForTransaction(tempData);
     setOrgContentModalData({...DefaultTransactionContent});
     setEditedContentModalData({});
