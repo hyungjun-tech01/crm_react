@@ -10,7 +10,7 @@ import { option_locations, option_deal_type } from "../../constants/constants";
 import {
   atomCurrentCompany,
   defaultCompany,
-  atomAllPurchases,
+  atomAllPurchaseObj,
   atomPurchaseState,
   atomAllTransactions,
   atomTransactionState,
@@ -46,7 +46,7 @@ const CompanyDetailsModel = ({ openTransaction }) => {
   //===== [RecoilState] Related with Purchase =========================================
   const purchaseState = useRecoilValue(atomPurchaseState);
   const { tryLoadAllPurchases } = useRecoilValue(PurchaseRepo);
-  const allPurchases = useRecoilValue(atomAllPurchases);
+  const allPurchases = useRecoilValue(atomAllPurchaseObj);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
 

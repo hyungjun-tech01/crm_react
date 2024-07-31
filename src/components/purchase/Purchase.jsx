@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
-import { atomAllPurchases,
-  atomFilteredPurchase,
+import { atomAllPurchaseObj,
+  atomFilteredPurchaseArray,
   atomCompanyState,
   atomPurchaseState,
   atomAllCompanyObj,
@@ -40,8 +40,8 @@ const Purchase = () => {
 
   //===== [RecoilState] Related with Purchase ============================================
   const purchaseState = useRecoilValue(atomPurchaseState);
-  const allPurchaseData = useRecoilValue(atomAllPurchases);
-  const filteredPurchase = useRecoilValue(atomFilteredPurchase);
+  const allPurchaseData = useRecoilValue(atomAllPurchaseObj);
+  const filteredPurchase = useRecoilValue(atomFilteredPurchaseArray);
   const { tryLoadAllPurchases, filterPurchases, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
   
 

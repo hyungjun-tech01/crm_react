@@ -1,9 +1,9 @@
 import React from 'react';
 import { selector } from "recoil";
 import { atomCurrentPurchase
-    , atomAllPurchases
+    , atomAllPurchaseObj
     , atomCompanyPurchases
-    , atomFilteredPurchase
+    , atomFilteredPurchaseArray
     , defaultPurchase
     , atomPurchaseState
 } from '../atoms/atoms';
@@ -33,19 +33,28 @@ export const PurchaseRepo = selector({
         });
         const loadAllPurchases = getCallback(({set}) => async () => {
             try{
-                console.log('[PurchaseRepository] Try loading all')
                 const response = await fetch(`${BASE_PATH}/purchases`);
                 const data = await response.json();
                 if(data.message){
                     console.log('loadAllPurchases message:', data.message);
-                    set(atomAllPurchases, []);
+                    set(atomAllPurchaseObj, []);
+                    set(atomFilteredPurchaseArray, []);
                     return false;
                 }
-                set(atomAllPurchases, data);
+                let allPurchases = {};
+                let filteredPurchases = [];
+                data.forEach(item => {
+                    allPurchases[item.purchase_code] = item;
+                    filteredPurchases.push(item);
+                });
+                set(atomAllPurchaseObj, allPurchases);
+                set(atomFilteredPurchaseArray, filteredPurchases);
                 return true;
             }
             catch(err){
                 console.error(`loadAllPurchases / Error : ${err}`);
+                set(atomAllPurchaseObj, []);
+                set(atomFilteredPurchaseArray, []);
                 return false;
             };
         });
@@ -84,14 +93,14 @@ export const PurchaseRepo = selector({
                                                 item.product_name && item.product_name.includes(filterText)      
                 ));
             }
-            set(atomFilteredPurchase, allPurchase);
+            set(atomFilteredPurchaseArray, allPurchase);
             return true;
         });
-
         const filterPurchases = getCallback(({set, snapshot }) => async (itemName, filterText) => {
-            const allPurchaseList = await snapshot.getPromise(atomAllPurchases);
-            let  allQPurchase ;
-            console.log('filterPurchases', itemName, filterText);
+            const allPurchaseData = await snapshot.getPromise(atomAllPurchaseObj);
+            const allPurchaseList = Object.values(allPurchaseData);
+            let  allQPurchase = [];
+            
             if(itemName === 'common.all'){
                 allQPurchase = allPurchaseList.filter(item => (item.product_type &&item.product_type.includes(filterText))||
                                             (item.product_name && item.product_name.includes(filterText)) ||
@@ -107,7 +116,7 @@ export const PurchaseRepo = selector({
                 allQPurchase = allPurchaseList.filter(item => (item.company_name &&item.company_name.includes(filterText))
                 );  
             }
-            set(atomFilteredPurchase, allQPurchase);
+            set(atomFilteredPurchaseArray, allQPurchase);
             return true;
         });            
         const modifyPurchase = getCallback(({set, snapshot}) => async (newPurchase) => {
@@ -126,7 +135,7 @@ export const PurchaseRepo = selector({
                     };
                 };
 
-                const allPurchases = await snapshot.getPromise(atomAllPurchases);
+                const allPurchases = await snapshot.getPromise(atomAllPurchaseObj);
                 if(newPurchase.action_type === 'ADD'){
                     delete newPurchase.action_type;
                     const updatedNewPurchase = {
@@ -137,7 +146,20 @@ export const PurchaseRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomAllPurchases, [updatedNewPurchase, ...allPurchases]);
+                    //----- Update AllPurchaseObj --------------------------//
+                    const updatedAllPurchases = {
+                        ...allPurchases,
+                        [data.out_purchase_code]: updatedNewPurchase,
+                    };
+                    set(atomAllPurchaseObj, updatedAllPurchases);
+
+                    //----- Update FilteredPurchaseArray --------------------//
+                    const filteredAllCompanies = await snapshot.getPromise(atomFilteredPurchaseArray);
+                    const updatedFiltered = [
+                        updatedNewPurchase,
+                        ...filteredAllCompanies
+                    ];
+                    set(atomFilteredPurchaseArray, updatedFiltered);
                     return {
                         result: true,
                         code: data.out_purchase_code,
@@ -154,25 +176,29 @@ export const PurchaseRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCurrentPurchase, modifiedPurchase);
-                    const foundIdx = allPurchases.findIndex(purchase => 
-                        purchase.purchase_code === modifiedPurchase.purchase_code);
+
+                    //----- Update AllPurchaseObj --------------------------//
+                    const updatedAllPurchases = {
+                        ...allPurchases,
+                        [modifiedPurchase.purchase_code] : modifiedPurchase,
+                    };
+                    set(atomAllPurchaseObj, updatedAllPurchases);
+
+                    //----- Update FilteredCompanies -----------------------//
+                    const filteredAllPurchases = await snapshot.getPromise(atomFilteredPurchaseArray);
+                    const foundIdx = filteredAllPurchases.filter(item => item.purchase_code === modifiedPurchase.purchase_code);
                     if(foundIdx !== -1){
-                        const updatedAllPurchases = [
-                            ...allPurchases.slice(0, foundIdx),
+                        const updatedFiltered = [
+                            ...filteredAllPurchases.slice(0, foundIdx),
                             modifiedPurchase,
-                            ...allPurchases.slice(foundIdx + 1,),
+                            ...filteredAllPurchases.slice(foundIdx + 1,),
                         ];
-                        set(atomAllPurchases, updatedAllPurchases);
-                        return {
-                            result: true,
-                            code: modifiedPurchase.purchase_code,
-                        };
-                    } else {
-                        console.log('\t[ modifyPurchase ] No specified purchase is found');
-                        return {
-                            result: false,
-                        };
-                    }
+                        set(atomFilteredPurchaseArray, updatedFiltered);
+                    };
+                    return {
+                        result: true,
+                        code: modifiedPurchase.purchase_code,
+                    };
                 }
             }
             catch(err){
@@ -187,7 +213,7 @@ export const PurchaseRepo = selector({
                     return;
                 };
 
-                let queriedPurchases = await snapshot.getPromise(atomAllPurchases);
+                let queriedPurchases = await snapshot.getPromise(atomAllPurchaseObj);
 
                 if(queriedPurchases.length === 0){
                     queriedPurchases = await snapshot.getPromise(atomCompanyPurchases);
@@ -203,6 +229,60 @@ export const PurchaseRepo = selector({
                 console.error(`setCurrentPurchase / Error : ${err}`);
             };
         });
+        const searchPurchases = getCallback(({set, snapshot}) => async (itemName, filterText) => {
+            // At first, request data to server
+            let foundInServer = {};
+            let foundData = [];
+            const query_obj = {
+                queryConditions: [{
+                    column: { value: itemName},
+                    columnQueryCondition: { value: 'like'},
+                    multiQueryInput: filterText,
+                    andOr: 'And',
+                }],
+            };
+            const input_json = JSON.stringify(query_obj);
+            try{
+                const response = await fetch(`${BASE_PATH}/purchases`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+                const data = await response.json();
+                if(data.message){
+                    console.log('\t[ searchPurchases ] message:', data.message);
+                    return { result: false, message: data.message};
+                } else {
+                    for(const item of data) {
+                        foundInServer[item.purchase_code] = item;
+                    };
+                    foundData = data.sort((a, b) => {
+                        const a_date = new Date(a.modify_date);
+                        const b_date = new Date(b.modify_date);
+                        if(a_date > b_date) return 1;
+                        if(a_date < b_date) return -1;
+                        return 0;
+                    });
+                };
+            } catch(e) {
+                console.log('\t[ searchPurchases ] error occurs on searching');
+                return { result: false, message: 'fail to query'};
+            };
+
+            //----- Update AllPurchaseObj --------------------------//
+            const allPurchaseData = await snapshot.getPromise(atomAllPurchaseObj);
+            const updatedAllPurchaseData = {
+                ...allPurchaseData,
+                ...foundInServer,
+            };
+            set(atomAllPurchaseObj, updatedAllPurchaseData);
+
+            //----- Update FilteredPurchases -----------------------//
+            const updatedList = Object.values(updatedAllPurchaseData);
+            set(atomFilteredPurchaseArray, updatedList);
+            
+            return { result: true, data: foundData};
+        });
         return {
             tryLoadAllPurchases,
             loadAllPurchases,
@@ -210,7 +290,8 @@ export const PurchaseRepo = selector({
             modifyPurchase,
             setCurrentPurchase,
             filterPurchases,
-            filterCompanyPurchase
+            filterCompanyPurchase,
+            searchPurchases,
         };
     }
 });

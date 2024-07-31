@@ -7,7 +7,7 @@ import { Avatar, Space, Switch } from "antd";
 import {
   atomCurrentLead, defaultLead,
   atomCurrentCompany, atomCompanyState, atomCompanyForSelection,
-  atomPurchaseState, atomAllPurchases,
+  atomPurchaseState, atomAllPurchaseObj,
   atomConsultingState, atomAllConsultingObj,
   atomQuotationState, atomAllQuotations,
 } from "../../atoms/atoms";
@@ -54,7 +54,7 @@ const LeadDetailsModel = () => {
   //===== [RecoilState] Related with Purchase =======================================
   const purchaseState = useRecoilValue(atomPurchaseState);
   const { tryLoadAllPurchases } = useRecoilValue(PurchaseRepo)
-  const allPurchases = useRecoilValue(atomAllPurchases);
+  const allPurchases = useRecoilValue(atomAllPurchaseObj);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
 

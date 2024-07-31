@@ -324,17 +324,17 @@ export const atomCurrentPurchase = atom({
     key: "currentPurchase",
     default: defaultPurchase,
 });
-export const atomAllPurchases = atom({
+export const atomAllPurchaseObj = atom({
     key: "allPurchases",
     default: {},
 });
 export const atomCompanyPurchases = atom({
     key: "companyPurchases",
-    default: {},
+    default: [],
 });
-export const atomFilteredPurchase = atom({
+export const atomFilteredPurchaseArray = atom({
     key: "allFilteredPurchases",
-    default: {},
+    default: [],
 });
 export const atomPurchaseState = atom({
     key: "purchaseState",
