@@ -5,7 +5,8 @@ import { atomCurrentConsulting
     , defaultConsulting
     , atomCompanyConsultings
     , atomFilteredConsultingArray
-    , atomConsultingState
+    , atomConsultingState,
+    atomFilteredCompanyArray
 } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
@@ -237,11 +238,20 @@ export const ConsultingRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
+                    //----- Update AllConsultingObj --------------------------//
                     const updatedAllConsultings = {
                         ...allConsultings,
                         [data.out_consulting_code]: updatedNewConsulting,
                     };
                     set(atomAllConsultingObj, updatedAllConsultings);
+
+                    //----- Update FilteredConsultings -----------------------//
+                    const filteredAllConsultings = await snapshot.getPromise(atomFilteredConsultingArray);
+                    const updatedFiltered = [
+                        updatedNewConsulting,
+                        ...filteredAllConsultings
+                    ];
+                    set(atomFilteredConsultingArray, updatedFiltered);
                     return true;
                 } else if(newConsulting.action_type === 'UPDATE'){
                     const currentConsulting = await snapshot.getPromise(atomCurrentConsulting);
@@ -255,12 +265,25 @@ export const ConsultingRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCurrentConsulting, modifiedConsulting);
-                    
+
+                    //----- Update AllConsultingObj --------------------------//
                     const updatedAllConsultings = {
                         ...allConsultings,
                         [modifiedConsulting.consulting_code] : modifiedConsulting,
                     };
                     set(atomAllConsultingObj, updatedAllConsultings);
+
+                    //----- Update FilteredConsultings -----------------------//
+                    const filteredAllConsultings = await snapshot.getPromise(atomFilteredConsultingArray);
+                    const foundIdx = filteredAllConsultings.filter(item => item.consulting_code === modifiedConsulting.consulting_code);
+                    if(foundIdx !== -1){
+                        const updatedFiltered = [
+                            ...filteredAllConsultings.slice(0, foundIdx),
+                            modifiedConsulting,
+                            ...filteredAllConsultings.slice(foundIdx + 1,),
+                        ];
+                        set(atomFilteredConsultingArray, updatedFiltered);
+                    };
                     return true;
                 }
             }
@@ -321,6 +344,7 @@ export const ConsultingRepo = selector({
         const searchConsultings = getCallback(({set, snapshot}) => async (itemName, filterText) => {
             // At first, request data to server
             let foundInServer = {};
+            let foundData = [];
             const query_obj = {
                 queryConditions: [{
                     column: { value: itemName},
@@ -344,13 +368,20 @@ export const ConsultingRepo = selector({
                     for(const item of data) {
                         foundInServer[item.consulting_code] = item;
                     };
+                    foundData = data.sort((a, b) => {
+                        const a_time = new Date(a.modify_date);
+                        const b_time = new Date(b.modify_date);
+                        if(a_time > b_time) return 1;
+                        if(a_time < b_time) return -1;
+                        return 0;
+                    });
                 };
             } catch(e) {
                 console.log('\t[ searchConsultings ] error occurs on searching');
                 return { result: false, message: 'fail to query'};
             };
 
-            // Then, update all Consulting obj
+            //----- Update AllConsultingObj --------------------------//
             const allConsultingData = await snapshot.getPromise(atomAllConsultingObj);
             const updatedAllConsultingData = {
                 ...allConsultingData,
@@ -358,19 +389,11 @@ export const ConsultingRepo = selector({
             };
             set(atomAllConsultingObj, updatedAllConsultingData);
 
-            // Next, look for this updated data
+            //----- Update FilteredConsultings -----------------------//
             const updatedList = Object.values(updatedAllConsultingData);
-            const foundConsultings = updatedList.filter(item =>
-                (item[itemName] && item[itemName].includes(filterText)))
-                .sort((a, b) => {
-                    const a_time = new Date(a.modify_date);
-                    const b_time = new Date(b.modify_date);
-                    if(a_time > b_time) return 1;
-                    if(a_time < b_time) return -1;
-                    return 0;
-                });
-            
-            return { result: true, data: foundConsultings };
+            set(atomFilteredConsultingArray, updatedList);
+
+            return { result: true, data: foundData };
         });
         return {
             tryLoadAllConsultings,

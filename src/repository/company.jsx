@@ -49,7 +49,6 @@ export const CompanyRepo = selector({
         });
         const loadAllCompanies = getCallback(({set}) => async (multiQueryCondi) => {
             const input_json = JSON.stringify(multiQueryCondi);
-
             try{
                 const response = await fetch(`${BASE_PATH}/companies`, {
                     method: "POST",
@@ -144,11 +143,20 @@ export const CompanyRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
+                    //----- Update AllCompanyObj --------------------------//
                     const updatedAllCompanies = {
                         ...allCompanies,
                         [data.out_company_code]: updatedNewCompany,
                     };
                     set(atomAllCompanyObj, updatedAllCompanies);
+
+                    //----- Update FilteredCompanyArray --------------------//
+                    const filteredAllCompanies = await snapshot.getPromise(atomFilteredCompanyArray);
+                    const updatedFiltered = [
+                        updatedNewCompany,
+                        ...filteredAllCompanies
+                    ];
+                    set(atomFilteredCompanyArray, updatedFiltered);
                     return true;
                 } else if(newCompany.action_type === 'UPDATE'){
                     const currentCompany = await snapshot.getPromise(atomCurrentCompany);
@@ -162,11 +170,25 @@ export const CompanyRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCurrentCompany, modifiedCompany);
+
+                    //----- Update AllCompanyObj --------------------------//
                     const updatedAllCompanies = {
                         ...allCompanies,
                         [modifiedCompany.company_code] : modifiedCompany,
                     };
                     set(atomAllCompanyObj, updatedAllCompanies);
+
+                    //----- Update FilteredCompanies -----------------------//
+                    const filteredAllCompanies = await snapshot.getPromise(atomFilteredCompanyArray);
+                    const foundIdx = filteredAllCompanies.filter(item => item.company_code === modifiedCompany.company_code);
+                    if(foundIdx !== -1){
+                        const updatedFiltered = [
+                            ...filteredAllCompanies.slice(0, foundIdx),
+                            modifiedCompany,
+                            ...filteredAllCompanies.slice(foundIdx + 1,),
+                        ];
+                        set(atomFilteredCompanyArray, updatedFiltered);
+                    };
                     return true;
                 }
             }
@@ -197,6 +219,7 @@ export const CompanyRepo = selector({
         const searchCompanies = getCallback(({set, snapshot}) => async (itemName, filterText) => {
             // At first, request data to server
             let foundInServer = {};
+            let foundData = [];
             const query_obj = {
                 queryConditions: [{
                     column: { value: itemName},
@@ -220,13 +243,18 @@ export const CompanyRepo = selector({
                     for(const item of data) {
                         foundInServer[item.company_code] = item;
                     };
+                    foundData = data.sort((a, b) => {
+                        if(a.company_name > b.company_name) return 1;
+                        if(a.company_name < b.company_name) return -1;
+                        return 0;
+                    });
                 };
             } catch(e) {
                 console.log('\t[ searchCompanies ] error occurs on searching');
                 return { result: false, message: 'fail to query'};
             };
 
-            // Then, update all company obj
+            //----- Update AllCompanyObj --------------------------//
             const allCompanyData = await snapshot.getPromise(atomAllCompanyObj);
             const updatedAllCompanyData = {
                 ...allCompanyData,
@@ -234,17 +262,11 @@ export const CompanyRepo = selector({
             };
             set(atomAllCompanyObj, updatedAllCompanyData);
 
-            // Next, look for this updated data
+            //----- Update FilteredCompanies -----------------------//
             const updatedList = Object.values(updatedAllCompanyData);
-            const foundCompanies = updatedList.filter(item =>
-                (item[itemName] && item[itemName].includes(filterText)))
-                .sort((a, b) => {
-                    if(a.company_name > b.company_name) return 1;
-                    if(a.company_name < b.company_name) return -1;
-                    return 0;
-                });
+            set(atomFilteredCompanyArray, updatedList);
             
-            return { result: true, data: foundCompanies};
+            return { result: true, data: foundData};
         });
         return {
             tryLoadAllCompanies,

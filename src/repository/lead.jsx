@@ -158,11 +158,20 @@ export const LeadRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
+                    //----- Update AllLeadObj --------------------------//
                     const updatedAllLeads = {
                         ...allLeads,
                         [data.out_lead_code] : updatedNewLead,
                     }
                     set(atomAllLeadObj, updatedAllLeads);
+
+                    //----- Update FilteredLeadArray --------------------//
+                    const filteredAllLeads = await snapshot.getPromise(atomFilteredLeadArray);
+                    const updatedFiltered = [
+                        updatedNewLead,
+                        ...filteredAllLeads
+                    ];
+                    set(atomFilteredLeadArray, updatedFiltered);
                     return true;
                 } else if(newLead.action_type === 'UPDATE'){
                     const currentLead = await snapshot.getPromise(atomCurrentLead);
@@ -176,11 +185,25 @@ export const LeadRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCurrentLead, modifiedLead);
+
+                    //----- Update AllLeadObj --------------------------//
                     const updatedAllLeads = {
                         ...allLeads,
                         [modifiedLead.lead_code] : modifiedLead,
                     };
                     set(atomAllLeadObj, updatedAllLeads);
+
+                    //----- Update FilteredLeadArray --------------------//
+                    const filteredAllLeads = await snapshot.getPromise(atomFilteredLeadArray);
+                    const foundIdx = filteredAllLeads.filter(item => item.lead_code === modifiedLead.lead_code);
+                    if(foundIdx !== -1){
+                        const updatedFiltered = [
+                            ...filteredAllLeads.slice(0, foundIdx),
+                            modifiedLead,
+                            ...filteredAllLeads.slice(foundIdx + 1,),
+                        ];
+                        set(atomFilteredLeadArray, updatedFiltered);
+                    };
                     return true;
                 }
             }
@@ -211,6 +234,7 @@ export const LeadRepo = selector({
         const searchLeads = getCallback(({set, snapshot}) => async (itemName, filterText) => {
             // At first, request data to server
             let foundInServer = {};
+            let foundData = [];
             const query_obj = {
                 queryConditions: [{
                     column: { value: itemName},
@@ -235,13 +259,18 @@ export const LeadRepo = selector({
                     for(const item of data) {
                         foundInServer[item.lead_code] = item;
                     };
+                    foundData = data.sort((a, b) => {
+                        if(a.lead_name > b.lead_name) return 1;
+                        if(a.lead_name < b.lead_name) return -1;
+                        return 0;
+                    });
                 };
             } catch(e) {
                 console.log('\t[ searchLeads ] error occurs on searching');
                 return { result: false, message: 'fail to query'};
             };
 
-            // Then, update all company obj
+            //----- Update AllLeadObj --------------------------//
             const allLeadData = await snapshot.getPromise(atomAllLeadObj);
             const updatedAllLeadData = {
                 ...allLeadData,
@@ -249,17 +278,11 @@ export const LeadRepo = selector({
             };
             set(atomAllLeadObj, updatedAllLeadData);
 
-            // Next, look for this updated data
+            //----- Update FilteredLeadArray --------------------//
             const updatedList = Object.values(updatedAllLeadData);
-            const foundLeads = updatedList.filter(item =>
-                (item[itemName] && item[itemName].includes(filterText)))
-                .sort((a, b) => {
-                    if(a.lead_name > b.lead_name) return 1;
-                    if(a.lead_name < b.lead_name) return -1;
-                    return 0;
-                });
-            
-            return { result: true, data: foundLeads};
+            set(atomFilteredLeadArray, updatedList);
+
+            return { result: true, data: foundData};
         });
         return {
             tryLoadAllLeads,
