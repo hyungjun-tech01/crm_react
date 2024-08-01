@@ -21,6 +21,14 @@ export const QuotationSendTypes = [
     { value: 'E-Mail', label: 'Email'},
 ];
 
+export const quotationColumn = [
+    { value: 'company_name', label: '회사명'},
+    { value: 'lead_name', label: '고객명'},
+    { value: 'quotation_manager', label: '견적 책임자'},
+    { value: 'quotation_title', label: '견적 제목'},
+    { value: 'quotation_contents', label: '견적 내용'},
+];
+
 
 export const QuotationRepo = selector({
     key: "QuotationRepository",
