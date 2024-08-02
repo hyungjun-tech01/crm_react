@@ -34,12 +34,12 @@ export const QuotationRepo = selector({
     key: "QuotationRepository",
     get: ({getCallback}) => {
         /////////////////////try to load all Quotations /////////////////////////////
-        const tryLoadAllQuotations = getCallback(({ set, snapshot }) => async () => {
+        const tryLoadAllQuotations = getCallback(({ set, snapshot }) => async (multiQueryCondi) => {
             const loadStates = await snapshot.getPromise(atomQuotationState);
             if((loadStates & 3) === 0){
                 console.log('[tryLoadAllQuotations] Try to load all Quotations');
                 set(atomQuotationState, (loadStates | 2));   // state : loading
-                const ret = await loadAllQuotations();
+                const ret = await loadAllQuotations(multiQueryCondi);
                 if(ret){
                     // succeeded to load
                     set(atomQuotationState, (loadStates | 3));
@@ -49,10 +49,17 @@ export const QuotationRepo = selector({
                 };
             }
         });
-        const loadAllQuotations = getCallback(({set}) => async () => {
+        const loadAllQuotations = getCallback(({set}) => async (multiQueryCondi) => {
+            const input_json = JSON.stringify(multiQueryCondi);
             try{
                 console.log('[QuotationRepository] Try loading all')
-                const response = await fetch(`${BASE_PATH}/quotations`);
+                const response = await fetch(`${BASE_PATH}/quotations`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+
+
                 const data = await response.json();
                 if(data.message){
                     console.log('loadAllQuotations message:', data.message);
