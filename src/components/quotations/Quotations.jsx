@@ -17,6 +17,7 @@ import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { QuotationRepo } from "../../repository/quotation";
 import { UserRepo } from "../../repository/user";
+import MultiQueryModal from "../../constants/MultiQueryModal";
 import {
   atomCompanyState,
   atomAllQuotations,
@@ -26,7 +27,7 @@ import {
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { compareCompanyName, compareText, ConvertCurrency, formatDate } from "../../constants/functions";
-
+import { quotationColumn } from "../../repository/quotation";
 
 const Quotations = () => {
   const { t } = useTranslation();
@@ -47,7 +48,7 @@ const Quotations = () => {
   const quotationState = useRecoilValue(atomQuotationState);
   const allQuotationData = useRecoilValue(atomAllQuotations);
   const filteredQuotation = useRecoilValue(atomFilteredQuotation);
-  const { tryLoadAllQuotations, setCurrentQuotation, filterQuotations } = useRecoilValue(QuotationRepo);
+  const { tryLoadAllQuotations, setCurrentQuotation, filterQuotations , loadAllQuotations} = useRecoilValue(QuotationRepo);
 
 
   //===== [RecoilState] Related with Lead =============================================
@@ -64,6 +65,87 @@ const Quotations = () => {
 
 
   const [statusSearch, setStatusSearch] = useState('common.all');
+
+  const [multiQueryModal, setMultiQueryModal] = useState(false);
+
+  const [queryConditions, setQueryConditions] = useState([
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+  ]);
+
+  const today = new Date();
+  const oneYearAgo = new Date();
+  const oneMonthAgo = new Date();
+  oneMonthAgo.setMonth(today.getMonth() - 1);
+  oneYearAgo.setMonth(today.getMonth() - 12);
+
+  // from date + to date picking 만들기 
+
+  const initialState = {
+    modify_date: { fromDate: oneYearAgo, toDate: today, checked: true },
+  }
+
+  const [dates, setDates] = useState(initialState);
+
+  const dateRangeSettings = [
+    { label: t('common.modify_date'), stateKey: 'modify_date', checked: true },
+  ];
+
+    // from date date 1개짜리 picking 만들기 
+  const initialSingleDate = {
+    // ma_finish_date: { fromDate: oneMonthAgo,  checked: false },  
+  };
+  
+  const [singleDate, setSingleDate] = useState(initialSingleDate);
+  
+  const singleDateSettings = [
+     // { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
+    ];
+
+  const handleMultiQueryModal = () => {
+    setMultiQueryModal(true);
+  }  
+
+  const handleMultiQueryModalOk = () => {
+
+    //setCompanyState(0);
+    setMultiQueryModal(false);
+
+    // query condition 세팅 후 query
+    console.log("handleMultiQueryModalOk", queryConditions);
+    let tommorow = new Date();
+    
+    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+        label: key,
+        fromDate: dates[key].fromDate,
+        toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
+        checked: dates[key].checked,
+    }));
+
+
+    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+      label: key,
+      fromDate: singleDate[key].fromDate,
+      checked: singleDate[key].checked,
+    }));
+    
+    const multiQueryCondi = {
+      queryConditions:queryConditions,
+      checkedDates:checkedDates,
+      singleDate:checkedSingleDates
+    }
+
+    console.log('multiQueryCondi',multiQueryCondi);
+
+    loadAllQuotations(multiQueryCondi);
+     
+  };
+  const handleMultiQueryModalCancel = () => {
+    setMultiQueryModal(false);
+  };  
+
 
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
@@ -190,7 +272,33 @@ const Quotations = () => {
   useEffect(() => {
     tryLoadAllCompanies();
     tryLoadAllLeads();
-    tryLoadAllQuotations();
+
+    // query condition 세팅 후 query
+    let tommorow = new Date();
+    
+    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+        label: key,
+        fromDate: dates[key].fromDate,
+        toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
+        checked: dates[key].checked,
+    }));
+
+
+    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+      label: key,
+      fromDate: singleDate[key].fromDate,
+      checked: singleDate[key].checked,
+    }));
+    
+    const multiQueryCondi = {
+      queryConditions:queryConditions,
+      checkedDates:checkedDates,
+      singleDate:checkedSingleDates
+    }
+
+    console.log('tryLoadAllQuotations multiQueryCondi',multiQueryCondi);
+    tryLoadAllQuotations(multiQueryCondi);
+
     tryLoadAllUsers();
     
     if(((companyState & 1) === 1)
@@ -238,6 +346,15 @@ const Quotations = () => {
                   value={searchCondition}
                   onChange={(e) => handleSearchCondition(e.target.value)}
                 />
+              </div>
+              <div className="col text-start" style={{margin:'0px 20px 5px 20px'}}>
+                  <button
+                      className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
+                      id="multi-company-query"
+                      onClick={handleMultiQueryModal}
+                  >
+                      {t('quotation.quotation_multi_query')}
+                  </button>                
               </div>
               <div className="col text-end">
                 <ul className="list-inline-item pl-0">
@@ -369,6 +486,23 @@ const Quotations = () => {
         <LeadDetailsModel />
         <QuotationAddModel init={initAddNewQuotation} handleInit={setInitAddNewQuotation} />
         <QuotationDetailsModel />
+        <MultiQueryModal 
+          title= {t('quotation.quotation_multi_query')}
+          open={multiQueryModal}
+          handleOk={handleMultiQueryModalOk}
+          handleCancel={handleMultiQueryModalCancel}
+          companyColumn={quotationColumn}
+          queryConditions={queryConditions}
+          setQueryConditions={setQueryConditions}
+          dates={dates}
+          setDates={setDates}
+          dateRangeSettings={dateRangeSettings}
+          initialState={initialState}
+          singleDate={singleDate}
+          setSingleDate={setSingleDate}
+          singleDateSettings={singleDateSettings}
+          initialSingleDate={initialSingleDate}
+        />  
       </div>
     </HelmetProvider>
   );

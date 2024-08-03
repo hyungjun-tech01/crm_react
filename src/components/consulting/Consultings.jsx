@@ -81,24 +81,24 @@ const Consultings = () => {
   // from date + to date picking 만들기 
 
   const initialState = {
-    registration_date: { fromDate: oneYearAgo, toDate: today, checked: true },
+    modify_date: { fromDate: oneYearAgo, toDate: today, checked: true },
   }
 
   const [dates, setDates] = useState(initialState);
 
   const dateRangeSettings = [
-    { label: t('purchase.registration_date'), stateKey: 'registration_date', checked: true },
+    { label: t('common.modify_date'), stateKey: 'modify_date', checked: true },
   ];
 
     // from date date 1개짜리 picking 만들기 
     const initialSingleDate = {
-      ma_finish_date: { fromDate: oneMonthAgo,  checked: false },  
+      //ma_finish_date: { fromDate: oneMonthAgo,  checked: false },  
     };
   
     const [singleDate, setSingleDate] = useState(initialSingleDate);
   
     const singleDateSettings = [
-      { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
+      //{ label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
     ];
 
   const handleMultiQueryModal = () => {
@@ -111,11 +111,12 @@ const Consultings = () => {
 
     // query condition 세팅 후 query
     console.log("handleMultiQueryModalOk", queryConditions);
+    let tommorow = new Date();
     
     const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
         label: key,
         fromDate: dates[key].fromDate,
-        toDate: dates[key].toDate,
+        toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
         checked: dates[key].checked,
     }));
 

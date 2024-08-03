@@ -176,6 +176,7 @@ const koResource = {
             warranty: '보증기간',
             _loading_add: '신규 견적 작성을 위한 기반 정보를 불러오고 있습니다.',
             _loading_detail: '견적에 대한 상세 정보를 불러오고 있습니다.',
+            quotation_multi_query:'견적 다중검색',
         },
         transaction:{
             add_content: '항목 추가',
@@ -327,6 +328,7 @@ const koResource = {
             view: '보기',
             visible: '보기',
             zip_code: '우편번호',
+            modify_date:'최종수정일'
         },
         comment: {
             search_address_first: '먼저 주소 검색하시기 바랍니다.',

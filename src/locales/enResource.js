@@ -176,6 +176,7 @@ const enResource = {
             warranty: 'Warranty Period',
             _loading_add: 'Now, loading the needed data to add new quotation ...',
             _loading_detail: 'Now, loading the details of quotation...',
+            quotation_multi_query:'Quotation Multi Query',
         },
         transaction:{
             add_content: 'Add Content',
@@ -327,6 +328,7 @@ const enResource = {
             view: 'View',
             visible: 'Visible',
             zip_code: 'Postal Code',
+            modify_date:'Modify Date'
         },
         comment: {
             search_address_first: 'Please search address...',
