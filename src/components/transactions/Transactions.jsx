@@ -22,6 +22,8 @@ import { UserRepo } from "../../repository/user";
 import { compareCompanyName , compareText, ConvertCurrency } from "../../constants/functions";
 import TransactionEditModel from "./TransactionEditModel";
 import TransactionEditBillModel from "./TransactionEditBillModel";
+import MultiQueryModal from "../../constants/MultiQueryModal";
+import { transactionColumn } from "../../repository/transaction";
 
 
 const Transactions = () => {
@@ -38,7 +40,7 @@ const Transactions = () => {
   const transactionState = useRecoilValue(atomTransactionState);
   const allTransactionData = useRecoilValue(atomAllTransactions);
   const filteredTransaction= useRecoilValue(atomFilteredTransaction);
-  const { tryLoadAllTransactions, setCurrentTransaction , filterTransactions} = useRecoilValue(TransactionRepo);
+  const { tryLoadAllTransactions, setCurrentTransaction , filterTransactions, loadAllTransactions} = useRecoilValue(TransactionRepo);
 
 
   //===== [RecoilState] Related with User =============================================
@@ -57,6 +59,83 @@ const Transactions = () => {
 
   const [statusSearch, setStatusSearch] = useState('common.all');
 
+  const [multiQueryModal, setMultiQueryModal] = useState(false);
+
+  const [queryConditions, setQueryConditions] = useState([
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+  ]);
+
+  const today = new Date();
+  const oneYearAgo = new Date();
+  const oneMonthAgo = new Date();
+  oneMonthAgo.setMonth(today.getMonth() - 1);
+  oneYearAgo.setMonth(today.getMonth() - 12);
+
+  // from date + to date picking 만들기 
+
+  const initialState = {
+    modify_date: { fromDate: oneYearAgo, toDate: today, checked: true },
+  }
+
+  const [dates, setDates] = useState(initialState);
+
+  const dateRangeSettings = [
+    { label: t('common.modify_date'), stateKey: 'modify_date', checked: true },
+  ];
+
+    // from date date 1개짜리 picking 만들기 
+  const initialSingleDate = {
+    // ma_finish_date: { fromDate: oneMonthAgo,  checked: false },  
+  };
+  
+  const [singleDate, setSingleDate] = useState(initialSingleDate);
+  
+  const singleDateSettings = [
+     // { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
+    ];
+
+    const handleMultiQueryModalOk = () => {
+
+      //setCompanyState(0);
+      setMultiQueryModal(false);
+  
+      // query condition 세팅 후 query
+      console.log("handleMultiQueryModalOk", queryConditions);
+      let tommorow = new Date();
+      
+      const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+          label: key,
+          fromDate: dates[key].fromDate,
+          toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
+          checked: dates[key].checked,
+      }));
+  
+  
+      const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+        label: key,
+        fromDate: singleDate[key].fromDate,
+        checked: singleDate[key].checked,
+      }));
+      
+      const multiQueryCondi = {
+        queryConditions:queryConditions,
+        checkedDates:checkedDates,
+        singleDate:checkedSingleDates
+      }
+  
+      console.log('multiQueryCondi',multiQueryCondi);
+  
+      loadAllTransactions(multiQueryCondi);
+       
+    };
+    const handleMultiQueryModalCancel = () => {
+      setMultiQueryModal(false);
+    };  
+  
+
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
     tryLoadAllTransactions();
@@ -69,6 +148,11 @@ const Transactions = () => {
     setSearchCondition(newValue);
     filterTransactions(statusSearch, newValue);
   };
+
+  const handleMultiQueryModal = () => {
+    setMultiQueryModal(true);
+  }  
+
 
   // --- Section for Table ------------------------------
   const columns = [
@@ -153,7 +237,33 @@ const Transactions = () => {
 
   useEffect(() => {
     tryLoadAllCompanies();
-    tryLoadAllTransactions();
+
+  // query condition 세팅 후 query
+  let tommorow = new Date();
+    
+  const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+      label: key,
+      fromDate: dates[key].fromDate,
+      toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
+      checked: dates[key].checked,
+  }));
+
+
+  const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+    label: key,
+    fromDate: singleDate[key].fromDate,
+    checked: singleDate[key].checked,
+  }));
+  
+  const multiQueryCondi = {
+    queryConditions:queryConditions,
+    checkedDates:checkedDates,
+    singleDate:checkedSingleDates
+  }
+
+  console.log('tryLoadAllQuotations multiQueryCondi',multiQueryCondi);   
+  tryLoadAllTransactions(multiQueryCondi);
+
     tryLoadAllUsers();
 
     if(((companyState & 1) === 1)
@@ -198,6 +308,15 @@ const Transactions = () => {
                       value={searchCondition}
                       onChange ={(e) => handleSearchCondition(e.target.value)}
                 />  
+              </div>
+              <div className="col text-start" style={{margin:'0px 20px 5px 20px'}}>
+                  <button
+                      className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
+                      id="multi-company-query"
+                      onClick={handleMultiQueryModal}
+                  >
+                      {t('transaction.transaction_multi_query')}
+                  </button>                
               </div>
               <div className="col text-end">
                 <ul className="list-inline-item pl-0">
@@ -292,6 +411,23 @@ const Transactions = () => {
           data={billData}
           contents={billContents}
         />
+        <MultiQueryModal 
+          title= {t('quotation.quotation_multi_query')}
+          open={multiQueryModal}
+          handleOk={handleMultiQueryModalOk}
+          handleCancel={handleMultiQueryModalCancel}
+          companyColumn={transactionColumn}
+          queryConditions={queryConditions}
+          setQueryConditions={setQueryConditions}
+          dates={dates}
+          setDates={setDates}
+          dateRangeSettings={dateRangeSettings}
+          initialState={initialState}
+          singleDate={singleDate}
+          setSingleDate={setSingleDate}
+          singleDateSettings={singleDateSettings}
+          initialSingleDate={initialSingleDate}
+        />  
       </div>
     </HelmetProvider>
   );

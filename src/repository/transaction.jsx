@@ -32,17 +32,24 @@ export const DefaultTransactionContent = {
     modify_date: null,
 };
 
+export const transactionColumn = [
+    { value: 'company_name', label: '회사명'},
+    { value: 'ceo_name', label: 'CEO 이름'},
+    { value: 'company_address', label: '회사 주소'},
+    { value: 'transaction_title', label: '거래 제목'},
+    { value: 'transaction_contents', label: '거래 내용'},
+];
 
 export const TransactionRepo = selector({
     key: "TransactionRepository",
     get: ({ getCallback }) => {
         /////////////////////try to load all Transactions /////////////////////////////
-        const tryLoadAllTransactions = getCallback(({ set, snapshot }) => async () => {
+        const tryLoadAllTransactions = getCallback(({ set, snapshot }) => async (multiQueryCondi) => {
             const loadStates = await snapshot.getPromise(atomTransactionState);
             if((loadStates & 3) === 0){
                 console.log('[tryLoadAllTransactions] Try to load all Transactions');
                 set(atomTransactionState, (loadStates | 2));   // state : loading
-                const ret = await loadAllTransactions();
+                const ret = await loadAllTransactions(multiQueryCondi);
                 if(ret){
                     // succeeded to load
                     set(atomTransactionState, (loadStates | 3));
@@ -52,10 +59,16 @@ export const TransactionRepo = selector({
                 };
             }
         });
-        const loadAllTransactions = getCallback(({ set }) => async () => {
+        const loadAllTransactions = getCallback(({ set }) => async (multiQueryCondi) => {
+            const input_json = JSON.stringify(multiQueryCondi);
             try {
                 console.log('[TransactionRepository] Try loading all')
-                const response = await fetch(`${BASE_PATH}/transactions`);
+                const response = await fetch(`${BASE_PATH}/transactions`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+
                 const data = await response.json();
                 if (data.message) {
                     console.log('loadAllTransactions message:', data.message);

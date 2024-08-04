@@ -229,6 +229,7 @@ const enResource = {
             trans_pages: 'Current/Total/Page',
             type:'Transaction Type',
             unit_price: 'Unit Price',
+            transaction_multi_query: '거래 다중검색',
         },
         purchase:{
             add_purchase:'Add Purchase',
@@ -254,6 +255,7 @@ const enResource = {
             registration_date:'Registration Date',
             serial_number:'Serial Number',
             type:'Purchase Type',
+            purchase_multi_query:'Purchase Multi Query',
         },
         contract:{
             add_contract: 'Add Contract',

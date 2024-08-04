@@ -229,6 +229,7 @@ const koResource = {
             trans_pages: '현재/전체/Page',
             type: '거래유형',
             unit_price: '단가',
+            transaction_multi_query: '거래 다중검색',
         },
         purchase:{
             add_purchase:'구매 제품 등록',
@@ -254,6 +255,7 @@ const koResource = {
             registration_date:'구매제품 등록일',
             serial_number:'기번',
             type:'구매유형',
+            purchase_multi_query:'구매 다중검색',
         },
         contract:{
             add_contract: '계약 추가',

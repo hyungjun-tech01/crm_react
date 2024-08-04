@@ -143,30 +143,8 @@ const Companies = () => {
 
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
-    //loadAllCompanies();
-    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
-      label: key,
-      fromDate: dates[key].fromDate,
-      toDate: dates[key].toDate,
-      checked: dates[key].checked,
-    }));
-
-    // console.log("checkedDates", checkedDates);
-
-    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
-      label: key,
-      fromDate: singleDate[key].fromDate,
-      checked: singleDate[key].checked,
-    }));
-
-    const multiQueryCondi = {
-      queryConditions: queryConditions,
-      checkedDates: checkedDates,
-      singleDate: checkedSingleDates
-    }
-
-    // loadAllCompanies(multiQueryCondi);
-    tryLoadAllCompanies(multiQueryCondi);
+    
+    tryLoadAllCompanies();
 
     setExpaned(false);
     setSearchCondition("");
