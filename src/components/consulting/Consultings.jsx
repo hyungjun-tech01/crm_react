@@ -279,7 +279,34 @@ const Consultings = () => {
   useEffect(() => {
     tryLoadAllCompanies();
     tryLoadAllLeads();
-    tryLoadAllConsultings();
+
+     // query condition 세팅 후 query
+     let tommorow = new Date();
+     
+     const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+         label: key,
+         fromDate: dates[key].fromDate,
+         toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
+         checked: dates[key].checked,
+     }));
+ 
+
+     const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+       label: key,
+       fromDate: singleDate[key].fromDate,
+       checked: singleDate[key].checked,
+     }));
+     
+     const multiQueryCondi = {
+       queryConditions:queryConditions,
+       checkedDates:checkedDates,
+       singleDate:checkedSingleDates
+     }
+ 
+    console.log('multiQueryCondi',multiQueryCondi);
+
+    tryLoadAllConsultings(multiQueryCondi);
+
     tryLoadAllUsers();
 
     if(((companyState & 1) === 1)

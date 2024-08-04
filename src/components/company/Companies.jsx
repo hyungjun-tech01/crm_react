@@ -27,7 +27,7 @@ const Companies = () => {
 
   //===== [RecoilState] Related with Company ==========================================
   const [ companyState, setCompanyState] = useRecoilState(atomCompanyState);
-  const { tryLoadAllCompanies, filterCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
+  const { tryLoadAllCompanies, filterCompanies, setCurrentCompany, loadAllCompanies } = useRecoilValue(CompanyRepo);
   const allCompanyData = useRecoilValue(atomAllCompanies);
   const filteredCompany = useRecoilValue(atomFilteredCompany);
 
@@ -67,19 +67,21 @@ const Companies = () => {
   // from date + to date picking 만들기 
 
   const initialState = {
-    registration_date: { fromDate: oneYearAgo, toDate: today, checked: true },
+    registration_date: { fromDate: oneYearAgo, toDate: today, checked: false },
     delivery_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
     hq_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
     ma_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
+    modify_date: { fromDate: oneYearAgo, toDate: today, checked: true },
   };
 
   const [dates, setDates] = useState(initialState);
 
   const dateRangeSettings = [
-    { label: t('purchase.registration_date'), stateKey: 'registration_date', checked: true },
+    { label: t('purchase.registration_date'), stateKey: 'registration_date', checked: false },
     { label: t('purchase.delivery_date'), stateKey: 'delivery_date', checked: false },
     { label: t('purchase.hq_finish_date'), stateKey: 'hq_finish_date', checked: false },
     { label: t('purchase.ma_finish_date'), stateKey: 'ma_finish_date', checked: false },
+    { label: t('common.modify_date'), stateKey: 'modify_date', checked: true },
   ];
 
 
@@ -100,16 +102,17 @@ const Companies = () => {
 
   const handleMultiQueryModalOk = () => {
 
-    setCompanyState(0);
+    //setCompanyState(0);
     setMultiQueryModal(false);
 
     // query condition 세팅 후 query
     console.log("queryConditions", queryConditions);
+    let tommorow = new Date();
 
     const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
       label: key,
       fromDate: dates[key].fromDate,
-      toDate: dates[key].toDate,
+      toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
       checked: dates[key].checked,
     }));
 
@@ -125,8 +128,8 @@ const Companies = () => {
       singleDate: checkedSingleDates
     }
 
-    //loadAllCompanies(multiQueryCondi);
-    tryLoadAllCompanies(multiQueryCondi);
+    loadAllCompanies(multiQueryCondi);
+    //tryLoadAllCompanies(multiQueryCondi);
   };
 
   const handleMultiQueryModalCancel = () => {
