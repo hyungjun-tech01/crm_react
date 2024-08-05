@@ -255,7 +255,7 @@ const koResource = {
             registration_date:'구매제품 등록일',
             serial_number:'기번',
             type:'구매유형',
-            purchase_multi_query:'구매 다중검색',
+            purchase_multi_query:'구매제품 다중검색',
         },
         contract:{
             add_contract: '계약 추가',
