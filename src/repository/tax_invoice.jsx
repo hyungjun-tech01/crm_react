@@ -15,12 +15,12 @@ export const TaxInvoiceRepo = selector({
     key: "TaxInvoiceRepository",
     get: ({ getCallback }) => {
         /////////////////////try to load all Transactions /////////////////////////////
-        const tryLoadTaxInvoices = getCallback(({ set, snapshot }) => async (multiQueryCondi) => {
+        const tryLoadTaxInvoices = getCallback(({ set, snapshot }) => async (compnay_code) => {
             const loadStates = await snapshot.getPromise(atomTaxInvoiceState);
             if((loadStates & 3) === 0){
                 console.log('[tryLoadAllTransactions] Try to load all Transactions');
                 set(atomTaxInvoiceState, (loadStates | 2));   // state : loading
-                const ret = await loadTaxInvoices(multiQueryCondi);
+                const ret = await loadTaxInvoices(compnay_code);
                 if(ret){
                     // succeeded to load
                     set(atomTaxInvoiceState, (loadStates | 3));
@@ -30,10 +30,10 @@ export const TaxInvoiceRepo = selector({
                 };
             }
         });
-        const loadTaxInvoices = getCallback(({ set }) => async (multiQueryCondi) => {
-            const input_json = JSON.stringify(multiQueryCondi);
+        const loadTaxInvoices = getCallback(({ set }) => async (code) => {
+            const input_json = JSON.stringify({company_code: code});
             try {
-                console.log('[TransactionRepository] Try loading all')
+                console.log('[TaxInvoiceRepository] Try loading all')
                 const response = await fetch(`${BASE_PATH}/taxInvoice`, {
                     method: "POST",
                     headers:{'Content-Type':'application/json'},
@@ -42,15 +42,18 @@ export const TaxInvoiceRepo = selector({
 
                 const data = await response.json();
                 if (data.message) {
-                    console.log('loadAllTransactions message:', data.message);
+                    console.log('loadTaxInvoices message:', data.message);
                     set(atomTaxInvoiceSet, []);
-                    return false;
+                    if(data.message === 'no data')
+                        return true;
+                    else
+                        return false;
                 }
                 set(atomTaxInvoiceSet, data);
                 return true;
             }
             catch (err) {
-                console.error(`loadAllTransactions / Error : ${err}`);
+                console.error(`loadTaxInvoices / Error : ${err}`);
                 return false;
             };
         });
@@ -114,7 +117,7 @@ export const TaxInvoiceRepo = selector({
                 return false;
             };
         });
-        const setCurrentTransaction = getCallback(({ set, snapshot }) => async (invoice_code) => {
+        const setCurrentTaxInvoice = getCallback(({ set, snapshot }) => async (invoice_code) => {
             try {
                 if(invoice_code === undefined || invoice_code === null) {
                     set(atomCurrentTaxInvoice, defaultTaxInvoice);
@@ -136,7 +139,7 @@ export const TaxInvoiceRepo = selector({
             tryLoadTaxInvoices,
             loadTaxInvoices,
             modifyTaxInvoice,
-            setCurrentTransaction,
+            setCurrentTaxInvoice,
         };
     }
 });

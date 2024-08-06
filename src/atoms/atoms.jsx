@@ -419,7 +419,7 @@ export const atomProductOptions = atom({
 //----- Tax Invoice ------------------------
 export const defaultTaxInvoice = {
     tax_invoice_code : null,
-    lead_code : null,
+    company_code : null,
     publish_type : null,
     transaction_type : null,
     invoice_type : null,

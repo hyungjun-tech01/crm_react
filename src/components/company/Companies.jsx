@@ -40,9 +40,9 @@ const Companies = () => {
   //===== Handles to this =============================================================
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ openTransaction, setOpenTransaction ] = useState(false);
-  const [ openBill, setOpenBill ] = useState(false);
-  const [ billData, setBillData ] = useState({});
-  const [ billContents, setBillContents ] = useState({});
+  const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
+  const [ taxBillData, setBillData ] = useState({});
+  const [ taxBillContents, setBillContents ] = useState({});
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
   const [ expanded, setExpaned ] = useState(false);
@@ -468,19 +468,22 @@ const Companies = () => {
         </div>
         {/* Modal */}
         <CompanyAddModel init={initToAddCompany} handleInit={setInitToAddCompany} />
-        <CompanyDetailsModel openTransaction={() =>setOpenTransaction(true)}/>
+        <CompanyDetailsModel
+          openTransaction={() =>setOpenTransaction(true)}
+          openTaxInvoice={()=>setOpenTaxInvoice(true)}
+        />
         <TransactionEditModel
           open={openTransaction}
           close={() =>setOpenTransaction(false)}
-          openBill={()=>setOpenBill(true)} 
+          openTaxInvoice={()=>setOpenTaxInvoice(true)} 
           setBillData={setBillData}
           setBillContents={setBillContents}
         />
         <TransactionEditBillModel
-          open={openBill}
-          close={() =>setOpenBill(false)}
-          data={billData}
-          contents={billContents}
+          open={openTaxInvoice}
+          close={() =>setOpenTaxInvoice(false)}
+          data={taxBillData}
+          contents={taxBillContents}
         />
         <MultiQueryModal
           title={t('company.company_multi_query')}

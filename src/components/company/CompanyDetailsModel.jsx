@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
@@ -14,6 +14,8 @@ import {
   atomPurchaseState,
   atomAllTransactions,
   atomTransactionState,
+  atomTaxInvoiceState,
+  atomTaxInvoiceSet,
 } from "../../atoms/atoms";
 import {
   atomUserState,
@@ -29,11 +31,13 @@ import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import CompanyPurchaseModel from "./CompanyPurchaseModel";
 import CompanyTransactionModel from "./CompanyTransactionModel";
+import CompanyTaxInvoiceModel from "./CompanyTaxInvoiceModel";
 import PurchaseAddModel from "../purchase/PurchaseAddModel";
 import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
+import { TaxInvoiceRepo } from "../../repository/tax_invoice";
 
 
-const CompanyDetailsModel = ({ openTransaction }) => {
+const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
@@ -54,6 +58,12 @@ const CompanyDetailsModel = ({ openTransaction }) => {
   const transactionState = useRecoilValue(atomTransactionState);
   const { tryLoadAllTransactions } = useRecoilValue(TransactionRepo);
   const allTransactions = useRecoilValue(atomAllTransactions);
+
+
+  //===== [RecoilState] Related with Tax Invoice ======================================
+  const [taxInvoiceState, setTaxInvoiceState] = useRecoilState(atomTaxInvoiceState);
+  const { tryLoadTaxInvoices } = useRecoilValue(TaxInvoiceRepo);
+  const taxInvoiceSet = useRecoilValue(atomTaxInvoiceSet);
 
 
   //===== [RecoilState] Related with Users ============================================
@@ -361,6 +371,7 @@ const CompanyDetailsModel = ({ openTransaction }) => {
     selectedCompany.company_name,
   ]);
 
+
   //===== useEffect for User ==========================================================
   useEffect(() => {
     console.log('[CompanyDetailsModel] useEffect / userState :', userState);
@@ -368,9 +379,20 @@ const CompanyDetailsModel = ({ openTransaction }) => {
       && ((transactionState & 1) === 1)
       && ((userState & 1) === 1)
      ){
-      setIsAllNeededDataLoaded(true);
+      if ((taxInvoiceState & 3) === 0) {
+        tryLoadTaxInvoices(selectedCompany.company_code);
+      } else if ((taxInvoiceState & 1) === 1) {
+        if((taxInvoiceSet.length > 0) 
+          && (taxInvoiceSet[0].company_code !== selectedCompany.company_code)
+        ) {
+          setTaxInvoiceState(0);
+          tryLoadTaxInvoices(selectedCompany.company_code);
+        } else {
+          setIsAllNeededDataLoaded(true);
+        };
+      }
     }
-  }, [purchaseState, transactionState, userState]);
+  }, [purchaseState, transactionState, taxInvoiceState, userState, taxInvoiceSet]);
 
   if (!isAllNeededDataLoaded)
     return <div>&nbsp;</div>;
@@ -471,10 +493,13 @@ const CompanyDetailsModel = ({ openTransaction }) => {
                   <li className="nav-item">
                     <Link
                       className="nav-link"
-                      to="#company-details-tax-invoice"
+                      to="#company-details-taxinvoice"
                       data-bs-toggle="tab"
                     >
-                      {t("transaction.tax_bill")}
+                      {t("transaction.tax_bill") +
+                        "(" +
+                        taxInvoiceSet.length +
+                        ")"}
                     </Link>
                   </li>
                   {/* <li className="nav-item">
@@ -530,6 +555,15 @@ const CompanyDetailsModel = ({ openTransaction }) => {
                     <CompanyTransactionModel
                       transactions={transactionByCompany}
                       openTransaction={openTransaction}
+                    />
+                  </div>
+                  <div
+                    className="tab-pane company-details-taxinvoice"
+                    id="company-details-taxinvoice"
+                  >
+                    <CompanyTaxInvoiceModel
+                      taxInvoices={taxInvoiceSet}
+                      openTaxInvoice={openTaxInvoice}
                     />
                   </div>
                 </div>
