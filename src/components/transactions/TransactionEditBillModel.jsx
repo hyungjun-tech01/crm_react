@@ -22,7 +22,7 @@ import { ConvertCurrency } from "../../constants/functions";
 import MessageModal from "../../constants/MessageModal";
 import TransactionBillPrint from "./TransactionBillPrint";
 
-import styles from './Transaction.module.scss';
+import styles from './TransactionEditBillModel.module.scss';
 import { company_info } from "../../repository/user";
 
 const default_bill_data = {
@@ -487,7 +487,7 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
                         <div>{t('common.type2')} : </div>
                         <div className={styles.billTransType}>
                           <Select
-                            className="trans_select"
+                            className={styles.select}
                             defaultValue={selectValues.trans_type}
                             value={selectValues.trans_type}
                             onChange={selected => handleSelectChange('trans_type', selected)}
@@ -497,7 +497,7 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
                         <div>{t('transaction.bill_type')} : </div>
                         <div className={styles.billBillType}>
                           <Select
-                            className="trans_select"
+                            className={styles.select}
                             defaultValue={selectValues.bill_type}
                             value={selectValues.bill_type}
                             onChange={selected => handleSelectChange('bill_type', selected)}
