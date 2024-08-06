@@ -53,7 +53,7 @@ const default_receipt_data = {
   card_number: '',
 };
 
-const TransactionEditModel = ({open, close, openBill, setBillData, setBillContents}) => {
+const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, setTaxInvoiceContents}) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [ isMessageModalOpen, setIsMessageModalOpen ] = useState(false);
@@ -518,15 +518,15 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
       ...transactionChange,
       ...dataForTransaction,
     };
-    setBillData(tempTransactionData);
-    setBillContents([
+    setTaxInvoiceData(tempTransactionData);
+    setTaxInvoiceContents([
       ...transactionContents,
     ]);
     let oldModal = bootstrap.Modal.getInstance('#edit_transaction');
     if(oldModal) {
         oldModal.hide();
     }
-    openBill();
+    openTaxInvoice();
     setTimeout(()=>{
         let myModal = new bootstrap.Modal(document.getElementById('edit_bill'), {
             keyboard: false

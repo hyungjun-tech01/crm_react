@@ -18,7 +18,7 @@ export const TaxInvoiceRepo = selector({
         const tryLoadTaxInvoices = getCallback(({ set, snapshot }) => async (compnay_code) => {
             const loadStates = await snapshot.getPromise(atomTaxInvoiceState);
             if((loadStates & 3) === 0){
-                console.log('[tryLoadAllTransactions] Try to load all Transactions');
+                console.log('[tryLoadTaxInvoices] Try to load all Transactions');
                 set(atomTaxInvoiceState, (loadStates | 2));   // state : loading
                 const ret = await loadTaxInvoices(compnay_code);
                 if(ret){
@@ -61,14 +61,14 @@ export const TaxInvoiceRepo = selector({
             const input_json = JSON.stringify(newTaxInvoice);
             console.log(`[ modifyTransaction ] input : `, input_json);
             try {
-                const response = await fetch(`${BASE_PATH}/modifyTransaction`, {
+                const response = await fetch(`${BASE_PATH}/modifyTaxInvoice`, {
                     method: "POST",
                     headers: { 'Content-Type': 'application/json' },
                     body: input_json,
                 });
                 const data = await response.json();
                 if (data.message) {
-                    console.log('\t[ modifyTransaction ] message:', data.message);
+                    console.log('\t[ modifyTaxInvoice ] message:', data.message);
                     return false;
                 };
 
@@ -107,13 +107,13 @@ export const TaxInvoiceRepo = selector({
                         set(allTaxInvoices, updatedAllTransactions);
                         return true;
                     } else {
-                        console.log('\t[ modifyTransaction ] No specified transaction is found');
+                        console.log('\t[ modifyTaxInvoice ] No specified tax invoice is found');
                         return false;
                     }
                 }
             }
             catch (err) {
-                console.error(`\t[ modifyTransaction ] Error : ${err}`);
+                console.error(`\t[ modifyTaxInvoice ] Error : ${err}`);
                 return false;
             };
         });

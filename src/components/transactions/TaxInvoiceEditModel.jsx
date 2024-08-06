@@ -16,13 +16,13 @@ import {
   atomCompanyState,
   atomCompanyForSelection,
 } from "../../atoms/atoms";
-import { TransactionRepo } from "../../repository/transaction";
+import { TaxInvoiceRepo } from "../../repository/tax_invoice";
 
 import { ConvertCurrency } from "../../constants/functions";
 import MessageModal from "../../constants/MessageModal";
 import TransactionBillPrint from "./TransactionBillPrint";
 
-import styles from './TransactionEditBillModel.module.scss';
+import styles from './TaxInvoiceEditModel.module.scss';
 import { company_info } from "../../repository/user";
 
 const default_bill_data = {
@@ -69,7 +69,7 @@ const default_bill_data = {
 };
 
 
-const TransactionEditBillModel = ({open, close, data, contents}) => {
+const TaxInvoiceEditModel = ({open, close, data, contents}) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -77,7 +77,7 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
 
 
   //===== [RecoilState] Related with Transaction =====================================
-  const { modifyTransaction } = useRecoilValue(TransactionRepo);
+  const { modifyTaxInvoice } = useRecoilValue(TaxInvoiceRepo);
 
 
   //===== [RecoilState] Related with Company =========================================
@@ -85,7 +85,7 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
   const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
-  //===== Handles to edit 'TransactionEditBillModel' ======================================
+  //===== Handles to edit 'TaxInvoiceEditModel' ======================================
   const [dataForBill, setDataForBill] = useState({...default_bill_data});
   const [transactionContents, setTransactionContents] = useState([]);
   const [isSale, setIsSale] = useState(true);
@@ -321,7 +321,7 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
 
     if ((companyState & 1) === 1) {
       if(data) {
-        console.log('[TransactionEditBillModel] called! :', data);
+        console.log('[TaxInvoiceEditModel] called! :', data);
         
         // dataForBill ------------------------------
         const selectedCompany = companyForSelection.filter(item=> item.label === data.company_name);
@@ -331,7 +331,7 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
           request_type: request_type[0],
           company_name: selectedCompany[0],
         };
-        console.log('[TransactionEditBillModel] selectValues :', tempSelectValues);
+        console.log('[TaxInvoiceEditModel] selectValues :', tempSelectValues);
         setSelectValue(tempSelectValues);
 
         // Text for Supply ------------------------------------
@@ -1029,4 +1029,4 @@ const TransactionEditBillModel = ({open, close, data, contents}) => {
   );
 };
 
-export default TransactionEditBillModel;
+export default TaxInvoiceEditModel;

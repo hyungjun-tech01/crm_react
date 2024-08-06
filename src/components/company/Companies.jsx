@@ -16,7 +16,7 @@ import CompanyDetailsModel from "./CompanyDetailsModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import { companyColumn } from "../../repository/company";
 import TransactionEditModel from "../transactions/TransactionEditModel";
-import TransactionEditBillModel from "../transactions/TransactionEditBillModel";
+import TaxInvoiceEditModel from "../transactions/TaxInvoiceEditModel";
 import { atomUserState } from "../../atoms/atomsUser";
 
 // import { MoreVert } from '@mui/icons-material';
@@ -41,8 +41,8 @@ const Companies = () => {
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ openTransaction, setOpenTransaction ] = useState(false);
   const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
-  const [ taxBillData, setBillData ] = useState({});
-  const [ taxBillContents, setBillContents ] = useState({});
+  const [ taxInvoiceData, setTaxInvoiceData ] = useState({});
+  const [ taxInvoiceContents, setTaxInvoiceContents ] = useState({});
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
   const [ expanded, setExpaned ] = useState(false);
@@ -476,14 +476,14 @@ const Companies = () => {
           open={openTransaction}
           close={() =>setOpenTransaction(false)}
           openTaxInvoice={()=>setOpenTaxInvoice(true)} 
-          setBillData={setBillData}
-          setBillContents={setBillContents}
+          setTaxInvoiceData={setTaxInvoiceData}
+          setTaxInvoiceContents={setTaxInvoiceContents}
         />
-        <TransactionEditBillModel
+        <TaxInvoiceEditModel
           open={openTaxInvoice}
           close={() =>setOpenTaxInvoice(false)}
-          data={taxBillData}
-          contents={taxBillContents}
+          data={taxInvoiceData}
+          contents={taxInvoiceContents}
         />
         <MultiQueryModal
           title={t('company.company_multi_query')}
