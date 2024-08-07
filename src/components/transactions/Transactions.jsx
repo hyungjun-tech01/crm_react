@@ -50,9 +50,9 @@ const Transactions = () => {
   //===== Handles to edit this ========================================================
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ openTransaction, setOpenTransaction ] = useState(false);
-  const [ openBill, setOpenBill ] = useState(false);
-  const [ billData, setBillData ] = useState(null);
-  const [ billContents, setBillContents ] = useState(null);
+  const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
+  const [ taxInvoiceData, setTaxInvoiceData ] = useState(null);
+  const [ taxInvoiceContents, setTaxInvoiceContents ] = useState(null);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -238,31 +238,31 @@ const Transactions = () => {
   useEffect(() => {
     tryLoadAllCompanies();
 
-  // query condition 세팅 후 query
-  let tommorow = new Date();
-    
-  const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+    // query condition 세팅 후 query
+    let tommorow = new Date();
+      
+    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+        label: key,
+        fromDate: dates[key].fromDate,
+        toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
+        checked: dates[key].checked,
+    }));
+
+
+    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
       label: key,
-      fromDate: dates[key].fromDate,
-      toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
-      checked: dates[key].checked,
-  }));
+      fromDate: singleDate[key].fromDate,
+      checked: singleDate[key].checked,
+    }));
+    
+    const multiQueryCondi = {
+      queryConditions:queryConditions,
+      checkedDates:checkedDates,
+      singleDate:checkedSingleDates
+    }
 
-
-  const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
-    label: key,
-    fromDate: singleDate[key].fromDate,
-    checked: singleDate[key].checked,
-  }));
-  
-  const multiQueryCondi = {
-    queryConditions:queryConditions,
-    checkedDates:checkedDates,
-    singleDate:checkedSingleDates
-  }
-
-  console.log('tryLoadAllQuotations multiQueryCondi',multiQueryCondi);   
-  tryLoadAllTransactions(multiQueryCondi);
+    console.log('tryLoadAllQuotations multiQueryCondi',multiQueryCondi);   
+    tryLoadAllTransactions(multiQueryCondi);
 
     tryLoadAllUsers();
 
@@ -341,31 +341,31 @@ const Transactions = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive activity-tables">
-                    { searchCondition === "" ?  
-                      <Table
-                        pagination={{
-                          total: allTransactionData.length,
-                          showTotal: ShowTotal,
-                          showSizeChanger: true,
-                          onShowSizeChange: onShowSizeChange,
-                          ItemRender: ItemRender,
-                        }}
-                        loading={nowLoading}
-                        style={{ overflowX: "auto" }}
-                        columns={columns}
-                        bordered
-                        dataSource={allTransactionData}
-                        rowKey={(record) => record.transaction_code}
-                        onRow={(record, rowIndex) => {
-                          return {
-                            onClick: (event) => {
-                              if(event.target.className === 'table_company') return;
-                              handleOpenTransactoin(record.transaction_code)
-                            }, // double click row
-                          };
-                        }}
-                      />:
-                      <Table
+                  { searchCondition === "" ?  
+                    <Table
+                      pagination={{
+                        total: allTransactionData.length,
+                        showTotal: ShowTotal,
+                        showSizeChanger: true,
+                        onShowSizeChange: onShowSizeChange,
+                        ItemRender: ItemRender,
+                      }}
+                      loading={nowLoading}
+                      style={{ overflowX: "auto" }}
+                      columns={columns}
+                      bordered
+                      dataSource={allTransactionData}
+                      rowKey={(record) => record.transaction_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onClick: (event) => {
+                            if(event.target.className === 'table_company') return;
+                            handleOpenTransactoin(record.transaction_code)
+                          }, // double click row
+                        };
+                      }}
+                    />:
+                    <Table
                       pagination={{
                         total: filteredTransaction.length >0 ? filteredTransaction.length:0,
                         showTotal: ShowTotal,
@@ -401,15 +401,15 @@ const Transactions = () => {
         <TransactionEditModel
           open={openTransaction}
           close={()=>setOpenTransaction(false)}
-          openBill={()=>setOpenBill(true)}
-          setBillData={setBillData}
-          setBillContents={setBillContents}
+          openTaxInvoice={()=>setOpenTaxInvoice(true)}
+          setTaxInvoiceData={setTaxInvoiceData}
+          setTaxInvoiceContents={setTaxInvoiceContents}
         />
         <TaxInvoiceEditModel
-          open={openBill}
-          close={()=>setOpenBill(false)}
-          data={billData}
-          contents={billContents}
+          open={openTaxInvoice}
+          close={()=>setOpenTaxInvoice(false)}
+          data={taxInvoiceData}
+          contents={taxInvoiceContents}
         />
         <MultiQueryModal 
           title= {t('quotation.quotation_multi_query')}
