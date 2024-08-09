@@ -735,7 +735,7 @@ const QuotationAddModel = (props) => {
     };
     const result = modifyQuotation(newQuotationData);
     result.then((res) => {
-      if(res) {
+      if(res.result) {
         let thisModal = bootstrap.Modal.getInstance('#add_quotation');
         if(thisModal) thisModal.hide();
       } else {

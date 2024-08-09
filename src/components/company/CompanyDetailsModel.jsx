@@ -154,11 +154,14 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
         modify_user: cookies.myLationCrmUserId,
         company_code: selectedCompany.company_code,
       };
-      if (modifyCompany(temp_all_saved)) {
-        console.log(`Succeeded to modify company`);
-      } else {
-        console.error("Failed to modify company");
-      }
+      const resp = modifyCompany(temp_all_saved)
+      resp.then(res => {
+        if (res.result) {
+          console.log(`Succeeded to modify company`);
+        } else {
+          console.error("Failed to modify company : ", res.data);
+        };
+      });
     } else {
       console.log("[ CompanyDetailModel ] No saved data");
     }

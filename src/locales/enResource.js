@@ -334,6 +334,8 @@ const enResource = {
         },
         comment: {
             search_address_first: 'Please search address...',
+            title_check: 'Check',
+            msg_fail_save: 'Failed to save.'
         }
     },
 }

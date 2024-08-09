@@ -140,7 +140,7 @@ const ConsultingAddModel = (props) => {
     };
     const result = modifyConsulting(newConsultingData);
     result.then((res) => {
-      if(res) {
+      if(res.result) {
         let thisModal = bootstrap.Modal.getInstance('#add_consulting');
         if(thisModal) thisModal.hide();
       } else {

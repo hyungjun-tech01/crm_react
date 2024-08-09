@@ -127,7 +127,6 @@ export const CompanyRepo = selector({
 
         const modifyCompany = getCallback(({set, snapshot}) => async (newCompany) => {
             const input_json = JSON.stringify(newCompany);
-            console.log(`[ modifyCompany ] input : `, input_json);
             try{
                 const response = await fetch(`${BASE_PATH}/modifyCompany`, {
                     method: "POST",
@@ -136,8 +135,7 @@ export const CompanyRepo = selector({
                 });
                 const data = await response.json();
                 if(data.message){
-                    console.log('\t[ modifyCompany ] message:', data.message);
-                    return false;
+                    return { result: false, data: data.message};
                 };
 
                 const allCompany = await snapshot.getPromise(atomAllCompanies);
@@ -170,7 +168,7 @@ export const CompanyRepo = selector({
                         },
                         label: updatedNewCompany.company_name,
                     }));
-                    return true;
+                    return { result: true};
                 } else if(newCompany.action_type === 'UPDATE'){
                     const currentCompany = await snapshot.getPromise(atomCurrentCompany);
                     delete newCompany.action_type;
@@ -217,19 +215,17 @@ export const CompanyRepo = selector({
                                 ...allCompanySelection.slice(foundSelIdx + 1, ),
                             ]
                             set(atomCompanyForSelection, updatedCompanySelection);
+                            return { result: true};
                         } else {
-                            console.log('\t[ modifyCompany / modify selection ] Impossible case~~!!');    
+                            return { result: false, data: "Unknown Error"};  
                         }
-                        return true;
                     } else {
-                        console.log('\t[ modifyCompany ] No specified company is found');
-                        return false;
+                        return {result:false, data: "No Data"};
                     };
                 }
             }
             catch(err){
-                console.error(`\t[ modifyCompany ] Error : ${err}`);
-                return false;
+                return {result:false, data: err};
             };
         });
         const setCurrentCompany = getCallback(({set, snapshot}) => async (company_code) => {

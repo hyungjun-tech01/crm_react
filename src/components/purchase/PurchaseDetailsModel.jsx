@@ -201,7 +201,7 @@ const PurchaseDetailsModel = () => {
             if (res.result) {
               console.log('Succeeded to update MA end date');
             } else {
-              console.log('Fail to update MA end date');
+              console.log('Fail to update MA end date :', res.data);
             };
           });
         };
