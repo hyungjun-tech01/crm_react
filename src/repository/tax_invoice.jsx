@@ -68,8 +68,7 @@ export const TaxInvoiceRepo = selector({
                 });
                 const data = await response.json();
                 if (data.message) {
-                    console.log('\t[ modifyTaxInvoice ] message:', data.message);
-                    return false;
+                    return {result:false, data: data.message};
                 };
 
                 const allTaxInvoices = await snapshot.getPromise(atomTaxInvoiceSet);
@@ -83,7 +82,7 @@ export const TaxInvoiceRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomTaxInvoiceState, [updatedNewTransaction, ...allTaxInvoices]);
-                    return true;
+                    return {result: true};
                 } else if (newTaxInvoice.action_type === 'UPDATE') {
                     const currentTransaction = await snapshot.getPromise(atomCurrentTaxInvoice);
                     delete newTaxInvoice.action_type;
@@ -105,16 +104,14 @@ export const TaxInvoiceRepo = selector({
                             ...allTaxInvoices.slice(foundIdx + 1,),
                         ];
                         set(allTaxInvoices, updatedAllTransactions);
-                        return true;
+                        return {result: true};
                     } else {
-                        console.log('\t[ modifyTaxInvoice ] No specified tax invoice is found');
-                        return false;
+                        return {result:false, data: "No Data"};
                     }
                 }
             }
             catch (err) {
-                console.error(`\t[ modifyTaxInvoice ] Error : ${err}`);
-                return false;
+                return {result:false, data: err};
             };
         });
         const setCurrentTaxInvoice = getCallback(({ set, snapshot }) => async (invoice_code) => {

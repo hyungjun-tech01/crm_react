@@ -334,6 +334,8 @@ const koResource = {
         },
         comment: {
             search_address_first: '먼저 주소 검색하시기 바랍니다.',
+            title_check: '확인',
+            msg_fail_save: '저장하지 못했습니다.'
         }
     },
 }

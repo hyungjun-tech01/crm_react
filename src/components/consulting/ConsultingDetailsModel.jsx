@@ -5,7 +5,8 @@ import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
 
-import { atomUserState,
+import {
+  atomUserState,
   atomUsersForSelection,
   atomEngineersForSelection,
   atomSalespersonsForSelection,
@@ -24,8 +25,8 @@ import DetailTitleItem from "../../constants/DetailTitleItem";
 
 
 const ConsultingDetailsModel = () => {
-  const [ t ] = useTranslation();
-  const [ cookies ] = useCookies(["myLationCrmUserId"]);
+  const [t] = useTranslation();
+  const [cookies] = useCookies(["myLationCrmUserId"]);
 
 
   //===== [RecoilState] Related with Consulting =======================================
@@ -42,12 +43,12 @@ const ConsultingDetailsModel = () => {
 
 
   //===== Handles to deal this component ==============================================
-  const [ isFullScreen, setIsFullScreen ] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentConsultingCode, setCurrentConsultingCode] = useState('');
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
-    if(checked)
+    if (checked)
       localStorage.setItem('isFullScreen', '1');
     else
       localStorage.setItem('isFullScreen', '0');
@@ -55,8 +56,8 @@ const ConsultingDetailsModel = () => {
 
 
   //===== Handles to edit 'Consulting Details' ========================================
-  const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
-  const [ editedDetailValues, setEditedDetailValues ] = useState(null);
+  const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
+  const [editedDetailValues, setEditedDetailValues] = useState(null);
 
   const handleDetailChange = useCallback((e) => {
     if (e.target.value !== selectedConsulting[e.target.name]) {
@@ -85,7 +86,7 @@ const ConsultingDetailsModel = () => {
 
   const handleDetailSelectChange = useCallback((name, selected) => {
     console.log('handleDetailSelectChange / start : ', selected);
-    
+
     if (selectedConsulting[name] !== selected.value) {
       const tempEdited = {
         ...editedDetailValues,
@@ -97,10 +98,9 @@ const ConsultingDetailsModel = () => {
   }, [editedDetailValues, selectedConsulting]);
 
   const handleSaveAll = useCallback(() => {
-    if(editedDetailValues !== null
+    if (editedDetailValues !== null
       && selectedConsulting
-      && selectedConsulting !== defaultConsulting)
-    {
+      && selectedConsulting !== defaultConsulting) {
       let temp_all_saved = {
         ...editedDetailValues
       };
@@ -108,12 +108,14 @@ const ConsultingDetailsModel = () => {
       temp_all_saved['modify_user'] = cookies.myLationCrmUserId;
       temp_all_saved['consulting_code'] = selectedConsulting.consulting_code;
 
-      if (modifyConsulting(temp_all_saved)) {
-        console.log(`Succeeded to modify company`);
-        
-      } else {
-        console.error('Failed to modify company')
-      }
+      const resp = modifyConsulting(temp_all_saved);
+      resp.then(res => {
+        if (res.result) {
+          console.log(`Succeeded to modify company`);
+        } else {
+          console.error('Failed to modify company : ', res.data);
+        };
+      });
     } else {
       console.log("[ ConsultingDetailModel ] No saved data");
     };
@@ -130,36 +132,36 @@ const ConsultingDetailsModel = () => {
   }, [setCurrentConsulting]);
 
   const consulting_items_info = [
-    { key: 'department', title:'lead.department', detail:{ type:'label', editing: handleDetailChange}},
-    { key: 'position', title:'lead.position', detail:{ type:'label', editing: handleDetailChange}},
-    { key: 'mobile_number', title:'lead.mobile', detail:{ type:'label', editing: handleDetailChange}},
-    { key: 'phone_number', title:'common.phone_no', detail:{ type:'label', editing: handleDetailChange}},
-    { key: 'email', title:'lead.email', detail:{ type:'label', editing: handleDetailChange}},
-    { key: 'status', title:'common.status', detail:{ type:'select', options:ConsultingStatusTypes, editing: handleDetailSelectChange}},
-    { key: 'receipt_date', title:'consulting.receipt_date', detail:{ type:'date', editing: handleDetailDateChange }},
-    { key: 'consulting_type', title:'consulting.type', detail:{ type:'select', options:ConsultingTypes, editing: handleDetailSelectChange}},
-    { key: 'lead_time', title:'consulting.lead_time', detail:{ type:'select', options:ConsultingTimeTypes, editing: handleDetailSelectChange}},
-    { key: 'product_type', title:'consulting.product_type', detail:{ type:'select', options:ProductTypes, editing: handleDetailSelectChange}},
-    { key: 'request_type', title:'consulting.request_type', detail:{ type:'label', editing: handleDetailChange}},
-    { key: 'lead_sales', title:'lead.lead_sales', detail:{ type:'select', options: salespersonsForSelection, editing: handleDetailSelectChange}},
-    { key: 'application_engineer', title:'company.engineer', detail:{ type:'select', options: engineersForSelection, editing: handleDetailSelectChange}},
-    { key: 'receiver', title:'consulting.receiver', detail:{ type:'select', options: usersForSelection, editing: handleDetailSelectChange}},
-    { key: 'request_content', title:'consulting.request_content', detail:{ type:'textarea', extra:'long' , editing: handleDetailChange}},
-    { key: 'action_content', title:'consulting.action_content', detail:{ type:'textarea', extra:'long' , editing: handleDetailChange}},
-    { key: 'memo', title:'common.memo', detail:{ type:'textarea', extra:'long' , editing: handleDetailChange}},
+    { key: 'department', title: 'lead.department', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'mobile_number', title: 'lead.mobile', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'phone_number', title: 'common.phone_no', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'email', title: 'lead.email', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'status', title: 'common.status', detail: { type: 'select', options: ConsultingStatusTypes, editing: handleDetailSelectChange } },
+    { key: 'receipt_date', title: 'consulting.receipt_date', detail: { type: 'date', editing: handleDetailDateChange } },
+    { key: 'consulting_type', title: 'consulting.type', detail: { type: 'select', options: ConsultingTypes, editing: handleDetailSelectChange } },
+    { key: 'lead_time', title: 'consulting.lead_time', detail: { type: 'select', options: ConsultingTimeTypes, editing: handleDetailSelectChange } },
+    { key: 'product_type', title: 'consulting.product_type', detail: { type: 'select', options: ProductTypes, editing: handleDetailSelectChange } },
+    { key: 'request_type', title: 'consulting.request_type', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'lead_sales', title: 'lead.lead_sales', detail: { type: 'select', options: salespersonsForSelection, editing: handleDetailSelectChange } },
+    { key: 'application_engineer', title: 'company.engineer', detail: { type: 'select', options: engineersForSelection, editing: handleDetailSelectChange } },
+    { key: 'receiver', title: 'consulting.receiver', detail: { type: 'select', options: usersForSelection, editing: handleDetailSelectChange } },
+    { key: 'request_content', title: 'consulting.request_content', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
+    { key: 'action_content', title: 'consulting.action_content', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
+    { key: 'memo', title: 'common.memo', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
   ];
 
 
   //===== useEffect functions =============================================== 
   useEffect(() => {
-    if((selectedConsulting !== defaultConsulting)
+    if ((selectedConsulting !== defaultConsulting)
       && (selectedConsulting.consulting_code !== currentConsultingCode)
-    ){
+    ) {
       const detailViewStatus = localStorage.getItem("isFullScreen");
-      if(detailViewStatus === null){
+      if (detailViewStatus === null) {
         localStorage.setItem("isFullScreen", '0');
         setIsFullScreen(false);
-      } else if(detailViewStatus === '0'){
+      } else if (detailViewStatus === '0') {
         setIsFullScreen(false);
       } else {
         setIsFullScreen(true);
@@ -210,12 +212,12 @@ const ConsultingDetailsModel = () => {
                 onEditing={handleDetailChange}
               />
             </div>
-            <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
+            <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange} />
             <button
               type="button"
               className="btn-close xs-close"
               data-bs-dismiss="modal"
-              onClick={ handleClose }
+              onClick={handleClose}
             />
           </div>
           <div className="modal-body">
@@ -261,7 +263,7 @@ const ConsultingDetailsModel = () => {
                               style={{ display: 'flex', marginBottom: '0.5rem' }}
                               wrap
                             >
-                              { consulting_items_info.map((item, index) => 
+                              {consulting_items_info.map((item, index) =>
                                 <DetailCardItem
                                   key={index}
                                   title={t(item.title)}
@@ -276,7 +278,7 @@ const ConsultingDetailsModel = () => {
                         </div>
                       </div>
                     </div>
-                    { editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&
+                    {editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&
                       <div className="text-center py-3">
                         <button
                           type="button"

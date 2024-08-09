@@ -132,10 +132,7 @@ export const PurchaseRepo = selector({
                 });
                 const data = await response.json();
                 if(data.message){
-                    console.log('\t[ modifyPurchase ] message:', data.message);
-                    return {
-                        result: false,
-                    };
+                    return {result: false, data: data.message};
                 };
 
                 const allPurchases = await snapshot.getPromise(atomAllPurchases);
@@ -150,10 +147,7 @@ export const PurchaseRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomAllPurchases, [updatedNewPurchase, ...allPurchases]);
-                    return {
-                        result: true,
-                        code: data.out_purchase_code,
-                    };
+                    return {result: true, code: data.out_purchase_code};
                 } else if(newPurchase.action_type === 'UPDATE'){
                     const currentPurchase = await snapshot.getPromise(atomCurrentPurchase);
                     delete newPurchase.action_type;
@@ -175,21 +169,14 @@ export const PurchaseRepo = selector({
                             ...allPurchases.slice(foundIdx + 1,),
                         ];
                         set(atomAllPurchases, updatedAllPurchases);
-                        return {
-                            result: true,
-                            code: modifiedPurchase.purchase_code,
-                        };
+                        return { result: true, code: modifiedPurchase.purchase_code };
                     } else {
-                        console.log('\t[ modifyPurchase ] No specified purchase is found');
-                        return {
-                            result: false,
-                        };
+                        return {result: false, data: 'No Data'};
                     }
                 }
             }
             catch(err){
-                console.error(`\t[ modifyPurchase ] Error : ${err}`);
-                return false;
+                return {result: false, data: err};
             };
         });
         const setCurrentPurchase = getCallback(({set, snapshot}) => async (code) => {

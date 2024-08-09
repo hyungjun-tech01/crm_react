@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
+import * as bootstrap from "../../assets/js/bootstrap.bundle";
 import { atomCompanyForSelection, atomCompanyState, defaultLead } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
@@ -9,12 +10,15 @@ import { option_locations } from "../../constants/constants";
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddAddressItem from '../../constants/AddAddressItem';
+import MessageModal from "../../constants/MessageModal";
 
 const LeadAddModel = (props) => {
     const { init, handleInit } = props;
     const { t } = useTranslation();
-    const [ cookies ] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
-    
+    const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+    const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+    const [message, setMessage] = useState({ title: "", message: "" });
+
 
     //===== [RecoilState] Related with Company =============================================
     const companyState = useRecoilValue(atomCompanyState);
@@ -30,11 +34,11 @@ const LeadAddModel = (props) => {
     const engineersForSelection = useRecoilValue(atomEngineersForSelection);
     const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
-    
+
     //===== Handles to edit 'Lead Add' =====================================================
-    const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
-    const [ leadChange, setLeadChange ] = useState(defaultLead);
-    const [ disabledItems, setDisabledItems ] = useState({});
+    const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
+    const [leadChange, setLeadChange] = useState(defaultLead);
+    const [disabledItems, setDisabledItems] = useState({});
 
     const initializeLeadTemplate = useCallback(() => {
         setLeadChange(defaultLead);
@@ -53,9 +57,22 @@ const LeadAddModel = (props) => {
     const handleAddNewLead = useCallback((event) => {
         // Check data if they are available
         if (leadChange.lead_name === null
-            || leadChange.lead_name === ''
-            || leadChange.company_code === null) {
-            console.log("Company Name must be available!");
+            || leadChange.lead_name === '') {
+            const tempMsg = {
+                title: t('comment.title_check'),
+                message: "고객이름은 필수 입력 항목입니다.",
+            };
+            setMessage(tempMsg);
+            setIsMessageModalOpen(true);
+            return;
+        };
+        if (leadChange.company_code === null) {
+            const tempMsg = {
+                title: t('comment.title_check'),
+                message: "고객의 회사 정보는 필수 입력 항목입니다.",
+            };
+            setMessage(tempMsg);
+            setIsMessageModalOpen(true);
             return;
         };
 
@@ -66,17 +83,27 @@ const LeadAddModel = (props) => {
             counter: 0,
             modify_user: cookies.myLationCrmUserId,
         };
-        const result = modifyLead(newLeadData);
-        if (result) {
-            initializeLeadTemplate();
-            //close modal ?
-        };
+        const resp = modifyLead(newLeadData);
+        resp.then(res => {
+            if (res.result) {
+                initializeLeadTemplate();
+                let thisModal = bootstrap.Modal.getInstance('#add_lead');
+                if(thisModal) thisModal.hide();
+            } else {
+                const tempMsg = {
+                    title: t('comment.title_check'),
+                    message: `${t('comment.msg_fail_save')} - 오류 이유 : ${res.data}`,
+                };
+                setMessage(tempMsg);
+                setIsMessageModalOpen(true);
+            }
+        });
     }, [cookies.myLationCrmUserId, initializeLeadTemplate, leadChange, modifyLead]);
 
     const handleSelectChange = useCallback((name, selected) => {
         console.log('[LeadAddModel] handleSelectChange :', selected);
         let modifiedData = null;
-        if(name === 'company_name') {
+        if (name === 'company_name') {
             modifiedData = {
                 ...leadChange,
                 company_code: selected.value.company_code,
@@ -90,34 +117,34 @@ const LeadAddModel = (props) => {
             let tempDisabled = {
                 ...disabledItems,
             };
-            if(selected.value.company_name_en) {
+            if (selected.value.company_name_en) {
                 tempDisabled['company_name_en'] = true;
             };
-            if(selected.value.company_address) {
+            if (selected.value.company_address) {
                 tempDisabled['company_address'] = true;
             };
             setDisabledItems(tempDisabled);
         } else {
             modifiedData = {
                 ...leadChange,
-                [name] : selected.value,
+                [name]: selected.value,
             };
         };
         setLeadChange(modifiedData);
     }, [leadChange, disabledItems]);
 
     useEffect(() => {
-        if(((companyState & 1) === 1) && ((userState & 1) === 1)) {
+        if (((companyState & 1) === 1) && ((userState & 1) === 1)) {
             setIsAllNeededDataLoaded(true);
             if (init) {
                 console.log('[LeadAddModel] initialize!');
-                if(handleInit) handleInit(!init);
-                setTimeout(()=>{
+                if (handleInit) handleInit(!init);
+                setTimeout(() => {
                     initializeLeadTemplate();
                 }, 500);
             };
         }
-    }, [companyState, userState, init ])
+    }, [companyState, userState, init])
 
     if (!isAllNeededDataLoaded)
         return <div>&nbsp;</div>;
@@ -339,6 +366,12 @@ const LeadAddModel = (props) => {
                 </div>
                 {/* modal-content */}
             </div>
+            <MessageModal
+                title={message.title}
+                message={message.message}
+                open={isMessageModalOpen}
+                handleOk={() => setIsMessageModalOpen(false)}
+            />
             {/* modal-dialog */}
         </div>
     )

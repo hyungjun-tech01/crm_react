@@ -558,12 +558,15 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
       newTransactionData['action_type'] = 'UPDATE';
       newTransactionData['modify_user'] = cookies.myLationCrmUserId;
     }
-    const result = modifyTransaction(newTransactionData);
-    result.then((res) => {
-      if(res){
+    const resp = modifyTransaction(newTransactionData);
+    resp.then((res) => {
+      if(res.result){
         if(value === 'TaxBill'){
           handleShowTaxBill();
           handleInitialize();
+        } else {
+          let thisModal = bootstrap.Modal.getInstance('#edit_transaction');
+          if(thisModal) thisModal.hide();
         };
       }
       else {

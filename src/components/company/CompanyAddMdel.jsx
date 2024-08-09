@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
+import * as bootstrap from "../../assets/js/bootstrap.bundle";
 import { defaultCompany } from "../../atoms/atoms";
 import {
   atomUserState,
@@ -77,7 +78,7 @@ const CompanyAddModel = (props) => {
         companyChange.company_name === ""
       ) {
         const tempMsg = {
-          title: "확인",
+          title: t('comment.title_check'),
           message: "회사이름이 누락되었습니다.",
         };
         setMessage(tempMsg);
@@ -95,12 +96,14 @@ const CompanyAddModel = (props) => {
       console.log(`[ handleAddNewCompany ]`, newComData);
       const result = modifyCompany(newComData);
       result.then((res) => {
-        if (res) {
+        if (res.result) {
           initializeCompanyTemplate();
+          let thisModal = bootstrap.Modal.getInstance('#add_company');
+          if(thisModal) thisModal.hide();
         } else {
           const tempMsg = {
-            title: "확인",
-            message: `저장하지 못했습니다.\n-오류 이유 : ${res}`,
+            title: t('comment.title_check'),
+            message: `${t('comment.msg_fail_save')} - 오류 이유 : ${res.data}`,
           };
           setMessage(tempMsg);
           setIsMessageModalOpen(true);
