@@ -34,7 +34,7 @@ export const TaxInvoiceRepo = selector({
             const input_json = JSON.stringify({company_code: code});
             try {
                 console.log('[TaxInvoiceRepository] Try loading all')
-                const response = await fetch(`${BASE_PATH}/taxInvoice`, {
+                const response = await fetch(`${BASE_PATH}/companyTaxInvoice`, {
                     method: "POST",
                     headers:{'Content-Type':'application/json'},
                     body: input_json,
