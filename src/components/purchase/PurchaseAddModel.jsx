@@ -426,14 +426,14 @@ const PurchaseAddModel = (props) => {
                                             title={t('purchase.receipt_date')}
                                             type='date'
                                             name="receipt_date"
-                                            time={{ data: purchaseChange.receipt_date }}
+                                            defaultValue={purchaseChange.receipt_date}
                                             onChange={handleDateChange}
                                         />
                                         <AddBasicItem
                                             title={t('purchase.delivery_date')}
                                             type='date'
                                             name="delivery_date"
-                                            time={{ data: purchaseChange.delivery_date }}
+                                            defaultValue={purchaseChange.delivery_date}
                                             onChange={handleDateChange}
                                         />
                                     </div>
@@ -442,14 +442,14 @@ const PurchaseAddModel = (props) => {
                                             title={t('purchase.hq_finish_date')}
                                             type='date'
                                             name="hq_finish_date"
-                                            time={{ data: purchaseChange.hq_finish_date }}
+                                            defaultValue={purchaseChange.hq_finish_date}
                                             onChange={handleDateChange}
                                         />
                                         <AddBasicItem
                                             title={t('purchase.ma_finish_date')}
                                             type='date'
                                             name="ma_finish_date"
-                                            time={{ data: purchaseChange.ma_finish_date }}
+                                            defaultValue={purchaseChange.ma_finish_date}
                                             onChange={handleDateChange}
                                         />
                                     </div>

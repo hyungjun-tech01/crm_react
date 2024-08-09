@@ -287,7 +287,7 @@ const CompanyAddModel = (props) => {
                       title={t("company.establishment_date")}
                       type="date"
                       name="establishment_date"
-                      time={{ data: companyChange.establishment_date }}
+                      defaultValue={companyChange.establishment_date}
                       onChange={handleDateChange}
                     />
                   </div>

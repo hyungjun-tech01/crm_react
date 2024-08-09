@@ -907,7 +907,7 @@ const QuotationAddModel = (props) => {
                   title={t('quotation.quotation_date')}
                   type='date'
                   name='quotation_date'
-                  time={{ data: quotationChange.quotation_date }}
+                  defaultValue={quotationChange.quotation_date}
                   onChange={handleDateChange}
                 />
               </div>
@@ -923,7 +923,7 @@ const QuotationAddModel = (props) => {
                   title={t('quotation.confirm_date')}
                   type='date'
                   name='comfirm_date'
-                  time={{ data: quotationChange.comfirm_date }}
+                  defaultValue={quotationChange.comfirm_date}
                   onChange={handleDateChange}
                 />
               </div>

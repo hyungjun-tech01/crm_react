@@ -53,6 +53,7 @@ const AddBasicItem = (props) => {
                     ? options.filter(item => item.value === defaultValue)[0]
                     : options.filter(item => item.value[name] === defaultValue)[0])
                 : null;
+            if(name === 'receiver') console.log('AddBasicItem / Select :', name, selected);
             return (
                 <div className={ long ? "col-sm-12" : "col-sm-6"} >
                     <div className="add-basic-item">
@@ -72,6 +73,7 @@ const AddBasicItem = (props) => {
                 </div>
             );
         case 'date':
+            if(name === 'receipt_date') console.log('AddBasicItem  / Date :', name, defaultValue);
             return (
                 <div className={ long ? "col-sm-12" : "col-sm-6"} >
                     <div className="add-basic-item">
@@ -80,20 +82,20 @@ const AddBasicItem = (props) => {
                             {required && <span className="text-danger">*</span>}
                         </div>
                         <div className='add-basic-date-wrapper'>
-                        {time.time ? 
+                        {time ? 
                             <DatePicker
                                 className="add-basic-date"
                                 name = {name}
-                                selected={time.data}
+                                selected={defaultValue}
                                 disabled={disabled ? disabled : false}
-                                onChange={onChange}
+                                onChange={(date) => onChange(name, date)}
                                 dateFormat="yyyy-MM-dd hh:mm:ss"
                                 showTimeSelect
                             /> : 
                             <DatePicker
                                 className="add-basic-date"
                                 name = {name}
-                                selected={time.data}
+                                selected={defaultValue}
                                 onChange={(date) => onChange(name, date)}
                                 dateFormat="yyyy-MM-dd"
                             /> 

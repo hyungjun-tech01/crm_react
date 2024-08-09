@@ -60,23 +60,27 @@ const ConsultingAddModel = (props) => {
 
     // set Receipt date -------------
     const tempDate = new Date();
+    let modified = null;
 
     if (leadCode && leadCode !== "") {
       const foundIdx = leadsForSelection.findIndex(item => item.value.lead_code === leadCode);
       if (foundIdx !== -1) {
         const found_lead_info = leadsForSelection.at(foundIdx);
-        setConsultingChange({
+        modified = {
+          ...defaultConsulting,
           ...found_lead_info.value,
           receiver: cookies.myLationCrmUserName,
           receipt_date: tempDate,
-        });
+        };
       };
     } else {
-      setConsultingChange({
+      modified = {
+        ...defaultConsulting,
         receiver: cookies.myLationCrmUserName,
         receipt_date: tempDate,
-      });
+      };
     };
+    setConsultingChange(modified);
   }, [cookies.myLationCrmUserName, leadsForSelection, leadCode]);
 
   const handleDateChange = (name, date) => {
@@ -84,18 +88,20 @@ const ConsultingAddModel = (props) => {
       ...consultingChange,
       [name]: date
     };
+    console.log('handleDateChange : ', modifiedData);
     setConsultingChange(modifiedData);
   };
 
-  const handleItemChange = useCallback((e) => {
+  const handleItemChange = (e) => {
     const modifiedData = {
       ...consultingChange,
       [e.target.name]: e.target.value,
     };
+    console.log('handleItemChange : ', modifiedData);
     setConsultingChange(modifiedData);
-  }, [consultingChange]);
+  };
 
-  const handleSelectChange = useCallback((name, selected) => {
+  const handleSelectChange = (name, selected) => {
     let modifiedData = null;
     if (name === 'lead_name') {
       modifiedData = {
@@ -116,9 +122,9 @@ const ConsultingAddModel = (props) => {
         [name]: selected.value,
       };
     };
-
+    console.log('handleSelectChange : ', modifiedData);
     setConsultingChange(modifiedData);
-  }, [consultingChange]);
+  };
 
   const handleAddNewConsulting = useCallback(() => {
     // Check data if they are available
@@ -157,13 +163,13 @@ const ConsultingAddModel = (props) => {
       setIsAllNeededDataLoaded(true);
       if (init) {
         console.log('[ConsultingAddModel] initialize!');
-        if(handleInit) handleInit(!init);
-        setTimeout(()=>{
+        // setTimeout(()=>{
           initializeConsultingTemplate();
-        }, 500);
+          if(handleInit) handleInit(!init);
+        // }, 500);
       };
     };
-  }, [leadsState, userState, init]);
+  }, [leadsState, userState, init, initializeConsultingTemplate, handleInit]);
 
   if (!isAllNeededDataLoaded)
     return <div>&nbsp;</div>;
@@ -204,7 +210,8 @@ const ConsultingAddModel = (props) => {
                   title={t('consulting.receipt_date')}
                   type='date'
                   name='receipt_date'
-                  time={{ data: consultingChange.receipt_date, time: true }}
+                  defaultValue={consultingChange.receipt_date}
+                  time
                   required
                   onChange={handleDateChange}
                 />
