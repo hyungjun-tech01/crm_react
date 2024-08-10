@@ -120,11 +120,14 @@ const QuotationDetailsModel = () => {
         modify_user: cookies.myLationCrmUserId,
         quotation_code: selectedQuotation.quotation_code,
       };
-      if (modifyQuotation(temp_all_saved)) {
-        console.log(`Succeeded to modify Quotation`);
-      } else {
-        console.error("Failed to modify Quotation");
-      }
+      const resp = modifyQuotation(temp_all_saved);
+      resp.then(res => {
+        if (res.result) {
+          console.log(`Succeeded to modify Quotation`);
+        } else {
+          console.error("Failed to modify Quotation :", res.data);
+        };
+      });
     } else {
       console.log("[ QuotationDetailModel ] No saved data");
     }
@@ -318,19 +321,21 @@ const QuotationDetailsModel = () => {
         modify_user: cookies.myLationCrmUserId,
         quotation_code: selectedQuotation.quotation_code,
       };
-      if (modifyQuotation(temp_all_saved)) {
-        console.log(`Succeeded to modify Quotation`);
-        setQuotationContents(tempContents);
-        setOrgQuotationContents(tempContents);
-        let tempCheck = [];
-        tempContents.forEach(content => {
-          tempCheck.push(true);
-        });
-        setCheckContentState(tempCheck);
-        setIsNewlyAdded(false);
-      } else {
-        console.error("Failed to modify Quotation");
-      }
+      const resp = modifyQuotation(temp_all_saved);
+      resp.then(res => {
+        if (res.result) {
+          setQuotationContents(tempContents);
+          setOrgQuotationContents(tempContents);
+          let tempCheck = [];
+          tempContents.forEach(content => {
+            tempCheck.push(true);
+          });
+          setCheckContentState(tempCheck);
+          setIsNewlyAdded(false);
+        } else {
+          console.error("Failed to modify Quotation : ", res.data);
+        };
+      });
     } else {
       console.log("[ QuotationDetailModel ] No saved data");
     }

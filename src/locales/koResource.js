@@ -177,6 +177,7 @@ const koResource = {
             warranty: '보증기간',
             _loading_add: '신규 견적 작성을 위한 기반 정보를 불러오고 있습니다.',
             _loading_detail: '견적에 대한 상세 정보를 불러오고 있습니다.',
+            quotation_multi_query:'견적 다중검색',
         },
         transaction:{
             add_content: '항목 추가',
@@ -229,6 +230,7 @@ const koResource = {
             trans_pages: '현재/전체/Page',
             type: '거래유형',
             unit_price: '단가',
+            transaction_multi_query: '거래 다중검색',
         },
         purchase:{
             add_purchase:'구매 제품 등록',
@@ -254,6 +256,7 @@ const koResource = {
             registration_date:'구매제품 등록일',
             serial_number:'기번',
             type:'구매유형',
+            purchase_multi_query:'구매제품 다중검색',
         },
         contract:{
             add_contract: '계약 추가',
@@ -328,10 +331,13 @@ const koResource = {
             view: '보기',
             visible: '보기',
             zip_code: '우편번호',
+            modify_date:'최종수정일'
         },
         comment: {
             input_search_text: '검색 문구를 입력하세요.',
             search_address_first: '먼저 주소 검색하시기 바랍니다.',
+            title_check: '확인',
+            msg_fail_save: '저장하지 못했습니다.'
         }
     },
 }

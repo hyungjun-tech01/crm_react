@@ -411,3 +411,47 @@ export const atomProductOptions = atom({
     key: "productOptions",
     default: [],
 });
+
+//----- Tax Invoice ------------------------
+export const defaultTaxInvoice = {
+    tax_invoice_code : null,
+    company_code : null,
+    publish_type : null,
+    transaction_type : null,
+    invoice_type : null,
+    index1 : null,
+    index2 : null,
+    business_registration_code : null,
+    company_name : null,
+    ceo_name : null,
+    company_address : null,
+    business_type : null,
+    business_item : null,
+    create_date : null,
+    supply_price : null,
+    tax_price : null,
+    total_price : null,
+    cash_amount : null,
+    check_amount : null,
+    note_amount : null,
+    receivable_amount : null,
+    receive_type : null,
+    memo : null,
+    summary : null,
+    invoice_contents : null,
+    modify_date : null,
+    creator : null,
+    recent_user : null,
+};
+export const atomCurrentTaxInvoice = atom({
+    key: "currentTaxInvoice",
+    default: defaultTaxInvoice,
+});
+export const atomTaxInvoiceSet = atom({
+    key: "taxInvoiceSet",
+    default: [],
+});
+export const atomTaxInvoiceState = atom({
+    key: "taxInvoiceState",
+    default: 0,
+});

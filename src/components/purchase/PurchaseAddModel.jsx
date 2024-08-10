@@ -4,7 +4,7 @@ import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
 import { Table } from 'antd';
 import { ItemRender, ShowTotal } from "../paginationfunction";
-
+import * as bootstrap from "../../assets/js/bootstrap.bundle";
 import {
     atomCompanyState,
     atomCompanyForSelection,
@@ -18,18 +18,21 @@ import { PurchaseRepo } from '../../repository/purchase';
 import { ProductTypeOptions } from '../../repository/product';
 import { MAContractRepo, ContractTypes } from "../../repository/ma_contract";
 
+import { ConvertCurrency, formatDate } from '../../constants/functions';
+import { Add } from "@mui/icons-material";
+
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddSearchItem from '../../constants/AddSearchItem';
 import DetailSubModal from '../../constants/DetailSubModal';
-import { ConvertCurrency, formatDate } from '../../constants/functions';
-import { Add } from "@mui/icons-material";
+import MessageModal from "../../constants/MessageModal";
 
 
 const PurchaseAddModel = (props) => {
     const { init, handleInit, companyCode } = props;
     const { t } = useTranslation();
     const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
-
+    const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+    const [message, setMessage] = useState({ title: "", message: "" });
 
     //===== [RecoilState] Related with Company =============================================
     const companyState = useRecoilValue(atomCompanyState);
@@ -137,14 +140,15 @@ const PurchaseAddModel = (props) => {
             modify_user: cookies.myLationCrmUserId,
         };
 
-        console.log(`[ handleAddNewPurchase ]`, newPurchaseData);
         const res_data = modifyPurchase(newPurchaseData);
         res_data.then((res) => {
             if (res.result) {
                 setCurrentPurchase(res.code);
                 setNeedInit(true);
+                let thisModal = bootstrap.Modal.getInstance('#add_purchase');
+                if(thisModal) thisModal.hide();
             } else {
-                console.log('[PurchaseAddModel] fail to add purchase');
+                console.log('[PurchaseAddModel] fail to add purchase :', res.data);
             }
         });
     }, [purchaseChange, cookies.myLationCrmUserId, modifyPurchase, setCurrentPurchase]);
@@ -250,7 +254,7 @@ const PurchaseAddModel = (props) => {
                             };
                             setPurchaseChange(updateAddChange);
                         } else {
-                            console.log('Fail to update MA end date');
+                            console.log('Fail to update MA end date : ', res.data);
                         };
                     });
                 };
@@ -423,14 +427,14 @@ const PurchaseAddModel = (props) => {
                                             title={t('purchase.receipt_date')}
                                             type='date'
                                             name="receipt_date"
-                                            time={{ data: purchaseChange.receipt_date }}
+                                            defaultValue={purchaseChange.receipt_date}
                                             onChange={handleDateChange}
                                         />
                                         <AddBasicItem
                                             title={t('purchase.delivery_date')}
                                             type='date'
                                             name="delivery_date"
-                                            time={{ data: purchaseChange.delivery_date }}
+                                            defaultValue={purchaseChange.delivery_date}
                                             onChange={handleDateChange}
                                         />
                                     </div>
@@ -439,14 +443,14 @@ const PurchaseAddModel = (props) => {
                                             title={t('purchase.hq_finish_date')}
                                             type='date'
                                             name="hq_finish_date"
-                                            time={{ data: purchaseChange.hq_finish_date }}
+                                            defaultValue={purchaseChange.hq_finish_date}
                                             onChange={handleDateChange}
                                         />
                                         <AddBasicItem
                                             title={t('purchase.ma_finish_date')}
                                             type='date'
                                             name="ma_finish_date"
-                                            time={{ data: purchaseChange.ma_finish_date }}
+                                            defaultValue={purchaseChange.ma_finish_date}
                                             onChange={handleDateChange}
                                         />
                                     </div>
@@ -582,6 +586,12 @@ const PurchaseAddModel = (props) => {
                 handleEdited={handleSubModalItemChange}
                 handleOk={handleSubModalOk}
                 handleCancel={handleSubModalCancel}
+            />
+            <MessageModal
+                title={message.title}
+                message={message.message}
+                open={isMessageModalOpen}
+                handleOk={() => setIsMessageModalOpen(false)}
             />
         </div>
     );

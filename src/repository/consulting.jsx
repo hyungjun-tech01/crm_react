@@ -214,7 +214,6 @@ export const ConsultingRepo = selector({
         });        
         const modifyConsulting = getCallback(({set, snapshot}) => async (newConsulting) => {
             const input_json = JSON.stringify(newConsulting);
-            console.log(`[ modifyConsulting ] input : `, input_json);
             try{
                 const response = await fetch(`${BASE_PATH}/modifyConsult`, {
                     method: "POST",
@@ -223,8 +222,7 @@ export const ConsultingRepo = selector({
                 });
                 const data = await response.json();
                 if(data.message){
-                    console.log('\t[ modifyConsulting ] message:', data.message);
-                    return false;
+                    return {result:false, data: data.message};
                 };
 
                 const allConsultings = await snapshot.getPromise(atomAllConsultingObj);
@@ -252,7 +250,7 @@ export const ConsultingRepo = selector({
                         ...filteredAllConsultings
                     ];
                     set(atomFilteredConsultingArray, updatedFiltered);
-                    return true;
+                    return {resutl: true};
                 } else if(newConsulting.action_type === 'UPDATE'){
                     const currentConsulting = await snapshot.getPromise(atomCurrentConsulting);
                     delete newConsulting.action_type;
@@ -284,12 +282,11 @@ export const ConsultingRepo = selector({
                         ];
                         set(atomFilteredConsultingArray, updatedFiltered);
                     };
-                    return true;
+                    return {resutl: true};
                 }
             }
             catch(err){
-                console.error(`\t[ modifyConsulting ] Error : ${err}`);
-                return false;
+                return {result:false, data: err};
             };
         });
         const setCurrentConsulting = getCallback(({set, snapshot}) => async (consulting_code) => {

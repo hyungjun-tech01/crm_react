@@ -21,17 +21,25 @@ export const QuotationSendTypes = [
     { value: 'E-Mail', label: 'Email'},
 ];
 
+export const quotationColumn = [
+    { value: 'company_name', label: '회사명'},
+    { value: 'lead_name', label: '고객명'},
+    { value: 'quotation_manager', label: '견적 책임자'},
+    { value: 'quotation_title', label: '견적 제목'},
+    { value: 'quotation_contents', label: '견적 내용'},
+];
+
 
 export const QuotationRepo = selector({
     key: "QuotationRepository",
     get: ({getCallback}) => {
         /////////////////////try to load all Quotations /////////////////////////////
-        const tryLoadAllQuotations = getCallback(({ set, snapshot }) => async () => {
+        const tryLoadAllQuotations = getCallback(({ set, snapshot }) => async (multiQueryCondi) => {
             const loadStates = await snapshot.getPromise(atomQuotationState);
             if((loadStates & 3) === 0){
                 console.log('[tryLoadAllQuotations] Try to load all Quotations');
                 set(atomQuotationState, (loadStates | 2));   // state : loading
-                const ret = await loadAllQuotations();
+                const ret = await loadAllQuotations(multiQueryCondi);
                 if(ret){
                     // succeeded to load
                     set(atomQuotationState, (loadStates | 3));
@@ -41,10 +49,17 @@ export const QuotationRepo = selector({
                 };
             }
         });
-        const loadAllQuotations = getCallback(({set}) => async () => {
+        const loadAllQuotations = getCallback(({set}) => async (multiQueryCondi) => {
+            const input_json = JSON.stringify(multiQueryCondi);
             try{
                 console.log('[QuotationRepository] Try loading all')
-                const response = await fetch(`${BASE_PATH}/quotations`);
+                const response = await fetch(`${BASE_PATH}/quotations`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+
+
                 const data = await response.json();
                 if(data.message){
                     console.log('loadAllQuotations message:', data.message);
@@ -141,7 +156,6 @@ export const QuotationRepo = selector({
         });     
         const modifyQuotation = getCallback(({set, snapshot}) => async (newQuotation) => {
             const input_json = JSON.stringify(newQuotation);
-            console.log(`[ modifyQuotation ] input : `, input_json);
             try{
                 const response = await fetch(`${BASE_PATH}/modifyQuotation`, {
                     method: "POST",
@@ -150,8 +164,7 @@ export const QuotationRepo = selector({
                 });
                 const data = await response.json();
                 if(data.message){
-                    console.log('\t[ modifyQuotation ] message:', data.message);
-                    return false;
+                    return {result:false, data: data.message};
                 };
 
                 const allQuotations = await snapshot.getPromise(atomAllQuotations);
@@ -165,9 +178,8 @@ export const QuotationRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    console.log('\t[ modifyQuotation ] new quotation : ', updatedNewQuotation);
                     set(atomAllQuotations, [updatedNewQuotation, ...allQuotations]);
-                    return true;
+                    return {result: true};
                 } else if(newQuotation.action_type === 'UPDATE'){
                     const currentQuotation = await snapshot.getPromise(atomCurrentQuotation);
                     delete newQuotation.action_type;
@@ -189,16 +201,14 @@ export const QuotationRepo = selector({
                             ...allQuotations.slice(foundIdx + 1,),
                         ];
                         set(atomAllQuotations, updatedAllQuotations);
-                        return true;
+                        return {result: true};
                     } else {
-                        console.log('\t[ modifyQuotation ] No specified quotation is found');
-                        return false;
+                        return {result:false, data: "No Data"};
                     }
                 }
             }
             catch(err){
-                console.error(`\t[ modifyQuotation ] Error : ${err}`);
-                return false;
+                return {result:false, data: err};
             };
         });
         const setCurrentQuotation = getCallback(({set, snapshot}) => async (quotation_code) => {

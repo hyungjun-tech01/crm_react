@@ -32,17 +32,24 @@ export const DefaultTransactionContent = {
     modify_date: null,
 };
 
+export const transactionColumn = [
+    { value: 'company_name', label: '회사명'},
+    { value: 'ceo_name', label: 'CEO 이름'},
+    { value: 'company_address', label: '회사 주소'},
+    { value: 'transaction_title', label: '거래 제목'},
+    { value: 'transaction_contents', label: '거래 내용'},
+];
 
 export const TransactionRepo = selector({
     key: "TransactionRepository",
     get: ({ getCallback }) => {
         /////////////////////try to load all Transactions /////////////////////////////
-        const tryLoadAllTransactions = getCallback(({ set, snapshot }) => async () => {
+        const tryLoadAllTransactions = getCallback(({ set, snapshot }) => async (multiQueryCondi) => {
             const loadStates = await snapshot.getPromise(atomTransactionState);
             if((loadStates & 3) === 0){
                 console.log('[tryLoadAllTransactions] Try to load all Transactions');
                 set(atomTransactionState, (loadStates | 2));   // state : loading
-                const ret = await loadAllTransactions();
+                const ret = await loadAllTransactions(multiQueryCondi);
                 if(ret){
                     // succeeded to load
                     set(atomTransactionState, (loadStates | 3));
@@ -52,10 +59,16 @@ export const TransactionRepo = selector({
                 };
             }
         });
-        const loadAllTransactions = getCallback(({ set }) => async () => {
+        const loadAllTransactions = getCallback(({ set }) => async (multiQueryCondi) => {
+            const input_json = JSON.stringify(multiQueryCondi);
             try {
                 console.log('[TransactionRepository] Try loading all')
-                const response = await fetch(`${BASE_PATH}/transactions`);
+                const response = await fetch(`${BASE_PATH}/transactions`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+
                 const data = await response.json();
                 if (data.message) {
                     console.log('loadAllTransactions message:', data.message);
@@ -102,7 +115,6 @@ export const TransactionRepo = selector({
         });
         const modifyTransaction = getCallback(({ set, snapshot }) => async (newTransaction) => {
             const input_json = JSON.stringify(newTransaction);
-            console.log(`[ modifyTransaction ] input : `, input_json);
             try {
                 const response = await fetch(`${BASE_PATH}/modifyTransaction`, {
                     method: "POST",
@@ -111,8 +123,7 @@ export const TransactionRepo = selector({
                 });
                 const data = await response.json();
                 if (data.message) {
-                    console.log('\t[ modifyTransaction ] message:', data.message);
-                    return false;
+                    return {result:false, data: data.message};
                 };
 
                 const allTransactions = await snapshot.getPromise(atomAllTransactions);
@@ -126,7 +137,7 @@ export const TransactionRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomAllTransactions, [updatedNewTransaction, ...allTransactions]);
-                    return true;
+                    return {result: true};
                 } else if (newTransaction.action_type === 'UPDATE') {
                     const currentTransaction = await snapshot.getPromise(atomCurrentTransaction);
                     delete newTransaction.action_type;
@@ -148,16 +159,14 @@ export const TransactionRepo = selector({
                             ...allTransactions.slice(foundIdx + 1,),
                         ];
                         set(atomAllTransactions, updatedAllTransactions);
-                        return true;
+                        return {result: true};
                     } else {
-                        console.log('\t[ modifyTransaction ] No specified transaction is found');
-                        return false;
+                        return {result:false, data: "No Data"};
                     }
                 }
             }
             catch (err) {
-                console.error(`\t[ modifyTransaction ] Error : ${err}`);
-                return false;
+                return {result:false, data: err};
             };
         });
         const setCurrentTransaction = getCallback(({ set, snapshot }) => async (transaction_code) => {

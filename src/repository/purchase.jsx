@@ -11,17 +11,24 @@ import { atomCurrentPurchase
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
+export const purchaseColumn = [
+    { value: 'company_name', label: '회사명'},
+    { value: 'product_class_name', label: '제품분류명'},
+    { value: 'product_name', label: '제품명'},
+    { value: 'purchase_memo', label: '구매 메모'},
+];
+
 
 export const PurchaseRepo = selector({
     key: "PurchaseRepository",
     get: ({getCallback}) => {
         /////////////////////try to load all Purchases /////////////////////////////
-        const tryLoadAllPurchases = getCallback(({ set, snapshot }) => async () => {
+        const tryLoadAllPurchases = getCallback(({ set, snapshot }) => async (multiQueryCondi) => {
             const loadStates = await snapshot.getPromise(atomPurchaseState);
             if((loadStates & 3) === 0){
                 console.log('[tryLoadAllPurchases] Try to load all Purchases');
                 set(atomPurchaseState, (loadStates | 2));   // state : loading
-                const ret = await loadAllPurchases();
+                const ret = await loadAllPurchases(multiQueryCondi);
                 if(ret){
                     // succeeded to load
                     set(atomPurchaseState, (loadStates | 3));
@@ -31,7 +38,8 @@ export const PurchaseRepo = selector({
                 };
             }
         });
-        const loadAllPurchases = getCallback(({set}) => async () => {
+        const loadAllPurchases = getCallback(({set}) => async (multiQueryCondi) => {
+            const input_json = JSON.stringify(multiQueryCondi);
             try{
                 const response = await fetch(`${BASE_PATH}/purchases`);
                 const data = await response.json();
@@ -129,10 +137,7 @@ export const PurchaseRepo = selector({
                 });
                 const data = await response.json();
                 if(data.message){
-                    console.log('\t[ modifyPurchase ] message:', data.message);
-                    return {
-                        result: false,
-                    };
+                    return {result: false, data: data.message};
                 };
 
                 const allPurchases = await snapshot.getPromise(atomAllPurchaseObj);
@@ -202,8 +207,7 @@ export const PurchaseRepo = selector({
                 }
             }
             catch(err){
-                console.error(`\t[ modifyPurchase ] Error : ${err}`);
-                return false;
+                return {result: false, data: err};
             };
         });
         const setCurrentPurchase = getCallback(({set, snapshot}) => async (code) => {

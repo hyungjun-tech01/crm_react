@@ -92,14 +92,11 @@ const PurchaseDetailsModel = () => {
   }, [editedDetailValues, currentPurchase]);
 
   const handleDetailSelectChange = useCallback((name, selected) => {
-    console.log('handleDetailSelectChange / start : ', selected);
-
     if (currentPurchase[name] !== selected.value) {
       const tempEdited = {
         ...editedDetailValues,
         [name]: selected.value,
       };
-      console.log('handleDetailSelectChange : ', tempEdited);
       setEditedDetailValues(tempEdited);
     };
   }, [editedDetailValues]);
@@ -113,11 +110,13 @@ const PurchaseDetailsModel = () => {
         purchase_code: currentPurchase.purchase_code,
       };
       const res_data = modifyPurchase(temp_all_saved);
-      if (res_data.result) {
-        console.log(`Succeeded to modify purchase`);
-      } else {
-        console.error("Failed to modify purchase");
-      }
+      res_data.then(res => {
+        if (res.result) {
+          console.log(`Succeeded to modify purchase`);
+        } else {
+          console.error("Failed to modify purchase");
+        }  
+      })
     } else {
       console.log("[ PurchaseDetailModel ] No saved data");
     }
@@ -202,7 +201,7 @@ const PurchaseDetailsModel = () => {
             if (res.result) {
               console.log('Succeeded to update MA end date');
             } else {
-              console.log('Fail to update MA end date');
+              console.log('Fail to update MA end date :', res.data);
             };
           });
         };
@@ -318,9 +317,6 @@ const PurchaseDetailsModel = () => {
     if ((currentPurchase !== defaultPurchase)
       && (currentPurchase.purchase_code !== currentPurchaseCode)
    ){
-      console.log("[PurchaseDetailsModel] called!", currentPurchase);
-      console.log("- Check", productOptions);
-
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {
         localStorage.setItem("isFullScreen", '0');

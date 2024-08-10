@@ -134,7 +134,6 @@ export const LeadRepo = selector({
         });
         const modifyLead = getCallback(({set, snapshot}) => async (newLead) => {
             const input_json = JSON.stringify(newLead);
-            console.log(`[ modifyLead ] input : `, input_json);
             try{
                 const response = await fetch(`${BASE_PATH}/modifyLead`, {
                     method: "POST",
@@ -143,8 +142,7 @@ export const LeadRepo = selector({
                 });
                 const data = await response.json();
                 if(data.message){
-                    console.log('\t[ modifyLead ] message:', data.message);
-                    return false;
+                    return {result:false, data: data.message};
                 };
 
                 const allLeads = await snapshot.getPromise(atomAllLeadObj);
@@ -172,7 +170,7 @@ export const LeadRepo = selector({
                         ...filteredAllLeads
                     ];
                     set(atomFilteredLeadArray, updatedFiltered);
-                    return true;
+                    return {result: true};
                 } else if(newLead.action_type === 'UPDATE'){
                     const currentLead = await snapshot.getPromise(atomCurrentLead);
                     delete newLead.action_type;
@@ -203,13 +201,14 @@ export const LeadRepo = selector({
                             ...filteredAllLeads.slice(foundIdx + 1,),
                         ];
                         set(atomFilteredLeadArray, updatedFiltered);
+                        return {result: true};
+                    } else {
+                        return {result:false, data: "No Data"};
                     };
-                    return true;
                 }
             }
             catch(err){
-                console.error(`\t[ modifyLead ] Error : ${err}`);
-                return false;
+                return {result:false, data: err};
             };
         });
         const setCurrentLead = getCallback(({set, snapshot}) => async (lead_code) => {

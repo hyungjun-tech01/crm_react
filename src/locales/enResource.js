@@ -177,6 +177,7 @@ const enResource = {
             warranty: 'Warranty Period',
             _loading_add: 'Now, loading the needed data to add new quotation ...',
             _loading_detail: 'Now, loading the details of quotation...',
+            quotation_multi_query:'Quotation Multi Query',
         },
         transaction:{
             add_content: 'Add Content',
@@ -229,6 +230,7 @@ const enResource = {
             trans_pages: 'Current/Total/Page',
             type:'Transaction Type',
             unit_price: 'Unit Price',
+            transaction_multi_query: '거래 다중검색',
         },
         purchase:{
             add_purchase:'Add Purchase',
@@ -254,6 +256,7 @@ const enResource = {
             registration_date:'Registration Date',
             serial_number:'Serial Number',
             type:'Purchase Type',
+            purchase_multi_query:'Purchase Multi Query',
         },
         contract:{
             add_contract: 'Add Contract',
@@ -328,10 +331,13 @@ const enResource = {
             view: 'View',
             visible: 'Visible',
             zip_code: 'Postal Code',
+            modify_date:'Modify Date'
         },
         comment: {
             input_search_text: 'Input search text',
             search_address_first: 'Please search address...',
+            title_check: 'Check',
+            msg_fail_save: 'Failed to save.'
         }
     },
 }

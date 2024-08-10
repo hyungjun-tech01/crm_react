@@ -119,7 +119,6 @@ export const CompanyRepo = selector({
         });
         const modifyCompany = getCallback(({set, snapshot}) => async (newCompany) => {
             const input_json = JSON.stringify(newCompany);
-            console.log(`[ modifyCompany ] input : `, input_json);
             try{
                 const response = await fetch(`${BASE_PATH}/modifyCompany`, {
                     method: "POST",
@@ -128,8 +127,7 @@ export const CompanyRepo = selector({
                 });
                 const data = await response.json();
                 if(data.message){
-                    console.log('\t[ modifyCompany ] message:', data.message);
-                    return false;
+                    return { result: false, data: data.message};
                 };
 
                 const allCompanies = await snapshot.getPromise(atomAllCompanyObj);
@@ -193,8 +191,7 @@ export const CompanyRepo = selector({
                 }
             }
             catch(err){
-                console.error(`\t[ modifyCompany ] Error : ${err}`);
-                return false;
+                return {result:false, data: err};
             };
         });
         const setCurrentCompany = getCallback(({set, snapshot}) => async (company_code) => {

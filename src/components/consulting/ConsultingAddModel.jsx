@@ -26,6 +26,7 @@ import {
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddSearchItem from "../../constants/AddSearchItem";
 import MessageModal from "../../constants/MessageModal";
+import { LeadRepo } from "../../repository/lead";
 
 
 const ConsultingAddModel = (props) => {
@@ -43,6 +44,7 @@ const ConsultingAddModel = (props) => {
   //===== [RecoilState] Related with Lead =============================================
   const leadsState = useRecoilValue(atomLeadState);
   const leadDataObj = useRecoilValue(atomAllLeadObj);
+  const { searchLeads } = useRecoilValue(LeadRepo);
 
 
   //===== [RecoilState] Related with Users ============================================
@@ -61,28 +63,34 @@ const ConsultingAddModel = (props) => {
 
     // set Receipt date -------------
     const tempDate = new Date();
+    let modified = {
+      ...defaultConsulting,
+      receiver: cookies.myLationCrmUserName,
+      receipt_date: tempDate,
+    };
 
     if (leadCode && leadCode !== "") {
-      const foundLead = leadDataObj[leadCode];
-      if (foundLead) {
-        setConsultingChange({
-          lead_code: foundLead.lead_code,
-          lead_name: foundLead.lead_name,
-          department: foundLead.department,
-          position: foundLead.position,
-          mobile_number: foundLead.mobile_number,
-          phone_number: foundLead.phone_number,
-          email: foundLead.email,
-          receiver: cookies.myLationCrmUserName,
-          receipt_date: tempDate,
+      const foundLeadPromise = searchLeads('lead_code', leadCode);
+      foundLeadPromise
+        .then(res => {
+          if(res.result) {
+            if(res.data.length === 1){
+              modified['lead_code'] = res.data[0].lead_code;
+              modified['lead_name'] = res.data[0].lead_name;
+              modified['department'] = res.data[0].department;
+              modified['position'] = res.data[0].position;
+              modified['mobile_number'] = res.data[0].mobile_number;
+              modified['phone_number'] = res.data[0].phone_number;
+              modified['email'] = res.data[0].email;
+            } else {
+              console.log('[ConsutlingAddModel] Initialize... found Lead is weired');
+            };
+          } else {
+            console.log('[ConsutlingAddModel] Initialize... error :', res.message);
+          };
         });
-      };
-    } else {
-      setConsultingChange({
-        receiver: cookies.myLationCrmUserName,
-        receipt_date: tempDate,
-      });
     };
+    setConsultingChange(modified);
   }, [cookies.myLationCrmUserName, leadCode]);
 
   const handleDateChange = (name, date) => {
@@ -90,24 +98,43 @@ const ConsultingAddModel = (props) => {
       ...consultingChange,
       [name]: date
     };
+    console.log('handleDateChange : ', modifiedData);
     setConsultingChange(modifiedData);
   };
 
-  const handleItemChange = useCallback((e) => {
+  const handleItemChange = (e) => {
     const modifiedData = {
       ...consultingChange,
       [e.target.name]: e.target.value,
     };
+    console.log('handleItemChange : ', modifiedData);
     setConsultingChange(modifiedData);
-  }, [consultingChange]);
+  };
 
-  const handleSelectChange = useCallback((name, selected) => {
-    const modifiedData = {
-      ...consultingChange,
-      [name]: selected.value,
+  const handleSelectChange = (name, selected) => {
+    let modifiedData = null;
+    if (name === 'lead_name') {
+      modifiedData = {
+        ...consultingChange,
+        lead_code: selected.value.lead_code,
+        lead_name: selected.value.lead_name,
+        department: selected.value.department,
+        position: selected.value.position,
+        mobile_number: selected.value.mobile_number,
+        phone_number: selected.value.phone_number,
+        email: selected.value.email,
+        company_name: selected.value.company_name,
+        company_code: selected.value.company_code,
+      };
+    } else {
+      modifiedData = {
+        ...consultingChange,
+        [name]: selected.value,
+      };
     };
+    console.log('handleSelectChange : ', modifiedData);
     setConsultingChange(modifiedData);
-  }, [consultingChange]);
+  };
 
   const handleAddNewConsulting = useCallback(() => {
     // Check data if they are available
@@ -129,7 +156,7 @@ const ConsultingAddModel = (props) => {
     };
     const result = modifyConsulting(newConsultingData);
     result.then((res) => {
-      if(res) {
+      if(res.result) {
         let thisModal = bootstrap.Modal.getInstance('#add_consulting');
         if(thisModal) thisModal.hide();
       } else {
@@ -146,13 +173,13 @@ const ConsultingAddModel = (props) => {
       setIsAllNeededDataLoaded(true);
       if (init) {
         console.log('[ConsultingAddModel] initialize!');
-        if(handleInit) handleInit(!init);
-        setTimeout(()=>{
+        // setTimeout(()=>{
           initializeConsultingTemplate();
-        }, 500);
+          if(handleInit) handleInit(!init);
+        // }, 500);
       };
     };
-  }, [leadsState, userState, init]);
+  }, [leadsState, userState, init, initializeConsultingTemplate, handleInit]);
 
   if (!isAllNeededDataLoaded)
     return <div>&nbsp;</div>;
@@ -193,7 +220,8 @@ const ConsultingAddModel = (props) => {
                   title={t('consulting.receipt_date')}
                   type='date'
                   name='receipt_date'
-                  time={{ data: consultingChange.receipt_date, time: true }}
+                  defaultValue={consultingChange.receipt_date}
+                  time
                   required
                   onChange={handleDateChange}
                 />
@@ -235,7 +263,7 @@ const ConsultingAddModel = (props) => {
                   setEdited={setConsultingChange}
                 />
               </div>
-              {(consultingChange.lead_name !== null) &&
+              {!!consultingChange.lead_name &&
                 <div className="form-group row">
                   <div className="col-sm-12">
                     <table className="table">

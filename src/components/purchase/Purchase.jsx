@@ -27,6 +27,9 @@ import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import { atomUserState } from "../../atoms/atomsUser";
 import { UserRepo } from "../../repository/user";
 
+import MultiQueryModal from "../../constants/MultiQueryModal";
+import { purchaseColumn } from "../../repository/purchase";
+
 
 const Purchase = () => {
   const { t } = useTranslation();
@@ -69,6 +72,82 @@ const Purchase = () => {
   const [expanded, setExpaned] = useState(false);
   const [statusSearch, setStatusSearch] = useState('common.all');
 
+  const [multiQueryModal, setMultiQueryModal] = useState(false);
+
+  const [queryConditions, setQueryConditions] = useState([
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+    { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
+  ]);
+
+  const today = new Date();
+  const oneYearAgo = new Date();
+  const oneMonthAgo = new Date();
+  oneMonthAgo.setMonth(today.getMonth() - 1);
+  oneYearAgo.setMonth(today.getMonth() - 12);
+
+  // from date + to date picking 만들기 
+
+  const initialState = {
+    modify_date: { fromDate: oneYearAgo, toDate: today, checked: true },
+  }
+
+  const [dates, setDates] = useState(initialState);
+
+  const dateRangeSettings = [
+    { label: t('common.modify_date'), stateKey: 'modify_date', checked: true },
+  ];
+
+    // from date date 1개짜리 picking 만들기 
+  const initialSingleDate = {
+    // ma_finish_date: { fromDate: oneMonthAgo,  checked: false },  
+  };
+  
+  const [singleDate, setSingleDate] = useState(initialSingleDate);
+  
+  const singleDateSettings = [
+     // { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
+    ];
+
+    const handleMultiQueryModalOk = () => {
+
+      //setCompanyState(0);
+      setMultiQueryModal(false);
+  
+      // query condition 세팅 후 query
+      console.log("handleMultiQueryModalOk", queryConditions);
+      let tommorow = new Date();
+      
+      const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+          label: key,
+          fromDate: dates[key].fromDate,
+          toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
+          checked: dates[key].checked,
+      }));
+  
+  
+      const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+        label: key,
+        fromDate: singleDate[key].fromDate,
+        checked: singleDate[key].checked,
+      }));
+      
+      const multiQueryCondi = {
+        queryConditions:queryConditions,
+        checkedDates:checkedDates,
+        singleDate:checkedSingleDates
+      }
+  
+      console.log('multiQueryCondi',multiQueryCondi);
+  
+      tryLoadAllPurchases(multiQueryCondi);
+       
+    };
+    const handleMultiQueryModalCancel = () => {
+      setMultiQueryModal(false);
+    };    
+
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
     tryLoadAllPurchases();
@@ -81,6 +160,10 @@ const Purchase = () => {
     setSearchCondition(newValue);
     filterPurchases(statusSearch, newValue);
   };
+
+  const handleMultiQueryModal = () => {
+    setMultiQueryModal(true);
+  }    
 
   // --- Functions used for Table ------------------------------
   const handleClickPurchase = useCallback((code)=>{
@@ -181,7 +264,33 @@ const Purchase = () => {
   //===== useEffect functions ==========================================
   useEffect(() => {
     tryLoadAllCompanies();
-    tryLoadAllPurchases();
+
+     // query condition 세팅 후 query
+    let tommorow = new Date();
+      
+    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+        label: key,
+        fromDate: dates[key].fromDate,
+        toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
+        checked: dates[key].checked,
+    }));
+
+
+    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+      label: key,
+      fromDate: singleDate[key].fromDate,
+      checked: singleDate[key].checked,
+    }));
+    
+    const multiQueryCondi = {
+      queryConditions:queryConditions,
+      checkedDates:checkedDates,
+      singleDate:checkedSingleDates
+    }
+
+    console.log('tryLoadAllQuotations multiQueryCondi',multiQueryCondi);   
+    tryLoadAllPurchases(multiQueryCondi);
+
     tryLoadAllUsers();
 
     if(((companyState & 1) === 1)
@@ -278,9 +387,18 @@ const Purchase = () => {
                       onChange ={(e) => handleSearchCondition(e.target.value)}
                 />  
               </div>
+              <div className="col text-start" style={{margin:'0px 20px 5px 20px'}}>
+                  <button
+                      className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
+                      id="multi-company-query"
+                      onClick={handleMultiQueryModal}
+                  >
+                      {t('purchase.purchase_multi_query')}
+                  </button>                
+              </div>              
               <div className="col text-end">
                 <ul className="list-inline-item pl-0">
-                  <li className="nav-item dropdown list-inline-item add-lists">
+                  {/* <li className="nav-item dropdown list-inline-item add-lists">
                     <a
                       className="nav-link dropdown-toggle"
                       id="profileDropdown"
@@ -305,7 +423,7 @@ const Purchase = () => {
                         Add New List View
                       </a>
                     </div>
-                  </li>
+                  </li> */}
                   <li className="list-inline-item">
                     <button
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
@@ -466,6 +584,23 @@ const Purchase = () => {
         <PurchaseAddModel init={initAddNewPurchase} handleInit={setInitAddNewPurchase} />
         <PurchaseDetailsModel />
         <CompanyDetailsModel />
+        <MultiQueryModal 
+          title= {t('purchase.purchase_multi_query')}
+          open={multiQueryModal}
+          handleOk={handleMultiQueryModalOk}
+          handleCancel={handleMultiQueryModalCancel}
+          companyColumn={purchaseColumn}
+          queryConditions={queryConditions}
+          setQueryConditions={setQueryConditions}
+          dates={dates}
+          setDates={setDates}
+          dateRangeSettings={dateRangeSettings}
+          initialState={initialState}
+          singleDate={singleDate}
+          setSingleDate={setSingleDate}
+          singleDateSettings={singleDateSettings}
+          initialSingleDate={initialSingleDate}
+        />  
       </div>
     </HelmetProvider>
   );

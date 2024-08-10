@@ -16,7 +16,7 @@ import CompanyDetailsModel from "./CompanyDetailsModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import { companyColumn } from "../../repository/company";
 import TransactionEditModel from "../transactions/TransactionEditModel";
-import TransactionEditBillModel from "../transactions/TransactionEditBillModel";
+import TaxInvoiceEditModel from "../transactions/TaxInvoiceEditModel";
 import { atomUserState } from "../../atoms/atomsUser";
 
 // import { MoreVert } from '@mui/icons-material';
@@ -39,9 +39,9 @@ const Companies = () => {
   //===== Handles to this =============================================================
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ openTransaction, setOpenTransaction ] = useState(false);
-  const [ openBill, setOpenBill ] = useState(false);
-  const [ billData, setBillData ] = useState({});
-  const [ billContents, setBillContents ] = useState({});
+  const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
+  const [ taxInvoiceData, setTaxInvoiceData ] = useState({});
+  const [ taxInvoiceContents, setTaxInvoiceContents ] = useState({});
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
   const [ expanded, setExpaned ] = useState(false);
@@ -66,19 +66,21 @@ const Companies = () => {
   // from date + to date picking 만들기 
 
   const initialState = {
-    registration_date: { fromDate: oneYearAgo, toDate: today, checked: true },
+    registration_date: { fromDate: oneYearAgo, toDate: today, checked: false },
     delivery_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
     hq_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
     ma_finish_date: { fromDate: oneMonthAgo, toDate: today, checked: false },
+    modify_date: { fromDate: oneYearAgo, toDate: today, checked: true },
   };
 
   const [dates, setDates] = useState(initialState);
 
   const dateRangeSettings = [
-    { label: t('purchase.registration_date'), stateKey: 'registration_date', checked: true },
+    { label: t('purchase.registration_date'), stateKey: 'registration_date', checked: false },
     { label: t('purchase.delivery_date'), stateKey: 'delivery_date', checked: false },
     { label: t('purchase.hq_finish_date'), stateKey: 'hq_finish_date', checked: false },
     { label: t('purchase.ma_finish_date'), stateKey: 'ma_finish_date', checked: false },
+    { label: t('common.modify_date'), stateKey: 'modify_date', checked: true },
   ];
 
 
@@ -99,16 +101,17 @@ const Companies = () => {
 
   const handleMultiQueryModalOk = () => {
 
-    setCompanyState(0);
+    //setCompanyState(0);
     setMultiQueryModal(false);
 
     // query condition 세팅 후 query
     console.log("queryConditions", queryConditions);
+    let tommorow = new Date();
 
     const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
       label: key,
       fromDate: dates[key].fromDate,
-      toDate: dates[key].toDate,
+      toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
       checked: dates[key].checked,
     }));
 
@@ -139,30 +142,8 @@ const Companies = () => {
 
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
-    //loadAllCompanies();
-    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
-      label: key,
-      fromDate: dates[key].fromDate,
-      toDate: dates[key].toDate,
-      checked: dates[key].checked,
-    }));
-
-    // console.log("checkedDates", checkedDates);
-
-    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
-      label: key,
-      fromDate: singleDate[key].fromDate,
-      checked: singleDate[key].checked,
-    }));
-
-    const multiQueryCondi = {
-      queryConditions: queryConditions,
-      checkedDates: checkedDates,
-      singleDate: checkedSingleDates
-    }
-
-    // loadAllCompanies(multiQueryCondi);
-    tryLoadAllCompanies(multiQueryCondi);
+    
+    tryLoadAllCompanies();
 
     setExpaned(false);
     setSearchCondition("");
@@ -461,19 +442,22 @@ const Companies = () => {
         </div>
         {/* Modal */}
         <CompanyAddModel init={initToAddCompany} handleInit={setInitToAddCompany} />
-        <CompanyDetailsModel openTransaction={() =>setOpenTransaction(true)}/>
+        <CompanyDetailsModel
+          openTransaction={() =>setOpenTransaction(true)}
+          openTaxInvoice={()=>setOpenTaxInvoice(true)}
+        />
         <TransactionEditModel
           open={openTransaction}
           close={() =>setOpenTransaction(false)}
-          openBill={()=>setOpenBill(true)} 
-          setBillData={setBillData}
-          setBillContents={setBillContents}
+          openTaxInvoice={()=>setOpenTaxInvoice(true)} 
+          setTaxInvoiceData={setTaxInvoiceData}
+          setTaxInvoiceContents={setTaxInvoiceContents}
         />
-        <TransactionEditBillModel
-          open={openBill}
-          close={() =>setOpenBill(false)}
-          data={billData}
-          contents={billContents}
+        <TaxInvoiceEditModel
+          open={openTaxInvoice}
+          close={() =>setOpenTaxInvoice(false)}
+          data={taxInvoiceData}
+          contents={taxInvoiceContents}
         />
         <MultiQueryModal
           title={t('company.company_multi_query')}

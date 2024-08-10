@@ -11,6 +11,7 @@ import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import classNames from 'classnames';
 
 import {
   atomCompanyState,
@@ -25,6 +26,8 @@ import TransactionContentModal from "./TransactionContentModal";
 import TransactionReceiptModal from "./TransactionReceiptModal";
 import MessageModal from "../../constants/MessageModal";
 import TransactionPrint from "./TransactionPrint";
+
+import styles from './TransactionEditModel.module.scss';
 
 const default_transaction_data = {
   title: '',
@@ -49,7 +52,7 @@ const default_receipt_data = {
   card_number: '',
 };
 
-const TransactionEditModel = ({open, close, openBill, setBillData, setBillContents}) => {
+const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, setTaxInvoiceContents}) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [ isMessageModalOpen, setIsMessageModalOpen ] = useState(false);
@@ -240,11 +243,13 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
   };
   
   const handleStartAddContent = () => {
-    if(!transactionChange['company_code']) return;
+    console.log('transaction add');
+    //if(!transactionChange['company_code']) return;
     const tempData = {
       ...dataForTransaction,
       title: t('quotation.add_content'),
     };
+    console.log('transaction add');
     setDataForTransaction(tempData);
     setOrgContentModalData({...DefaultTransactionContent});
     setEditedContentModalData({});
@@ -512,15 +517,15 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
       ...transactionChange,
       ...dataForTransaction,
     };
-    setBillData(tempTransactionData);
-    setBillContents([
+    setTaxInvoiceData(tempTransactionData);
+    setTaxInvoiceContents([
       ...transactionContents,
     ]);
     let oldModal = bootstrap.Modal.getInstance('#edit_transaction');
     if(oldModal) {
         oldModal.hide();
     }
-    openBill();
+    openTaxInvoice();
     setTimeout(()=>{
         let myModal = new bootstrap.Modal(document.getElementById('edit_bill'), {
             keyboard: false
@@ -552,12 +557,15 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
       newTransactionData['action_type'] = 'UPDATE';
       newTransactionData['modify_user'] = cookies.myLationCrmUserId;
     }
-    const result = modifyTransaction(newTransactionData);
-    result.then((res) => {
-      if(res){
+    const resp = modifyTransaction(newTransactionData);
+    resp.then((res) => {
+      if(res.result){
         if(value === 'TaxBill'){
           handleShowTaxBill();
           handleInitialize();
+        } else {
+          let thisModal = bootstrap.Modal.getInstance('#edit_transaction');
+          if(thisModal) thisModal.hide();
         };
       }
       else {
@@ -716,7 +724,7 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
                   <form className="forms-sampme" id="add_new_transaction_form">
                     <div className="card p-3">
                       <Row>
-                        <Col flex={13}>
+                        <div className={styles.upperLeft}>
                           <Row justify="space-around" align="middle">
                             <Col className="trans_title">{t("transaction.statement_of_account")}</Col>
                           </Row>
@@ -733,7 +741,7 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
                               <Row justify='space-between' style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
                                 <Col>
                                   <Select
-                                    className="trans_select"
+                                    className={styles.select}
                                     value={selectData.trans_type}
                                     onChange={selected => handleSelectChange('transaction_type', selected)}
                                     options={trans_types}
@@ -761,7 +769,7 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
                                     selected={transactionChange['publish_date'] ? transactionChange['publish_date'] : orgTransaction.publish_date}
                                     onChange={(date) => handleDateChange('publish_date', date)}
                                     dateFormat="yyyy-MM-dd"
-                                    className="trans_date"
+                                    className={styles.datePicker}
                                   />
                                 </Col>
                               </Row>
@@ -773,13 +781,17 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
                               </Row>
                             </Col>
                           </Row>
-                        </Col>
-                        <Col flex={10} className={`trans_receiver trans_br ${!isSale && 'trans_pur'}`}>
-                          <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`} >{isSale ? t('transaction.receiver') : t('transaction.supplier')}</Col>
-                          <Col flex='auto' align='strech'>
-                            <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
-                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.register_no')}</Col>
-                              <Col flex='auto'>
+                        </div>
+                        <div className={classNames(styles.upperRight, { 'trans_pur': !isSale })}>
+                          <div className={classNames(styles.sm_title, styles.title_wrapper, {'trans_pur': !isSale })}>
+                            <div>{isSale ? t('transaction.receiver') : t('transaction.supplier')}</div>
+                          </div>
+                          <div className={styles.upperItems}>
+                            <div className={classNames(styles.rowItem, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.md_title, styles.title_wrapper, { 'trans_pur': !isSale })}>
+                                <div>{t('transaction.register_no')}</div>
+                              </div>
+                              <div className={classNames(styles.rightCell, styles.title_wrapper)}>
                                 <Input
                                   name='business_registration_code'
                                   value={transactionChange['business_registration_code']
@@ -787,30 +799,36 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
                                     : orgTransaction.business_registration_code}
                                   onChange={handleItemChange}
                                 />
-                              </Col>
-                            </Row>
-                            <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
-                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.company_name')}</Col>
-                              <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
+                              </div>
+                            </div>
+                            <div className={classNames(styles.rowItem, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.md_title, styles.title_wrapper, { 'trans_pur': !isSale })}>
+                                <div>{t('transaction.company_name')}</div>
+                              </div>
+                              <div className={classNames(styles.midCell, styles.title_wrapper)}>
                                 <label>
                                   {transactionChange['company_name']
                                     ? transactionChange['company_name']
                                     : orgTransaction.company_name
                                   }
                                 </label>
-                              </Col>
-                              <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('common.name2')}</Col>
-                              <Col flex={1}>
+                              </div>
+                              <div className={classNames(styles.sm_title, styles.title_wrapper, { 'trans_pur': !isSale })}>
+                                <div>{t('common.name2')}</div>
+                              </div>
+                              <div className={classNames(styles.midCell, styles.title_wrapper)}>
                                 <Input
                                   name='ceo_name'
                                   value={transactionChange['ceo_name'] ? transactionChange['ceo_name'] : orgTransaction.ceo_name}
                                   onChange={handleItemChange}
                                 />
-                              </Col>
-                            </Row>
-                            <Row className={`trans_rec_item ${!isSale && 'trans_pur'}`}>
-                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('transaction.address')}</Col>
-                              <Col flex='auto'>
+                              </div>
+                            </div>
+                            <div className={classNames(styles.rowItem, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.md_title, styles.title_wrapper, { 'trans_pur': !isSale })}>
+                                <div>{t('transaction.address')}</div>
+                              </div>
+                              <div className={classNames(styles.rightCell, styles.title_wrapper)}>
                                 <Input
                                   name='company_address'
                                   value={transactionChange['company_address']
@@ -818,28 +836,32 @@ const TransactionEditModel = ({open, close, openBill, setBillData, setBillConten
                                     : orgTransaction.company_address}
                                   onChange={handleItemChange}
                                 />
-                              </Col>
-                            </Row>
-                            <Row className="trans_rec_item_last">
-                              <Col flex='125px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('company.business_type')}</Col>
-                              <Col flex={1} className={`trans_rec_content ${!isSale && 'trans_pur'}`}>
+                              </div>
+                            </div>
+                            <div className={classNames(styles.rowItemLast, { 'trans_pur': !isSale })}>
+                              <div className={classNames(styles.md_title, styles.title_wrapper, { 'trans_pur': !isSale })}>
+                                <div>{t('company.business_type')}</div>
+                              </div>
+                              <div className={classNames(styles.midCell, styles.title_wrapper)}>
                                 <Input
                                   name='business_type'
                                   value={transactionChange['business_type'] ? transactionChange['business_type'] : orgTransaction.business_type}
                                   onChange={handleItemChange}
                                 />
-                              </Col>
-                              <Col flex='25px' className={`trans_rec_title ${!isSale && 'trans_pur'}`}>{t('company.business_item')}</Col>
-                              <Col flex={1}>
+                              </div>
+                              <div className={classNames(styles.sm_title, styles.title_wrapper, { 'trans_pur': !isSale })}>
+                                <div>{t('company.business_item')}</div>
+                              </div>
+                              <div className={classNames(styles.midCell, styles.title_wrapper)}>
                                 <Input
                                   name='business_item'
                                   value={transactionChange['business_item'] ? transactionChange['business_item'] : orgTransaction.business_item}
                                   onChange={handleItemChange}
                                 />
-                              </Col>
-                            </Row>
-                          </Col>
-                        </Col>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </Row>
                       <Row align='middle'>
                         <Col flex={13} className={`trans_cell_left ${!isSale && "trans_pur"}`}>

@@ -90,7 +90,7 @@ const LeadDetailsModel = () => {
 
 
   //===== Handles to edit 'Lead Details' ===============================================
-  const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
+  const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
   const [editedDetailValues, setEditedDetailValues] = useState({});
 
   const handleDetailChange = useCallback((e) => {
@@ -165,11 +165,14 @@ const LeadDetailsModel = () => {
       lead_code: selectedLead.lead_code,
     };
 
-    if (modifyLead(tempEdited)) {
-      console.log(`Succeeded to lead change status`);
-    } else {
-      console.error('Failed to modify lead')
-    }
+    const resp = modifyLead(tempEdited);
+    resp.then(res => {
+      if (res.result) {
+        console.log(`Succeeded to lead change status`);
+      } else {
+        console.error('Failed to modify lead : ', res.data);
+      };
+    })
   };
 
   const handleClose = useCallback(() => {
@@ -209,11 +212,14 @@ const LeadDetailsModel = () => {
           temp_update_company['action_type'] = 'UPDATE';
           temp_update_company['modify_user'] = cookies.myLationCrmUserId;
           temp_update_company['company_code'] = currentCompany.company_code;
-          if (modifyCompany(temp_update_company)) {
-            console.log(`Succeeded to modify company`);
-          } else {
-            console.error('Failed to modify company');
-          };
+          const resp = modifyCompany(temp_update_company);
+          resp.then(res => {
+            if (res.result) {
+              console.log(`Succeeded to modify company`);
+            } else {
+              console.error('Failed to modify company : ', res.data);
+            };
+          });
         };
       } else {
         console.error('Failed to modify lead')
@@ -265,7 +271,7 @@ const LeadDetailsModel = () => {
   const [quotationsByLead, setQuotationsByLead] = useState([]);
   const [initAddQuotation, setInitAddQuotation] = useState(false);
 
-  
+
   //===== Handles related with Search ===============================================  
   const [searchQuotationCondition, setSearchQuotationCondition] = useState("");
   const [searchPurchaseCondition, setSearchPurchaseCondition] = useState("");
@@ -360,19 +366,19 @@ const LeadDetailsModel = () => {
     tryLoadAllQuotations();
     if ((quotationState & 1) === 1) {
       const tempQuotationsByLead = allQuotations.filter(item => item.lead_code === selectedLead.lead_code);
-      if(quotationsByLead.length !== tempQuotationsByLead.length) {
+      if (quotationsByLead.length !== tempQuotationsByLead.length) {
         setQuotationsByLead(tempQuotationsByLead);
       };
     };
   }, [allQuotations, quotationState, quotationsByLead, selectedLead.lead_code]);
 
   useEffect(() => {
-    if (((companyState & 1) === 1) 
+    if (((companyState & 1) === 1)
       && ((userState & 1) === 1)
       && ((purchaseState & 1) === 1)
       && ((consultingState & 1) === 1)
       && ((quotationState & 1) === 1)
-    ){
+    ) {
       console.log('[LeadDetailModel] all needed data is loaded');
       setIsAllNeededDataLoaded(true);
     };

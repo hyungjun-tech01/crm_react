@@ -78,25 +78,25 @@ const Consultings = () => {
   // from date + to date picking 만들기 
 
   const initialState = {
-    registration_date: { fromDate: oneYearAgo, toDate: today, checked: true },
+    modify_date: { fromDate: oneYearAgo, toDate: today, checked: true },
   }
 
   const [dates, setDates] = useState(initialState);
 
   const dateRangeSettings = [
-    { label: t('purchase.registration_date'), stateKey: 'registration_date', checked: true },
+    { label: t('common.modify_date'), stateKey: 'modify_date', checked: true },
   ];
 
-  // from date date 1개짜리 picking 만들기 
-  const initialSingleDate = {
-    ma_finish_date: { fromDate: oneMonthAgo,  checked: false },  
-  };
+    // from date date 1개짜리 picking 만들기 
+    const initialSingleDate = {
+      //ma_finish_date: { fromDate: oneMonthAgo,  checked: false },  
+    };
   
-  const [singleDate, setSingleDate] = useState(initialSingleDate);
-
-  const singleDateSettings = [
-    { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
-  ];
+    const [singleDate, setSingleDate] = useState(initialSingleDate);
+  
+    const singleDateSettings = [
+      //{ label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
+    ];
 
   const handleMultiQueryModal = () => {
     setMultiQueryModal(true);
@@ -108,11 +108,12 @@ const Consultings = () => {
 
     // query condition 세팅 후 query
     console.log("handleMultiQueryModalOk", queryConditions);
+    let tommorow = new Date();
     
     const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
         label: key,
         fromDate: dates[key].fromDate,
-        toDate: dates[key].toDate,
+        toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
         checked: dates[key].checked,
     }));
 
@@ -132,6 +133,7 @@ const Consultings = () => {
     console.log('multiQueryCondi',multiQueryCondi);
     //tryLoadAllLeads(multiQueryCondi);   
     //loadAllLeads(multiQueryCondi);
+    loadAllConsultings(multiQueryCondi);
      
   };
   const handleMultiQueryModalCancel = () => {
@@ -145,7 +147,29 @@ const Consultings = () => {
 
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
-    loadAllConsultings();
+
+    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+      label: key,
+      fromDate: dates[key].fromDate,
+      toDate: dates[key].toDate,
+      checked: dates[key].checked,
+  }));
+
+
+  const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+    label: key,
+    fromDate: singleDate[key].fromDate,
+    checked: singleDate[key].checked,
+  }));
+  
+  const multiQueryCondi = {
+    queryConditions:queryConditions,
+    checkedDates:checkedDates,
+    singleDate:checkedSingleDates
+  }
+  
+    loadAllConsultings(multiQueryCondi);
+    
     setExpaned(false);
     setSearchCondition("");
   };
@@ -252,7 +276,34 @@ const Consultings = () => {
   useEffect(() => {
     tryLoadAllCompanies();
     tryLoadAllLeads();
-    tryLoadAllConsultings();
+
+     // query condition 세팅 후 query
+     let tommorow = new Date();
+     
+     const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+         label: key,
+         fromDate: dates[key].fromDate,
+         toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
+         checked: dates[key].checked,
+     }));
+ 
+
+     const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+       label: key,
+       fromDate: singleDate[key].fromDate,
+       checked: singleDate[key].checked,
+     }));
+     
+     const multiQueryCondi = {
+       queryConditions:queryConditions,
+       checkedDates:checkedDates,
+       singleDate:checkedSingleDates
+     }
+ 
+    console.log('multiQueryCondi',multiQueryCondi);
+
+    tryLoadAllConsultings(multiQueryCondi);
+
     tryLoadAllUsers();
 
     if(((companyState & 1) === 1)
