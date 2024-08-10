@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
@@ -10,11 +10,7 @@ import { option_locations, option_deal_type } from "../../constants/constants";
 import {
   atomCurrentCompany,
   defaultCompany,
-  atomAllPurchaseObj,
-  atomPurchaseState,
   atomAllTransactions,
-  atomTransactionState,
-  atomTaxInvoiceState,
   atomTaxInvoiceSet,
 } from "../../atoms/atoms";
 import {
@@ -40,6 +36,9 @@ import { TaxInvoiceRepo } from "../../repository/tax_invoice";
 const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+  const [checkState,  setCheckState] = useState({
+    purchase: false, transaction: false, taxInvoice: false,
+  });
 
 
   //===== [RecoilState] Related with Company ==========================================
@@ -48,22 +47,21 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
 
 
   //===== [RecoilState] Related with Purchase =========================================
-  const purchaseState = useRecoilValue(atomPurchaseState);
-  const { tryLoadAllPurchases } = useRecoilValue(PurchaseRepo);
-  const allPurchases = useRecoilValue(atomAllPurchaseObj);
+  // const purchaseState = useRecoilValue(atomPurchaseState);
+  const { searchPurchases } = useRecoilValue(PurchaseRepo);
+  // const allPurchases = useRecoilValue(atomAllPurchaseObj);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
 
   //===== [RecoilState] Related with Transaction ======================================
-  const transactionState = useRecoilValue(atomTransactionState);
-  const { tryLoadAllTransactions } = useRecoilValue(TransactionRepo);
+  // const transactionState = useRecoilValue(atomTransactionState);
+  const { searchTransactions } = useRecoilValue(TransactionRepo);
   const allTransactions = useRecoilValue(atomAllTransactions);
 
 
   //===== [RecoilState] Related with Tax Invoice ======================================
-  const [taxInvoiceState, setTaxInvoiceState] = useRecoilState(atomTaxInvoiceState);
-  const { tryLoadTaxInvoices } = useRecoilValue(TaxInvoiceRepo);
-  const taxInvoiceSet = useRecoilValue(atomTaxInvoiceSet);
+  // const [taxInvoiceState, setTaxInvoiceState] = useRecoilState(atomTaxInvoiceState);
+  const { tryLoadTaxInvoices, searchTaxInvoices } = useRecoilValue(TaxInvoiceRepo);
 
 
   //===== [RecoilState] Related with Users ============================================
@@ -90,6 +88,7 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
   const [initAddPurchase, setInitAddPurchase] = useState(false);
   const [transactionByCompany, setTransactionByCompany] = useState([]);
   const [validMACount, setValidMACount] = useState(0);
+  const [taxInvoiceByCompany, setTaxInvoiceByCompany] = useState([]);
 
   const handleDetailChange = useCallback(
     (e) => {
@@ -318,8 +317,9 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
         setIsFullScreen(false);
       } else {
         setIsFullScreen(true);
-      }
+      };
 
+      setCheckState({purchase:false, transaction:false, taxInvoice:false});
       loadCompanyMAContracts(selectedCompany.company_code);
       setCurrentCompanyCode(selectedCompany.company_code);
     }
@@ -327,75 +327,82 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
 
   //===== useEffect for Purchase =======================================================
   useEffect(() => {
-    tryLoadAllPurchases();
-    if ((purchaseState & 1) === 1) {
-      console.log("[CompanyDetailModel] useEffect / Purchase");
-      const tempCompanyPurchases = allPurchases.filter(
-        (purchase) => purchase.company_code === selectedCompany.company_code
-      );
-      if (purchasesByCompany.length !== tempCompanyPurchases.length) {
-        console.log(
-          "[CompanyDetailsModel] set purchasesBycompany / set MA Count"
-        );
-        setPurchasesByCompany(tempCompanyPurchases);
-
-        let valid_count = 0;
-        tempCompanyPurchases.forEach((item) => {
-          if (item.ma_finish_date && new Date(item.ma_finish_date) > Date.now())
-            valid_count++;
+    if(!!selectedCompany.company_code && !checkState.purchase) {
+      const queryPromise = searchPurchases('company_code', selectedCompany.company_code, true);
+      queryPromise
+        .then(res => {
+          if(res.result) {
+            setPurchasesByCompany(res.data);
+  
+            let valid_count = 0;
+            res.data.forEach((item) => {
+              if (item.ma_finish_date && new Date(item.ma_finish_date) > Date.now())
+                valid_count++;
+            });
+            setValidMACount(valid_count);
+          } else {
+            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
+            setPurchasesByCompany([]);
+            setValidMACount(0);
+          };
+          setCheckState({
+            ...checkState,
+            purchase: true,
+          });
         });
-        setValidMACount(valid_count);
-      }
     }
-  }, [
-    purchaseState,
-    allPurchases,
-    purchasesByCompany,
-    selectedCompany.company_code,
-  ]);
+  }, [checkState, searchPurchases, selectedCompany.company_code]);
 
   //===== useEffect for Transaction ====================================================
   useEffect(() => {
-    tryLoadAllTransactions();
-    if ((transactionState & 1) === 1) {
-      const tempCompanyTransactions = allTransactions.filter(
-        (transaction) =>
-          transaction.company_name === selectedCompany.company_name
-      );
-      if (transactionByCompany.length !== tempCompanyTransactions.length) {
-        console.log("CompanyDetailsModel / update setTransactionByCompany");
-        setTransactionByCompany(tempCompanyTransactions);
-      }
+    if(!!selectedCompany.company_code && !checkState.transaction) {
+      const queryPromise = searchTransactions('company_code', selectedCompany.company_code, true);
+      queryPromise
+        .then(res => {
+          if(res.result) {
+            setTransactionByCompany(res.data);
+          } else {
+            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
+            setTransactionByCompany([]);
+          };
+          setCheckState({
+            ...checkState,
+            transaction: true,
+          });
+        });
     }
-  }, [
-    transactionState,
-    allTransactions,
-    transactionByCompany.length,
-    selectedCompany.company_name,
-  ]);
+  }, [checkState, searchTransactions, selectedCompany.company_code]);
+
+  //===== useEffect for Tax Invoice ====================================================
+  useEffect(() => {
+    if(!!selectedCompany.company_code && !checkState.taxInvoice) {
+      const queryPromise = searchTaxInvoices('company_code', selectedCompany.company_code, true);
+      queryPromise
+        .then(res => {
+          if(res.result) {
+            setTaxInvoiceByCompany(res.data);
+          } else {
+            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
+            setTaxInvoiceByCompany([]);
+          };
+          setCheckState({
+            ...checkState,
+            taxInvoice: true,
+          });
+        });
+    }
+  }, [checkState, searchTransactions, selectedCompany.company_code]);
 
 
   //===== useEffect for User ==========================================================
   useEffect(() => {
     console.log('[CompanyDetailsModel] useEffect / userState :', userState);
-    if (((purchaseState & 1) === 1)
-      && ((transactionState & 1) === 1)
+    if (checkState.purchase && checkState.transaction && checkState.taxInvoice
       && ((userState & 1) === 1)
      ){
-      if ((taxInvoiceState & 3) === 0) {
-        tryLoadTaxInvoices(selectedCompany.company_code);
-      } else if ((taxInvoiceState & 1) === 1) {
-        if((taxInvoiceSet.length > 0) 
-          && (taxInvoiceSet[0].company_code !== selectedCompany.company_code)
-        ) {
-          setTaxInvoiceState(0);
-          tryLoadTaxInvoices(selectedCompany.company_code);
-        } else {
-          setIsAllNeededDataLoaded(true);
-        };
-      }
-    }
-  }, [purchaseState, transactionState, taxInvoiceState, userState, taxInvoiceSet]);
+      setIsAllNeededDataLoaded(true);
+    };
+  }, [checkState, userState]);
 
   if (!isAllNeededDataLoaded)
     return <div>&nbsp;</div>;
@@ -501,7 +508,7 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
                     >
                       {t("transaction.tax_bill") +
                         "(" +
-                        taxInvoiceSet.length +
+                        taxInvoiceByCompany.length +
                         ")"}
                     </Link>
                   </li>

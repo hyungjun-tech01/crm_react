@@ -147,14 +147,16 @@ const Companies = () => {
 
     setExpaned(false);
     setSearchCondition("");
-  }
+  };
 
   // --- Functions used for Table ------------------------------
   const handleClickCompanyName = useCallback((id) => {
     console.log('[Company] set current company : ', id);
     setCurrentCompany(id);
     setTimeout(()=>{
-      let myModal = bootstrap.Modal.getOrCreateInstance('#company-details');
+      let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
+        keyboard: false
+      });
       myModal.show();
     }, 500);
     
@@ -207,7 +209,6 @@ const Companies = () => {
   }, [setInitToAddCompany]);
 
   useEffect(() => {
-
     const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
       label: key,
       fromDate: dates[key].fromDate,

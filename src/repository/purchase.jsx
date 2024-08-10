@@ -41,7 +41,11 @@ export const PurchaseRepo = selector({
         const loadAllPurchases = getCallback(({set}) => async (multiQueryCondi) => {
             const input_json = JSON.stringify(multiQueryCondi);
             try{
-                const response = await fetch(`${BASE_PATH}/purchases`);
+                const response = await fetch(`${BASE_PATH}/purchases`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
                 const data = await response.json();
                 if(data.message){
                     console.log('loadAllPurchases message:', data.message);
@@ -233,14 +237,14 @@ export const PurchaseRepo = selector({
                 console.error(`setCurrentPurchase / Error : ${err}`);
             };
         });
-        const searchPurchases = getCallback(({set, snapshot}) => async (itemName, filterText) => {
+        const searchPurchases = getCallback(() => async (itemName, filterText, isAccurate = false) => {
             // At first, request data to server
             let foundInServer = {};
             let foundData = [];
             const query_obj = {
                 queryConditions: [{
-                    column: { value: itemName},
-                    columnQueryCondition: { value: 'like'},
+                    column: { value: `tpi.${itemName}`},
+                    columnQueryCondition: { value: isAccurate ? '=' : 'like'},
                     multiQueryInput: filterText,
                     andOr: 'And',
                 }],
@@ -273,17 +277,17 @@ export const PurchaseRepo = selector({
                 return { result: false, message: 'fail to query'};
             };
 
-            //----- Update AllPurchaseObj --------------------------//
-            const allPurchaseData = await snapshot.getPromise(atomAllPurchaseObj);
-            const updatedAllPurchaseData = {
-                ...allPurchaseData,
-                ...foundInServer,
-            };
-            set(atomAllPurchaseObj, updatedAllPurchaseData);
+            // //----- Update AllPurchaseObj --------------------------//
+            // const allPurchaseData = await snapshot.getPromise(atomAllPurchaseObj);
+            // const updatedAllPurchaseData = {
+            //     ...allPurchaseData,
+            //     ...foundInServer,
+            // };
+            // set(atomAllPurchaseObj, updatedAllPurchaseData);
 
-            //----- Update FilteredPurchases -----------------------//
-            const updatedList = Object.values(updatedAllPurchaseData);
-            set(atomFilteredPurchaseArray, updatedList);
+            // //----- Update FilteredPurchases -----------------------//
+            // const updatedList = Object.values(updatedAllPurchaseData);
+            // set(atomFilteredPurchaseArray, updatedList);
             
             return { result: true, data: foundData};
         });

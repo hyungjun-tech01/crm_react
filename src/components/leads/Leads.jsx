@@ -174,7 +174,7 @@ const Leads = () => {
       keyboard: false
     });
     myModal.show();
-  }, []);
+  }, [loadCompanyConsultings, loadCompanyPurchases, loadCompanyQuotations, setCurrentCompany, setCurrentLead]);
 
 
   const [ expanded, setExpaned ] = useState(false);

@@ -187,12 +187,67 @@ export const TransactionRepo = selector({
                 console.error(`setCurrentTransaction / Error : ${err}`);
             };
         });
+        const searchTransactions = getCallback(() => async (itemName, filterText, isAccurate = false) => {
+            // At first, request data to server
+            let foundInServer = {};
+            let foundData = [];
+            const query_obj = {
+                queryConditions: [{
+                    column: { value: itemName},
+                    columnQueryCondition: { value: isAccurate ? '=' : 'like'},
+                    multiQueryInput: filterText,
+                    andOr: 'And',
+                }],
+            };
+            const input_json = JSON.stringify(query_obj);
+            try{
+                const response = await fetch(`${BASE_PATH}/transactions`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+                const data = await response.json();
+                if(data.message){
+                    console.log('\t[ searchTransactions ] message:', data.message);
+                    return { result: false, message: data.message};
+                } else {
+                    for(const item of data) {
+                        foundInServer[item.purchase_code] = item;
+                    };
+                    foundData = data.sort((a, b) => {
+                        const a_date = new Date(a.modify_date);
+                        const b_date = new Date(b.modify_date);
+                        if(a_date > b_date) return 1;
+                        if(a_date < b_date) return -1;
+                        return 0;
+                    });
+                };
+            } catch(e) {
+                console.log('\t[ searchTransactions ] error occurs on searching');
+                return { result: false, message: 'fail to query'};
+            };
+
+            // //----- Update AllTransactionObj --------------------------//
+            // const allTransactionData = await snapshot.getPromise(atomAllTransactionObj);
+            // const updatedAllTransactionData = {
+            //     ...allTransactionData,
+            //     ...foundInServer,
+            // };
+            // set(atomAllTransactionObj, updatedAllTransactionData);
+
+            // //----- Update FilteredTransactions -----------------------//
+            // const updatedList = Object.values(updatedAllTransactionData);
+            // set(atomFilteredTransactionArray, updatedList);
+            
+            return { result: true, data: foundData};
+        });
         return {
             tryLoadAllTransactions,
             loadAllTransactions,
             modifyTransaction,
             setCurrentTransaction,
             filterTransactions,
+            searchTransactions,
         };
     }
 });

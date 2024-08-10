@@ -53,7 +53,7 @@ const LeadDetailsModel = () => {
 
   //===== [RecoilState] Related with Purchase =======================================
   const purchaseState = useRecoilValue(atomPurchaseState);
-  const { tryLoadAllPurchases } = useRecoilValue(PurchaseRepo)
+  const { searchPurchases } = useRecoilValue(PurchaseRepo)
   const allPurchases = useRecoilValue(atomAllPurchaseObj);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
@@ -331,23 +331,31 @@ const LeadDetailsModel = () => {
     };
   }, [isAllNeededDataLoaded, selectedLead, currentLeadCode, companyState, setCurrentCompany, loadCompanyMAContracts]);
 
+  //===== useEffect for Purchase =======================================================
   useEffect(() => {
-    tryLoadAllPurchases();
-    if ((purchaseState & 1) === 1) {
-      const tempCompanyPurchases = allPurchases.filter(purchase => purchase.company_code === currentCompany.company_code);
-      if (purchasesByCompany.length !== tempCompanyPurchases.length) {
-        console.log('[CompanyDetailsModel] set purchasesBycompany / set MA Count');
-        setPurchasesByCompany(tempCompanyPurchases);
-
-        let valid_count = 0;
-        tempCompanyPurchases.forEach(item => {
-          if (item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now())) valid_count++;
+    if(!!currentCompany.company_code) {
+      const queryPromise = searchPurchases('company_code', currentCompany.company_code, true);
+      queryPromise
+        .then(res => {
+          if(res.result) {
+            setPurchasesByCompany(res.data);
+  
+            let valid_count = 0;
+            res.data.forEach((item) => {
+              if (item.ma_finish_date && new Date(item.ma_finish_date) > Date.now())
+                valid_count++;
+            });
+            setValidMACount(valid_count);
+          } else {
+            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
+            setPurchasesByCompany([]);
+            setValidMACount(0);
+          };
         });
-        setValidMACount(valid_count);
-      };
-    };
-  }, [purchaseState, allPurchases, purchasesByCompany, currentCompany.company_code]);
+    }
+  }, [currentCompany.company_code, searchPurchases]);
 
+  //===== useEffect for Consulting =======================================================
   useEffect(() => {
     tryLoadAllConsultings();
     if ((consultingState & 1) === 1) {
