@@ -253,7 +253,7 @@ const ConsultingAddModel = (props) => {
                   onChange={handleSelectChange}
                 />
               </div>
-              {(consultingChange.lead_name !== null) &&
+              {!!consultingChange.lead_name &&
                 <div className="form-group row">
                   <div className="col-sm-12">
                     <table className="table">
