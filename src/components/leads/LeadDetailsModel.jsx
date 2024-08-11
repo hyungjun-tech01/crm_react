@@ -263,6 +263,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
   //===== Handles to edit 'Quotation Add/Details' ===============================================
   const [quotationsByLead, setQuotationsByLead] = useState([]);
   const [initAddQuotation, setInitAddQuotation] = useState(false);
+  const [initEditQuotation, setInitEditQuotation] = useState(false);
 
 
   //===== Handles related with Search ===============================================  
@@ -645,7 +646,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
       <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} leadCode={selectedLead.lead_code} />
       <ConsultingDetailsModel />
       <QuotationAddModel init={initAddQuotation} handleInit={setInitAddQuotation} leadCode={selectedLead.lead_code} />
-      <QuotationDetailsModel />
+      <QuotationDetailsModel  init={initEditQuotation} handleInit={setInitEditQuotation}/>
       <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} companyCode={selectedLead.company_code} />
       <PurchaseDetailsModel />
     </>
