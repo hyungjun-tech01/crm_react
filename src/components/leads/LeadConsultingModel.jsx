@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { Add } from "@mui/icons-material";
 
-import { ConsultingRepo } from "../../repository/consulting";
-
+import { atomCurrentConsulting, defaultConsulting } from "../../atoms/atoms";
 
 const LeadConsultingModel = (props) => {
     const { consultings, handleInitAddConsulting } = props;
@@ -15,7 +14,7 @@ const LeadConsultingModel = (props) => {
 
 
     //===== [RecoilState] Related with Consulting ==========================================
-    const { setCurrentConsulting } = useRecoilValue(ConsultingRepo);
+    const setCurrentConsulting = useSetRecoilState(atomCurrentConsulting);
 
 
     //===== Handles to deal this component =================================================
@@ -29,7 +28,7 @@ const LeadConsultingModel = (props) => {
     };
 
     const handleAddNewConsulting = () => {
-        setCurrentConsulting();
+        setCurrentConsulting(defaultConsulting);
         handleInitAddConsulting(true);
         transferToOtherModal('add_consulting');
     };
@@ -92,10 +91,10 @@ const LeadConsultingModel = (props) => {
             if (selectedRows.length > 0) {
                 // Set data to edit selected consulting ----------------------
                 const selectedValue = selectedRows.at(0);
-                setCurrentConsulting(selectedValue.consulting_code);
+                setCurrentConsulting(selectedValue);
                 setSelectedRowKeys([]);   //initialize the selected list about contract
             } else {
-                setCurrentConsulting();
+                setCurrentConsulting(defaultConsulting);
             };
         },
         getCheckboxProps: (record) => ({
@@ -147,7 +146,7 @@ const LeadConsultingModel = (props) => {
                                 return {
                                     onClick: (event) => {
                                         setSelectedRowKeys([record.consulting_code]);
-                                        setCurrentConsulting(record.consulting_code);
+                                        setCurrentConsulting(record);
                                         transferToOtherModal('consulting-details');
                                         setSelectedRowKeys([]);   //initialize the selected list about contract
                                     }, // click row

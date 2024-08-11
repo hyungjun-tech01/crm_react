@@ -213,14 +213,14 @@ export const CompanyRepo = selector({
                 set(atomCurrentCompany, defaultCompany);
             };
         });
-        const searchCompanies = getCallback(({set, snapshot}) => async (itemName, filterText) => {
+        const searchCompanies = getCallback(() => async (itemName, filterText, isAccurate = false) => {
             // At first, request data to server
             let foundInServer = {};
             let foundData = [];
             const query_obj = {
                 queryConditions: [{
                     column: { value: itemName},
-                    columnQueryCondition: { value: 'like'},
+                    columnQueryCondition: { value: isAccurate ? '=' : 'like'},
                     multiQueryInput: filterText,
                     andOr: 'And',
                 }],
@@ -251,17 +251,17 @@ export const CompanyRepo = selector({
                 return { result: false, message: 'fail to query'};
             };
 
-            //----- Update AllCompanyObj --------------------------//
-            const allCompanyData = await snapshot.getPromise(atomAllCompanyObj);
-            const updatedAllCompanyData = {
-                ...allCompanyData,
-                ...foundInServer,
-            };
-            set(atomAllCompanyObj, updatedAllCompanyData);
+            // //----- Update AllCompanyObj --------------------------//
+            // const allCompanyData = await snapshot.getPromise(atomAllCompanyObj);
+            // const updatedAllCompanyData = {
+            //     ...allCompanyData,
+            //     ...foundInServer,
+            // };
+            // set(atomAllCompanyObj, updatedAllCompanyData);
 
-            //----- Update FilteredCompanies -----------------------//
-            const updatedList = Object.values(updatedAllCompanyData);
-            set(atomFilteredCompanyArray, updatedList);
+            // //----- Update FilteredCompanies -----------------------//
+            // const updatedList = Object.values(updatedAllCompanyData);
+            // set(atomFilteredCompanyArray, updatedList);
             
             return { result: true, data: foundData};
         });

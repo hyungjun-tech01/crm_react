@@ -169,24 +169,24 @@ export const TransactionRepo = selector({
                 return {result:false, data: err};
             };
         });
-        const setCurrentTransaction = getCallback(({ set, snapshot }) => async (transaction_code) => {
-            try {
-                if(transaction_code === undefined || transaction_code === null) {
-                    set(atomCurrentTransaction, defaultTransaction);
-                    return;
-                };
-                const allTransactions = await snapshot.getPromise(atomAllTransactions);
-                const selected_arrary = allTransactions.filter(transaction => transaction.transaction_code === transaction_code);
-                if (selected_arrary.length > 0) {
-                    set(atomCurrentTransaction, selected_arrary[0]);
-                } else {
-                    set(atomCurrentTransaction, defaultTransaction);
-                }
-            }
-            catch (err) {
-                console.error(`setCurrentTransaction / Error : ${err}`);
-            };
-        });
+        // const setCurrentTransaction = getCallback(({ set, snapshot }) => async (transaction_code) => {
+        //     try {
+        //         if(transaction_code === undefined || transaction_code === null) {
+        //             set(atomCurrentTransaction, defaultTransaction);
+        //             return;
+        //         };
+        //         const allTransactions = await snapshot.getPromise(atomAllTransactions);
+        //         const selected_arrary = allTransactions.filter(transaction => transaction.transaction_code === transaction_code);
+        //         if (selected_arrary.length > 0) {
+        //             set(atomCurrentTransaction, selected_arrary[0]);
+        //         } else {
+        //             set(atomCurrentTransaction, defaultTransaction);
+        //         }
+        //     }
+        //     catch (err) {
+        //         console.error(`setCurrentTransaction / Error : ${err}`);
+        //     };
+        // });
         const searchTransactions = getCallback(() => async (itemName, filterText, isAccurate = false) => {
             // At first, request data to server
             let foundInServer = {};
@@ -245,7 +245,7 @@ export const TransactionRepo = selector({
             tryLoadAllTransactions,
             loadAllTransactions,
             modifyTransaction,
-            setCurrentTransaction,
+            // setCurrentTransaction,
             filterTransactions,
             searchTransactions,
         };

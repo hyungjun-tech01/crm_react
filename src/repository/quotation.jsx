@@ -211,33 +211,87 @@ export const QuotationRepo = selector({
                 return {result:false, data: err};
             };
         });
-        const setCurrentQuotation = getCallback(({set, snapshot}) => async (quotation_code) => {
-            try{
-                if(quotation_code === undefined || quotation_code === null) {
-                    set(atomCurrentQuotation, defaultQuotation);
-                    return;
-                };
-                let queriedQotations = await snapshot.getPromise(atomAllQuotations);
-                if(queriedQotations.length === 0){
-                    queriedQotations = await snapshot.getPromise(atomCompanyQuotations);
-                };
-                const selected_arrary = queriedQotations.filter(quotation => quotation.quotation_code === quotation_code);
-                if(selected_arrary.length > 0){
-                    set(atomCurrentQuotation, selected_arrary[0]);
-                }
-            }
-            catch(err){
-                console.error(`setCurrentQuotation / Error : ${err}`);
+        // const setCurrentQuotation = getCallback(({set, snapshot}) => async (quotation_code) => {
+        //     try{
+        //         if(quotation_code === undefined || quotation_code === null) {
+        //             set(atomCurrentQuotation, defaultQuotation);
+        //             return;
+        //         };
+        //         let queriedQotations = await snapshot.getPromise(atomAllQuotations);
+        //         if(queriedQotations.length === 0){
+        //             queriedQotations = await snapshot.getPromise(atomCompanyQuotations);
+        //         };
+        //         const selected_arrary = queriedQotations.filter(quotation => quotation.quotation_code === quotation_code);
+        //         if(selected_arrary.length > 0){
+        //             set(atomCurrentQuotation, selected_arrary[0]);
+        //         }
+        //     }
+        //     catch(err){
+        //         console.error(`setCurrentQuotation / Error : ${err}`);
+        //     };
+        // });
+        const searchQuotations = getCallback(() => async (itemName, filterText, isAccurate = false) => {
+            // At first, request data to server
+            let foundInServer = {};
+            let foundData = [];
+            const query_obj = {
+                queryConditions: [{
+                    column: { value: itemName},
+                    columnQueryCondition: { value: isAccurate ? '=' : 'like'},
+                    multiQueryInput: filterText,
+                    andOr: 'And',
+                }],
             };
+            const input_json = JSON.stringify(query_obj);
+            try{
+                const response = await fetch(`${BASE_PATH}/quotations`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+
+                const data = await response.json();
+                if(data.message){
+                    console.log('\t[ searchQuotations ] message:', data.message);
+                    return { result: false, message: data.message};
+                } else {
+                    for(const item of data) {
+                        foundInServer[item.quotation_code] = item;
+                    };
+                    foundData = data.sort((a, b) => {
+                        if(a.quotation_name > b.quotation_name) return 1;
+                        if(a.quotation_name < b.quotation_name) return -1;
+                        return 0;
+                    });
+                };
+            } catch(e) {
+                console.log('\t[ searchQuotations ] error occurs on searching');
+                return { result: false, message: 'fail to query'};
+            };
+
+            // //----- Update AllQuotationObj --------------------------//
+            // const allQuotationData = await snapshot.getPromise(atomAllQuotationObj);
+            // const updatedAllQuotationData = {
+            //     ...allQuotationData,
+            //     ...foundInServer,
+            // };
+            // set(atomAllQuotationObj, updatedAllQuotationData);
+
+            // //----- Update FilteredQuotationArray --------------------//
+            // const updatedList = Object.values(updatedAllQuotationData);
+            // set(atomFilteredQuotationArray, updatedList);
+
+            return { result: true, data: foundData};
         });
         return {
             tryLoadAllQuotations,
             loadAllQuotations,
             modifyQuotation,
-            setCurrentQuotation,
+            // setCurrentQuotation,
             filterQuotations,
             loadCompanyQuotations,
             filterCompanyQuotation,
+            searchQuotations,
         };
     }
 });

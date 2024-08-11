@@ -6,10 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Avatar, Space, Switch } from "antd";
 import {
   atomCurrentLead, defaultLead,
-  atomCurrentCompany, atomCompanyState, atomCompanyForSelection,
-  atomPurchaseState, atomAllPurchaseObj,
-  atomConsultingState, atomAllConsultingObj,
-  atomQuotationState, atomAllQuotations,
+  atomCurrentCompany,
 } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo } from "../../repository/company";
@@ -34,9 +31,12 @@ import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
 import PurchaseAddModel from "../purchase/PurchaseAddModel";
 
 
-const LeadDetailsModel = () => {
+const LeadDetailsModel = ({init, handleInit}) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+  const [checkState,  setCheckState] = useState({
+    purchase: false, consulting: false, quotation: false,
+  });
 
 
   //===== [RecoilState] Related with Lead ==========================================
@@ -45,28 +45,21 @@ const LeadDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Company =======================================
-  const companyState = useRecoilValue(atomCompanyState);
   const currentCompany = useRecoilValue(atomCurrentCompany);
   const { modifyCompany, setCurrentCompany, searchCompanies } = useRecoilValue(CompanyRepo);
-  const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
   //===== [RecoilState] Related with Purchase =======================================
-  const purchaseState = useRecoilValue(atomPurchaseState);
   const { searchPurchases } = useRecoilValue(PurchaseRepo)
-  const allPurchases = useRecoilValue(atomAllPurchaseObj);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
 
   //===== [RecoilState] Related with Consulting =======================================
-  const consultingState = useRecoilValue(atomConsultingState);
-  const { tryLoadAllConsultings, searchConsultings } = useRecoilValue(ConsultingRepo);
+  const { searchConsultings } = useRecoilValue(ConsultingRepo);
 
 
   //===== [RecoilState] Related with Quotation ========================================
-  const quotationState = useRecoilValue(atomQuotationState);
-  const { tryLoadAllQuotations } = useRecoilValue(QuotationRepo);
-  const allQuotations = useRecoilValue(atomAllQuotations);
+  const { searchQuotations } = useRecoilValue(QuotationRepo);
 
 
   //===== [RecoilState] Related with Users ==========================================
@@ -90,7 +83,7 @@ const LeadDetailsModel = () => {
 
 
   //===== Handles to edit 'Lead Details' ===============================================
-  const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
+  // const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
   const [editedDetailValues, setEditedDetailValues] = useState({});
 
   const handleDetailChange = useCallback((e) => {
@@ -303,12 +296,11 @@ const LeadDetailsModel = () => {
 
   //===== useEffect functions ===============================================  
   useEffect(() => {
-    if (isAllNeededDataLoaded
+    if (init
       && (selectedLead !== defaultLead)
       && (selectedLead.lead_code !== currentLeadCode)
-      && ((companyState & 1) === 1)
     ) {
-      console.log('[LeadDetailsModel] useEffect / lead');
+      console.log('[LeadDetailsModel] new lead is loaded');
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {
@@ -319,22 +311,29 @@ const LeadDetailsModel = () => {
       } else {
         setIsFullScreen(true);
       };
-
-      setCurrentLeadCode(selectedLead.company_code);
-      const companyByLeadArray = searchCompanies('company_code', selectedLead.company_code);
+      
+      setCurrentLeadCode(selectedLead.lead_code);
+      const companyByLeadArray = searchCompanies('company_code', selectedLead.company_code, true);
       companyByLeadArray.then(res => {
-          if(res.result) {
-            setCurrentCompany(res.data[0]);
-            loadCompanyMAContracts(res.data[0].company_code);
-          };
-        });
+        if(res.result) {
+          setCurrentCompany(res.data[0]);
+          loadCompanyMAContracts(res.data[0].company_code);
+        };
+      });
+
+      setCheckState({purchase:false, consulting:false, quotation:false});
+      // setIsAllNeededDataLoaded(false);
     };
-  }, [isAllNeededDataLoaded, selectedLead, currentLeadCode, companyState, setCurrentCompany, loadCompanyMAContracts]);
+  }, [selectedLead, currentLeadCode, searchCompanies, setCurrentCompany, loadCompanyMAContracts]);
 
   //===== useEffect for Purchase =======================================================
   useEffect(() => {
-    if(!!currentCompany.company_code) {
-      const queryPromise = searchPurchases('company_code', currentCompany.company_code, true);
+    if(!!selectedLead.company_code  && !checkState.purchase) {
+      setCheckState({
+        ...checkState,
+        purchase: true,
+      });
+      const queryPromise = searchPurchases('company_code', selectedLead.company_code, true);
       queryPromise
         .then(res => {
           if(res.result) {
@@ -347,52 +346,65 @@ const LeadDetailsModel = () => {
             });
             setValidMACount(valid_count);
           } else {
-            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
+            console.log('[LeadDetailsModel] fail to get purchase :', res.message);
             setPurchasesByCompany([]);
             setValidMACount(0);
           };
         });
     }
-  }, [currentCompany.company_code, searchPurchases]);
+  }, [selectedLead.company_code, searchPurchases, checkState]);
 
   //===== useEffect for Consulting =======================================================
   useEffect(() => {
-    tryLoadAllConsultings();
-    if ((consultingState & 1) === 1) {
-      const tempConsultingByLead = searchConsultings('lead_code', selectedLead.lead_code);
-      tempConsultingByLead
+    if(!!selectedLead.lead_code  && !checkState.consulting) {
+      setCheckState({
+        ...checkState,
+        consulting: true,
+      });
+      const queryPromise = searchConsultings('lead_code', selectedLead.lead_code, true);
+      queryPromise
         .then(res => {
-          console.log('LeadDetailsModel / useEffect : ', res);
           if(res.result) {
             setConsultingsByLead(res.data);
-          }
-        })
+          } else {
+            console.log('[LeadDetailsModel] fail to get consulting :', res.message);
+            setConsultingsByLead([]);
+          };
+        });
     };
-  }, [consultingState, selectedLead.lead_code]);
+  }, [checkState, searchConsultings, selectedLead.lead_code]);
+
+  //===== useEffect for Quotation =======================================================
+  useEffect(() => {
+    if(!!selectedLead.lead_code  && !checkState.quotation) {
+      setCheckState({
+        ...checkState,
+        quotation: true,
+      });
+      const queryPromise = searchQuotations('lead_code', selectedLead.lead_code, true);
+      queryPromise
+        .then(res => {
+          if(res.result) {
+            setQuotationsByLead(res.data);
+          } else {
+            console.log('[LeadDetailsModel] fail to get quotation :', res.message);
+            setQuotationsByLead([]);
+          };
+        });
+    };
+  }, [checkState, searchQuotations, selectedLead.lead_code]);
 
   useEffect(() => {
-    tryLoadAllQuotations();
-    if ((quotationState & 1) === 1) {
-      const tempQuotationsByLead = allQuotations.filter(item => item.lead_code === selectedLead.lead_code);
-      if (quotationsByLead.length !== tempQuotationsByLead.length) {
-        setQuotationsByLead(tempQuotationsByLead);
-      };
-    };
-  }, [allQuotations, quotationState, quotationsByLead, selectedLead.lead_code]);
-
-  useEffect(() => {
-    if (((companyState & 1) === 1)
+    if (checkState.purchase && checkState.consulting && checkState.quotation
       && ((userState & 1) === 1)
-      && ((purchaseState & 1) === 1)
-      && ((consultingState & 1) === 1)
-      && ((quotationState & 1) === 1)
     ) {
       console.log('[LeadDetailModel] all needed data is loaded');
-      setIsAllNeededDataLoaded(true);
+      // setIsAllNeededDataLoaded(true);
+      handleInit(false);
     };
-  }, [userState, companyState, purchaseState, consultingState, quotationState]);
+  }, [userState, checkState, handleInit]);
 
-  if (!isAllNeededDataLoaded)
+  if (init)
     return <div>&nbsp;</div>;
 
   return (

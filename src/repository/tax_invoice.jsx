@@ -114,24 +114,24 @@ export const TaxInvoiceRepo = selector({
                 return {result:false, data: err};
             };
         });
-        const setCurrentTaxInvoice = getCallback(({ set, snapshot }) => async (invoice_code) => {
-            try {
-                if(invoice_code === undefined || invoice_code === null) {
-                    set(atomCurrentTaxInvoice, defaultTaxInvoice);
-                    return;
-                };
-                const TaxInvoiceSet = await snapshot.getPromise(atomTaxInvoiceSet);
-                const selected_arrary = TaxInvoiceSet.filter(tax_invoice => tax_invoice.tax_invoice_code === invoice_code);
-                if (selected_arrary.length > 0) {
-                    set(atomCurrentTaxInvoice, selected_arrary[0]);
-                } else {
-                    set(atomCurrentTaxInvoice, defaultTaxInvoice);
-                }
-            }
-            catch (err) {
-                console.error(`setCurrentTaxInvoice / Error : ${err}`);
-            };
-        });
+        // const setCurrentTaxInvoice = getCallback(({ set, snapshot }) => async (invoice_code) => {
+        //     try {
+        //         if(invoice_code === undefined || invoice_code === null) {
+        //             set(atomCurrentTaxInvoice, defaultTaxInvoice);
+        //             return;
+        //         };
+        //         const TaxInvoiceSet = await snapshot.getPromise(atomTaxInvoiceSet);
+        //         const selected_arrary = TaxInvoiceSet.filter(tax_invoice => tax_invoice.tax_invoice_code === invoice_code);
+        //         if (selected_arrary.length > 0) {
+        //             set(atomCurrentTaxInvoice, selected_arrary[0]);
+        //         } else {
+        //             set(atomCurrentTaxInvoice, defaultTaxInvoice);
+        //         }
+        //     }
+        //     catch (err) {
+        //         console.error(`setCurrentTaxInvoice / Error : ${err}`);
+        //     };
+        // });
         const searchTaxInvoices = getCallback(() => async (itemName, filterText, isAccurate = false) => {
             // At first, request data to server
             let foundInServer = {};
@@ -190,7 +190,7 @@ export const TaxInvoiceRepo = selector({
             tryLoadTaxInvoices,
             loadTaxInvoices,
             modifyTaxInvoice,
-            setCurrentTaxInvoice,
+            // setCurrentTaxInvoice,
             searchTaxInvoices,
         };
     }

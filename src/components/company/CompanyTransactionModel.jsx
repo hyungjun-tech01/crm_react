@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useRecoilValue } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
-import { TransactionRepo } from "../../repository/transaction";
-
+import { atomCurrentTransaction, defaultTransaction } from '../../atoms/atoms';
 
 const CompanyTransactionModel = (props) => {
     const { transactions, openTransaction } = props;
@@ -15,14 +14,13 @@ const CompanyTransactionModel = (props) => {
 
 
     //===== [RecoilState] Related with Transaction ======================================
-    const { setCurrentTransaction } = useRecoilValue(TransactionRepo);
-
+    const setCurrentTransaction = useSetRecoilState(atomCurrentTransaction)
     
     // --- Variables for only Transaction ------------------------------------------------
     const [selectedTransactionRowKeys, setSelectedTransactionRowKeys] = useState([]);
 
     const handleSelectTransaction = useCallback((value) => {
-        setCurrentTransaction(value.transaction_code);
+        setCurrentTransaction(value);
         openTransaction();
 
         setTimeout(()=>{
@@ -31,7 +29,7 @@ const CompanyTransactionModel = (props) => {
             });
             myModal.show();
         }, 500);
-    }, [setCurrentTransaction]);
+    }, []);
 
     const transactionRowSelection = {
         selectedRowKeys: selectedTransactionRowKeys,
@@ -44,7 +42,7 @@ const CompanyTransactionModel = (props) => {
                 const selectedValue = selectedRows.at(0);
                 handleSelectTransaction(selectedValue);
             } else {
-                setCurrentTransaction();
+                setCurrentTransaction(defaultTransaction);
             };
         },
         getCheckboxProps: (record) => ({

@@ -53,7 +53,6 @@ const AddBasicItem = (props) => {
                     ? options.filter(item => item.value === defaultValue)[0]
                     : options.filter(item => item.value[name] === defaultValue)[0])
                 : null;
-            if(name === 'receiver') console.log('AddBasicItem / Select :', name, selected);
             return (
                 <div className={ long ? "col-sm-12" : "col-sm-6"} >
                     <div className="add-basic-item">
@@ -73,7 +72,6 @@ const AddBasicItem = (props) => {
                 </div>
             );
         case 'date':
-            if(name === 'receipt_date') console.log('AddBasicItem  / Date :', name, defaultValue);
             return (
                 <div className={ long ? "col-sm-12" : "col-sm-6"} >
                     <div className="add-basic-item">

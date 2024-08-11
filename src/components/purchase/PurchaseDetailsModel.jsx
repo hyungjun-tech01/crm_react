@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch, Table } from "antd";
@@ -34,8 +34,8 @@ const PurchaseDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Purchase =========================================
-  const currentPurchase = useRecoilValue(atomCurrentPurchase);
-  const { modifyPurchase, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
+  const [currentPurchase, setCurrentPurchase] = useRecoilState(atomCurrentPurchase);
+  const { modifyPurchase } = useRecoilValue(PurchaseRepo);
 
 
   //===== [RecoilState] Related with Company ==========================================
@@ -134,7 +134,7 @@ const PurchaseDetailsModel = () => {
 
   const handleClose = useCallback(() => {
     setEditedDetailValues(null);
-    setCurrentPurchase();
+    setCurrentPurchase(defaultPurchase);
   }, []);
 
   const purchase_items_info = [
@@ -314,9 +314,10 @@ const PurchaseDetailsModel = () => {
   ];
 
   useEffect(() => {
+    console.log('[PurchaseDetailsModel]', currentPurchase);
     if ((currentPurchase !== defaultPurchase)
       && (currentPurchase.purchase_code !== currentPurchaseCode)
-   ){
+    ){
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {
         localStorage.setItem("isFullScreen", '0');
@@ -333,13 +334,12 @@ const PurchaseDetailsModel = () => {
   }, [currentPurchase, loadPurchaseMAContracts, currentPurchaseCode]);
 
   useEffect(() => {
-    if (((companyState & 1) === 1)
-      && ((productClassState & 1) === 1)
+    if (((productClassState & 1) === 1)
       && ((productState & 1) === 1)
     ) {
       setIsAllNeededDataLoaded(true);
     };
-  }, [companyState, productClassState, productState]);
+  }, [productClassState, productState]);
 
   if (!isAllNeededDataLoaded)
     return <div>&nbsp;</div>;

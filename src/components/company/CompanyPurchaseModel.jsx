@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useRecoilValue, useRecoilState } from "recoil";
+import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
@@ -8,13 +8,14 @@ import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Add } from "@mui/icons-material";
 
 import {
+    atomCurrentPurchase,
     atomProductClassList,
     atomProductClassListState,
     atomAllProducts,
     atomProductsState,
     atomProductOptions,
+    defaultPurchase,
 } from "../../atoms/atoms";
-import { PurchaseRepo } from "../../repository/purchase";
 import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 
 
@@ -34,7 +35,7 @@ const CompanyPurchaseModel = (props) => {
 
 
     //===== [RecoilState] Related with Purchase =========================================
-    const { setCurrentPurchase } = useRecoilValue(PurchaseRepo);
+    const setCurrentPurchase = useSetRecoilState(atomCurrentPurchase);
 
 
     //===== Handles to this =============================================================
@@ -48,13 +49,13 @@ const CompanyPurchaseModel = (props) => {
         myModal.show();
     };
 
-    const handleSelectPurchase = (code) => {
-        setCurrentPurchase(code);
+    const handleSelectPurchase = (selected) => {
+        setCurrentPurchase(selected);
         transferToOtherModal('purchase-details');
     };
 
     const handleAddNewPurchase = () => {
-        setCurrentPurchase();
+        setCurrentPurchase(defaultPurchase);
         handleInitAddPurchase(true);
         transferToOtherModal('add_purchase');
     };
@@ -101,7 +102,7 @@ const CompanyPurchaseModel = (props) => {
             if (selectedRows.length > 0) {
                 // Set data to edit selected purchase ----------------------
                 const selectedValue = selectedRows.at(0);
-                handleSelectPurchase(selectedValue.purchase_code);
+                handleSelectPurchase(selectedValue);
             } else {
                 setCurrentPurchase();
             };
@@ -190,7 +191,7 @@ const CompanyPurchaseModel = (props) => {
                                 return {
                                     onClick: (event) => {
                                         setSelectedPurchaseRowKeys([record.purchase_code]);
-                                        handleSelectPurchase(record.purchase_code);
+                                        handleSelectPurchase(record);
                                     },
                                 };
                             }}

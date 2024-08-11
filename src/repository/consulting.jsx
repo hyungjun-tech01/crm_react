@@ -289,63 +289,63 @@ export const ConsultingRepo = selector({
                 return {result:false, data: err};
             };
         });
-        const setCurrentConsulting = getCallback(({set, snapshot}) => async (consulting_code) => {
-            try{
-                if(consulting_code === undefined || consulting_code === null) {
-                    set(atomCurrentConsulting, defaultConsulting);
-                    return;
-                };
-                const allConsultings = await snapshot.getPromise(atomAllConsultingObj);
+        // const setCurrentConsulting = getCallback(({set, snapshot}) => async (consulting_code) => {
+        //     try{
+        //         if(consulting_code === undefined || consulting_code === null) {
+        //             set(atomCurrentConsulting, defaultConsulting);
+        //             return;
+        //         };
+        //         const allConsultings = await snapshot.getPromise(atomAllConsultingObj);
                
-                if(!allConsultings[consulting_code]){
-                    // consulting이 없다면 쿼리 
-                    const input_json = {consulting_code:consulting_code};
-                    //JSON.stringify(company_code);
-                    try{
-                        const response = await fetch(`${BASE_PATH}/consultingCodeConsultings`, {
-                            method: "POST",
-                            headers:{'Content-Type':'application/json'},
-                            body: JSON.stringify(input_json),
-                        });
+        //         if(!allConsultings[consulting_code]){
+        //             // consulting이 없다면 쿼리 
+        //             const input_json = {consulting_code:consulting_code};
+        //             //JSON.stringify(company_code);
+        //             try{
+        //                 const response = await fetch(`${BASE_PATH}/consultingCodeConsultings`, {
+        //                     method: "POST",
+        //                     headers:{'Content-Type':'application/json'},
+        //                     body: JSON.stringify(input_json),
+        //                 });
 
-                        const data = await response.json();
-                        if(data.message){
-                            console.log('loadCompanyConsultings message:', data.message);
-                            set(atomCurrentConsulting, defaultConsulting);
-                            return;
-                        }
-                        set(atomCurrentConsulting, data);
-                        console.log('atomCurrentConsulting', data,atomCurrentConsulting.company_name);
+        //                 const data = await response.json();
+        //                 if(data.message){
+        //                     console.log('loadCompanyConsultings message:', data.message);
+        //                     set(atomCurrentConsulting, defaultConsulting);
+        //                     return;
+        //                 }
+        //                 set(atomCurrentConsulting, data);
+        //                 console.log('atomCurrentConsulting', data,atomCurrentConsulting.company_name);
                         
-                        // update all consulting obj ---------------------------
-                        const updatedAllConsultings = {
-                            ...allConsultings,
-                            [data.consulting_code] : data,
-                        };
-                        set(atomAllConsultingObj, updatedAllConsultings);
-                    }
-                    catch(err){
-                        console.error(`setCurrentConsulting / Error : ${err}`);
-                        set(atomCurrentConsulting, defaultConsulting);
-                    };
-                }else{
-                    set(atomCurrentConsulting, allConsultings[consulting_code]);
-                }
+        //                 // update all consulting obj ---------------------------
+        //                 const updatedAllConsultings = {
+        //                     ...allConsultings,
+        //                     [data.consulting_code] : data,
+        //                 };
+        //                 set(atomAllConsultingObj, updatedAllConsultings);
+        //             }
+        //             catch(err){
+        //                 console.error(`setCurrentConsulting / Error : ${err}`);
+        //                 set(atomCurrentConsulting, defaultConsulting);
+        //             };
+        //         }else{
+        //             set(atomCurrentConsulting, allConsultings[consulting_code]);
+        //         }
                 
-            }
-            catch(err){
-                console.error(`setCurrentConsulting / Error : ${err}`);
-                set(atomCurrentConsulting, defaultConsulting);
-            };
-        });
-        const searchConsultings = getCallback(({set, snapshot}) => async (itemName, filterText) => {
+        //     }
+        //     catch(err){
+        //         console.error(`setCurrentConsulting / Error : ${err}`);
+        //         set(atomCurrentConsulting, defaultConsulting);
+        //     };
+        // });
+        const searchConsultings = getCallback(() => async (itemName, filterText, isAccurate = false) => {
             // At first, request data to server
             let foundInServer = {};
             let foundData = [];
             const query_obj = {
                 queryConditions: [{
                     column: { value: itemName},
-                    columnQueryCondition: { value: 'like'},
+                    columnQueryCondition: { value: isAccurate ? '=' : 'like'},
                     multiQueryInput: filterText,
                     andOr: 'And',
                 }],
@@ -378,17 +378,17 @@ export const ConsultingRepo = selector({
                 return { result: false, message: 'fail to query'};
             };
 
-            //----- Update AllConsultingObj --------------------------//
-            const allConsultingData = await snapshot.getPromise(atomAllConsultingObj);
-            const updatedAllConsultingData = {
-                ...allConsultingData,
-                ...foundInServer,
-            };
-            set(atomAllConsultingObj, updatedAllConsultingData);
+            // //----- Update AllConsultingObj --------------------------//
+            // const allConsultingData = await snapshot.getPromise(atomAllConsultingObj);
+            // const updatedAllConsultingData = {
+            //     ...allConsultingData,
+            //     ...foundInServer,
+            // };
+            // set(atomAllConsultingObj, updatedAllConsultingData);
 
-            //----- Update FilteredConsultings -----------------------//
-            const updatedList = Object.values(updatedAllConsultingData);
-            set(atomFilteredConsultingArray, updatedList);
+            // //----- Update FilteredConsultings -----------------------//
+            // const updatedList = Object.values(updatedAllConsultingData);
+            // set(atomFilteredConsultingArray, updatedList);
 
             return { result: true, data: foundData };
         });
@@ -396,7 +396,7 @@ export const ConsultingRepo = selector({
             tryLoadAllConsultings,
             loadAllConsultings,
             modifyConsulting,
-            setCurrentConsulting,
+            // setCurrentConsulting,
             loadCompanyConsultings,
             filterConsulting,
             filterConsultingOri,

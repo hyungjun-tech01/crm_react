@@ -47,6 +47,7 @@ const Companies = () => {
   const [ expanded, setExpaned ] = useState(false);
 
   const [initToAddCompany, setInitToAddCompany] = useState(false);
+  const [initToEditCompany, setInitToEditCompany] = useState(false);
 
   const [multiQueryModal, setMultiQueryModal] = useState(false);
 
@@ -152,6 +153,7 @@ const Companies = () => {
   // --- Functions used for Table ------------------------------
   const handleClickCompanyName = useCallback((id) => {
     console.log('[Company] set current company : ', id);
+    setInitToEditCompany(true);
     setCurrentCompany(id);
     setTimeout(()=>{
       let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
@@ -444,6 +446,8 @@ const Companies = () => {
         {/* Modal */}
         <CompanyAddModel init={initToAddCompany} handleInit={setInitToAddCompany} />
         <CompanyDetailsModel
+          init={initToEditCompany}
+          handleInit={setInitToEditCompany}
           openTransaction={() =>setOpenTransaction(true)}
           openTaxInvoice={()=>setOpenTaxInvoice(true)}
         />

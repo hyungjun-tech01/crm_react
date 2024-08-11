@@ -62,6 +62,7 @@ const Leads = () => {
   //===== Handles to this =============================================================
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ initToAddLead, setInitToAddLead ] = useState(false);
+  const [ initToEditLead, setInitToEditLead ] = useState(false);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
@@ -165,16 +166,17 @@ const Leads = () => {
 
   const handleClickLeadName = useCallback((leadCode, companyCode) => {
     console.log("[Lead] set current lead : ", leadCode);
+    setInitToEditLead(true);
     setCurrentLead(leadCode);
     setCurrentCompany(companyCode);   // 현재 company 세팅 
-    loadCompanyConsultings(companyCode);  // 현재 company에 해당하는 consulting 조회 
-    loadCompanyQuotations(companyCode);  // 현재 company에 해당하는 quotation 조회 
-    loadCompanyPurchases(companyCode);  // 현재 company에 해당하는 purchase 조회 
+    // loadCompanyConsultings(companyCode);  // 현재 company에 해당하는 consulting 조회 
+    // loadCompanyQuotations(companyCode);  // 현재 company에 해당하는 quotation 조회 
+    // loadCompanyPurchases(companyCode);  // 현재 company에 해당하는 purchase 조회 
     let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
       keyboard: false
     });
     myModal.show();
-  }, [loadCompanyConsultings, loadCompanyPurchases, loadCompanyQuotations, setCurrentCompany, setCurrentLead]);
+  }, [setCurrentCompany, setCurrentLead]);
 
 
   const [ expanded, setExpaned ] = useState(false);
@@ -528,7 +530,7 @@ const Leads = () => {
           </div>
         </div>
         <LeadAddModel init={initToAddLead} handleInit={setInitToAddLead} />
-        <LeadDetailsModel />
+        <LeadDetailsModel init={initToEditLead} handleInit={setInitToEditLead} />
         <MultiQueryModal 
           title= {t('lead.lead_multi_query')}
           open={multiQueryModal}

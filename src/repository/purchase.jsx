@@ -214,29 +214,29 @@ export const PurchaseRepo = selector({
                 return {result: false, data: err};
             };
         });
-        const setCurrentPurchase = getCallback(({set, snapshot}) => async (code) => {
-            try{
-                if(code === undefined || code === null) {
-                    set(atomCurrentPurchase, defaultPurchase);
-                    return;
-                };
+        // const setCurrentPurchase = getCallback(({set, snapshot}) => async (code) => {
+        //     try{
+        //         if(code === undefined || code === null) {
+        //             set(atomCurrentPurchase, defaultPurchase);
+        //             return;
+        //         };
 
-                let queriedPurchases = await snapshot.getPromise(atomAllPurchaseObj);
+        //         let queriedPurchases = await snapshot.getPromise(atomAllPurchaseObj);
 
-                if(queriedPurchases.length === 0){
-                    queriedPurchases = await snapshot.getPromise(atomCompanyPurchases);
-                };
-                const selected_arrary = queriedPurchases.filter(purchase => purchase.purchase_code === code);
-                if(selected_arrary.length > 0){
-                    set(atomCurrentPurchase, selected_arrary[0]);
-                } else {
-                    set(atomCurrentPurchase, defaultPurchase);
-                }
-            }
-            catch(err){
-                console.error(`setCurrentPurchase / Error : ${err}`);
-            };
-        });
+        //         if(queriedPurchases.length === 0){
+        //             queriedPurchases = await snapshot.getPromise(atomCompanyPurchases);
+        //         };
+        //         const selected_arrary = queriedPurchases.filter(purchase => purchase.purchase_code === code);
+        //         if(selected_arrary.length > 0){
+        //             set(atomCurrentPurchase, selected_arrary[0]);
+        //         } else {
+        //             set(atomCurrentPurchase, defaultPurchase);
+        //         }
+        //     }
+        //     catch(err){
+        //         console.error(`setCurrentPurchase / Error : ${err}`);
+        //     };
+        // });
         const searchPurchases = getCallback(() => async (itemName, filterText, isAccurate = false) => {
             // At first, request data to server
             let foundInServer = {};
@@ -296,7 +296,7 @@ export const PurchaseRepo = selector({
             loadAllPurchases,
             loadCompanyPurchases,
             modifyPurchase,
-            setCurrentPurchase,
+            // setCurrentPurchase,
             filterPurchases,
             filterCompanyPurchase,
             searchPurchases,

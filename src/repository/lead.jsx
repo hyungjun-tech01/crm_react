@@ -230,14 +230,14 @@ export const LeadRepo = selector({
                 set(atomCurrentLead, defaultLead);
             };
         });
-        const searchLeads = getCallback(({set, snapshot}) => async (itemName, filterText) => {
+        const searchLeads = getCallback(() => async (itemName, filterText, isAccurate = false) => {
             // At first, request data to server
             let foundInServer = {};
             let foundData = [];
             const query_obj = {
                 queryConditions: [{
                     column: { value: itemName},
-                    columnQueryCondition: { value: 'like'},
+                    columnQueryCondition: { value: isAccurate ? '=' : 'like'},
                     multiQueryInput: filterText,
                     andOr: 'And',
                 }],
@@ -269,17 +269,17 @@ export const LeadRepo = selector({
                 return { result: false, message: 'fail to query'};
             };
 
-            //----- Update AllLeadObj --------------------------//
-            const allLeadData = await snapshot.getPromise(atomAllLeadObj);
-            const updatedAllLeadData = {
-                ...allLeadData,
-                ...foundInServer,
-            };
-            set(atomAllLeadObj, updatedAllLeadData);
+            // //----- Update AllLeadObj --------------------------//
+            // const allLeadData = await snapshot.getPromise(atomAllLeadObj);
+            // const updatedAllLeadData = {
+            //     ...allLeadData,
+            //     ...foundInServer,
+            // };
+            // set(atomAllLeadObj, updatedAllLeadData);
 
-            //----- Update FilteredLeadArray --------------------//
-            const updatedList = Object.values(updatedAllLeadData);
-            set(atomFilteredLeadArray, updatedList);
+            // //----- Update FilteredLeadArray --------------------//
+            // const updatedList = Object.values(updatedAllLeadData);
+            // set(atomFilteredLeadArray, updatedList);
 
             return { result: true, data: foundData};
         });

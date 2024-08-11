@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useRecoilValue } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
-import { TaxInvoiceRepo } from "../../repository/tax_invoice";
-
+import { atomCurrentTaxInvoice, defaultTaxInvoice } from '../../atoms/atoms';
 
 const CompanyTaxInvoiceModel = (props) => {
     const { taxInvoices, openTaxInvoice } = props;
@@ -15,14 +14,14 @@ const CompanyTaxInvoiceModel = (props) => {
 
 
     //===== [RecoilState] Related with TaxInvoice ======================================
-    const { setCurrentTaxInvoice } = useRecoilValue(TaxInvoiceRepo);
+    const setCurrentTaxInvoice = useSetRecoilState(atomCurrentTaxInvoice);
 
     
     // --- Variables for only TaxInvoice ------------------------------------------------
     const [selectedTaxInvoiceRowKeys, setSelectedTaxInvoiceRowKeys] = useState([]);
 
     const handleSelectTaxInvoice = useCallback((value) => {
-        setCurrentTaxInvoice(value.tax_invoice_code);
+        setCurrentTaxInvoice(value);
         openTaxInvoice();
 
         setTimeout(()=>{
@@ -44,7 +43,7 @@ const CompanyTaxInvoiceModel = (props) => {
                 const selectedValue = selectedRows.at(0);
                 handleSelectTaxInvoice(selectedValue);
             } else {
-                setCurrentTaxInvoice();
+                setCurrentTaxInvoice(defaultTaxInvoice);
             };
         },
         getCheckboxProps: (record) => ({
