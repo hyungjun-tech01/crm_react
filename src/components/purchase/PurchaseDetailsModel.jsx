@@ -314,7 +314,6 @@ const PurchaseDetailsModel = () => {
   ];
 
   useEffect(() => {
-    console.log('[PurchaseDetailsModel]', currentPurchase);
     if ((currentPurchase !== defaultPurchase)
       && (currentPurchase.purchase_code !== currentPurchaseCode)
     ){

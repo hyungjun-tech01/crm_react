@@ -1,10 +1,10 @@
 import React from 'react';
 import { selector } from "recoil";
 import { atomCurrentQuotation
-    , atomAllQuotations
+    , atomAllQuotationObj
     , defaultQuotation
     , atomCompanyQuotations
-    , atomFilteredQuotation
+    , atomFilteredQuotationArray
     , atomQuotationState
 } from '../atoms/atoms';
 
@@ -58,19 +58,26 @@ export const QuotationRepo = selector({
                     headers:{'Content-Type':'application/json'},
                     body: input_json,
                 });
-
-
                 const data = await response.json();
                 if(data.message){
                     console.log('loadAllQuotations message:', data.message);
-                    set(atomAllQuotations, []);
+                    set(atomAllQuotationObj, {});
                     return false;
-                }
-                set(atomAllQuotations, data);
+                };
+                let allQuotations = {};
+                let filteredQuotations = [];
+                data.forEach(item => {
+                    allQuotations[item.quotation_code] = item;
+                    filteredQuotations.push(item);
+                });
+                set(atomAllQuotationObj, allQuotations);
+                set(atomFilteredQuotationArray, filteredQuotations);
                 return true;
             }
             catch(err){
                 console.error(`loadAllQuotations / Error : ${err}`);
+                set(atomAllQuotationObj, {});
+                set(atomFilteredQuotationArray, []);
                 return false;
             };
         });
@@ -112,12 +119,12 @@ export const QuotationRepo = selector({
                                                 item.lead_name && item.lead_name.includes(filterText)                        
                 ));
             }
-            set(atomFilteredQuotation, allQuotation);
+            set(atomFilteredQuotationArray, allQuotation);
             return true;
         });
 
         const filterQuotations = getCallback(({set, snapshot }) => async (itemName, filterText) => {
-            const allQuotationList = await snapshot.getPromise(atomAllQuotations);
+            const allQuotationList = await snapshot.getPromise(atomAllQuotationObj);
             let  allQuotation ;
             console.log('filterQuotations', itemName, filterText);
             if(itemName === 'common.all'){
@@ -151,7 +158,7 @@ export const QuotationRepo = selector({
                 allQuotation = allQuotationList.filter(item => (item.email &&item.email.includes(filterText))
                 );    
             }
-            set(atomFilteredQuotation, allQuotation);
+            set(atomFilteredQuotationArray, allQuotation);
             return true;
         });     
         const modifyQuotation = getCallback(({set, snapshot}) => async (newQuotation) => {
@@ -167,7 +174,7 @@ export const QuotationRepo = selector({
                     return {result:false, data: data.message};
                 };
 
-                const allQuotations = await snapshot.getPromise(atomAllQuotations);
+                const allQuotations = await snapshot.getPromise(atomAllQuotationObj);
                 if(newQuotation.action_type === 'ADD'){
                     delete newQuotation.action_type;
                     const updatedNewQuotation = {
@@ -178,7 +185,7 @@ export const QuotationRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomAllQuotations, [updatedNewQuotation, ...allQuotations]);
+                    set(atomAllQuotationObj, [updatedNewQuotation, ...allQuotations]);
                     return {result: true};
                 } else if(newQuotation.action_type === 'UPDATE'){
                     const currentQuotation = await snapshot.getPromise(atomCurrentQuotation);
@@ -200,7 +207,7 @@ export const QuotationRepo = selector({
                             modifiedQuotation,
                             ...allQuotations.slice(foundIdx + 1,),
                         ];
-                        set(atomAllQuotations, updatedAllQuotations);
+                        set(atomAllQuotationObj, updatedAllQuotations);
                         return {result: true};
                     } else {
                         return {result:false, data: "No Data"};
@@ -211,25 +218,40 @@ export const QuotationRepo = selector({
                 return {result:false, data: err};
             };
         });
-        // const setCurrentQuotation = getCallback(({set, snapshot}) => async (quotation_code) => {
-        //     try{
-        //         if(quotation_code === undefined || quotation_code === null) {
-        //             set(atomCurrentQuotation, defaultQuotation);
-        //             return;
-        //         };
-        //         let queriedQotations = await snapshot.getPromise(atomAllQuotations);
-        //         if(queriedQotations.length === 0){
-        //             queriedQotations = await snapshot.getPromise(atomCompanyQuotations);
-        //         };
-        //         const selected_arrary = queriedQotations.filter(quotation => quotation.quotation_code === quotation_code);
-        //         if(selected_arrary.length > 0){
-        //             set(atomCurrentQuotation, selected_arrary[0]);
-        //         }
-        //     }
-        //     catch(err){
-        //         console.error(`setCurrentQuotation / Error : ${err}`);
-        //     };
-        // });
+        const setCurrentQuotation = getCallback(({set, snapshot}) => async (quotation_code) => {
+            try{
+                if(quotation_code === undefined || quotation_code === null) {
+                    set(atomCurrentQuotation, defaultQuotation);
+                    return;
+                }; 
+                const allQuotations = await snapshot.getPromise(atomAllQuotationObj);
+                if(!allQuotations[quotation_code]){
+                    const found = await searchQuotations('quotation_code', quotation_code, true);
+                    if(found.result) {
+                        let foundObj = {};
+                        found.data.forEach(item => {
+                            foundObj[item.quotation_code] = item;
+                        });
+                        const updatedAllConsultings = {
+                            ...allQuotations,
+                            ...foundObj,
+                        };
+                        set(atomAllQuotationObj, updatedAllConsultings);
+
+                        const allFiltered = await snapshot.getPromise(atomFilteredQuotationArray);
+                        set(atomFilteredQuotationArray, [...allFiltered, ...found.data]);
+                    } else {
+                        set(atomCurrentQuotation, defaultQuotation);
+                    };
+                } else {
+                    set(atomCurrentQuotation, allQuotations[quotation_code]);
+                };
+            }
+            catch(err){
+                console.error(`setCurrentQuotation / Error : ${err}`);
+                set(atomCurrentQuotation, defaultQuotation);
+            };
+        });
         const searchQuotations = getCallback(() => async (itemName, filterText, isAccurate = false) => {
             // At first, request data to server
             let foundInServer = {};
@@ -279,7 +301,7 @@ export const QuotationRepo = selector({
 
             // //----- Update FilteredQuotationArray --------------------//
             // const updatedList = Object.values(updatedAllQuotationData);
-            // set(atomFilteredQuotationArray, updatedList);
+            // set(atomFilteredQuotationArrayArray, updatedList);
 
             return { result: true, data: foundData};
         });
@@ -287,7 +309,7 @@ export const QuotationRepo = selector({
             tryLoadAllQuotations,
             loadAllQuotations,
             modifyQuotation,
-            // setCurrentQuotation,
+            setCurrentQuotation,
             filterQuotations,
             loadCompanyQuotations,
             filterCompanyQuotation,

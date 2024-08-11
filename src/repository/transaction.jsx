@@ -2,8 +2,8 @@ import React from 'react';
 import { selector } from "recoil";
 import {
     atomCurrentTransaction
-    , atomAllTransactions
-    , atomFilteredTransaction
+    , atomAllTransactionObj
+    , atomFilteredTransactionArray
     , atomTransactionState,
     defaultTransaction
 } from '../atoms/atoms';
@@ -70,21 +70,31 @@ export const TransactionRepo = selector({
                 });
 
                 const data = await response.json();
-                if (data.message) {
+                if(data.message){
                     console.log('loadAllTransactions message:', data.message);
-                    set(atomAllTransactions, []);
+                    set(atomAllTransactionObj, {});
+                    set(atomFilteredTransactionArray, []);
                     return false;
-                }
-                set(atomAllTransactions, data);
+                };
+                let allconsultings = {};
+                let filteredTransactions = [];
+                data.forEach(item => {
+                    allconsultings[item.transaction_code] = item;
+                    filteredTransactions.push(item);
+                });
+                set(atomAllTransactionObj, allconsultings);
+                set(atomFilteredTransactionArray, filteredTransactions);
                 return true;
             }
-            catch (err) {
+            catch(err){
                 console.error(`loadAllTransactions / Error : ${err}`);
+                set(atomAllTransactionObj, {});
+                set(atomFilteredTransactionArray, []);
                 return false;
             };
         });
         const filterTransactions = getCallback(({ set, snapshot }) => async (itemName, filterText) => {
-            const allTransactionList = await snapshot.getPromise(atomAllTransactions);
+            const allTransactionList = await snapshot.getPromise(atomAllTransactionObj);
             let allTransaction;
             console.log('filterTransactions', itemName, filterText);
             if (itemName === 'common.all') {
@@ -110,7 +120,7 @@ export const TransactionRepo = selector({
                 allTransaction = allTransactionList.filter(item => (item.payment_type && item.payment_type.includes(filterText))
                 );
             }
-            set(atomFilteredTransaction, allTransaction);
+            set(atomFilteredTransactionArray, allTransaction);
             return true;
         });
         const modifyTransaction = getCallback(({ set, snapshot }) => async (newTransaction) => {
@@ -126,7 +136,7 @@ export const TransactionRepo = selector({
                     return {result:false, data: data.message};
                 };
 
-                const allTransactions = await snapshot.getPromise(atomAllTransactions);
+                const allTransactions = await snapshot.getPromise(atomAllTransactionObj);
                 if (newTransaction.action_type === 'ADD') {
                     delete newTransaction.action_type;
                     const updatedNewTransaction = {
@@ -136,7 +146,7 @@ export const TransactionRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomAllTransactions, [updatedNewTransaction, ...allTransactions]);
+                    set(atomAllTransactionObj, [updatedNewTransaction, ...allTransactions]);
                     return {result: true};
                 } else if (newTransaction.action_type === 'UPDATE') {
                     const currentTransaction = await snapshot.getPromise(atomCurrentTransaction);
@@ -158,7 +168,7 @@ export const TransactionRepo = selector({
                             modifiedTransaction,
                             ...allTransactions.slice(foundIdx + 1,),
                         ];
-                        set(atomAllTransactions, updatedAllTransactions);
+                        set(atomAllTransactionObj, updatedAllTransactions);
                         return {result: true};
                     } else {
                         return {result:false, data: "No Data"};
@@ -169,24 +179,42 @@ export const TransactionRepo = selector({
                 return {result:false, data: err};
             };
         });
-        // const setCurrentTransaction = getCallback(({ set, snapshot }) => async (transaction_code) => {
-        //     try {
-        //         if(transaction_code === undefined || transaction_code === null) {
-        //             set(atomCurrentTransaction, defaultTransaction);
-        //             return;
-        //         };
-        //         const allTransactions = await snapshot.getPromise(atomAllTransactions);
-        //         const selected_arrary = allTransactions.filter(transaction => transaction.transaction_code === transaction_code);
-        //         if (selected_arrary.length > 0) {
-        //             set(atomCurrentTransaction, selected_arrary[0]);
-        //         } else {
-        //             set(atomCurrentTransaction, defaultTransaction);
-        //         }
-        //     }
-        //     catch (err) {
-        //         console.error(`setCurrentTransaction / Error : ${err}`);
-        //     };
-        // });
+        const setCurrentTransaction = getCallback(({set, snapshot}) => async (transaction_code) => {
+            try{
+                if(transaction_code === undefined || transaction_code === null) {
+                    set(atomCurrentTransaction, defaultTransaction);
+                    return;
+                };
+                const allTransactions = await snapshot.getPromise(atomAllTransactionObj);
+                if(!allTransactions[transaction_code]){
+                    // consulting이 없다면 쿼리 
+                    const found = await searchTransactions('transaction_code', transaction_code, true);
+                    if(found.result) {
+                        set(atomCurrentTransaction, found.data[0]);
+                        let foundObj = {};
+                        found.data.forEach(item => {
+                            foundObj[item.transaction_code] = item;
+                        });
+                        const updatedAllTransactions = {
+                            ...allTransactions,
+                            ...foundObj,
+                        };
+                        set(atomAllTransactionObj, updatedAllTransactions);
+
+                        const allFiltered = await snapshot.getPromise(atomFilteredTransactionArray);
+                        set(atomFilteredTransactionArray, [...allFiltered, ...found.data]);
+                    } else {
+                        set(atomCurrentTransaction, defaultTransaction);
+                    };
+                }else{
+                    set(atomCurrentTransaction, allTransactions[transaction_code]);
+                }
+            }
+            catch(err){
+                console.error(`setCurrentTransaction / Error : ${err}`);
+                set(atomCurrentTransaction, defaultTransaction);
+            };
+        });
         const searchTransactions = getCallback(() => async (itemName, filterText, isAccurate = false) => {
             // At first, request data to server
             let foundInServer = {};
@@ -237,7 +265,7 @@ export const TransactionRepo = selector({
 
             // //----- Update FilteredTransactions -----------------------//
             // const updatedList = Object.values(updatedAllTransactionData);
-            // set(atomFilteredTransactionArray, updatedList);
+            // set(atomFilteredTransactionArrayArray, updatedList);
             
             return { result: true, data: foundData};
         });
@@ -245,7 +273,7 @@ export const TransactionRepo = selector({
             tryLoadAllTransactions,
             loadAllTransactions,
             modifyTransaction,
-            // setCurrentTransaction,
+            setCurrentTransaction,
             filterTransactions,
             searchTransactions,
         };

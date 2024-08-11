@@ -49,7 +49,7 @@ export const PurchaseRepo = selector({
                 const data = await response.json();
                 if(data.message){
                     console.log('loadAllPurchases message:', data.message);
-                    set(atomAllPurchaseObj, []);
+                    set(atomAllPurchaseObj, {});
                     set(atomFilteredPurchaseArray, []);
                     return false;
                 }
@@ -214,29 +214,42 @@ export const PurchaseRepo = selector({
                 return {result: false, data: err};
             };
         });
-        // const setCurrentPurchase = getCallback(({set, snapshot}) => async (code) => {
-        //     try{
-        //         if(code === undefined || code === null) {
-        //             set(atomCurrentPurchase, defaultPurchase);
-        //             return;
-        //         };
+        const setCurrentPurchase = getCallback(({set, snapshot}) => async (purchase_code) => {
+            try{
+                if(purchase_code === undefined || purchase_code === null) {
+                    set(atomCurrentPurchase, defaultPurchase);
+                    return;
+                };
+                const allPurchases = await snapshot.getPromise(atomAllPurchaseObj);
+                if(!allPurchases[purchase_code]){
+                    // consulting이 없다면 쿼리 
+                    const found = await searchPurchases('consuliting_code', purchase_code, true);
+                    if(found.result) {
+                        set(atomCurrentPurchase, found.data[0]);
+                        let foundObj = {};
+                        found.data.forEach(item => {
+                            foundObj[item.purchase_code] = item;
+                        });
+                        const updatedAllPurchases = {
+                            ...allPurchases,
+                            ...foundObj,
+                        };
+                        set(atomAllPurchaseObj, updatedAllPurchases);
 
-        //         let queriedPurchases = await snapshot.getPromise(atomAllPurchaseObj);
-
-        //         if(queriedPurchases.length === 0){
-        //             queriedPurchases = await snapshot.getPromise(atomCompanyPurchases);
-        //         };
-        //         const selected_arrary = queriedPurchases.filter(purchase => purchase.purchase_code === code);
-        //         if(selected_arrary.length > 0){
-        //             set(atomCurrentPurchase, selected_arrary[0]);
-        //         } else {
-        //             set(atomCurrentPurchase, defaultPurchase);
-        //         }
-        //     }
-        //     catch(err){
-        //         console.error(`setCurrentPurchase / Error : ${err}`);
-        //     };
-        // });
+                        const allFiltered = await snapshot.getPromise(atomFilteredPurchaseArray);
+                        set(atomFilteredPurchaseArray, [...allFiltered, ...found.data]);
+                    } else {
+                        set(atomCurrentPurchase, defaultPurchase);
+                    };
+                }else{
+                    set(atomCurrentPurchase, allPurchases[purchase_code]);
+                }
+            }
+            catch(err){
+                console.error(`setCurrentPurchase / Error : ${err}`);
+                set(atomCurrentPurchase, defaultPurchase);
+            };
+        });
         const searchPurchases = getCallback(() => async (itemName, filterText, isAccurate = false) => {
             // At first, request data to server
             let foundInServer = {};
@@ -296,7 +309,7 @@ export const PurchaseRepo = selector({
             loadAllPurchases,
             loadCompanyPurchases,
             modifyPurchase,
-            // setCurrentPurchase,
+            setCurrentPurchase,
             filterPurchases,
             filterCompanyPurchase,
             searchPurchases,

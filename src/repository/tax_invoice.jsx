@@ -2,7 +2,8 @@ import React from 'react';
 import { selector } from "recoil";
 import {
     atomCurrentTaxInvoice
-    , atomTaxInvoiceSet
+    , atomAllTaxInvoiceObj
+    , atomTaxInvoiceArray
     , atomTaxInvoiceState
     , defaultTaxInvoice
 } from '../atoms/atoms';
@@ -43,13 +44,13 @@ export const TaxInvoiceRepo = selector({
                 const data = await response.json();
                 if (data.message) {
                     console.log('loadTaxInvoices message:', data.message);
-                    set(atomTaxInvoiceSet, []);
+                    set(atomAllTaxInvoiceObj, []);
                     if(data.message === 'no data')
                         return true;
                     else
                         return false;
                 }
-                set(atomTaxInvoiceSet, data);
+                set(atomAllTaxInvoiceObj, data);
                 return true;
             }
             catch (err) {
@@ -71,7 +72,7 @@ export const TaxInvoiceRepo = selector({
                     return {result:false, data: data.message};
                 };
 
-                const allTaxInvoices = await snapshot.getPromise(atomTaxInvoiceSet);
+                const allTaxInvoices = await snapshot.getPromise(atomAllTaxInvoiceObj);
                 if (newTaxInvoice.action_type === 'ADD') {
                     delete newTaxInvoice.action_type;
                     const updatedNewTransaction = {
@@ -114,24 +115,42 @@ export const TaxInvoiceRepo = selector({
                 return {result:false, data: err};
             };
         });
-        // const setCurrentTaxInvoice = getCallback(({ set, snapshot }) => async (invoice_code) => {
-        //     try {
-        //         if(invoice_code === undefined || invoice_code === null) {
-        //             set(atomCurrentTaxInvoice, defaultTaxInvoice);
-        //             return;
-        //         };
-        //         const TaxInvoiceSet = await snapshot.getPromise(atomTaxInvoiceSet);
-        //         const selected_arrary = TaxInvoiceSet.filter(tax_invoice => tax_invoice.tax_invoice_code === invoice_code);
-        //         if (selected_arrary.length > 0) {
-        //             set(atomCurrentTaxInvoice, selected_arrary[0]);
-        //         } else {
-        //             set(atomCurrentTaxInvoice, defaultTaxInvoice);
-        //         }
-        //     }
-        //     catch (err) {
-        //         console.error(`setCurrentTaxInvoice / Error : ${err}`);
-        //     };
-        // });
+        const setCurrentTaxInvoice = getCallback(({set, snapshot}) => async (tax_invoice_code) => {
+            try{
+                if(tax_invoice_code === undefined || tax_invoice_code === null) {
+                    set(atomCurrentTaxInvoice, defaultTaxInvoice);
+                    return;
+                };
+                const allTaxInvoices = await snapshot.getPromise(atomAllTaxInvoiceObj);
+                if(!allTaxInvoices[tax_invoice_code]){
+                    // consulting이 없다면 쿼리 
+                    const found = await searchTaxInvoices('tax_invoice_code', tax_invoice_code, true);
+                    if(found.result) {
+                        set(atomCurrentTaxInvoice, found.data[0]);
+                        let foundObj = {};
+                        found.data.forEach(item => {
+                            foundObj[item.tax_invoice_code] = item;
+                        });
+                        const updatedAllTaxInvoices = {
+                            ...allTaxInvoices,
+                            ...foundObj,
+                        };
+                        set(atomAllTaxInvoiceObj, updatedAllTaxInvoices);
+
+                        const allFiltered = await snapshot.getPromise(atomTaxInvoiceArray);
+                        set(atomTaxInvoiceArray, [...allFiltered, ...found.data]);
+                    } else {
+                        set(atomCurrentTaxInvoice, defaultTaxInvoice);
+                    };
+                }else{
+                    set(atomCurrentTaxInvoice, allTaxInvoices[tax_invoice_code]);
+                }
+            }
+            catch(err){
+                console.error(`setCurrentTaxInvoice / Error : ${err}`);
+                set(atomCurrentTaxInvoice, defaultTaxInvoice);
+            };
+        });
         const searchTaxInvoices = getCallback(() => async (itemName, filterText, isAccurate = false) => {
             // At first, request data to server
             let foundInServer = {};
@@ -190,7 +209,7 @@ export const TaxInvoiceRepo = selector({
             tryLoadTaxInvoices,
             loadTaxInvoices,
             modifyTaxInvoice,
-            // setCurrentTaxInvoice,
+            setCurrentTaxInvoice,
             searchTaxInvoices,
         };
     }

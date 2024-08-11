@@ -220,7 +220,7 @@ export const atomCurrentQuotation = atom({
     key: "currentQuotation",
     default: defaultQuotation,
 });
-export const atomAllQuotations = atom({
+export const atomAllQuotationObj = atom({
     key: "allQuotations",
     default: {},
 });
@@ -228,9 +228,9 @@ export const atomCompanyQuotations = atom({
     key: "companyQuotations",
     default: {},
 });
-export const atomFilteredQuotation = atom({
+export const atomFilteredQuotationArray = atom({
     key: "filteredQuotations",
-    default: {},
+    default: [],
 });
 export const atomQuotationState = atom({
     key: "quotationState",
@@ -274,13 +274,13 @@ export const atomCurrentTransaction = atom({
     key: "currentTransaction",
     default: defaultTransaction,
 });
-export const atomAllTransactions = atom({
+export const atomAllTransactionObj = atom({
     key: "allTransactions",
     default: {},
 });
-export const atomFilteredTransaction = atom({
+export const atomFilteredTransactionArray = atom({
     key: "allFilteredTransactions",
-    default: {},
+    default: [],
 });
 export const atomTransactionState = atom({
     key: "transactionState",
@@ -447,9 +447,13 @@ export const atomCurrentTaxInvoice = atom({
     key: "currentTaxInvoice",
     default: defaultTaxInvoice,
 });
-export const atomTaxInvoiceSet = atom({
-    key: "taxInvoiceSet",
-    default: [],
+export const atomAllTaxInvoiceObj = atom({
+    key: "taxInvoiceObj",
+    default: {},
+});
+export const atomTaxInvoiceArray = atom({
+    key: "taxInvoiceArray",
+    default: {},
 });
 export const atomTaxInvoiceState = atom({
     key: "taxInvoiceState",

@@ -30,7 +30,7 @@ import { Add, Remove } from '@mui/icons-material';
 const content_indices = ['3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18'];
 
 
-const QuotationDetailsModel = () => {
+const QuotationDetailsModel = ({init, handleInit}) => {
   const [ t ] = useTranslation();
   const [ cookies ] = useCookies(["myLationCrmUserId"]);
   const { Panel } = Collapse;
@@ -404,7 +404,7 @@ const QuotationDetailsModel = () => {
     if((selectedQuotation !== defaultQuotation)
       && (selectedQuotation.quotation_code !== currentQuotationCode)
     ){
-      console.log('[QuotationDetailsModel] useEffect / quotation!');
+      console.log('[QuotationDetailsModel] new quotation is loading!');
 
       const headerValues = selectedQuotation.quotation_table.split('|');
       if(headerValues && Array.isArray(headerValues)){
@@ -479,11 +479,11 @@ const QuotationDetailsModel = () => {
       }
         
       console.log('[QuotationDetailsModel] all needed data is loaded');
-      setIsAllNeededDataLoaded(true);
+      handleInit(false);
     };
-}, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions, userState, quotationState]);
+}, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions, userState, quotationState, handleInit]);
 
-if (!isAllNeededDataLoaded)
+if (init)
   return <div>&nbsp;</div>;
 
   return (

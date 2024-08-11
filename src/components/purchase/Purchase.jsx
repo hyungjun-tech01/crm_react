@@ -5,11 +5,9 @@ import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
-import { atomAllPurchaseObj,
+import {
   atomFilteredPurchaseArray,
-  atomCompanyState,
   atomPurchaseState,
-  atomAllCompanyObj,
   atomProductClassListState,
   atomProductClassList,
   atomProductsState,
@@ -36,14 +34,11 @@ const Purchase = () => {
 
 
   //===== [RecoilState] Related with Company =============================================
-  const companyState = useRecoilValue(atomCompanyState);
-  const { setCurrentCompany, tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
-  const allCompanyData = useRecoilValue(atomAllCompanyObj);
+  const { setCurrentCompany, searchCompanies } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Purchase ============================================
   const purchaseState = useRecoilValue(atomPurchaseState);
-  const allPurchaseData = useRecoilValue(atomAllPurchaseObj);
   const filteredPurchase = useRecoilValue(atomFilteredPurchaseArray);
   const { tryLoadAllPurchases, filterPurchases, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
   
@@ -263,8 +258,6 @@ const Purchase = () => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    tryLoadAllCompanies();
-
      // query condition 세팅 후 query
     let tommorow = new Date();
       
@@ -290,37 +283,38 @@ const Purchase = () => {
 
     console.log('tryLoadAllQuotations multiQueryCondi',multiQueryCondi);   
     tryLoadAllPurchases(multiQueryCondi);
-
     tryLoadAllUsers();
 
-    if(((companyState & 1) === 1)
-      && ((purchaseState & 1) === 1)
+    if(((purchaseState & 1) === 1)
       && ((userState & 1) === 1)
     ){
       setNowLoading(false);
-      const modifiedData = allPurchaseData.map(purchase => {
-        const foundIdx = allCompanyData.findIndex(company => company.company_code === purchase.company_code);
-        if(foundIdx !== -1){
-          let remain_date = '';
-          if(purchase.ma_finish_date) {
-            const calc_remain_date = Math.ceil((new Date(purchase.ma_finish_date).getTime() - new Date().getTime())/86400000);
-            if(calc_remain_date >= 0){
-              remain_date = calc_remain_date;
+      const modifiedData = filteredPurchase.map(purchase => {
+        // const foundIdx = allCompanyData.findIndex(company => company.company_code === purchase.company_code);
+        const found = searchCompanies('company_code', purchase.company_code, true);
+        found.then(res => {
+          if(res.result) {
+            let remain_date = '';
+            if(purchase.ma_finish_date) {
+              const calc_remain_date = Math.ceil((new Date(purchase.ma_finish_date).getTime() - new Date().getTime())/86400000);
+              if(calc_remain_date >= 0){
+                remain_date = calc_remain_date;
+              };
             };
+            return {
+              ...purchase,
+              company_name: res.data[0].company_name,
+              company_name_en: res.data[0].company_name_en,
+              ma_remain_date: remain_date,
+            }
+          } else {
+            return null;
           };
-          return {
-            ...purchase,
-            company_name: allCompanyData[foundIdx].company_name,
-            company_name_en: allCompanyData[foundIdx].company_name_en,
-            ma_remain_date: remain_date,
-          }
-        } else {
-          return null;
-        };
+        });
       });
       setTableData(modifiedData);
     };
-  }, [companyState, purchaseState, userState, allPurchaseData, allCompanyData]);
+  }, [dates, filteredPurchase, purchaseState, queryConditions, searchCompanies, singleDate, userState]);
 
   // ----- useEffect for Production -----------------------------------
   useEffect(() => {
@@ -446,31 +440,6 @@ const Purchase = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive">
-                  {searchCondition === "" ? 
-                    <Table
-                      pagination={{
-                        total: tableData.length,
-                        showTotal: ShowTotal,
-                        showSizeChanger: true,
-                        onShowSizeChange: onShowSizeChange,
-                        ItemRender: ItemRender,
-                      }}
-                      loading={nowLoading}
-                      className="table"
-                      style={{ overflowX: "auto" }}
-                      columns={columns}
-                      dataSource={tableData}
-                      rowKey={(record) => record.purchase_code}
-                      onRow={(record, rowIndex) => {
-                        return {
-                          onClick: (event) => {
-                            if(event.target.className === 'table_company') return;
-                            handleClickPurchase(record.purchase_code);
-                          },
-                        };
-                      }}
-                    />
-                    :
                     <Table
                       pagination={{
                         total: filteredPurchase.length >0 ? filteredPurchase.length:0,
@@ -493,7 +462,6 @@ const Purchase = () => {
                         };
                       }}
                     /> 
-                    }
                   </div>
                 </div>
               </div>

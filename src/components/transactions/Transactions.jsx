@@ -12,8 +12,8 @@ import SystemUserModel from "../task/SystemUserModel";
 import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
 import {
-  atomAllTransactions,
-  atomFilteredTransaction,
+  atomAllTransactionObj,
+  atomFilteredTransactionArray,
   atomCompanyState,
   atomTransactionState,
 } from "../../atoms/atoms";
@@ -38,8 +38,8 @@ const Transactions = () => {
 
   //===== [RecoilState] Related with Transaction ======================================
   const transactionState = useRecoilValue(atomTransactionState);
-  const allTransactionData = useRecoilValue(atomAllTransactions);
-  const filteredTransaction= useRecoilValue(atomFilteredTransaction);
+  const allTransactionData = useRecoilValue(atomAllTransactionObj);
+  const filteredTransaction= useRecoilValue(atomFilteredTransactionArray);
   const { tryLoadAllTransactions, setCurrentTransaction , filterTransactions, loadAllTransactions} = useRecoilValue(TransactionRepo);
 
 
@@ -341,30 +341,6 @@ const Transactions = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive activity-tables">
-                  { searchCondition === "" ?  
-                    <Table
-                      pagination={{
-                        total: allTransactionData.length,
-                        showTotal: ShowTotal,
-                        showSizeChanger: true,
-                        onShowSizeChange: onShowSizeChange,
-                        ItemRender: ItemRender,
-                      }}
-                      loading={nowLoading}
-                      style={{ overflowX: "auto" }}
-                      columns={columns}
-                      bordered
-                      dataSource={allTransactionData}
-                      rowKey={(record) => record.transaction_code}
-                      onRow={(record, rowIndex) => {
-                        return {
-                          onClick: (event) => {
-                            if(event.target.className === 'table_company') return;
-                            handleOpenTransactoin(record.transaction_code)
-                          }, // double click row
-                        };
-                      }}
-                    />:
                     <Table
                       pagination={{
                         total: filteredTransaction.length >0 ? filteredTransaction.length:0,
@@ -388,7 +364,6 @@ const Transactions = () => {
                         };
                       }}
                     />
-                  }
                   </div>
                 </div>
               </div>

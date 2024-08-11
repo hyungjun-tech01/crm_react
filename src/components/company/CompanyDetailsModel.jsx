@@ -299,7 +299,7 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
       && (selectedCompany !== defaultCompany)
       && (selectedCompany.company_code !== currentCompanyCode)
     ) {
-      console.log("[CompanyDetailsModel] new company is loaded!");
+      console.log("[CompanyDetailsModel] new company is loading!");
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {

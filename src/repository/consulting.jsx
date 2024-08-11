@@ -103,7 +103,7 @@ export const ConsultingRepo = selector({
                     set(atomAllConsultingObj, {});
                     set(atomFilteredConsultingArray, []);
                     return false;
-                }
+                };
                 let allconsultings = {};
                 let filteredConsultings = [];
                 data.forEach(item => {
@@ -289,55 +289,42 @@ export const ConsultingRepo = selector({
                 return {result:false, data: err};
             };
         });
-        // const setCurrentConsulting = getCallback(({set, snapshot}) => async (consulting_code) => {
-        //     try{
-        //         if(consulting_code === undefined || consulting_code === null) {
-        //             set(atomCurrentConsulting, defaultConsulting);
-        //             return;
-        //         };
-        //         const allConsultings = await snapshot.getPromise(atomAllConsultingObj);
-               
-        //         if(!allConsultings[consulting_code]){
-        //             // consulting이 없다면 쿼리 
-        //             const input_json = {consulting_code:consulting_code};
-        //             //JSON.stringify(company_code);
-        //             try{
-        //                 const response = await fetch(`${BASE_PATH}/consultingCodeConsultings`, {
-        //                     method: "POST",
-        //                     headers:{'Content-Type':'application/json'},
-        //                     body: JSON.stringify(input_json),
-        //                 });
+        const setCurrentConsulting = getCallback(({set, snapshot}) => async (consulting_code) => {
+            try{
+                if(consulting_code === undefined || consulting_code === null) {
+                    set(atomCurrentConsulting, defaultConsulting);
+                    return;
+                };
+                const allConsultings = await snapshot.getPromise(atomAllConsultingObj);
+                if(!allConsultings[consulting_code]){
+                    // consulting이 없다면 쿼리 
+                    const found = await searchConsultings('consuliting_code', consulting_code, true);
+                    if(found.result) {
+                        set(atomCurrentConsulting, found.data[0]);
+                        let foundObj = {};
+                        found.data.forEach(item => {
+                            foundObj[item.consulting_code] = item;
+                        });
+                        const updatedAllConsultings = {
+                            ...allConsultings,
+                            ...foundObj,
+                        };
+                        set(atomAllConsultingObj, updatedAllConsultings);
 
-        //                 const data = await response.json();
-        //                 if(data.message){
-        //                     console.log('loadCompanyConsultings message:', data.message);
-        //                     set(atomCurrentConsulting, defaultConsulting);
-        //                     return;
-        //                 }
-        //                 set(atomCurrentConsulting, data);
-        //                 console.log('atomCurrentConsulting', data,atomCurrentConsulting.company_name);
-                        
-        //                 // update all consulting obj ---------------------------
-        //                 const updatedAllConsultings = {
-        //                     ...allConsultings,
-        //                     [data.consulting_code] : data,
-        //                 };
-        //                 set(atomAllConsultingObj, updatedAllConsultings);
-        //             }
-        //             catch(err){
-        //                 console.error(`setCurrentConsulting / Error : ${err}`);
-        //                 set(atomCurrentConsulting, defaultConsulting);
-        //             };
-        //         }else{
-        //             set(atomCurrentConsulting, allConsultings[consulting_code]);
-        //         }
-                
-        //     }
-        //     catch(err){
-        //         console.error(`setCurrentConsulting / Error : ${err}`);
-        //         set(atomCurrentConsulting, defaultConsulting);
-        //     };
-        // });
+                        const allFiltered = await snapshot.getPromise(atomFilteredConsultingArray);
+                        set(atomFilteredConsultingArray, [...allFiltered, ...found.data]);
+                    } else {
+                        set(atomCurrentConsulting, defaultConsulting);
+                    };
+                }else{
+                    set(atomCurrentConsulting, allConsultings[consulting_code]);
+                }
+            }
+            catch(err){
+                console.error(`setCurrentConsulting / Error : ${err}`);
+                set(atomCurrentConsulting, defaultConsulting);
+            };
+        });
         const searchConsultings = getCallback(() => async (itemName, filterText, isAccurate = false) => {
             // At first, request data to server
             let foundInServer = {};
@@ -396,7 +383,7 @@ export const ConsultingRepo = selector({
             tryLoadAllConsultings,
             loadAllConsultings,
             modifyConsulting,
-            // setCurrentConsulting,
+            setCurrentConsulting,
             loadCompanyConsultings,
             filterConsulting,
             filterConsultingOri,
