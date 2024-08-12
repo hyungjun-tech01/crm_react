@@ -140,6 +140,7 @@ export const CompanyRepo = selector({
                         create_date : data.out_create_date,
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
+                        company_number: data.out_company_number,
                     };
                     //----- Update AllCompanyObj --------------------------//
                     const updatedAllCompanies = {
@@ -155,7 +156,7 @@ export const CompanyRepo = selector({
                         ...filteredAllCompanies
                     ];
                     set(atomFilteredCompanyArray, updatedFiltered);
-                    return true;
+                    return {result:true};
                 } else if(newCompany.action_type === 'UPDATE'){
                     const currentCompany = await snapshot.getPromise(atomCurrentCompany);
                     delete newCompany.action_type;
@@ -187,7 +188,7 @@ export const CompanyRepo = selector({
                         ];
                         set(atomFilteredCompanyArray, updatedFiltered);
                     };
-                    return true;
+                    return {result:true};
                 }
             }
             catch(err){
