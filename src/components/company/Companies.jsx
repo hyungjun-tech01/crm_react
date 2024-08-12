@@ -27,7 +27,7 @@ const Companies = () => {
 
   //===== [RecoilState] Related with Company ==========================================
   const [ companyState, setCompanyState] = useRecoilState(atomCompanyState);
-  const { tryLoadAllCompanies, filterCompanies, setCurrentCompany } = useRecoilValue(CompanyRepo);
+  const { tryLoadAllCompanies, filterCompanies, setCurrentCompany , loadAllCompanies } = useRecoilValue(CompanyRepo);
   const filteredCompany = useRecoilValue(atomFilteredCompanyArray);
 
 
@@ -128,8 +128,8 @@ const Companies = () => {
       singleDate: checkedSingleDates
     }
 
-    //loadAllCompanies(multiQueryCondi);
-    tryLoadAllCompanies(multiQueryCondi);
+    loadAllCompanies(multiQueryCondi);
+    //tryLoadAllCompanies(multiQueryCondi);
   };
 
   const handleMultiQueryModalCancel = () => {
