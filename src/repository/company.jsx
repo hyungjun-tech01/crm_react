@@ -205,24 +205,19 @@ export const CompanyRepo = selector({
                 if(allCompanies[company_code]){
                     set(atomCurrentCompany, allCompanies[company_code]);
                 } else {
-                    const queryCompany = searchCompanies('company_code', company_code, true);
-                    queryCompany.then(res => {
-                        if(res.result) {
-                            set(atomCurrentCompany, res.data[0]);
+                    const found = await searchCompanies('company_code', company_code, true);
+                    if(found.result) {
+                        set(atomCurrentCompany, found.data[0]);
 
-                            const updatedCompanyObj = {
-                                ...allCompanies,
-                                [res.data[0].company_code]: res.data[0]
-                            };
-                            set(atomAllCompanyObj, updatedCompanyObj);
-                            set(atomFilteredCompanyArray, Object.values(updatedCompanyObj));
-                        } else {
-                            set(atomCurrentCompany, defaultCompany);
-                            return;
-                        }
-                    })
-                    set(atomCurrentCompany, defaultCompany);
-                    return;
+                        const updatedAllCompanies = {
+                            ...allCompanies,
+                            [found.data[0].company_code]: found.data[0]
+                        };
+                        set(atomAllCompanyObj, updatedAllCompanies);
+                        set(atomFilteredCompanyArray, Object.values(updatedAllCompanies));
+                    } else {
+                        set(atomCurrentCompany, defaultCompany);
+                    };
                 };
             }
             catch(err){

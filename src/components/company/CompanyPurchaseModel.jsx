@@ -153,7 +153,7 @@ const CompanyPurchaseModel = (props) => {
     }, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions]);
 
     useEffect(() => {
-        console.log('[CompanyPurchaseModel] called!', purchaseByCompany);
+        console.log('[CompanyPurchaseModel] called!');
     }, [purchaseByCompany]);
 
     if (!isAllNeededDataLoaded)

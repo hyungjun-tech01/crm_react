@@ -1,12 +1,15 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Avatar, Space, Switch } from "antd";
 import {
   atomCurrentLead, defaultLead,
   atomCurrentCompany,
+  atomPurchaseByCompany,
+  atomConsultingByLead,
+  atomQuotationByLead,
 } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo } from "../../repository/company";
@@ -46,19 +49,22 @@ const LeadDetailsModel = ({init, handleInit}) => {
 
   //===== [RecoilState] Related with Company =======================================
   const currentCompany = useRecoilValue(atomCurrentCompany);
-  const { modifyCompany, setCurrentCompany, searchCompanies } = useRecoilValue(CompanyRepo);
+  const { modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Purchase =======================================
+  const [ purchaseByCompany, setPurchasesByCompany ] = useRecoilState(atomPurchaseByCompany);
   const { searchPurchases } = useRecoilValue(PurchaseRepo)
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
 
   //===== [RecoilState] Related with Consulting =======================================
+  const [ consultingByLead, setConsultingsByLead ] = useRecoilState(atomConsultingByLead);
   const { searchConsultings } = useRecoilValue(ConsultingRepo);
 
 
   //===== [RecoilState] Related with Quotation ========================================
+  const [ quotationByLead, setQuotationsByLead ] = useRecoilState(atomQuotationByLead);
   const { searchQuotations } = useRecoilValue(QuotationRepo);
 
 
@@ -251,17 +257,14 @@ const LeadDetailsModel = ({init, handleInit}) => {
 
 
   //===== Handles to edit 'Purchase Add/Details' ===============================================
-  const [purchasesByCompany, setPurchasesByCompany] = useState([]);
   const [initAddPurchase, setInitAddPurchase] = useState(false);
 
 
   //===== Handles to edit 'Consulting Add/Details' ===============================================
-  const [consultingsByLead, setConsultingsByLead] = useState([]);
   const [initAddConsulting, setInitAddConsulting] = useState(false);
 
 
   //===== Handles to edit 'Quotation Add/Details' ===============================================
-  const [quotationsByLead, setQuotationsByLead] = useState([]);
   const [initAddQuotation, setInitAddQuotation] = useState(false);
   const [initEditQuotation, setInitEditQuotation] = useState(false);
 
@@ -313,19 +316,12 @@ const LeadDetailsModel = ({init, handleInit}) => {
         setIsFullScreen(true);
       };
       
+      setCurrentCompany(selectedLead.company_code);
+      loadCompanyMAContracts(selectedLead.company_code);
       setCurrentLeadCode(selectedLead.lead_code);
-      const companyByLeadArray = searchCompanies('company_code', selectedLead.company_code, true);
-      companyByLeadArray.then(res => {
-        if(res.result) {
-          setCurrentCompany(res.data[0]);
-          loadCompanyMAContracts(res.data[0].company_code);
-        };
-      });
-
       setCheckState({purchase:false, consulting:false, quotation:false});
-      // setIsAllNeededDataLoaded(false);
     };
-  }, [selectedLead, currentLeadCode, searchCompanies, setCurrentCompany, loadCompanyMAContracts]);
+  }, [selectedLead, currentLeadCode, setCurrentCompany, loadCompanyMAContracts]);
 
   //===== useEffect for Purchase =======================================================
   useEffect(() => {
@@ -396,7 +392,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
   }, [checkState, searchQuotations, selectedLead.lead_code]);
 
   useEffect(() => {
-    if (checkState.purchase && checkState.consulting && checkState.quotation
+    if (init && checkState.purchase && checkState.consulting && checkState.quotation
       && ((userState & 1) === 1)
     ) {
       console.log('[LeadDetailModel] all needed data is loaded');
@@ -543,7 +539,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
                             to="#sub-lead-purchases"
                             data-bs-toggle="tab"
                           >
-                            {t('purchase.product_info') + "(" + validMACount + "/" + purchasesByCompany.length + ")"}
+                            {t('purchase.product_info') + "(" + validMACount + "/" + purchaseByCompany.length + ")"}
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -552,7 +548,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
                             to="#sub-lead-consultings"
                             data-bs-toggle="tab"
                           >
-                            {t('lead.consulting_history') + '('} {consultingsByLead.length}{')'}
+                            {t('lead.consulting_history') + '('} {consultingByLead.length}{')'}
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -561,7 +557,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
                             to="#sub-lead-quotation"
                             data-bs-toggle="tab"
                           >
-                            {t('lead.quotation_history') + '('} {quotationsByLead.length}{')'}
+                            {t('lead.quotation_history') + '('} {quotationByLead.length}{')'}
                           </Link>
                         </li>
                       </ul>
@@ -595,21 +591,18 @@ const LeadDetailsModel = ({init, handleInit}) => {
                         <div className="tab-pane task-related p-0"
                           id="sub-lead-purchases" >
                           <CompanyPurchaseModel
-                            purchases={purchasesByCompany}
                             handleInitAddPurchase={setInitAddPurchase}
                           />
                         </div>
                         <div className="tab-pane task-related p-0"
                           id="sub-lead-consultings" >
                           <LeadConsultingModel
-                            consultings={consultingsByLead}
                             handleInitAddConsulting={setInitAddConsulting}
                           />
                         </div>
                         <div className="tab-pane task-related p-0"
                           id="sub-lead-quotation" >
                           <LeadQuotationModel
-                            quotations={quotationsByLead}
                             handleInitAddQuotation={setInitAddQuotation}
                           />
                         </div>

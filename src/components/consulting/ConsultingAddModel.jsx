@@ -5,9 +5,9 @@ import { useTranslation } from "react-i18next";
 import "react-datepicker/dist/react-datepicker.css";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import {
-  defaultConsulting,
-  atomLeadState,
-  atomAllLeadObj,
+  atomCurrentCompany,
+  atomCurrentLead,
+  defaultLead,
 } from "../../atoms/atoms";
 import {
   atomUserState,
@@ -26,7 +26,7 @@ import {
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddSearchItem from "../../constants/AddSearchItem";
 import MessageModal from "../../constants/MessageModal";
-import { LeadRepo } from "../../repository/lead";
+import { CompanyRepo } from "../../repository/company";
 
 
 const ConsultingAddModel = (props) => {
@@ -42,9 +42,12 @@ const ConsultingAddModel = (props) => {
 
 
   //===== [RecoilState] Related with Lead =============================================
-  const leadsState = useRecoilValue(atomLeadState);
-  const leadDataObj = useRecoilValue(atomAllLeadObj);
-  const { searchLeads } = useRecoilValue(LeadRepo);
+  const currentLead = useRecoilValue(atomCurrentLead);
+
+
+  //===== [RecoilState] Related with Company ==========================================
+  const currentCompany = useRecoilValue(atomCurrentCompany);
+  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Users ============================================
@@ -55,8 +58,7 @@ const ConsultingAddModel = (props) => {
 
 
   //===== Handles to edit 'ConsultingAddModel' ========================================
-  const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
-  const [consultingChange, setConsultingChange] = useState({ ...defaultConsulting });
+  const [consultingChange, setConsultingChange] = useState({});
 
   const initializeConsultingTemplate = useCallback(() => {
     document.querySelector("#add_new_consulting_form").reset();
@@ -64,41 +66,31 @@ const ConsultingAddModel = (props) => {
     // set Receipt date -------------
     const tempDate = new Date();
     let modified = {
-      ...defaultConsulting,
       receiver: cookies.myLationCrmUserName,
       receipt_date: tempDate,
     };
 
     if (leadCode && leadCode !== "") {
-      const foundLeadPromise = searchLeads('lead_code', leadCode);
-      foundLeadPromise
-        .then(res => {
-          if(res.result) {
-            if(res.data.length === 1){
-              modified['lead_code'] = res.data[0].lead_code;
-              modified['lead_name'] = res.data[0].lead_name;
-              modified['department'] = res.data[0].department;
-              modified['position'] = res.data[0].position;
-              modified['mobile_number'] = res.data[0].mobile_number;
-              modified['phone_number'] = res.data[0].phone_number;
-              modified['email'] = res.data[0].email;
-            } else {
-              console.log('[ConsutlingAddModel] Initialize... found Lead is weired');
-            };
-          } else {
-            console.log('[ConsutlingAddModel] Initialize... error :', res.message);
-          };
-        });
+      if (currentLead !== defaultLead) {
+        modified['lead_code'] = currentLead.lead_code;
+        modified['lead_name'] = currentLead.lead_name;
+        modified['department'] = currentLead.department;
+        modified['position'] = currentLead.position;
+        modified['mobile_number'] = currentLead.mobile_number;
+        modified['phone_number'] = currentLead.phone_number;
+        modified['email'] = currentLead.email;
+
+        setCurrentCompany(currentLead.company_code);
+      };
     };
     setConsultingChange(modified);
-  }, [cookies.myLationCrmUserName, leadCode]);
+  }, [cookies.myLationCrmUserName, currentLead, leadCode, setCurrentCompany]);
 
   const handleDateChange = (name, date) => {
     const modifiedData = {
       ...consultingChange,
       [name]: date
     };
-    console.log('handleDateChange : ', modifiedData);
     setConsultingChange(modifiedData);
   };
 
@@ -107,7 +99,6 @@ const ConsultingAddModel = (props) => {
       ...consultingChange,
       [e.target.name]: e.target.value,
     };
-    console.log('handleItemChange : ', modifiedData);
     setConsultingChange(modifiedData);
   };
 
@@ -132,7 +123,6 @@ const ConsultingAddModel = (props) => {
         [name]: selected.value,
       };
     };
-    console.log('handleSelectChange : ', modifiedData);
     setConsultingChange(modifiedData);
   };
 
@@ -142,46 +132,44 @@ const ConsultingAddModel = (props) => {
       || consultingChange.lead_name === ''
       || consultingChange.consulting_type === null
     ) {
-      setMessage({title:'필요 정보 누락', message:'필요 입력 항목이 누락되었습니다.'});
+      setMessage({ title: '필요 정보 누락', message: '필요 입력 항목이 누락되었습니다.' });
       setIsMessageModalOpen(true);
       return;
     };
 
     const newConsultingData = {
       ...consultingChange,
+      company_code: currentCompany.company_code,
+      compnay_name: currentCompany.company_name,
       action_type: 'ADD',
-      lead_number: '99999',// Temporary
       counter: 0,
       modify_user: cookies.myLationCrmUserId,
     };
     const result = modifyConsulting(newConsultingData);
     result.then((res) => {
-      if(res.result) {
+      if (res.result) {
         let thisModal = bootstrap.Modal.getInstance('#add_consulting');
-        if(thisModal) thisModal.hide();
+        if (thisModal) thisModal.hide();
       } else {
-        setMessage({title:'저장 실패', message:'정보 저장에 실패하였습니다.'});
+        setMessage({ title: '저장 실패', message: '정보 저장에 실패하였습니다.' });
         setIsMessageModalOpen(true);
       };
     });
-  }, [cookies.myLationCrmUserId, consultingChange, modifyConsulting]);
+  }, [cookies.myLationCrmUserId, consultingChange, modifyConsulting, currentCompany]);
 
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    if (((leadsState & 1) === 1) && ((userState & 1) === 1)) {
-      setIsAllNeededDataLoaded(true);
-      if (init) {
-        console.log('[ConsultingAddModel] initialize!');
-        // setTimeout(()=>{
-          initializeConsultingTemplate();
-          if(handleInit) handleInit(!init);
-        // }, 500);
-      };
+    if (init && ((userState & 1) === 1)) {
+      console.log('[ConsultingAddModel] initialize!');
+      if (handleInit) handleInit(!init);
+      setTimeout(() => {
+        initializeConsultingTemplate();
+      }, 500);
     };
-  }, [leadsState, userState, init, initializeConsultingTemplate, handleInit]);
+  }, [userState, init, initializeConsultingTemplate, handleInit]);
 
-  if (!isAllNeededDataLoaded)
+  if (init)
     return <div>&nbsp;</div>;
 
   return (

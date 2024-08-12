@@ -5,7 +5,10 @@ import {
     , atomAllTaxInvoiceObj
     , atomTaxInvoiceArray
     , atomTaxInvoiceState
-    , defaultTaxInvoice
+    , defaultTaxInvoice,
+    atomCurrentCompany,
+    defaultCompany,
+    atomTaxInvoiceByCompany
 } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
@@ -50,7 +53,14 @@ export const TaxInvoiceRepo = selector({
                     else
                         return false;
                 }
-                set(atomAllTaxInvoiceObj, data);
+                let allObj = {};
+                let filteredArray = [];
+                data.forEach(item => {
+                    allObj[item.tax_invoice_code] = item;
+                    filteredArray.push(item);
+                });
+                set(atomAllTaxInvoiceObj, allObj);
+                set(atomTaxInvoiceArray, filteredArray);
                 return true;
             }
             catch (err) {
@@ -75,40 +85,74 @@ export const TaxInvoiceRepo = selector({
                 const allTaxInvoices = await snapshot.getPromise(atomAllTaxInvoiceObj);
                 if (newTaxInvoice.action_type === 'ADD') {
                     delete newTaxInvoice.action_type;
-                    const updatedNewTransaction = {
+                    const updatedTaxInvoice = {
                         ...newTaxInvoice,
-                        transaction_code: data.out_transaction_code,
+                        tax_invoice_code: data.out_tax_invoice_code,
                         creater: data.out_create_user,
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomTaxInvoiceState, [updatedNewTransaction, ...allTaxInvoices]);
+                    //----- Update AllPurchaseObj --------------------------//
+                    const updatedAllObj = {
+                        ...allTaxInvoices,
+                        [data.out_tax_invoice_code]: updatedTaxInvoice,
+                    };
+                    set(atomTaxInvoiceState, updatedAllObj);
+
+                    //----- Update FilteredPurchaseArray --------------------//
+                    set(atomTaxInvoiceArray, Object.values(updatedAllObj));
+
+                    //----- Update PurchaseByCompany --------------------//
+                    const currentCompany = await snapshot.getPromise(atomCurrentCompany);
+                    if((currentCompany !== defaultCompany)
+                        && (currentCompany.company_code === updatedTaxInvoice.company_code)) {
+                        const taxInvoiceByCompany = await snapshot.getPromise(atomTaxInvoiceByCompany);
+                        const updated = [
+                            ...taxInvoiceByCompany,
+                            updatedTaxInvoice,
+                        ];
+                        set(atomTaxInvoiceByCompany, updated);
+                    };
                     return {result: true};
                 } else if (newTaxInvoice.action_type === 'UPDATE') {
-                    const currentTransaction = await snapshot.getPromise(atomCurrentTaxInvoice);
+                    const currentTaxInvoice = await snapshot.getPromise(atomCurrentTaxInvoice);
                     delete newTaxInvoice.action_type;
                     delete newTaxInvoice.company_code;
                     delete newTaxInvoice.modify_user;
-                    const modifiedTransaction = {
-                        ...currentTransaction,
+                    const modifiedTaxInvoice = {
+                        ...currentTaxInvoice,
                         ...newTaxInvoice,
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomCurrentTaxInvoice, modifiedTransaction);
-                    const foundIdx = allTaxInvoices.findIndex(transaction =>
-                        transaction.transaction_code === modifiedTransaction.transaction_code);
-                    if (foundIdx !== -1) {
-                        const updatedAllTransactions = [
-                            ...allTaxInvoices.slice(0, foundIdx),
-                            modifiedTransaction,
-                            ...allTaxInvoices.slice(foundIdx + 1,),
-                        ];
-                        set(allTaxInvoices, updatedAllTransactions);
-                        return {result: true};
-                    } else {
-                        return {result:false, data: "No Data"};
-                    }
+                    set(atomCurrentTaxInvoice, modifiedTaxInvoice);
+
+                    //----- Update AllPurchaseObj --------------------------//
+                    const updatedAllObj = {
+                        ...allTaxInvoices,
+                        [modifiedTaxInvoice.tax_invoice_code]: modifiedTaxInvoice,
+                    };
+                    set(atomTaxInvoiceState, updatedAllObj);
+
+                    //----- Update FilteredPurchaseArray --------------------//
+                    set(atomTaxInvoiceArray, Object.values(updatedAllObj));
+
+                    //----- Update PurchaseByCompany --------------------//
+                    const currentCompany = await snapshot.getPromise(atomCurrentCompany);
+                    if((currentCompany !== defaultCompany)
+                        && (currentCompany.company_code === modifiedTaxInvoice.company_code)) {
+                        const taxInvoiceByCompany = await snapshot.getPromise(atomTaxInvoiceByCompany);
+                        const foundIdx = taxInvoiceByCompany.findIndex(item => item.tax_invoice_code === modifiedTaxInvoice.tax_invoice_code);
+                        if(foundIdx !== -1) {
+                            const updated = [
+                                ...taxInvoiceByCompany.slice(0, foundIdx),
+                                modifiedTaxInvoice,
+                                ...taxInvoiceByCompany.slice(foundIdx + 1,),
+                            ];
+                            set(atomTaxInvoiceByCompany, updated);
+                        };
+                    };
+                    return {result: true};
                 }
             }
             catch (err) {

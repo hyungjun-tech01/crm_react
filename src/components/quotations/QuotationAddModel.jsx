@@ -19,6 +19,8 @@ import {
   defaultQuotation,
   atomAllProducts,
   atomAllLeadObj,
+  atomCurrentLead,
+  defaultLead,
 } from "../../atoms/atoms";
 import {
   atomUserState,
@@ -57,8 +59,7 @@ const QuotationAddModel = (props) => {
 
 
   //===== [RecoilState] Related with Lead ============================================
-  const leadsState = useRecoilValue(atomLeadState);
-  const leadDataObj = useRecoilValue(atomAllLeadObj);
+  const currentLead = useRecoilValue(atomCurrentLead);
 
 
   //===== [RecoilState] Related with Product ==========================================
@@ -78,40 +79,38 @@ const QuotationAddModel = (props) => {
 
 
   //===== Handles to edit 'QuotationAddModel' ========================================
-  const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
   const [quotationChange, setQuotationChange] = useState({ ...defaultQuotation });
   const [quotationContents, setQuotationContents] = useState([]);
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
 
   const initializeQuotationTemplate = useCallback(() => {
     document.querySelector("#add_new_quotation_form").reset();
-
     setQuotationContents([]);
+
     if (leadCode && leadCode !== '') {
-      const foundLead = leadDataObj[leadCode];
-      if (foundLead) {
+      if(currentLead !== defaultLead) {
         setQuotationChange({
           ...defaultQuotation,
-          lead_code: foundLead.lead_code,
-          lead_name: foundLead.lead_name,
-          department: foundLead.department,
-          position: foundLead.position,
-          mobile_number: foundLead.mobile_number,
-          phone_number: foundLead.phone_number,
-          email: foundLead.email,
+          lead_code: currentLead.lead_code,
+          lead_name: currentLead.lead_name,
+          department: currentLead.department,
+          position: currentLead.position,
+          mobile_number: currentLead.mobile_number,
+          phone_number: currentLead.phone_number,
+          email: currentLead.email,
           receiver: cookies.myLationCrmUserName,
         });
       };
     } else {
       setQuotationChange({
-        ...defaultQuotation,
+        receiver: cookies.myLationCrmUserName,
       });
       handleContentModalCancel();
     };
     setAmountsForContent({
       sub_total_amount: 0, dc_amount: 0, sum_dc_applied:0, vat_amount:0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
     });
-  }, [leadCode, leadDataObj]);
+  }, [cookies.myLationCrmUserName, currentLead, leadCode]);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
@@ -740,7 +739,7 @@ const QuotationAddModel = (props) => {
   useEffect(() => {
     tryLoadAllProductClassList();
     tryLoadAllProducts();
-    if (((leadsState & 1) === 1)
+    if (init
       && ((userState & 1) === 1)
       && ((productClassState & 1) === 1)
       && ((productState & 1) === 1)
@@ -771,18 +770,14 @@ const QuotationAddModel = (props) => {
         setProductOptions(productOptionsValue);
       };
 
-      setIsAllNeededDataLoaded(true);
-
-      if (init) {
-        if (handleInit) handleInit(!init);
-        setTimeout(()=>{
-          initializeQuotationTemplate();
-        }, 500);
-      };
+      if (handleInit) handleInit(!init);
+      setTimeout(()=>{
+        initializeQuotationTemplate();
+      }, 500);
     };
-  }, [leadsState, userState, productClassState, productState, productOptions, init]);
+  }, [userState, productClassState, productState, productOptions, init, tryLoadAllProductClassList, tryLoadAllProducts, handleInit, allProductClassList, setProductOptions, allProducts, initializeQuotationTemplate]);
 
-  if (!isAllNeededDataLoaded)
+  if (init)
     return <div>&nbsp;</div>;
 
   return (

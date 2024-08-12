@@ -42,17 +42,6 @@ const Leads = () => {
   const { tryLoadAllLeads, loadAllLeads, setCurrentLead, filterLeads } = useRecoilValue(LeadRepo);
 
 
-  //===== [RecoilState] Related with Consulting =======================================
-  const { loadCompanyConsultings} = useRecoilValue(ConsultingRepo);
-
-
-  //===== [RecoilState] Related with Quotation ========================================
-  const { loadCompanyQuotations} = useRecoilValue(QuotationRepo);
-
-
-  //===== [RecoilState] Related with Purchase =========================================
-
-
   //===== [RecoilState] Related with User ================================================
   const userState = useRecoilValue(atomUserState);
   const { tryLoadAllUsers } = useRecoilValue(UserRepo);

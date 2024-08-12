@@ -316,7 +316,6 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
 
       loadCompanyMAContracts(selectedCompany.company_code);
       setCurrentCompanyCode(selectedCompany.company_code);
-
       setCheckState({purchase:false, transaction:false, taxInvoice:false});
     }
   }, [selectedCompany, currentCompanyCode, loadCompanyMAContracts]);

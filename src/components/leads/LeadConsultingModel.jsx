@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { useSetRecoilState } from "recoil";
+import { useSetRecoilState, useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { Add } from "@mui/icons-material";
 
-import { atomCurrentConsulting, defaultConsulting } from "../../atoms/atoms";
+import { atomConsultingByLead, atomCurrentConsulting, defaultConsulting } from "../../atoms/atoms";
 
-const LeadConsultingModel = (props) => {
-    const { consultings, handleInitAddConsulting } = props;
+const LeadConsultingModel = ({ handleInitAddConsulting }) => {
     const { t } = useTranslation();
 
 
     //===== [RecoilState] Related with Consulting ==========================================
+    const consultingsByLead = useRecoilValue(atomConsultingByLead);
     const setCurrentConsulting = useSetRecoilState(atomCurrentConsulting);
 
 
@@ -106,7 +106,7 @@ const LeadConsultingModel = (props) => {
 
     useEffect(()=>{
         console.log('[LeadConsultingModel] Maybe consultings are updated');
-    }, [consultings])
+    }, [consultingsByLead])
 
     return (
         <div className="row">
@@ -116,7 +116,7 @@ const LeadConsultingModel = (props) => {
                         <Table
                             rowSelection={consultingRowSelection}
                             pagination={{
-                                total: consultings.length,
+                                total: consultingsByLead.length,
                                 showTotal: ShowTotal,
                                 showSizeChanger: true,
                                 ItemRender: ItemRender,
@@ -124,7 +124,7 @@ const LeadConsultingModel = (props) => {
                             className="table"
                             style={{ overflowX: "auto" }}
                             columns={columns_consulting}
-                            dataSource={consultings}
+                            dataSource={consultingsByLead}
                             rowKey={(record) => record.consulting_code}
                             title={() =>
                                 <div style={{

@@ -113,7 +113,15 @@ export const atomAllLeadObj = atom({
 });
 export const atomFilteredLeadArray  = atom({
     key: "filteredLeadArray",
-    default: {},
+    default: [],
+});
+export const atomConsultingByLead = atom({
+    key: "consultingByLead",
+    default: [],
+});
+export const atomQuotationByLead = atom({
+    key: "quotationByLead",
+    default: [],
 });
 export const atomLeadState = atom({
     key: "leadState",
@@ -238,7 +246,7 @@ export const atomAllQuotationObj = atom({
 });
 export const atomCompanyQuotations = atom({
     key: "companyQuotations",
-    default: {},
+    default: [],
 });
 export const atomFilteredQuotationArray = atom({
     key: "filteredQuotations",
@@ -465,7 +473,7 @@ export const atomAllTaxInvoiceObj = atom({
 });
 export const atomTaxInvoiceArray = atom({
     key: "taxInvoiceArray",
-    default: {},
+    default: [],
 });
 export const atomTaxInvoiceState = atom({
     key: "taxInvoiceState",

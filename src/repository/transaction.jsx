@@ -4,8 +4,11 @@ import {
     atomCurrentTransaction
     , atomAllTransactionObj
     , atomFilteredTransactionArray
-    , atomTransactionState,
-    defaultTransaction
+    , atomTransactionState
+    , defaultTransaction
+    , atomCurrentCompany
+    , defaultCompany,
+    atomTransactionByCompany
 } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
@@ -146,7 +149,27 @@ export const TransactionRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomAllTransactionObj, [updatedNewTransaction, ...allTransactions]);
+                    //----- Update AllTransactionObj --------------------------//
+                    const updatedAllObj = {
+                        ...allTransactions,
+                        [updatedNewTransaction.transaction_code] : updatedNewTransaction,
+                    };
+                    set(atomAllTransactionObj, updatedAllObj);
+
+                    //----- Update FilteredTransactionArray --------------------//
+                    set(atomFilteredTransactionArray, Object.values(updatedAllObj));
+
+                    //----- Update TransactionByCompany --------------------//
+                    const currentCompany = await snapshot.getPromise(atomCurrentCompany);
+                    if((currentCompany !== defaultCompany)
+                        && (currentCompany.company_code === updatedNewTransaction.company_code)) {
+                        const transactionByCompany = await snapshot.getPromise(atomTransactionByCompany);
+                        const updated = [
+                            ...transactionByCompany,
+                            updatedNewTransaction,
+                        ];
+                        set(atomTransactionByCompany, updated);
+                    };
                     return {result: true};
                 } else if (newTransaction.action_type === 'UPDATE') {
                     const currentTransaction = await snapshot.getPromise(atomCurrentTransaction);
@@ -160,15 +183,31 @@ export const TransactionRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCurrentTransaction, modifiedTransaction);
-                    const foundIdx = allTransactions.findIndex(transaction =>
-                        transaction.transaction_code === modifiedTransaction.transaction_code);
-                    if (foundIdx !== -1) {
-                        const updatedAllTransactions = [
-                            ...allTransactions.slice(0, foundIdx),
+
+                    //----- Update AllTransactionObj --------------------------//
+                    const updatedAllObj = {
+                        ...allTransactions,
+                        [modifiedTransaction.transaction_code] : modifiedTransaction,
+                    };
+                    set(atomAllTransactionObj, updatedAllObj);
+
+                    //----- Update FilteredTransactionArray --------------------//
+                    set(atomFilteredTransactionArray, Object.values(updatedAllObj));
+
+                    //----- Update TransactionByCompany --------------------//
+                    const currentCompany = await snapshot.getPromise(atomCurrentCompany);
+                    if((currentCompany !== defaultCompany)
+                        && (currentCompany.company_code === modifiedTransaction.company_code)) {
+                        const transactionByCompany = await snapshot.getPromise(atomTransactionByCompany);
+                        const foundIdx = transactionByCompany.findIndex(item => item.transaction_code === modifiedTransaction.transaction_code);
+                        const updated = [
+                            ...transactionByCompany.slice(0, foundIdx),
                             modifiedTransaction,
-                            ...allTransactions.slice(foundIdx + 1,),
+                            ...transactionByCompany.slice(foundIdx + 1, ),
                         ];
-                        set(atomAllTransactionObj, updatedAllTransactions);
+                        set(atomTransactionByCompany, updated);
+                    };
+
                         return {result: true};
                     } else {
                         return {result:false, data: "No Data"};

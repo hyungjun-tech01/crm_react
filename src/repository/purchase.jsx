@@ -159,23 +159,19 @@ export const PurchaseRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     //----- Update AllPurchaseObj --------------------------//
-                    const updatedAllPurchases = {
+                    const updatedAllObj = {
                         ...allPurchases,
                         [data.out_purchase_code]: updatedNewPurchase,
                     };
-                    set(atomAllPurchaseObj, updatedAllPurchases);
+                    set(atomAllPurchaseObj, updatedAllObj);
 
                     //----- Update FilteredPurchaseArray --------------------//
-                    const filteredAllCompanies = await snapshot.getPromise(atomFilteredPurchaseArray);
-                    const updatedFiltered = [
-                        updatedNewPurchase,
-                        ...filteredAllCompanies
-                    ];
-                    set(atomFilteredPurchaseArray, updatedFiltered);
+                    set(atomFilteredPurchaseArray, Object.values(updatedAllObj));
 
                     //----- Update PurchaseByCompany --------------------//
                     const currentCompany = await snapshot.getPromise(atomCurrentCompany);
-                    if(currentCompany !== defaultCompany) {
+                    if((currentCompany !== defaultCompany)
+                        && (currentCompany.company_code === updatedNewPurchase.company_code)) {
                         const purchaseByCompany = await snapshot.getPromise(atomPurchaseByCompany);
                         const updatedPurchaseByCompany = [
                             ...purchaseByCompany,
@@ -202,29 +198,21 @@ export const PurchaseRepo = selector({
                     set(atomCurrentPurchase, modifiedPurchase);
 
                     //----- Update AllPurchaseObj --------------------------//
-                    const updatedAllPurchases = {
+                    const updatedAllObj = {
                         ...allPurchases,
                         [modifiedPurchase.purchase_code] : modifiedPurchase,
                     };
-                    set(atomAllPurchaseObj, updatedAllPurchases);
+                    set(atomAllPurchaseObj, updatedAllObj);
 
-                    //----- Update FilteredCompanies -----------------------//
-                    const filteredAllPurchases = await snapshot.getPromise(atomFilteredPurchaseArray);
-                    const foundIdx = filteredAllPurchases.filter(item => item.purchase_code === modifiedPurchase.purchase_code);
-                    if(foundIdx !== -1){
-                        const updatedFiltered = [
-                            ...filteredAllPurchases.slice(0, foundIdx),
-                            modifiedPurchase,
-                            ...filteredAllPurchases.slice(foundIdx + 1,),
-                        ];
-                        set(atomFilteredPurchaseArray, updatedFiltered);
-                    };
+                    //----- Update FilteredPurchaseArray --------------------//
+                    set(atomFilteredPurchaseArray, Object.values(updatedAllObj));
 
                     //----- Update PurchaseByCompany --------------------//
                     const currentCompany = await snapshot.getPromise(atomCurrentCompany);
-                    if(currentCompany !== defaultCompany) {
+                    if((currentCompany !== defaultCompany)
+                        && (currentCompany.company_code === modifiedPurchase.company_code)) {
                         const purchaseByCompany = await snapshot.getPromise(atomPurchaseByCompany);
-                        const foundIdx = purchaseByCompany.findIndex(item => item.company_code === currentCompany.company_code);
+                        const foundIdx = purchaseByCompany.findIndex(item => item.purchase_code === modifiedPurchase.purchase_code);
                         if(foundIdx !== -1) {
                             const updatedPurchaseByCompany = [
                                 ...purchaseByCompany.slice(0, foundIdx),
@@ -252,29 +240,23 @@ export const PurchaseRepo = selector({
                     return;
                 };
                 const allPurchases = await snapshot.getPromise(atomAllPurchaseObj);
-                if(!allPurchases[purchase_code]){
-                    // consulting이 없다면 쿼리 
-                    const found = await searchPurchases('consuliting_code', purchase_code, true);
+                if(allPurchases[purchase_code]){
+                    set(atomCurrentPurchase, allPurchases[purchase_code]);
+                } else {
+                    const found = await searchPurchases('purchase_code', purchase_code, true);
                     if(found.result) {
                         set(atomCurrentPurchase, found.data[0]);
-                        let foundObj = {};
-                        found.data.forEach(item => {
-                            foundObj[item.purchase_code] = item;
-                        });
+                        
                         const updatedAllPurchases = {
                             ...allPurchases,
-                            ...foundObj,
+                            [found.data[0].purchase_code] : found.data[0],
                         };
                         set(atomAllPurchaseObj, updatedAllPurchases);
-
-                        const allFiltered = await snapshot.getPromise(atomFilteredPurchaseArray);
-                        set(atomFilteredPurchaseArray, [...allFiltered, ...found.data]);
+                        set(atomFilteredPurchaseArray, Object.values(updatedAllPurchases));
                     } else {
                         set(atomCurrentPurchase, defaultPurchase);
                     };
-                }else{
-                    set(atomCurrentPurchase, allPurchases[purchase_code]);
-                }
+                };
             }
             catch(err){
                 console.error(`setCurrentPurchase / Error : ${err}`);

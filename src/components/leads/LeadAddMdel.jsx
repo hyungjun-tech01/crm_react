@@ -32,7 +32,6 @@ const LeadAddModel = (props) => {
 
 
     //===== Handles to edit 'Lead Add' =====================================================
-    const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
     const [ leadChange, setLeadChange ] = useState({...defaultLead});
     const [ disabledItems, setDisabledItems ] = useState({});
 
@@ -139,7 +138,7 @@ const LeadAddModel = (props) => {
         }
     }, [userState, init]);
 
-    if (!isAllNeededDataLoaded)
+    if (init)
         return <div>&nbsp;</div>;
 
     return (

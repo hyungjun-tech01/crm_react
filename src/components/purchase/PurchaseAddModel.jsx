@@ -13,7 +13,6 @@ import {
     atomProductOptions,
     atomCurrentCompany,
     defaultCompany,
-    defaultPurchase,
 } from '../../atoms/atoms';
 import { PurchaseRepo } from '../../repository/purchase';
 import { ProductTypeOptions } from '../../repository/product';
@@ -318,7 +317,7 @@ const PurchaseAddModel = (props) => {
                 initializePurchaseTemplate();
             }, 500);
         };
-    }, [productClassState, productState, init]);
+    }, [productClassState, productState, init, handleInit, initializePurchaseTemplate]);
 
     if (init)
         return <div>&nbsp;</div>;

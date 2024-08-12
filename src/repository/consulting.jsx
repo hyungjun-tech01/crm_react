@@ -5,8 +5,10 @@ import { atomCurrentConsulting
     , defaultConsulting
     , atomCompanyConsultings
     , atomFilteredConsultingArray
-    , atomConsultingState,
-    atomFilteredCompanyArray
+    , atomConsultingState
+    , atomCurrentLead
+    , defaultLead,
+    atomConsultingByLead
 } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
@@ -237,20 +239,29 @@ export const ConsultingRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     //----- Update AllConsultingObj --------------------------//
-                    const updatedAllConsultings = {
+                    const updatedAllObj = {
                         ...allConsultings,
                         [data.out_consulting_code]: updatedNewConsulting,
                     };
-                    set(atomAllConsultingObj, updatedAllConsultings);
+                    set(atomAllConsultingObj, updatedAllObj);
 
                     //----- Update FilteredConsultings -----------------------//
-                    const filteredAllConsultings = await snapshot.getPromise(atomFilteredConsultingArray);
-                    const updatedFiltered = [
-                        updatedNewConsulting,
-                        ...filteredAllConsultings
-                    ];
-                    set(atomFilteredConsultingArray, updatedFiltered);
-                    return {resutl: true};
+                    set(atomFilteredConsultingArray, Object.values(updatedAllObj));
+
+                    //----- Update ConsultingByLead -----------------------//
+                    const currentLead = await snapshot.getPromise(atomCurrentLead);
+                    if((currentLead !== defaultLead)
+                        && (currentLead.lead_code === updatedNewConsulting.lead_code))
+                    {
+                        const purchaseByCompany = await snapshot.getPromise(atomConsultingByLead);
+                        const updatedPurchaseByCompany = [
+                            ...purchaseByCompany,
+                            updatedNewConsulting,
+                        ];
+                        set(atomConsultingByLead, updatedPurchaseByCompany);
+                    };
+
+                    return {result: true};
                 } else if(newConsulting.action_type === 'UPDATE'){
                     const currentConsulting = await snapshot.getPromise(atomCurrentConsulting);
                     delete newConsulting.action_type;
@@ -265,24 +276,32 @@ export const ConsultingRepo = selector({
                     set(atomCurrentConsulting, modifiedConsulting);
 
                     //----- Update AllConsultingObj --------------------------//
-                    const updatedAllConsultings = {
+                    const updatedAllObj = {
                         ...allConsultings,
                         [modifiedConsulting.consulting_code] : modifiedConsulting,
                     };
-                    set(atomAllConsultingObj, updatedAllConsultings);
+                    set(atomAllConsultingObj, updatedAllObj);
 
                     //----- Update FilteredConsultings -----------------------//
-                    const filteredAllConsultings = await snapshot.getPromise(atomFilteredConsultingArray);
-                    const foundIdx = filteredAllConsultings.filter(item => item.consulting_code === modifiedConsulting.consulting_code);
-                    if(foundIdx !== -1){
-                        const updatedFiltered = [
-                            ...filteredAllConsultings.slice(0, foundIdx),
-                            modifiedConsulting,
-                            ...filteredAllConsultings.slice(foundIdx + 1,),
-                        ];
-                        set(atomFilteredConsultingArray, updatedFiltered);
+                    set(atomFilteredConsultingArray, Object.values(updatedAllObj));
+
+                    //----- Update ConsultingByLead -----------------------//
+                    const currentLead = await snapshot.getPromise(atomCurrentLead);
+                    if((currentLead !== defaultLead)
+                        && (currentLead.lead_code === modifiedConsulting.lead_code)) {
+                        const consultingsByLead = await snapshot.getPromise(atomConsultingByLead);
+                        const foundIdx = consultingsByLead.findIndex(item => item.consulting_code === modifiedConsulting.consulting_code);
+                        if(foundIdx !== -1) {
+                            const updatedConsultingByLead = [
+                                ...consultingsByLead.slice(0, foundIdx),
+                                modifiedConsulting,
+                                ...consultingsByLead.slice(foundIdx + 1,),
+                            ];
+                            set(atomConsultingByLead, updatedConsultingByLead);
+                        };
                     };
-                    return {resutl: true};
+
+                    return {result: true};
                 }
             }
             catch(err){
@@ -301,18 +320,12 @@ export const ConsultingRepo = selector({
                     const found = await searchConsultings('consuliting_code', consulting_code, true);
                     if(found.result) {
                         set(atomCurrentConsulting, found.data[0]);
-                        let foundObj = {};
-                        found.data.forEach(item => {
-                            foundObj[item.consulting_code] = item;
-                        });
                         const updatedAllConsultings = {
                             ...allConsultings,
-                            ...foundObj,
+                            [found.data[0].consulting_code] : found.data[0],
                         };
                         set(atomAllConsultingObj, updatedAllConsultings);
-
-                        const allFiltered = await snapshot.getPromise(atomFilteredConsultingArray);
-                        set(atomFilteredConsultingArray, [...allFiltered, ...found.data]);
+                        set(atomFilteredConsultingArray, Object.values(updatedAllConsultings));
                     } else {
                         set(atomCurrentConsulting, defaultConsulting);
                     };

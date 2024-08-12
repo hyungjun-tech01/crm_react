@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSetRecoilState } from "recoil";
+import { useSetRecoilState, useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
@@ -7,15 +7,15 @@ import { ItemRender, ShowTotal } from "../paginationfunction";
 import { formatDate, ConvertCurrency } from "../../constants/functions";
 import { Add } from "@mui/icons-material";
 
-import { atomCurrentQuotation, defaultQuotation } from "../../atoms/atoms";
+import { atomCurrentQuotation, atomQuotationByLead, defaultQuotation } from "../../atoms/atoms";
 
 
-const LeadQuotationModel = (props) => {
-    const { quotations, handleInitAddQuotation } = props;
+const LeadQuotationModel = ({ handleInitAddQuotation }) => {
     const { t } = useTranslation();
 
 
     //===== [RecoilState] Related with Quotation ===========================================
+    const quotationsByLead = useRecoilValue(atomQuotationByLead);
     const setCurrentQuotation = useSetRecoilState(atomCurrentQuotation);
 
 
@@ -108,7 +108,7 @@ const LeadQuotationModel = (props) => {
                         <Table
                             rowSelection={quotationRowSelection}
                             pagination={{
-                                total: quotations.length,
+                                total: quotationsByLead.length,
                                 showTotal: ShowTotal,
                                 showSizeChanger: true,
                                 ItemRender: ItemRender,
@@ -116,7 +116,7 @@ const LeadQuotationModel = (props) => {
                             className="table"
                             style={{ overflowX: "auto" }}
                             columns={columns_quotation}
-                            dataSource={quotations}
+                            dataSource={quotationsByLead}
                             rowKey={(record) => record.quotation_code}
                             title={() =>
                                 <div style={{

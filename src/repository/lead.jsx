@@ -221,8 +221,19 @@ export const LeadRepo = selector({
                 if(allLeads[lead_code]){
                     set(atomCurrentLead, allLeads[lead_code]);
                 } else {
-                    console.log('\t[ setCurrentLead ] No lead data matched the specified id');
-                    set(atomCurrentLead, defaultLead);
+                    const found = await searchLeads('lead_code', lead_code, true);
+                    if(found.result) {
+                        set(atomCurrentLead, found.data[0]);
+
+                        const updatedAllLeads = {
+                            ...allLeads,
+                            [found.data[0].lead_code]: found.data[0]
+                        };
+                        set(atomAllLeadObj, updatedAllLeads);
+                        set(atomFilteredLeadArray, Object.values(updatedAllLeads));
+                    } else {
+                        set(atomCurrentLead, defaultLead);
+                    };
                 }
             }
             catch(err){

@@ -5,7 +5,10 @@ import { atomCurrentQuotation
     , defaultQuotation
     , atomCompanyQuotations
     , atomFilteredQuotationArray
-    , atomQuotationState
+    , atomQuotationState,
+    atomCurrentLead,
+    defaultLead,
+    atomQuotationByLead
 } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
@@ -185,7 +188,29 @@ export const QuotationRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomAllQuotationObj, [updatedNewQuotation, ...allQuotations]);
+                    //----- Update AllQuotationObj --------------------------//
+                    const updatedAllObj = {
+                        ...allQuotations,
+                        [data.out_quotation_code]: updatedNewQuotation,
+                    };
+                    set(atomAllQuotationObj, updatedAllObj);
+
+                    //----- Update FilteredQuotationArry -----------------------//
+                    set(atomFilteredQuotationArray, Object.values(updatedAllObj));
+
+                    //----- Update QuotationByLead -----------------------//
+                    const currentLead = await snapshot.getPromise(atomCurrentLead);
+                    if((currentLead !== defaultLead)
+                        && (currentLead.lead_code === updatedNewQuotation.lead_code))
+                    {
+                        const quotationByLead = await snapshot.getPromise(atomQuotationByLead);
+                        const updatedQuotationByLead = [
+                            ...quotationByLead,
+                            updatedNewQuotation,
+                        ];
+                        set(atomQuotationByLead, updatedQuotationByLead);
+                    };
+
                     return {result: true};
                 } else if(newQuotation.action_type === 'UPDATE'){
                     const currentQuotation = await snapshot.getPromise(atomCurrentQuotation);
@@ -199,18 +224,32 @@ export const QuotationRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCurrentQuotation, modifiedQuotation);
-                    const foundIdx = allQuotations.findIndex(quotation => 
-                        quotation.quotation_code === modifiedQuotation.quotation_code);
-                    if(foundIdx !== -1){
-                        const updatedAllQuotations = [
-                            ...allQuotations.slice(0, foundIdx),
-                            modifiedQuotation,
-                            ...allQuotations.slice(foundIdx + 1,),
-                        ];
-                        set(atomAllQuotationObj, updatedAllQuotations);
-                        return {result: true};
-                    } else {
-                        return {result:false, data: "No Data"};
+
+                    //----- Update AllQuotationObj --------------------------//
+                    const updatedAllObj = {
+                        ...allQuotations,
+                        [modifiedQuotation.consulting_code]: modifiedQuotation,
+                    };
+                    set(atomAllQuotationObj, updatedAllObj);
+
+                    //----- Update FilteredQuotationArry -----------------------//
+                    set(atomFilteredQuotationArray, Object.values(updatedAllObj));
+
+                    //----- Update QuotationByLead -----------------------//
+                    const currentLead = await snapshot.getPromise(atomCurrentLead);
+                    if((currentLead !== defaultLead)
+                        && (currentLead.lead_code === modifiedQuotation.lead_code))
+                    {
+                        const quotationsByLead = await snapshot.getPromise(atomQuotationByLead);
+                        const foundIdx = quotationsByLead.findIndex(item => item.quotation_code === modifiedQuotation.quotation_code);
+                        if(foundIdx !== -1) {
+                            const updated = [
+                                ...quotationsByLead.slice(0, foundIdx),
+                                modifiedQuotation,
+                                ...quotationsByLead.slice(foundIdx + 1, ),
+                            ];
+                            set(atomQuotationByLead, updated);
+                        }
                     }
                 }
             }
