@@ -173,13 +173,12 @@ export const PurchaseRepo = selector({
                     if((currentCompany !== defaultCompany)
                         && (currentCompany.company_code === updatedNewPurchase.company_code)) {
                         const purchaseByCompany = await snapshot.getPromise(atomPurchaseByCompany);
-                        const updatedPurchaseByCompany = [
-                            ...purchaseByCompany,
+                        const updated = [
                             updatedNewPurchase,
+                            ...purchaseByCompany,
                         ];
-                        set(atomPurchaseByCompany, updatedPurchaseByCompany);
+                        set(atomPurchaseByCompany, updated);
                     };
-
                     return {
                         result: true,
                         code: data.out_purchase_code,
@@ -214,15 +213,14 @@ export const PurchaseRepo = selector({
                         const purchaseByCompany = await snapshot.getPromise(atomPurchaseByCompany);
                         const foundIdx = purchaseByCompany.findIndex(item => item.purchase_code === modifiedPurchase.purchase_code);
                         if(foundIdx !== -1) {
-                            const updatedPurchaseByCompany = [
+                            const updated = [
                                 ...purchaseByCompany.slice(0, foundIdx),
                                 modifiedPurchase,
                                 ...purchaseByCompany.slice(foundIdx + 1,),
                             ];
-                            set(atomPurchaseByCompany, updatedPurchaseByCompany);
+                            set(atomPurchaseByCompany, updated);
                         };
                     };
-
                     return {
                         result: true,
                         code: modifiedPurchase.purchase_code,

@@ -253,12 +253,12 @@ export const ConsultingRepo = selector({
                     if((currentLead !== defaultLead)
                         && (currentLead.lead_code === updatedNewConsulting.lead_code))
                     {
-                        const purchaseByCompany = await snapshot.getPromise(atomConsultingByLead);
-                        const updatedPurchaseByCompany = [
-                            ...purchaseByCompany,
+                        const consultingByCompany = await snapshot.getPromise(atomConsultingByLead);
+                        const updated = [
                             updatedNewConsulting,
+                            ...consultingByCompany,
                         ];
-                        set(atomConsultingByLead, updatedPurchaseByCompany);
+                        set(atomConsultingByLead, updated);
                     };
 
                     return {result: true};
@@ -292,17 +292,16 @@ export const ConsultingRepo = selector({
                         const consultingsByLead = await snapshot.getPromise(atomConsultingByLead);
                         const foundIdx = consultingsByLead.findIndex(item => item.consulting_code === modifiedConsulting.consulting_code);
                         if(foundIdx !== -1) {
-                            const updatedConsultingByLead = [
+                            const updated = [
                                 ...consultingsByLead.slice(0, foundIdx),
                                 modifiedConsulting,
                                 ...consultingsByLead.slice(foundIdx + 1,),
                             ];
-                            set(atomConsultingByLead, updatedConsultingByLead);
+                            set(atomConsultingByLead, updated);
                         };
                     };
-
                     return {result: true};
-                }
+                };
             }
             catch(err){
                 return {result:false, data: err};

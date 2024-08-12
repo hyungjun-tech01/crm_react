@@ -204,11 +204,11 @@ export const QuotationRepo = selector({
                         && (currentLead.lead_code === updatedNewQuotation.lead_code))
                     {
                         const quotationByLead = await snapshot.getPromise(atomQuotationByLead);
-                        const updatedQuotationByLead = [
-                            ...quotationByLead,
+                        const updated = [
                             updatedNewQuotation,
+                            ...quotationByLead,
                         ];
-                        set(atomQuotationByLead, updatedQuotationByLead);
+                        set(atomQuotationByLead, updated);
                     };
 
                     return {result: true};

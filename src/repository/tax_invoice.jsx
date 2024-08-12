@@ -108,8 +108,8 @@ export const TaxInvoiceRepo = selector({
                         && (currentCompany.company_code === updatedTaxInvoice.company_code)) {
                         const taxInvoiceByCompany = await snapshot.getPromise(atomTaxInvoiceByCompany);
                         const updated = [
-                            ...taxInvoiceByCompany,
                             updatedTaxInvoice,
+                            ...taxInvoiceByCompany,
                         ];
                         set(atomTaxInvoiceByCompany, updated);
                     };

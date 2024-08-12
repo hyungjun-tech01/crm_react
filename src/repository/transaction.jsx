@@ -165,8 +165,8 @@ export const TransactionRepo = selector({
                         && (currentCompany.company_code === updatedNewTransaction.company_code)) {
                         const transactionByCompany = await snapshot.getPromise(atomTransactionByCompany);
                         const updated = [
-                            ...transactionByCompany,
                             updatedNewTransaction,
+                            ...transactionByCompany,
                         ];
                         set(atomTransactionByCompany, updated);
                     };
@@ -207,12 +207,8 @@ export const TransactionRepo = selector({
                         ];
                         set(atomTransactionByCompany, updated);
                     };
-
-                        return {result: true};
-                    } else {
-                        return {result:false, data: "No Data"};
-                    }
-                }
+                    return {result: true};
+                };
             }
             catch (err) {
                 return {result:false, data: err};
