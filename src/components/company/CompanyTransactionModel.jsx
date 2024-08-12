@@ -1,19 +1,20 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useSetRecoilState } from "recoil";
+import { useSetRecoilState, useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
-import { atomCurrentTransaction, defaultTransaction } from '../../atoms/atoms';
+import { atomCurrentTransaction, atomTransactionByCompany, defaultTransaction } from '../../atoms/atoms';
 
 const CompanyTransactionModel = (props) => {
-    const { transactions, openTransaction } = props;
+    const { openTransaction } = props;
     const { t } = useTranslation();
 
 
     //===== [RecoilState] Related with Transaction ======================================
+    const transactionByCompany = useRecoilValue(atomTransactionByCompany);
     const setCurrentTransaction = useSetRecoilState(atomCurrentTransaction)
     
     // --- Variables for only Transaction ------------------------------------------------
@@ -102,7 +103,7 @@ const CompanyTransactionModel = (props) => {
 
     useEffect(() => {
         console.log('[CompanyTransactionModel] called!');
-    }, [transactions]);
+    }, [transactionByCompany]);
 
     return (
         <div className="row">
@@ -112,7 +113,7 @@ const CompanyTransactionModel = (props) => {
                         <Table
                             rowSelection={transactionRowSelection}
                             pagination={{
-                                total: transactions.length,
+                                total: transactionByCompany.length,
                                 showTotal: ShowTotal,
                                 showSizeChanger: true,
                                 ItemRender: ItemRender,
@@ -120,7 +121,7 @@ const CompanyTransactionModel = (props) => {
                             className="table"
                             style={{ overflowX: "auto" }}
                             columns={columns_transaction}
-                            dataSource={transactions}
+                            dataSource={transactionByCompany}
                             rowKey={(record) => record.publish_date}
                             onRow={(record, rowIndex) => {
                                 return {

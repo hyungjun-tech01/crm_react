@@ -34,6 +34,7 @@ const PurchaseAddModel = (props) => {
     const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
     const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
     const [message, setMessage] = useState({ title: "", message: "" });
+    
 
     //===== [RecoilState] Related with Company =============================================
     const currentCompany = useRecoilValue(atomCurrentCompany);
@@ -310,7 +311,7 @@ const PurchaseAddModel = (props) => {
         if (init
             && ((productClassState & 1) === 1)
             && ((productState & 1) === 1)
-        ) {
+        ){
             console.log('[PurchaseAddModel] initialize!');
             if(handleInit) handleInit(!init);
             setTimeout(()=>{

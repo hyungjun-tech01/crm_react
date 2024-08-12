@@ -1,19 +1,20 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
-import { atomCurrentTaxInvoice, defaultTaxInvoice } from '../../atoms/atoms';
+import { atomCurrentTaxInvoice, atomTaxInvoiceByCompany, defaultTaxInvoice } from '../../atoms/atoms';
 
 const CompanyTaxInvoiceModel = (props) => {
-    const { taxInvoices, openTaxInvoice } = props;
+    const { openTaxInvoice } = props;
     const { t } = useTranslation();
 
 
     //===== [RecoilState] Related with TaxInvoice ======================================
+    const taxInvoiceByCompany = useRecoilValue(atomTaxInvoiceByCompany);
     const setCurrentTaxInvoice = useSetRecoilState(atomCurrentTaxInvoice);
 
     
@@ -103,7 +104,7 @@ const CompanyTaxInvoiceModel = (props) => {
 
     useEffect(() => {
         console.log('[CompanyTaxInvoiceModel] called!');
-    }, [taxInvoices]);
+    }, [taxInvoiceByCompany]);
 
     return (
         <div className="row">
@@ -113,7 +114,7 @@ const CompanyTaxInvoiceModel = (props) => {
                         <Table
                             rowSelection={taxInvoiceRowSelection}
                             pagination={{
-                                total: taxInvoices.length,
+                                total: taxInvoiceByCompany.length,
                                 showTotal: ShowTotal,
                                 showSizeChanger: true,
                                 ItemRender: ItemRender,
@@ -121,7 +122,7 @@ const CompanyTaxInvoiceModel = (props) => {
                             className="table"
                             style={{ overflowX: "auto" }}
                             columns={columns_tax_invoice}
-                            dataSource={taxInvoices}
+                            dataSource={taxInvoiceByCompany}
                             rowKey={(record) => record.publish_date}
                             onRow={(record, rowIndex) => {
                                 return {

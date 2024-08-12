@@ -5,7 +5,10 @@ import { atomCurrentPurchase
     , atomCompanyPurchases
     , atomFilteredPurchaseArray
     , defaultPurchase
-    , atomPurchaseState
+    , atomPurchaseState,
+    atomCurrentCompany,
+    defaultCompany,
+    atomPurchaseByCompany
 } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
@@ -70,67 +73,67 @@ export const PurchaseRepo = selector({
                 return false;
             };
         });
-        const loadCompanyPurchases = getCallback(({set}) => async (company_code) => {
-            const input_json = {company_code:company_code};
-            //JSON.stringify(company_code);
-            try{
-                const response = await fetch(`${BASE_PATH}/companyPurchases`, {
-                    method: "POST",
-                    headers:{'Content-Type':'application/json'},
-                    body: JSON.stringify(input_json),
-                });
+        // const loadCompanyPurchases = getCallback(({set}) => async (company_code) => {
+        //     const input_json = {company_code:company_code};
+        //     //JSON.stringify(company_code);
+        //     try{
+        //         const response = await fetch(`${BASE_PATH}/companyPurchases`, {
+        //             method: "POST",
+        //             headers:{'Content-Type':'application/json'},
+        //             body: JSON.stringify(input_json),
+        //         });
 
-                const data = await response.json();
-                if(data.message){
-                    console.log('loadCompanyPurchases message:', data.message);
-                    set(atomCompanyPurchases, input_json);
-                    return;
-                }
-                set(atomCompanyPurchases, data);
-            }
-            catch(err){
-                console.error(`loadCompanyPurchases / Error : ${err}`);
-            };
-        });
-        const filterCompanyPurchase = getCallback(({set, snapshot }) => async (filterText) => {
-            const allPurchaseList = await snapshot.getPromise(atomCompanyPurchases);
+        //         const data = await response.json();
+        //         if(data.message){
+        //             console.log('loadCompanyPurchases message:', data.message);
+        //             set(atomCompanyPurchases, input_json);
+        //             return;
+        //         }
+        //         set(atomCompanyPurchases, data);
+        //     }
+        //     catch(err){
+        //         console.error(`loadCompanyPurchases / Error : ${err}`);
+        //     };
+        // });
+        // const filterCompanyPurchase = getCallback(({set, snapshot }) => async (filterText) => {
+        //     const allPurchaseList = await snapshot.getPromise(atomCompanyPurchases);
             
-            let allPurchase;
-            if (filterText === '') {
-                allPurchase = allPurchaseList;
-            }
-            else {
-                allPurchase = 
-                allPurchaseList.filter(item => ( item.product_type && item.product_type.includes(filterText)||
-                                                item.product_name && item.product_name.includes(filterText)      
-                ));
-            }
-            set(atomFilteredPurchaseArray, allPurchase);
-            return true;
-        });
-        const filterPurchases = getCallback(({set, snapshot }) => async (itemName, filterText) => {
-            const allPurchaseData = await snapshot.getPromise(atomAllPurchaseObj);
-            const allPurchaseList = Object.values(allPurchaseData);
-            let  allQPurchase = [];
+        //     let allPurchase;
+        //     if (filterText === '') {
+        //         allPurchase = allPurchaseList;
+        //     }
+        //     else {
+        //         allPurchase = 
+        //         allPurchaseList.filter(item => ( item.product_type && item.product_type.includes(filterText)||
+        //                                         item.product_name && item.product_name.includes(filterText)      
+        //         ));
+        //     }
+        //     set(atomFilteredPurchaseArray, allPurchase);
+        //     return true;
+        // });
+        // const filterPurchases = getCallback(({set, snapshot }) => async (itemName, filterText) => {
+        //     const allPurchaseData = await snapshot.getPromise(atomAllPurchaseObj);
+        //     const allPurchaseList = Object.values(allPurchaseData);
+        //     let  allQPurchase = [];
             
-            if(itemName === 'common.all'){
-                allQPurchase = allPurchaseList.filter(item => (item.product_type &&item.product_type.includes(filterText))||
-                                            (item.product_name && item.product_name.includes(filterText)) ||
-                                            (item.company_name && item.company_name.includes(filterText)) 
-                );
-            }else if(itemName === 'purchase.product_type'){
-                allQPurchase = allPurchaseList.filter(item => (item.product_type &&item.product_type.includes(filterText))
-                );    
-            }else if(itemName === 'purchase.product_name'){
-                allQPurchase = allPurchaseList.filter(item => (item.product_name &&item.product_name.includes(filterText))
-                );  
-            }else if(itemName === 'company.company_name'){
-                allQPurchase = allPurchaseList.filter(item => (item.company_name &&item.company_name.includes(filterText))
-                );  
-            }
-            set(atomFilteredPurchaseArray, allQPurchase);
-            return true;
-        });            
+        //     if(itemName === 'common.all'){
+        //         allQPurchase = allPurchaseList.filter(item => (item.product_type &&item.product_type.includes(filterText))||
+        //                                     (item.product_name && item.product_name.includes(filterText)) ||
+        //                                     (item.company_name && item.company_name.includes(filterText)) 
+        //         );
+        //     }else if(itemName === 'purchase.product_type'){
+        //         allQPurchase = allPurchaseList.filter(item => (item.product_type &&item.product_type.includes(filterText))
+        //         );    
+        //     }else if(itemName === 'purchase.product_name'){
+        //         allQPurchase = allPurchaseList.filter(item => (item.product_name &&item.product_name.includes(filterText))
+        //         );  
+        //     }else if(itemName === 'company.company_name'){
+        //         allQPurchase = allPurchaseList.filter(item => (item.company_name &&item.company_name.includes(filterText))
+        //         );  
+        //     }
+        //     set(atomFilteredPurchaseArray, allQPurchase);
+        //     return true;
+        // });            
         const modifyPurchase = getCallback(({set, snapshot}) => async (newPurchase) => {
             const input_json = JSON.stringify(newPurchase);
             try{
@@ -169,6 +172,18 @@ export const PurchaseRepo = selector({
                         ...filteredAllCompanies
                     ];
                     set(atomFilteredPurchaseArray, updatedFiltered);
+
+                    //----- Update PurchaseByCompany --------------------//
+                    const currentCompany = await snapshot.getPromise(atomCurrentCompany);
+                    if(currentCompany !== defaultCompany) {
+                        const purchaseByCompany = await snapshot.getPromise(atomPurchaseByCompany);
+                        const updatedPurchaseByCompany = [
+                            ...purchaseByCompany,
+                            updatedNewPurchase,
+                        ];
+                        set(atomPurchaseByCompany, updatedPurchaseByCompany);
+                    };
+
                     return {
                         result: true,
                         code: data.out_purchase_code,
@@ -204,6 +219,22 @@ export const PurchaseRepo = selector({
                         ];
                         set(atomFilteredPurchaseArray, updatedFiltered);
                     };
+
+                    //----- Update PurchaseByCompany --------------------//
+                    const currentCompany = await snapshot.getPromise(atomCurrentCompany);
+                    if(currentCompany !== defaultCompany) {
+                        const purchaseByCompany = await snapshot.getPromise(atomPurchaseByCompany);
+                        const foundIdx = purchaseByCompany.findIndex(item => item.company_code === currentCompany.company_code);
+                        if(foundIdx !== -1) {
+                            const updatedPurchaseByCompany = [
+                                ...purchaseByCompany.slice(0, foundIdx),
+                                modifiedPurchase,
+                                ...purchaseByCompany.slice(foundIdx + 1,),
+                            ];
+                            set(atomPurchaseByCompany, updatedPurchaseByCompany);
+                        };
+                    };
+
                     return {
                         result: true,
                         code: modifiedPurchase.purchase_code,
@@ -307,11 +338,8 @@ export const PurchaseRepo = selector({
         return {
             tryLoadAllPurchases,
             loadAllPurchases,
-            loadCompanyPurchases,
             modifyPurchase,
             setCurrentPurchase,
-            filterPurchases,
-            filterCompanyPurchase,
             searchPurchases,
         };
     }

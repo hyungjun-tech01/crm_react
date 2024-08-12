@@ -7,8 +7,6 @@ import { Space, Switch, Table } from "antd";
 import { Add } from "@mui/icons-material";
 
 import {
-  atomCompanyState,
-  atomCompanyForSelection,
   atomProductClassListState,
   atomProductsState,
   atomProductOptions,
@@ -16,6 +14,8 @@ import {
   defaultMAContract,
   atomCurrentPurchase,
   defaultPurchase,
+  atomCurrentCompany,
+  defaultCompany,
 } from "../../atoms/atoms";
 import { PurchaseRepo } from "../../repository/purchase";
 import { ProductTypeOptions } from "../../repository/product";
@@ -26,6 +26,7 @@ import DetailTitleItem from "../../constants/DetailTitleItem";
 import DetailSubModal from "../../constants/DetailSubModal";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
+import { CompanyRepo } from "../../repository/company";
 
 
 const PurchaseDetailsModel = () => {
@@ -39,8 +40,8 @@ const PurchaseDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Company ==========================================
-  const companyState = useRecoilValue(atomCompanyState);
-  const companyForSelection = useRecoilValue(atomCompanyForSelection);
+  const currentCompany = useRecoilValue(atomCurrentCompany);
+  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Product ==========================================
@@ -329,8 +330,12 @@ const PurchaseDetailsModel = () => {
 
       loadPurchaseMAContracts(currentPurchase.purchase_code);
       setCurrentPurchaseCode(currentPurchase.purchase_code);
+
+      if(currentCompany === defaultCompany) {
+        setCurrentCompany(currentPurchase.company_code);
+      };
     };
-  }, [currentPurchase, loadPurchaseMAContracts, currentPurchaseCode]);
+  }, [currentPurchase, currentCompany, loadPurchaseMAContracts, currentPurchaseCode]);
 
   useEffect(() => {
     if (((productClassState & 1) === 1)
@@ -382,7 +387,7 @@ const PurchaseDetailsModel = () => {
                       <span><b>{t('company.company_name')}</b></span>
                       <div style={{display: 'flex'}}>
                         <label className='detail-title-input'>
-                          {currentPurchase.company_name}
+                          {currentCompany.company_name}
                         </label>
                       </div>
                   </div>

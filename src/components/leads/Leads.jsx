@@ -51,7 +51,6 @@ const Leads = () => {
 
 
   //===== [RecoilState] Related with Purchase =========================================
-  const { loadCompanyPurchases }  = useRecoilValue(PurchaseRepo);
 
 
   //===== [RecoilState] Related with User ================================================

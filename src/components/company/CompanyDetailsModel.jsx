@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
@@ -9,6 +9,9 @@ import { option_locations, option_deal_type } from "../../constants/constants";
 
 import {
   atomCurrentCompany,
+  atomPurchaseByCompany,
+  atomTaxInvoiceByCompany,
+  atomTransactionByCompany,
   defaultCompany,
 } from "../../atoms/atoms";
 import {
@@ -45,15 +48,18 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
 
 
   //===== [RecoilState] Related with Purchase =========================================
+  const [ purchaseByCompany, setPurchasesByCompany ] = useRecoilState(atomPurchaseByCompany);
   const { searchPurchases } = useRecoilValue(PurchaseRepo);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
 
   //===== [RecoilState] Related with Transaction ======================================
+  const [ transactionByCompany, setTransactionByCompany ] = useRecoilState(atomTransactionByCompany);
   const { searchTransactions } = useRecoilValue(TransactionRepo);
 
 
   //===== [RecoilState] Related with Tax Invoice ======================================
+  const [ taxInvoiceByCompany, setTaxInvoiceByCompany ] = useRecoilState(atomTaxInvoiceByCompany);
   const { searchTaxInvoices } = useRecoilValue(TaxInvoiceRepo);
 
 
@@ -76,11 +82,8 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
 
   //===== Handles to edit 'Company Details' ============================================
   const [editedDetailValues, setEditedDetailValues] = useState(null);
-  const [purchasesByCompany, setPurchasesByCompany] = useState([]);
   const [initAddPurchase, setInitAddPurchase] = useState(false);
-  const [transactionByCompany, setTransactionByCompany] = useState([]);
   const [validMACount, setValidMACount] = useState(0);
-  const [taxInvoiceByCompany, setTaxInvoiceByCompany] = useState([]);
 
   const handleDetailChange = useCallback(
     (e) => {
@@ -145,7 +148,7 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
         modify_user: cookies.myLationCrmUserId,
         company_code: selectedCompany.company_code,
       };
-      const resp = modifyCompany(temp_all_saved)
+      const resp = modifyCompany(temp_all_saved);
       resp.then(res => {
         if (res.result) {
           console.log(`Succeeded to modify company`);
@@ -388,7 +391,7 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
 
   //===== useEffect for User ==========================================================
   useEffect(() => {
-    if (checkState.purchase && checkState.transaction && checkState.taxInvoice
+    if (init && checkState.purchase && checkState.transaction && checkState.taxInvoice
       && ((userState & 1) === 1)
      ){
       console.log('[CompanyDetailModel] all needed data is loaded');
@@ -476,7 +479,7 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
                         "(" +
                         validMACount +
                         "/" +
-                        purchasesByCompany.length +
+                        purchaseByCompany.length +
                         ")"}
                     </Link>
                   </li>
@@ -546,7 +549,6 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
                     id="company-details-product"
                   >
                     <CompanyPurchaseModel
-                      purchases={purchasesByCompany}
                       handleInitAddPurchase={setInitAddPurchase}
                     />
                   </div>
@@ -555,7 +557,6 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
                     id="company-details-transaction"
                   >
                     <CompanyTransactionModel
-                      transactions={transactionByCompany}
                       openTransaction={openTransaction}
                     />
                   </div>
@@ -564,7 +565,6 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
                     id="company-details-taxinvoice"
                   >
                     <CompanyTaxInvoiceModel
-                      taxInvoices={taxInvoiceByCompany}
                       openTaxInvoice={openTaxInvoice}
                     />
                   </div>

@@ -15,12 +15,13 @@ import {
     atomProductsState,
     atomProductOptions,
     defaultPurchase,
+    atomPurchaseByCompany,
 } from "../../atoms/atoms";
 import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 
 
 const CompanyPurchaseModel = (props) => {
-    const { purchases, handleInitAddPurchase } = props;
+    const { handleInitAddPurchase } = props;
     const { t } = useTranslation();
 
 
@@ -35,6 +36,7 @@ const CompanyPurchaseModel = (props) => {
 
 
     //===== [RecoilState] Related with Purchase =========================================
+    const purchaseByCompany = useRecoilValue(atomPurchaseByCompany);
     const setCurrentPurchase = useSetRecoilState(atomCurrentPurchase);
 
 
@@ -130,7 +132,7 @@ const CompanyPurchaseModel = (props) => {
                             label: <span>{item.product_name}</span>,
                             value: { product_code: item.product_code,
                                 product_name: item.product_name,
-                                product_class: item.product_class,
+                                product_class_name: item.product_class_name,
                                 detail_desc: item.detail_desc,
                                 cost_price: item.const_price,
                                 reseller_price: item.reseller_price,
@@ -150,6 +152,10 @@ const CompanyPurchaseModel = (props) => {
         };
     }, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions]);
 
+    useEffect(() => {
+        console.log('[CompanyPurchaseModel] called!', purchaseByCompany);
+    }, [purchaseByCompany]);
+
     if (!isAllNeededDataLoaded)
         return <div>&nbsp;</div>;
 
@@ -161,7 +167,7 @@ const CompanyPurchaseModel = (props) => {
                         <Table
                             rowSelection={purchaseRowSelection}
                             pagination={{
-                                total: purchases.length,
+                                total: purchaseByCompany.length,
                                 showTotal: ShowTotal,
                                 showSizeChanger: true,
                                 ItemRender: ItemRender,
@@ -169,7 +175,7 @@ const CompanyPurchaseModel = (props) => {
                             className="table"
                             style={{ overflowX: "auto" }}
                             columns={columns_purchase}
-                            dataSource={purchases}
+                            dataSource={purchaseByCompany}
                             rowKey={(record) => record.purchase_code}
                             title={() =>
                                 <div style={{

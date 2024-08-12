@@ -55,6 +55,18 @@ export const atomCompanyForSelection = atom({
     key: "companySelection",
     default: [],
 });
+export const atomPurchaseByCompany = atom({
+    key: "purchaseByCompany",
+    default: [],
+});
+export const atomTransactionByCompany = atom({
+    key: "transactionByCompany",
+    default: [],
+});
+export const atomTaxInvoiceByCompany = atom({
+    key: "taxInvoiceByCompany",
+    default: [],
+});
 
 //----- Lead ------------------------
 export const defaultLead = {
@@ -385,7 +397,7 @@ export const atomProductClassListState = atom({
 //----- Product  -----------------------------
 export const defaultProduct = {
     product_code : null,
-    product_class : null,
+    product_class_name : null,
     manufacturer : null,
     model_name : null,
     product_name : null,
