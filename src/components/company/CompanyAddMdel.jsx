@@ -89,7 +89,6 @@ const CompanyAddModel = (props) => {
       const newComData = {
         ...companyChange,
         action_type: "ADD",
-        company_number: "99999", // Temporary
         counter: 0,
         modify_user: cookies.myLationCrmUserId,
       };

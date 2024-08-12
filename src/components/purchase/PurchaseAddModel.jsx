@@ -6,13 +6,14 @@ import { Table } from 'antd';
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import * as bootstrap from "../../assets/js/bootstrap.bundle";
 import {
-    atomCompanyState,
-    atomCompanyForSelection,
     atomCurrentPurchase,
     defaultMAContract,
     atomProductClassListState,
     atomProductsState,
     atomProductOptions,
+    atomCurrentCompany,
+    defaultCompany,
+    defaultPurchase,
 } from '../../atoms/atoms';
 import { PurchaseRepo } from '../../repository/purchase';
 import { ProductTypeOptions } from '../../repository/product';
@@ -35,8 +36,7 @@ const PurchaseAddModel = (props) => {
     const [message, setMessage] = useState({ title: "", message: "" });
 
     //===== [RecoilState] Related with Company =============================================
-    const companyState = useRecoilValue(atomCompanyState);
-    const companyForSelection = useRecoilValue(atomCompanyForSelection);
+    const currentCompany = useRecoilValue(atomCurrentCompany);
 
 
     //===== [RecoilState] Related with Purcahse ============================================
@@ -54,7 +54,6 @@ const PurchaseAddModel = (props) => {
     const productOptions = useRecoilValue(atomProductOptions);
 
     //===== Handles to edit 'Purchase Add' =================================================
-    const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
     const [purchaseChange, setPurchaseChange] = useState({});
     const [companyData, setCompanyData] = useState({ company_name: '', company_code: '' });
     const [needInit, setNeedInit] = useState(false);
@@ -63,22 +62,20 @@ const PurchaseAddModel = (props) => {
         document.querySelector("#add_new_purchase_form").reset();
         
         if(companyCode && companyCode !== "") {
-            const foundIdx = companyForSelection.findIndex(item => item.value.company_code === companyCode);
-            if(foundIdx !== -1) {
+            if(currentCompany !== defaultCompany) {
                 setPurchaseChange({
                     company_code: companyCode,
                 });
-                const found_company_info = companyForSelection.at(foundIdx);
                 setCompanyData({
-                    company_code: found_company_info.value.company_code,
-                    company_name: found_company_info.value.company_name,
+                    company_code: currentCompany.company_code,
+                    company_name: currentCompany.company_name,
                 });
             };
         } else {
             setPurchaseChange({});
         }
         setNeedInit(false);
-    }, [companyCode, companyForSelection]);
+    }, [companyCode, currentCompany]);
 
     const handleItemChange = useCallback((e) => {
         const modifiedData = {
@@ -310,22 +307,19 @@ const PurchaseAddModel = (props) => {
 
     //===== useEffect functions ===========================================================
     useEffect(() => {
-        if (((companyState & 1) === 1)
+        if (init
             && ((productClassState & 1) === 1)
             && ((productState & 1) === 1)
         ) {
-            setIsAllNeededDataLoaded(true);
-            if (init) {
-                console.log('[PurchaseAddModel] initialize!');
-                if(handleInit) handleInit(!init);
-                setTimeout(()=>{
-                    initializePurchaseTemplate();
-                }, 500);
-            };
+            console.log('[PurchaseAddModel] initialize!');
+            if(handleInit) handleInit(!init);
+            setTimeout(()=>{
+                initializePurchaseTemplate();
+            }, 500);
         };
-    }, [companyState, productClassState, productState, init]);
+    }, [productClassState, productState, init]);
 
-    if (!isAllNeededDataLoaded)
+    if (init)
         return <div>&nbsp;</div>;
 
     return (

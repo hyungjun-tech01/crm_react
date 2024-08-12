@@ -136,7 +136,7 @@ const CompanyPurchaseModel = (props) => {
                                 reseller_price: item.reseller_price,
                                 list_price: item.list_price,
                             }
-                        }
+                        };
                     });
                     return {
                         label: <span>{proClass.product_class_name}</span>,

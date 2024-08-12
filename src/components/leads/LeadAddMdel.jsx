@@ -21,10 +21,6 @@ const LeadAddModel = (props) => {
     const [message, setMessage] = useState({ title: "", message: "" });
 
 
-    //===== [RecoilState] Related with Company =============================================
-    // const companyState = useRecoilValue(atomCompanyState);
-
-
     //===== [RecoilState] Related with Lead ================================================
     const { modifyLead } = useRecoilValue(LeadRepo);
 
@@ -134,15 +130,12 @@ const LeadAddModel = (props) => {
     }, [leadChange]);
 
     useEffect(() => {
-        if ((userState & 1) === 1) {
-            setIsAllNeededDataLoaded(true);
-            if (init) {
-                console.log('[LeadAddModel] initialize!');
-                if (handleInit) handleInit(!init);
-                setTimeout(() => {
-                    initializeLeadTemplate();
-                }, 500);
-            };
+        if (init && (userState & 1) === 1) {
+            console.log('[LeadAddModel] initialize!');
+            if(handleInit) handleInit(!init);
+            setTimeout(() => {
+                initializeLeadTemplate();
+            }, 500);
         }
     }, [userState, init]);
 
