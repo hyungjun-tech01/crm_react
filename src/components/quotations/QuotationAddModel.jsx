@@ -823,7 +823,7 @@ const QuotationAddModel = (props) => {
                   setEdited={setQuotationChange}
                 />
               </div>
-              {(quotationChange.lead_name !== null) &&
+              {!!quotationChange.lead_name &&
                 <div className="form-group row">
                   <div className="col-sm-12">
                     <table className="table">

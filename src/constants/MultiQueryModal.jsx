@@ -1,11 +1,10 @@
-import React, {  useState , useCallback} from "react";
-import { Button, Modal, Checkbox, CheckboxProps } from 'antd';
+import React from "react";
+import { Button, Modal, Checkbox } from 'antd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Select from "react-select";
 import { ColumnQueryCondition } from "../repository/company";
 import { useTranslation } from "react-i18next";
 
-import AddBasicItem from "./AddBasicItem";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -210,7 +209,7 @@ const handleSingleCheckedChange = (key) => {
             onCancel={handleCancel}
             width={800}
             footer={  [
-                <Button key="cancel" onClick={handleInitial}>
+                <Button key="init" onClick={handleInitial}>
                   Initialize
                 </Button>,
                 <Button key="cancel" onClick={handleCancel}>

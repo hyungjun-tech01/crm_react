@@ -44,7 +44,7 @@ const AddSearchItem = (props) => {
                 </div>
             </div>
             <SelectListModal
-                title={t('company.search_name')}
+                title={`${title} ${t('common.search')}`}
                 condition={{category: category, item: name}}
                 open={isPopupOpen}
                 handleChange={(data) => {

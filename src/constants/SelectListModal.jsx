@@ -142,10 +142,10 @@ const SelectListModal = (props) => {
     };
 
     useEffect(() => {
-        if(inputRef.current !== null) {
+        if(open && inputRef.current !== null) {
             inputRef.current.focus();
         };
-    }, []);
+    }, [open]);
 
     return (
         <Modal
