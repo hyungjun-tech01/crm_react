@@ -21,7 +21,7 @@ import { atomUserState } from "../../atoms/atomsUser";
 import { UserRepo } from "../../repository/user";
 import { compareCompanyName , compareText, ConvertCurrency } from "../../constants/functions";
 import TransactionEditModel from "./TransactionEditModel";
-import TaxInvoiceEditModel from "./TaxInvoiceEditModel";
+import TaxInvoiceEditModel from "../taxinvoice/TaxInvoiceEditModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import { transactionColumn } from "../../repository/transaction";
 

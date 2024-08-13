@@ -13,6 +13,7 @@ import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
 export const company_info = {
+    company_code: '',
     business_registration_code: '106-86-26016',
     company_name: '노드데이타',
     ceo_name: '김신일',

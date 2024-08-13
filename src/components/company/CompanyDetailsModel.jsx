@@ -16,6 +16,7 @@ import {
   atomTransactionState,
   atomTaxInvoiceState,
   atomTaxInvoiceSet,
+  atomTaxInvoiceByCompany,
 } from "../../atoms/atoms";
 import {
   atomUserState,
@@ -26,6 +27,7 @@ import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
 import { PurchaseRepo } from "../../repository/purchase";
 import { MAContractRepo } from "../../repository/ma_contract";
+import { TaxInvoiceRepo } from "../../repository/tax_invoice";
 
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
@@ -34,7 +36,6 @@ import CompanyTransactionModel from "./CompanyTransactionModel";
 import CompanyTaxInvoiceModel from "./CompanyTaxInvoiceModel";
 import PurchaseAddModel from "../purchase/PurchaseAddModel";
 import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
-import { TaxInvoiceRepo } from "../../repository/tax_invoice";
 
 
 const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
@@ -61,9 +62,10 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
 
 
   //===== [RecoilState] Related with Tax Invoice ======================================
-  const [taxInvoiceState, setTaxInvoiceState] = useRecoilState(atomTaxInvoiceState);
+  const taxInvoiceState = useRecoilValue(atomTaxInvoiceState);
+  const [taxInvoiceByCompany, setTaxInvoiceByCompany] = useRecoilState(atomTaxInvoiceByCompany);
   const { tryLoadTaxInvoices } = useRecoilValue(TaxInvoiceRepo);
-  const taxInvoiceSet = useRecoilValue(atomTaxInvoiceSet);
+  const allTaxInvoice = useRecoilValue(atomTaxInvoiceSet);
 
 
   //===== [RecoilState] Related with Users ============================================
@@ -374,28 +376,38 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
     selectedCompany.company_name,
   ]);
 
+  //===== useEffect for Tax Invoice ====================================================
+  useEffect(() => {
+    tryLoadTaxInvoices();
+    if ((taxInvoiceState & 1) === 1) {
+      const tempCompanyTaxInvocies = allTaxInvoice.filter(
+        (item) =>
+          item.company_code === selectedCompany.company_code
+      );
+      if (taxInvoiceByCompany.length !== tempCompanyTaxInvocies.length) {
+        console.log("CompanyDetailsModel / update setTaxInvoiceByCompany");
+        setTaxInvoiceByCompany(tempCompanyTaxInvocies);
+      }
+    }
+  }, [
+    taxInvoiceState,
+    allTaxInvoice,
+    taxInvoiceByCompany.length,
+    selectedCompany.company_name,
+  ]);
+
 
   //===== useEffect for User ==========================================================
   useEffect(() => {
     console.log('[CompanyDetailsModel] useEffect / userState :', userState);
     if (((purchaseState & 1) === 1)
       && ((transactionState & 1) === 1)
+      && ((taxInvoiceState & 1) === 1)
       && ((userState & 1) === 1)
      ){
-      if ((taxInvoiceState & 3) === 0) {
-        tryLoadTaxInvoices(selectedCompany.company_code);
-      } else if ((taxInvoiceState & 1) === 1) {
-        if((taxInvoiceSet.length > 0) 
-          && (taxInvoiceSet[0].company_code !== selectedCompany.company_code)
-        ) {
-          setTaxInvoiceState(0);
-          tryLoadTaxInvoices(selectedCompany.company_code);
-        } else {
           setIsAllNeededDataLoaded(true);
-        };
       }
-    }
-  }, [purchaseState, transactionState, taxInvoiceState, userState, taxInvoiceSet]);
+  }, [purchaseState, transactionState, taxInvoiceState, userState, taxInvoiceState]);
 
   if (!isAllNeededDataLoaded)
     return <div>&nbsp;</div>;
@@ -501,7 +513,7 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
                     >
                       {t("transaction.tax_bill") +
                         "(" +
-                        taxInvoiceSet.length +
+                        taxInvoiceByCompany.length +
                         ")"}
                     </Link>
                   </li>
@@ -565,7 +577,7 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
                     id="company-details-taxinvoice"
                   >
                     <CompanyTaxInvoiceModel
-                      taxInvoices={taxInvoiceSet}
+                      taxInvoices={taxInvoiceByCompany}
                       openTaxInvoice={openTaxInvoice}
                     />
                   </div>

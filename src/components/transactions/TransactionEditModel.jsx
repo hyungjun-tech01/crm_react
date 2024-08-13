@@ -19,7 +19,6 @@ import {
   atomCurrentTransaction,
   defaultTransaction,
 } from "../../atoms/atoms";
-import { CompanyRepo } from "../../repository/company";
 import { DefaultTransactionContent, TransactionRepo } from "../../repository/transaction";
 
 import { ConvertCurrency, formatDate } from "../../constants/functions";
@@ -58,6 +57,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [ isMessageModalOpen, setIsMessageModalOpen ] = useState(false);
   const [ message, setMessage ] = useState({title:'', message: ''});
+  const [ isAdd, setIsAdd ] = useState(true);
 
 
   //===== [RecoilState] Related with Transaction =====================================
@@ -269,7 +269,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   };
 
   const handleContentModalOk = () => {
-    if(!editedContentModalData['transaction_date']){
+    if(!editedContentModalData['month_day']){
       const tempMsg = {title: '확인', message: '거래일 정보가 누락되었습니다.'}
       setMessage(tempMsg);
       setIsMessageModalOpen(true);
@@ -277,16 +277,14 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     };
 
     setIsContentModalOpen(false);
-    const inputData = new Date(editedContentModalData.transaction_date);
-    const tempDate = `${inputData.getMonth()+1}.${inputData.getDate()}`;
     const tempContent = {
       ...orgContentModalData,
       ...editedContentModalData,
-      month_day: tempDate,
+      
       transaction_sub_index: transactionContents.length + 1,
       company_code: transactionChange.company_code,
       company_name: transactionChange.company_name,
-      transaction_sub_type: dataForTransaction.payment_type,
+      transaction_sub_type: dataForTransaction.transaction_type,
       modify_date: formatDate(new Date()),
     };
     delete tempContent.transaction_date;
@@ -486,6 +484,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   const [contentsForPrint, setContentsForPrint] = useState(null);
 
   const handleInitialize = useCallback(() => {
+    setIsAdd(true);
     setIsSale(true);
     setIsVatIncluded(true);
     setShowDecimal(0);
@@ -528,7 +527,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     }
     openTaxInvoice();
     setTimeout(()=>{
-        let myModal = new bootstrap.Modal(document.getElementById('edit_bill'), {
+        let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
             keyboard: false
         });
         myModal.show();
@@ -548,7 +547,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
       setIsMessageModalOpen(true);
       return;
     };
-    if (currentTransaction === defaultTransaction){
+    if (isAdd){
       newTransactionData['transaction_contents']= JSON.stringify(transactionContents);
       newTransactionData['transaction_title'] = transactionContents.at(0).product_name + ' 외';
       newTransactionData['action_type'] = 'ADD';
@@ -561,6 +560,13 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     const resp = modifyTransaction(newTransactionData);
     resp.then((res) => {
       if(res.result){
+        if(isAdd) {
+          const updatedContents = transactionContents.map(item => ({
+            ...item,
+            transaction_code: res.code
+          }));
+          setTransactionContents(updatedContents);
+        };
         if(value === 'TaxBill'){
           handleShowTaxBill();
           handleInitialize();
@@ -600,7 +606,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   const handleClose = () => {
     handleInitialize();
     close();
-  }
+  };
 
   //===== useEffect ==============================================================
   useEffect(() => {
@@ -615,6 +621,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
         handleInitialize();
       } else {
         console.log('[TransactionEditModel] Modify Transaction~', currentTransaction);
+        setIsAdd(false);
         const currentContents = JSON.parse(currentTransaction.transaction_contents);
         setTransactionContents(currentContents);
         

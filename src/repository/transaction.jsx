@@ -14,20 +14,21 @@ const BASE_PATH = Paths.BASE_PATH;
 export const DefaultTransactionContent = {
     transaction_code: null,
     month_day: null,
-    product_class_name: null,
-    product_name: null,
-    standard: null,
-    unit: null,
+    product_class_name: '',
+    product_name: '',
+    standard: '',
+    unit: '',
     quantity: 0,
     unit_price: 0,
     supply_price: 0,
     tax_price: 0,
     total_price: 0,
-    memo: null,
-    transaction_sub_index: null,
+    memo: '',
+    transaction_sub_index: 0,
+    company_code: null,
     lead_code: null,
-    company_name: null,
-    statement_number: null,
+    company_name: '',
+    statement_number: '',
     transaction_sub_type: null,
     modify_date: null,
 };
@@ -137,7 +138,7 @@ export const TransactionRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomAllTransactions, [updatedNewTransaction, ...allTransactions]);
-                    return {result: true};
+                    return {result: true, code: data.out_transaction_code};
                 } else if (newTransaction.action_type === 'UPDATE') {
                     const currentTransaction = await snapshot.getPromise(atomCurrentTransaction);
                     delete newTransaction.action_type;

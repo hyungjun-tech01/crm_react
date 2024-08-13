@@ -15,12 +15,12 @@ export const TaxInvoiceRepo = selector({
     key: "TaxInvoiceRepository",
     get: ({ getCallback }) => {
         /////////////////////try to load all Transactions /////////////////////////////
-        const tryLoadTaxInvoices = getCallback(({ set, snapshot }) => async (compnay_code) => {
+        const tryLoadTaxInvoices = getCallback(({ set, snapshot }) => async (multiQueryCondi) => {
             const loadStates = await snapshot.getPromise(atomTaxInvoiceState);
             if((loadStates & 3) === 0){
                 console.log('[tryLoadTaxInvoices] Try to load all Transactions');
                 set(atomTaxInvoiceState, (loadStates | 2));   // state : loading
-                const ret = await loadTaxInvoices(compnay_code);
+                const ret = await loadTaxInvoices(multiQueryCondi);
                 if(ret){
                     // succeeded to load
                     set(atomTaxInvoiceState, (loadStates | 3));
@@ -30,11 +30,11 @@ export const TaxInvoiceRepo = selector({
                 };
             }
         });
-        const loadTaxInvoices = getCallback(({ set }) => async (code) => {
-            const input_json = JSON.stringify({company_code: code});
+        const loadTaxInvoices = getCallback(({ set }) => async (multiQueryCondi) => {
+            const input_json = JSON.stringify(multiQueryCondi);
             try {
                 console.log('[TaxInvoiceRepository] Try loading all')
-                const response = await fetch(`${BASE_PATH}/companyTaxInvoice`, {
+                const response = await fetch(`${BASE_PATH}/taxInvoice`, {
                     method: "POST",
                     headers:{'Content-Type':'application/json'},
                     body: input_json,
@@ -76,13 +76,14 @@ export const TaxInvoiceRepo = selector({
                     delete newTaxInvoice.action_type;
                     const updatedNewTransaction = {
                         ...newTaxInvoice,
-                        transaction_code: data.out_transaction_code,
+                        tax_invoice_code: data.out_tax_invoice_code,
                         creater: data.out_create_user,
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
                     set(atomTaxInvoiceState, [updatedNewTransaction, ...allTaxInvoices]);
-                    return {result: true};
+                    
+                    return {result: true, code: data.out_tax_invoice_code};
                 } else if (newTaxInvoice.action_type === 'UPDATE') {
                     const currentTransaction = await snapshot.getPromise(atomCurrentTaxInvoice);
                     delete newTaxInvoice.action_type;
@@ -95,8 +96,8 @@ export const TaxInvoiceRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCurrentTaxInvoice, modifiedTransaction);
-                    const foundIdx = allTaxInvoices.findIndex(transaction =>
-                        transaction.transaction_code === modifiedTransaction.transaction_code);
+                    const foundIdx = allTaxInvoices.findIndex(item =>
+                        item.tax_invoice_code === modifiedTransaction.tax_invoice_code);
                     if (foundIdx !== -1) {
                         const updatedAllTransactions = [
                             ...allTaxInvoices.slice(0, foundIdx),

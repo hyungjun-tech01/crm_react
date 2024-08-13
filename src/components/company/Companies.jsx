@@ -16,7 +16,7 @@ import CompanyDetailsModel from "./CompanyDetailsModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import { companyColumn } from "../../repository/company";
 import TransactionEditModel from "../transactions/TransactionEditModel";
-import TaxInvoiceEditModel from "../transactions/TaxInvoiceEditModel";
+import TaxInvoiceEditModel from "../taxinvoice/TaxInvoiceEditModel";
 import { atomUserState } from "../../atoms/atomsUser";
 
 // import { MoreVert } from '@mui/icons-material';
