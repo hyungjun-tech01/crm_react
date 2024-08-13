@@ -129,7 +129,7 @@ const CompanyPurchaseModel = (props) => {
                             label: <span>{item.product_name}</span>,
                             value: { product_code: item.product_code,
                                 product_name: item.product_name,
-                                product_class: item.product_class,
+                                product_class_name: item.product_class_name,
                                 detail_desc: item.detail_desc,
                                 cost_price: item.const_price,
                                 reseller_price: item.reseller_price,
