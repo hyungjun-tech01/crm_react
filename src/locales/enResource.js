@@ -267,6 +267,10 @@ const enResource = {
         },
         taxinvoice:{
             taxinvoice_manage: 'Manage (Tax) Invoice',
+            memo : 'Invoice Memo',
+            summary:'Summary',
+            invoice_contents:'Invoice Contents',
+            taxinvoice_multi_query:'Invoice Multi Query',
         },
         common:{
             actions: 'Actions',
