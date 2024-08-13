@@ -4,6 +4,7 @@ import {
     atomCurrentTaxInvoice
     , atomTaxInvoiceSet
     , atomTaxInvoiceState
+    , atomFilteredTaxInvoices
     , defaultTaxInvoice
 } from '../atoms/atoms';
 
@@ -14,11 +15,11 @@ const BASE_PATH = Paths.BASE_PATH;
 export const TaxInvoiceRepo = selector({
     key: "TaxInvoiceRepository",
     get: ({ getCallback }) => {
-        /////////////////////try to load all Transactions /////////////////////////////
+        /////////////////////try to load all TaxInvoices /////////////////////////////
         const tryLoadTaxInvoices = getCallback(({ set, snapshot }) => async (multiQueryCondi) => {
             const loadStates = await snapshot.getPromise(atomTaxInvoiceState);
             if((loadStates & 3) === 0){
-                console.log('[tryLoadTaxInvoices] Try to load all Transactions');
+                console.log('[tryLoadTaxInvoices] Try to load all TaxInvoices');
                 set(atomTaxInvoiceState, (loadStates | 2));   // state : loading
                 const ret = await loadTaxInvoices(multiQueryCondi);
                 if(ret){
@@ -57,9 +58,39 @@ export const TaxInvoiceRepo = selector({
                 return false;
             };
         });
+        const filterTaxInvoices = getCallback(({ set, snapshot }) => async (itemName, filterText) => {
+            const allTaxInvoiceList = await snapshot.getPromise(atomTaxInvoiceSet);
+            let allTaxInvoice;
+            console.log('filterTaxInvoices', itemName, filterText);
+            if (itemName === 'common.all') {
+                allTaxInvoice = allTaxInvoiceList.filter(item => (item.company_name && item.company_name.includes(filterText)) ||
+                    (item.transaction_title && item.transaction_title.includes(filterText)) ||
+                    (item.transaction_type && item.transaction_type.includes(filterText)) ||
+                    (item.publish_type && item.publish_type.includes(filterText)) ||
+                    (item.payment_type && item.payment_type.includes(filterText))
+                );
+            } else if (itemName === 'company.company_name') {
+                allTaxInvoice = allTaxInvoiceList.filter(item => (item.company_name && item.company_name.includes(filterText))
+                );
+            } else if (itemName === 'transaction.title') {
+                allTaxInvoice = allTaxInvoiceList.filter(item => (item.transaction_title && item.transaction_title.includes(filterText))
+                );
+            } else if (itemName === 'transaction.type') {
+                allTaxInvoice = allTaxInvoiceList.filter(item => (item.transaction_type && item.transaction_type.includes(filterText))
+                );
+            } else if (itemName === 'transaction.publish_type') {
+                allTaxInvoice = allTaxInvoiceList.filter(item => (item.publish_type && item.publish_type.includes(filterText))
+                );
+            } else if (itemName === 'transaction.payment_type') {
+                allTaxInvoice = allTaxInvoiceList.filter(item => (item.payment_type && item.payment_type.includes(filterText))
+                );
+            }
+            set(atomFilteredTaxInvoices, allTaxInvoice);
+            return true;
+        });
         const modifyTaxInvoice = getCallback(({ set, snapshot }) => async (newTaxInvoice) => {
             const input_json = JSON.stringify(newTaxInvoice);
-            console.log(`[ modifyTransaction ] input : `, input_json);
+            console.log(`[ modifyTaxInvoice ] input : `, input_json);
             try {
                 const response = await fetch(`${BASE_PATH}/modifyTaxInvoice`, {
                     method: "POST",
@@ -74,37 +105,37 @@ export const TaxInvoiceRepo = selector({
                 const allTaxInvoices = await snapshot.getPromise(atomTaxInvoiceSet);
                 if (newTaxInvoice.action_type === 'ADD') {
                     delete newTaxInvoice.action_type;
-                    const updatedNewTransaction = {
+                    const updatedNewTaxInvoice = {
                         ...newTaxInvoice,
                         tax_invoice_code: data.out_tax_invoice_code,
                         creater: data.out_create_user,
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomTaxInvoiceState, [updatedNewTransaction, ...allTaxInvoices]);
+                    set(atomTaxInvoiceState, [updatedNewTaxInvoice, ...allTaxInvoices]);
                     
                     return {result: true, code: data.out_tax_invoice_code};
                 } else if (newTaxInvoice.action_type === 'UPDATE') {
-                    const currentTransaction = await snapshot.getPromise(atomCurrentTaxInvoice);
+                    const currentTaxInvoice = await snapshot.getPromise(atomCurrentTaxInvoice);
                     delete newTaxInvoice.action_type;
                     delete newTaxInvoice.company_code;
                     delete newTaxInvoice.modify_user;
-                    const modifiedTransaction = {
-                        ...currentTransaction,
+                    const modifiedTaxInvoice = {
+                        ...currentTaxInvoice,
                         ...newTaxInvoice,
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomCurrentTaxInvoice, modifiedTransaction);
+                    set(atomCurrentTaxInvoice, modifiedTaxInvoice);
                     const foundIdx = allTaxInvoices.findIndex(item =>
-                        item.tax_invoice_code === modifiedTransaction.tax_invoice_code);
+                        item.tax_invoice_code === modifiedTaxInvoice.tax_invoice_code);
                     if (foundIdx !== -1) {
-                        const updatedAllTransactions = [
+                        const updatedAllTaxInvoices = [
                             ...allTaxInvoices.slice(0, foundIdx),
-                            modifiedTransaction,
+                            modifiedTaxInvoice,
                             ...allTaxInvoices.slice(foundIdx + 1,),
                         ];
-                        set(allTaxInvoices, updatedAllTransactions);
+                        set(allTaxInvoices, updatedAllTaxInvoices);
                         return {result: true};
                     } else {
                         return {result:false, data: "No Data"};

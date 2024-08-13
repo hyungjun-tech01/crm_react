@@ -459,6 +459,10 @@ export const atomTaxInvoiceSet = atom({
     key: "taxInvoiceSet",
     default: [],
 });
+export const atomFilteredTaxInvoices = atom({
+    key: "filteredTaxxInvoices",
+    default: [],
+});
 export const atomTaxInvoiceByCompany = atom({
     key: "taxInvoiceByCompany",
     default: [],
