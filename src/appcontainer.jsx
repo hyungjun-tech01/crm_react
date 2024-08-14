@@ -16,6 +16,7 @@ import Consultings from "./components/consulting/Consultings.jsx";
 import Transactions from "./components/transactions/Transactions.jsx";
 import Quotations from "./components/quotations/Quotations.jsx";
 import Purchase from "./components/purchase/Purchase.jsx";
+import TaxInvoices from "./components/taxinvoice/TaxInvoices.jsx";
 //pages
 import FAQ from "./components/pages/faq";
 import Privacypolicy from "./components/pages/privacy";
@@ -273,6 +274,9 @@ const AppUniversal = (props) => {
 
           {/* Purchase */}
           <Route path="/purchases" exact component={Purchase} />
+
+          {/* Tax Invoices */}
+          <Route path="/taxinvoices" exact component={TaxInvoices} />
 
           {/* Settings */}
           <Route path="/userinfo" exact component={UserInfo} />

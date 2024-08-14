@@ -10,23 +10,22 @@ import "../antdstyle.css";
 import SystemUserModel from "../task/SystemUserModel";
 
 import { CompanyRepo } from "../../repository/company";
-import { TransactionRepo } from "../../repository/transaction";
 import {
-  atomAllTransactionObj,
-  atomFilteredTransactionArray,
+  atomTaxInvoiceSet,
   atomCompanyState,
-  atomTransactionState,
+  atomFilteredTaxInvoices,
+  atomTaxInvoiceState,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { UserRepo } from "../../repository/user";
 import { compareCompanyName , compareText, ConvertCurrency } from "../../constants/functions";
-import TransactionEditModel from "./TransactionEditModel";
 import TaxInvoiceEditModel from "../taxinvoice/TaxInvoiceEditModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import { transactionColumn } from "../../repository/transaction";
+import { TaxInvoiceRepo } from "../../repository/tax_invoice";
 
 
-const Transactions = () => {
+const TaxInovices = () => {
   const { t } = useTranslation();
 
 
@@ -37,19 +36,19 @@ const Transactions = () => {
 
 
   //===== [RecoilState] Related with Transaction ======================================
-  const transactionState = useRecoilValue(atomTransactionState);
-  const allTransactionData = useRecoilValue(atomAllTransactionObj);
-  const filteredTransaction= useRecoilValue(atomFilteredTransactionArray);
-  const { tryLoadAllTransactions, setCurrentTransaction , filterTransactions, loadAllTransactions} = useRecoilValue(TransactionRepo);
+  const taxInvoiceState = useRecoilValue(atomTaxInvoiceState);
+  const allTaxInvoicesData = useRecoilValue(atomTaxInvoiceSet);
+  const filteredTaxInvoices= useRecoilValue(atomFilteredTaxInvoices);
+  const { tryLoadTaxInvoices, setCurrentTaxInvoice , filterTaxInovices, loadAllTaxInovices} = useRecoilValue(TaxInvoiceRepo);
 
 
   //===== [RecoilState] Related with User =============================================
   const userState = useRecoilValue(atomUserState);
   const { tryLoadAllUsers } = useRecoilValue(UserRepo);
 
+
   //===== Handles to edit this ========================================================
   const [ nowLoading, setNowLoading ] = useState(true);
-  const [ openTransaction, setOpenTransaction ] = useState(false);
   const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
   const [ taxInvoiceData, setTaxInvoiceData ] = useState(null);
   const [ taxInvoiceContents, setTaxInvoiceContents ] = useState(null);
@@ -128,7 +127,7 @@ const Transactions = () => {
   
       console.log('multiQueryCondi',multiQueryCondi);
   
-      loadAllTransactions(multiQueryCondi);
+      loadAllTaxInovices(multiQueryCondi);
        
     };
     const handleMultiQueryModalCancel = () => {
@@ -138,7 +137,7 @@ const Transactions = () => {
 
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
-    tryLoadAllTransactions();
+    tryLoadTaxInvoices();
 
     setExpaned(false);
     setSearchCondition("");
@@ -146,7 +145,7 @@ const Transactions = () => {
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
-    filterTransactions(statusSearch, newValue);
+    filterTaxInovices(statusSearch, newValue);
   };
 
   const handleMultiQueryModal = () => {
@@ -212,8 +211,7 @@ const Transactions = () => {
   ];
 
   const handleAddNewTransaction = useCallback(() => {
-    setCurrentTransaction()
-    setOpenTransaction(true);
+    setCurrentTaxInvoice()
 
     setTimeout(()=>{
       let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
@@ -221,11 +219,10 @@ const Transactions = () => {
       })
       myModal.show();
     }, 1000);
-  }, [setCurrentTransaction]);
+  }, [setCurrentTaxInvoice]);
 
   const handleOpenTransactoin = (code) => {
-    setCurrentTransaction(code)
-    setOpenTransaction(true);
+    setCurrentTaxInvoice(code)
 
     setTimeout(()=>{
       let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
@@ -262,17 +259,17 @@ const Transactions = () => {
     }
 
     console.log('tryLoadAllQuotations multiQueryCondi',multiQueryCondi);   
-    tryLoadAllTransactions(multiQueryCondi);
+    tryLoadTaxInvoices(multiQueryCondi);
 
     tryLoadAllUsers();
 
     if(((companyState & 1) === 1)
-      && ((transactionState & 1) === 1)
+      && ((taxInvoiceState & 1) === 1)
       && ((userState & 1) === 1)
     ){
       setNowLoading(false);
     };
-  }, [ companyState, transactionState, userState ]);
+  }, [ companyState, taxInvoiceState, userState ]);
 
   return (
     <HelmetProvider>
@@ -341,9 +338,10 @@ const Transactions = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive activity-tables">
+                  { searchCondition === "" ?  
                     <Table
                       pagination={{
-                        total: filteredTransaction.length >0 ? filteredTransaction.length:0,
+                        total: allTaxInvoicesData.length,
                         showTotal: ShowTotal,
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
@@ -353,7 +351,30 @@ const Transactions = () => {
                       style={{ overflowX: "auto" }}
                       columns={columns}
                       bordered
-                      dataSource={filteredTransaction.length >0 ? filteredTransaction:null}
+                      dataSource={allTaxInvoicesData}
+                      rowKey={(record) => record.transaction_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onClick: (event) => {
+                            if(event.target.className === 'table_company') return;
+                            handleOpenTransactoin(record.transaction_code)
+                          }, // double click row
+                        };
+                      }}
+                    />:
+                    <Table
+                      pagination={{
+                        total: filteredTaxInvoices.length >0 ? filteredTaxInvoices.length:0,
+                        showTotal: ShowTotal,
+                        showSizeChanger: true,
+                        onShowSizeChange: onShowSizeChange,
+                        ItemRender: ItemRender,
+                      }}
+                      loading={nowLoading}
+                      style={{ overflowX: "auto" }}
+                      columns={columns}
+                      bordered
+                      dataSource={filteredTaxInvoices.length >0 ? filteredTaxInvoices:null}
                       rowKey={(record) => record.transaction_code}
                       onRow={(record, rowIndex) => {
                         return {
@@ -364,6 +385,7 @@ const Transactions = () => {
                         };
                       }}
                     />
+                  }
                   </div>
                 </div>
               </div>
@@ -373,13 +395,6 @@ const Transactions = () => {
         </div>
         {/* modal */}
         <SystemUserModel />
-        <TransactionEditModel
-          open={openTransaction}
-          close={()=>setOpenTransaction(false)}
-          openTaxInvoice={()=>setOpenTaxInvoice(true)}
-          setTaxInvoiceData={setTaxInvoiceData}
-          setTaxInvoiceContents={setTaxInvoiceContents}
-        />
         <TaxInvoiceEditModel
           open={openTaxInvoice}
           close={()=>setOpenTaxInvoice(false)}
@@ -408,4 +423,4 @@ const Transactions = () => {
   );
 };
 
-export default Transactions;
+export default TaxInovices;

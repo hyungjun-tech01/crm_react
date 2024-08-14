@@ -11,6 +11,7 @@ import { Business
   , ReceiptLongOutlined
   , ShoppingBagOutlined
   , SpaceDashboardOutlined
+  , WalletOutlined
 } from "@mui/icons-material";
 
 const SidebarNav = (props) => {
@@ -91,12 +92,17 @@ const SidebarNav = (props) => {
               </li>
               <li>
                 <Link className={`${pathname.includes("transactions") ? "active" : ""}`} to="/transactions">
-                  <ReceiptLongOutlined /> <span>{t('transaction.transaction_manage')}</span>
+                  <WalletOutlined /> <span>{t('transaction.transaction_manage')}</span>
                 </Link>
               </li>
               <li>
                 <Link className={`${pathname.includes("purchases") ? "active" : ""}`} to="/purchases">
                   <ShoppingBagOutlined /> <span>{t('purchase.purchase_manage')}</span>
+                </Link>
+              </li>
+              <li>
+                <Link className={`${pathname.includes("taxinvoice") ? "active" : ""}`} to="/taxinvoices">
+                  <ReceiptLongOutlined /> <span>{t('taxinvoice.taxinvoice_manage')}</span>
                 </Link>
               </li>
               {/* <li>

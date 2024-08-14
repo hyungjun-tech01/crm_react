@@ -8,7 +8,7 @@ import { useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
 
 import { FiBell, FiTable } from "react-icons/fi";
-import { BiBuildings, BiCalculator, BiClipboard, BiMessageRounded, BiReceipt, BiShoppingBag, BiUser } from "react-icons/bi";
+import { BiBuildings, BiCalculator, BiClipboard, BiMessageRounded, BiReceipt, BiShoppingBag, BiUser, BiWallet } from "react-icons/bi";
 
 const Header = (props) => {
   const [cookies, removeCookie ] = useCookies(["myLationCrmUserId", "myLationCrmUserName", "myLationCrmAuthToken"]);
@@ -17,15 +17,16 @@ const Header = (props) => {
   const currentUser = useRecoilValue(atomCurrentUser);
 
   const exclusionArray = [ "login", "register", "forgot-password", "error-404", "error-500", ];
-  const itemsArray = ["dashboard", "companies", "leads", "consultings", "quotations", "transactions", "purchases"];
+  const itemsArray = ["dashboard", "companies", "leads", "consultings", "quotations", "transactions", "purchases", "taxinvoices"];
   const headerIcons = {
     dashboard: <FiTable />,
     companies : <BiBuildings />,
     leads : <BiUser />,
     consultings : <BiClipboard />,
     quotations : <BiCalculator />,
-    transactions : <BiReceipt />,
+    transactions : <BiWallet />,
     purchases : <BiShoppingBag />,
+    taxinvoices : <BiReceipt />
   };
   const headerTitles = {
     dashboard: t('dashboard.dashboard'),
@@ -35,6 +36,7 @@ const Header = (props) => {
     quotations : t('quotation.quotation_manage'),
     transactions : t('transaction.transaction_manage'),
     purchases : t('purchase.purchase_manage'),
+    taxinvoices : t('taxinvoice.taxinvoice_manage'),
   };
 
   const changeLanguage = (lng) => {   // 언어 변경  

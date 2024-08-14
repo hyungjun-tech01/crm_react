@@ -23,6 +23,7 @@ import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
 import { PurchaseRepo } from "../../repository/purchase";
 import { MAContractRepo } from "../../repository/ma_contract";
+import { TaxInvoiceRepo } from "../../repository/tax_invoice";
 
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
@@ -31,7 +32,6 @@ import CompanyTransactionModel from "./CompanyTransactionModel";
 import CompanyTaxInvoiceModel from "./CompanyTaxInvoiceModel";
 import PurchaseAddModel from "../purchase/PurchaseAddModel";
 import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
-import { TaxInvoiceRepo } from "../../repository/tax_invoice";
 
 
 const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice }) => {

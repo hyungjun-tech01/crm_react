@@ -434,20 +434,24 @@ export const atomProductOptions = atom({
 
 //----- Tax Invoice ------------------------
 export const defaultTaxInvoice = {
+    //----- Tax Invoice info --------------
     tax_invoice_code : null,
-    company_code : null,
     publish_type : null,
     transaction_type : null,
     invoice_type : null,
     index1 : null,
     index2 : null,
+    receive_type : null,
+    invoice_contents : null,
+    //----- Company info --------------
+    company_code : null,
     business_registration_code : null,
     company_name : null,
     ceo_name : null,
     company_address : null,
     business_type : null,
     business_item : null,
-    create_date : null,
+    //----- Price info --------------
     supply_price : null,
     tax_price : null,
     total_price : null,
@@ -455,10 +459,10 @@ export const defaultTaxInvoice = {
     check_amount : null,
     note_amount : null,
     receivable_amount : null,
-    receive_type : null,
+    //----- Etc info --------------
     memo : null,
     summary : null,
-    invoice_contents : null,
+    create_date : null,
     modify_date : null,
     creator : null,
     recent_user : null,
@@ -473,6 +477,14 @@ export const atomAllTaxInvoiceObj = atom({
 });
 export const atomTaxInvoiceArray = atom({
     key: "taxInvoiceArray",
+    default: [],
+});
+export const atomFilteredTaxInvoices = atom({
+    key: "filteredTaxxInvoices",
+    default: [],
+});
+export const atomTaxInvoiceByCompany = atom({
+    key: "taxInvoiceByCompany",
     default: [],
 });
 export const atomTaxInvoiceState = atom({

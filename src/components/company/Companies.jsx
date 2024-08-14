@@ -16,7 +16,7 @@ import CompanyDetailsModel from "./CompanyDetailsModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import { companyColumn } from "../../repository/company";
 import TransactionEditModel from "../transactions/TransactionEditModel";
-import TaxInvoiceEditModel from "../transactions/TaxInvoiceEditModel";
+import TaxInvoiceEditModel from "../taxinvoice/TaxInvoiceEditModel";
 import { atomUserState } from "../../atoms/atomsUser";
 
 // import { MoreVert } from '@mui/icons-material';
@@ -211,10 +211,13 @@ const Companies = () => {
   }, [setInitToAddCompany]);
 
   useEffect(() => {
+
+    let tommorow = new Date();
+
     const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
       label: key,
       fromDate: dates[key].fromDate,
-      toDate: dates[key].toDate,
+      toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
       checked: dates[key].checked,
     }));
 

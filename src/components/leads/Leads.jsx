@@ -306,10 +306,11 @@ const Leads = () => {
   useEffect(() => {
     tryLoadAllCompanies();
 
+    let tommorow = new Date();
     const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
       label: key,
       fromDate: dates[key].fromDate,
-      toDate: dates[key].toDate,
+      toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
       checked: dates[key].checked,
     }));
 

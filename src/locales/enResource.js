@@ -266,6 +266,9 @@ const enResource = {
             contract_type:'Contract Type',
             end_date:'End Date',
         },
+        taxinvoice:{
+            taxinvoice_manage: 'Manage (Tax) Invoice',
+        },
         common:{
             actions: 'Actions',
             activity: 'Activity',

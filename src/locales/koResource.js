@@ -266,6 +266,9 @@ const koResource = {
             contract_type:'계약종류',
             end_date:'종료일',
         },
+        taxinvoice:{
+            taxinvoice_manage: '(세금)계산서 관리',
+        },
         common:{
             actions: '',
             activity: '활동',
