@@ -21,8 +21,7 @@ import { UserRepo } from "../../repository/user";
 import { compareCompanyName , compareText, ConvertCurrency } from "../../constants/functions";
 import TaxInvoiceEditModel from "../taxinvoice/TaxInvoiceEditModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
-import { transactionColumn } from "../../repository/transaction";
-import { TaxInvoiceRepo } from "../../repository/tax_invoice";
+import { TaxInvoiceRepo, taxInvoiceColumn } from "../../repository/tax_invoice";
 
 
 const TaxInovices = () => {
@@ -407,7 +406,7 @@ const TaxInovices = () => {
           open={multiQueryModal}
           handleOk={handleMultiQueryModalOk}
           handleCancel={handleMultiQueryModalCancel}
-          companyColumn={transactionColumn}
+          companyColumn={taxInvoiceColumn}
           queryConditions={queryConditions}
           setQueryConditions={setQueryConditions}
           dates={dates}
