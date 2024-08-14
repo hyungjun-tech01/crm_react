@@ -15,6 +15,14 @@ import {
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
+export const quotationColumn = [
+    { value: 'company_name', label: '회사명'},
+    { value: 'ceo_name', label: '대표자명'},
+    { value: 'company_address', label: '주소'},
+    { value: 'summary', label: '계산서요약'},
+    { value: 'memo', label: '계산서메모'},
+    { value: 'invoice_contents', label: '계산서내용'},
+];
 
 export const TaxInvoiceRepo = selector({
     key: "TaxInvoiceRepository",
@@ -25,7 +33,7 @@ export const TaxInvoiceRepo = selector({
             if((loadStates & 3) === 0){
                 console.log('[tryLoadTaxInvoices] Try to load all TaxInvoices');
                 set(atomTaxInvoiceState, (loadStates | 2));   // state : loading
-                const ret = await loadTaxInvoices(multiQueryCondi);
+                const ret = await loadAllTaxInvoices(multiQueryCondi);
                 if(ret){
                     // succeeded to load
                     set(atomTaxInvoiceState, (loadStates | 3));
@@ -35,7 +43,7 @@ export const TaxInvoiceRepo = selector({
                 };
             }
         });
-        const loadTaxInvoices = getCallback(({ set }) => async (multiQueryCondi) => {
+        const loadAllTaxInvoices = getCallback(({ set }) => async (multiQueryCondi) => {
             const input_json = JSON.stringify(multiQueryCondi);
             try {
                 console.log('[TaxInvoiceRepository] Try loading all')
@@ -47,7 +55,7 @@ export const TaxInvoiceRepo = selector({
 
                 const data = await response.json();
                 if (data.message) {
-                    console.log('loadTaxInvoices message:', data.message);
+                    console.log('loadAllTaxInvoices message:', data.message);
                     set(atomAllTaxInvoiceObj, []);
                     if(data.message === 'no data')
                         return true;
@@ -75,25 +83,29 @@ export const TaxInvoiceRepo = selector({
             console.log('filterTaxInvoices', itemName, filterText);
             if (itemName === 'common.all') {
                 allTaxInvoice = allTaxInvoiceList.filter(item => (item.company_name && item.company_name.includes(filterText)) ||
-                    (item.transaction_title && item.transaction_title.includes(filterText)) ||
-                    (item.transaction_type && item.transaction_type.includes(filterText)) ||
-                    (item.publish_type && item.publish_type.includes(filterText)) ||
-                    (item.payment_type && item.payment_type.includes(filterText))
+                    (item.ceo_name && item.ceo_name.includes(filterText)) ||
+                    (item.company_address && item.company_address.includes(filterText)) ||
+                    (item.summary && item.summary.includes(filterText)) ||
+                    (item.memo && item.memo.includes(filterText)) ||
+                    (item.invoice_contents && item.invoice_contents.includes(filterText))
                 );
             } else if (itemName === 'company.company_name') {
                 allTaxInvoice = allTaxInvoiceList.filter(item => (item.company_name && item.company_name.includes(filterText))
                 );
-            } else if (itemName === 'transaction.title') {
-                allTaxInvoice = allTaxInvoiceList.filter(item => (item.transaction_title && item.transaction_title.includes(filterText))
+            } else if (itemName === 'company.address') {
+                allTaxInvoice = allTaxInvoiceList.filter(item => (item.company_address && item.company_address.includes(filterText))
                 );
-            } else if (itemName === 'transaction.type') {
-                allTaxInvoice = allTaxInvoiceList.filter(item => (item.transaction_type && item.transaction_type.includes(filterText))
+            } else if (itemName === 'company.ceo_name') {
+                allTaxInvoice = allTaxInvoiceList.filter(item => (item.ceo_name && item.ceo_name.includes(filterText))
                 );
-            } else if (itemName === 'transaction.publish_type') {
-                allTaxInvoice = allTaxInvoiceList.filter(item => (item.publish_type && item.publish_type.includes(filterText))
+            } else if (itemName === 'taxinvoice.memo') {
+                allTaxInvoice = allTaxInvoiceList.filter(item => (item.memo && item.memo.includes(filterText))
                 );
-            } else if (itemName === 'transaction.payment_type') {
-                allTaxInvoice = allTaxInvoiceList.filter(item => (item.payment_type && item.payment_type.includes(filterText))
+            } else if (itemName === 'taxinvoice.summary') {
+                allTaxInvoice = allTaxInvoiceList.filter(item => (item.summary && item.summary.includes(filterText))
+                );
+            }else if (itemName === 'taxinvoice.invoice_contents') {
+                allTaxInvoice = allTaxInvoiceList.filter(item => (item.invoice_contents && item.invoice_contents.includes(filterText))
                 );
             }
             set(atomFilteredTaxInvoices, allTaxInvoice);
@@ -268,7 +280,7 @@ export const TaxInvoiceRepo = selector({
         });
         return {
             tryLoadTaxInvoices,
-            loadTaxInvoices,
+            loadAllTaxInvoices,
             filterTaxInvoices,
             modifyTaxInvoice,
             setCurrentTaxInvoice,

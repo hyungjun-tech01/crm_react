@@ -16,6 +16,7 @@ const BASE_PATH = Paths.BASE_PATH;
 
 export const DefaultTransactionContent = {
     transaction_code: null,
+    transaction_date: null,
     month_day: null,
     product_class_name: '',
     product_name: '',

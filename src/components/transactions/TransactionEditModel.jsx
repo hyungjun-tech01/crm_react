@@ -264,30 +264,36 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     };
     setDataForTransaction(tempData);
 
-    const trans_date_value = data['month_day'].split('.');
-    let dateValue = new Date();
-    dateValue.setMonth(trans_date_value[0] - 1);
-    dateValue.setDate(trans_date_value[1]);
-    delete data.month_day;
-
-    setOrgContentModalData({...DefaultTransactionContent, ...data, transaction_date: dateValue});
+    let trans_date = new Date();
+    if(!!data.month_day){
+      const splitted = data.month_day.split('.');
+      trans_date.setMonth(splitted[0] - 1);
+      trans_date.setDate(splitted[1]);
+    };
+    const contentData = {
+      ...data,
+      transaction_date: trans_date,
+    };
+    setOrgContentModalData(contentData);
     setEditedContentModalData({});
     setIsContentModalOpen(true);
   };
 
   const handleContentModalOk = () => {
-    if(!editedContentModalData['month_day']){
+    if(!editedContentModalData['transaction_date']){
       const tempMsg = {title: '확인', message: '거래일 정보가 누락되었습니다.'}
       setMessage(tempMsg);
       setIsMessageModalOpen(true);
       return;
     };
+    const monthDay = `${editedContentModalData.transaction_date.getMonth() -1}
+      .${editedContentModalData.transaction_date.getDate()}`;
 
     setIsContentModalOpen(false);
     const tempContent = {
       ...orgContentModalData,
       ...editedContentModalData,
-      
+      month_day: monthDay,
       transaction_sub_index: transactionContents.length + 1,
       company_code: transactionChange.company_code,
       company_name: transactionChange.company_name,

@@ -26,15 +26,9 @@ const TransactionContentModal = (props) => {
     ];
 
     const handleTime = (name, time) => {
-        let timeValue = null;
-        if(name === 'month_day') {
-            timeValue = `${time.getMonth()+1}.${time.getDate()}`;
-        } else {
-            timeValue = time;
-        };
         const tempData = {
             ...edited,
-            [name]: timeValue,
+            [name]: time,
         };
         handleEdited(tempData)
     };
