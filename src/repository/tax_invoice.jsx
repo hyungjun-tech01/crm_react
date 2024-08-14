@@ -29,7 +29,7 @@ export const TaxInvoiceRepo = selector({
             if((loadStates & 3) === 0){
                 console.log('[tryLoadTaxInvoices] Try to load all TaxInvoices');
                 set(atomTaxInvoiceState, (loadStates | 2));   // state : loading
-                const ret = await loadTaxInvoices(multiQueryCondi);
+                const ret = await loadAllTaxInvoices(multiQueryCondi);
                 if(ret){
                     // succeeded to load
                     set(atomTaxInvoiceState, (loadStates | 3));
@@ -39,7 +39,7 @@ export const TaxInvoiceRepo = selector({
                 };
             }
         });
-        const loadTaxInvoices = getCallback(({ set }) => async (multiQueryCondi) => {
+        const loadAllTaxInvoices = getCallback(({ set }) => async (multiQueryCondi) => {
             const input_json = JSON.stringify(multiQueryCondi);
             try {
                 console.log('[TaxInvoiceRepository] Try loading all')
@@ -51,7 +51,7 @@ export const TaxInvoiceRepo = selector({
 
                 const data = await response.json();
                 if (data.message) {
-                    console.log('loadTaxInvoices message:', data.message);
+                    console.log('loadAllTaxInvoices message:', data.message);
                     set(atomTaxInvoiceSet, []);
                     if(data.message === 'no data')
                         return true;
@@ -178,7 +178,8 @@ export const TaxInvoiceRepo = selector({
         });
         return {
             tryLoadTaxInvoices,
-            loadTaxInvoices,
+            loadAllTaxInvoices,
+            filterTaxInvoices,  
             modifyTaxInvoice,
             setCurrentTaxInvoice,
         };

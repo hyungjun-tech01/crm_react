@@ -39,7 +39,7 @@ const TaxInovices = () => {
   const taxInvoiceState = useRecoilValue(atomTaxInvoiceState);
   const allTaxInvoicesData = useRecoilValue(atomTaxInvoiceSet);
   const filteredTaxInvoices= useRecoilValue(atomFilteredTaxInvoices);
-  const { tryLoadTaxInvoices, setCurrentTaxInvoice , filterTaxInovices, loadAllTaxInovices} = useRecoilValue(TaxInvoiceRepo);
+  const { tryLoadTaxInvoices, setCurrentTaxInvoice , filterTaxInvoices, loadAllTaxInvoices} = useRecoilValue(TaxInvoiceRepo);
 
 
   //===== [RecoilState] Related with User =============================================
@@ -127,7 +127,7 @@ const TaxInovices = () => {
   
       console.log('multiQueryCondi',multiQueryCondi);
   
-      loadAllTaxInovices(multiQueryCondi);
+      loadAllTaxInvoices(multiQueryCondi);
        
     };
     const handleMultiQueryModalCancel = () => {
@@ -145,7 +145,7 @@ const TaxInovices = () => {
 
   const handleSearchCondition =  (newValue)=> {
     setSearchCondition(newValue);
-    filterTaxInovices(statusSearch, newValue);
+    filterTaxInvoices(statusSearch, newValue);
   };
 
   const handleMultiQueryModal = () => {
@@ -163,12 +163,12 @@ const TaxInovices = () => {
     },
     {
       title: t('transaction.publish_date'),
-      dataIndex: "publish_date",
+      dataIndex: "create_date",
       render: (text, record) => 
         <>
           {new Date(text).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day: 'numeric'})}
         </>,
-      sorter: (a, b) => a.publish_date - b.publish_date,
+      sorter: (a, b) => a.create_date - b.create_date,
     },
     {
       title: t('company.company_name'),
@@ -275,7 +275,7 @@ const TaxInovices = () => {
     <HelmetProvider>
       <div className="page-wrapper">
         <Helmet>
-          <title>{t('transaction.transaction')}</title>
+          <title>{t('taxinvoice.taxinvoice_manage')}</title>
           <meta name="description" content="Reactify Blank Page" />
         </Helmet>
         {/* Page Content */}
