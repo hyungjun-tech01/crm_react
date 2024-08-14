@@ -31,7 +31,7 @@ const TransactionContentModal = (props) => {
 
     //===== Handles to edit 'Contents' ==================================================
     const content_items = [
-        { name: 'month_day', title: t('transaction.transaction_date'), detail: { type: 'date', extra: 'long' } },
+        { name: 'transaction_date', title: t('transaction.transaction_date'), detail: { type: 'date', extra: 'long' } },
         { name: 'product_name', title: t('purchase.product_name'), detail: {
                 type: 'select', options: productOptions, group: 'product_class_name', extra: 'long'
             }
@@ -47,15 +47,9 @@ const TransactionContentModal = (props) => {
     ];
 
     const handleTime = (name, time) => {
-        let timeValue = null;
-        if(name === 'month_day') {
-            timeValue = `${time.getMonth()+1}.${time.getDate()}`;
-        } else {
-            timeValue = time;
-        };
         const tempData = {
             ...edited,
-            [name]: timeValue,
+            [name]: time,
         };
         handleEdited(tempData)
     };
