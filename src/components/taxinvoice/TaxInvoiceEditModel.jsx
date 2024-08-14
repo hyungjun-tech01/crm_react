@@ -377,123 +377,123 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
   useEffect(() => {
     if(!open) return;
 
-    if ((companyState & 1) === 1) {
-      if(data) {
-        console.log('[TaxInvoiceEditModel] called! :', data);
-        
-        // dataForBill ------------------------------
-        const tempSelectValues = {
-          transaction_type: data.is_sale? trans_types[0] : trans_types[1],
-          invoice_type: data.vat_included? invoice_types[0] : invoice_types[1],
-          receive_type: receive_types[0],
-          company_name: {label: data.company_name, value: data.company_name},
+    if ((companyState & 1) === 0) return;
+    
+    if(data) {
+      console.log('[TaxInvoiceEditModel] called! :', data);
+      
+      // dataForBill ------------------------------
+      const tempSelectValues = {
+        transaction_type: data.is_sale? trans_types[0] : trans_types[1],
+        invoice_type: data.vat_included? invoice_types[0] : invoice_types[1],
+        receive_type: receive_types[0],
+        company_name: {label: data.company_name, value: data.company_name},
+      };
+      console.log('[TaxInvoiceEditModel] selectValues :', tempSelectValues);
+      setSelectValue(tempSelectValues);
+
+      // Text for Supply ------------------------------------
+      let inputAmountText = '';
+      let vacantCount = 0;
+
+      const tempAmountText = typeof data.supply_price === 'number'
+        ? data.supply_price.toString() : data.supply_price;
+      const tempVacantCount = 11 - tempAmountText.length;
+
+      if(tempVacantCount < 0){
+        console.log('Too high value');
+        vacantCount = 0;
+        inputAmountText = tempAmountText.slice(-11);
+      } else {
+        vacantCount = tempVacantCount;
+        for(let i=0; i < tempVacantCount; i++){
+          inputAmountText += ' ';
         };
-        console.log('[TaxInvoiceEditModel] selectValues :', tempSelectValues);
-        setSelectValue(tempSelectValues);
+        inputAmountText += tempAmountText;
+      };
 
-        // Text for Supply ------------------------------------
-        let inputAmountText = '';
-        let vacantCount = 0;
-
-        const tempAmountText = typeof data.supply_price === 'number'
-          ? data.supply_price.toString() : data.supply_price;
-        const tempVacantCount = 11 - tempAmountText.length;
-
-        if(tempVacantCount < 0){
-          console.log('Too high value');
-          vacantCount = 0;
-          inputAmountText = tempAmountText.slice(-11);
-        } else {
-          vacantCount = tempVacantCount;
-          for(let i=0; i < tempVacantCount; i++){
-            inputAmountText += ' ';
-          };
-          inputAmountText += tempAmountText;
+      // Text for Tax ------------------------------------
+      let intputTaxText = '';
+      const tempTaxText = typeof data.tax_price === 'number'
+        ? data.tax_price.toFixed().toString() : data.tax_price;
+      if(tempTaxText.length > 10){
+        intputTaxText = tempTaxText.slice(-10);
+      } else {
+        for(let i=0; i< 10-tempTaxText.length; i++){
+          intputTaxText += ' ';
         };
+        intputTaxText += tempTaxText;
+      };
 
-        // Text for Tax ------------------------------------
-        let intputTaxText = '';
-        const tempTaxText = typeof data.tax_price === 'number'
-          ? data.tax_price.toFixed().toString() : data.tax_price;
-        if(tempTaxText.length > 10){
-          intputTaxText = tempTaxText.slice(-10);
-        } else {
-          for(let i=0; i< 10-tempTaxText.length; i++){
-            intputTaxText += ' ';
-          };
-          intputTaxText += tempTaxText;
-        };
+      const isCash = data.payment_type === '현금';
 
-        const isCash = data.payment_type === '현금';
+      let tempBillData = {
+        ...default_bill_data,
+        transaction_type: data.transaction_type,
+        invoice_type: data.vat_included?'세금계산서':'계산서',
+        show_decimal: data.show_decimal,
+        receive_type: '청구',
+        issue_date: data.publish_date,
+        supply_price: data.supply_price,
+        tax_price: data.tax_price,
+        total_price: data.total_price,
 
-        let tempBillData = {
-          ...default_bill_data,
-          transaction_type: data.transaction_type,
-          invoice_type: data.vat_included?'세금계산서':'계산서',
-          show_decimal: data.show_decimal,
-          receive_type: '청구',
-          issue_date: data.publish_date,
-          supply_price: data.supply_price,
-          tax_price: data.tax_price,
-          total_price: data.total_price,
+        supply_text: inputAmountText,
+        tax_text: intputTaxText,
+        vacant_count: vacantCount,
 
-          supply_text: inputAmountText,
-          tax_text: intputTaxText,
-          vacant_count: vacantCount,
+        cash_amount: isCash ? data.paid_money: 0,
+        check_amount: isCash ? 0 : data.paid_money,
+      };
 
-          cash_amount: isCash ? data.paid_money: 0,
-          check_amount: isCash ? 0 : data.paid_money,
-        };
+      setIsTaxBill(data.vat_included);
+      // IsSale ------------------------------------
+      setIsSale(data.is_sale);
+      if(data.is_sale) {
+        tempBillData.supplier = {...company_info};
+        tempBillData.receiver = {
+          company_code: data.company_code,
+          business_registration_code: data.business_registration_code,
+          company_name: data.company_name,
+          ceo_name: data.ceo_name,
+          company_address: data.company_address,
+          business_type: data.business_type,
+          business_item: data.business_item,
+        }
+      } else {
+        tempBillData.supplier = {
+          company_code: data.company_code,
+          business_registration_code: data.business_registration_code,
+          company_name: data.company_name,
+          ceo_name: data.ceo_name,
+          company_address: data.company_address,
+          business_type: data.business_type,
+          business_item: data.business_item,
+        }
+        tempBillData.receiver = {...company_info};
+      };
+      setDataForBill(tempBillData);
+    }
+    // Copy contents into 'transaction contents' -------------------
+    if(contents) {
+      const modified = contents.map((item, index) => ({
+        index: index,
+        tax_invoice_code: null,
+        month_day: item.month_day,
+        product_name: item.product_name,
+        standard: item.standard,
+        quantity: item.quantity,
+        supply_price: item.supply_price,
+        tax_price: item.tax_price,
+        total_price: item.total_price,
+        memo: item.memo,
+      }));
+      setTransactionContents(modified);
+    }
+    else
+      setTransactionContents([]);
 
-        setIsTaxBill(data.vat_included);
-        // IsSale ------------------------------------
-        setIsSale(data.is_sale);
-        if(data.is_sale) {
-          tempBillData.supplier = {...company_info};
-          tempBillData.receiver = {
-            company_code: data.company_code,
-            business_registration_code: data.business_registration_code,
-            company_name: data.company_name,
-            ceo_name: data.ceo_name,
-            company_address: data.company_address,
-            business_type: data.business_type,
-            business_item: data.business_item,
-          }
-        } else {
-          tempBillData.supplier = {
-            company_code: data.company_code,
-            business_registration_code: data.business_registration_code,
-            company_name: data.company_name,
-            ceo_name: data.ceo_name,
-            company_address: data.company_address,
-            business_type: data.business_type,
-            business_item: data.business_item,
-          }
-          tempBillData.receiver = {...company_info};
-        };
-        setDataForBill(tempBillData);
-      }
-      // Copy contents into 'transaction contents' -------------------
-      if(contents) {
-        const modified = contents.map((item, index) => ({
-          index: index,
-          tax_invoice_code: null,
-          month_day: item.month_day,
-          product_name: item.product_name,
-          standard: item.standard,
-          quantity: item.quantity,
-          supply_price: item.supply_price,
-          tax_price: item.tax_price,
-          total_price: item.total_price,
-          memo: item.memo,
-        }));
-        setTransactionContents(modified);
-      }
-      else
-        setTransactionContents([]);
-    };
-
-  }, [contents, data, companyState]);
+  }, [open, contents, data, companyState]);
 
   if(!open) return (
       <div>&nbsp;</div>

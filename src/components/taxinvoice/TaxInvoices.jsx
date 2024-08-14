@@ -210,7 +210,8 @@ const TaxInovices = () => {
   ];
 
   const handleAddNewTaxInvoice = useCallback(() => {
-    setCurrentTaxInvoice()
+    setCurrentTaxInvoice();
+    setOpenTaxInvoice(true);
 
     setTimeout(()=>{
       let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
@@ -221,7 +222,8 @@ const TaxInovices = () => {
   }, [setCurrentTaxInvoice]);
 
   const handleOpenTaxInvoice = (code) => {
-    setCurrentTaxInvoice(code)
+    setCurrentTaxInvoice(code);
+    setOpenTaxInvoice(true);
 
     setTimeout(()=>{
       let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
