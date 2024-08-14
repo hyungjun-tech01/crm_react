@@ -258,11 +258,18 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
 
   const handleStartEditContent = (data) => {
     const tempData = {
-      ...data,
+      ...dataForTransaction,
       title: `${t('common.item')} ${t('common.edit')}`,
     };
     setDataForTransaction(tempData);
-    setOrgContentModalData({...DefaultTransactionContent});
+
+    const trans_date_value = data['month_day'].split('.');
+    let dateValue = new Date();
+    dateValue.setMonth(trans_date_value[0] - 1);
+    dateValue.setDate(trans_date_value[1]);
+    delete data.month_day;
+
+    setOrgContentModalData({...DefaultTransactionContent, ...data, transaction_date: dateValue});
     setEditedContentModalData({});
     setIsContentModalOpen(true);
   };

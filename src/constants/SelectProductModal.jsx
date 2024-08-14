@@ -23,7 +23,6 @@ const SelectProductModal = (props) => {
     const [ productClassOptions, setProductClassOptions ] = useState([]);
     const [ productOptionObj, setProductOptionObj ] = useState({});
     
-    // const [ loadingState, setLoadingState ] = useState(false);
     const [ selectedProductClass, setSelectedProductClass ] = useState(null);
     const [ listItems, setListItems ] = useState([]);
     const [ selectedItem, setSelectedItem ] = useState(null);
@@ -33,25 +32,18 @@ const SelectProductModal = (props) => {
     const handleSelectProductClass = (selected) => {
         setSelectedProductClass(selected);
 
-        console.log('handleSelectProductClass', selected);
         const selectedProducts = productOptionObj[selected.value];
-
-        console.log('handleSelectProductClass', selectedProducts);
-
         setListItems(selectedProducts);
     };
-
     const handleClickRow = (data) => {
         setSelectedItem({...data});
     };
-    
     const handleOk = () => {
         if(Object.keys(selectedItem).length > 0){
             handleChange(selectedItem);
         };
         handleCancel();
     };
-
     const handleCancel = () => {
         setListItems([]);
         setSelectedItem({});
@@ -65,24 +57,31 @@ const SelectProductModal = (props) => {
         if(((productState & 1) === 1) 
             && ((productClassListState & 1) ===  1)
         ) {
-            const found = productClassList.map(item => ({
-                label: item.product_class_name,
-                value: item.product_class_name,
-            }));
-            setProductClassOptions(found);
-
-            let foundObj = {};
-            productClassList.forEach(item => {
-                const foundProducts = allProducts.filter(product => product.product_class_name === item.product_class_name);
-                const tempItems = foundProducts.map((product, idx) => ({
-                    ...product,
-                    index: idx,
-                    component: <div>{product.product_name}</div>,
+            if(productClassOptions.length === 0 || Object.keys(productOptionObj).length === 0) {
+                const found = productClassList.map(item => ({
+                    label: item.product_class_name,
+                    value: item.product_class_name,
                 }));
-                foundObj[item.product_class_name] = tempItems;
-            });
-            console.log('SelecteProductModal : ', foundObj);
-            setProductOptionObj(foundObj);
+                setProductClassOptions(found);
+    
+                let foundObj = {};
+                productClassList.forEach(item => {
+                    const foundProducts = allProducts.filter(product => product.product_class_name === item.product_class_name);
+                    const tempItems = foundProducts.map((product, idx) => ({
+                        ...product,
+                        index: idx,
+                        component: <div>{product.product_name}</div>,
+                    }));
+                    foundObj[item.product_class_name] = tempItems;
+                });
+                setProductOptionObj(foundObj);
+            } else {
+                if(selectedProductClass && productClassOptions.indexOf(selectedProductClass) !== -1){
+                    const selectedProducts = productOptionObj[selectedProductClass.value];
+                   setListItems(selectedProducts);
+                };
+            };
+            
         };
     }, [allProducts, productClassList, productClassListState, productState, tryLoadAllProductClassList, tryLoadAllProducts]);
 
