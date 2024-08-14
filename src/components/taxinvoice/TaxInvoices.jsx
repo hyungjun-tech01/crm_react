@@ -288,10 +288,11 @@ const TaxInovices = () => {
                     <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.all')}>{t('common.all')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('transaction.title')}>{t('transaction.title')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('transaction.type')}>{t('transaction.type')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('transaction.publish_type')}>{t('transaction.publish_type')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('transaction.payment_type')}>{t('transaction.payment_type')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.ceo_name')}>{t('company.ceo_name')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.address')}>{t('company.address')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('taxinvoice.memo')}>{t('taxinvoice.memo')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('taxinvoice.summary')}>{t('taxinvoice.summary')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('taxinvoice.invoice_contents')}>{t('taxinvoice.invoice_contents')}</button>
                     </div>
                 </div>
               </div>
@@ -312,7 +313,7 @@ const TaxInovices = () => {
                       id="multi-company-query"
                       onClick={handleMultiQueryModal}
                   >
-                      {t('transaction.transaction_multi_query')}
+                      {t('taxinvoice.taxinvoice_multi_query')}
                   </button>                
               </div>
               <div className="col text-end">
