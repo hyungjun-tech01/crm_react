@@ -11,9 +11,9 @@ import SystemUserModel from "../task/SystemUserModel";
 
 import { CompanyRepo } from "../../repository/company";
 import {
-  atomAllTaxInvoiceObj,
+  atomTaxInvoiceArray,
   atomCompanyState,
-  atomFilteredTaxInvoices,
+  atomFilteredTaxInvoiceArray,
   atomTaxInvoiceState,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
@@ -35,10 +35,9 @@ const TaxInovices = () => {
   const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
-  //===== [RecoilState] Related with Transaction ======================================
+  //===== [RecoilState] Related with Tax Invoice ======================================
   const taxInvoiceState = useRecoilValue(atomTaxInvoiceState);
-  const allTaxInvoicesData = useRecoilValue(atomAllTaxInvoiceObj);
-  const filteredTaxInvoices= useRecoilValue(atomFilteredTaxInvoices);
+  const filteredTaxInvoices= useRecoilValue(atomFilteredTaxInvoiceArray);
   const { tryLoadTaxInvoices, setCurrentTaxInvoice , filterTaxInvoices, loadAllTaxInvoices} = useRecoilValue(TaxInvoiceRepo);
 
 
@@ -210,22 +209,22 @@ const TaxInovices = () => {
     },
   ];
 
-  const handleAddNewTransaction = useCallback(() => {
+  const handleAddNewTaxInvoice = useCallback(() => {
     setCurrentTaxInvoice()
 
     setTimeout(()=>{
-      let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
+      let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
         keyboard: false
       })
       myModal.show();
     }, 1000);
   }, [setCurrentTaxInvoice]);
 
-  const handleOpenTransactoin = (code) => {
+  const handleOpenTaxInvoice = (code) => {
     setCurrentTaxInvoice(code)
 
     setTimeout(()=>{
-      let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
+      let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
         keyboard: false
       })
       myModal.show();
@@ -324,7 +323,7 @@ const TaxInovices = () => {
                       id="add-task"
                       // data-bs-toggle="modal"
                       // data-bs-target="#edit_transaction"
-                      onClick={handleAddNewTransaction}
+                      onClick={handleAddNewTaxInvoice}
                     >
                       {t('taxinvoice.add_taxinvoice')}
                     </button>
@@ -339,10 +338,9 @@ const TaxInovices = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive activity-tables">
-                  { searchCondition === "" ?  
                     <Table
                       pagination={{
-                        total: allTaxInvoicesData.length,
+                        total: filteredTaxInvoices.length,
                         showTotal: ShowTotal,
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
@@ -352,41 +350,17 @@ const TaxInovices = () => {
                       style={{ overflowX: "auto" }}
                       columns={columns}
                       bordered
-                      dataSource={allTaxInvoicesData}
-                      rowKey={(record) => record.transaction_code}
+                      dataSource={filteredTaxInvoices}
+                      rowKey={(record) => record.tax_invoice_code}
                       onRow={(record, rowIndex) => {
                         return {
                           onClick: (event) => {
                             if(event.target.className === 'table_company') return;
-                            handleOpenTransactoin(record.transaction_code)
-                          }, // double click row
-                        };
-                      }}
-                    />:
-                    <Table
-                      pagination={{
-                        total: filteredTaxInvoices.length >0 ? filteredTaxInvoices.length:0,
-                        showTotal: ShowTotal,
-                        showSizeChanger: true,
-                        onShowSizeChange: onShowSizeChange,
-                        ItemRender: ItemRender,
-                      }}
-                      loading={nowLoading}
-                      style={{ overflowX: "auto" }}
-                      columns={columns}
-                      bordered
-                      dataSource={filteredTaxInvoices.length >0 ? filteredTaxInvoices:null}
-                      rowKey={(record) => record.transaction_code}
-                      onRow={(record, rowIndex) => {
-                        return {
-                          onClick: (event) => {
-                            if(event.target.className === 'table_company') return;
-                            handleOpenTransactoin(record.transaction_code)
+                            handleOpenTaxInvoice(record.tax_invoice_code)
                           }, // double click row
                         };
                       }}
                     />
-                  }
                   </div>
                 </div>
               </div>

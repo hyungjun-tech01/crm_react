@@ -104,7 +104,10 @@ export const ConsultingRepo = selector({
                     console.log('loadAllConsultings message:', data.message);
                     set(atomAllConsultingObj, {});
                     set(atomFilteredConsultingArray, []);
-                    return false;
+                    if(data.message === 'no data')
+                        return true;
+                    else
+                        return false;
                 };
                 let allconsultings = {};
                 let filteredConsultings = [];

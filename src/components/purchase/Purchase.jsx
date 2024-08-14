@@ -192,27 +192,13 @@ const Purchase = () => {
     {
       title: t('company.company_name'),
       dataIndex: "company_name",
-      render: (text, record) =>
-        <div className="table_company" style={{color:'#0d6efd'}}
-          onClick={() => {
-            handleClickCompany(record.company_code);
-          }}
-        >
-          {text}
-        </div>,
+      render: (text, record) =><>{text}</>,
       sorter: (a, b) => compareText(a.company_name, b.company_name),
     },
     {
       title: t('company.company_name_en'),
       dataIndex: "company_name_en",
-      render: (text, record) =>
-        <div className="table_company" style={{color:'#0d6efd'}}
-          onClick={() => {
-            handleClickCompany(record.company_code);
-          }}
-        >
-          {text}
-        </div>,
+      render: (text, record) =><>{text}</>,
       sorter: (a, b) => compareText(a.company_name_en, b.company_name_en),
     },
     {
@@ -452,7 +438,7 @@ const Purchase = () => {
                       style={{ overflowX: "auto" }}
                       columns={columns}
                       dataSource={filteredPurchase.length >0 ? filteredPurchase : null}
-                      rowKey={(record) => record.lead_code}
+                      rowKey={(record) => record.purchase_code}
                       onRow={(record, rowIndex) => {
                         return {
                           onClick: (event) => {
@@ -551,7 +537,6 @@ const Purchase = () => {
         {/* Modal */}
         <PurchaseAddModel init={initAddNewPurchase} handleInit={setInitAddNewPurchase} />
         <PurchaseDetailsModel />
-        <CompanyDetailsModel />
         <MultiQueryModal 
           title= {t('purchase.purchase_multi_query')}
           open={multiQueryModal}
