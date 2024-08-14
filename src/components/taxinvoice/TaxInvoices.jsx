@@ -11,7 +11,7 @@ import SystemUserModel from "../task/SystemUserModel";
 
 import { CompanyRepo } from "../../repository/company";
 import {
-  atomTaxInvoiceSet,
+  atomAllTaxInvoiceObj,
   atomCompanyState,
   atomFilteredTaxInvoices,
   atomTaxInvoiceState,
@@ -37,7 +37,7 @@ const TaxInovices = () => {
 
   //===== [RecoilState] Related with Transaction ======================================
   const taxInvoiceState = useRecoilValue(atomTaxInvoiceState);
-  const allTaxInvoicesData = useRecoilValue(atomTaxInvoiceSet);
+  const allTaxInvoicesData = useRecoilValue(atomAllTaxInvoiceObj);
   const filteredTaxInvoices= useRecoilValue(atomFilteredTaxInvoices);
   const { tryLoadTaxInvoices, setCurrentTaxInvoice , filterTaxInovices, loadAllTaxInovices} = useRecoilValue(TaxInvoiceRepo);
 

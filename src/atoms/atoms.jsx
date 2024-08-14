@@ -483,10 +483,6 @@ export const atomFilteredTaxInvoices = atom({
     key: "filteredTaxxInvoices",
     default: [],
 });
-export const atomTaxInvoiceByCompany = atom({
-    key: "taxInvoiceByCompany",
-    default: [],
-});
 export const atomTaxInvoiceState = atom({
     key: "taxInvoiceState",
     default: 0,

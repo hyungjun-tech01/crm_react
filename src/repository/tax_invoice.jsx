@@ -70,7 +70,7 @@ export const TaxInvoiceRepo = selector({
             };
         });
         const filterTaxInvoices = getCallback(({ set, snapshot }) => async (itemName, filterText) => {
-            const allTaxInvoiceList = await snapshot.getPromise(atomTaxInvoiceSet);
+            const allTaxInvoiceList = await snapshot.getPromise(atomAllTaxInvoiceObj);
             let allTaxInvoice;
             console.log('filterTaxInvoices', itemName, filterText);
             if (itemName === 'common.all') {
