@@ -267,6 +267,7 @@ const koResource = {
         },
         taxinvoice:{
             taxinvoice_manage: '(세금)계산서 관리',
+            add_taxinvoice :'세금계산서 등록',
             memo : '계산서메모',
             summary:'계산서요약',
             invoice_contents:'계산서내용',

@@ -326,7 +326,7 @@ const TaxInovices = () => {
                       // data-bs-target="#edit_transaction"
                       onClick={handleAddNewTransaction}
                     >
-                      {t('transaction.add_transaction')}
+                      {t('taxinvoice.add_taxinvoice')}
                     </button>
                   </li>
                 </ul>
