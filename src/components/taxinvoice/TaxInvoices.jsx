@@ -95,6 +95,22 @@ const TaxInovices = () => {
      // { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
     ];
 
+    let tommorow = new Date();
+      
+    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+        label: key,
+        fromDate: dates[key].fromDate,
+        toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
+        checked: dates[key].checked,
+    }));
+
+
+    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+      label: key,
+      fromDate: singleDate[key].fromDate,
+      checked: singleDate[key].checked,
+    }));    
+
     const handleMultiQueryModalOk = () => {
 
       //setCompanyState(0);
@@ -102,21 +118,7 @@ const TaxInovices = () => {
   
       // query condition 세팅 후 query
       console.log("handleMultiQueryModalOk", queryConditions);
-      let tommorow = new Date();
-      
-      const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
-          label: key,
-          fromDate: dates[key].fromDate,
-          toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
-          checked: dates[key].checked,
-      }));
-  
-  
-      const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
-        label: key,
-        fromDate: singleDate[key].fromDate,
-        checked: singleDate[key].checked,
-      }));
+
       
       const multiQueryCondi = {
         queryConditions:queryConditions,
@@ -234,30 +236,13 @@ const TaxInovices = () => {
   useEffect(() => {
     tryLoadAllCompanies();
 
-    // query condition 세팅 후 query
-    let tommorow = new Date();
-      
-    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
-        label: key,
-        fromDate: dates[key].fromDate,
-        toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
-        checked: dates[key].checked,
-    }));
-
-
-    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
-      label: key,
-      fromDate: singleDate[key].fromDate,
-      checked: singleDate[key].checked,
-    }));
-    
     const multiQueryCondi = {
       queryConditions:queryConditions,
       checkedDates:checkedDates,
       singleDate:checkedSingleDates
     }
 
-    console.log('tryLoadAllQuotations multiQueryCondi',multiQueryCondi);   
+    console.log('multiQueryCondi',multiQueryCondi);   
     tryLoadTaxInvoices(multiQueryCondi);
 
     tryLoadAllUsers();
@@ -352,7 +337,7 @@ const TaxInovices = () => {
                       columns={columns}
                       bordered
                       dataSource={allTaxInvoicesData}
-                      rowKey={(record) => record.transaction_code}
+                      rowKey={(record) => record.tax_invoice_code}
                       onRow={(record, rowIndex) => {
                         return {
                           onClick: (event) => {
@@ -375,12 +360,12 @@ const TaxInovices = () => {
                       columns={columns}
                       bordered
                       dataSource={filteredTaxInvoices.length >0 ? filteredTaxInvoices:null}
-                      rowKey={(record) => record.transaction_code}
+                      rowKey={(record) => record.tax_invoice_code}
                       onRow={(record, rowIndex) => {
                         return {
                           onClick: (event) => {
                             if(event.target.className === 'table_company') return;
-                            handleOpenTransactoin(record.transaction_code)
+                            handleOpenTransactoin(record.tax_invoice_code)
                           }, // double click row
                         };
                       }}

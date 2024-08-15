@@ -210,7 +210,7 @@ const handleSingleCheckedChange = (key) => {
             onCancel={handleCancel}
             width={800}
             footer={  [
-                <Button key="cancel" onClick={handleInitial}>
+                <Button key="init" onClick={handleInitial}>
                   Initialize
                 </Button>,
                 <Button key="cancel" onClick={handleCancel}>
