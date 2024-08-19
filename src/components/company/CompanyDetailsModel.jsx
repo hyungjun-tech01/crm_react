@@ -432,13 +432,13 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
                   </div>
                 </div>
                 <DetailTitleItem
-                  original={selectedCompany.company_name_en}
+                  original={selectedCompany}
                   name="company_name_en"
                   title={t("company.company_name_en")}
                   onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
-                  original={selectedCompany.business_registration_code}
+                  original={selectedCompany}
                   name="business_registration_code"
                   title={t("company.business_registration_code")}
                   onEditing={handleDetailChange}

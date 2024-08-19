@@ -9,7 +9,7 @@ import { ProductClassListRepo, ProductRepo } from '../repository/product';
 import styles from './SelectListModal.module.scss';
 
 const SelectProductModal = (props) => {
-    const { title, open, handleChange, handleClose } = props;
+    const { title, current, open, handleChange, handleClose } = props;
     const { t } = useTranslation();
 
     const productClassListState = useRecoilValue(atomProductClassListState);
@@ -76,14 +76,46 @@ const SelectProductModal = (props) => {
                 });
                 setProductOptionObj(foundObj);
             } else {
-                if(selectedProductClass && productClassOptions.indexOf(selectedProductClass) !== -1){
-                    const selectedProducts = productOptionObj[selectedProductClass.value];
-                   setListItems(selectedProducts);
+                if(!!current) {
+                    if(!!current['product_class_name']) {
+                        const tempValue = {label: current.product_class_name, value: current.product_class_name};
+                        if(!selectedProductClass || selectedProductClass.value !== tempValue.value) {
+                            setSelectedProductClass(tempValue);
+                            const selectedProducts = productOptionObj[tempValue.value];
+                            setListItems(selectedProducts);
+
+                            if(!!current['product_name']) {
+                                if(!selectedItem || selectedItem.product_name !== current.product_name) {
+                                    const foundIdx = selectedProducts.findIndex(item => item.product_name === current.product_name);
+                                    if(foundIdx !== -1) {
+                                        setSelectedItem({...selectedProducts.at(foundIdx)});
+                                    };
+                                };
+                            };
+                        } else {
+                            const selectedProducts = productOptionObj[selectedProductClass.value];
+                            setListItems(selectedProducts);
+
+                            if(!!current['product_name']) {
+                                if(!selectedItem || selectedItem.product_name !== current.product_name) {
+                                    const foundIdx = selectedProducts.findIndex(item => item.product_name === current.product_name);
+                                    if(foundIdx !== -1) {
+                                        setSelectedItem({...selectedProducts.at(foundIdx)});
+                                    };
+                                };
+                            };
+                        };
+                    };
+                } else {
+                    if(selectedProductClass && productClassOptions.indexOf(selectedProductClass) !== -1){
+                        const selectedProducts = productOptionObj[selectedProductClass.value];
+                       setListItems(selectedProducts);
+                    };
                 };
             };
             
         };
-    }, [allProducts, productClassList, productClassListState, productState, tryLoadAllProductClassList, tryLoadAllProducts]);
+    }, [allProducts, current, productClassList, productClassListState, productState, tryLoadAllProductClassList, tryLoadAllProducts]);
 
     useEffect(() => {
         if(open && inputRef.current !== null) {

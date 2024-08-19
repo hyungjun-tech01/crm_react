@@ -501,19 +501,19 @@ if (init)
             <div className="modal-header">
               <div className="row w-100">
                 <DetailTitleItem
-                  original={selectedQuotation.quotation_title}
-                  name='title'
+                  original={selectedQuotation}
+                  name='quotation_title'
                   title={t('common.title')}
                   onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
-                  original={selectedQuotation.quotation_number}
+                  original={selectedQuotation}
                   name='quotation_number'
                   title={t('quotation.doc_no')}
                   onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
-                  original={selectedQuotation.status}
+                  original={selectedQuotation}
                   name='status'
                   title={t('common.status')}
                   onEditing={handleDetailChange}

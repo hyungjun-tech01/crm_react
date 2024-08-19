@@ -194,19 +194,19 @@ const ConsultingDetailsModel = () => {
           <div className="modal-header">
             <div className="row w-100">
               <DetailTitleItem
-                original={selectedConsulting.lead_name}
+                original={selectedConsulting}
                 name='lead_name'
                 title={t('lead.lead_name')}
                 onEditing={handleDetailChange}
               />
               <DetailTitleItem
-                original={selectedConsulting.company_name}
+                original={selectedConsulting}
                 name='company_name'
                 title={t('company.company_name')}
                 onEditing={handleDetailChange}
               />
               <DetailTitleItem
-                original={selectedConsulting.position}
+                original={selectedConsulting}
                 name='position'
                 title={t('lead.position')}
                 onEditing={handleDetailChange}

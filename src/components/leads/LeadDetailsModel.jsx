@@ -424,19 +424,19 @@ const LeadDetailsModel = ({init, handleInit}) => {
                   </div>
                 </div>
                 <DetailTitleItem
-                  original={selectedLead.lead_name}
+                  original={selectedLead}
                   name='lead_name'
                   title={t('lead.lead_name')}
                   onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
-                  original={selectedLead.company_name}
+                  original={selectedLead}
                   name='company_name'
                   title={t('company.company_name')}
                   onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
-                  original={selectedLead.position}
+                  original={selectedLead}
                   name='position'
                   title={t('lead.position')}
                   onEditing={handleDetailChange}
