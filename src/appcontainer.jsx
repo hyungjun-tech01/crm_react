@@ -30,6 +30,7 @@ import Components from "./components/components";
 //component
 import Email from "./components/email";
 import Mailview from "./components/email/mail-view";
+import EmailTest from "./components/test";
 import Task from "./components/task";
 import BasicTable from "./components/table/basictable";
 import DataTable from "./components/table/datatable";
@@ -290,6 +291,7 @@ const AppUniversal = (props) => {
           {/* Email   */}
           <Route path="/email" exact component={Email} />
           <Route path="/mail-view" exact component={Mailview} />
+          <Route path="/emailTest" exact component={EmailTest} />
           {/* Error Pages */}
           <Route path="/error-404" exact component={Error404} />
           <Route path="/error-500" exact component={Error500} />

@@ -446,7 +446,7 @@ const Purchase = () => {
                       style={{ overflowX: "auto" }}
                       columns={columns}
                       dataSource={tableData}
-                      rowKey={(record) => record.purchase_code}
+                      rowKey={(record) => record ? record.purchase_code : ''}
                       onRow={(record, rowIndex) => {
                         return {
                           onClick: (event) => {
