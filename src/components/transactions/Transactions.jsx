@@ -92,45 +92,46 @@ const Transactions = () => {
   };
   
   const [singleDate, setSingleDate] = useState(initialSingleDate);
+
+  let tommorow = new Date();
+
+  const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+    label: key,
+    fromDate: dates[key].fromDate,
+    toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
+    checked: dates[key].checked,
+  }));
+
+
+  const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+    label: key,
+    fromDate: singleDate[key].fromDate,
+    checked: singleDate[key].checked,
+  }));
   
   const singleDateSettings = [
      // { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
     ];
 
-    const handleMultiQueryModalOk = () => {
+  const handleMultiQueryModalOk = () => {
 
       //setCompanyState(0);
-      setMultiQueryModal(false);
+    setMultiQueryModal(false);
   
-      // query condition 세팅 후 query
-      console.log("handleMultiQueryModalOk", queryConditions);
-      let tommorow = new Date();
-      
-      const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
-          label: key,
-          fromDate: dates[key].fromDate,
-          toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
-          checked: dates[key].checked,
-      }));
+    // query condition 세팅 후 query
+    console.log("handleMultiQueryModalOk", queryConditions);
   
-  
-      const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
-        label: key,
-        fromDate: singleDate[key].fromDate,
-        checked: singleDate[key].checked,
-      }));
-      
-      const multiQueryCondi = {
+    const multiQueryCondi = {
         queryConditions:queryConditions,
         checkedDates:checkedDates,
         singleDate:checkedSingleDates
       }
   
-      console.log('multiQueryCondi',multiQueryCondi);
+      // console.log('multiQueryCondi',multiQueryCondi);
   
-      loadAllTransactions(multiQueryCondi);
+    loadAllTransactions(multiQueryCondi);
        
-    };
+  };
     const handleMultiQueryModalCancel = () => {
       setMultiQueryModal(false);
     };  
@@ -239,21 +240,21 @@ const Transactions = () => {
     tryLoadAllCompanies();
 
     // query condition 세팅 후 query
-    let tommorow = new Date();
+    // let tommorow = new Date();
       
-    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
-        label: key,
-        fromDate: dates[key].fromDate,
-        toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
-        checked: dates[key].checked,
-    }));
+    // const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+    //     label: key,
+    //     fromDate: dates[key].fromDate,
+    //     toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
+    //     checked: dates[key].checked,
+    // }));
 
 
-    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
-      label: key,
-      fromDate: singleDate[key].fromDate,
-      checked: singleDate[key].checked,
-    }));
+    // const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+    //   label: key,
+    //   fromDate: singleDate[key].fromDate,
+    //   checked: singleDate[key].checked,
+    // }));
     
     const multiQueryCondi = {
       queryConditions:queryConditions,
@@ -261,7 +262,7 @@ const Transactions = () => {
       singleDate:checkedSingleDates
     }
 
-    console.log('tryLoadAllQuotations multiQueryCondi',multiQueryCondi);   
+    // console.log('tryLoadAllQuotations multiQueryCondi',multiQueryCondi);   
     tryLoadAllTransactions(multiQueryCondi);
 
     tryLoadAllUsers();

@@ -21,8 +21,7 @@ import { UserRepo } from "../../repository/user";
 import { compareCompanyName , compareText, ConvertCurrency } from "../../constants/functions";
 import TaxInvoiceEditModel from "../taxinvoice/TaxInvoiceEditModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
-import { transactionColumn } from "../../repository/transaction";
-import { TaxInvoiceRepo } from "../../repository/tax_invoice";
+import { TaxInvoiceRepo, taxInvoiceColumn } from "../../repository/tax_invoice";
 
 
 const TaxInovices = () => {
@@ -95,6 +94,22 @@ const TaxInovices = () => {
      // { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
     ];
 
+    let tommorow = new Date();
+      
+    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+        label: key,
+        fromDate: dates[key].fromDate,
+        toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
+        checked: dates[key].checked,
+    }));
+
+
+    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+      label: key,
+      fromDate: singleDate[key].fromDate,
+      checked: singleDate[key].checked,
+    }));    
+
     const handleMultiQueryModalOk = () => {
 
       //setCompanyState(0);
@@ -102,21 +117,7 @@ const TaxInovices = () => {
   
       // query condition 세팅 후 query
       console.log("handleMultiQueryModalOk", queryConditions);
-      let tommorow = new Date();
-      
-      const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
-          label: key,
-          fromDate: dates[key].fromDate,
-          toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
-          checked: dates[key].checked,
-      }));
-  
-  
-      const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
-        label: key,
-        fromDate: singleDate[key].fromDate,
-        checked: singleDate[key].checked,
-      }));
+
       
       const multiQueryCondi = {
         queryConditions:queryConditions,
@@ -236,30 +237,13 @@ const TaxInovices = () => {
   useEffect(() => {
     tryLoadAllCompanies();
 
-    // query condition 세팅 후 query
-    let tommorow = new Date();
-      
-    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
-        label: key,
-        fromDate: dates[key].fromDate,
-        toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
-        checked: dates[key].checked,
-    }));
-
-
-    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
-      label: key,
-      fromDate: singleDate[key].fromDate,
-      checked: singleDate[key].checked,
-    }));
-    
     const multiQueryCondi = {
       queryConditions:queryConditions,
       checkedDates:checkedDates,
       singleDate:checkedSingleDates
     }
 
-    console.log('tryLoadAllQuotations multiQueryCondi',multiQueryCondi);   
+    console.log('multiQueryCondi',multiQueryCondi);   
     tryLoadTaxInvoices(multiQueryCondi);
 
     tryLoadAllUsers();
@@ -383,7 +367,7 @@ const TaxInovices = () => {
           open={multiQueryModal}
           handleOk={handleMultiQueryModalOk}
           handleCancel={handleMultiQueryModalCancel}
-          companyColumn={transactionColumn}
+          companyColumn={taxInvoiceColumn}
           queryConditions={queryConditions}
           setQueryConditions={setQueryConditions}
           dates={dates}

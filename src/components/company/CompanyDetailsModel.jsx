@@ -530,7 +530,7 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
                           >
                             {company_items_info.map((item, index) => (
                               <DetailCardItem
-                                key={index}
+                                key={`${item.title}-${index}`}
                                 title={t(item.title)}
                                 defaultValue={selectedCompany[item.key]}
                                 edited={editedDetailValues}

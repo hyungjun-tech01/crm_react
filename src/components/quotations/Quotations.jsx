@@ -95,6 +95,23 @@ const Quotations = () => {
      // { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
     ];
 
+   // query condition 세팅 후 query
+   let tommorow = new Date();
+    
+   const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
+       label: key,
+       fromDate: dates[key].fromDate,
+       toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
+       checked: dates[key].checked,
+   }));
+
+
+   const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
+     label: key,
+     fromDate: singleDate[key].fromDate,
+     checked: singleDate[key].checked,
+   }));    
+
   const handleMultiQueryModal = () => {
     setMultiQueryModal(true);
   }  
@@ -105,22 +122,6 @@ const Quotations = () => {
     setMultiQueryModal(false);
 
     // query condition 세팅 후 query
-    console.log("handleMultiQueryModalOk", queryConditions);
-    let tommorow = new Date();
-    
-    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
-        label: key,
-        fromDate: dates[key].fromDate,
-        toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
-        checked: dates[key].checked,
-    }));
-
-
-    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
-      label: key,
-      fromDate: singleDate[key].fromDate,
-      checked: singleDate[key].checked,
-    }));
     
     const multiQueryCondi = {
       queryConditions:queryConditions,
@@ -128,7 +129,7 @@ const Quotations = () => {
       singleDate:checkedSingleDates
     }
 
-    console.log('multiQueryCondi',multiQueryCondi);
+  //  console.log('multiQueryCondi',multiQueryCondi);
 
     loadAllQuotations(multiQueryCondi);
      
@@ -264,22 +265,7 @@ const Quotations = () => {
     // tryLoadAllCompanies();
     // tryLoadAllLeads();
 
-    // query condition 세팅 후 query
-    let tommorow = new Date();
-    
-    const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
-        label: key,
-        fromDate: dates[key].fromDate,
-        toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
-        checked: dates[key].checked,
-    }));
-
-
-    const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
-      label: key,
-      fromDate: singleDate[key].fromDate,
-      checked: singleDate[key].checked,
-    }));
+ 
     
     const multiQueryCondi = {
       queryConditions:queryConditions,

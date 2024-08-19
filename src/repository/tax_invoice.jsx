@@ -14,7 +14,7 @@ import {
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
-export const quotationColumn = [
+export const taxInvoiceColumn = [
     { value: 'company_name', label: '회사명'},
     { value: 'ceo_name', label: '대표자명'},
     { value: 'company_address', label: '주소'},

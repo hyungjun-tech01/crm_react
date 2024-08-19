@@ -122,7 +122,7 @@ const CompanyTransactionModel = (props) => {
                             style={{ overflowX: "auto" }}
                             columns={columns_transaction}
                             dataSource={transactionByCompany}
-                            rowKey={(record) => record.publish_date}
+                            rowKey={(record) => record.transaction_code}
                             onRow={(record, rowIndex) => {
                                 return {
                                     onClick: (event) => {
