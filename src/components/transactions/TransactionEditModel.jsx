@@ -530,7 +530,27 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
       ...transactionChange,
       ...dataForTransaction,
     };
-    setTaxInvoiceData(tempTransactionData);
+    const tempTaxInvoiceData = {
+      publish_type : null,
+      transaction_type : tempTransactionData.transaction_type,
+      invoice_type : tempTransactionData.vat_included ? '세금계산서' : '계산서',
+      company_code : tempTransactionData.company_code,
+      business_registration_code : tempTransactionData.business_registration_code,
+      company_name : tempTransactionData.company_name,
+      ceo_name : tempTransactionData.ceo_name,
+      company_address : tempTransactionData.company_address,
+      business_type : tempTransactionData.business_type,
+      business_item : tempTransactionData.business_item,
+      //----- Price info --------------
+      supply_price : tempTransactionData.supply_price,
+      tax_price : tempTransactionData.tax_price,
+      total_price : tempTransactionData.total_price,
+      cash_amount : null,
+      check_amount : null,
+      note_amount : null,
+      receivable_amount : null,
+    };
+    setTaxInvoiceData(tempTaxInvoiceData);
     setTaxInvoiceContents([
       ...transactionContents,
     ]);
@@ -560,15 +580,14 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
       setIsMessageModalOpen(true);
       return;
     };
+    newTransactionData['transaction_contents']= JSON.stringify(transactionContents);
+    newTransactionData['modify_user'] = cookies.myLationCrmUserId;
+
     if (isAdd){
-      newTransactionData['transaction_contents']= JSON.stringify(transactionContents);
       newTransactionData['transaction_title'] = transactionContents.at(0).product_name + ' 외';
       newTransactionData['action_type'] = 'ADD';
-      newTransactionData['modify_user'] = cookies.myLationCrmUserId;
     } else {
-      newTransactionData['transaction_contents']= JSON.stringify(transactionContents);
       newTransactionData['action_type'] = 'UPDATE';
-      newTransactionData['modify_user'] = cookies.myLationCrmUserId;
     }
     const resp = modifyTransaction(newTransactionData);
     resp.then((res) => {
@@ -649,7 +668,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
           trans_type: tempIsSale ? trans_types[0] : trans_types[1],
           tax_type: tempIsVatIncluded ? 'vat_included' : 'vat_excluded',
           company_selection: tempCurrentCompany.length > 0 ? tempCurrentCompany[0]: null,
-        }
+        };
         setSelectData(tempData);
 
         if(currentTransaction.paid_money > 0){

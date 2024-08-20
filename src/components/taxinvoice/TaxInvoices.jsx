@@ -7,9 +7,7 @@ import { Table } from "antd";
 import "antd/dist/reset.css";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
-import SystemUserModel from "../task/SystemUserModel";
 
-import { CompanyRepo } from "../../repository/company";
 import {
   atomTaxInvoiceSet,
   atomCompanyState,
@@ -17,11 +15,15 @@ import {
   atomTaxInvoiceState,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
+
+import { CompanyRepo } from "../../repository/company";
+import { TaxInvoiceRepo, taxInvoiceColumn } from "../../repository/tax_invoice";
 import { UserRepo } from "../../repository/user";
+
 import { compareCompanyName , compareText, ConvertCurrency } from "../../constants/functions";
 import TaxInvoiceEditModel from "../taxinvoice/TaxInvoiceEditModel";
+import SystemUserModel from "../task/SystemUserModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
-import { TaxInvoiceRepo, taxInvoiceColumn } from "../../repository/tax_invoice";
 
 
 const TaxInovices = () => {
@@ -31,10 +33,9 @@ const TaxInovices = () => {
   //===== [RecoilState] Related with Company ==========================================
   const companyState = useRecoilValue(atomCompanyState);
   const { tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
-  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
-  //===== [RecoilState] Related with Transaction ======================================
+  //===== [RecoilState] Related with Tax Invoice ======================================
   const taxInvoiceState = useRecoilValue(atomTaxInvoiceState);
   const allTaxInvoicesData = useRecoilValue(atomTaxInvoiceSet);
   const filteredTaxInvoices= useRecoilValue(atomFilteredTaxInvoices);
@@ -212,21 +213,31 @@ const TaxInovices = () => {
   ];
 
   const handleAddNewTransaction = useCallback(() => {
-    setCurrentTaxInvoice()
+    setCurrentTaxInvoice();
+    setTaxInvoiceContents(null);
+    setTaxInvoiceData(null);
+    setOpenTaxInvoice(true);
 
     setTimeout(()=>{
-      let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
+      let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
         keyboard: false
       })
       myModal.show();
     }, 1000);
   }, [setCurrentTaxInvoice]);
 
-  const handleOpenTransactoin = (code) => {
-    setCurrentTaxInvoice(code)
+  const handleOpenTaxInvoice = (data) => {
+    setCurrentTaxInvoice(data.tax_invoice_code);
+
+    const dataContents = JSON.parse(data.invoice_contents);
+    setTaxInvoiceContents(dataContents);
+
+    delete data.invoice_contents;
+    setTaxInvoiceData(data);
+    setOpenTaxInvoice(true);
 
     setTimeout(()=>{
-      let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
+      let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
         keyboard: false
       })
       myModal.show();
@@ -342,7 +353,7 @@ const TaxInovices = () => {
                         return {
                           onClick: (event) => {
                             if(event.target.className === 'table_company') return;
-                            handleOpenTransactoin(record.transaction_code)
+                            handleOpenTaxInvoice(record)
                           }, // double click row
                         };
                       }}
@@ -365,7 +376,7 @@ const TaxInovices = () => {
                         return {
                           onClick: (event) => {
                             if(event.target.className === 'table_company') return;
-                            handleOpenTransactoin(record.tax_invoice_code)
+                            handleOpenTaxInvoice(record)
                           }, // double click row
                         };
                       }}

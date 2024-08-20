@@ -38,25 +38,6 @@ const default_bill_data = {
   index1:'',
   index2:'',
   serial_no:'',
-  
-  supplier: {
-    compnay_code:'',
-    business_registration_code:'',
-    company_name: '',
-    ceo_name:'',
-    company_address:'',
-    business_type:'',
-    business_item:'',
-  },
-  receiver: {
-    compnay_code:'',
-    business_registration_code:'',
-    company_name: '',
-    ceo_name:'',
-    company_address:'',
-    business_type:'',
-    business_item:'',
-  },
   issue_date: null,
   memo: '',
 
@@ -92,29 +73,31 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
 
 
   //===== Handles to edit 'TaxInvoiceEditModel' ======================================
-  const [dataForBill, setDataForBill] = useState({...default_bill_data});
+  const [receiver, setReceiver] = useState({});
+  const [supplier, setSupplier] = useState({});
+  const [dataForInvoice, setDataForInvoice] = useState({...default_bill_data});
   const [transactionContents, setTransactionContents] = useState([]);
   const [isSale, setIsSale] = useState(true);
-  const [isTaxBill, setIsTaxBill] = useState(true);
+  const [isTaxBill, setIsTaxInvoice] = useState(true);
   const [selectValues, setSelectValue] = useState({})
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
-      ...dataForBill,
+      ...dataForInvoice,
       [e.target.name]: e.target.value,
     };
-    setDataForBill(modifiedData);
-  }, [dataForBill]);
+    setDataForInvoice(modifiedData);
+  }, [dataForInvoice]);
 
   const handleDateChange = useCallback((name, date) => {
     const modifiedData = {
-      ...dataForBill,
+      ...dataForInvoice,
       [name]: date
     };
     console.log('[handleDateChange] : ', modifiedData);
-    setDataForBill(modifiedData);
-  }, [dataForBill]);
+    setDataForInvoice(modifiedData);
+  }, [dataForInvoice]);
 
   const handleSelectChange = useCallback((name, selected) => {
     // set data for selection ------------------------------
@@ -125,59 +108,59 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
     setSelectValue(tempSelectValues);
 
     // set changed data ------------------------------------
-    let modifiedData = null;
     if (name === 'company_name') {
       if(isSale){
-        modifiedData = {
-          ...dataForBill,
-          receiver: {
-            company_code: selected.value.company_code,
-            company_name: selected.value.company_name,
-            company_address: selected.value.company_address,
-            ceo_name: selected.value.ceo_name,
-            business_type: selected.value.business_type,
-            business_item: selected.value.business_item,
-            business_registration_code: selected.value.business_registration_code,
-          },
-        };
+        setReceiver({
+          company_code: selected.value.company_code,
+          company_name: selected.value.company_name,
+          company_address: selected.value.company_address,
+          ceo_name: selected.value.ceo_name,
+          business_type: selected.value.business_type,
+          business_item: selected.value.business_item,
+          business_registration_code: selected.value.business_registration_code,
+        });
       } else {
-        modifiedData = {
-          ...dataForBill,
-          supplier: {
-            company_code: selected.value.company_code,
-            company_name: selected.value.company_name,
-            company_address: selected.value.company_address,
-            ceo_name: selected.value.ceo_name,
-            business_type: selected.value.business_type,
-            business_item: selected.value.business_item,
-            business_registration_code: selected.value.business_registration_code,
-          },
-        };
+        setSupplier({
+          company_code: selected.value.company_code,
+          company_name: selected.value.company_name,
+          company_address: selected.value.company_address,
+          ceo_name: selected.value.ceo_name,
+          business_type: selected.value.business_type,
+          business_item: selected.value.business_item,
+          business_registration_code: selected.value.business_registration_code,
+        });
       }
     } else {
       if (name === 'transaction_type') {
         console.log('handleSelectChange / transaction_type :', selected);
         if (selected.value === '매출') {
           setIsSale(true);
+          if(supplier !== company_info) {
+            setReceiver({...supplier});
+            setSupplier(company_info);
+          };
         } else {
           setIsSale(false);
+          if(receiver !== company_info) {
+            setSupplier({...receiver});
+            setReceiver(company_info);
+          };
         };
       } else if (name === 'invoice_type') {
         console.log('handleSelectChange / invoice_type :', selected);
         if (selected.value === '세금계산서') {
-          setIsTaxBill(true);
+          setIsTaxInvoice(true);
         } else {
-          setIsTaxBill(false);
+          setIsTaxInvoice(false);
         };
       };
-      modifiedData = {
-        ...dataForBill,
+      const modifiedData = {
+        ...dataForInvoice,
         [name]: selected.value,
       };
+      setDataForInvoice(modifiedData);
     };
-    setDataForBill(modifiedData);
-    console.log('handleSelectChange : ', modifiedData);
-  }, [dataForBill, selectValues]);
+  }, [dataForInvoice, isSale, receiver, selectValues, supplier]);
 
   const trans_types = [
     { value: '매출', label: t('company.deal_type_sales') },
@@ -226,17 +209,17 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
     {
       title: t('transaction.supply_price'),
       dataIndex: 'supply_price',
-      render: (text, record) => <>{ConvertCurrency(record.supply_price, dataForBill.show_decimal && 4)}</>,
+      render: (text, record) => <>{ConvertCurrency(record.supply_price, dataForInvoice.show_decimal && 4)}</>,
     },
     {
       title: t('transaction.tax_price'),
       dataIndex: 'tax_price',
-      render: (text, record) => <>{ConvertCurrency(record.tax_price, dataForBill.show_decimal && 4)}</>,
+      render: (text, record) => <>{ConvertCurrency(record.tax_price, dataForInvoice.show_decimal && 4)}</>,
     },
     {
       title: t('transaction.total_price'),
       dataIndex: 'total_price',
-      render: (text, record) => <>{ConvertCurrency(record.total_price, dataForBill.show_decimal && 4)}</>,
+      render: (text, record) => <>{ConvertCurrency(record.total_price, dataForInvoice.show_decimal && 4)}</>,
     },
     {
       title: t('common.note'),
@@ -267,17 +250,17 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
     {
       title: t('transaction.unit_price'),
       dataIndex: 'unit_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForBill.show_decimal)}</>,
+      render: (text, record) => <>{ConvertCurrency(text, dataForInvoice.show_decimal)}</>,
     },
     {
       title: t('transaction.supply_price'),
       dataIndex: 'supply_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForBill.show_decimal)}</>,
+      render: (text, record) => <>{ConvertCurrency(text, dataForInvoice.show_decimal)}</>,
     },
     {
       title: t('transaction.total_price'),
       dataIndex: 'total_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForBill.show_decimal)}</>,
+      render: (text, record) => <>{ConvertCurrency(text, dataForInvoice.show_decimal)}</>,
     },
     {
       title: t('common.note'),
@@ -297,10 +280,10 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
       if (isNaN(ret)) return;
     };
 
-    return dataForBill.show_decimal
+    return dataForInvoice.show_decimal
       ? ret?.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,')
       : ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  }, [dataForBill.show_decimal]);
+  }, [dataForInvoice.show_decimal]);
 
 
   const handleStartEditContent = (data) => {
@@ -308,17 +291,17 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
       ...data,
       title: `${t('common.item')} ${t('common.edit')}`,
     };
-    setDataForBill(tempData);
+    setDataForInvoice(tempData);
   };
 
 
   //===== Handles for special actions =============================================
   const handleShowDecimal = (e) => {
     const tempData = {
-      ...dataForBill,
+      ...dataForInvoice,
       show_decimal: e.target.checked,
     };
-    setDataForBill(tempData);
+    setDataForInvoice(tempData);
   };
 
   const handleInitialize = useCallback(() => {
@@ -330,10 +313,10 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
       modify_user: cookies.myLationCrmUserId,
     };
     Object.keys(defaultTaxInvoice).forEach(item => {
-      if((dataForBill[item] !== undefined) && (dataForBill[item] !== null)){
-        newTaxInvoice[item] = dataForBill[item];
+      if((dataForInvoice[item] !== undefined) && (dataForInvoice[item] !== null)){
+        newTaxInvoice[item] = dataForInvoice[item];
       };
-      const companyData = isSale ? dataForBill.receiver : dataForBill.supplier;
+      const companyData = isSale ? receiver : supplier;
       if((companyData[item] !== undefined) && (companyData[item] !== null)) {
         newTaxInvoice[item] = companyData[item];
       };
@@ -381,10 +364,10 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
       if(data) {
         console.log('[TaxInvoiceEditModel] called! :', data);
         
-        // dataForBill ------------------------------
+        // dataForInvoice ------------------------------
         const tempSelectValues = {
-          transaction_type: data.is_sale? trans_types[0] : trans_types[1],
-          invoice_type: data.vat_included? invoice_types[0] : invoice_types[1],
+          transaction_type: data.transaction_type === '매출' ? trans_types[0] : trans_types[1],
+          invoice_type: data.invoice_type === '세금계산서' ? invoice_types[0] : invoice_types[1],
           receive_type: receive_types[0],
           company_name: {label: data.company_name, value: data.company_name},
         };
@@ -429,8 +412,8 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
         let tempBillData = {
           ...default_bill_data,
           transaction_type: data.transaction_type,
-          invoice_type: data.vat_included?'세금계산서':'계산서',
-          show_decimal: data.show_decimal,
+          invoice_type: data.invoice_type,
+          show_decimal: false,
           receive_type: '청구',
           issue_date: data.publish_date,
           supply_price: data.supply_price,
@@ -445,12 +428,12 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
           check_amount: isCash ? 0 : data.paid_money,
         };
 
-        setIsTaxBill(data.vat_included);
+        setIsTaxInvoice(data.vat_included);
         // IsSale ------------------------------------
-        setIsSale(data.is_sale);
-        if(data.is_sale) {
-          tempBillData.supplier = {...company_info};
-          tempBillData.receiver = {
+        if(data.transaction_type === '매출'){
+          setIsSale(true);
+          setSupplier(company_info);
+          setReceiver({
             company_code: data.company_code,
             business_registration_code: data.business_registration_code,
             company_name: data.company_name,
@@ -458,9 +441,10 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
             company_address: data.company_address,
             business_type: data.business_type,
             business_item: data.business_item,
-          }
+          });
         } else {
-          tempBillData.supplier = {
+          setIsSale(false);
+          setSupplier({
             company_code: data.company_code,
             business_registration_code: data.business_registration_code,
             company_name: data.company_name,
@@ -468,10 +452,12 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
             company_address: data.company_address,
             business_type: data.business_type,
             business_item: data.business_item,
-          }
-          tempBillData.receiver = {...company_info};
+          });
+          setReceiver(company_info);
         };
-        setDataForBill(tempBillData);
+        setDataForInvoice(tempBillData);
+      } else {
+        setDataForInvoice({...default_bill_data});
       }
       // Copy contents into 'transaction contents' -------------------
       if(contents) {
@@ -577,7 +563,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                           />
                         </div>
                         <div style={{ paddingRight: '0.5rem' }}>
-                          <Checkbox defaultValue={dataForBill.show_decimal} onChange={handleShowDecimal}/>
+                          <Checkbox defaultValue={dataForInvoice.show_decimal} onChange={handleShowDecimal}/>
                         </div>
                         <div>{t('quotation.show_decimal')}</div>
                       </div>
@@ -597,8 +583,8 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               <Input
                                 className={styles.input}
                                 name='index1'
-                                defaultValue={dataForBill['index1']}
-                                value={dataForBill['index1']}
+                                defaultValue={dataForInvoice['index1']}
+                                value={dataForInvoice['index1']}
                                 onChange={handleItemChange}
                                 style={{textAlign: 'end'}}
                               />
@@ -607,9 +593,9 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                             <div className={classNames(styles.third, { 'trans_pur': !isSale })}>
                               <Input
                                 className={styles.input}
-                                defaultValue={dataForBill['index2']}
+                                defaultValue={dataForInvoice['index2']}
                                 name='index2'
-                                value={dataForBill['index2']}
+                                value={dataForInvoice['index2']}
                                 onChange={handleItemChange}
                                 style={{textAlign: 'end'}}
                               />
@@ -624,7 +610,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               <Input
                                 className={styles.input}
                                 name='serial_no'
-                                value={dataForBill['serial_no']}
+                                value={dataForInvoice['serial_no']}
                                 onChange={handleItemChange}
                                 style={{textAlign: 'center'}}
                               />
@@ -644,13 +630,13 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               </div>
                               <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label className={styles.regNo}>{dataForBill.supplier.business_registration_code}</label>
+                                  <label className={styles.regNo}>{supplier.business_registration_code}</label>
                                   :
                                   <Input
                                     className={classNames(styles.input, styles.regNo)}
-                                    defaultValue={dataForBill.supplier['business_registration_code']}
+                                    defaultValue={supplier['business_registration_code']}
                                     name='business_registration_code'
-                                    value={dataForBill.supplier['business_registration_code']}
+                                    value={supplier['business_registration_code']}
                                     onChange={handleItemChange}
                                   />
                                 }
@@ -662,7 +648,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               </div>
                               <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label className={styles.textStart}>{dataForBill.supplier.company_name}</label>
+                                  <label className={styles.textStart}>{supplier.company_name}</label>
                                   :
                                   <Select
                                     defaultValue={selectValues['company_name']}
@@ -677,12 +663,12 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               </div>
                               <div className={classNames(styles.content, styles.text, styles.textStart, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label>{dataForBill.supplier.ceo_name}</label>
+                                  <label>{supplier.ceo_name}</label>
                                   :
                                   <Input
                                     className={styles.input}
                                     name='ceo_name'
-                                    value={dataForBill.supplier['ceo_name']}
+                                    value={supplier['ceo_name']}
                                     onChange={handleItemChange}
                                   />
                                 }
@@ -694,12 +680,12 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               </div>
                               <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label className={styles.textStart}>{dataForBill.supplier.company_address}</label>
+                                  <label className={styles.textStart}>{supplier.company_address}</label>
                                   :
                                   <Input
                                     className={styles.input}
                                     name='company_address'
-                                    value={dataForBill.supplier['company_address']}
+                                    value={supplier['company_address']}
                                     onChange={handleItemChange}
                                   />
                                 }
@@ -711,12 +697,12 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               </div>
                               <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label className={styles.textStart}>{dataForBill.supplier.business_type}</label>
+                                  <label className={styles.textStart}>{supplier.business_type}</label>
                                   :
                                   <Input
                                     className={styles.input}
                                     name='business_type'
-                                    value={dataForBill.supplier['business_type']}
+                                    value={supplier['business_type']}
                                     onChange={handleItemChange}
                                     style={{ color: 'black' }}
                                   />
@@ -727,12 +713,12 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               </div>
                               <div className={classNames(styles.content, styles.text, styles.textStart, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label>{dataForBill.supplier.business_item}</label>
+                                  <label>{supplier.business_item}</label>
                                   :
                                   <Input
                                     className={styles.input}
                                     name='business_item'
-                                    value={dataForBill.supplier['business_item']}
+                                    value={supplier['business_item']}
                                     onChange={handleItemChange}
                                   />
                                 }
@@ -754,11 +740,11 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                                   <Input
                                     className={classNames(styles.input, styles.regNo)}
                                     name='business_registration_code'
-                                    value={dataForBill.receiver['business_registration_code']}
+                                    value={receiver['business_registration_code']}
                                     onChange={handleItemChange}
                                   />
                                   :
-                                  <label className={styles.regNo}>{dataForBill.receiver.business_registration_code}</label>
+                                  <label className={styles.regNo}>{receiver.business_registration_code}</label>
                                 }
                               </div>
                             </div>
@@ -775,7 +761,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                                     onChange={selected => handleSelectChange('company_name', selected)}
                                   />
                                   :
-                                  <label className={styles.textStart}>{dataForBill.receiver.company_name}</label>
+                                  <label className={styles.textStart}>{receiver.company_name}</label>
                                 }
                               </div>
                               <div className={classNames(styles.subTitle, styles.text, { 'trans_pur_bd': !isSale })}>
@@ -786,11 +772,11 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                                   <Input
                                     className={styles.input}
                                     name='ceo_name'
-                                    value={dataForBill.receiver['ceo_name']}
+                                    value={receiver['ceo_name']}
                                     onChange={handleItemChange}
                                   />
                                   :
-                                  <label>{dataForBill.receiver.ceo_name}</label>
+                                  <label>{receiver.ceo_name}</label>
                                 }
                               </div>
                             </div>
@@ -803,11 +789,11 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                                   <Input
                                     className={styles.input}
                                     name='company_address'
-                                    value={dataForBill.receiver['company_address']}
+                                    value={receiver['company_address']}
                                     onChange={handleItemChange}
                                   />
                                   :
-                                  <label className={styles.textStart}>{dataForBill.receiver.company_address}</label>
+                                  <label className={styles.textStart}>{receiver.company_address}</label>
                                 }
                               </div>
                             </div>
@@ -820,11 +806,11 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                                   <Input
                                     className={styles.input}
                                     name='business_type'
-                                    value={dataForBill.receiver['business_type']}
+                                    value={receiver['business_type']}
                                     onChange={handleItemChange}
                                   />
                                   :
-                                  <label className={styles.textStart}>{dataForBill.receiver.business_type}</label>
+                                  <label className={styles.textStart}>{receiver.business_type}</label>
                                 }
                               </div>
                               <div className={classNames(styles.subTitle, styles.text, { 'trans_pur_bd': !isSale })} >
@@ -835,11 +821,11 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                                   <Input
                                     className={styles.input}
                                     name='business_item'
-                                    value={dataForBill.receiver['business_item']}
+                                    value={receiver['business_item']}
                                     onChange={handleItemChange}
                                   />
                                   :
-                                  <label>{dataForBill.receiver.business_item}</label>
+                                  <label>{receiver.business_item}</label>
                                 }
                               </div>
                             </div>
@@ -851,12 +837,12 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                           <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>작성</div>
                           <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>년-월-일</div>
                           <div className={classNames(styles.MidCellLast, { "trans_pur": !isSale })}>
-                            {/* {dataForBill.issue_date
-                              ? dataForBill.issue_date.toLocaleDateString('ko-KR', {year:'numeric',month:'numeric',day:'numeric'})
+                            {/* {dataForInvoice.issue_date
+                              ? dataForInvoice.issue_date.toLocaleDateString('ko-KR', {year:'numeric',month:'numeric',day:'numeric'})
                               : null} */}
                             <DatePicker
                               name="publish_date"
-                              selected={dataForBill['issue_date']}
+                              selected={dataForInvoice['issue_date']}
                               onChange={(date) => handleDateChange('issue_date', date)}
                               dateFormat="yyyy-MM-dd"
                               className="datePick"
@@ -868,51 +854,51 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                           <div className={classNames(styles.Units, { "trans_pur": !isSale })}>
                             <div className={classNames(styles.Unit3, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>공란수</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.vacant_count}</div></div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{dataForInvoice.vacant_count}</div></div>
                             </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>백</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(0)}</div></div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{dataForInvoice.supply_text.at(0)}</div></div>
                             </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>십</div>
-                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForBill.supply_text.at(1)}</div></div>
+                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForInvoice.supply_text.at(1)}</div></div>
                             </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>억</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(2)}</div></div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{dataForInvoice.supply_text.at(2)}</div></div>
                             </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>천</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(3)}</div></div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{dataForInvoice.supply_text.at(3)}</div></div>
                               </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>백</div>
-                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForBill.supply_text.at(4)}</div></div>
+                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForInvoice.supply_text.at(4)}</div></div>
                               </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>십</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(5)}</div></div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{dataForInvoice.supply_text.at(5)}</div></div>
                               </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>만</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(6)}</div></div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{dataForInvoice.supply_text.at(6)}</div></div>
                               </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>천</div>
-                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForBill.supply_text.at(7)}</div></div>
+                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForInvoice.supply_text.at(7)}</div></div>
                               </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>백</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(8)}</div></div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{dataForInvoice.supply_text.at(8)}</div></div>
                               </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>십</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(9)}</div></div>
+                              <div className={styles.lower}><div style={{color:'black'}}>{dataForInvoice.supply_text.at(9)}</div></div>
                             </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper0}>원</div>
-                              <div className={styles.lower0}><div style={{color:'black'}}>{dataForBill.supply_text.at(10)}</div></div>
+                              <div className={styles.lower0}><div style={{color:'black'}}>{dataForInvoice.supply_text.at(10)}</div></div>
                             </div>
                           </div>
                         </div>
@@ -922,43 +908,43 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                             <div className={classNames(styles.Units, { "trans_pur": !isSale })}>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>십</div>
-                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}>{dataForBill.tax_text.at(0)}</div>
+                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}>{dataForInvoice.tax_text.at(0)}</div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>억</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(1)}</div></div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{dataForInvoice.tax_text.at(1)}</div></div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>천</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(2)}</div></div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{dataForInvoice.tax_text.at(2)}</div></div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>백</div>
-                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForBill.tax_text.at(3)}</div></div>
+                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForInvoice.tax_text.at(3)}</div></div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>십</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(4)}</div></div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{dataForInvoice.tax_text.at(4)}</div></div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>만</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(5)}</div></div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{dataForInvoice.tax_text.at(5)}</div></div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>천</div>
-                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForBill.tax_text.at(6)}</div></div>
+                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForInvoice.tax_text.at(6)}</div></div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>백</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(7)}</div></div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{dataForInvoice.tax_text.at(7)}</div></div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>십</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(8)}</div></div>
+                                <div className={styles.lower}><div style={{color:'black'}}>{dataForInvoice.tax_text.at(8)}</div></div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper0}>원</div>
-                                <div className={styles.lower0}><div style={{color:'black'}}>{dataForBill.tax_text.at(9)}</div></div>
+                                <div className={styles.lower0}><div style={{color:'black'}}>{dataForInvoice.tax_text.at(9)}</div></div>
                               </div>
                             </div>
                           </div>
@@ -970,7 +956,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               className={styles.inputTall}
                               name='memo'
                               row_no={2}
-                              value={dataForBill['memo']}
+                              value={dataForInvoice['memo']}
                               onChange={handleItemChange}
                             />
                           </div>
@@ -1007,7 +993,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               <div>합계 금액</div>
                             </div>
                             <div className={classNames(styles.content, styles.text)}>
-                              <div style={{textAlign:'end', paddingRight:'0.5rem'}}>{ConvertCurrency(dataForBill.total_price, dataForBill.show_decimal?4:0)}</div>
+                              <div style={{textAlign:'end', paddingRight:'0.5rem'}}>{ConvertCurrency(dataForInvoice.total_price, dataForInvoice.show_decimal?4:0)}</div>
                             </div>
                           </div>
                           <div className={styles.item}>
@@ -1018,7 +1004,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               <Input
                                 className={styles.input}
                                 name='cash_amount'
-                                value={dataForBill['cash_amount']}
+                                value={dataForInvoice['cash_amount']}
                                 onChange={handleItemChange}
                                 style={{textAlign: 'end'}}
                               />
@@ -1032,7 +1018,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               <Input
                                 className={styles.input}
                                 name='check_amount'
-                                value={dataForBill['check_amount']}
+                                value={dataForInvoice['check_amount']}
                                 onChange={handleItemChange}
                                 style={{textAlign: 'end'}}
                               />
@@ -1046,7 +1032,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               <Input
                                 className={styles.input}
                                 name='note_amount'
-                                value={dataForBill['note_amount']}
+                                value={dataForInvoice['note_amount']}
                                 onChange={handleItemChange}
                                 style={{textAlign: 'end'}}
                               />
@@ -1060,7 +1046,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               <Input
                                 className={styles.input}
                                 name='receivable_amount'
-                                value={dataForBill['receivable_amount']}
+                                value={dataForInvoice['receivable_amount']}
                                 onChange={handleItemChange}
                                 style={{textAlign: 'end'}}
                               />
@@ -1101,7 +1087,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                   </form>
                 </div>
                 <div className="tab-pane show" id="tax-bill-print">
-                  <TransactionBillPrint billData={dataForBill} contents={contents}/>
+                  <TransactionBillPrint billData={dataForInvoice} contents={contents}/>
                 </div>
               </div>
             </div>
