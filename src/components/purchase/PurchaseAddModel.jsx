@@ -8,11 +8,9 @@ import * as bootstrap from "../../assets/js/bootstrap.bundle";
 import {
     atomCurrentPurchase,
     defaultMAContract,
-    atomProductClassListState,
-    atomProductsState,
-    atomProductOptions,
     atomCurrentCompany,
     defaultCompany,
+    defaultPurchase,
 } from '../../atoms/atoms';
 import { PurchaseRepo } from '../../repository/purchase';
 import { ProductTypeOptions } from '../../repository/product';
@@ -23,6 +21,7 @@ import { Add } from "@mui/icons-material";
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddSearchItem from '../../constants/AddSearchItem';
+import AddSearchProduct from '../../constants/AddSearchProduct';
 import DetailSubModal from '../../constants/DetailSubModal';
 import MessageModal from "../../constants/MessageModal";
 
@@ -48,11 +47,6 @@ const PurchaseAddModel = (props) => {
     const { modifyMAContract, setCurrentMAContract } = useRecoilValue(MAContractRepo);
 
 
-    //===== [RecoilState] Related with Product =============================================
-    const productClassState = useRecoilValue(atomProductClassListState);
-    const productState = useRecoilValue(atomProductsState);
-    const productOptions = useRecoilValue(atomProductOptions);
-
     //===== Handles to edit 'Purchase Add' =================================================
     const [purchaseChange, setPurchaseChange] = useState({});
     const [companyData, setCompanyData] = useState({ company_name: '', company_code: '' });
@@ -64,6 +58,7 @@ const PurchaseAddModel = (props) => {
         if(companyCode && companyCode !== "") {
             if(currentCompany !== defaultCompany) {
                 setPurchaseChange({
+                    ...defaultPurchase,
                     company_code: companyCode,
                 });
                 setCompanyData({
@@ -72,7 +67,7 @@ const PurchaseAddModel = (props) => {
                 });
             };
         } else {
-            setPurchaseChange({});
+            setPurchaseChange({...defaultPurchase});
         }
         setNeedInit(false);
     }, [companyCode, currentCompany]);
@@ -307,17 +302,14 @@ const PurchaseAddModel = (props) => {
 
     //===== useEffect functions ===========================================================
     useEffect(() => {
-        if (init
-            && ((productClassState & 1) === 1)
-            && ((productState & 1) === 1)
-        ){
+        if (init){
             console.log('[PurchaseAddModel] initialize!');
             if(handleInit) handleInit(!init);
             setTimeout(()=>{
                 initializePurchaseTemplate();
             }, 500);
         };
-    }, [productClassState, productState, init, handleInit, initializePurchaseTemplate]);
+    }, [init, handleInit, initializePurchaseTemplate]);
 
     if (init)
         return <div>&nbsp;</div>;
@@ -358,7 +350,7 @@ const PurchaseAddModel = (props) => {
                                             title={t('company.company_name')}
                                             category='purchase'
                                             name='company_name'
-                                            defaultValue={purchaseChange.company_name}
+                                            defaultValue={companyData.company_name}
                                             required
                                             long
                                             edited={companyData}
@@ -366,14 +358,12 @@ const PurchaseAddModel = (props) => {
                                         />
                                     </div>
                                     <div className="form-group row">
-                                        <AddBasicItem
+                                        <AddSearchProduct
                                             title={t('purchase.product_name')}
-                                            type='select'
                                             name="product_name"
-                                            defaultValue={purchaseChange.product_name}
                                             required
-                                            options={productOptions}
-                                            onChange={handleSelectChange}
+                                            edited={purchaseChange}
+                                            setEdited={setPurchaseChange}
                                         />
                                         <AddBasicItem
                                             title={t('purchase.product_type')}
