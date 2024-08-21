@@ -5,7 +5,7 @@ import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "antd/dist/reset.css";
-import { Checkbox, Input, Table } from 'antd';
+import { Button, Checkbox, Input, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import DatePicker from "react-datepicker";
@@ -19,7 +19,7 @@ import {
   atomCurrentTaxInvoice,
   defaultTaxInvoice,
 } from "../../atoms/atoms";
-import { TaxInvoiceRepo } from "../../repository/tax_invoice";
+import { DefaultTaxInvoiceContent, TaxInvoiceRepo } from "../../repository/tax_invoice";
 
 import { ConvertCurrency } from "../../constants/functions";
 import MessageModal from "../../constants/MessageModal";
@@ -27,8 +27,9 @@ import TransactionBillPrint from "../transactions/TransactionBillPrint";
 
 import styles from './TaxInvoiceEditModel.module.scss';
 import { company_info } from "../../repository/user";
+import TaxInvoiceContentModal from "./TaxInvoiceContentModal";
 
-const default_bill_data = {
+const default_invoice_data = {
   transaction_type: '',
   invoice_type: '',
   vat_included:'',
@@ -54,7 +55,6 @@ const default_bill_data = {
   vacant_count: 0,
 };
 
-
 const TaxInvoiceEditModel = ({open, close, data, contents}) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
@@ -75,10 +75,10 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
   //===== Handles to edit 'TaxInvoiceEditModel' ======================================
   const [receiver, setReceiver] = useState({});
   const [supplier, setSupplier] = useState({});
-  const [dataForInvoice, setDataForInvoice] = useState({...default_bill_data});
-  const [transactionContents, setTransactionContents] = useState([]);
+  const [dataForInvoice, setDataForInvoice] = useState({...default_invoice_data});
+  const [taxInvoiceContents, setTaxInvoiceContents] = useState([]);
   const [isSale, setIsSale] = useState(true);
-  const [isTaxBill, setIsTaxInvoice] = useState(true);
+  const [isTaxInvoice, setIsTaxInvoice] = useState(true);
   const [selectValues, setSelectValue] = useState({})
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
 
@@ -185,7 +185,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
     },
   };
 
-  const default_columns = isTaxBill ? [
+  const default_columns = isTaxInvoice ? [
     {
       title: t('transaction.month_day'),
       dataIndex: 'month_day',
@@ -271,6 +271,10 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
 
 
   //===== Handles to edit 'Contents' =================================================
+  const [settingForContentModal, setSettingForContentModal] = useState({});
+  const [isContentModalOpen, setIsContentModalOpen] = useState(false);
+  const [orgContentModalData, setOrgContentModalData] = useState({});
+  const [editedContentModalData, setEditedContentModalData] = useState({});
 
   const handleFormatter = useCallback((value) => {
     if (value === undefined || value === null || value === '') return '';
@@ -285,15 +289,145 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
       : ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }, [dataForInvoice.show_decimal]);
 
+  const handleStartAddContent = () => {
+    console.log('add transaction');
+    const tempSetting = {
+      title: t('quotation.add_content'),
+    };
+
+    setSettingForContentModal(tempSetting);
+    setOrgContentModalData({
+      ...DefaultTaxInvoiceContent,
+      invoice_date: null,
+    });
+    setEditedContentModalData({});
+    setIsContentModalOpen(true);
+  };
 
   const handleStartEditContent = (data) => {
     const tempData = {
-      ...data,
       title: `${t('common.item')} ${t('common.edit')}`,
     };
-    setDataForInvoice(tempData);
+    let tempDate = new Date();
+    if(!!data['month_day'] && typeof data.month_day === 'string') {
+      const splitted = data.month_day.split('.');
+      tempDate.setMonth(splitted[0] - 1);
+      tempDate.setDate(splitted[1]);
+    };
+
+    setSettingForContentModal(tempData);
+    setOrgContentModalData({...data, invoice_date: tempDate});
+    setEditedContentModalData({});
+    setIsContentModalOpen(true);
   };
 
+  const handleContentModalOk = () => {
+    if(!editedContentModalData['month_day']){
+      const tempMsg = {title: '확인', message: '날짜 정보가 없습니다.'}
+      setMessage(tempMsg);
+      setIsMessageModalOpen(true);
+      return;
+    };
+    
+    setIsContentModalOpen(false);
+    const tempContent = {
+      ...orgContentModalData,
+      ...editedContentModalData,
+    };
+
+    const tempContents = taxInvoiceContents.concat(tempContent);
+    setTaxInvoiceContents(tempContents);
+    setIsContentModalOpen(false);
+    setOrgContentModalData({});
+    setEditedContentModalData({});
+  };
+
+  const handleContentModalCancel = () => {
+    setIsContentModalOpen(false);
+    setEditedContentModalData({});
+    setOrgContentModalData({});
+    setSelectedContentRowKeys([]);
+  };
+
+  const handleContentDelete = () => {};
+  
+  const handleContentMoveUp = () => {
+    if(selectedContentRowKeys.length === 0) return;
+    selectedContentRowKeys.sort();
+    
+    let tempContents = null;
+    let startIdx = 0;
+    const selecteds = taxInvoiceContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) !== -1);
+    const unselecteds = taxInvoiceContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) === -1);
+    const firstIdx = selectedContentRowKeys[0];
+    if(firstIdx === 1){
+      tempContents = [
+        ...selecteds,
+        ...unselecteds,
+      ];
+      startIdx = 1;
+    } else {
+      tempContents = [
+        ...unselecteds.slice(0, firstIdx - 2),
+        ...selecteds,
+        ...unselecteds.slice(firstIdx - 2, ),
+      ];
+      startIdx = firstIdx - 1;
+    };
+    const finalContents = tempContents.map((item, index) => {
+      const temp3 = {
+        ...item,
+        transaction_sub_index: index + 1,
+      };
+      return temp3;
+    });
+    setTaxInvoiceContents(finalContents);
+
+    let tempKeys = [];
+    for(let i = 0; i<selecteds.length; i++, startIdx++){
+      tempKeys.push(startIdx);
+    }
+    setSelectedContentRowKeys(tempKeys);
+  };
+
+  const handleContentMoveDown = () => {
+    if(selectedContentRowKeys.length === 0) return;
+    selectedContentRowKeys.sort();
+
+    let tempContents = null;
+    let startIdx = 0;
+    const selecteds = taxInvoiceContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) !== -1);
+    const unselecteds = taxInvoiceContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) === -1);
+    const lastIdx = selectedContentRowKeys.at(-1);
+    if(lastIdx === taxInvoiceContents.length){
+      tempContents = [
+        ...unselecteds,
+        ...selecteds,
+      ];
+      startIdx=lastIdx;
+    } else {
+      tempContents = [
+        ...unselecteds.slice(0, lastIdx),
+        ...selecteds,
+        ...unselecteds.slice(lastIdx, ),
+      ];
+      startIdx=lastIdx + 1;
+    };
+    const finalContents = tempContents.map((item, index) => {
+      const temp3 = {
+        ...item,
+        transaction_sub_index: index + 1,
+      };
+      return temp3;
+    });
+    setTaxInvoiceContents(finalContents);
+
+    let tempKeys = [];
+    for(let i = 0; i<selecteds.length; i++){
+      tempKeys.push(startIdx--);
+    }
+    setSelectedContentRowKeys(tempKeys);
+  };
 
   //===== Handles for special actions =============================================
   const handleShowDecimal = (e) => {
@@ -321,7 +455,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
         newTaxInvoice[item] = companyData[item];
       };
     });
-    const updatedContents = transactionContents.map(item => {
+    const updatedContents = taxInvoiceContents.map(item => {
       const newItem = {...item};
       delete newItem.index;
       return newItem;
@@ -410,7 +544,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
         const isCash = data.payment_type === '현금';
 
         let tempBillData = {
-          ...default_bill_data,
+          ...default_invoice_data,
           transaction_type: data.transaction_type,
           invoice_type: data.invoice_type,
           show_decimal: false,
@@ -457,7 +591,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
         };
         setDataForInvoice(tempBillData);
       } else {
-        setDataForInvoice({...default_bill_data});
+        setDataForInvoice({...default_invoice_data});
       }
       // Copy contents into 'transaction contents' -------------------
       if(contents) {
@@ -473,10 +607,10 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
           total_price: item.total_price,
           memo: item.memo,
         }));
-        setTransactionContents(modified);
+        setTaxInvoiceContents(modified);
       }
       else
-        setTransactionContents([]);
+        setTaxInvoiceContents([]);
     };
 
   }, [contents, data, companyState]);
@@ -569,7 +703,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                       </div>
                       <div className={classNames(styles.billRow, { 'trans_pur': !isSale })}>
                         <div className={classNames(styles.title, { 'trans_pur': !isSale })}>
-                          <div>{isTaxBill ? t("transaction.tax_bill") : t("transaction.bill")}</div>
+                          <div>{isTaxInvoice ? t("transaction.tax_bill") : t("transaction.bill")}</div>
                         </div>
                         <div className={classNames(styles.billType, { 'trans_pur': !isSale })}>
                           <div>({isSale ? t("transaction.for_receiver") : t('transaction.for_supplier')})</div>
@@ -902,7 +1036,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                             </div>
                           </div>
                         </div>
-                        {isTaxBill &&
+                        {isTaxInvoice &&
                           <div className={classNames(styles.Tax, { "trans_pur": !isSale })}>
                             <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>세 액</div>
                             <div className={classNames(styles.Units, { "trans_pur": !isSale })}>
@@ -962,11 +1096,17 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                           </div>
                         </div>
                       </div>
+                      <div className={classNames(styles.billRowAdjustContent, { 'trans_pur': !isSale })}>
+                        <Button onClick={handleStartAddContent}>{t('transaction.add_content')}</Button>
+                        <Button onClick={handleContentDelete} disabled={selectedContentRowKeys.length === 0}>{t('transaction.remove_selects')}</Button>
+                        <Button onClick={handleContentMoveUp} disabled={selectedContentRowKeys.length === 0}>{t('transaction.move_up')}</Button>
+                        <Button onClick={handleContentMoveDown} disabled={selectedContentRowKeys.length === 0}>{t('transaction.move_down')}</Button>
+                      </div>
                       <div className={classNames(styles.billRow, styles.table, { 'trans_pur': !isSale })}>
                         <Table
                           rowSelection={rowSelection}
                           pagination={{
-                            total: transactionContents.length,
+                            total: taxInvoiceContents.length,
                             showTotal: ShowTotal,
                             showSizeChanger: true,
                             onShowSizeChange: onShowSizeChange,
@@ -975,7 +1115,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                           style={{ flex: 'auto', overflowX: "auto" }}
                           columns={default_columns}
                           bordered
-                          dataSource={transactionContents}
+                          dataSource={taxInvoiceContents}
                           onRow={(record, rowIndex) => {
                             return {
                               onClick: (event) => {
@@ -1094,6 +1234,15 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
           </div>
         </div>
       </div>
+      <TaxInvoiceContentModal
+        setting={settingForContentModal}
+        open={isContentModalOpen}
+        original={orgContentModalData}
+        edited={editedContentModalData}
+        handleEdited={setEditedContentModalData}
+        handleOk={handleContentModalOk}
+        handleCancel={handleContentModalCancel}
+      />
       <MessageModal
         title={message.title}
         message={message.message}

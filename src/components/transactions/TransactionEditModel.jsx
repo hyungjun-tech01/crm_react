@@ -244,13 +244,12 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   };
   
   const handleStartAddContent = () => {
-    console.log('transaction add');
+    console.log('add transaction');
     //if(!transactionChange['company_code']) return;
     const tempData = {
       ...dataForTransaction,
       title: t('quotation.add_content'),
     };
-    console.log('transaction add');
     setDataForTransaction(tempData);
     setOrgContentModalData({...DefaultTransactionContent});
     setEditedContentModalData({});
