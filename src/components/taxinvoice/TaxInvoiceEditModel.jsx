@@ -616,18 +616,17 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
         const textValues = handleShowNumbers(inputData.supply_price, inputData.tax_price);
 
         let tempInvoiceData = {
-          ...default_invoice_data,
-          transaction_type: inputData.transaction_type,
-          invoice_type: inputData.invoice_type,
+          ...inputData,
           show_decimal: false,
           receive_type: '청구',
           issue_date: inputData.publish_date,
-          supply_price: inputData.supply_price,
-          tax_price: inputData.tax_price,
-          total_price: inputData.total_price,
 
-          cash_amount: isCash ? inputData.paid_money : 0,
-          check_amount: isCash ? 0 : inputData.paid_money,
+          cash_amount: inputData['cash_amount']
+            ? inputData.cash_amount
+            : (isCash && inputData['paid_money'] ? inputData.paid_money : 0),
+          check_amount: inputData['check_amount']
+            ? inputData.check_amount
+            : (isCash && inputData['paid_money'] ? 0 : inputData.paid_money),
           ...textValues
         };
 
