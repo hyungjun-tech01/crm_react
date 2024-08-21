@@ -71,14 +71,14 @@ Font.register({
     ]
 });
 
-const TransactionBillPrint = (props) => {
-    const { billData, contents} = props;
+const TaxInvoicePrint = (props) => {
+    const { invoiceData, contents, supplierData, receiverData} = props;
     const [ transactionContents, setTransactionContents ] = useState([]);
     const [ supplier, setSupplier ] = useState({});
     const [ receiver, setReceiver ] = useState({});
 
     useEffect(() => {
-        console.log('TransactionBillPrint: ', billData);
+        console.log('TaxInvoicePrint: ', invoiceData);
         if(contents && Array.isArray(contents) && contents.length > 0){
             const num_5 = Math.ceil(contents.length / 5) * 5;
             let temp_array = new Array(num_5);
@@ -109,13 +109,13 @@ const TransactionBillPrint = (props) => {
         } else {
             setTransactionContents([]);
         };
-        if(billData) {
-            setSupplier({...billData.supplier});
-            setReceiver({...billData.receiver});
+        if(invoiceData) {
+            setSupplier({...supplierData});
+            setReceiver({...receiverData});
         }
-    }, [contents, billData]);
+    }, [contents, invoiceData]);
 
-    if(!billData || Object.keys(billData).length === 0) return null;
+    if(!invoiceData || Object.keys(invoiceData).length === 0) return null;
 
     return (
         <PDFViewer style={{width: '100%', minHeight: '480px', height: '960px'}}>
@@ -149,14 +149,14 @@ const TransactionBillPrint = (props) => {
                                     <View style={{width: '70%',display:'flex',flexDirection:'column'}}>
                                         <View style={{width: '100%',display:'flex',flexDirection:'row',borderBottom:0.6,borderColor:'#0000ff'}}>
                                             <View style={{width:'50%',height:20,borderRight:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
-                                                <Text style={[Styles.SupplierText,{fontSize:10,textAlign:'right'}]}>{`${billData.book_no ? billData.book_no : ''} 권`}</Text>
+                                                <Text style={[Styles.SupplierText,{fontSize:10,textAlign:'right'}]}>{`${invoiceData.book_no ? invoiceData.book_no : ''} 권`}</Text>
                                             </View>
                                             <View style={{width:'50%',height:20,display:'flex',flexDirection:'column',justifyContent:'center'}}>
-                                                <Text style={[Styles.SupplierText,{fontSize:10,textAlign:'right'}]}>{`${billData.book_sub_no ? billData.book_sub_no : ''} 호`}</Text>
+                                                <Text style={[Styles.SupplierText,{fontSize:10,textAlign:'right'}]}>{`${invoiceData.book_sub_no ? invoiceData.book_sub_no : ''} 호`}</Text>
                                             </View>
                                         </View>
                                         <View style={{width: '100%',display:'flex',flexDirection:'column'}}>
-                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.serial_no}</Text>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{invoiceData.serial_no}</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -288,7 +288,7 @@ const TransactionBillPrint = (props) => {
                                     </View>
                                     <View style={{height:28,display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                         <View>
-                                            <Text style={[Styles.inputText,{fontSize:11,textAlign:'center'}]}>{formatDate(billData.issue_date, 1)}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:11,textAlign:'center'}]}>{formatDate(invoiceData.issue_date, 1)}</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -303,7 +303,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:1.2,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.inputText,{fontSize:11,textAlign:'center'}]}>{billData.vacant_count}</Text>
+                                                    <Text style={[Styles.inputText,{fontSize:11,textAlign:'center'}]}>{invoiceData.vacant_count}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -313,7 +313,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.supply_text.at(0)}</Text>
+                                                    <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.supply_text.at(0)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -323,7 +323,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:1.2,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.supply_text.at(1)}</Text>
+                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.supply_text.at(1)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -333,7 +333,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.supply_text.at(2)}</Text>
+                                                    <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.supply_text.at(2)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -343,7 +343,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.supply_text.at(3)}</Text>
+                                                    <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.supply_text.at(3)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -353,7 +353,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:1.2,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.supply_text.at(4)}</Text>
+                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.supply_text.at(4)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -363,7 +363,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.supply_text.at(5)}</Text>
+                                                    <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.supply_text.at(5)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -373,7 +373,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.supply_text.at(6)}</Text>
+                                                    <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.supply_text.at(6)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -383,7 +383,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:1.2,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.supply_text.at(7)}</Text>
+                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.supply_text.at(7)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -393,7 +393,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.supply_text.at(8)}</Text>
+                                                    <Text style={[Styles.SupplierText,{fontSize:10}]}>{invoiceData.supply_text.at(8)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -403,7 +403,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.supply_text.at(9)}</Text>
+                                                    <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.supply_text.at(9)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -413,7 +413,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.supply_text.at(10)}</Text>
+                                                    <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.supply_text.at(10)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -430,7 +430,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:1.2,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.tax_text.at(0)}</Text>
+                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.tax_text.at(0)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -440,7 +440,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.tax_text.at(1)}</Text>
+                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.tax_text.at(1)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -450,7 +450,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.tax_text.at(2)}</Text>
+                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.tax_text.at(2)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -460,7 +460,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:1.2,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.tax_text.at(3)}</Text>
+                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.tax_text.at(3)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -470,7 +470,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.tax_text.at(4)}</Text>
+                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.tax_text.at(4)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -480,7 +480,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.tax_text.at(5)}</Text>
+                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.tax_text.at(5)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -490,7 +490,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:1.2,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.tax_text.at(6)}</Text>
+                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.tax_text.at(6)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -500,7 +500,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.tax_text.at(7)}</Text>
+                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.tax_text.at(7)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -510,7 +510,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.tax_text.at(8)}</Text>
+                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.tax_text.at(8)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -520,7 +520,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{billData.tax_text.at(9)}</Text>
+                                                <Text style={[Styles.SupplierText,{fontSize:11}]}>{invoiceData.tax_text.at(9)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -531,7 +531,7 @@ const TransactionBillPrint = (props) => {
                                         <Text style={[Styles.SupplierText,{fontSize:10}]}>비 고</Text>
                                     </View>
                                     <View style={{textAlign:'center'}}>
-                                        <Text style={[Styles.SupplierText,{fontSize:10}]}>{billData.memo}</Text>
+                                        <Text style={[Styles.SupplierText,{fontSize:10}]}>{invoiceData.memo}</Text>
                                     </View>
                                 </View>
                             </View>
@@ -680,14 +680,14 @@ const TransactionBillPrint = (props) => {
                                             );
                                     })}
                                 </View>
-                                {billData && 
+                                {invoiceData && 
                                     <View style={{width: '100%',margin:0,padding:0,borderTop:0.6,borderBottom:1.2,borderColor:'#0000ff',flexDirection:'row',alignContent:'center'}}>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
                                             <View style={{width: '100%',height:18,margin:0,padding:0,borderRight:0.6,borderBottom:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
                                                 <Text style={[Styles.SupplierText,{fontSize:10}]}>합 계 금 액</Text>
                                             </View>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(billData.total_amount)}</Text>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.total_amount)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
@@ -695,7 +695,7 @@ const TransactionBillPrint = (props) => {
                                                 <Text style={[Styles.SupplierText,{fontSize:10}]}>현    금</Text>
                                             </View>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(billData.cash)}</Text>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.cash)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
@@ -703,7 +703,7 @@ const TransactionBillPrint = (props) => {
                                                 <Text style={[Styles.SupplierText,{fontSize:10}]}>수    표</Text>
                                             </View>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(billData.check)}</Text>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.check)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
@@ -711,7 +711,7 @@ const TransactionBillPrint = (props) => {
                                                 <Text style={[Styles.SupplierText,{fontSize:10}]}>어    음</Text>
                                             </View>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(billData.note)}</Text>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.note)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
@@ -719,7 +719,7 @@ const TransactionBillPrint = (props) => {
                                                 <Text style={[Styles.SupplierText,{fontSize:10}]}>외상미수금</Text>
                                             </View>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(billData.credit)}</Text>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.credit)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 20%',margin:0,padding:0,display:'flex',flexDirection:'row',justifyContent:'center'}}>
@@ -728,10 +728,10 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{width:'30%',height:36,margin:0,padding:0,display:'flex',flexDirection:'column'}}>
                                                 <View style={{width:'100%',margin:0,padding:0}}>
-                                                    <Text style={[Styles.SupplierText,{fontSize:10},billData.request_type!=='청구' && {border:1,borderRadius:6}]}>영수</Text>
+                                                    <Text style={[Styles.SupplierText,{fontSize:10},invoiceData.request_type!=='청구' && {border:1,borderRadius:6}]}>영수</Text>
                                                 </View>
                                                 <View style={{width:'100%',margin:0,padding:0}}>
-                                                    <Text style={[Styles.SupplierText,{fontSize:10},billData.request_type==='청구' && {border:1,borderRadius:6}]}>청구</Text>
+                                                    <Text style={[Styles.SupplierText,{fontSize:10},invoiceData.request_type==='청구' && {border:1,borderRadius:6}]}>청구</Text>
                                                 </View>
                                             </View>
                                             <View style={{width:'20%',height:36,margin:0,padding:0,alignItems:'center',justifyContent:'center'}}>
@@ -773,14 +773,14 @@ const TransactionBillPrint = (props) => {
                                     <View style={{width: '70%',display:'flex',flexDirection:'column'}}>
                                         <View style={{width: '100%',display:'flex',flexDirection:'row',borderBottom:0.6,borderColor:'#ff0505'}}>
                                             <View style={{width:'50%',height:20,borderRight:0.6,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
-                                                <Text style={[Styles.ReceiverText,{fontSize:10,textAlign:'right'}]}>{`${billData.book_no ? billData.book_no : ''} 권`}</Text>
+                                                <Text style={[Styles.ReceiverText,{fontSize:10,textAlign:'right'}]}>{`${invoiceData.book_no ? invoiceData.book_no : ''} 권`}</Text>
                                             </View>
                                             <View style={{width:'50%',height:20,display:'flex',flexDirection:'column',justifyContent:'center'}}>
-                                                <Text style={[Styles.ReceiverText,{fontSize:10,textAlign:'right'}]}>{`${billData.book_sub_no ? billData.book_sub_no : ''} 호`}</Text>
+                                                <Text style={[Styles.ReceiverText,{fontSize:10,textAlign:'right'}]}>{`${invoiceData.book_sub_no ? invoiceData.book_sub_no : ''} 호`}</Text>
                                             </View>
                                         </View>
                                         <View style={{width: '100%',display:'flex',flexDirection:'column'}}>
-                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{billData.serial_no}</Text>
+                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{invoiceData.serial_no}</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -912,7 +912,7 @@ const TransactionBillPrint = (props) => {
                                     </View>
                                     <View style={{height:28,display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                         <View>
-                                            <Text style={[Styles.inputText,{fontSize:11,textAlign:'center'}]}>{formatDate(billData.issue_date, 1)}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:11,textAlign:'center'}]}>{formatDate(invoiceData.issue_date, 1)}</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -927,7 +927,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:1.2,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.inputText,{fontSize:11,textAlign:'center'}]}>{billData.vacant_count}</Text>
+                                                    <Text style={[Styles.inputText,{fontSize:11,textAlign:'center'}]}>{invoiceData.vacant_count}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -937,7 +937,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.supply_text.at(0)}</Text>
+                                                    <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.supply_text.at(0)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -947,7 +947,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:1.2,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.supply_text.at(1)}</Text>
+                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.supply_text.at(1)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -957,7 +957,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.supply_text.at(2)}</Text>
+                                                    <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.supply_text.at(2)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -967,7 +967,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.supply_text.at(3)}</Text>
+                                                    <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.supply_text.at(3)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -977,7 +977,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:1.2,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.supply_text.at(4)}</Text>
+                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.supply_text.at(4)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -987,7 +987,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.supply_text.at(5)}</Text>
+                                                    <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.supply_text.at(5)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -997,7 +997,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.supply_text.at(6)}</Text>
+                                                    <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.supply_text.at(6)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -1007,7 +1007,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:1.2,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.supply_text.at(7)}</Text>
+                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.supply_text.at(7)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -1017,7 +1017,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.ReceiverText,{fontSize:10}]}>{billData.supply_text.at(8)}</Text>
+                                                    <Text style={[Styles.ReceiverText,{fontSize:10}]}>{invoiceData.supply_text.at(8)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -1027,7 +1027,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.supply_text.at(9)}</Text>
+                                                    <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.supply_text.at(9)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -1037,7 +1037,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                    <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.supply_text.at(10)}</Text>
+                                                    <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.supply_text.at(10)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -1054,7 +1054,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:1.2,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.tax_text.at(0)}</Text>
+                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.tax_text.at(0)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -1064,7 +1064,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.tax_text.at(1)}</Text>
+                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.tax_text.at(1)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -1074,7 +1074,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.tax_text.at(2)}</Text>
+                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.tax_text.at(2)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -1084,7 +1084,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:1.2,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.tax_text.at(3)}</Text>
+                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.tax_text.at(3)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -1094,7 +1094,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.tax_text.at(4)}</Text>
+                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.tax_text.at(4)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -1104,7 +1104,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.tax_text.at(5)}</Text>
+                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.tax_text.at(5)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -1114,7 +1114,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:1.2,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.tax_text.at(6)}</Text>
+                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.tax_text.at(6)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -1124,7 +1124,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.tax_text.at(7)}</Text>
+                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.tax_text.at(7)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -1134,7 +1134,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,borderRight:0.6,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.tax_text.at(8)}</Text>
+                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.tax_text.at(8)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -1144,7 +1144,7 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{height:28,display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                                 <View>
-                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{billData.tax_text.at(9)}</Text>
+                                                <Text style={[Styles.ReceiverText,{fontSize:11}]}>{invoiceData.tax_text.at(9)}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -1155,7 +1155,7 @@ const TransactionBillPrint = (props) => {
                                         <Text style={[Styles.ReceiverText,{fontSize:10}]}>비 고</Text>
                                     </View>
                                     <View style={{textAlign:'center'}}>
-                                        <Text style={[Styles.ReceiverText,{fontSize:10}]}>{billData.memo}</Text>
+                                        <Text style={[Styles.ReceiverText,{fontSize:10}]}>{invoiceData.memo}</Text>
                                     </View>
                                 </View>
                             </View>
@@ -1304,14 +1304,14 @@ const TransactionBillPrint = (props) => {
                                             );
                                     })}
                                 </View>
-                                {billData && 
+                                {invoiceData && 
                                     <View style={{width: '100%',margin:0,padding:0,borderTop:0.6,borderBottom:1.2,borderColor:'#ff0505',flexDirection:'row',alignContent:'center'}}>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
                                             <View style={{width: '100%',height:18,margin:0,padding:0,borderRight:0.6,borderBottom:0.6,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
                                                 <Text style={[Styles.ReceiverText,{fontSize:10}]}>합 계 금 액</Text>
                                             </View>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(billData.total_amount)}</Text>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.total_amount)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
@@ -1319,7 +1319,7 @@ const TransactionBillPrint = (props) => {
                                                 <Text style={[Styles.ReceiverText,{fontSize:10}]}>현    금</Text>
                                             </View>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(billData.cash)}</Text>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.cash)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
@@ -1327,7 +1327,7 @@ const TransactionBillPrint = (props) => {
                                                 <Text style={[Styles.ReceiverText,{fontSize:10}]}>수    표</Text>
                                             </View>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(billData.check)}</Text>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.check)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
@@ -1335,7 +1335,7 @@ const TransactionBillPrint = (props) => {
                                                 <Text style={[Styles.ReceiverText,{fontSize:10}]}>어    음</Text>
                                             </View>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(billData.note)}</Text>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.note)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
@@ -1343,7 +1343,7 @@ const TransactionBillPrint = (props) => {
                                                 <Text style={[Styles.ReceiverText,{fontSize:10}]}>외상미수금</Text>
                                             </View>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(billData.credit)}</Text>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.credit)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 20%',margin:0,padding:0,display:'flex',flexDirection:'row',justifyContent:'center'}}>
@@ -1352,10 +1352,10 @@ const TransactionBillPrint = (props) => {
                                             </View>
                                             <View style={{width:'30%',height:36,margin:0,padding:0,display:'flex',flexDirection:'column'}}>
                                                 <View style={{width:'100%',margin:0,padding:0}}>
-                                                    <Text style={[Styles.ReceiverText,{fontSize:10},billData.request_type!=='청구' && {border:1,borderRadius:6}]}>영수</Text>
+                                                    <Text style={[Styles.ReceiverText,{fontSize:10},invoiceData.request_type!=='청구' && {border:1,borderRadius:6}]}>영수</Text>
                                                 </View>
                                                 <View style={{width:'100%',margin:0,padding:0}}>
-                                                    <Text style={[Styles.ReceiverText,{fontSize:10},billData.request_type==='청구' && {border:1,borderRadius:6}]}>청구</Text>
+                                                    <Text style={[Styles.ReceiverText,{fontSize:10},invoiceData.request_type==='청구' && {border:1,borderRadius:6}]}>청구</Text>
                                                 </View>
                                             </View>
                                             <View style={{width:'20%',height:36,margin:0,padding:0,alignItems:'center',justifyContent:'center'}}>
@@ -1373,4 +1373,4 @@ const TransactionBillPrint = (props) => {
     );
 };
 
-export default TransactionBillPrint;
+export default TaxInvoicePrint;

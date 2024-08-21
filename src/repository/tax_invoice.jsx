@@ -12,6 +12,8 @@ import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
 export const DefaultTaxInvoiceContent = {
+    sub_index: 0,
+    invoice_date: null,
     month_day: '',
     product_name: '',
     standard: '',

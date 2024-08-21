@@ -230,10 +230,22 @@ const TaxInovices = () => {
     setCurrentTaxInvoice(data.tax_invoice_code);
 
     const dataContents = JSON.parse(data.invoice_contents);
-    setTaxInvoiceContents(dataContents);
+    const tempContents = dataContents.map((item, index) => {
+      const tempDate = new Date();
+      const splitted = item.month_day.split('.');
+      tempDate.setMonth(splitted.at(0) - 1);
+      tempDate.setDate(splitted.at(1));
+      return {
+        ...item,
+        invoice_date: tempDate,
+        sub_index: index,
+      }
+    });
+    setTaxInvoiceContents(tempContents);
 
-    delete data.invoice_contents;
-    setTaxInvoiceData(data);
+    const tempData = {...data};
+    delete tempData.invoice_contents;
+    setTaxInvoiceData(tempData);
     setOpenTaxInvoice(true);
 
     setTimeout(()=>{
