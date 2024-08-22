@@ -597,7 +597,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
         };
       };
 
-      if(inputData) {
+      if(inputData && Object.keys(inputData).length > 0) {
         // invoiceData ------------------------------
         const tempSelectValues = {
           transaction_type: inputData.transaction_type === '매출' ? trans_types[0] : trans_types[1],
@@ -666,7 +666,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
         setInvoiceData(tempInvoiceData);
       };
       // Copy contents into 'transaction contents' -------------------
-      if (!!contents) {
+      if (!!contents && contents.length > 0) {
         setInvoiceContents(contents);
       } else {
         if(currentTaxInvoice !== defaultTaxInvoice) {

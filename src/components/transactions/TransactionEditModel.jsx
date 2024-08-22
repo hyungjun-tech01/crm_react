@@ -523,16 +523,23 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setContentsForPrint(transactionContents);
   };
 
-  const handleShowTaxBill = () => {
+  const handleShowInvoice = () => {
+    // Making (Tax) Invoice data --------------------------------
     const tempTransactionData = {
       ...orgTransaction,
       ...transactionChange,
       ...dataForTransaction,
     };
     const tempTaxInvoiceData = {
+      tax_invoice_code : null,
       publish_type : null,
       transaction_type : tempTransactionData.transaction_type,
       invoice_type : tempTransactionData.vat_included ? '세금계산서' : '계산서',
+      index1 : null,
+      index2 : null,
+      receive_type : null,
+      invoice_contents : null,
+      //----- Company info --------------
       company_code : tempTransactionData.company_code,
       business_registration_code : tempTransactionData.business_registration_code,
       company_name : tempTransactionData.company_name,
@@ -544,15 +551,36 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
       supply_price : tempTransactionData.supply_price,
       tax_price : tempTransactionData.tax_price,
       total_price : tempTransactionData.total_price,
-      cash_amount : null,
-      check_amount : null,
-      note_amount : null,
-      receivable_amount : null,
+      cash_amount : 0,
+      check_amount : 0,
+      note_amount : 0,
+      receivable_amount : 0,
+      //----- Etc info --------------
+      sequence_number: null,
+      memo : '',
+      summary : '',
+      create_date : tempTransactionData.publish_date,
     };
     setTaxInvoiceData(tempTaxInvoiceData);
-    setTaxInvoiceContents([
-      ...transactionContents,
-    ]);
+
+    // Making (Tax) Invoice Contents --------------------------------
+    const tempInvoiceContents = transactionContents.map(item => {
+      return {
+        sub_index: item.transaction_sub_index,
+        invoice_date: item.transaction_date,
+        month_day: item.month_day,
+        product_name: item.product_name,
+        standard: item.standard,
+        unit: item.unit,
+        quantity: item.quantity,
+        supply_price: item.supply_price,
+        tax_price: item.tax_price,
+        total_price: item.total_price,
+        memo: item.memo,
+      };
+    });
+
+    setTaxInvoiceContents(tempInvoiceContents);
     let oldModal = bootstrap.Modal.getInstance('#edit_transaction');
     if(oldModal) {
         oldModal.hide();
@@ -598,8 +626,8 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
           }));
           setTransactionContents(updatedContents);
         };
-        if(value === 'TaxBill'){
-          handleShowTaxBill();
+        if(value === 'Invoice'){
+          handleShowInvoice();
           handleInitialize();
         } else {
           let thisModal = bootstrap.Modal.getInstance('#edit_transaction');
@@ -613,12 +641,12 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     });
   };
 
-  const handleIssueBill = () => {
+  const handleIssueInvoice = () => {
     // Save this transactions -------------------------
     if(transactionChange && Object.keys(transactionChange).length > 0) {
-      handleSaveTransaction('TaxBill');
+      handleSaveTransaction('Invoice');
     } else {
-      handleShowTaxBill();
+      handleShowInvoice();
     };
   };
 
@@ -813,7 +841,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
                               </Row>
                               <Row style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
                                 <Col>
-                                  <Button onClick={handleIssueBill} style={{ width: 150 }}>{t('transaction.issue')}</Button>
+                                  <Button onClick={handleIssueInvoice} style={{ width: 150 }}>{t('transaction.issue')}</Button>
                                   <Button onClick={handleInitialize} style={{ width: 100 }}>{t('common.initialize')}</Button>
                                 </Col>
                               </Row>

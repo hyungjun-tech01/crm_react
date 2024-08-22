@@ -780,7 +780,7 @@ const TaxInvoicePrint = (props) => {
                                             </View>
                                         </View>
                                         <View style={{width: '100%',display:'flex',flexDirection:'column'}}>
-                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{invoiceData.serial_no}</Text>
+                                            <Text style={[Styles.ReceiverText,{fontSize:10}]}>{invoiceData.sequence_number}</Text>
                                         </View>
                                     </View>
                                 </View>
