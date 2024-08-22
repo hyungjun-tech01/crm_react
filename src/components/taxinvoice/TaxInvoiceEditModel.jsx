@@ -55,7 +55,7 @@ const default_invoice_data = {
   vacant_count: 0,
 };
 
-const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
+const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -1375,7 +1375,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
                         </div>
                       </div>
                     </div>
-                    { Object.keys(invoiceChange).length > 0 &&
+                    { (Object.keys(invoiceChange).length > 0 || needSave) &&
                       <div className="text-center">
                         <button
                           type="button"

@@ -19,7 +19,7 @@ import {
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { UserRepo } from "../../repository/user";
-import { compareCompanyName , compareText, ConvertCurrency } from "../../constants/functions";
+import { compareCompanyName, compareText, ConvertCurrency } from "../../constants/functions";
 import TransactionEditModel from "./TransactionEditModel";
 import TaxInvoiceEditModel from "../taxinvoice/TaxInvoiceEditModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
@@ -39,20 +39,22 @@ const Transactions = () => {
   //===== [RecoilState] Related with Transaction ======================================
   const transactionState = useRecoilValue(atomTransactionState);
   const allTransactionData = useRecoilValue(atomAllTransactions);
-  const filteredTransaction= useRecoilValue(atomFilteredTransaction);
-  const { tryLoadAllTransactions, setCurrentTransaction , filterTransactions, loadAllTransactions} = useRecoilValue(TransactionRepo);
+  const filteredTransaction = useRecoilValue(atomFilteredTransaction);
+  const { tryLoadAllTransactions, setCurrentTransaction, filterTransactions, loadAllTransactions } = useRecoilValue(TransactionRepo);
 
 
   //===== [RecoilState] Related with User =============================================
   const userState = useRecoilValue(atomUserState);
   const { tryLoadAllUsers } = useRecoilValue(UserRepo);
 
+
   //===== Handles to edit this ========================================================
-  const [ nowLoading, setNowLoading ] = useState(true);
-  const [ openTransaction, setOpenTransaction ] = useState(false);
-  const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
-  const [ taxInvoiceData, setTaxInvoiceData ] = useState(null);
-  const [ taxInvoiceContents, setTaxInvoiceContents ] = useState(null);
+  const [nowLoading, setNowLoading] = useState(true);
+  const [openTransaction, setOpenTransaction] = useState(false);
+  const [openTaxInvoice, setOpenTaxInvoice] = useState(false);
+  const [taxInvoiceData, setTaxInvoiceData] = useState(null);
+  const [taxInvoiceContents, setTaxInvoiceContents] = useState(null);
+  const [needSaveTaxInvoice, setNeedSaveTaxxInvoice] = useState(false);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -86,11 +88,11 @@ const Transactions = () => {
     { label: t('common.modify_date'), stateKey: 'modify_date', checked: true },
   ];
 
-    // from date date 1개짜리 picking 만들기 
+  // from date date 1개짜리 picking 만들기 
   const initialSingleDate = {
     // ma_finish_date: { fromDate: oneMonthAgo,  checked: false },  
   };
-  
+
   const [singleDate, setSingleDate] = useState(initialSingleDate);
 
   let tommorow = new Date();
@@ -98,44 +100,41 @@ const Transactions = () => {
   const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
     label: key,
     fromDate: dates[key].fromDate,
-    toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
+    toDate: new Date(tommorow.setDate(dates[key].toDate.getDate() + 1)),
     checked: dates[key].checked,
   }));
-
 
   const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
     label: key,
     fromDate: singleDate[key].fromDate,
     checked: singleDate[key].checked,
   }));
-  
+
   const singleDateSettings = [
-     // { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
-    ];
+    // { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
+  ];
 
   const handleMultiQueryModalOk = () => {
-
-      //setCompanyState(0);
+    //setCompanyState(0);
     setMultiQueryModal(false);
-  
+
     // query condition 세팅 후 query
     console.log("handleMultiQueryModalOk", queryConditions);
-  
+
     const multiQueryCondi = {
-        queryConditions:queryConditions,
-        checkedDates:checkedDates,
-        singleDate:checkedSingleDates
-      }
-  
-      // console.log('multiQueryCondi',multiQueryCondi);
-  
+      queryConditions: queryConditions,
+      checkedDates: checkedDates,
+      singleDate: checkedSingleDates
+    }
+
+    // console.log('multiQueryCondi',multiQueryCondi);
+
     loadAllTransactions(multiQueryCondi);
-       
   };
-    const handleMultiQueryModalCancel = () => {
-      setMultiQueryModal(false);
-    };  
-  
+
+  const handleMultiQueryModalCancel = () => {
+    setMultiQueryModal(false);
+  };
 
   const handleStatusSearch = (newValue) => {
     setStatusSearch(newValue);
@@ -145,14 +144,14 @@ const Transactions = () => {
     setSearchCondition("");
   };
 
-  const handleSearchCondition =  (newValue)=> {
+  const handleSearchCondition = (newValue) => {
     setSearchCondition(newValue);
     filterTransactions(statusSearch, newValue);
   };
 
   const handleMultiQueryModal = () => {
     setMultiQueryModal(true);
-  }  
+  }
 
 
   // --- Section for Table ------------------------------
@@ -166,9 +165,9 @@ const Transactions = () => {
     {
       title: t('transaction.publish_date'),
       dataIndex: "publish_date",
-      render: (text, record) => 
+      render: (text, record) =>
         <>
-          {new Date(text).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day: 'numeric'})}
+          {new Date(text).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' })}
         </>,
       sorter: (a, b) => a.publish_date - b.publish_date,
     },
@@ -216,7 +215,7 @@ const Transactions = () => {
     setCurrentTransaction()
     setOpenTransaction(true);
 
-    setTimeout(()=>{
+    setTimeout(() => {
       let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
         keyboard: false
       })
@@ -228,7 +227,7 @@ const Transactions = () => {
     setCurrentTransaction(code)
     setOpenTransaction(true);
 
-    setTimeout(()=>{
+    setTimeout(() => {
       let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
         keyboard: false
       })
@@ -239,41 +238,22 @@ const Transactions = () => {
   useEffect(() => {
     tryLoadAllCompanies();
 
-    // query condition 세팅 후 query
-    // let tommorow = new Date();
-      
-    // const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
-    //     label: key,
-    //     fromDate: dates[key].fromDate,
-    //     toDate: new Date( tommorow.setDate(dates[key].toDate.getDate()+1)),
-    //     checked: dates[key].checked,
-    // }));
-
-
-    // const checkedSingleDates = Object.keys(singleDate).filter(key => singleDate[key].checked).map(key => ({
-    //   label: key,
-    //   fromDate: singleDate[key].fromDate,
-    //   checked: singleDate[key].checked,
-    // }));
-    
     const multiQueryCondi = {
-      queryConditions:queryConditions,
-      checkedDates:checkedDates,
-      singleDate:checkedSingleDates
+      queryConditions: queryConditions,
+      checkedDates: checkedDates,
+      singleDate: checkedSingleDates
     }
 
-    // console.log('tryLoadAllQuotations multiQueryCondi',multiQueryCondi);   
     tryLoadAllTransactions(multiQueryCondi);
-
     tryLoadAllUsers();
 
-    if(((companyState & 1) === 1)
+    if (((companyState & 1) === 1)
       && ((transactionState & 1) === 1)
       && ((userState & 1) === 1)
-    ){
+    ) {
       setNowLoading(false);
     };
-  }, [ companyState, transactionState, userState ]);
+  }, [companyState, transactionState, userState]);
 
   return (
     <HelmetProvider>
@@ -286,38 +266,38 @@ const Transactions = () => {
         <div className="content container-fluid">
           <div className="page-header pt-3 mb-0 ">
             <div className="row">
-              <div className="text-start" style={{width:'120px'}}>
+              <div className="text-start" style={{ width: '120px' }}>
                 <div className="dropdown">
-                  <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.all'):t(statusSearch)}</button>
-                    <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.all')}>{t('common.all')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('transaction.title')}>{t('transaction.title')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('transaction.type')}>{t('transaction.type')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('transaction.publish_type')}>{t('transaction.publish_type')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('transaction.payment_type')}>{t('transaction.payment_type')}</button>
-                    </div>
+                  <button className="dropdown-toggle recently-viewed" type="button" onClick={() => setExpaned(!expanded)} data-bs-toggle="dropdown" aria-expanded={expanded} style={{ backgroundColor: 'transparent', border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.all') : t(statusSearch)}</button>
+                  <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('common.all')}>{t('common.all')}</button>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('transaction.title')}>{t('transaction.title')}</button>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('transaction.type')}>{t('transaction.type')}</button>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('transaction.publish_type')}>{t('transaction.publish_type')}</button>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('transaction.payment_type')}>{t('transaction.payment_type')}</button>
+                  </div>
                 </div>
               </div>
-              <div className="col text-start" style={{width:'400px'}}>
+              <div className="col text-start" style={{ width: '400px' }}>
                 <input
-                      id = "searchCondition"
-                      className="form-control" 
-                      type="text"
-                      placeholder= {t('common.search_here')}
-                      style={{width:'300px', display: 'inline'}}
-                      value={searchCondition}
-                      onChange ={(e) => handleSearchCondition(e.target.value)}
-                />  
+                  id="searchCondition"
+                  className="form-control"
+                  type="text"
+                  placeholder={t('common.search_here')}
+                  style={{ width: '300px', display: 'inline' }}
+                  value={searchCondition}
+                  onChange={(e) => handleSearchCondition(e.target.value)}
+                />
               </div>
-              <div className="col text-start" style={{margin:'0px 20px 5px 20px'}}>
-                  <button
-                      className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
-                      id="multi-company-query"
-                      onClick={handleMultiQueryModal}
-                  >
-                      {t('transaction.transaction_multi_query')}
-                  </button>                
+              <div className="col text-start" style={{ margin: '0px 20px 5px 20px' }}>
+                <button
+                  className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
+                  id="multi-company-query"
+                  onClick={handleMultiQueryModal}
+                >
+                  {t('transaction.transaction_multi_query')}
+                </button>
               </div>
               <div className="col text-end">
                 <ul className="list-inline-item pl-0">
@@ -342,54 +322,54 @@ const Transactions = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive activity-tables">
-                  { searchCondition === "" ?  
-                    <Table
-                      pagination={{
-                        total: allTransactionData.length,
-                        showTotal: ShowTotal,
-                        showSizeChanger: true,
-                        onShowSizeChange: onShowSizeChange,
-                        ItemRender: ItemRender,
-                      }}
-                      loading={nowLoading}
-                      style={{ overflowX: "auto" }}
-                      columns={columns}
-                      bordered
-                      dataSource={allTransactionData}
-                      rowKey={(record) => record.transaction_code}
-                      onRow={(record, rowIndex) => {
-                        return {
-                          onClick: (event) => {
-                            if(event.target.className === 'table_company') return;
-                            handleOpenTransactoin(record.transaction_code)
-                          }, // double click row
-                        };
-                      }}
-                    />:
-                    <Table
-                      pagination={{
-                        total: filteredTransaction.length >0 ? filteredTransaction.length:0,
-                        showTotal: ShowTotal,
-                        showSizeChanger: true,
-                        onShowSizeChange: onShowSizeChange,
-                        ItemRender: ItemRender,
-                      }}
-                      loading={nowLoading}
-                      style={{ overflowX: "auto" }}
-                      columns={columns}
-                      bordered
-                      dataSource={filteredTransaction.length >0 ? filteredTransaction:null}
-                      rowKey={(record) => record.transaction_code}
-                      onRow={(record, rowIndex) => {
-                        return {
-                          onClick: (event) => {
-                            if(event.target.className === 'table_company') return;
-                            handleOpenTransactoin(record.transaction_code)
-                          }, // double click row
-                        };
-                      }}
-                    />
-                  }
+                    {searchCondition === "" ?
+                      <Table
+                        pagination={{
+                          total: allTransactionData.length,
+                          showTotal: ShowTotal,
+                          showSizeChanger: true,
+                          onShowSizeChange: onShowSizeChange,
+                          ItemRender: ItemRender,
+                        }}
+                        loading={nowLoading}
+                        style={{ overflowX: "auto" }}
+                        columns={columns}
+                        bordered
+                        dataSource={allTransactionData}
+                        rowKey={(record) => record.transaction_code}
+                        onRow={(record, rowIndex) => {
+                          return {
+                            onClick: (event) => {
+                              if (event.target.className === 'table_company') return;
+                              handleOpenTransactoin(record.transaction_code)
+                            }, // double click row
+                          };
+                        }}
+                      /> :
+                      <Table
+                        pagination={{
+                          total: filteredTransaction.length > 0 ? filteredTransaction.length : 0,
+                          showTotal: ShowTotal,
+                          showSizeChanger: true,
+                          onShowSizeChange: onShowSizeChange,
+                          ItemRender: ItemRender,
+                        }}
+                        loading={nowLoading}
+                        style={{ overflowX: "auto" }}
+                        columns={columns}
+                        bordered
+                        dataSource={filteredTransaction.length > 0 ? filteredTransaction : null}
+                        rowKey={(record) => record.transaction_code}
+                        onRow={(record, rowIndex) => {
+                          return {
+                            onClick: (event) => {
+                              if (event.target.className === 'table_company') return;
+                              handleOpenTransactoin(record.transaction_code)
+                            }, // double click row
+                          };
+                        }}
+                      />
+                    }
                   </div>
                 </div>
               </div>
@@ -401,19 +381,21 @@ const Transactions = () => {
         <SystemUserModel />
         <TransactionEditModel
           open={openTransaction}
-          close={()=>setOpenTransaction(false)}
-          openTaxInvoice={()=>setOpenTaxInvoice(true)}
+          close={() => setOpenTransaction(false)}
+          openTaxInvoice={() => setOpenTaxInvoice(true)}
           setTaxInvoiceData={setTaxInvoiceData}
           setTaxInvoiceContents={setTaxInvoiceContents}
+          setNeedSaveTaxInvoice={setNeedSaveTaxxInvoice}
         />
         <TaxInvoiceEditModel
           open={openTaxInvoice}
-          close={()=>setOpenTaxInvoice(false)}
+          close={() => setOpenTaxInvoice(false)}
           data={taxInvoiceData}
           contents={taxInvoiceContents}
+          needSave={needSaveTaxInvoice}
         />
-        <MultiQueryModal 
-          title= {t('quotation.quotation_multi_query')}
+        <MultiQueryModal
+          title={t('quotation.quotation_multi_query')}
           open={multiQueryModal}
           handleOk={handleMultiQueryModalOk}
           handleCancel={handleMultiQueryModalCancel}
@@ -428,7 +410,7 @@ const Transactions = () => {
           setSingleDate={setSingleDate}
           singleDateSettings={singleDateSettings}
           initialSingleDate={initialSingleDate}
-        />  
+        />
       </div>
     </HelmetProvider>
   );
