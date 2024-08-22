@@ -86,20 +86,19 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
-      ...invoiceData,
+      ...invoiceChange,
       [e.target.name]: e.target.value,
     };
-    setInvoiceData(modifiedData);
-  }, [invoiceData]);
+    setInvoiceChange(modifiedData);
+  }, [invoiceChange]);
 
   const handleDateChange = useCallback((name, date) => {
     const modifiedData = {
-      ...invoiceData,
+      ...invoiceChange,
       [name]: date
     };
-    console.log('[handleDateChange] : ', modifiedData);
-    setInvoiceData(modifiedData);
-  }, [invoiceData]);
+    setInvoiceChange(modifiedData);
+  }, [invoiceChange]);
 
   const handleSelectChange = useCallback((name, selected) => {
     // set data for selection ------------------------------
@@ -157,12 +156,12 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
         };
       };
       const modifiedData = {
-        ...invoiceData,
+        ...invoiceChange,
         [name]: selected.value,
       };
-      setInvoiceData(modifiedData);
+      setInvoiceChange(modifiedData);
     };
-  }, [invoiceData, isSale, receiver, selectValues, supplier]);
+  }, [invoiceChange, isSale, receiver, selectValues, supplier]);
 
   const trans_types = [
     { value: '매출', label: t('company.deal_type_sales') },
@@ -496,6 +495,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
 
     const tempAmountText = typeof supply_price === 'number'
       ? supply_price.toString() : supply_price;
+    console.log('handleShowNumbers : ', tempAmountText);
     const tempVacantCount = 11 - tempAmountText.length;
 
     if (tempVacantCount < 0) {
@@ -593,7 +593,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
 
     if ((companyState & 1) === 1) {
       let inputData = null;
-      if (data) {
+      if (!!data) {
         inputData = data;
       } else {
         if(currentTaxInvoice !== defaultTaxInvoice) {
@@ -602,6 +602,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
       };
 
       if(inputData) {
+        console.log('TaxInvoiceEditModel / inpuData :', inputData);
         // invoiceData ------------------------------
         const tempSelectValues = {
           transaction_type: inputData.transaction_type === '매출' ? trans_types[0] : trans_types[1],
@@ -609,7 +610,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
           receive_type: receive_types[0],
           company_name: { label: inputData.company_name, value: inputData.company_name },
         };
-        console.log('[TaxInvoiceEditModel] selectValues :', tempSelectValues);
         setSelectValue(tempSelectValues);
 
         const isCash = inputData.payment_type === '현금';
@@ -619,7 +619,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
           ...inputData,
           show_decimal: false,
           receive_type: '청구',
-          issue_date: inputData.publish_date,
+          create_date: new Date(inputData.create_date),
 
           cash_amount: inputData['cash_amount']
             ? inputData.cash_amount
@@ -630,9 +630,12 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
           ...textValues
         };
 
-        setIsTaxInvoice(inputData['vat_included'] ? inputData.vat_included : (inputData.invoice_type === '세금계산서'));
+        setIsTaxInvoice(inputData['vat_included']
+          ? inputData.vat_included
+          : (inputData.invoice_type === '세금계산서')
+        );
         // IsSale ------------------------------------
-        if (data.transaction_type === '매출') {
+        if (inputData.transaction_type === '매출') {
           setIsSale(true);
           setSupplier(company_info);
           setReceiver({
@@ -657,21 +660,44 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
           });
           setReceiver(company_info);
         };
-        console.log('[TaxInvoiceEditModel] check :', tempInvoiceData);
         setInvoiceData(tempInvoiceData);
       } else {
-        setInvoiceData({ ...defaultTaxInvoice });
+        setReceiver({});
+        setSupplier({});
+        const tempInvoiceData = {
+          ...default_invoice_data,
+          ...defaultTaxInvoice,
+        };
+        setInvoiceData(tempInvoiceData);
       };
       // Copy contents into 'transaction contents' -------------------
-      if (contents) {
+      console.log('[TaxInvoiceEditModel] check :', contents);
+      if (!!contents) {
         setInvoiceContents(contents);
-      } else
-        setInvoiceContents([]);
-
+      } else {
+        if(currentTaxInvoice !== defaultTaxInvoice) {
+          const dataContents = JSON.parse(currentTaxInvoice.invoice_contents);
+          const tempContents = dataContents.map((item, index) => {
+              const tempDate = new Date();
+              const splitted = item.month_day.split('.');
+              tempDate.setMonth(splitted.at(0) - 1);
+              tempDate.setDate(splitted.at(1));
+              return {
+                  ...item,
+                  invoice_date: tempDate,
+                  sub_index: index,
+              }
+          });
+          console.log('[TaxInvoiceEditModel] check :', tempContents);
+          setInvoiceContents(tempContents);
+        } else {
+          setInvoiceContents([]);
+        }
+      }
       setInvoiceChange({});
     };
 
-  }, [contents, data, companyState, open]);
+  }, [contents, data, companyState, open, currentTaxInvoice]);
 
   if (!open) return (
     <div>&nbsp;</div>
@@ -724,6 +750,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
                     className="nav-link"
                     to="#tax-bill-print"
                     data-bs-toggle="tab"
+                    onClick={()=> setPrintData({...invoiceData, ...invoiceChange})}
                   >
                     {t('common.preview')}
                   </Link>
@@ -801,8 +828,8 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
                             <div className={styles.fourth}>
                               <Input
                                 className={styles.input}
-                                name='serial_no'
-                                value={invoiceData['serial_no']}
+                                name='sequence_number'
+                                value={invoiceChange['sequence_number'] ? invoiceChange.sequence_number : invoiceData.sequence_number}
                                 onChange={handleItemChange}
                                 style={{ textAlign: 'center' }}
                               />
@@ -1033,9 +1060,9 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
                               ? invoiceData.issue_date.toLocaleDateString('ko-KR', {year:'numeric',month:'numeric',day:'numeric'})
                               : null} */}
                             <DatePicker
-                              name="publish_date"
-                              selected={invoiceData['issue_date']}
-                              onChange={(date) => handleDateChange('issue_date', date)}
+                              name="create_date"
+                              selected={invoiceChange['create_date'] ? invoiceChange.create_date : invoiceData.create_date}
+                              onChange={(date) => handleDateChange('create_date', date)}
                               dateFormat="yyyy-MM-dd"
                               className="datePick"
                             />
@@ -1234,7 +1261,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
                               className={styles.inputTall}
                               name='memo'
                               row_no={2}
-                              value={invoiceData['memo']}
+                              value={invoiceChange['memo'] ? invoiceChange.memo : invoiceData.memo}
                               onChange={handleItemChange}
                             />
                           </div>
@@ -1294,7 +1321,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
                               <Input
                                 className={styles.input}
                                 name='cash_amount'
-                                value={invoiceData['cash_amount']}
+                                value={invoiceChange['cash_amount'] ? invoiceChange.cash_amount : invoiceData.cash_amount}
                                 onChange={handleItemChange}
                                 style={{ textAlign: 'end' }}
                               />
@@ -1308,7 +1335,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
                               <Input
                                 className={styles.input}
                                 name='check_amount'
-                                value={invoiceData['check_amount']}
+                                value={invoiceChange['check_amount'] ? invoiceChange.check_amount : invoiceData.check_amount}
                                 onChange={handleItemChange}
                                 style={{ textAlign: 'end' }}
                               />
@@ -1322,7 +1349,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
                               <Input
                                 className={styles.input}
                                 name='note_amount'
-                                value={invoiceData['note_amount']}
+                                value={invoiceChange['note_amount'] ? invoiceChange.note_amount : invoiceData.note_amount}
                                 onChange={handleItemChange}
                                 style={{ textAlign: 'end' }}
                               />
@@ -1336,7 +1363,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
                               <Input
                                 className={styles.input}
                                 name='receivable_amount'
-                                value={invoiceData['receivable_amount']}
+                                value={invoiceChange['receivable_amount'] ? invoiceChange.receivable_amount : invoiceData.receivable_amount}
                                 onChange={handleItemChange}
                                 style={{ textAlign: 'end' }}
                               />
@@ -1356,24 +1383,26 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
                         </div>
                       </div>
                     </div>
-                    <div className="text-center">
-                      <button
-                        type="button"
-                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                        onClick={handleSaveTaxInvoice}
-                      >
-                        {t('common.save')}
-                      </button>
-                      &nbsp;&nbsp;
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-rounded"
-                        data-bs-dismiss="modal"
-                        onClick={handleClose}
-                      >
-                        {t('common.cancel')}
-                      </button>
-                    </div>
+                    { Object.keys(invoiceChange).length > 0 &&
+                      <div className="text-center">
+                        <button
+                          type="button"
+                          className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                          onClick={handleSaveTaxInvoice}
+                        >
+                          {t('common.save')}
+                        </button>
+                        &nbsp;&nbsp;
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-rounded"
+                          data-bs-dismiss="modal"
+                          onClick={handleClose}
+                        >
+                          {t('common.cancel')}
+                        </button>
+                      </div>
+                    }
                   </form>
                 </div>
                 <div className="tab-pane show" id="tax-bill-print">

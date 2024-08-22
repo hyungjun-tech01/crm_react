@@ -21,9 +21,9 @@ const CompanyTaxInvoiceModel = (props) => {
     // --- Variables for only TaxInvoice ------------------------------------------------
     const [selectedTaxInvoiceRowKeys, setSelectedTaxInvoiceRowKeys] = useState([]);
 
-    const handleSelectTaxInvoice = useCallback((value) => {
-        setCurrentTaxInvoice(value.tax_invoice_code);
-        openTaxInvoice();
+    const handleSelectTaxInvoice = useCallback((code) => {
+        setCurrentTaxInvoice(code);
+        openTaxInvoice(true);
 
         setTimeout(()=>{
             let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
@@ -123,12 +123,12 @@ const CompanyTaxInvoiceModel = (props) => {
                             style={{ overflowX: "auto" }}
                             columns={columns_tax_invoice}
                             dataSource={taxInvoices}
-                            rowKey={(record) => record.publish_date}
+                            rowKey={(record) => record.tax_invoice_code}
                             onRow={(record, rowIndex) => {
                                 return {
                                     onClick: (event) => {
                                         setSelectedTaxInvoiceRowKeys([record.tax_invoice_code]);
-                                        handleSelectTaxInvoice(record);
+                                        handleSelectTaxInvoice(record.tax_invoice_code);
                                     }, // click row
                                 };
                             }}

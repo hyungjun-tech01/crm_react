@@ -41,8 +41,8 @@ const Companies = () => {
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ openTransaction, setOpenTransaction ] = useState(false);
   const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
-  const [ taxInvoiceData, setTaxInvoiceData ] = useState({});
-  const [ taxInvoiceContents, setTaxInvoiceContents ] = useState({});
+  const [ taxInvoiceData, setTaxInvoiceData ] = useState(null);
+  const [ taxInvoiceContents, setTaxInvoiceContents ] = useState(null);
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
   const [ expanded, setExpaned ] = useState(false);

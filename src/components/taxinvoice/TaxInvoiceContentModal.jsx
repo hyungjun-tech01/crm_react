@@ -53,6 +53,7 @@ const TaxInvoiceContentModal = (props) => {
         };
         handleEdited(tempData)
     };
+
     const handleSelect = (name, value) => {
         let tempData = { ...edited };
         if(name === 'product_name'){
@@ -65,6 +66,7 @@ const TaxInvoiceContentModal = (props) => {
 
         handleEdited(tempData);
     };
+
     const handleValue = (event) => {
         const target_name = event.target.name;
         const target_value = event.target.value;
@@ -150,6 +152,7 @@ const TaxInvoiceContentModal = (props) => {
         >
             {content_items && content_items.map((item, index) => {
                 let modifiedDetail = { ...item.detail };
+                
                 if (item.detail.type === 'date') {
                     modifiedDetail['editing'] = handleTime;
                 } else if (item.detail.type === 'select') {
@@ -157,6 +160,7 @@ const TaxInvoiceContentModal = (props) => {
                 } else {
                     modifiedDetail['editing'] = handleValue;
                 };
+
                 return (
                     <DetailCardItem
                         key={index}

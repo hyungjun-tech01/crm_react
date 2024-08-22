@@ -50,9 +50,6 @@ const TaxInovices = () => {
   //===== Handles to edit this ========================================================
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
-  const [ taxInvoiceData, setTaxInvoiceData ] = useState(null);
-  const [ taxInvoiceContents, setTaxInvoiceContents ] = useState(null);
-
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
 
@@ -214,8 +211,6 @@ const TaxInovices = () => {
 
   const handleAddNewTransaction = useCallback(() => {
     setCurrentTaxInvoice();
-    setTaxInvoiceContents(null);
-    setTaxInvoiceData(null);
     setOpenTaxInvoice(true);
 
     setTimeout(()=>{
@@ -226,26 +221,8 @@ const TaxInovices = () => {
     }, 1000);
   }, [setCurrentTaxInvoice]);
 
-  const handleOpenTaxInvoice = (data) => {
-    setCurrentTaxInvoice(data.tax_invoice_code);
-
-    const dataContents = JSON.parse(data.invoice_contents);
-    const tempContents = dataContents.map((item, index) => {
-      const tempDate = new Date();
-      const splitted = item.month_day.split('.');
-      tempDate.setMonth(splitted.at(0) - 1);
-      tempDate.setDate(splitted.at(1));
-      return {
-        ...item,
-        invoice_date: tempDate,
-        sub_index: index,
-      }
-    });
-    setTaxInvoiceContents(tempContents);
-
-    const tempData = {...data};
-    delete tempData.invoice_contents;
-    setTaxInvoiceData(tempData);
+  const handleOpenTaxInvoice = (code) => {
+    setCurrentTaxInvoice(code);
     setOpenTaxInvoice(true);
 
     setTimeout(()=>{
@@ -365,7 +342,7 @@ const TaxInovices = () => {
                         return {
                           onClick: (event) => {
                             if(event.target.className === 'table_company') return;
-                            handleOpenTaxInvoice(record)
+                            handleOpenTaxInvoice(record.tax_invoice_code)
                           }, // double click row
                         };
                       }}
@@ -388,7 +365,7 @@ const TaxInovices = () => {
                         return {
                           onClick: (event) => {
                             if(event.target.className === 'table_company') return;
-                            handleOpenTaxInvoice(record)
+                            handleOpenTaxInvoice(record.tax_invoice_code)
                           }, // double click row
                         };
                       }}
@@ -406,8 +383,6 @@ const TaxInovices = () => {
         <TaxInvoiceEditModel
           open={openTaxInvoice}
           close={()=>setOpenTaxInvoice(false)}
-          data={taxInvoiceData}
-          contents={taxInvoiceContents}
         />
         <MultiQueryModal 
           title= {t('quotation.quotation_multi_query')}

@@ -149,14 +149,14 @@ const TaxInvoicePrint = (props) => {
                                     <View style={{width: '70%',display:'flex',flexDirection:'column'}}>
                                         <View style={{width: '100%',display:'flex',flexDirection:'row',borderBottom:0.6,borderColor:'#0000ff'}}>
                                             <View style={{width:'50%',height:20,borderRight:0.6,borderColor:'#0000ff',display:'flex',flexDirection:'column',justifyContent:'center'}}>
-                                                <Text style={[Styles.SupplierText,{fontSize:10,textAlign:'right'}]}>{`${invoiceData.book_no ? invoiceData.book_no : ''} 권`}</Text>
+                                                <Text style={[Styles.SupplierText,{fontSize:10,textAlign:'right'}]}>{`${invoiceData.index1} 권`}</Text>
                                             </View>
                                             <View style={{width:'50%',height:20,display:'flex',flexDirection:'column',justifyContent:'center'}}>
-                                                <Text style={[Styles.SupplierText,{fontSize:10,textAlign:'right'}]}>{`${invoiceData.book_sub_no ? invoiceData.book_sub_no : ''} 호`}</Text>
+                                                <Text style={[Styles.SupplierText,{fontSize:10,textAlign:'right'}]}>{`${invoiceData.index2} 호`}</Text>
                                             </View>
                                         </View>
                                         <View style={{width: '100%',display:'flex',flexDirection:'column'}}>
-                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{invoiceData.serial_no}</Text>
+                                            <Text style={[Styles.SupplierText,{fontSize:10}]}>{invoiceData.sequence_number}</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -288,7 +288,7 @@ const TaxInvoicePrint = (props) => {
                                     </View>
                                     <View style={{height:28,display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                         <View>
-                                            <Text style={[Styles.inputText,{fontSize:11,textAlign:'center'}]}>{formatDate(invoiceData.issue_date, 1)}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:11,textAlign:'center'}]}>{formatDate(invoiceData.create_date, 1)}</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -687,7 +687,7 @@ const TaxInvoicePrint = (props) => {
                                                 <Text style={[Styles.SupplierText,{fontSize:10}]}>합 계 금 액</Text>
                                             </View>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.total_amount)}</Text>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.total_price)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
@@ -695,31 +695,31 @@ const TaxInvoicePrint = (props) => {
                                                 <Text style={[Styles.SupplierText,{fontSize:10}]}>현    금</Text>
                                             </View>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.cash)}</Text>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.cash_amount)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderBottom:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
                                                 <Text style={[Styles.SupplierText,{fontSize:10}]}>수    표</Text>
                                             </View>
-                                            <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.check)}</Text>
+                                            <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.check_amount)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderBottom:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
                                                 <Text style={[Styles.SupplierText,{fontSize:10}]}>어    음</Text>
                                             </View>
-                                            <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.note)}</Text>
+                                            <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.note_amount)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderBottom:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'center'}}>
                                                 <Text style={[Styles.SupplierText,{fontSize:10}]}>외상미수금</Text>
                                             </View>
-                                            <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.credit)}</Text>
+                                            <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderColor:'#0000ff',alignItems:'center',justifyContent:'end'}}>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.receivable_amount)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 20%',margin:0,padding:0,display:'flex',flexDirection:'row',justifyContent:'center'}}>
@@ -773,10 +773,10 @@ const TaxInvoicePrint = (props) => {
                                     <View style={{width: '70%',display:'flex',flexDirection:'column'}}>
                                         <View style={{width: '100%',display:'flex',flexDirection:'row',borderBottom:0.6,borderColor:'#ff0505'}}>
                                             <View style={{width:'50%',height:20,borderRight:0.6,borderColor:'#ff0505',display:'flex',flexDirection:'column',justifyContent:'center'}}>
-                                                <Text style={[Styles.ReceiverText,{fontSize:10,textAlign:'right'}]}>{`${invoiceData.book_no ? invoiceData.book_no : ''} 권`}</Text>
+                                                <Text style={[Styles.ReceiverText,{fontSize:10,textAlign:'right'}]}>{`${invoiceData.index1} 권`}</Text>
                                             </View>
                                             <View style={{width:'50%',height:20,display:'flex',flexDirection:'column',justifyContent:'center'}}>
-                                                <Text style={[Styles.ReceiverText,{fontSize:10,textAlign:'right'}]}>{`${invoiceData.book_sub_no ? invoiceData.book_sub_no : ''} 호`}</Text>
+                                                <Text style={[Styles.ReceiverText,{fontSize:10,textAlign:'right'}]}>{`${invoiceData.index2} 호`}</Text>
                                             </View>
                                         </View>
                                         <View style={{width: '100%',display:'flex',flexDirection:'column'}}>
@@ -912,7 +912,7 @@ const TaxInvoicePrint = (props) => {
                                     </View>
                                     <View style={{height:28,display:'flex',flexDirection:'column',justifyContent:'center'}}>
                                         <View>
-                                            <Text style={[Styles.inputText,{fontSize:11,textAlign:'center'}]}>{formatDate(invoiceData.issue_date, 1)}</Text>
+                                            <Text style={[Styles.inputText,{fontSize:11,textAlign:'center'}]}>{formatDate(invoiceData.create_date, 1)}</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -1311,7 +1311,7 @@ const TaxInvoicePrint = (props) => {
                                                 <Text style={[Styles.ReceiverText,{fontSize:10}]}>합 계 금 액</Text>
                                             </View>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.total_amount)}</Text>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.total_price)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
@@ -1319,31 +1319,31 @@ const TaxInvoicePrint = (props) => {
                                                 <Text style={[Styles.ReceiverText,{fontSize:10}]}>현    금</Text>
                                             </View>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.cash)}</Text>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.cash_amount)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderBottom:0.6,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
                                                 <Text style={[Styles.ReceiverText,{fontSize:10}]}>수    표</Text>
                                             </View>
-                                            <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.check)}</Text>
+                                            <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.check_amount)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
                                             <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderBottom:0.6,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
                                                 <Text style={[Styles.ReceiverText,{fontSize:10}]}>어    음</Text>
                                             </View>
-                                            <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.note)}</Text>
+                                            <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.note_amount)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 16%',margin:0,padding:0,display:'flex',flexDirection:'column',alignContent:'center'}}>
-                                            <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderBottom:0.6,borderColor:'#ff0505',alignItems:'center',justifyContent:'center'}}>
+                                            <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderColor:'#ff0505',borderBottom:0.6,alignItems:'center',justifyContent:'center'}}>
                                                 <Text style={[Styles.ReceiverText,{fontSize:10}]}>외상미수금</Text>
                                             </View>
-                                            <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,alignItems:'center',justifyContent:'end'}}>
-                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.credit)}</Text>
+                                            <View style={{width:'100%',height:18,margin:0,padding:0,borderRight:0.6,borderColor:'#ff0505',alignItems:'center',justifyContent:'end'}}>
+                                                <Text style={[Styles.inputAmount,{fontSize:10}]}>{ConvertCurrency(invoiceData.receivable_amount)}</Text>
                                             </View>
                                         </View>
                                         <View style={{flex:'1 1 20%',margin:0,padding:0,display:'flex',flexDirection:'row',justifyContent:'center'}}>

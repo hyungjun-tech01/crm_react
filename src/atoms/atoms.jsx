@@ -444,6 +444,7 @@ export const defaultTaxInvoice = {
     note_amount : null,
     receivable_amount : null,
     //----- Etc info --------------
+    sequence_number: 0,
     memo : null,
     summary : null,
     create_date : null,
