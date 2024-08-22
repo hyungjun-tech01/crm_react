@@ -5,7 +5,7 @@ import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "antd/dist/reset.css";
-import { Checkbox, Input, Table } from 'antd';
+import { Button, Checkbox, Input, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import DatePicker from "react-datepicker";
@@ -19,62 +19,43 @@ import {
   atomCurrentTaxInvoice,
   defaultTaxInvoice,
 } from "../../atoms/atoms";
-import { TaxInvoiceRepo } from "../../repository/tax_invoice";
+import { DefaultTaxInvoiceContent, TaxInvoiceRepo } from "../../repository/tax_invoice";
 
 import { ConvertCurrency } from "../../constants/functions";
 import MessageModal from "../../constants/MessageModal";
-import TransactionBillPrint from "../transactions/TransactionBillPrint";
+import TaxInvoicePrint from "./TaxInvoicePrint";
 
 import styles from './TaxInvoiceEditModel.module.scss';
 import { company_info } from "../../repository/user";
+import TaxInvoiceContentModal from "./TaxInvoiceContentModal";
 
-const default_bill_data = {
+const default_invoice_data = {
   transaction_type: '',
   invoice_type: '',
-  vat_included:'',
+  vat_included: '',
   show_decimal: false,
   receive_type: '',
 
-  index1:'',
-  index2:'',
-  serial_no:'',
-  
-  supplier: {
-    compnay_code:'',
-    business_registration_code:'',
-    company_name: '',
-    ceo_name:'',
-    company_address:'',
-    business_type:'',
-    business_item:'',
-  },
-  receiver: {
-    compnay_code:'',
-    business_registration_code:'',
-    company_name: '',
-    ceo_name:'',
-    company_address:'',
-    business_type:'',
-    business_item:'',
-  },
+  index1: '',
+  index2: '',
+  serial_no: '',
   issue_date: null,
   memo: '',
 
-  supply_price:0,
-  tax_price:0,
-  total_price:0,
-  cash_amount:0,
-  check_amount:0,
-  note_amount:0,
-  receivable_amount:0,
+  supply_price: 0,
+  tax_price: 0,
+  total_price: 0,
+  cash_amount: 0,
+  check_amount: 0,
+  note_amount: 0,
+  receivable_amount: 0,
 
-  supply_text:'',
-  tax_text:'',
+  supply_text: '',
+  tax_text: '',
   vacant_count: 0,
 };
 
-
-const TaxInvoiceEditModel = ({open, close, data, contents}) => {
+const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -92,29 +73,32 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
 
 
   //===== Handles to edit 'TaxInvoiceEditModel' ======================================
-  const [dataForBill, setDataForBill] = useState({...default_bill_data});
-  const [transactionContents, setTransactionContents] = useState([]);
+  const [receiver, setReceiver] = useState({});
+  const [supplier, setSupplier] = useState({});
+  const [invoiceData, setInvoiceData] = useState({ ...default_invoice_data });
+  const [invoiceChange, setInvoiceChange] = useState({});
+  const [invoiceContents, setInvoiceContents] = useState([]);
+  const [printData, setPrintData] = useState({})
   const [isSale, setIsSale] = useState(true);
-  const [isTaxBill, setIsTaxBill] = useState(true);
+  const [isTaxInvoice, setIsTaxInvoice] = useState(true);
   const [selectValues, setSelectValue] = useState({})
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
-      ...dataForBill,
+      ...invoiceChange,
       [e.target.name]: e.target.value,
     };
-    setDataForBill(modifiedData);
-  }, [dataForBill]);
+    setInvoiceChange(modifiedData);
+  }, [invoiceChange]);
 
   const handleDateChange = useCallback((name, date) => {
     const modifiedData = {
-      ...dataForBill,
+      ...invoiceChange,
       [name]: date
     };
-    console.log('[handleDateChange] : ', modifiedData);
-    setDataForBill(modifiedData);
-  }, [dataForBill]);
+    setInvoiceChange(modifiedData);
+  }, [invoiceChange]);
 
   const handleSelectChange = useCallback((name, selected) => {
     // set data for selection ------------------------------
@@ -125,59 +109,57 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
     setSelectValue(tempSelectValues);
 
     // set changed data ------------------------------------
-    let modifiedData = null;
     if (name === 'company_name') {
-      if(isSale){
-        modifiedData = {
-          ...dataForBill,
-          receiver: {
-            company_code: selected.value.company_code,
-            company_name: selected.value.company_name,
-            company_address: selected.value.company_address,
-            ceo_name: selected.value.ceo_name,
-            business_type: selected.value.business_type,
-            business_item: selected.value.business_item,
-            business_registration_code: selected.value.business_registration_code,
-          },
-        };
+      if (isSale) {
+        setReceiver({
+          company_code: selected.value.company_code,
+          company_name: selected.value.company_name,
+          company_address: selected.value.company_address,
+          ceo_name: selected.value.ceo_name,
+          business_type: selected.value.business_type,
+          business_item: selected.value.business_item,
+          business_registration_code: selected.value.business_registration_code,
+        });
       } else {
-        modifiedData = {
-          ...dataForBill,
-          supplier: {
-            company_code: selected.value.company_code,
-            company_name: selected.value.company_name,
-            company_address: selected.value.company_address,
-            ceo_name: selected.value.ceo_name,
-            business_type: selected.value.business_type,
-            business_item: selected.value.business_item,
-            business_registration_code: selected.value.business_registration_code,
-          },
-        };
+        setSupplier({
+          company_code: selected.value.company_code,
+          company_name: selected.value.company_name,
+          company_address: selected.value.company_address,
+          ceo_name: selected.value.ceo_name,
+          business_type: selected.value.business_type,
+          business_item: selected.value.business_item,
+          business_registration_code: selected.value.business_registration_code,
+        });
       }
     } else {
       if (name === 'transaction_type') {
-        console.log('handleSelectChange / transaction_type :', selected);
         if (selected.value === '매출') {
           setIsSale(true);
+          if (supplier !== company_info) {
+            setReceiver({ ...supplier });
+            setSupplier(company_info);
+          };
         } else {
           setIsSale(false);
+          if (receiver !== company_info) {
+            setSupplier({ ...receiver });
+            setReceiver(company_info);
+          };
         };
       } else if (name === 'invoice_type') {
-        console.log('handleSelectChange / invoice_type :', selected);
         if (selected.value === '세금계산서') {
-          setIsTaxBill(true);
+          setIsTaxInvoice(true);
         } else {
-          setIsTaxBill(false);
+          setIsTaxInvoice(false);
         };
       };
-      modifiedData = {
-        ...dataForBill,
+      const modifiedData = {
+        ...invoiceChange,
         [name]: selected.value,
       };
+      setInvoiceChange(modifiedData);
     };
-    setDataForBill(modifiedData);
-    console.log('handleSelectChange : ', modifiedData);
-  }, [dataForBill, selectValues]);
+  }, [invoiceChange, isSale, receiver, selectValues, supplier]);
 
   const trans_types = [
     { value: '매출', label: t('company.deal_type_sales') },
@@ -197,12 +179,11 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
   const rowSelection = {
     selectedRowKeys: selectedContentRowKeys,
     onChange: (selectedRowKeys, selectedRows) => {
-      console.log('selected :', selectedRowKeys);
       setSelectedContentRowKeys(selectedRowKeys);
     },
   };
 
-  const default_columns = isTaxBill ? [
+  const default_columns = isTaxInvoice ? [
     {
       title: t('transaction.month_day'),
       dataIndex: 'month_day',
@@ -226,17 +207,17 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
     {
       title: t('transaction.supply_price'),
       dataIndex: 'supply_price',
-      render: (text, record) => <>{ConvertCurrency(record.supply_price, dataForBill.show_decimal && 4)}</>,
+      render: (text, record) => <>{ConvertCurrency(record.supply_price, invoiceData.show_decimal && 4)}</>,
     },
     {
       title: t('transaction.tax_price'),
       dataIndex: 'tax_price',
-      render: (text, record) => <>{ConvertCurrency(record.tax_price, dataForBill.show_decimal && 4)}</>,
+      render: (text, record) => <>{ConvertCurrency(record.tax_price, invoiceData.show_decimal && 4)}</>,
     },
     {
       title: t('transaction.total_price'),
       dataIndex: 'total_price',
-      render: (text, record) => <>{ConvertCurrency(record.total_price, dataForBill.show_decimal && 4)}</>,
+      render: (text, record) => <>{ConvertCurrency(record.total_price, invoiceData.show_decimal && 4)}</>,
     },
     {
       title: t('common.note'),
@@ -267,17 +248,17 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
     {
       title: t('transaction.unit_price'),
       dataIndex: 'unit_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForBill.show_decimal)}</>,
+      render: (text, record) => <>{ConvertCurrency(text, invoiceData.show_decimal)}</>,
     },
     {
       title: t('transaction.supply_price'),
       dataIndex: 'supply_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForBill.show_decimal)}</>,
+      render: (text, record) => <>{ConvertCurrency(text, invoiceData.show_decimal)}</>,
     },
     {
       title: t('transaction.total_price'),
       dataIndex: 'total_price',
-      render: (text, record) => <>{ConvertCurrency(text, dataForBill.show_decimal)}</>,
+      render: (text, record) => <>{ConvertCurrency(text, invoiceData.show_decimal)}</>,
     },
     {
       title: t('common.note'),
@@ -288,6 +269,10 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
 
 
   //===== Handles to edit 'Contents' =================================================
+  const [settingForContentModal, setSettingForContentModal] = useState({});
+  const [isContentModalOpen, setIsContentModalOpen] = useState(false);
+  const [orgContentModalData, setOrgContentModalData] = useState({});
+  const [editedContentModalData, setEditedContentModalData] = useState({});
 
   const handleFormatter = useCallback((value) => {
     if (value === undefined || value === null || value === '') return '';
@@ -297,28 +282,248 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
       if (isNaN(ret)) return;
     };
 
-    return dataForBill.show_decimal
+    return invoiceData.show_decimal
       ? ret?.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,')
       : ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  }, [dataForBill.show_decimal]);
+  }, [invoiceData.show_decimal]);
 
+  const handleAmountCalculation = (data) => {
+    let supply_price = 0, tax_price = 0, total_price = 0;
+    data.forEach(item => {
+      supply_price += item.supply_price;
+      tax_price += item.tax_price;
+      total_price += item.total_price;
+    });
+    let tempEdited = { ...invoiceChange };
+    if ((!tempEdited['supply_price'] && invoiceData.supply_price !== supply_price)
+      || (!!tempEdited['supply_price'])) tempEdited['supply_price'] = supply_price;
+    if ((!tempEdited['tax_price'] && invoiceData.tax_price !== tax_price)
+      || (!!tempEdited['tax_price'])) tempEdited['tax_price'] = tax_price;
+    if ((!tempEdited['total_price'] && invoiceData.total_price !== total_price)
+      || (!!tempEdited['total_price'])) tempEdited['total_price'] = total_price;
+
+    const textValues = handleShowNumbers(supply_price, tax_price);
+    setInvoiceChange({
+      ...tempEdited,
+      ...textValues,
+    });
+  };
+
+  const handleStartAddContent = () => {
+    console.log('add transaction');
+    const tempSetting = {
+      title: t('quotation.add_content'),
+      vat_included: isTaxInvoice,
+    };
+
+    setSettingForContentModal(tempSetting);
+    setOrgContentModalData({
+      ...DefaultTaxInvoiceContent,
+      sub_index: invoiceContents.length,
+    });
+    setEditedContentModalData({});
+    setIsContentModalOpen(true);
+  };
 
   const handleStartEditContent = (data) => {
     const tempData = {
-      ...data,
       title: `${t('common.item')} ${t('common.edit')}`,
+      vat_included: isTaxInvoice,
     };
-    setDataForBill(tempData);
+    let tempDate = new Date();
+    if (!!data['month_day'] && typeof data.month_day === 'string') {
+      const splitted = data.month_day.split('.');
+      tempDate.setMonth(splitted[0] - 1);
+      tempDate.setDate(splitted[1]);
+    };
+
+    setSettingForContentModal(tempData);
+    setOrgContentModalData({ ...data, invoice_date: tempDate });
+    setEditedContentModalData({});
+    setIsContentModalOpen(true);
   };
 
+  const handleContentModalOk = () => {
+    if (!orgContentModalData['invoice_date'] && !editedContentModalData['invoice_date']) {
+      const tempMsg = { title: '확인', message: '날짜 정보가 없습니다.' };
+      setMessage(tempMsg);
+      setIsMessageModalOpen(true);
+      return;
+    };
+    let tempMonthDay = null;
+    const editedMonthDay = editedContentModalData['invoice_date'];
+    if (!!editedMonthDay) {
+      tempMonthDay = `${editedMonthDay.getMonth() + 1}.${editedMonthDay.getDate()}`;
+    } else {
+      tempMonthDay = orgContentModalData['month_day'];
+    };
+
+    setIsContentModalOpen(false);
+
+    const tempContent = {
+      ...orgContentModalData,
+      ...editedContentModalData,
+      month_day: tempMonthDay,
+    };
+    const foundIdx = invoiceContents.findIndex(item => item.sub_index === tempContent.sub_index);
+    if (foundIdx === -1) {
+      const tempContents = invoiceContents.concat(tempContent);
+      setInvoiceContents(tempContents);
+      handleAmountCalculation(tempContents);
+    } else {
+      const tempContents = [
+        ...invoiceContents.slice(0, foundIdx),
+        tempContent,
+        ...invoiceContents.slice(foundIdx + 1,),
+      ];
+      setInvoiceContents(tempContents);
+      handleAmountCalculation(tempContents);
+    };
+    setIsContentModalOpen(false);
+    setOrgContentModalData({});
+    setEditedContentModalData({});
+  };
+
+  const handleContentModalCancel = () => {
+    setIsContentModalOpen(false);
+    setEditedContentModalData({});
+    setOrgContentModalData({});
+    setSelectedContentRowKeys([]);
+  };
+
+  const handleContentDelete = () => {
+    if (selectedContentRowKeys.length === 0) return;
+    const tempContents = invoiceContents.filter(item => selectedContentRowKeys.indexOf(item.sub_index) === -1);
+    setInvoiceContents(tempContents);
+    setSelectedContentRowKeys([]);
+  };
+
+  const handleContentMoveUp = () => {
+    if (selectedContentRowKeys.length === 0) return;
+    selectedContentRowKeys.sort();
+
+    let tempContents = null;
+    let startIdx = 0;
+    const selecteds = invoiceContents.filter(item => selectedContentRowKeys.indexOf(item.sub_index) !== -1);
+    const unselecteds = invoiceContents.filter(item => selectedContentRowKeys.indexOf(item.sub_index) === -1);
+    const firstIdx = selectedContentRowKeys[0];
+    if (firstIdx === 1) {
+      tempContents = [
+        ...selecteds,
+        ...unselecteds,
+      ];
+      startIdx = 1;
+    } else {
+      tempContents = [
+        ...unselecteds.slice(0, firstIdx - 2),
+        ...selecteds,
+        ...unselecteds.slice(firstIdx - 2,),
+      ];
+      startIdx = firstIdx - 1;
+    };
+    const finalContents = tempContents.map((item, index) => {
+      const temp3 = {
+        ...item,
+        sub_index: index + 1,
+      };
+      return temp3;
+    });
+    setInvoiceContents(finalContents);
+
+    let tempKeys = [];
+    for (let i = 0; i < selecteds.length; i++, startIdx++) {
+      tempKeys.push(startIdx);
+    }
+    setSelectedContentRowKeys(tempKeys);
+  };
+
+  const handleContentMoveDown = () => {
+    if (selectedContentRowKeys.length === 0) return;
+    selectedContentRowKeys.sort();
+
+    let tempContents = null;
+    let startIdx = 0;
+    const selecteds = invoiceContents.filter(item => selectedContentRowKeys.indexOf(item.sub_index) !== -1);
+    const unselecteds = invoiceContents.filter(item => selectedContentRowKeys.indexOf(item.sub_index) === -1);
+    const lastIdx = selectedContentRowKeys.at(-1);
+    if (lastIdx === invoiceContents.length) {
+      tempContents = [
+        ...unselecteds,
+        ...selecteds,
+      ];
+      startIdx = lastIdx;
+    } else {
+      tempContents = [
+        ...unselecteds.slice(0, lastIdx),
+        ...selecteds,
+        ...unselecteds.slice(lastIdx,),
+      ];
+      startIdx = lastIdx + 1;
+    };
+    const finalContents = tempContents.map((item, index) => {
+      const temp3 = {
+        ...item,
+        sub_index: index + 1,
+      };
+      return temp3;
+    });
+    setInvoiceContents(finalContents);
+
+    let tempKeys = [];
+    for (let i = 0; i < selecteds.length; i++) {
+      tempKeys.push(startIdx--);
+    }
+    setSelectedContentRowKeys(tempKeys);
+  };
 
   //===== Handles for special actions =============================================
   const handleShowDecimal = (e) => {
     const tempData = {
-      ...dataForBill,
+      ...invoiceData,
       show_decimal: e.target.checked,
     };
-    setDataForBill(tempData);
+    setInvoiceData(tempData);
+  };
+
+  const handleShowNumbers = (supply_price, tax_price) => {
+    // Text for Supply ------------------------------------
+    let inputAmountText = '';
+    let vacantCount = 0;
+
+    const tempAmountText = typeof supply_price === 'number'
+      ? supply_price.toString() : supply_price;
+    const tempVacantCount = 11 - tempAmountText.length;
+
+    if (tempVacantCount < 0) {
+      console.log('Too high value');
+      vacantCount = 0;
+      inputAmountText = tempAmountText.slice(-11);
+    } else {
+      vacantCount = tempVacantCount;
+      for (let i = 0; i < tempVacantCount; i++) {
+        inputAmountText += ' ';
+      };
+      inputAmountText += tempAmountText;
+    };
+
+    // Text for Tax ------------------------------------
+    let intputTaxText = '';
+    const tempTaxText = typeof tax_price === 'number'
+      ? tax_price.toFixed().toString() : tax_price;
+    if (tempTaxText.length > 10) {
+      intputTaxText = tempTaxText.slice(-10);
+    } else {
+      for (let i = 0; i < 10 - tempTaxText.length; i++) {
+        intputTaxText += ' ';
+      };
+      intputTaxText += tempTaxText;
+    };
+
+    return {
+      supply_text: inputAmountText,
+      tax_text: intputTaxText,
+      vacant_count: vacantCount,
+    };
   };
 
   const handleInitialize = useCallback(() => {
@@ -326,25 +531,30 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
   }, []);
 
   const handleSaveTaxInvoice = () => {
+    const finalData = {
+      ...invoiceData,
+      ...invoiceChange,
+    };
     let newTaxInvoice = {
       modify_user: cookies.myLationCrmUserId,
     };
     Object.keys(defaultTaxInvoice).forEach(item => {
-      if((dataForBill[item] !== undefined) && (dataForBill[item] !== null)){
-        newTaxInvoice[item] = dataForBill[item];
+      if ((finalData[item] !== undefined) && (finalData[item] !== null)) {
+        newTaxInvoice[item] = finalData[item];
       };
-      const companyData = isSale ? dataForBill.receiver : dataForBill.supplier;
-      if((companyData[item] !== undefined) && (companyData[item] !== null)) {
+      const companyData = isSale ? receiver : supplier;
+      if ((companyData[item] !== undefined) && (companyData[item] !== null)) {
         newTaxInvoice[item] = companyData[item];
       };
     });
-    const updatedContents = transactionContents.map(item => {
-      const newItem = {...item};
-      delete newItem.index;
+    const updatedContents = invoiceContents.map(item => {
+      const newItem = { ...item };
+      delete newItem.sub_index;
+      delete newItem.invoice_date;
       return newItem;
     });
     newTaxInvoice['invoice_contents'] = JSON.stringify(updatedContents);
-    if(currentTaxInvoice === defaultTaxInvoice) {
+    if (currentTaxInvoice === defaultTaxInvoice) {
       newTaxInvoice['action_type'] = 'ADD';
     } else {
       newTaxInvoice['action_type'] = 'UPDATE';
@@ -356,13 +566,13 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
 
     const resp = modifyTaxInvoice(newTaxInvoice);
     resp.then((res) => {
-      if(res.result){
+      if (res.result) {
         handleInitialize();
         let thisModal = bootstrap.Modal.getInstance('#edit_tax_invoice');
-        if(thisModal) thisModal.hide();
+        if (thisModal) thisModal.hide();
       }
       else {
-        setMessage({title: '저장 중 오류', message: `오류가 발생하여 저장하지 못했습니다. - ${res.message}`});
+        setMessage({ title: '저장 중 오류', message: `오류가 발생하여 저장하지 못했습니다. - ${res.message}` });
         setIsMessageModalOpen(true);
       };
     });
@@ -375,128 +585,115 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
 
   //===== useEffect ==============================================================
   useEffect(() => {
-    if(!open) return;
+    if (!open) return;
 
-    if ((companyState & 1) === 0) return;
-    
-    if(data) {
-      console.log('[TaxInvoiceEditModel] called! :', data);
-      
-      // dataForBill ------------------------------
-      const tempSelectValues = {
-        transaction_type: data.is_sale? trans_types[0] : trans_types[1],
-        invoice_type: data.vat_included? invoice_types[0] : invoice_types[1],
-        receive_type: receive_types[0],
-        company_name: {label: data.company_name, value: data.company_name},
-      };
-      console.log('[TaxInvoiceEditModel] selectValues :', tempSelectValues);
-      setSelectValue(tempSelectValues);
-
-      // Text for Supply ------------------------------------
-      let inputAmountText = '';
-      let vacantCount = 0;
-
-      const tempAmountText = typeof data.supply_price === 'number'
-        ? data.supply_price.toString() : data.supply_price;
-      const tempVacantCount = 11 - tempAmountText.length;
-
-      if(tempVacantCount < 0){
-        console.log('Too high value');
-        vacantCount = 0;
-        inputAmountText = tempAmountText.slice(-11);
+    if ((companyState & 1) === 1) {
+      let inputData = null;
+      if (!!data) {
+        inputData = data;
       } else {
-        vacantCount = tempVacantCount;
-        for(let i=0; i < tempVacantCount; i++){
-          inputAmountText += ' ';
+        if(currentTaxInvoice !== defaultTaxInvoice) {
+          inputData = {...currentTaxInvoice};
         };
-        inputAmountText += tempAmountText;
       };
 
-      // Text for Tax ------------------------------------
-      let intputTaxText = '';
-      const tempTaxText = typeof data.tax_price === 'number'
-        ? data.tax_price.toFixed().toString() : data.tax_price;
-      if(tempTaxText.length > 10){
-        intputTaxText = tempTaxText.slice(-10);
-      } else {
-        for(let i=0; i< 10-tempTaxText.length; i++){
-          intputTaxText += ' ';
+      if(inputData && Object.keys(inputData).length > 0) {
+        // invoiceData ------------------------------
+        const tempSelectValues = {
+          transaction_type: inputData.transaction_type === '매출' ? trans_types[0] : trans_types[1],
+          invoice_type: inputData.invoice_type === '세금계산서' ? invoice_types[0] : invoice_types[1],
+          receive_type: receive_types[0],
+          company_name: { label: inputData.company_name, value: inputData.company_name },
         };
-        intputTaxText += tempTaxText;
-      };
+        setSelectValue(tempSelectValues);
 
-      const isCash = data.payment_type === '현금';
+        const isCash = inputData.payment_type === '현금';
+        const textValues = handleShowNumbers(inputData.supply_price, inputData.tax_price);
 
-      let tempBillData = {
-        ...default_bill_data,
-        transaction_type: data.transaction_type,
-        invoice_type: data.vat_included?'세금계산서':'계산서',
-        show_decimal: data.show_decimal,
-        receive_type: '청구',
-        issue_date: data.publish_date,
-        supply_price: data.supply_price,
-        tax_price: data.tax_price,
-        total_price: data.total_price,
+        let tempInvoiceData = {
+          ...inputData,
+          show_decimal: false,
+          receive_type: '청구',
+          create_date: new Date(inputData.create_date),
 
-        supply_text: inputAmountText,
-        tax_text: intputTaxText,
-        vacant_count: vacantCount,
+          cash_amount: inputData['cash_amount']
+            ? inputData.cash_amount
+            : (isCash && inputData['paid_money'] ? inputData.paid_money : 0),
+          check_amount: inputData['check_amount']
+            ? inputData.check_amount
+            : (isCash && inputData['paid_money'] ? 0 : inputData.paid_money),
+          ...textValues
+        };
 
-        cash_amount: isCash ? data.paid_money: 0,
-        check_amount: isCash ? 0 : data.paid_money,
-      };
-
-      setIsTaxBill(data.vat_included);
-      // IsSale ------------------------------------
-      setIsSale(data.is_sale);
-      if(data.is_sale) {
-        tempBillData.supplier = {...company_info};
-        tempBillData.receiver = {
-          company_code: data.company_code,
-          business_registration_code: data.business_registration_code,
-          company_name: data.company_name,
-          ceo_name: data.ceo_name,
-          company_address: data.company_address,
-          business_type: data.business_type,
-          business_item: data.business_item,
-        }
+        setIsTaxInvoice(inputData['vat_included']
+          ? inputData.vat_included
+          : (inputData.invoice_type === '세금계산서')
+        );
+        // IsSale ------------------------------------
+        if (inputData.transaction_type === '매출') {
+          setIsSale(true);
+          setSupplier(company_info);
+          setReceiver({
+            company_code: inputData.company_code,
+            business_registration_code: inputData.business_registration_code,
+            company_name: inputData.company_name,
+            ceo_name: inputData.ceo_name,
+            company_address: inputData.company_address,
+            business_type: inputData.business_type,
+            business_item: inputData.business_item,
+          });
+        } else {
+          setIsSale(false);
+          setSupplier({
+            company_code: inputData.company_code,
+            business_registration_code: inputData.business_registration_code,
+            company_name: inputData.company_name,
+            ceo_name: inputData.ceo_name,
+            company_address: inputData.company_address,
+            business_type: inputData.business_type,
+            business_item: inputData.business_item,
+          });
+          setReceiver(company_info);
+        };
+        setInvoiceData(tempInvoiceData);
       } else {
-        tempBillData.supplier = {
-          company_code: data.company_code,
-          business_registration_code: data.business_registration_code,
-          company_name: data.company_name,
-          ceo_name: data.ceo_name,
-          company_address: data.company_address,
-          business_type: data.business_type,
-          business_item: data.business_item,
-        }
-        tempBillData.receiver = {...company_info};
+        setReceiver({});
+        setSupplier({});
+        const tempInvoiceData = {
+          ...default_invoice_data,
+          ...defaultTaxInvoice,
+        };
+        setInvoiceData(tempInvoiceData);
       };
-      setDataForBill(tempBillData);
-    }
-    // Copy contents into 'transaction contents' -------------------
-    if(contents) {
-      const modified = contents.map((item, index) => ({
-        index: index,
-        tax_invoice_code: null,
-        month_day: item.month_day,
-        product_name: item.product_name,
-        standard: item.standard,
-        quantity: item.quantity,
-        supply_price: item.supply_price,
-        tax_price: item.tax_price,
-        total_price: item.total_price,
-        memo: item.memo,
-      }));
-      setTransactionContents(modified);
-    }
-    else
-      setTransactionContents([]);
+      // Copy contents into 'transaction contents' -------------------
+      if (!!contents && contents.length > 0) {
+        setInvoiceContents(contents);
+      } else {
+        if(currentTaxInvoice !== defaultTaxInvoice) {
+          const dataContents = JSON.parse(currentTaxInvoice.invoice_contents);
+          const tempContents = dataContents.map((item, index) => {
+              const tempDate = new Date();
+              const splitted = item.month_day.split('.');
+              tempDate.setMonth(splitted.at(0) - 1);
+              tempDate.setDate(splitted.at(1));
+              return {
+                  ...item,
+                  invoice_date: tempDate,
+                  sub_index: index,
+              }
+          });
+          setInvoiceContents(tempContents);
+        } else {
+          setInvoiceContents([]);
+        }
+      }
+      setInvoiceChange({});
+    };
 
-  }, [open, contents, data, companyState]);
+  }, [contents, data, companyState, open, currentTaxInvoice]);
 
-  if(!open) return (
-      <div>&nbsp;</div>
+  if (!open) return (
+    <div>&nbsp;</div>
   );
 
   return (
@@ -546,6 +743,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                     className="nav-link"
                     to="#tax-bill-print"
                     data-bs-toggle="tab"
+                    onClick={()=> setPrintData({...invoiceData, ...invoiceChange})}
                   >
                     {t('common.preview')}
                   </Link>
@@ -577,13 +775,13 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                           />
                         </div>
                         <div style={{ paddingRight: '0.5rem' }}>
-                          <Checkbox defaultValue={dataForBill.show_decimal} onChange={handleShowDecimal}/>
+                          <Checkbox defaultValue={invoiceData.show_decimal} onChange={handleShowDecimal} />
                         </div>
                         <div>{t('quotation.show_decimal')}</div>
                       </div>
                       <div className={classNames(styles.billRow, { 'trans_pur': !isSale })}>
                         <div className={classNames(styles.title, { 'trans_pur': !isSale })}>
-                          <div>{isTaxBill ? t("transaction.tax_bill") : t("transaction.bill")}</div>
+                          <div>{isTaxInvoice ? t("transaction.tax_bill") : t("transaction.bill")}</div>
                         </div>
                         <div className={classNames(styles.billType, { 'trans_pur': !isSale })}>
                           <div>({isSale ? t("transaction.for_receiver") : t('transaction.for_supplier')})</div>
@@ -597,21 +795,21 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               <Input
                                 className={styles.input}
                                 name='index1'
-                                defaultValue={dataForBill['index1']}
-                                value={dataForBill['index1']}
+                                defaultValue={invoiceData['index1']}
+                                value={invoiceChange['index1'] ? invoiceChange.index1 : invoiceData.index1}
                                 onChange={handleItemChange}
-                                style={{textAlign: 'end'}}
+                                style={{ textAlign: 'end' }}
                               />
                               <div className={styles.text}><div>권</div></div>
                             </div>
                             <div className={classNames(styles.third, { 'trans_pur': !isSale })}>
                               <Input
                                 className={styles.input}
-                                defaultValue={dataForBill['index2']}
+                                defaultValue={invoiceData['index2']}
                                 name='index2'
-                                value={dataForBill['index2']}
+                                value={invoiceChange['index2'] ? invoiceChange.index2 : invoiceData.index2}
                                 onChange={handleItemChange}
-                                style={{textAlign: 'end'}}
+                                style={{ textAlign: 'end' }}
                               />
                               <div className={styles.text}><div>호</div></div>
                             </div>
@@ -623,10 +821,10 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                             <div className={styles.fourth}>
                               <Input
                                 className={styles.input}
-                                name='serial_no'
-                                value={dataForBill['serial_no']}
+                                name='sequence_number'
+                                value={invoiceChange['sequence_number'] ? invoiceChange.sequence_number : invoiceData.sequence_number}
                                 onChange={handleItemChange}
-                                style={{textAlign: 'center'}}
+                                style={{ textAlign: 'center' }}
                               />
                             </div>
                           </div>
@@ -644,13 +842,13 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               </div>
                               <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label className={styles.regNo}>{dataForBill.supplier.business_registration_code}</label>
+                                  <label className={styles.regNo}>{supplier.business_registration_code}</label>
                                   :
                                   <Input
                                     className={classNames(styles.input, styles.regNo)}
-                                    defaultValue={dataForBill.supplier['business_registration_code']}
+                                    defaultValue={supplier['business_registration_code']}
                                     name='business_registration_code'
-                                    value={dataForBill.supplier['business_registration_code']}
+                                    value={supplier['business_registration_code']}
                                     onChange={handleItemChange}
                                   />
                                 }
@@ -662,7 +860,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               </div>
                               <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label className={styles.textStart}>{dataForBill.supplier.company_name}</label>
+                                  <label className={styles.textStart}>{supplier.company_name}</label>
                                   :
                                   <Select
                                     defaultValue={selectValues['company_name']}
@@ -677,12 +875,12 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               </div>
                               <div className={classNames(styles.content, styles.text, styles.textStart, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label>{dataForBill.supplier.ceo_name}</label>
+                                  <label>{supplier.ceo_name}</label>
                                   :
                                   <Input
                                     className={styles.input}
                                     name='ceo_name'
-                                    value={dataForBill.supplier['ceo_name']}
+                                    value={supplier['ceo_name']}
                                     onChange={handleItemChange}
                                   />
                                 }
@@ -694,12 +892,12 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               </div>
                               <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label className={styles.textStart}>{dataForBill.supplier.company_address}</label>
+                                  <label className={styles.textStart}>{supplier.company_address}</label>
                                   :
                                   <Input
                                     className={styles.input}
                                     name='company_address'
-                                    value={dataForBill.supplier['company_address']}
+                                    value={supplier['company_address']}
                                     onChange={handleItemChange}
                                   />
                                 }
@@ -711,12 +909,12 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               </div>
                               <div className={classNames(styles.content, styles.text, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label className={styles.textStart}>{dataForBill.supplier.business_type}</label>
+                                  <label className={styles.textStart}>{supplier.business_type}</label>
                                   :
                                   <Input
                                     className={styles.input}
                                     name='business_type'
-                                    value={dataForBill.supplier['business_type']}
+                                    value={supplier['business_type']}
                                     onChange={handleItemChange}
                                     style={{ color: 'black' }}
                                   />
@@ -727,12 +925,12 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               </div>
                               <div className={classNames(styles.content, styles.text, styles.textStart, { 'trans_pur': !isSale })}>
                                 {isSale ?
-                                  <label>{dataForBill.supplier.business_item}</label>
+                                  <label>{supplier.business_item}</label>
                                   :
                                   <Input
                                     className={styles.input}
                                     name='business_item'
-                                    value={dataForBill.supplier['business_item']}
+                                    value={supplier['business_item']}
                                     onChange={handleItemChange}
                                   />
                                 }
@@ -754,11 +952,11 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                                   <Input
                                     className={classNames(styles.input, styles.regNo)}
                                     name='business_registration_code'
-                                    value={dataForBill.receiver['business_registration_code']}
+                                    value={receiver['business_registration_code']}
                                     onChange={handleItemChange}
                                   />
                                   :
-                                  <label className={styles.regNo}>{dataForBill.receiver.business_registration_code}</label>
+                                  <label className={styles.regNo}>{receiver.business_registration_code}</label>
                                 }
                               </div>
                             </div>
@@ -775,7 +973,7 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                                     onChange={selected => handleSelectChange('company_name', selected)}
                                   />
                                   :
-                                  <label className={styles.textStart}>{dataForBill.receiver.company_name}</label>
+                                  <label className={styles.textStart}>{receiver.company_name}</label>
                                 }
                               </div>
                               <div className={classNames(styles.subTitle, styles.text, { 'trans_pur_bd': !isSale })}>
@@ -786,11 +984,11 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                                   <Input
                                     className={styles.input}
                                     name='ceo_name'
-                                    value={dataForBill.receiver['ceo_name']}
+                                    value={receiver['ceo_name']}
                                     onChange={handleItemChange}
                                   />
                                   :
-                                  <label>{dataForBill.receiver.ceo_name}</label>
+                                  <label>{receiver.ceo_name}</label>
                                 }
                               </div>
                             </div>
@@ -803,11 +1001,11 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                                   <Input
                                     className={styles.input}
                                     name='company_address'
-                                    value={dataForBill.receiver['company_address']}
+                                    value={receiver['company_address']}
                                     onChange={handleItemChange}
                                   />
                                   :
-                                  <label className={styles.textStart}>{dataForBill.receiver.company_address}</label>
+                                  <label className={styles.textStart}>{receiver.company_address}</label>
                                 }
                               </div>
                             </div>
@@ -820,11 +1018,11 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                                   <Input
                                     className={styles.input}
                                     name='business_type'
-                                    value={dataForBill.receiver['business_type']}
+                                    value={receiver['business_type']}
                                     onChange={handleItemChange}
                                   />
                                   :
-                                  <label className={styles.textStart}>{dataForBill.receiver.business_type}</label>
+                                  <label className={styles.textStart}>{receiver.business_type}</label>
                                 }
                               </div>
                               <div className={classNames(styles.subTitle, styles.text, { 'trans_pur_bd': !isSale })} >
@@ -835,11 +1033,11 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                                   <Input
                                     className={styles.input}
                                     name='business_item'
-                                    value={dataForBill.receiver['business_item']}
+                                    value={receiver['business_item']}
                                     onChange={handleItemChange}
                                   />
                                   :
-                                  <label>{dataForBill.receiver.business_item}</label>
+                                  <label>{receiver.business_item}</label>
                                 }
                               </div>
                             </div>
@@ -851,13 +1049,13 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                           <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>작성</div>
                           <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>년-월-일</div>
                           <div className={classNames(styles.MidCellLast, { "trans_pur": !isSale })}>
-                            {/* {dataForBill.issue_date
-                              ? dataForBill.issue_date.toLocaleDateString('ko-KR', {year:'numeric',month:'numeric',day:'numeric'})
+                            {/* {invoiceData.issue_date
+                              ? invoiceData.issue_date.toLocaleDateString('ko-KR', {year:'numeric',month:'numeric',day:'numeric'})
                               : null} */}
                             <DatePicker
-                              name="publish_date"
-                              selected={dataForBill['issue_date']}
-                              onChange={(date) => handleDateChange('issue_date', date)}
+                              name="create_date"
+                              selected={invoiceChange['create_date'] ? invoiceChange.create_date : invoiceData.create_date}
+                              onChange={(date) => handleDateChange('create_date', date)}
                               dateFormat="yyyy-MM-dd"
                               className="datePick"
                             />
@@ -868,97 +1066,183 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                           <div className={classNames(styles.Units, { "trans_pur": !isSale })}>
                             <div className={classNames(styles.Unit3, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>공란수</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.vacant_count}</div></div>
+                              <div className={styles.lower}>
+                                <div style={{ color: 'black' }}>
+                                  {invoiceChange['vacant_count'] ? invoiceChange.vacant_count : invoiceData.vacant_count}
+                                </div>
+                              </div>
                             </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>백</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(0)}</div></div>
+                              <div className={styles.lower}>
+                                <div style={{ color: 'black' }}>
+                                  {invoiceChange['supply_text'] ? invoiceChange.supply_text.at(0) : invoiceData.supply_text.at(0)}
+                                </div>
+                              </div>
                             </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
-                              <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>십</div>
-                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForBill.supply_text.at(1)}</div></div>
+                              <div className={classNames(styles.upper1, { "trans_pur": !isSale })}>십</div>
+                              <div className={classNames(styles.lower1, { "trans_pur": !isSale })}>
+                                <div style={{ color: 'black' }}>
+                                  {invoiceChange['supply_text'] ? invoiceChange.supply_text.at(1) : invoiceData.supply_text.at(1)}
+                                </div>
+                              </div>
                             </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>억</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(2)}</div></div>
+                              <div className={styles.lower}>
+                                <div style={{ color: 'black' }}>
+                                  {invoiceChange['supply_text'] ? invoiceChange.supply_text.at(2) : invoiceData.supply_text.at(2)}
+                                </div>
+                              </div>
                             </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>천</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(3)}</div></div>
+                              <div className={styles.lower}>
+                                <div style={{ color: 'black' }}>
+                                  {invoiceChange['supply_text'] ? invoiceChange.supply_text.at(3) : invoiceData.supply_text.at(3)}
+                                </div>
                               </div>
+                            </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
-                              <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>백</div>
-                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForBill.supply_text.at(4)}</div></div>
+                              <div className={classNames(styles.upper1, { "trans_pur": !isSale })}>백</div>
+                              <div className={classNames(styles.lower1, { "trans_pur": !isSale })}>
+                                <div style={{ color: 'black' }}>
+                                  {invoiceChange['supply_text'] ? invoiceChange.supply_text.at(4) : invoiceData.supply_text.at(4)}
+                                </div>
                               </div>
+                            </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>십</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(5)}</div></div>
+                              <div className={styles.lower}>
+                                <div style={{ color: 'black' }}>
+                                  {invoiceChange['supply_text'] ? invoiceChange.supply_text.at(5) : invoiceData.supply_text.at(5)}
+                                </div>
                               </div>
+                            </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>만</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(6)}</div></div>
+                              <div className={styles.lower}>
+                                <div style={{ color: 'black' }}>
+                                  {invoiceChange['supply_text'] ? invoiceChange.supply_text.at(6) : invoiceData.supply_text.at(6)}
+                                </div>
                               </div>
+                            </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
-                              <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>천</div>
-                              <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForBill.supply_text.at(7)}</div></div>
+                              <div className={classNames(styles.upper1, { "trans_pur": !isSale })}>천</div>
+                              <div className={classNames(styles.lower1, { "trans_pur": !isSale })}>
+                                <div style={{ color: 'black' }}>
+                                  {invoiceChange['supply_text'] ? invoiceChange.supply_text.at(7) : invoiceData.supply_text.at(7)}
+                                </div>
                               </div>
+                            </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>백</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(8)}</div></div>
+                              <div className={styles.lower}>
+                                <div style={{ color: 'black' }}>
+                                  {invoiceChange['supply_text'] ? invoiceChange.supply_text.at(8) : invoiceData.supply_text.at(8)}
+                                </div>
                               </div>
+                            </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper}>십</div>
-                              <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.supply_text.at(9)}</div></div>
+                              <div className={styles.lower}>
+                                <div style={{ color: 'black' }}>
+                                  {invoiceChange['supply_text'] ? invoiceChange.supply_text.at(9) : invoiceData.supply_text.at(9)}
+                                </div>
+                              </div>
                             </div>
                             <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                               <div className={styles.upper0}>원</div>
-                              <div className={styles.lower0}><div style={{color:'black'}}>{dataForBill.supply_text.at(10)}</div></div>
+                              <div className={styles.lower0}>
+                                <div style={{ color: 'black' }}>
+                                  {invoiceChange['supply_text'] ? invoiceChange.supply_text.at(10) : invoiceData.supply_text.at(10)}
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
-                        {isTaxBill &&
+                        {isTaxInvoice &&
                           <div className={classNames(styles.Tax, { "trans_pur": !isSale })}>
                             <div className={classNames(styles.MidCell, { "trans_pur": !isSale })}>세 액</div>
                             <div className={classNames(styles.Units, { "trans_pur": !isSale })}>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
-                                <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>십</div>
-                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}>{dataForBill.tax_text.at(0)}</div>
+                                <div className={classNames(styles.upper1, { "trans_pur": !isSale })}>십</div>
+                                <div className={classNames(styles.lower1, { "trans_pur": !isSale })}>
+                                  {invoiceChange['tax_text'] ? invoiceChange.tax_text.at(0) : invoiceData.tax_text.at(0)}
+                                </div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>억</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(1)}</div></div>
+                                <div className={styles.lower}>
+                                  <div style={{ color: 'black' }}>
+                                    {invoiceChange['tax_text'] ? invoiceChange.tax_text.at(1) : invoiceData.tax_text.at(1)}
+                                  </div>
+                                </div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>천</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(2)}</div></div>
+                                <div className={styles.lower}>
+                                  <div style={{ color: 'black' }}>
+                                    {invoiceChange['tax_text'] ? invoiceChange.tax_text.at(2) : invoiceData.tax_text.at(2)}
+                                  </div>
+                                </div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
-                                <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>백</div>
-                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForBill.tax_text.at(3)}</div></div>
+                                <div className={classNames(styles.upper1, { "trans_pur": !isSale })}>백</div>
+                                <div className={classNames(styles.lower1, { "trans_pur": !isSale })}>
+                                  <div style={{ color: 'black' }}>
+                                    {invoiceChange['tax_text'] ? invoiceChange.tax_text.at(3) : invoiceData.tax_text.at(3)}
+                                  </div>
+                                </div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>십</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(4)}</div></div>
+                                <div className={styles.lower}>
+                                  <div style={{ color: 'black' }}>
+                                    {invoiceChange['tax_text'] ? invoiceChange.tax_text.at(4) : invoiceData.tax_text.at(4)}
+                                  </div>
+                                </div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>만</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(5)}</div></div>
+                                <div className={styles.lower}>
+                                  <div style={{ color: 'black' }}>
+                                    {invoiceChange['tax_text'] ? invoiceChange.tax_text.at(5) : invoiceData.tax_text.at(5)}
+                                  </div>
+                                </div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
-                                <div className={classNames(styles.upper1, {"trans_pur": !isSale})}>천</div>
-                                <div className={classNames(styles.lower1, {"trans_pur": !isSale})}><div style={{color:'black'}}>{dataForBill.tax_text.at(6)}</div></div>
+                                <div className={classNames(styles.upper1, { "trans_pur": !isSale })}>천</div>
+                                <div className={classNames(styles.lower1, { "trans_pur": !isSale })}>
+                                  <div style={{ color: 'black' }}>
+                                    {invoiceChange['tax_text'] ? invoiceChange.tax_text.at(6) : invoiceData.tax_text.at(6)}
+                                  </div>
+                                </div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>백</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(7)}</div></div>
+                                <div className={styles.lower}>
+                                  <div style={{ color: 'black' }}>
+                                    {invoiceChange['tax_text'] ? invoiceChange.tax_text.at(7) : invoiceData.tax_text.at(7)}
+                                  </div>
+                                </div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper}>십</div>
-                                <div className={styles.lower}><div style={{color:'black'}}>{dataForBill.tax_text.at(8)}</div></div>
+                                <div className={styles.lower}>
+                                  <div style={{ color: 'black' }}>
+                                    {invoiceChange['tax_text'] ? invoiceChange.tax_text.at(8) : invoiceData.tax_text.at(8)}
+                                  </div>
+                                </div>
                               </div>
                               <div className={classNames(styles.Unit, { "trans_pur": !isSale })}>
                                 <div className={styles.upper0}>원</div>
-                                <div className={styles.lower0}><div style={{color:'black'}}>{dataForBill.tax_text.at(9)}</div></div>
+                                <div className={styles.lower0}>
+                                  <div style={{ color: 'black' }}>
+                                    {invoiceChange['tax_text'] ? invoiceChange.tax_text.at(9) : invoiceData.tax_text.at(9)}
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -970,17 +1254,23 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               className={styles.inputTall}
                               name='memo'
                               row_no={2}
-                              value={dataForBill['memo']}
+                              value={invoiceChange['memo'] ? invoiceChange.memo : invoiceData.memo}
                               onChange={handleItemChange}
                             />
                           </div>
                         </div>
                       </div>
+                      <div className={classNames(styles.billRowAdjustContent, { 'trans_pur': !isSale })}>
+                        <Button onClick={handleStartAddContent}>{t('transaction.add_content')}</Button>
+                        <Button onClick={handleContentDelete} disabled={selectedContentRowKeys.length === 0}>{t('transaction.remove_selects')}</Button>
+                        <Button onClick={handleContentMoveUp} disabled={selectedContentRowKeys.length === 0}>{t('transaction.move_up')}</Button>
+                        <Button onClick={handleContentMoveDown} disabled={selectedContentRowKeys.length === 0}>{t('transaction.move_down')}</Button>
+                      </div>
                       <div className={classNames(styles.billRow, styles.table, { 'trans_pur': !isSale })}>
                         <Table
                           rowSelection={rowSelection}
                           pagination={{
-                            total: transactionContents.length,
+                            total: invoiceContents.length,
                             showTotal: ShowTotal,
                             showSizeChanger: true,
                             onShowSizeChange: onShowSizeChange,
@@ -989,11 +1279,11 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                           style={{ flex: 'auto', overflowX: "auto" }}
                           columns={default_columns}
                           bordered
-                          dataSource={transactionContents}
+                          dataSource={invoiceContents}
+                          rowKey={(record) => record.sub_index}
                           onRow={(record, rowIndex) => {
                             return {
                               onClick: (event) => {
-                                console.log('Double Click / Edit - ', record);
                                 handleStartEditContent(record);
                               }, // click row
                             };
@@ -1007,7 +1297,12 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               <div>합계 금액</div>
                             </div>
                             <div className={classNames(styles.content, styles.text)}>
-                              <div style={{textAlign:'end', paddingRight:'0.5rem'}}>{ConvertCurrency(dataForBill.total_price, dataForBill.show_decimal?4:0)}</div>
+                              <div style={{ textAlign: 'end', paddingRight: '0.5rem' }}>
+                                {ConvertCurrency(
+                                  invoiceChange['total_price'] ? invoiceChange.total_price : invoiceData.total_price,
+                                  invoiceData.show_decimal ? 4 : 0)
+                                }
+                              </div>
                             </div>
                           </div>
                           <div className={styles.item}>
@@ -1018,9 +1313,9 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               <Input
                                 className={styles.input}
                                 name='cash_amount'
-                                value={dataForBill['cash_amount']}
+                                value={invoiceChange['cash_amount'] ? invoiceChange.cash_amount : invoiceData.cash_amount}
                                 onChange={handleItemChange}
-                                style={{textAlign: 'end'}}
+                                style={{ textAlign: 'end' }}
                               />
                             </div>
                           </div>
@@ -1032,9 +1327,9 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               <Input
                                 className={styles.input}
                                 name='check_amount'
-                                value={dataForBill['check_amount']}
+                                value={invoiceChange['check_amount'] ? invoiceChange.check_amount : invoiceData.check_amount}
                                 onChange={handleItemChange}
-                                style={{textAlign: 'end'}}
+                                style={{ textAlign: 'end' }}
                               />
                             </div>
                           </div>
@@ -1046,9 +1341,9 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               <Input
                                 className={styles.input}
                                 name='note_amount'
-                                value={dataForBill['note_amount']}
+                                value={invoiceChange['note_amount'] ? invoiceChange.note_amount : invoiceData.note_amount}
                                 onChange={handleItemChange}
-                                style={{textAlign: 'end'}}
+                                style={{ textAlign: 'end' }}
                               />
                             </div>
                           </div>
@@ -1060,54 +1355,70 @@ const TaxInvoiceEditModel = ({open, close, data, contents}) => {
                               <Input
                                 className={styles.input}
                                 name='receivable_amount'
-                                value={dataForBill['receivable_amount']}
+                                value={invoiceChange['receivable_amount'] ? invoiceChange.receivable_amount : invoiceData.receivable_amount}
                                 onChange={handleItemChange}
-                                style={{textAlign: 'end'}}
+                                style={{ textAlign: 'end' }}
                               />
                             </div>
                           </div>
                         </div>
                         <div className={classNames(styles.NoteParts, { 'trans_pur': !isSale })}>
-                          <div style={{display: 'flex', flexDirection: 'row', justifyContent:'center'}}>
-                            <div className={styles.text}><div>이 금액을 </div></div>
+                          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                            <div className={styles.text}><div>이 금액을  </div></div>
                             <Select
                               value={selectValues.receive_type}
                               options={receive_types}
                               onChange={selected => handleSelectChange('receive_type', selected)}
                             />
-                            <div className={styles.text}><div> 함.</div></div>
+                            <div className={styles.text}><div>  함.</div></div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="text-center">
-                      <button
-                        type="button"
-                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                        onClick={handleSaveTaxInvoice}
-                      >
-                        {t('common.save')}
-                      </button>
-                      &nbsp;&nbsp;
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-rounded"
-                        data-bs-dismiss="modal"
-                        onClick = {handleClose}
-                      >
-                        {t('common.cancel')}
-                      </button>
-                    </div>
+                    { (Object.keys(invoiceChange).length > 0 || needSave) &&
+                      <div className="text-center">
+                        <button
+                          type="button"
+                          className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                          onClick={handleSaveTaxInvoice}
+                        >
+                          {t('common.save')}
+                        </button>
+                        &nbsp;&nbsp;
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-rounded"
+                          data-bs-dismiss="modal"
+                          onClick={handleClose}
+                        >
+                          {t('common.cancel')}
+                        </button>
+                      </div>
+                    }
                   </form>
                 </div>
                 <div className="tab-pane show" id="tax-bill-print">
-                  <TransactionBillPrint billData={dataForBill} contents={contents}/>
+                  <TaxInvoicePrint
+                    invoiceData={printData}
+                    contents={invoiceContents}
+                    supplierData={supplier}
+                    receiverData={receiver}
+                  />
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <TaxInvoiceContentModal
+        setting={settingForContentModal}
+        open={isContentModalOpen}
+        original={orgContentModalData}
+        edited={editedContentModalData}
+        handleEdited={setEditedContentModalData}
+        handleOk={handleContentModalOk}
+        handleCancel={handleContentModalCancel}
+      />
       <MessageModal
         title={message.title}
         message={message.message}

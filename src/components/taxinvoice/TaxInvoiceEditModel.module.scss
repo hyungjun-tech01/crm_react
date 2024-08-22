@@ -253,6 +253,25 @@
         border-right: 2px solid #ff0505;
         border-bottom: 2px solid #ff0505;
     }
+    .AdjustContents
+    {
+        padding: 0.5rem 1rem;
+        justify-content: right;
+    }
+}
+.billRowAdjustContent
+{
+    border-left: 2px solid #ff0505;
+    border-right: 2px solid #ff0505;
+    border-top: 2px solid #ff0505;
+    display: flex;
+    flex-direction: row;
+    justify-items: start;
+    justify-content: start;
+    padding: 0.5rem 1rem;
+    font-size: 14px;
+    color: #ff0505;
+    text-align: center;
 }
 .table {
     flex: auto;

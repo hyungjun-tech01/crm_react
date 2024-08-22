@@ -90,7 +90,7 @@ const Leads = () => {
     const [singleDate, setSingleDate] = useState(initialSingleDate);
   
     const singleDateSettings = [
-      { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
+      //{ label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
     ];
 
   const handleMultiQueryModal = () => {

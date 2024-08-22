@@ -31,7 +31,7 @@ const TaxInvoiceContentModal = (props) => {
 
     //===== Handles to edit 'Contents' ==================================================
     const content_items = [
-        { name: 'month_day', title: t('transaction.transaction_date'), detail: { type: 'date', extra: 'long' } },
+        { name: 'invoice_date', title: t('transaction.transaction_date'), detail: { type: 'date', extra: 'long' } },
         { name: 'product_name', title: t('purchase.product_name'), detail: {
                 type: 'select', options: productOptions, group: 'product_class_name', extra: 'long'
             }
@@ -47,18 +47,13 @@ const TaxInvoiceContentModal = (props) => {
     ];
 
     const handleTime = (name, time) => {
-        let timeValue = null;
-        if(name === 'month_day') {
-            timeValue = `${time.getMonth()+1}.${time.getDate()}`;
-        } else {
-            timeValue = time;
-        };
         const tempData = {
             ...edited,
-            [name]: timeValue,
+            [name]: time,
         };
         handleEdited(tempData)
     };
+
     const handleSelect = (name, value) => {
         let tempData = { ...edited };
         if(name === 'product_name'){
@@ -71,6 +66,7 @@ const TaxInvoiceContentModal = (props) => {
 
         handleEdited(tempData);
     };
+
     const handleValue = (event) => {
         const target_name = event.target.name;
         const target_value = event.target.value;
@@ -156,6 +152,7 @@ const TaxInvoiceContentModal = (props) => {
         >
             {content_items && content_items.map((item, index) => {
                 let modifiedDetail = { ...item.detail };
+                
                 if (item.detail.type === 'date') {
                     modifiedDetail['editing'] = handleTime;
                 } else if (item.detail.type === 'select') {
@@ -163,6 +160,7 @@ const TaxInvoiceContentModal = (props) => {
                 } else {
                     modifiedDetail['editing'] = handleValue;
                 };
+
                 return (
                     <DetailCardItem
                         key={index}

@@ -7,9 +7,7 @@ import { Table } from "antd";
 import "antd/dist/reset.css";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
-import SystemUserModel from "../task/SystemUserModel";
 
-import { CompanyRepo } from "../../repository/company";
 import {
   atomTaxInvoiceArray,
   atomCompanyState,
@@ -17,11 +15,15 @@ import {
   atomTaxInvoiceState,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
+
+import { CompanyRepo } from "../../repository/company";
+import { TaxInvoiceRepo, taxInvoiceColumn } from "../../repository/tax_invoice";
 import { UserRepo } from "../../repository/user";
+
 import { compareCompanyName , compareText, ConvertCurrency } from "../../constants/functions";
 import TaxInvoiceEditModel from "../taxinvoice/TaxInvoiceEditModel";
+import SystemUserModel from "../task/SystemUserModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
-import { TaxInvoiceRepo, taxInvoiceColumn } from "../../repository/tax_invoice";
 
 
 const TaxInovices = () => {
@@ -31,7 +33,6 @@ const TaxInovices = () => {
   //===== [RecoilState] Related with Company ==========================================
   const companyState = useRecoilValue(atomCompanyState);
   const { tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
-  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Tax Invoice ======================================
@@ -48,9 +49,6 @@ const TaxInovices = () => {
   //===== Handles to edit this ========================================================
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
-  const [ taxInvoiceData, setTaxInvoiceData ] = useState(null);
-  const [ taxInvoiceContents, setTaxInvoiceContents ] = useState(null);
-
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
 
@@ -359,8 +357,6 @@ const TaxInovices = () => {
         <TaxInvoiceEditModel
           open={openTaxInvoice}
           close={()=>setOpenTaxInvoice(false)}
-          data={taxInvoiceData}
-          contents={taxInvoiceContents}
         />
         <MultiQueryModal 
           title= {t('quotation.quotation_multi_query')}
