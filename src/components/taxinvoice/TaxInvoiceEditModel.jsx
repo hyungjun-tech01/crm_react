@@ -133,7 +133,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
       }
     } else {
       if (name === 'transaction_type') {
-        console.log('handleSelectChange / transaction_type :', selected);
         if (selected.value === '매출') {
           setIsSale(true);
           if (supplier !== company_info) {
@@ -148,7 +147,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
           };
         };
       } else if (name === 'invoice_type') {
-        console.log('handleSelectChange / invoice_type :', selected);
         if (selected.value === '세금계산서') {
           setIsTaxInvoice(true);
         } else {
@@ -181,7 +179,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
   const rowSelection = {
     selectedRowKeys: selectedContentRowKeys,
     onChange: (selectedRowKeys, selectedRows) => {
-      console.log('selected :', selectedRowKeys);
       setSelectedContentRowKeys(selectedRowKeys);
     },
   };
@@ -495,7 +492,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
 
     const tempAmountText = typeof supply_price === 'number'
       ? supply_price.toString() : supply_price;
-    console.log('handleShowNumbers : ', tempAmountText);
     const tempVacantCount = 11 - tempAmountText.length;
 
     if (tempVacantCount < 0) {
@@ -602,7 +598,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
       };
 
       if(inputData) {
-        console.log('TaxInvoiceEditModel / inpuData :', inputData);
         // invoiceData ------------------------------
         const tempSelectValues = {
           transaction_type: inputData.transaction_type === '매출' ? trans_types[0] : trans_types[1],
@@ -671,7 +666,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
         setInvoiceData(tempInvoiceData);
       };
       // Copy contents into 'transaction contents' -------------------
-      console.log('[TaxInvoiceEditModel] check :', contents);
       if (!!contents) {
         setInvoiceContents(contents);
       } else {
@@ -688,7 +682,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
                   sub_index: index,
               }
           });
-          console.log('[TaxInvoiceEditModel] check :', tempContents);
           setInvoiceContents(tempContents);
         } else {
           setInvoiceContents([]);
@@ -1291,7 +1284,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
                           onRow={(record, rowIndex) => {
                             return {
                               onClick: (event) => {
-                                console.log('Double Click / Edit - ', record);
                                 handleStartEditContent(record);
                               }, // click row
                             };
