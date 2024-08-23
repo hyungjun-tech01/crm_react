@@ -15,7 +15,6 @@ import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import {
   atomCompanyState,
-  atomCompanyForSelection,
   atomCurrentTaxInvoice,
   defaultTaxInvoice,
 } from "../../atoms/atoms";
@@ -72,7 +71,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
 
   //===== [RecoilState] Related with Company =========================================
   const companyState = useRecoilValue(atomCompanyState);
-  const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
   //===== Handles to edit 'TaxInvoiceEditModel' ======================================
@@ -605,8 +603,8 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
           inputData = {...currentTaxInvoice};
         };
       };
-
-      if(inputData && Object.keys(inputData).length > 0) {
+      console.log('TaxInvoiceEditModel / useEffect : ', inputData);
+      if(!!inputData && Object.keys(inputData).length > 0) {
         // invoiceData ------------------------------
         const tempSelectValues = {
           transaction_type: inputData.transaction_type === '매출' ? trans_types[0] : trans_types[1],

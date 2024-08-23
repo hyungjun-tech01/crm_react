@@ -67,7 +67,6 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
 
   //===== [RecoilState] Related with Company =========================================
   const [companyState] = useRecoilState(atomCompanyState);
-  const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
   //===== Handles to edit 'TransactionEditModel' ======================================
@@ -691,11 +690,9 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
         const tempIsVatIncluded = currentTransaction.tax_price && currentTransaction.tax_price > 0;
         setIsVatIncluded(tempIsVatIncluded);
 
-        const tempCurrentCompany = companyForSelection.filter(item => item.value.company_code === currentTransaction.company_code);
         const tempData = {
           trans_type: tempIsSale ? trans_types[0] : trans_types[1],
           tax_type: tempIsVatIncluded ? 'vat_included' : 'vat_excluded',
-          company_selection: tempCurrentCompany.length > 0 ? tempCurrentCompany[0]: null,
         };
         setSelectData(tempData);
 
@@ -822,7 +819,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
                                   <AddSearchItem
                                     category='transaction'
                                     name='company_name'
-                                    defaultValue={transactionChange.company_name}
+                                    defaultValue={orgTransaction.company_name}
                                     edited={transactionChange}
                                     setEdited={setTransactionChange}
                                   />

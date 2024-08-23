@@ -31,20 +31,15 @@ const AddSearchItem = (props) => {
                         {required && <span className="text-danger">*</span>}
                     </div>
                 )}
-                <input
-                    className={styleName}
-                    id="add_adress_input"
-                    type="text"
-                    value={edited[name] ? edited[name] : (defaultValue ? defaultValue : '')}
-                    placeholder={title}
-                    disabled    //={disabled ? disabled : false}
-                />
+                <label className={styleName}>
+                    {edited[name] ? edited[name] : (defaultValue ? defaultValue : '')}
+                </label>
                 <div className="add-basic-btn" onClick={() => {if(!disabled) setIsPopupOpen(!isPopupOpen)}}>
                     <FiSearch />
                 </div>
             </div>
             <SelectListModal
-                title={`${title} ${t('common.search')}`}
+                title={`${title ? title : ''} ${t('common.search')}`}
                 condition={{category: category, item: name}}
                 open={isPopupOpen}
                 handleChange={(data) => {

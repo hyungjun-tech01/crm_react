@@ -172,7 +172,7 @@ const ConsultingDetailsModel = () => {
   }, [consultingState, cookies.myLationCrmUserId, currentConsultingCode, selectedConsulting]);
 
   useEffect(() => {
-    if (((userState & 1) === 1) && ((consultingState & 1) === 1)) {
+    if ((userState & 1) === 1) {
       setIsAllNeededDataLoaded(true);
     };
   }, [userState, consultingState])
@@ -263,7 +263,7 @@ const ConsultingDetailsModel = () => {
                               style={{ display: 'flex', marginBottom: '0.5rem' }}
                               wrap
                             >
-                              {consulting_items_info.map((item, index) =>
+                              { consulting_items_info.map((item, index) =>
                                 <DetailCardItem
                                   key={index}
                                   title={t(item.title)}
@@ -278,7 +278,7 @@ const ConsultingDetailsModel = () => {
                         </div>
                       </div>
                     </div>
-                    {editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&
+                    { editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&
                       <div className="text-center py-3">
                         <button
                           type="button"

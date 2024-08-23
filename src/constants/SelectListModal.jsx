@@ -181,6 +181,7 @@ const SelectListModal = (props) => {
                 ref={inputRef}
                 placeholder={t('comment.input_search_text')}
                 allowClear
+                value={inputText}
                 addonAfter={<div><FiSearch onClick={(e) => handleSearch(inputText)} /></div>}
                 onChange={(e) => setInputText(e.target.value)}
                 onPressEnter={(e) => handleSearch(inputText)}
