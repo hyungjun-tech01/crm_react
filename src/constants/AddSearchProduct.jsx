@@ -52,7 +52,6 @@ const AddSearchProduct = (props) => {
                 handleChange={(data) => {
                     delete data.index;
                     delete data.component;
-                    console.log('AddSearchProduct / current :', edited);
                     const modified = {
                         ...edited,
                         product_code: data.product_code,

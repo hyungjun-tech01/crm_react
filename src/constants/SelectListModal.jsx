@@ -37,6 +37,7 @@ const SelectListModal = (props) => {
             case 'company':
             case 'transaction':
             case 'purchase':
+            case 'tax_invoice':
                 if(condition.item === 'company_name')
                     response = searchCompanies(condition.item, input);
                 break;
@@ -120,6 +121,17 @@ const SelectListModal = (props) => {
                 if(condition.item === 'company_name') {
                     modifiedData['company_code'] = data.company_code;
                     modifiedData['company_name'] = data.company_name;
+                };
+                break;
+            case 'tax_invoice':
+                if(condition.item === 'company_name') {
+                    modifiedData['company_code'] = data.company_code;
+                    modifiedData['company_name'] = data.company_name;
+                    modifiedData['company_address'] = data.company_address;
+                    modifiedData['ceo_name'] = data.ceo_name;
+                    modifiedData['business_type'] = data.business_type;
+                    modifiedData['business_item'] = data.business_item;
+                    modifiedData['business_registration_code'] = data.business_registration_code;
                 };
                 break;
             default:

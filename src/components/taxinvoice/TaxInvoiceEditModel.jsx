@@ -20,14 +20,17 @@ import {
   defaultTaxInvoice,
 } from "../../atoms/atoms";
 import { DefaultTaxInvoiceContent, TaxInvoiceRepo } from "../../repository/tax_invoice";
+import { company_info } from "../../repository/user";
+
+import TaxInvoiceContentModal from "./TaxInvoiceContentModal";
+import TaxInvoicePrint from "./TaxInvoicePrint";
 
 import { ConvertCurrency } from "../../constants/functions";
 import MessageModal from "../../constants/MessageModal";
-import TaxInvoicePrint from "./TaxInvoicePrint";
+import SelectListModal from "../../constants/SelectListModal";
 
+import { FiSearch } from "react-icons/fi";
 import styles from './TaxInvoiceEditModel.module.scss';
-import { company_info } from "../../repository/user";
-import TaxInvoiceContentModal from "./TaxInvoiceContentModal";
 
 const default_invoice_data = {
   transaction_type: '',
@@ -109,56 +112,32 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
     setSelectValue(tempSelectValues);
 
     // set changed data ------------------------------------
-    if (name === 'company_name') {
-      if (isSale) {
-        setReceiver({
-          company_code: selected.value.company_code,
-          company_name: selected.value.company_name,
-          company_address: selected.value.company_address,
-          ceo_name: selected.value.ceo_name,
-          business_type: selected.value.business_type,
-          business_item: selected.value.business_item,
-          business_registration_code: selected.value.business_registration_code,
-        });
+    if (name === 'transaction_type') {
+      if (selected.value === '매출') {
+        setIsSale(true);
+        if (supplier !== company_info) {
+          setReceiver({ ...supplier });
+          setSupplier(company_info);
+        };
       } else {
-        setSupplier({
-          company_code: selected.value.company_code,
-          company_name: selected.value.company_name,
-          company_address: selected.value.company_address,
-          ceo_name: selected.value.ceo_name,
-          business_type: selected.value.business_type,
-          business_item: selected.value.business_item,
-          business_registration_code: selected.value.business_registration_code,
-        });
-      }
-    } else {
-      if (name === 'transaction_type') {
-        if (selected.value === '매출') {
-          setIsSale(true);
-          if (supplier !== company_info) {
-            setReceiver({ ...supplier });
-            setSupplier(company_info);
-          };
-        } else {
-          setIsSale(false);
-          if (receiver !== company_info) {
-            setSupplier({ ...receiver });
-            setReceiver(company_info);
-          };
-        };
-      } else if (name === 'invoice_type') {
-        if (selected.value === '세금계산서') {
-          setIsTaxInvoice(true);
-        } else {
-          setIsTaxInvoice(false);
+        setIsSale(false);
+        if (receiver !== company_info) {
+          setSupplier({ ...receiver });
+          setReceiver(company_info);
         };
       };
-      const modifiedData = {
-        ...invoiceChange,
-        [name]: selected.value,
+    } else if (name === 'invoice_type') {
+      if (selected.value === '세금계산서') {
+        setIsTaxInvoice(true);
+      } else {
+        setIsTaxInvoice(false);
       };
-      setInvoiceChange(modifiedData);
     };
+    const modifiedData = {
+      ...invoiceChange,
+      [name]: selected.value,
+    };
+    setInvoiceChange(modifiedData);
   }, [invoiceChange, isSale, receiver, selectValues, supplier]);
 
   const trans_types = [
@@ -476,6 +455,36 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
     setSelectedContentRowKeys(tempKeys);
   };
 
+
+  //===== Handles to edit 'Company' =================================================
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  const handleSelectCompany = (data) => {
+    console.log('handleSelectCompany', data);
+    if (isSale) {
+      setReceiver({
+        company_code: data.company_code,
+        company_name: data.company_name,
+        company_address: data.company_address,
+        ceo_name: data.ceo_name,
+        business_type: data.business_type,
+        business_item: data.business_item,
+        business_registration_code: data.business_registration_code,
+      });
+    } else {
+      setSupplier({
+        company_code: data.company_code,
+        company_name: data.company_name,
+        company_address: data.company_address,
+        ceo_name: data.ceo_name,
+        business_type: data.business_type,
+        business_item: data.business_item,
+        business_registration_code: data.business_registration_code,
+      });
+    };
+  };
+
+
   //===== Handles for special actions =============================================
   const handleShowDecimal = (e) => {
     const tempData = {
@@ -603,7 +612,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
           transaction_type: inputData.transaction_type === '매출' ? trans_types[0] : trans_types[1],
           invoice_type: inputData.invoice_type === '세금계산서' ? invoice_types[0] : invoice_types[1],
           receive_type: receive_types[0],
-          company_name: { label: inputData.company_name, value: inputData.company_name },
         };
         setSelectValue(tempSelectValues);
 
@@ -862,12 +870,12 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
                                 {isSale ?
                                   <label className={styles.textStart}>{supplier.company_name}</label>
                                   :
-                                  <Select
-                                    defaultValue={selectValues['company_name']}
-                                    value={selectValues['company_name']}
-                                    options={companyForSelection}
-                                    onChange={selected => handleSelectChange('company_name', selected)}
-                                  />
+                                  <div className={styles.searchWarpper}>
+                                    <label className={styles.textStart}>{supplier.company_name}</label>
+                                    <div className={styles.searchIcon} onClick={() => setIsPopupOpen(!isPopupOpen)}>
+                                        <FiSearch />
+                                    </div>
+                                  </div>
                                 }
                               </div>
                               <div className={classNames(styles.subTitle, styles.text, { 'trans_pur': !isSale })}>
@@ -966,12 +974,12 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
                               </div>
                               <div className={classNames(styles.content, styles.text, { 'trans_pur_bd': !isSale })}>
                                 {isSale ?
-                                  <Select
-                                    defaultValue={selectValues['company_name']}
-                                    value={selectValues['company_name']}
-                                    options={companyForSelection}
-                                    onChange={selected => handleSelectChange('company_name', selected)}
-                                  />
+                                  <div className={styles.searchWarpper}>
+                                    <label className={styles.textStart}>{receiver.company_name}</label>
+                                    <div className={styles.searchIcon} onClick={() => setIsPopupOpen(!isPopupOpen)}>
+                                        <FiSearch />
+                                    </div>
+                                  </div>
                                   :
                                   <label className={styles.textStart}>{receiver.company_name}</label>
                                 }
@@ -1425,6 +1433,17 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
         open={isMessageModalOpen}
         handleOk={() => setIsMessageModalOpen(false)}
       />
+      <SelectListModal
+        title={`${t('company.company')} ${t('common.search')}`}
+        condition={{category: 'tax_invoice', item: 'company_name'}}
+        open={isPopupOpen}
+        handleChange={(data) => {
+            delete data.index;
+            delete data.component;
+            handleSelectCompany(data);
+        }}
+        handleClose={()=>setIsPopupOpen(false)}
+    />
     </div>
   );
 };
