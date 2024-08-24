@@ -9,8 +9,11 @@ import { UserRepo } from "../../repository/user";
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailDateItem from "../../constants/DetailDateItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
+import { useTranslation } from "react-i18next";
 
 const UserDetailModel = () => {
+  const { t } = useTranslation();
+
   const { Panel } = Collapse;
   const selectedUser = useRecoilValue(atomCurrentUser);
   const { modifyUser } = useRecoilValue(UserRepo);
@@ -37,6 +40,7 @@ const UserDetailModel = () => {
   }, [editedValues, selectedUser]);
 
   const handleEditing = useCallback((e) => {
+    console.log('editedValues',editedValues);
     const tempEdited = {
       ...editedValues,
       [e.target.name]: e.target.value,
@@ -45,6 +49,7 @@ const UserDetailModel = () => {
   }, [editedValues]);
 
   const handleEndEdit = useCallback((name) => {
+
     if(editedValues[name] === selectedUser[name]){
       const tempEdited = {
         ...editedValues,
@@ -67,6 +72,8 @@ const UserDetailModel = () => {
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, selectedUser]);
 
+  
+
   // --- Funtions for Saving ---------------------------------
   const handleCheckSaved = useCallback((name) => {
     return savedValues !== null && name in savedValues;
@@ -81,12 +88,12 @@ const UserDetailModel = () => {
   }, [savedValues]);
 
   const handleSaveAll = useCallback(() => {
-    if(savedValues !== null
+    if(editedValues !== null
       && selectedUser
       && selectedUser !== defaultUser)
     {
       const temp_all_saved = {
-        ...savedValues,
+        ...editedValues,
         action_type: "UPDATE",
         modify_user: cookies.myLationCrmUserId,
         userId: selectedUser.userId,
@@ -102,7 +109,7 @@ const UserDetailModel = () => {
     };
     setEditedValues(null);
     setSavedValues(null);
-  }, [cookies.myLationCrmUserId, modifyUser, savedValues, selectedUser]);
+  }, [cookies.myLationCrmUserId, modifyUser, savedValues,editedValues, selectedUser]);
 
   const handleCancelAll = useCallback(() => {
     setEditedValues(null);
@@ -131,7 +138,7 @@ const UserDetailModel = () => {
     const tempEdited = {
       ...editedValues,
     };
-    delete tempEdited.establishDate;
+    delete tempEdited.establishDate;  
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, orgEstablishDate, establishDate]);
 
@@ -278,7 +285,7 @@ const UserDetailModel = () => {
                                   defaultText={selectedUser.userName}
                                   saved={savedValues}
                                   name="userName"
-                                  title="Name"
+                                  title={ t('user.name')}
                                   no_border={true}
                                   checkEdit={handleCheckEditState}
                                   startEdit={handleStartEdit}
@@ -348,7 +355,7 @@ const UserDetailModel = () => {
                                   cancelSaved={handleCancelSaved}
                                 />          
                                 <DetailLabelItem
-                                  defaultText={selectedUser.group_}
+                                  defaultText={selectedUser.private_group}
                                   saved={savedValues}
                                   name="group_"
                                   title="Group"
@@ -372,7 +379,21 @@ const UserDetailModel = () => {
                                   endEdit={handleEndEdit}
                                   checkSaved={handleCheckSaved}
                                   cancelSaved={handleCancelSaved}
-                                />       
+                                />
+                                <DetailLabelItem
+                                  defaultText={selectedUser.memo}
+                                  saved={savedValues}
+                                  name="password"
+                                  title="password"
+                                  row_no={3}
+                                  no_border={true}
+                                  checkEdit={handleCheckEditState}
+                                  startEdit={handleStartEdit}
+                                  editing={handleEditing}
+                                  endEdit={handleEndEdit}
+                                  checkSaved={handleCheckSaved}
+                                  cancelSaved={handleCancelSaved}
+                                />          
                               </tbody>
                             </table>
                           {/* </Panel>
@@ -382,7 +403,7 @@ const UserDetailModel = () => {
                   </div>
 
                 </div>
-                { savedValues !== null && Object.keys(savedValues).length !== 0 &&
+                { editedValues !== null && Object.keys(editedValues).length !== 0 &&
                   <div className="text-center py-3">
                     <button
                       type="button"

@@ -19,7 +19,7 @@ const UserInfo = () => {
     "myLationCrmUserName",
     "myLationCrmAuthToken",
   ]);
-  console.log("currentUser", currentUser.userId);
+  console.log("currentUser", currentUser);
 
 
   
@@ -112,7 +112,7 @@ const UserInfo = () => {
                               <li>
                                 <div className="title">Group:</div>
                                 <div className="text">
-                                  <a>&nbsp;{currentUser.group_}</a>
+                                  <a>&nbsp;{currentUser.private_group}</a>
                                 </div>
                               </li>                              
                               <li>
@@ -133,8 +133,8 @@ const UserInfo = () => {
                           href="#"
                           onClick={()=>{handleClickUserEdit(cookies.myLationCrmUserId)}}
                         >
-                          <i className="fa fa-pencil" />
-                        </a>
+                          <i className="fa fa-pencil" />Edit
+                        </a>  
                       </div>
                     </div>
                   </div>
