@@ -39,9 +39,8 @@ const SelectProductModal = (props) => {
         setSelectedItem({...data});
     };
     const handleOk = () => {
-        if(Object.keys(selectedItem).length > 0){
-            handleChange(selectedItem);
-        };
+        if(!selectedItem || selectedItem.length === 0) return;
+        handleChange(selectedItem);
         handleCancel();
     };
     const handleCancel = () => {

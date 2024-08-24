@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import "react-datepicker/dist/react-datepicker.css";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import {
-  atomCurrentCompany,
   atomCurrentLead,
   defaultLead,
 } from "../../atoms/atoms";
@@ -46,7 +45,6 @@ const ConsultingAddModel = (props) => {
 
 
   //===== [RecoilState] Related with Company ==========================================
-  const currentCompany = useRecoilValue(atomCurrentCompany);
   const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
@@ -79,8 +77,8 @@ const ConsultingAddModel = (props) => {
         modified['mobile_number'] = currentLead.mobile_number;
         modified['phone_number'] = currentLead.phone_number;
         modified['email'] = currentLead.email;
-
-        setCurrentCompany(currentLead.company_code);
+        modified['company_code'] = currentLead.company_code;
+        modified['company_name'] = currentLead.company_name;
       };
     };
     setConsultingChange(modified);
@@ -103,25 +101,9 @@ const ConsultingAddModel = (props) => {
   };
 
   const handleSelectChange = (name, selected) => {
-    let modifiedData = null;
-    if (name === 'lead_name') {
-      modifiedData = {
-        ...consultingChange,
-        lead_code: selected.value.lead_code,
-        lead_name: selected.value.lead_name,
-        department: selected.value.department,
-        position: selected.value.position,
-        mobile_number: selected.value.mobile_number,
-        phone_number: selected.value.phone_number,
-        email: selected.value.email,
-        company_name: selected.value.company_name,
-        company_code: selected.value.company_code,
-      };
-    } else {
-      modifiedData = {
-        ...consultingChange,
-        [name]: selected.value,
-      };
+    const modifiedData = {
+      ...consultingChange,
+      [name]: selected.value,
     };
     setConsultingChange(modifiedData);
   };
@@ -139,12 +121,11 @@ const ConsultingAddModel = (props) => {
 
     const newConsultingData = {
       ...consultingChange,
-      company_code: currentCompany.company_code,
-      compnay_name: currentCompany.company_name,
       action_type: 'ADD',
       counter: 0,
       modify_user: cookies.myLationCrmUserId,
     };
+
     const result = modifyConsulting(newConsultingData);
     result.then((res) => {
       if (res.result) {
@@ -155,7 +136,7 @@ const ConsultingAddModel = (props) => {
         setIsMessageModalOpen(true);
       };
     });
-  }, [cookies.myLationCrmUserId, consultingChange, modifyConsulting, currentCompany]);
+  }, [cookies.myLationCrmUserId, consultingChange, modifyConsulting]);
 
 
   //===== useEffect functions ==========================================
