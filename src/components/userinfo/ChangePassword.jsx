@@ -11,7 +11,7 @@ import DetailDateItem from "../../constants/DetailDateItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
 import { useTranslation } from "react-i18next";
 
-const UserDetailModel = () => {
+const ChangePassword = () => {
   const { t } = useTranslation();
 
   const { Panel } = Collapse;
@@ -178,7 +178,7 @@ const UserDetailModel = () => {
     <>
       <div
         className="modal right fade"
-        id="user-detail"
+        id="change-password"
         tabIndex={-1}
         role="dialog"
         aria-modal="true"
@@ -282,95 +282,11 @@ const UserDetailModel = () => {
                             <table className="table">
                               <tbody>
                                 <DetailLabelItem
-                                  defaultText={selectedUser.userName}
+                                  defaultText=""
                                   saved={savedValues}
-                                  name="userName"
-                                  title={ t('user.name')}
-                                  no_border={true}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                <DetailLabelItem
-                                  defaultText={selectedUser.department}
-                                  saved={savedValues}
-                                  name="department"
-                                  title= {t('user.department')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                               <DetailLabelItem
-                                  defaultText={selectedUser.position}
-                                  saved={savedValues}
-                                  name="position"
-                                  title= {t('user.position')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />     
-                                <DetailLabelItem
-                                  defaultText={selectedUser.phoneNumber}
-                                  saved={savedValues}
-                                  name="phoneNumber"
-                                  title= {t('user.phone')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />                                                                 
-                                <DetailLabelItem
-                                  defaultText={selectedUser.mobileNumber}
-                                  saved={savedValues}
-                                  name="mobileNumber"
-                                  title= {t('user.mobile')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                               <DetailLabelItem
-                                  defaultText={selectedUser.email}
-                                  saved={savedValues}
-                                  name="email"
-                                  title= {t('user.e_mail')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />          
-                                <DetailLabelItem
-                                  defaultText={selectedUser.private_group}
-                                  saved={savedValues}
-                                  name="private_group"
-                                  title= {t('user.private_group')}
-                                  checkEdit={handleCheckEditState}
-                                  startEdit={handleStartEdit}
-                                  editing={handleEditing}
-                                  endEdit={handleEndEdit}
-                                  checkSaved={handleCheckSaved}
-                                  cancelSaved={handleCancelSaved}
-                                />
-                                 <DetailTextareaItem
-                                  defaultText={selectedUser.memo}
-                                  saved={savedValues}
-                                  name="memo"
-                                  title= {t('user.memo')}
+                                  name="current_password"
+                                  type = "password"
+                                  title= {t('user.current_password')}
                                   row_no={3}
                                   no_border={true}
                                   checkEdit={handleCheckEditState}
@@ -379,7 +295,37 @@ const UserDetailModel = () => {
                                   endEdit={handleEndEdit}
                                   checkSaved={handleCheckSaved}
                                   cancelSaved={handleCancelSaved}
-                                />       
+                                />
+                                <DetailLabelItem
+                                  defaultText=""
+                                  saved={savedValues}
+                                  name="change_password"
+                                  type = "password"
+                                  title= {t('user.change_password')}
+                                  row_no={3}
+                                  no_border={true}
+                                  checkEdit={handleCheckEditState}
+                                  startEdit={handleStartEdit}
+                                  editing={handleEditing}
+                                  endEdit={handleEndEdit}
+                                  checkSaved={handleCheckSaved}
+                                  cancelSaved={handleCancelSaved}
+                                />
+                                <DetailLabelItem
+                                  defaultText=""
+                                  saved={savedValues}
+                                  name="change_password_confirm"
+                                  type = "password"
+                                  title= {t('user.change_password_confirm')}
+                                  row_no={3}
+                                  no_border={true}
+                                  checkEdit={handleCheckEditState}
+                                  startEdit={handleStartEdit}
+                                  editing={handleEditing}
+                                  endEdit={handleEndEdit}
+                                  checkSaved={handleCheckSaved}
+                                  cancelSaved={handleCancelSaved}
+                                />          
                               </tbody>
                             </table>
                           {/* </Panel>
@@ -419,4 +365,4 @@ const UserDetailModel = () => {
   );
 };
 
-export default UserDetailModel;
+export default ChangePassword;

@@ -349,14 +349,14 @@ const koResource = {
             phone:'전화번호',
             mobile:'휴대전화',
             e_mail:'이메일',
-            group:'그룹',
+            private_group:'그룹',
             memo:'메모',
             name:'이름',
             department:'부서',
             position:'직급',
             current_password:'현재 비밀번호',
             change_password:'변경 비밀번호',
-            change_password2:'변경 비밀번호',
+            change_password_confirm:'변경 비밀번호 학인',
         }
     },
 }

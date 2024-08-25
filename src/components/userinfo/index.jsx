@@ -8,6 +8,7 @@ import {useRecoilValue} from "recoil";
 import { UserRepo } from "../../repository/user";
 
 import UserDetailModel from "./UserDetailModel.jsx";
+import ChangePassword from "./ChangePassword.jsx";
 // import DatePicker from "react-datepicker";
 
 
@@ -121,6 +122,17 @@ const UserInfo = () => {
                                 &nbsp;{currentUser.memo}
                                 </div>
                               </li>
+                              <li>
+                                <button
+                                className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
+                                id="add-task"
+                                data-bs-toggle="modal"
+                                data-bs-target="#change-password"
+                                onClick={()=>{handleClickUserEdit(cookies.myLationCrmUserId)}}
+                                >
+                                Change Password
+                              </button>
+                              </li>                              
                             </ul>
                           </div>
                         </div>
@@ -378,6 +390,7 @@ const UserInfo = () => {
         </div>
         {/* /Page Content */}
         <UserDetailModel />        
+        <ChangePassword />
       </div>
     </HelmetProvider>
   );
