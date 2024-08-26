@@ -7,7 +7,8 @@ import { ConvertCurrency, formatDate } from "../../constants/functions";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Add } from "@mui/icons-material";
 
-import { atomCurrentTransaction, atomTransactionByCompany, defaultTransaction } from '../../atoms/atoms';
+import { atomTransactionByCompany, defaultTransaction } from '../../atoms/atoms';
+import { TransactionRepo } from '../../repository/transaction';
 
 const CompanyTransactionModel = (props) => {
     const { openTransaction } = props;
@@ -16,6 +17,7 @@ const CompanyTransactionModel = (props) => {
 
     //===== [RecoilState] Related with Transaction ======================================
     const transactionByCompany = useRecoilValue(atomTransactionByCompany);
+    const { setCurrentTransaction } = useRecoilValue(TransactionRepo);
     
     // --- Variables for only Transaction ------------------------------------------------
     const [selectedTransactionRowKeys, setSelectedTransactionRowKeys] = useState([]);
@@ -134,7 +136,7 @@ const CompanyTransactionModel = (props) => {
                             className="table"
                             style={{ overflowX: "auto" }}
                             columns={columns_transaction}
-                            dataSource={transactions}
+                            dataSource={transactionByCompany}
                             rowKey={(record) => record.transaction_code}  // publish_date
                             title={() =>
                                 <div style={{
