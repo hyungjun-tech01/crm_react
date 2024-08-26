@@ -14,11 +14,11 @@ const AddSearchItem = (props) => {
     useEffect(() => {
         if(!title) {
             setStyleName('add-search');
-            setStyleLong('col=sm-12');
+            setStyleLong('col-sm-12');
         }
         else if(long) {
             setStyleName('add-long-content');
-            setStyleLong('col=sm-12');
+            setStyleLong('col-sm-12');
         };
     }, [title, long]);
 
@@ -26,7 +26,7 @@ const AddSearchItem = (props) => {
         <div className={ styleLong } >
             <div className="add-basic-item">
                 {title !== undefined && title !== null && (
-                    <div className="add-basic-title" >
+                    <div className={long ? "add-long-title" :"add-basic-title"} >
                         {title}
                         {required && <span className="text-danger">*</span>}
                     </div>

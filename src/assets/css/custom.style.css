@@ -162,6 +162,7 @@
 }
 .add-basic-item {
     width: 100%;
+    min-height: 36px;
     display: flex;
     flex-direction: row;
     font-size: 14px;
