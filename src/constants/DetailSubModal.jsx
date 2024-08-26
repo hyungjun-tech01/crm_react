@@ -66,14 +66,16 @@ const DetailSubModal = (props) => {
                     modifiedDetail['editing'] = handleValue;
                 };
                 return (
-                    <DetailCardItem
-                        key={index}
-                        title={item.title}
-                        defaultValue={original[item.name]}
-                        name={item.name}
-                        edited={edited}
-                        detail={modifiedDetail}
-                    />
+                    <div style={{padding: '0.25rem 0'}}>
+                        <DetailCardItem
+                            key={index}
+                            title={item.title}
+                            defaultValue={original[item.name]}
+                            name={item.name}
+                            edited={edited}
+                            detail={modifiedDetail}
+                        />
+                    </div>
                 );
             })}
         </Modal>
