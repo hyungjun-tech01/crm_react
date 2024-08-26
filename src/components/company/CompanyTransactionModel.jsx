@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
+import { Add } from "@mui/icons-material";
 
 import { TransactionRepo } from "../../repository/transaction";
 
@@ -21,17 +22,30 @@ const CompanyTransactionModel = (props) => {
     // --- Variables for only Transaction ------------------------------------------------
     const [selectedTransactionRowKeys, setSelectedTransactionRowKeys] = useState([]);
 
-    const handleSelectTransaction = useCallback((value) => {
+    const transferToOtherModal = (id) => {
+        let myModal = new bootstrap.Modal(document.getElementById(id), {
+            keyboard: false
+        });
+        myModal.show();
+    };
+
+    const handleSelectTransaction = (value) => {
         setCurrentTransaction(value.transaction_code);
-        openTransaction();
+        openTransaction(true);
+        
+        setTimeout(()=>{
+            transferToOtherModal('edit_transaction');
+        }, 500);
+    };
+
+    const handleAddNewTransaction = () => {
+        setCurrentTransaction();
+        openTransaction(true);
 
         setTimeout(()=>{
-            let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
-                keyboard: false
-            });
-            myModal.show();
+            transferToOtherModal('edit_transaction');
         }, 500);
-    }, [setCurrentTransaction]);
+    };
 
     const transactionRowSelection = {
         selectedRowKeys: selectedTransactionRowKeys,
@@ -124,6 +138,22 @@ const CompanyTransactionModel = (props) => {
                             columns={columns_transaction}
                             dataSource={transactions}
                             rowKey={(record) => record.transaction_code}  // publish_date
+                            title={() =>
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    backgroundColor: '#cccccc',
+                                    fontWeight: 600,
+                                    lineHeight: 1.5,
+                                    height: '2.5rem',
+                                    padding: '0.5rem 0.8rem',
+                                    borderRadius: '5px',
+                                }}
+                                >
+                                    <div>{t('purchase.information')}</div>
+                                    <Add  onClick={() => handleAddNewTransaction()}/>
+                                </div>
+                            }
                             onRow={(record, rowIndex) => {
                                 return {
                                     onClick: (event) => {

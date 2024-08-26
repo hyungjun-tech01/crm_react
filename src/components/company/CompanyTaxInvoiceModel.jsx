@@ -5,6 +5,7 @@ import { Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
+import { Add } from "@mui/icons-material";
 
 import { TaxInvoiceRepo } from "../../repository/tax_invoice";
 
@@ -21,17 +22,30 @@ const CompanyTaxInvoiceModel = (props) => {
     // --- Variables for only TaxInvoice ------------------------------------------------
     const [selectedTaxInvoiceRowKeys, setSelectedTaxInvoiceRowKeys] = useState([]);
 
-    const handleSelectTaxInvoice = useCallback((code) => {
+    const transferToOtherModal = (id) => {
+        let myModal = new bootstrap.Modal(document.getElementById(id), {
+            keyboard: false
+        });
+        myModal.show();
+    };
+
+    const handleSelectTaxInvoice = (code) => {
         setCurrentTaxInvoice(code);
         openTaxInvoice(true);
 
         setTimeout(()=>{
-            let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
-                keyboard: false
-            });
-            myModal.show();
+            transferToOtherModal('edit_tax_invoice');
         }, 500);
-    }, [openTaxInvoice, setCurrentTaxInvoice]);
+    };
+
+    const handleAddNewTaxInvoice = () => {
+        setCurrentTaxInvoice();
+        openTaxInvoice(true);
+
+        setTimeout(()=>{
+            transferToOtherModal('edit_tax_invoice');
+        }, 500);
+    };
 
     const taxInvoiceRowSelection = {
         selectedRowKeys: selectedTaxInvoiceRowKeys,
@@ -124,6 +138,22 @@ const CompanyTaxInvoiceModel = (props) => {
                             columns={columns_tax_invoice}
                             dataSource={taxInvoices}
                             rowKey={(record) => record.tax_invoice_code}
+                            title={() =>
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    backgroundColor: '#cccccc',
+                                    fontWeight: 600,
+                                    lineHeight: 1.5,
+                                    height: '2.5rem',
+                                    padding: '0.5rem 0.8rem',
+                                    borderRadius: '5px',
+                                }}
+                                >
+                                    <div>{t('purchase.information')}</div>
+                                    <Add  onClick={() => handleAddNewTaxInvoice()}/>
+                                </div>
+                            }
                             onRow={(record, rowIndex) => {
                                 return {
                                     onClick: (event) => {

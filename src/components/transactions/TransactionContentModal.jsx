@@ -158,9 +158,8 @@ const TransactionContentModal = (props) => {
                     modifiedDetail['editing'] = handleValue;
                 };
                 return (
-                    <div style={{padding: '0.25rem 0'}}>
+                    <div key={index} style={{padding: '0.25rem 0'}}>
                         <DetailCardItem
-                            key={index}
                             title={item.title}
                             defaultValue={original[item.name]}
                             groupValue={item.name === 'product_name' ? original.product_class_name : null}
