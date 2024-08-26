@@ -8,6 +8,7 @@ import {useRecoilValue} from "recoil";
 import { UserRepo } from "../../repository/user";
 
 import UserDetailModel from "./UserDetailModel.jsx";
+import ChangePassword from "./ChangePassword.jsx";
 // import DatePicker from "react-datepicker";
 
 
@@ -19,7 +20,7 @@ const UserInfo = () => {
     "myLationCrmUserName",
     "myLationCrmAuthToken",
   ]);
-  console.log("currentUser", currentUser.userId);
+  console.log("currentUser", currentUser);
 
 
   
@@ -112,7 +113,7 @@ const UserInfo = () => {
                               <li>
                                 <div className="title">Group:</div>
                                 <div className="text">
-                                  <a>&nbsp;{currentUser.group_}</a>
+                                  <a>&nbsp;{currentUser.private_group}</a>
                                 </div>
                               </li>                              
                               <li>
@@ -121,6 +122,17 @@ const UserInfo = () => {
                                 &nbsp;{currentUser.memo}
                                 </div>
                               </li>
+                              <li>
+                                <button
+                                className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
+                                id="add-task"
+                                data-bs-toggle="modal"
+                                data-bs-target="#change-password"
+                                onClick={()=>{handleClickUserEdit(cookies.myLationCrmUserId)}}
+                                >
+                                Change Password
+                              </button>
+                              </li>                              
                             </ul>
                           </div>
                         </div>
@@ -133,8 +145,8 @@ const UserInfo = () => {
                           href="#"
                           onClick={()=>{handleClickUserEdit(cookies.myLationCrmUserId)}}
                         >
-                          <i className="fa fa-pencil" />
-                        </a>
+                          <i className="fa fa-pencil" />Edit
+                        </a>  
                       </div>
                     </div>
                   </div>
@@ -378,6 +390,7 @@ const UserInfo = () => {
         </div>
         {/* /Page Content */}
         <UserDetailModel />        
+        <ChangePassword />
       </div>
     </HelmetProvider>
   );

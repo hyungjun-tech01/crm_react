@@ -346,6 +346,19 @@ const enResource = {
             search_address_first: 'Please search address...',
             title_check: 'Check',
             msg_fail_save: 'Failed to save.'
+        },
+        user :{
+            phone:'Phone Number',
+            mobile:'Mobile Phone',
+            e_mail:'E Mail Address',
+            private_group:'Group',
+            memo:'Memp',
+            name:'Name',
+            department:'Department',
+            position:'Position',
+            current_password:'Current Password',
+            change_password:'Change Password',
+            change_password_confirm:'Change Password Confirm',
         }
     },
 }
