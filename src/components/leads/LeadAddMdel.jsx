@@ -3,7 +3,7 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
 import * as bootstrap from "../../assets/js/bootstrap.bundle";
-import { atomCompanyForSelection, atomCompanyState, defaultLead } from "../../atoms/atoms";
+import { defaultLead } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { option_locations } from "../../constants/constants";

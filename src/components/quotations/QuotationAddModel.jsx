@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Checkbox, InputNumber, Space, Table } from 'antd';
@@ -11,14 +11,11 @@ import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import "antd/dist/reset.css";
 import "../antdstyle.css";
 import {
-  atomLeadState,
   atomProductClassList,
   atomProductClassListState,
   atomProductsState,
-  atomProductOptions,
   defaultQuotation,
   atomAllProducts,
-  atomAllLeadObj,
   atomCurrentLead,
   defaultLead,
 } from "../../atoms/atoms";
@@ -67,7 +64,6 @@ const QuotationAddModel = (props) => {
   const allProductClassList = useRecoilValue(atomProductClassList);
   const productState = useRecoilValue(atomProductsState);
   const allProducts = useRecoilValue(atomAllProducts);
-  const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
   const { tryLoadAllProductClassList } = useRecoilValue(ProductClassListRepo);
   const { tryLoadAllProducts } = useRecoilValue(ProductRepo);
 
@@ -741,41 +737,13 @@ const QuotationAddModel = (props) => {
     tryLoadAllProducts();
     if (init
       && ((userState & 1) === 1)
-      && ((productClassState & 1) === 1)
-      && ((productState & 1) === 1)
     ) {
-      if((productOptions.length === 0)) {
-        console.log('[QuotationAddModel] set products for selection');
-        const productOptionsValue = allProductClassList.map(proClass => {
-            const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
-            const subOptions = foundProducts.map(item => {
-                return {
-                    label: <span>{item.product_name}</span>,
-                    value: { product_code: item.product_code,
-                      product_name: item.product_name,
-                      product_class_name: item.product_class_name,
-                      detail_desc: item.detail_desc,
-                      cost_price: item.const_price,
-                      reseller_price: item.reseller_price,
-                      list_price: item.list_price,
-                  }
-                }
-            });
-            return {
-                label: <span>{proClass.product_class_name}</span>,
-                title: proClass.product_class_name,
-                options: subOptions,
-            };
-        });
-        setProductOptions(productOptionsValue);
-      };
-
       if (handleInit) handleInit(!init);
       setTimeout(()=>{
         initializeQuotationTemplate();
       }, 500);
     };
-  }, [userState, productClassState, productState, productOptions, init, tryLoadAllProductClassList, tryLoadAllProducts, handleInit, allProductClassList, setProductOptions, allProducts, initializeQuotationTemplate]);
+  }, [userState, init, tryLoadAllProductClassList, tryLoadAllProducts, handleInit, allProductClassList, allProducts, initializeQuotationTemplate]);
 
   if (init)
     return <div>&nbsp;</div>;

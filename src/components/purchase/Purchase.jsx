@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
@@ -8,20 +8,13 @@ import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import {
   atomFilteredPurchaseArray,
   atomPurchaseState,
-  atomProductClassListState,
-  atomProductClassList,
-  atomProductsState,
-  atomAllProducts,
-  atomProductOptions
 } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
 import { PurchaseRepo } from "../../repository/purchase";
-import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 import { compareText, formatDate } from "../../constants/functions";
 
 import PurchaseAddModel from "./PurchaseAddModel";
 import PurchaseDetailsModel from "./PurchaseDetailsModel";
-import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import { atomUserState } from "../../atoms/atomsUser";
 import { UserRepo } from "../../repository/user";
 
@@ -42,16 +35,6 @@ const Purchase = () => {
   const filteredPurchase = useRecoilValue(atomFilteredPurchaseArray);
   const { tryLoadAllPurchases, filterPurchases, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
   
-
-  //===== [RecoilState] Related with Product =============================================
-  const productClassState = useRecoilValue(atomProductClassListState);
-  const allProductClassList = useRecoilValue(atomProductClassList);
-  const { tryLoadAllProductClassList } = useRecoilValue(ProductClassListRepo);
-  const productState = useRecoilValue(atomProductsState);
-  const allProducts = useRecoilValue(atomAllProducts);
-  const { tryLoadAllProducts } = useRecoilValue(ProductRepo);
-  const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
-
 
   //===== [RecoilState] Related with User ================================================
   const userState = useRecoilValue(atomUserState);
@@ -174,15 +157,6 @@ const Purchase = () => {
     setInitAddNewPurchase(true);
   }, []);
 
-  const handleClickCompany = useCallback((code) => {
-    console.log("[Consulting] set current company : ", code);
-    setCurrentCompany(code);
-    let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
-      keyboard: false
-    })
-    myModal.show();
-  }, []);
-
   const columns = [
     {
       title: t('purchase.delivery_date'),
@@ -287,37 +261,6 @@ const Purchase = () => {
       setTableData(modifiedData);
     };
   }, [dates, filteredPurchase, purchaseState, queryConditions, searchCompanies, singleDate, userState]);
-
-  // ----- useEffect for Production -----------------------------------
-  useEffect(() => {
-    tryLoadAllProductClassList();
-    tryLoadAllProducts();
-    if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
-        console.log('[Purchase] set product options for selection');
-        const productOptionsValue = allProductClassList.map(proClass => {
-            const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
-            const subOptions = foundProducts.map(item => {
-                return {
-                    label: <span>{item.product_name}</span>,
-                    value: { product_code: item.product_code,
-                        product_name: item.product_name,
-                        product_class_name: item.product_class_name,
-                        detail_desc: item.detail_desc,
-                        cost_price: item.const_price,
-                        reseller_price: item.reseller_price,
-                        list_price: item.list_price,
-                    }
-                }
-            });
-            return {
-                label: <span>{proClass.product_class_name}</span>,
-                title: proClass.product_class_name,
-                options: subOptions,
-            };
-        });
-        setProductOptions(productOptionsValue);
-    };
-}, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions]);
 
 
   return (

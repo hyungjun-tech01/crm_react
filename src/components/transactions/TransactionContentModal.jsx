@@ -38,15 +38,9 @@ const TransactionContentModal = (props) => {
             tempData['product_class_name'] = value.product_class_name;
             tempData['product_name'] = value.product_name;
             tempData['unit_price'] = Number(value.list_price);
-            // tempData['product_code'] = value.product_code;
-            // tempData['cost_price'] = Number(value.cost_price);
-            // tempData['reseller_price'] = Number(value.reseller_price);
-            // tempData['list_price'] = setting.unit_vat_included ? Number(value.list_price) / 1.1 : Number(value.list_price);
-            // tempData['org_unit_prce'] = Number(value.list_price);
         } else {
             tempData[name] = value.value;
         };
-        console.log('TransactionContentModal / handleSelect :', tempData);
         handleEdited(tempData);
     };
     const handleValue = (event) => {
@@ -109,14 +103,16 @@ const TransactionContentModal = (props) => {
                 };
                 if(item.name === 'product_name')
                     return (
-                        <DetailSelectProduct
-                            key={index}
-                            title={item.title}
-                            defaultValue={original[item.name]}
-                            name={item.name}
-                            edited={edited}
-                            detail={modifiedDetail}
-                        />
+                        <div key={index} style={{padding: '0.25rem 0'}}>
+                            <DetailSelectProduct
+                                key={index}
+                                title={item.title}
+                                defaultValue={original[item.name]}
+                                name={item.name}
+                                edited={edited}
+                                detail={modifiedDetail}
+                            />
+                        </div>
                     );
                 return (
                     <div key={index} style={{padding: '0.25rem 0'}}>

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Collapse, Space, Switch } from "antd";
@@ -10,7 +10,6 @@ import { atomCurrentQuotation,
   atomProductClassList,
   atomProductClassListState,
   atomProductsState,
-  atomProductOptions,
   atomAllProducts,
 } from "../../atoms/atoms";
 import { atomUserState,
@@ -47,7 +46,6 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   const allProductClassList = useRecoilValue(atomProductClassList);
   const productState = useRecoilValue(atomProductsState);
   const allProducts = useRecoilValue(atomAllProducts);
-  const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
   const { tryLoadAllProductClassList } = useRecoilValue(ProductClassListRepo);
   const { tryLoadAllProducts } = useRecoilValue(ProductRepo);
 
@@ -59,7 +57,6 @@ const QuotationDetailsModel = ({init, handleInit}) => {
 
 
   //===== Handles to deal this component ==============================================
-  const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
   const [ isFullScreen, setIsFullScreen ] = useState(false);
   const [ currentQuotationCode, setCurrentQuotationCode ] = useState('');
 
@@ -445,43 +442,13 @@ const QuotationDetailsModel = ({init, handleInit}) => {
 
   // ----- useEffect for Production -----------------------------------
   useEffect(() => {
-    tryLoadAllProductClassList();
-    tryLoadAllProducts();
     if (((userState & 1) === 1)
       && ((quotationState & 1) === 1)
-      && ((productClassState & 1) === 1)
-      && ((productState & 1) === 1)
     ) {
-      if((productOptions.length === 0)) {
-        console.log('[PurchaseAddModel] set companies for selection');
-        const productOptionsValue = allProductClassList.map(proClass => {
-            const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
-            const subOptions = foundProducts.map(item => {
-                return {
-                    label: <span>{item.product_name}</span>,
-                    value: { product_code: item.product_code,
-                      product_name: item.product_name,
-                      product_class_name: item.product_class_name,
-                      detail_desc: item.detail_desc,
-                      cost_price: item.const_price,
-                      reseller_price: item.reseller_price,
-                      list_price: item.list_price,
-                  }
-                }
-            });
-            return {
-                label: <span>{proClass.product_class_name}</span>,
-                title: proClass.product_class_name,
-                options: subOptions,
-            };
-        });
-        setProductOptions(productOptionsValue);
-      }
-        
       console.log('[QuotationDetailsModel] all needed data is loaded');
       handleInit(false);
     };
-}, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions, userState, quotationState, handleInit]);
+}, [allProductClassList, allProducts, productClassState, productState, userState, quotationState, handleInit]);
 
 if (init)
   return <div>&nbsp;</div>;

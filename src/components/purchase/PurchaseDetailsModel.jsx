@@ -9,7 +9,6 @@ import { Add } from "@mui/icons-material";
 import {
   atomProductClassListState,
   atomProductsState,
-  atomProductOptions,
   atomMAContractSet,
   defaultMAContract,
   atomCurrentPurchase,
@@ -48,7 +47,6 @@ const PurchaseDetailsModel = () => {
   //===== [RecoilState] Related with Product ==========================================
   const productClassState = useRecoilValue(atomProductClassListState);
   const productState = useRecoilValue(atomProductsState);
-  const productOptions = useRecoilValue(atomProductOptions);
 
 
   //===== [RecoilState] Related with MA Contract ======================================

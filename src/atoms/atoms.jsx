@@ -51,10 +51,6 @@ export const atomCompanyState = atom({
     key: "companyState",
     default: 0,
 });
-export const atomCompanyForSelection = atom({
-    key: "companySelection",
-    default: [],
-});
 export const atomPurchaseByCompany = atom({
     key: "purchaseByCompany",
     default: [],
@@ -426,11 +422,6 @@ export const atomProductsState = atom({
     default: 0,
 });
 
-//----- Product Options for Select  -----------------------------
-export const atomProductOptions = atom({
-    key: "productOptions",
-    default: [],
-});
 
 //----- Tax Invoice ------------------------
 export const defaultTaxInvoice = {

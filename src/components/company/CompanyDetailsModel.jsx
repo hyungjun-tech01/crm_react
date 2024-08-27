@@ -332,21 +332,23 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
         .then(res => {
           if(res.result) {
             setPurchasesByCompany(res.data);
-  
-            let valid_count = 0;
-            res.data.forEach((item) => {
-              if (item.ma_finish_date && new Date(item.ma_finish_date) > Date.now())
-                valid_count++;
-            });
-            setValidMACount(valid_count);
           } else {
             console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
             setPurchasesByCompany([]);
-            setValidMACount(0);
           };
         });
     }
   }, [checkState, searchPurchases, selectedCompany.company_code]);
+
+  //===== useEffect for Purchase =======================================================
+  useEffect(() => {
+    let valid_count = 0;
+    purchaseByCompany.forEach((item) => {
+      if (!!item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now()))
+        valid_count++;
+    });
+    setValidMACount(valid_count);
+  }, [purchaseByCompany]);
 
   //===== useEffect for Transaction ====================================================
   useEffect(() => {

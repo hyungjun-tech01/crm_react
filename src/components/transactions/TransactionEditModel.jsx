@@ -15,7 +15,6 @@ import classNames from 'classnames';
 
 import {
   atomCompanyState,
-  atomCompanyForSelection,
   atomCurrentTransaction,
   defaultTransaction,
 } from "../../atoms/atoms";

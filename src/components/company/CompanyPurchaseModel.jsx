@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
@@ -9,30 +9,14 @@ import { Add } from "@mui/icons-material";
 
 import {
     atomCurrentPurchase,
-    atomProductClassList,
-    atomProductClassListState,
-    atomAllProducts,
-    atomProductsState,
-    atomProductOptions,
     defaultPurchase,
     atomPurchaseByCompany,
 } from "../../atoms/atoms";
-import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 
 
 const CompanyPurchaseModel = (props) => {
     const { handleInitAddPurchase } = props;
     const { t } = useTranslation();
-
-
-    //===== [RecoilState] Related with Product ==========================================
-    const productClassState = useRecoilValue(atomProductClassListState);
-    const { tryLoadAllProductClassList } = useRecoilValue(ProductClassListRepo);
-    const allProductClassList = useRecoilValue(atomProductClassList);
-    const productState = useRecoilValue(atomProductsState);
-    const allProducts = useRecoilValue(atomAllProducts);
-    const { tryLoadAllProducts } = useRecoilValue(ProductRepo);
-    const [ productOptions, setProductOptions ] = useRecoilState(atomProductOptions);
 
 
     //===== [RecoilState] Related with Purchase =========================================
@@ -41,7 +25,6 @@ const CompanyPurchaseModel = (props) => {
 
 
     //===== Handles to this =============================================================
-    const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
     const [selectedPurchaseRowKeys, setSelectedPurchaseRowKeys] = useState([]);
 
     const transferToOtherModal = (id) => {
@@ -117,47 +100,9 @@ const CompanyPurchaseModel = (props) => {
     };
 
 
-    // ----- useEffect for Production -----------------------------------
-    useEffect(() => {
-        tryLoadAllProductClassList();
-        tryLoadAllProducts();
-        if (((productClassState & 1) === 1)
-            && ((productState & 1) === 1)
-        ){
-            if(productOptions.length === 0) {
-                const productOptionsValue = allProductClassList.map(proClass => {
-                    const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
-                    const subOptions = foundProducts.map(item => {
-                        return {
-                            label: <span>{item.product_name}</span>,
-                            value: { product_code: item.product_code,
-                                product_name: item.product_name,
-                                product_class_name: item.product_class_name,
-                                detail_desc: item.detail_desc,
-                                cost_price: item.const_price,
-                                reseller_price: item.reseller_price,
-                                list_price: item.list_price,
-                            }
-                        };
-                    });
-                    return {
-                        label: <span>{proClass.product_class_name}</span>,
-                        title: proClass.product_class_name,
-                        options: subOptions,
-                    };
-                });
-                setProductOptions(productOptionsValue);
-            };
-            setIsAllNeededDataLoaded(true);
-        };
-    }, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions]);
-
     useEffect(() => {
         console.log('[CompanyPurchaseModel] called!');
     }, [purchaseByCompany]);
-
-    if (!isAllNeededDataLoaded)
-        return <div>&nbsp;</div>;
 
     return (
         <div className="row">
