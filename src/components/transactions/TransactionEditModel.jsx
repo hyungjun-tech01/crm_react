@@ -504,8 +504,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setIsVatIncluded(true);
     setShowDecimal(0);
     setDataForTransaction({...default_transaction_data});
-    console.log('TransactionEdit / handleInitialize :', selectedItem);
-    console.log('TransactionEdit / handleInitialize :', currentCompany);
+
     if((selectedItem.category === 'company')
       && (currentCompany !== defaultCompany)
       && (selectedItem.item_code === currentCompany.company_code))
@@ -684,7 +683,9 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   };
 
   const handleClose = () => {
-    setSelectedItem({category: null, item_code: null});
+    if(selectedItem.category && (selectedItem.category === 'transaction')){
+      setSelectedItem({category: null, item_code: null});
+    };
     handleInitialize();
     close();
   };

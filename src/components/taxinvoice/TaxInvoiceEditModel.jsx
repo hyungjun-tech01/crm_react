@@ -572,10 +572,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
       newTaxInvoice['action_type'] = 'UPDATE';
     };
 
-    // -------------------------------------------
-    console.log('[TaxInvoiceEditModel] handleSaveTaxInvoice : ', newTaxInvoice);
-    // -------------------------------------------
-
     const resp = modifyTaxInvoice(newTaxInvoice);
     resp.then((res) => {
       if (res.result) {
@@ -591,7 +587,9 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
   };
 
   const handleClose = () => {
-    setSelectedItem({category: null, item_code: null});
+    if(selectedItem.category && (selectedItem.category === 'tax_invoice')){
+      setSelectedItem({category: null, item_code: null});
+    };
     handleInitialize();
     close();
   };
@@ -724,7 +722,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
       setInvoiceChange({});
     };
 
-  }, [contents, data, companyState, open, currentTaxInvoice, selectedItem]);
+  }, [contents, data, companyState, open, currentTaxInvoice, selectedItem, currentCompany]);
 
   if (!open) return (
     <div>&nbsp;</div>

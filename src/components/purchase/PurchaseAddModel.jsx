@@ -61,8 +61,7 @@ const PurchaseAddModel = (props) => {
 
     const initializePurchaseTemplate = useCallback(() => {
         document.querySelector("#add_new_purchase_form").reset();
-        
-        // if(companyCode && companyCode !== "") {
+
         if((currentCompany !== defaultCompany)
             && (
                 ((selectedItem.category === 'company') && (selectedItem.item_code === currentCompany.company_code))
