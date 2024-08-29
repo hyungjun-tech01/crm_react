@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch, Table } from "antd";
@@ -15,6 +15,7 @@ import {
   defaultPurchase,
   atomCurrentCompany,
   defaultCompany,
+  atomSelectedItem,
 } from "../../atoms/atoms";
 import { PurchaseRepo } from "../../repository/purchase";
 import { ProductTypeOptions } from "../../repository/product";
@@ -56,6 +57,7 @@ const PurchaseDetailsModel = () => {
   
   //===== Handles to deal this component ==============================================
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -142,6 +144,7 @@ const PurchaseDetailsModel = () => {
   }, []);
 
   const handleClose = useCallback(() => {
+    setSelectedItem({category: null, item_code: null});
     setEditedDetailValues(null);
     setCurrentPurchase(defaultPurchase);
   }, []);

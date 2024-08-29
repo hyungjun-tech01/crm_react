@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { useTranslation } from "react-i18next";
@@ -7,7 +7,7 @@ import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { CompanyRepo } from "../../repository/company";
-import { atomCompanyState, atomFilteredCompanyArray } from "../../atoms/atoms";
+import { atomCompanyState, atomFilteredCompanyArray, atomSelectedItem } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 import { UserRepo } from '../../repository/user';
 
@@ -42,6 +42,8 @@ const Companies = () => {
   const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
   const [ taxInvoiceData, setTaxInvoiceData ] = useState(null);
   const [ taxInvoiceContents, setTaxInvoiceContents ] = useState(null);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
+
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
   const [ expanded, setExpaned ] = useState(false);
@@ -155,6 +157,7 @@ const Companies = () => {
     console.log('[Company] set current company : ', id);
     setInitToEditCompany(true);
     setCurrentCompany(id);
+    setSelectedItem({category: 'company', item_code: id});
     setTimeout(()=>{
       let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
         keyboard: false

@@ -11,11 +11,8 @@ import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import "antd/dist/reset.css";
 import "../antdstyle.css";
 import {
-  atomProductClassList,
-  atomProductClassListState,
-  atomProductsState,
   defaultQuotation,
-  atomAllProducts,
+  atomSelectedItem,
   atomCurrentLead,
   defaultLead,
 } from "../../atoms/atoms";
@@ -29,7 +26,6 @@ import {
   QuotationTypes,
   QuotationSendTypes
 } from "../../repository/quotation";
-import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddSearchItem from "../../constants/AddSearchItem";
@@ -44,7 +40,7 @@ const default_quotation_content = {
 };
 
 const QuotationAddModel = (props) => {
-  const { init, handleInit, leadCode } = props;
+  const { init, handleInit } = props;
   const [t] = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -59,15 +55,6 @@ const QuotationAddModel = (props) => {
   const currentLead = useRecoilValue(atomCurrentLead);
 
 
-  //===== [RecoilState] Related with Product ==========================================
-  const productClassState = useRecoilValue(atomProductClassListState);
-  const allProductClassList = useRecoilValue(atomProductClassList);
-  const productState = useRecoilValue(atomProductsState);
-  const allProducts = useRecoilValue(atomAllProducts);
-  const { tryLoadAllProductClassList } = useRecoilValue(ProductClassListRepo);
-  const { tryLoadAllProducts } = useRecoilValue(ProductRepo);
-
-
   //===== [RecoilState] Related with Users ===========================================
   const userState = useRecoilValue(atomUserState);
   const usersForSelection = useRecoilValue(atomUsersForSelection);
@@ -78,25 +65,27 @@ const QuotationAddModel = (props) => {
   const [quotationChange, setQuotationChange] = useState({ ...defaultQuotation });
   const [quotationContents, setQuotationContents] = useState([]);
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
+  const selectedItem = useRecoilValue(atomSelectedItem);
 
   const initializeQuotationTemplate = useCallback(() => {
     document.querySelector("#add_new_quotation_form").reset();
     setQuotationContents([]);
 
-    if (leadCode && leadCode !== '') {
-      if(currentLead !== defaultLead) {
-        setQuotationChange({
-          ...defaultQuotation,
-          lead_code: currentLead.lead_code,
-          lead_name: currentLead.lead_name,
-          department: currentLead.department,
-          position: currentLead.position,
-          mobile_number: currentLead.mobile_number,
-          phone_number: currentLead.phone_number,
-          email: currentLead.email,
-          receiver: cookies.myLationCrmUserName,
-        });
-      };
+    if ((selectedItem.category === 'lead')
+      && (currentLead !== defaultLead)
+      && (selectedItem.item_code === currentLead.lead_code)
+    ) {
+      setQuotationChange({
+        ...defaultQuotation,
+        lead_code: currentLead.lead_code,
+        lead_name: currentLead.lead_name,
+        department: currentLead.department,
+        position: currentLead.position,
+        mobile_number: currentLead.mobile_number,
+        phone_number: currentLead.phone_number,
+        email: currentLead.email,
+        receiver: cookies.myLationCrmUserName,
+      });
     } else {
       setQuotationChange({
         receiver: cookies.myLationCrmUserName,
@@ -104,9 +93,9 @@ const QuotationAddModel = (props) => {
       handleContentModalCancel();
     };
     setAmountsForContent({
-      sub_total_amount: 0, dc_amount: 0, sum_dc_applied:0, vat_amount:0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
+      sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
     });
-  }, [cookies.myLationCrmUserName, currentLead, leadCode]);
+  }, [cookies.myLationCrmUserName, currentLead, selectedItem]);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
@@ -271,12 +260,12 @@ const QuotationAddModel = (props) => {
     let ret = '';
 
     default_content_array.forEach((item, index) => {
-      if(index === 0)
+      if (index === 0)
         ret += item.at(0);
       else
         ret += '|' + item.at(0);
 
-      ret +=  '|' + item.at(1) + '|';
+      ret += '|' + item.at(1) + '|';
 
       const foundIdx = data.findIndex(col => col.title === item.at(1));
       if (foundIdx === -1) {
@@ -294,12 +283,13 @@ const QuotationAddModel = (props) => {
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [orgContentModalValues, setOrgContentModalValues] = useState({});
   const [editedContentModalValues, setEditedContentModalValues] = useState({});
-  const [settingForContent, setSettingForContent] = useState({ title: '',
+  const [settingForContent, setSettingForContent] = useState({
+    title: '',
     vat_included: false, unit_vat_included: false, total_only: false, auto_calc: true, show_decimal: false,
     vat_included_disabled: false, unit_vat_included_disabled: true, total_only_disabled: true, dc_rate: 0,
   });
   const [amountsForContent, setAmountsForContent] = useState({
-    sub_total_amount: 0, dc_amount: 0, sum_dc_applied:0, vat_amount:0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
+    sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
   });
 
   const handleChangeContentSetting = (event) => {
@@ -307,13 +297,12 @@ const QuotationAddModel = (props) => {
     const target_value = event.target.checked;
 
     let tempSetting = { ...settingForContent };
-    switch(target_name)
-    {
+    switch (target_name) {
       case 'vat_included':
         tempSetting.vat_included = target_value;
         tempSetting.unit_vat_included_disabled = !target_value;
-        if(settingForContent.auto_calc){
-          const vat_amount = target_value ? amountsForContent.sum_dc_applied*0.1 : 0;
+        if (settingForContent.auto_calc) {
+          const vat_amount = target_value ? amountsForContent.sum_dc_applied * 0.1 : 0;
           const updatedAmount = {
             ...amountsForContent,
             vat_amount: vat_amount,
@@ -330,7 +319,7 @@ const QuotationAddModel = (props) => {
           let updatedEachSums = 0;
           const updatedContents = quotationContents.map(item => {
             const newPrice = (target_value && !settingForContent.total_only) ? item['org_unit_prce'] / 1.1 : item['org_unit_prce'];
-            const updatedAmount = newPrice*item['12'];
+            const updatedAmount = newPrice * item['12'];
             updatedEachSums += updatedAmount;
             return {
               ...item,
@@ -349,7 +338,7 @@ const QuotationAddModel = (props) => {
           let updatedEachSums = 0;
           const updatedContents = quotationContents.map(item => {
             const newPrice = (!target_value && settingForContent.unit_vat_included) ? item['org_unit_prce'] / 1.1 : item['org_unit_prce'];
-            const updatedAmount = newPrice*item['12'];
+            const updatedAmount = newPrice * item['12'];
             updatedEachSums += updatedAmount;
             return {
               ...item,
@@ -382,10 +371,10 @@ const QuotationAddModel = (props) => {
     });
     const sum_cost_items = SumEachCosts;
     const sub_total_amount = settingForContent.total_only ? SumEachItems / 1.1 : SumEachItems;
-    const dc_amount = sub_total_amount * settingForContent.dc_rate* 0.01;
+    const dc_amount = sub_total_amount * settingForContent.dc_rate * 0.01;
     const sum_dc_applied = sub_total_amount - dc_amount;
-    const vat_amount = settingForContent.vat_included ? sum_dc_applied*0.1 : 0;
-    const sum_final= sum_dc_applied + vat_amount - amountsForContent.cut_off_amount;
+    const vat_amount = settingForContent.vat_included ? sum_dc_applied * 0.1 : 0;
+    const sum_final = sum_dc_applied + vat_amount - amountsForContent.cut_off_amount;
     const tempAmount = {
       ...amountsForContent,
       sub_total_amount: sub_total_amount,
@@ -402,10 +391,10 @@ const QuotationAddModel = (props) => {
   const handleChangeEachSum = (value) => {
     let updatedAmount = {
       ...amountsForContent,
-      sub_total_amount : value,
+      sub_total_amount: value,
     };
-    if(settingForContent.auto_calc){
-      const dc_amount = value * settingForContent.dc_rate* 0.01;
+    if (settingForContent.auto_calc) {
+      const dc_amount = value * settingForContent.dc_rate * 0.01;
       const sum_dc_applied = value - dc_amount;
       const vat_amount = settingForContent.vat_included ? sum_dc_applied * 0.1 : 0;
       updatedAmount.dc_amount = dc_amount;
@@ -419,14 +408,14 @@ const QuotationAddModel = (props) => {
   const handleChangeDCRate = (value) => {
     const updatedSetting = {
       ...settingForContent,
-      dc_rate : value
+      dc_rate: value
     };
     setSettingForContent(updatedSetting);
 
-    if(settingForContent.auto_calc && amountsForContent.sub_total_amount !==0){
+    if (settingForContent.auto_calc && amountsForContent.sub_total_amount !== 0) {
       const dc_amount = amountsForContent.sub_total_amount * value * 0.01;
       const sum_dc_applied = amountsForContent.sub_total_amount - dc_amount;
-      const vat_amount = settingForContent.vat_included ? sum_dc_applied*0.1 : 0;
+      const vat_amount = settingForContent.vat_included ? sum_dc_applied * 0.1 : 0;
       const tempAmount = {
         ...amountsForContent,
         dc_amount: dc_amount,
@@ -442,11 +431,11 @@ const QuotationAddModel = (props) => {
   const handleChangeDCAmount = (value) => {
     let updatedAmount = {
       ...amountsForContent,
-      dc_amount : value
+      dc_amount: value
     };
-    if(settingForContent.auto_calc){
+    if (settingForContent.auto_calc) {
       const sum_dc_applied = amountsForContent.sub_total_amount - value;
-      const vat_amount = settingForContent.vat_included ? sum_dc_applied*0.1 : 0;
+      const vat_amount = settingForContent.vat_included ? sum_dc_applied * 0.1 : 0;
       updatedAmount.sum_dc_applied = sum_dc_applied;
       updatedAmount.vat_amount = vat_amount;
       updatedAmount.sum_final = sum_dc_applied + vat_amount - amountsForContent.cut_off_amount;
@@ -457,10 +446,10 @@ const QuotationAddModel = (props) => {
   const handleChangeDCAppliedSum = (value) => {
     let updatedAmount = {
       ...amountsForContent,
-      sum_dc_applied : value
+      sum_dc_applied: value
     };
-    if(settingForContent.auto_calc){
-      const vat_amount = settingForContent.vat_included ? value*0.1 : 0;
+    if (settingForContent.auto_calc) {
+      const vat_amount = settingForContent.vat_included ? value * 0.1 : 0;
       updatedAmount.vat_amount = vat_amount;
       updatedAmount.sum_final = value + vat_amount - amountsForContent.cut_off_amount;
     };
@@ -470,9 +459,9 @@ const QuotationAddModel = (props) => {
   const handleChangeVAT = (value) => {
     let updatedAmount = {
       ...amountsForContent,
-      vat_amount : value,
+      vat_amount: value,
     };
-    if(settingForContent.auto_calc){
+    if (settingForContent.auto_calc) {
       updatedAmount.sum_final = amountsForContent.sum_dc_applied + value - amountsForContent.cut_off_amount;
     };
     setAmountsForContent(updatedAmount);
@@ -481,9 +470,9 @@ const QuotationAddModel = (props) => {
   const handleChangeCutOffAmount = (value) => {
     let updatedAmount = {
       ...amountsForContent,
-      cut_off_amount : value
+      cut_off_amount: value
     };
-    if(settingForContent.auto_calc){
+    if (settingForContent.auto_calc) {
       updatedAmount.sum_final = amountsForContent.sum_dc_applied + amountsForContent.vat_amount - value;
     }
     setAmountsForContent(updatedAmount);
@@ -492,7 +481,7 @@ const QuotationAddModel = (props) => {
   const handleChangeFinalAmount = (value) => {
     const updatedSetting = {
       ...amountsForContent,
-      sum_final : value,
+      sum_final: value,
     };
     setAmountsForContent(updatedSetting);
   };
@@ -500,12 +489,13 @@ const QuotationAddModel = (props) => {
   // --- Functions used for editing content ------------------------------
   const handleAddNewContent = useCallback(() => {
     if (!quotationChange.lead_name) {
-      setMessage({title:'필요 정보 누락', message:'고객 이름이 누락되었습니다.'});
+      setMessage({ title: '필요 정보 누락', message: '고객 이름이 누락되었습니다.' });
       setIsMessageModalOpen(true);
       return;
     };
-    
-    setSettingForContent({ ...settingForContent,
+
+    setSettingForContent({
+      ...settingForContent,
       action: 'ADD',
       index: quotationContents.length + 1,
       title: t('quotation.add_content'),
@@ -529,12 +519,13 @@ const QuotationAddModel = (props) => {
 
   const handleModifyContent = useCallback((data) => {
     if (!data) {
-      setMessage({title:'필요 정보 누락', message:'입력 Data가 없습니다.'});
+      setMessage({ title: '필요 정보 누락', message: '입력 Data가 없습니다.' });
       setIsMessageModalOpen(true);
       return;
     };
 
-    setSettingForContent({ ...settingForContent,
+    setSettingForContent({
+      ...settingForContent,
       action: 'UPDATE',
       index: data['1'],
       title: t('quotation.modify_content'),
@@ -558,7 +549,7 @@ const QuotationAddModel = (props) => {
 
   const handleDeleteSelectedConetents = useCallback(() => {
     if (selectedContentRowKeys.length === 0) {
-      setMessage({title:'선택 항목 누락', message:'선택한 값이 없습니다.'});
+      setMessage({ title: '선택 항목 누락', message: '선택한 값이 없습니다.' });
       setIsMessageModalOpen(true);
       return;
     };
@@ -596,14 +587,14 @@ const QuotationAddModel = (props) => {
       ...editedContentModalValues,
     };
     if (!finalData.product_name || !finalData.quotation_amount) {
-      setMessage({title:'필요 항목 누락', message:'필요 값 - 제품명 또는 견적 가격 - 이 없습니다.'});
+      setMessage({ title: '필요 항목 누락', message: '필요 값 - 제품명 또는 견적 가격 - 이 없습니다.' });
       setIsMessageModalOpen(true);
       return;
     };
-    console.log('[handleContentModalOk] new content :', );
+    console.log('[handleContentModalOk] new content :',);
 
     // update Contents -------------------------------------------------
-    if(settingForContent.action === "ADD") {
+    if (settingForContent.action === "ADD") {
       const updatedContent = {
         ...default_quotation_content,
         '1': quotationContents.length + 1,
@@ -616,13 +607,13 @@ const QuotationAddModel = (props) => {
         '15': finalData.list_price,
         '16': finalData.quotation_amount,
         '17': finalData.cost_price,
-        '998': finalData.detail_desc? finalData.detail_desc : '',
+        '998': finalData.detail_desc ? finalData.detail_desc : '',
         'org_price': finalData.org_unit_price,
       };
       const updatedContents = quotationContents.concat(updatedContent);
       setQuotationContents(updatedContents);
 
-      if(settingForContent.auto_calc){
+      if (settingForContent.auto_calc) {
         handleCalculateAmounts(updatedContents);
       };
     } else {  //Update
@@ -638,11 +629,11 @@ const QuotationAddModel = (props) => {
         '15': finalData.list_price,
         '16': finalData.quotation_amount,
         '17': finalData.cost_price,
-        '998': finalData.detail_desc? finalData.detail_desc : '',
+        '998': finalData.detail_desc ? finalData.detail_desc : '',
         'org_price': finalData.org_unit_price,
       };
       const foundIdx = quotationContents.findIndex(item => item['1'] === settingForContent.index);
-      if(foundIdx === -1){
+      if (foundIdx === -1) {
         console.log('Something Wrong when modifying content');
         return;
       };
@@ -653,13 +644,13 @@ const QuotationAddModel = (props) => {
       ];
       setQuotationContents(updatedContents);
 
-      if(settingForContent.auto_calc){
+      if (settingForContent.auto_calc) {
         handleCalculateAmounts(updatedContents);
       };
     };
 
     handleContentModalCancel();
-  }, [ editedContentModalValues, handleCalculateAmounts, orgContentModalValues, quotationContents, settingForContent ]);
+  }, [editedContentModalValues, handleCalculateAmounts, orgContentModalValues, quotationContents, settingForContent]);
 
   const handleContentModalCancel = () => {
     setIsContentModalOpen(false);
@@ -674,13 +665,13 @@ const QuotationAddModel = (props) => {
   }, []);
 
   const handleFormatter = useCallback((value) => {
-    if(value === undefined || value === null || value === '') return '';
+    if (value === undefined || value === null || value === '') return '';
     let ret = value;
-    if(typeof value === 'string') {
+    if (typeof value === 'string') {
       ret = Number(value);
-      if(isNaN(ret)) return;
+      if (isNaN(ret)) return;
     };
-    
+
     return settingForContent.show_decimal
       ? ret?.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,')
       : ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -695,7 +686,7 @@ const QuotationAddModel = (props) => {
       || quotationChange.quotation_type === null
       || quotationContents.length === 0
     ) {
-      setMessage({title:'필요 항목 누락', message:'필요 값이 없습니다.'});
+      setMessage({ title: '필요 항목 누락', message: '필요 값이 없습니다.' });
       setIsMessageModalOpen(true);
       return;
     };
@@ -720,11 +711,11 @@ const QuotationAddModel = (props) => {
     };
     const result = modifyQuotation(newQuotationData);
     result.then((res) => {
-      if(res.result) {
+      if (res.result) {
         let thisModal = bootstrap.Modal.getInstance('#add_quotation');
-        if(thisModal) thisModal.hide();
+        if (thisModal) thisModal.hide();
       } else {
-        setMessage({title:'저장 실패', message:'정보 저장에 실패하였습니다.'});
+        setMessage({ title: '저장 실패', message: '정보 저장에 실패하였습니다.' });
         setIsMessageModalOpen(true);
       };
     });
@@ -733,17 +724,15 @@ const QuotationAddModel = (props) => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    tryLoadAllProductClassList();
-    tryLoadAllProducts();
     if (init
       && ((userState & 1) === 1)
     ) {
       if (handleInit) handleInit(!init);
-      setTimeout(()=>{
+      setTimeout(() => {
         initializeQuotationTemplate();
       }, 500);
     };
-  }, [userState, init, tryLoadAllProductClassList, tryLoadAllProducts, handleInit, allProductClassList, allProducts, initializeQuotationTemplate]);
+  }, [userState, init, handleInit, initializeQuotationTemplate]);
 
   if (init)
     return <div>&nbsp;</div>;
@@ -980,7 +969,7 @@ const QuotationAddModel = (props) => {
                     checked={settingForContent.vat_included}
                     disabled={settingForContent.vat_included_disabled}
                     onChange={handleChangeContentSetting}
-                   >
+                  >
                     {t('quotation.vat_included')}
                   </Checkbox>
                   <Checkbox
@@ -988,7 +977,7 @@ const QuotationAddModel = (props) => {
                     checked={settingForContent.unit_vat_included}
                     disabled={settingForContent.unit_vat_included_disabled}
                     onChange={handleChangeContentSetting}
-                   >
+                  >
                     {t('quotation.unit_vat_included')}
                   </Checkbox>
                   <Checkbox
@@ -1031,9 +1020,9 @@ const QuotationAddModel = (props) => {
                   rowKey={(record) => record['1']}
                   onRow={(record, rowIndex) => {
                     return {
-                        onClick: (event) => {
-                          handleModifyContent(record);
-                        }, // click row
+                      onClick: (event) => {
+                        handleModifyContent(record);
+                      }, // click row
                     };
                   }}
                 />

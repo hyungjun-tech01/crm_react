@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
@@ -8,15 +8,12 @@ import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import LeadDetailsModel from "./LeadDetailsModel";
 import { CompanyRepo } from "../../repository/company";
-import { ConsultingRepo } from "../../repository/consulting";
-import { QuotationRepo } from "../../repository/quotation";
-import { PurchaseRepo } from "../../repository/purchase";
 import { LeadRepo } from "../../repository/lead";
-import { 
-  atomAllLeadObj,
+import {
   atomFilteredLeadArray,
   atomCompanyState,
   atomLeadState,
+  atomSelectedItem,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { compareCompanyName, compareText } from "../../constants/functions";
@@ -51,6 +48,7 @@ const Leads = () => {
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ initToAddLead, setInitToAddLead ] = useState(false);
   const [ initToEditLead, setInitToEditLead ] = useState(false);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
@@ -153,18 +151,16 @@ const Leads = () => {
   }, [setInitToAddLead]);
 
   const handleClickLeadName = useCallback((leadCode, companyCode) => {
-    console.log("[Lead] set current lead : ", leadCode);
     setInitToEditLead(true);
     setCurrentLead(leadCode);
+    setSelectedItem({category: 'lead', item_code: leadCode});
     setCurrentCompany(companyCode);   // 현재 company 세팅 
-    // loadCompanyConsultings(companyCode);  // 현재 company에 해당하는 consulting 조회 
-    // loadCompanyQuotations(companyCode);  // 현재 company에 해당하는 quotation 조회 
-    // loadCompanyPurchases(companyCode);  // 현재 company에 해당하는 purchase 조회 
+    
     let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
       keyboard: false
     });
     myModal.show();
-  }, [setCurrentCompany, setCurrentLead]);
+  }, [setCurrentCompany, setCurrentLead, setSelectedItem]);
 
 
   const [ expanded, setExpaned ] = useState(false);

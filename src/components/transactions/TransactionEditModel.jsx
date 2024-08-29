@@ -15,7 +15,10 @@ import classNames from 'classnames';
 
 import {
   atomCompanyState,
+  atomCurrentCompany,
   atomCurrentTransaction,
+  atomSelectedItem,
+  defaultCompany,
   defaultTransaction,
 } from "../../atoms/atoms";
 import { DefaultTransactionContent, TransactionRepo } from "../../repository/transaction";
@@ -65,7 +68,8 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
 
 
   //===== [RecoilState] Related with Company =========================================
-  const [companyState] = useRecoilState(atomCompanyState);
+  const companyState = useRecoilValue(atomCompanyState);
+  const currentCompany = useRecoilValue(atomCurrentCompany);
 
 
   //===== Handles to edit 'TransactionEditModel' ======================================
@@ -77,6 +81,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   const [showDecimal, setShowDecimal] = useState(0);
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
   const [selectData, setSelectData] = useState({});
+  const [selectedItem, setSelectedItem] = useRecoilState(atomSelectedItem);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
@@ -499,7 +504,24 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setIsVatIncluded(true);
     setShowDecimal(0);
     setDataForTransaction({...default_transaction_data});
-    setTransactionChange({});
+    console.log('TransactionEdit / handleInitialize :', selectedItem);
+    console.log('TransactionEdit / handleInitialize :', currentCompany);
+    if((selectedItem.category === 'company')
+      && (currentCompany !== defaultCompany)
+      && (selectedItem.item_code === currentCompany.company_code))
+    {
+      setTransactionChange({
+        company_code: currentCompany.company_code,
+        company_name: currentCompany.company_name,
+        ceo_name: currentCompany.ceo_name,
+        company_address: currentCompany.company_address,
+        business_type: currentCompany.business_type,
+        business_item: currentCompany.business_item,
+        business_registration_code: currentCompany.business_registration_code,
+      });
+    } else {
+      setTransactionChange({});
+    };
     setTransactionContents([]);
     setOrgReceiptModalData({...default_receipt_data});
     setEditedReceiptModalData({});
@@ -509,7 +531,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setTransactionForPrint(null);
     setContentsForPrint(null);
     document.querySelector("#add_new_transaction_form").reset();
-  }, []);
+  }, [selectedItem, currentCompany]);
 
   const handleShowPrint = () => {
     const tempTransactionData = {
@@ -662,6 +684,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   };
 
   const handleClose = () => {
+    setSelectedItem({category: null, item_code: null});
     handleInitialize();
     close();
   };

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Table } from "antd";
@@ -16,6 +16,7 @@ import {
   atomFilteredTransactionArray,
   atomCompanyState,
   atomTransactionState,
+  atomSelectedItem,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { UserRepo } from "../../repository/user";
@@ -33,12 +34,10 @@ const Transactions = () => {
   //===== [RecoilState] Related with Company ==========================================
   const companyState = useRecoilValue(atomCompanyState);
   const { tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
-  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Transaction ======================================
   const transactionState = useRecoilValue(atomTransactionState);
-  const allTransactionData = useRecoilValue(atomAllTransactionObj);
   const filteredTransaction= useRecoilValue(atomFilteredTransactionArray);
   const { tryLoadAllTransactions, setCurrentTransaction , filterTransactions, loadAllTransactions} = useRecoilValue(TransactionRepo);
 
@@ -55,6 +54,7 @@ const Transactions = () => {
   const [taxInvoiceData, setTaxInvoiceData] = useState(null);
   const [taxInvoiceContents, setTaxInvoiceContents] = useState(null);
   const [needSaveTaxInvoice, setNeedSaveTaxxInvoice] = useState(false);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -226,6 +226,7 @@ const Transactions = () => {
   const handleOpenTransactoin = (code) => {
     setCurrentTransaction(code)
     setOpenTransaction(true);
+    setSelectedItem({category: 'transaction', item_code: code});
 
     setTimeout(() => {
       let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {

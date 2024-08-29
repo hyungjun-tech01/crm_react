@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
@@ -11,7 +11,7 @@ import {
   atomEngineersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
-import { atomConsultingState, atomCurrentConsulting, defaultConsulting } from "../../atoms/atoms";
+import { atomConsultingState, atomCurrentConsulting, atomSelectedItem, defaultConsulting } from "../../atoms/atoms";
 import {
   ConsultingRepo,
   ConsultingTypes,
@@ -45,6 +45,7 @@ const ConsultingDetailsModel = () => {
   //===== Handles to deal this component ==============================================
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentConsultingCode, setCurrentConsultingCode] = useState('');
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -127,6 +128,7 @@ const ConsultingDetailsModel = () => {
   }, []);
 
   const handleClose = useCallback(() => {
+    setSelectedItem({category: null, item_code: null});
     setEditedDetailValues(null);
     setCurrentConsulting();
   }, [setCurrentConsulting]);

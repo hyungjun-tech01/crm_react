@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Table } from "antd";
@@ -9,10 +9,10 @@ import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 
 import {
-  atomTaxInvoiceArray,
   atomCompanyState,
   atomFilteredTaxInvoiceArray,
   atomTaxInvoiceState,
+  atomSelectedItem,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 
@@ -49,11 +49,11 @@ const TaxInovices = () => {
   //===== Handles to edit this ========================================================
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
+
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
-
   const [statusSearch, setStatusSearch] = useState('common.all');
-
   const [multiQueryModal, setMultiQueryModal] = useState(false);
 
   const [queryConditions, setQueryConditions] = useState([
@@ -223,6 +223,7 @@ const TaxInovices = () => {
   const handleOpenTaxInvoice = (code) => {
     setCurrentTaxInvoice(code);
     setOpenTaxInvoice(true);
+    setSelectedItem({category: 'tax_invoice', item_code: code});
 
     setTimeout(()=>{
       let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {

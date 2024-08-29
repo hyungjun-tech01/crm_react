@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Collapse, Space, Switch } from "antd";
@@ -11,13 +11,13 @@ import { atomCurrentQuotation,
   atomProductClassListState,
   atomProductsState,
   atomAllProducts,
+  atomSelectedItem,
 } from "../../atoms/atoms";
 import { atomUserState,
   atomUsersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
 import { QuotationRepo, QuotationSendTypes, QuotationTypes } from "../../repository/quotation";
-import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
@@ -46,8 +46,6 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   const allProductClassList = useRecoilValue(atomProductClassList);
   const productState = useRecoilValue(atomProductsState);
   const allProducts = useRecoilValue(atomAllProducts);
-  const { tryLoadAllProductClassList } = useRecoilValue(ProductClassListRepo);
-  const { tryLoadAllProducts } = useRecoilValue(ProductRepo);
 
 
   //===== [RecoilState] Related with Users ============================================
@@ -59,6 +57,7 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   //===== Handles to deal this component ==============================================
   const [ isFullScreen, setIsFullScreen ] = useState(false);
   const [ currentQuotationCode, setCurrentQuotationCode ] = useState('');
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -360,9 +359,10 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   
 
   const handleClose = useCallback(() => {
+    setSelectedItem({category: null, item_code: null});
     setEditedDetailValues(null);
     setCurrentQuotation();
-  }, [setCurrentQuotation]);
+  }, [setCurrentQuotation, setSelectedItem]);
 
   const qotation_items_info = [
     { key:'quotation_type', title:'quotation.quotation_type', detail:{ type:'select', options:QuotationTypes, editing:handleDetailChange }},

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
@@ -8,6 +8,7 @@ import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import {
   atomFilteredPurchaseArray,
   atomPurchaseState,
+  atomSelectedItem,
 } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
 import { PurchaseRepo } from "../../repository/purchase";
@@ -45,6 +46,7 @@ const Purchase = () => {
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ initAddNewPurchase, setInitAddNewPurchase ] = useState(false);
   const [ tableData, setTableData ] = useState([]);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
   
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -147,11 +149,12 @@ const Purchase = () => {
   // --- Functions used for Table ------------------------------
   const handleClickPurchase = useCallback((code)=>{
     setCurrentPurchase(code);
+    setSelectedItem({category: 'purchase', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('purchase-details'), {
       keyboard: false
     })
     myModal.show();
-  },[setCurrentPurchase]);
+  },[setCurrentPurchase, setSelectedItem]);
 
   const handleAddNewPurchaseClicked = useCallback(() => {
     setInitAddNewPurchase(true);

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
@@ -10,6 +10,7 @@ import { option_locations, option_deal_type } from "../../constants/constants";
 import {
   atomCurrentCompany,
   atomPurchaseByCompany,
+  atomSelectedItem,
   atomTaxInvoiceByCompany,
   atomTransactionByCompany,
   defaultCompany,
@@ -72,6 +73,7 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
   //===== Handles to deal this component ==============================================
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentCompanyCode, setCurrentCompanyCode] = useState("");
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
 
   const handleWindowWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -172,6 +174,7 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
   }, []);
 
   const handleClose = useCallback(() => {
+    setSelectedItem({category: null, item_code: null});
     setEditedDetailValues(null);
     setCurrentCompany();
     setCurrentCompanyCode("");
@@ -596,7 +599,7 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
           {/* modal-content */}
         </div>
       </div>
-      <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} companyCode={selectedCompany.company_code} />
+      <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} />
       <PurchaseDetailsModel />
     </>
   );

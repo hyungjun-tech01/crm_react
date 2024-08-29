@@ -9,8 +9,10 @@ import {
     atomCurrentPurchase,
     defaultMAContract,
     atomCurrentCompany,
+    atomSelectedItem,
     defaultCompany,
     defaultPurchase,
+    atomCurrentLead,
 } from '../../atoms/atoms';
 import { PurchaseRepo } from '../../repository/purchase';
 import { ProductTypeOptions } from '../../repository/product';
@@ -27,7 +29,7 @@ import MessageModal from "../../constants/MessageModal";
 
 
 const PurchaseAddModel = (props) => {
-    const { init, handleInit, companyCode } = props;
+    const { init, handleInit } = props;
     const { t } = useTranslation();
     const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
     const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -36,6 +38,10 @@ const PurchaseAddModel = (props) => {
 
     //===== [RecoilState] Related with Company =============================================
     const currentCompany = useRecoilValue(atomCurrentCompany);
+
+
+    //===== [RecoilState] Related with Company =============================================
+    const currentLead = useRecoilValue(atomCurrentLead);
 
 
     //===== [RecoilState] Related with Purcahse ============================================
@@ -51,26 +57,31 @@ const PurchaseAddModel = (props) => {
     const [purchaseChange, setPurchaseChange] = useState({});
     const [companyData, setCompanyData] = useState({ company_name: '', company_code: '' });
     const [needInit, setNeedInit] = useState(false);
+    const selectedItem = useRecoilValue(atomSelectedItem);
 
     const initializePurchaseTemplate = useCallback(() => {
         document.querySelector("#add_new_purchase_form").reset();
         
-        if(companyCode && companyCode !== "") {
-            if(currentCompany !== defaultCompany) {
-                setPurchaseChange({
-                    ...defaultPurchase,
-                    company_code: companyCode,
-                });
-                setCompanyData({
-                    company_code: currentCompany.company_code,
-                    company_name: currentCompany.company_name,
-                });
-            };
+        // if(companyCode && companyCode !== "") {
+        if((currentCompany !== defaultCompany)
+            && (
+                ((selectedItem.category === 'company') && (selectedItem.item_code === currentCompany.company_code))
+                || ((selectedItem.category === 'lead') && (selectedItem.item_code === currentLead.lead_code))
+            )
+        ){
+            setPurchaseChange({
+                ...defaultPurchase,
+                company_code: currentCompany.company_code,
+            });
+            setCompanyData({
+                company_code: currentCompany.company_code,
+                company_name: currentCompany.company_name,
+            });
         } else {
             setPurchaseChange({...defaultPurchase});
         }
         setNeedInit(false);
-    }, [companyCode, currentCompany]);
+    }, [currentCompany, selectedItem]);
 
     const handleItemChange = useCallback((e) => {
         const modifiedData = {

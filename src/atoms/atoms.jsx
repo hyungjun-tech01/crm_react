@@ -479,3 +479,9 @@ export const atomTaxInvoiceState = atom({
     key: "taxInvoiceState",
     default: 0,
 });
+
+//----- Selected Item ------------------------
+export const atomSelectedItem = atom({
+    key: "selectedItem",
+    default: { category: null, item_code: null },
+});

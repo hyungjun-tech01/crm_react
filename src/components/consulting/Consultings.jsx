@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
@@ -19,10 +19,10 @@ import { ConsultingRepo } from "../../repository/consulting";
 import { UserRepo } from "../../repository/user";
 import {
   atomCompanyState,
-  atomAllConsultingObj,
   atomFilteredConsultingArray,
   atomLeadState,
   atomConsultingState,
+  atomSelectedItem,
   defaultLead,
 } from "../../atoms/atoms"; 
 import { compareCompanyName, compareText } from "../../constants/functions";
@@ -58,6 +58,8 @@ const Consultings = () => {
   //===== Handles to deal 'Consultings' ========================================
   const [ nowLoading, setNowLoading ] = useState(true);
   const [initAddConsulting, setInitAddConsulting] = useState(false);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
+
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
   const [statusSearch, setStatusSearch] = useState('common.all');
@@ -159,8 +161,8 @@ const Consultings = () => {
   }, []);
 
   const handleClickConsulting = useCallback((code) => {
-    console.log("[Consulting] set current consulting : ", code);
     setCurrentConsulting(code);
+    setSelectedItem({category: 'consulting', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
       keyboard: false
     })
@@ -168,8 +170,8 @@ const Consultings = () => {
   }, []);
 
   const handleClickCompany = useCallback((code) => {
-    console.log("[Consulting] set current company : ", code);
     setCurrentCompany(code);
+    setSelectedItem({category: 'company', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
       keyboard: false
     })
@@ -177,8 +179,8 @@ const Consultings = () => {
   }, []);
 
   const handleClickLead = useCallback((code) => {
-    console.log("[Consulting] set current lead : ", code);
-    setCurrentCompany(code);
+    setCurrentLead(code);
+    setSelectedItem({category: 'lead', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
       keyboard: false
     })

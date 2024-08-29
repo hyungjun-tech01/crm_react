@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Avatar, Space, Switch } from "antd";
@@ -10,6 +10,7 @@ import {
   atomPurchaseByCompany,
   atomConsultingByLead,
   atomQuotationByLead,
+  atomSelectedItem,
 } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo } from "../../repository/company";
@@ -78,6 +79,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentLeadCode, setCurrentLeadCode] = useState('');
   const [validMACount, setValidMACount] = useState(0);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -175,6 +177,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
   };
 
   const handleClose = useCallback(() => {
+    setSelectedItem({category: null, item_code: null});
     setEditedDetailValues(null);
     setCurrentLead();
     setCurrentLeadCode('');
@@ -636,11 +639,11 @@ const LeadDetailsModel = ({init, handleInit}) => {
         </div>
         {/* modal-dialog */}
       </div>
-      <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} leadCode={selectedLead.lead_code} />
+      <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} />
       <ConsultingDetailsModel />
-      <QuotationAddModel init={initAddQuotation} handleInit={setInitAddQuotation} leadCode={selectedLead.lead_code} />
+      <QuotationAddModel init={initAddQuotation} handleInit={setInitAddQuotation} />
       <QuotationDetailsModel  init={initEditQuotation} handleInit={setInitEditQuotation}/>
-      <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} companyCode={selectedLead.company_code} />
+      <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} />
       <PurchaseDetailsModel />
     </>
   );

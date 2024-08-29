@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
@@ -10,17 +10,15 @@ import "../antdstyle.css";
 import QuotationDetailsModel from "./QuotationDetailsModel";
 import QuotationAddModel from "./QuotationAddModel";
 import SystemUserModel from "../task/SystemUserModel";
-import CompanyDetailsModel from "../company/CompanyDetailsModel";
-import LeadDetailsModel from "../leads/LeadDetailsModel";
 
-import { CompanyRepo } from "../../repository/company";
+// import { CompanyRepo } from "../../repository/company";
 import { QuotationRepo } from "../../repository/quotation";
 import { UserRepo } from "../../repository/user";
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import {
-  atomAllQuotationObj,
   atomFilteredQuotationArray,
   atomQuotationState,
+  atomSelectedItem,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { compareCompanyName, compareText, ConvertCurrency, formatDate } from "../../constants/functions";
@@ -31,12 +29,11 @@ const Quotations = () => {
 
 
   //===== [RecoilState] Related with Company ==========================================
-  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
+  // const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Quotation ========================================
   const quotationState = useRecoilValue(atomQuotationState);
-  const allQuotationData = useRecoilValue(atomAllQuotationObj);
   const filteredQuotation = useRecoilValue(atomFilteredQuotationArray);
   const { tryLoadAllQuotations, setCurrentQuotation, filterQuotations , loadAllQuotations} = useRecoilValue(QuotationRepo);
 
@@ -50,6 +47,7 @@ const Quotations = () => {
   const [ nowLoading, setNowLoading ] = useState(true);
   const [initAddNewQuotation, setInitAddNewQuotation] = useState(false);
   const [initEditQuotation, setInitEditQuotation] = useState(false);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -152,27 +150,29 @@ const Quotations = () => {
     filterQuotations(statusSearch, newValue);
   };
 
-  const handleClickCompany = useCallback((code) => {
-    console.log("[Consulting] set current company : ", code);
-    setCurrentCompany(code);
-    let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
-      keyboard: false
-    })
-    myModal.show();
-  }, []);
+  // const handleClickCompany = useCallback((code) => {
+  //   console.log("[Consulting] set current company : ", code);
+  //   setCurrentCompany(code);
+  //   setSelectedItem({category: 'company', item_code: code});
+  //   let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
+  //     keyboard: false
+  //   })
+  //   myModal.show();
+  // }, []);
 
-  const handleClickLead = useCallback((code) => {
-    console.log("[Consulting] set current lead : ", code);
-    setCurrentCompany(code);
-    let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
-      keyboard: false
-    })
-    myModal.show();
-  }, []);
+  // const handleClickLead = useCallback((code) => {
+  //   console.log("[Consulting] set current lead : ", code);
+  //   setCurrentLead(code);
+  //   setSelectedItem({category: 'lead', item_code: code});
+  //   let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
+  //     keyboard: false
+  //   })
+  //   myModal.show();
+  // }, []);
 
   const handleClickQuotation = useCallback((code) => {
-    console.log("[Quotation] set current quotation : ", code);
     setCurrentQuotation(code);
+    setSelectedItem({category: 'quotation', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('quotation-details'), {
       keyboard: false
     })
@@ -264,8 +264,6 @@ const Quotations = () => {
   useEffect(() => {
     // tryLoadAllCompanies();
     // tryLoadAllLeads();
-
- 
     
     const multiQueryCondi = {
       queryConditions:queryConditions,

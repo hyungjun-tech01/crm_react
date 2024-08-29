@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import {
   atomCurrentLead,
+  atomSelectedItem,
   defaultLead,
 } from "../../atoms/atoms";
 import {
@@ -29,7 +30,7 @@ import { CompanyRepo } from "../../repository/company";
 
 
 const ConsultingAddModel = (props) => {
-  const { init, handleInit, leadCode } = props;
+  const { init, handleInit } = props;
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId", "myLationCrmUserName"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -57,6 +58,7 @@ const ConsultingAddModel = (props) => {
 
   //===== Handles to edit 'ConsultingAddModel' ========================================
   const [consultingChange, setConsultingChange] = useState({});
+  const selectedItem = useRecoilValue(atomSelectedItem);
 
   const initializeConsultingTemplate = useCallback(() => {
     document.querySelector("#add_new_consulting_form").reset();
@@ -68,21 +70,22 @@ const ConsultingAddModel = (props) => {
       receipt_date: tempDate,
     };
 
-    if (leadCode && leadCode !== "") {
-      if (currentLead !== defaultLead) {
-        modified['lead_code'] = currentLead.lead_code;
-        modified['lead_name'] = currentLead.lead_name;
-        modified['department'] = currentLead.department;
-        modified['position'] = currentLead.position;
-        modified['mobile_number'] = currentLead.mobile_number;
-        modified['phone_number'] = currentLead.phone_number;
-        modified['email'] = currentLead.email;
-        modified['company_code'] = currentLead.company_code;
-        modified['company_name'] = currentLead.company_name;
-      };
+    if ((selectedItem.category === 'lead')
+      && (currentLead !== defaultLead)
+      && (selectedItem.item_code === currentLead.lead_code)
+    ) {
+      modified['lead_code'] = currentLead.lead_code;
+      modified['lead_name'] = currentLead.lead_name;
+      modified['department'] = currentLead.department;
+      modified['position'] = currentLead.position;
+      modified['mobile_number'] = currentLead.mobile_number;
+      modified['phone_number'] = currentLead.phone_number;
+      modified['email'] = currentLead.email;
+      modified['company_code'] = currentLead.company_code;
+      modified['company_name'] = currentLead.company_name;
     };
     setConsultingChange(modified);
-  }, [cookies.myLationCrmUserName, currentLead, leadCode, setCurrentCompany]);
+  }, [cookies.myLationCrmUserName, currentLead, setCurrentCompany, selectedItem]);
 
   const handleDateChange = (name, date) => {
     const modifiedData = {

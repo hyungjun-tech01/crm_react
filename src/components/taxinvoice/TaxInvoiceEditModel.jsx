@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
@@ -15,7 +15,10 @@ import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import {
   atomCompanyState,
+  atomCurrentCompany,
   atomCurrentTaxInvoice,
+  atomSelectedItem,
+  defaultCompany,
   defaultTaxInvoice,
 } from "../../atoms/atoms";
 import { DefaultTaxInvoiceContent, TaxInvoiceRepo } from "../../repository/tax_invoice";
@@ -71,6 +74,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
 
   //===== [RecoilState] Related with Company =========================================
   const companyState = useRecoilValue(atomCompanyState);
+  const currentCompany = useRecoilValue(atomCurrentCompany);
 
 
   //===== Handles to edit 'TaxInvoiceEditModel' ======================================
@@ -84,6 +88,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
   const [isTaxInvoice, setIsTaxInvoice] = useState(true);
   const [selectValues, setSelectValue] = useState({})
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
+  const [selectedItem, setSelectedItem] = useRecoilState(atomSelectedItem);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
@@ -586,6 +591,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
   };
 
   const handleClose = () => {
+    setSelectedItem({category: null, item_code: null});
     handleInitialize();
     close();
   };
@@ -601,7 +607,30 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
       } else {
         if(currentTaxInvoice !== defaultTaxInvoice) {
           inputData = {...currentTaxInvoice};
-        };
+        } else {
+          if((selectedItem.category === 'company')
+            && (currentCompany !== defaultCompany)
+            && (selectedItem.item_code === currentCompany.company_code)
+          ){
+            inputData = {
+              ...default_invoice_data,
+              ...defaultTaxInvoice,
+              create_date: new Date(),
+              transaction_type : '매출',  // default
+              invoice_type: '세금계산서', // default
+              payment_type: '현금', //default
+              supply_price: 0,
+              tax_price: 0,
+              company_code : currentCompany.company_code,
+              business_registration_code : currentCompany.business_registration_code,
+              company_name : currentCompany.company_name,
+              ceo_name : currentCompany.ceo_name,
+              company_address : currentCompany.company_address,
+              business_type : currentCompany.business_type,
+              business_item : currentCompany.business_item,
+            }
+          };
+        }
       };
       console.log('TaxInvoiceEditModel / useEffect : ', inputData);
       if(!!inputData && Object.keys(inputData).length > 0) {
@@ -619,7 +648,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
         let tempInvoiceData = {
           ...inputData,
           show_decimal: false,
-          receive_type: '청구',
           create_date: new Date(inputData.create_date),
 
           cash_amount: inputData['cash_amount']
@@ -696,7 +724,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
       setInvoiceChange({});
     };
 
-  }, [contents, data, companyState, open, currentTaxInvoice]);
+  }, [contents, data, companyState, open, currentTaxInvoice, selectedItem]);
 
   if (!open) return (
     <div>&nbsp;</div>
