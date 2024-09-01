@@ -159,9 +159,14 @@ export const UserRepo = selector({
                 });
                 const data = await response.json();
                 if (data.message !== "success") {
-                    console.log('\t[ modifyUser ] message:', data.message);
-                    return false;
+                    console.log('[modifyUser] rtn message:', data.message);
+                    return  false;
                 };
+
+                if (newUser.action_type === 'UPDATE_PASSWORD') {
+                    console.log('modified password', );
+                    return true;
+                }
 
                 if (newUser.action_type === 'UPDATE') {
                     const currentUser = await snapshot.getPromise(atomCurrentUser);
@@ -231,9 +236,10 @@ export const UserRepo = selector({
 
                     return (true);
                 }
+              
             } catch (err) {
                 console.error(`\t[ modifyUser ] Error : ${err}`);
-                return false;
+                return {'message':`\t[ modifyUser ] Error : ${err}`};
             };
         });
         /////////////////////modify User /////////////////////////////

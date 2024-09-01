@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
@@ -6,12 +6,13 @@ import { Collapse } from "antd";
 import { C_logo, C_logo2, CircleImg } from "../imagepath";
 import { atomCurrentUser, defaultUser } from "../../atoms/atomsUser";
 import { UserRepo } from "../../repository/user";
-import DetailLabelItem from "../../constants/DetailLabelItem";
-import DetailDateItem from "../../constants/DetailDateItem";
-import DetailTextareaItem from "../../constants/DetailTextareaItem";
+import DetailLabelItemChangePassword from "../../constants/DetailLabelItem";
 import { useTranslation } from "react-i18next";
 
-const ChangePassword = () => {
+const ChangePassword = (props) => {
+
+  const { inputPassword } = props;
+
   const { t } = useTranslation();
 
   const { Panel } = Collapse;
@@ -25,6 +26,11 @@ const ChangePassword = () => {
   const [ establishDate, setEstablishDate ] = useState(new Date());
   const [ orgCloseDate, setOrgCloseDate ] = useState(null);
   const [ closeDate, setCloseDate ] = useState(new Date());
+  const resetInputValueRef = useRef(null);  // resetInputValue 함수 참조
+
+
+  console.log('savedValues', savedValues);
+  console.log('editedValues',editedValues);
 
   // --- Funtions for Editing ---------------------------------
   const handleCheckEditState = useCallback((name) => {
@@ -32,6 +38,7 @@ const ChangePassword = () => {
   }, [editedValues]);
 
   const handleStartEdit = useCallback((name) => {
+    console.log('start editedValues',editedValues);
     const tempEdited = {
       ...editedValues,
       [name]: selectedUser[name],
@@ -40,7 +47,7 @@ const ChangePassword = () => {
   }, [editedValues, selectedUser]);
 
   const handleEditing = useCallback((e) => {
-    console.log('editedValues',editedValues);
+    console.log('editing editedValues',editedValues);
     const tempEdited = {
       ...editedValues,
       [e.target.name]: e.target.value,
@@ -87,33 +94,119 @@ const ChangePassword = () => {
     setSavedValues(tempSaved);
   }, [savedValues]);
 
-  const handleSaveAll = useCallback(() => {
+  const handleSaveAll = useCallback(async () => {
     if(editedValues !== null
       && selectedUser
       && selectedUser !== defaultUser)
     {
+      
       const temp_all_saved = {
         ...editedValues,
-        action_type: "UPDATE",
+        action_type: "UPDATE_PASSWORD",
         modify_user: cookies.myLationCrmUserId,
         userId: selectedUser.userId,
       };
-      console.log('temp_all_saved', temp_all_saved);
-      if (modifyUser(temp_all_saved)) {
-        console.log(`Succeeded to modify company`);
-      } else {
-        console.error('Failed to modify company')
+
+      console.log("confirm password", temp_all_saved.change_password);
+
+      if(temp_all_saved.change_password === null || temp_all_saved.change_password === null|| temp_all_saved.change_password_confirm === null||
+        temp_all_saved.change_password === '' || temp_all_saved.change_password === '' || temp_all_saved.change_password_confirm === '' ||
+        temp_all_saved.change_password === undefined || temp_all_saved.change_password === undefined || temp_all_saved.change_password_confirm === undefined){
+        
+        alert(t('user.miss_password_item'));
+        return;
       }
+
+      if(temp_all_saved.change_password.length <= 4){
+        alert(t('user.min_password_length'));
+        return;
+      }
+      if(temp_all_saved.change_password !== temp_all_saved.change_password_confirm){
+        alert(t('user.change_password_same'))
+        return;
+      }
+     
+      const res = await modifyUser(temp_all_saved);
+      if (res) {
+        alert('패스워드가 변경되었습니다.');
+      } else {
+        alert('패스워드 변경이 실패하였습니다.');
+      }
+
     } else {
       console.log("[ CompanyDetailModel ] No saved data");
     };
+
     setEditedValues(null);
     setSavedValues(null);
-  }, [cookies.myLationCrmUserId, modifyUser, savedValues,editedValues, selectedUser]);
+
+    var changepassword1 = document.querySelector('[name="current_password"]');
+    if (changepassword1) {
+      changepassword1.value='';
+    } else {
+        console.error('changepassword1 not found');
+    }    
+
+    var changepassword2 = document.querySelector('[name="change_password"]');
+    if (changepassword2) {
+      changepassword2.value='';
+    } else {
+        console.error('changepassword2 not found');
+    }    
+    
+    var changepassword3 = document.querySelector('[name="change_password_confirm"]');
+    if (changepassword3) {
+      changepassword3.value='';
+    } else {
+        console.error('changepassword3 not found');
+    }    
+
+   // setTimeout(() => {
+      var closeButton = document.querySelector('#btn_change_password_close');
+      if (closeButton) {
+          closeButton.click();
+      } else {
+          console.error('Close button not found');
+      }
+ //   }, 100); // 모달이 렌더링될 시간을 준 후 시도  
+      if (resetInputValueRef.current) {
+        resetInputValueRef.current();  // inputValue를 빈 문자열로 설정
+      }
+  }, [cookies.myLationCrmUserId, modifyUser, savedValues,editedValues, selectedUser, resetInputValueRef]);
 
   const handleCancelAll = useCallback(() => {
     setEditedValues(null);
     setSavedValues(null);
+
+
+    var changepassword1 = document.querySelector('[name="current_password"]');
+    if (changepassword1) {
+      changepassword1.value='';
+    } else {
+        console.error('changepassword1 not found');
+    }    
+
+    var changepassword2 = document.querySelector('[name="change_password"]');
+    if (changepassword2) {
+      changepassword2.value='';
+    } else {
+        console.error('changepassword2 not found');
+    }    
+    
+    var changepassword3 = document.querySelector('[name="change_password_confirm"]');
+    if (changepassword3) {
+      changepassword3.value='';
+    } else {
+        console.error('changepassword3 not found');
+    }        
+
+    var closeButton = document.querySelector('#btn_change_password_close');
+    if (closeButton) {
+        closeButton.click();
+    } else {
+        console.error('Close button not found');
+    }  
+
   }, []);
 
   // --- Funtions for Establishment Date ---------------------------------
@@ -168,11 +261,20 @@ const ChangePassword = () => {
     setEditedValues(tempEdited);
   }, [editedValues, savedValues, orgCloseDate, closeDate]);
 
+
+useEffect(() => {
+    // 모달이 열릴 때 editedValues와 savedValues를 초기화
+    setEditedValues(null);
+    setSavedValues(null);
+}, []);
+
   // useEffect(() => {
-  //   console.log('[UserDetailModel] called!', selectedUser);
-  //   setOrgEstablishDate(selectedCompany.establishment_date ? new Date(selectedCompany.establishment_date) : null);
-  //   setOrgCloseDate(selectedCompany.closure_date ? new Date(selectedCompany.closure_date) : null);
-  // }, [selectedCompany, savedValues]);
+  //   if (isModalOpen) {
+  //     setEditedValues(null);
+  //     setSavedValues(null);
+  //     console.log('savedValues!', savedValues);
+  //   }
+  //  }, [isModalOpen]);
 
   return (
     <>
@@ -220,47 +322,6 @@ const ChangePassword = () => {
                         {" "}
                         Actions{" "}
                       </Link>
-                      <div className="dropdown-menu">
-                        <Link className="dropdown-item" to="#">
-                          Edit This Company
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Change Organization Image
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Delete This Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Change Record Owner
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Generate Merge Document
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Print This Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Task For Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Event For Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add Activity Set To Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Contact For Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Opportunity For Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Opportunity For Organization
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                          Add New Project For Organization
-                        </Link>
-                      </div>
                     </li>
                   </ul>
                 </div>
@@ -268,7 +329,9 @@ const ChangePassword = () => {
               <button
                 type="button"
                 className="btn-close xs-close"
+                id = "btn_change_password_close"
                 data-bs-dismiss="modal"
+                onClick={handleCancelAll}
               />
             </div>
             <div className="modal-body">
@@ -281,7 +344,7 @@ const ChangePassword = () => {
                           <Panel header="Organization Name" key="1"> */}
                             <table className="table">
                               <tbody>
-                                <DetailLabelItem
+                                <DetailLabelItemChangePassword
                                   defaultText=""
                                   saved={savedValues}
                                   name="current_password"
@@ -295,8 +358,9 @@ const ChangePassword = () => {
                                   endEdit={handleEndEdit}
                                   checkSaved={handleCheckSaved}
                                   cancelSaved={handleCancelSaved}
+                                  resetInputValue={resetInputValueRef}
                                 />
-                                <DetailLabelItem
+                                <DetailLabelItemChangePassword
                                   defaultText=""
                                   saved={savedValues}
                                   name="change_password"
@@ -311,7 +375,7 @@ const ChangePassword = () => {
                                   checkSaved={handleCheckSaved}
                                   cancelSaved={handleCancelSaved}
                                 />
-                                <DetailLabelItem
+                                <DetailLabelItemChangePassword
                                   defaultText=""
                                   saved={savedValues}
                                   name="change_password_confirm"

@@ -33,6 +33,10 @@ const UserInfo = () => {
     setCurrentUser(id);
   },[setCurrentUser]);  
 
+  const handleChangePassword = useCallback((id)=>{
+    setCurrentUser(id);
+  },[setCurrentUser]);  
+
   useEffect(() => {
     if (currentUser.userId === "") {  
       loadUsers(cookies.myLationCrmUserId);
@@ -122,13 +126,13 @@ const UserInfo = () => {
                                 &nbsp;{currentUser.memo}
                                 </div>
                               </li>
-                              <li>
+                              <li>                               
                                 <button
                                 className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                                 id="add-task"
                                 data-bs-toggle="modal"
                                 data-bs-target="#change-password"
-                                onClick={()=>{handleClickUserEdit(cookies.myLationCrmUserId)}}
+                                onClick={()=>{handleChangePassword(cookies.myLationCrmUserId)}}
                                 >
                                 Change Password
                               </button>

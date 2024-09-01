@@ -357,6 +357,9 @@ const enResource = {
             current_password:'Current Password',
             change_password:'Change Password',
             change_password_confirm:'Change Password Confirm',
+            miss_password_item :'Some missing input items.',
+            min_password_length:'Password must be at least 5 characters long.',
+            change_password_same:'Confirm Change Password and Change Password must be the same.',
         }
     },
 }

@@ -357,6 +357,9 @@ const koResource = {
             current_password:'현재 비밀번호',
             change_password:'변경 비밀번호',
             change_password_confirm:'변경 비밀번호 학인',
+            miss_password_item :'입력항목이 누락되었습니다.',
+            min_password_length:'password 는 5자리 이상이어야 합니다.',
+            change_password_same:'변경 비밀번호 확인과 변경 비밀번호는 같아야 합니다.'
         }
     },
 }
