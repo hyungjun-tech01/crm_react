@@ -38,7 +38,6 @@ const CompanyAddModel = (props) => {
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
   //===== Handles to edit 'CompanyAddModel' ===========================================
-  const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
   const [companyChange, setCompanyChange] = useState({ ...defaultCompany });
 
   const initializeCompanyTemplate = useCallback(() => {
@@ -89,7 +88,6 @@ const CompanyAddModel = (props) => {
       const newComData = {
         ...companyChange,
         action_type: "ADD",
-        company_number: "99999", // Temporary
         counter: 0,
         modify_user: cookies.myLationCrmUserId,
       };
@@ -99,7 +97,7 @@ const CompanyAddModel = (props) => {
         if (res.result) {
           initializeCompanyTemplate();
           let thisModal = bootstrap.Modal.getInstance('#add_company');
-          if(thisModal) thisModal.hide();
+          if (thisModal) thisModal.hide();
         } else {
           const tempMsg = {
             title: t('comment.title_check'),
@@ -119,19 +117,16 @@ const CompanyAddModel = (props) => {
   );
 
   useEffect(() => {
-    if ((userState & 1) === 1) {
-      setIsAllNeededDataLoaded(true);
-      if (init) {
-        console.log("[CompanyAddModel] initialzie!");
-        if(handleInit) handleInit(!init);
-        setTimeout(()=>{
-          initializeCompanyTemplate();
-        }, 500);
-      };
+    if (init && (userState & 1) === 1) {
+      console.log("[CompanyAddModel] initialzie!");
+      if (handleInit) handleInit(!init);
+      setTimeout(() => {
+        initializeCompanyTemplate();
+      }, 500);
     }
   }, [userState, init]);
 
-  if (!isAllNeededDataLoaded)
+  if (init)
     return <div>&nbsp;</div>;
 
   return (

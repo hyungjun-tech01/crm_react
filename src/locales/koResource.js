@@ -66,6 +66,7 @@ const koResource = {
             new_company:'업체 등록',
             phone_number : '회사전화',
             salesman:'영업담당',
+            search_name: '회사명 검색',
             zip_code : '업체우편번호',
             _loading_add: '신규 업체 추가를 위한 기반 정보를 불러오고 있습니다.',
             _loading_detail: '업체에 대한 상세 정보를 불러오고 있습니다.',
@@ -341,6 +342,7 @@ const koResource = {
             modify_date:'최종수정일'
         },
         comment: {
+            input_search_text: '검색 문구를 입력하세요.',
             search_address_first: '먼저 주소 검색하시기 바랍니다.',
             title_check: '확인',
             msg_fail_save: '저장하지 못했습니다.'

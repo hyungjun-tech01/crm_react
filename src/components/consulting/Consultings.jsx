@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
@@ -19,10 +19,10 @@ import { ConsultingRepo } from "../../repository/consulting";
 import { UserRepo } from "../../repository/user";
 import {
   atomCompanyState,
-  atomAllConsultings,
-  atomFilteredConsulting,
+  atomFilteredConsultingArray,
   atomLeadState,
   atomConsultingState,
+  atomSelectedItem,
   defaultLead,
 } from "../../atoms/atoms"; 
 import { compareCompanyName, compareText } from "../../constants/functions";
@@ -35,8 +35,7 @@ const Consultings = () => {
 
   //===== [RecoilState] Related with Consulting =======================================
   const consultingState = useRecoilValue(atomConsultingState);
-  const allConsultingData = useRecoilValue(atomAllConsultings);
-  const filteredConsulting = useRecoilValue(atomFilteredConsulting);
+  const filteredConsulting = useRecoilValue(atomFilteredConsultingArray);
   const { tryLoadAllConsultings, loadAllConsultings, setCurrentConsulting, filterConsultingOri } = useRecoilValue(ConsultingRepo);
 
 
@@ -59,12 +58,12 @@ const Consultings = () => {
   //===== Handles to deal 'Consultings' ========================================
   const [ nowLoading, setNowLoading ] = useState(true);
   const [initAddConsulting, setInitAddConsulting] = useState(false);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
+
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
   const [statusSearch, setStatusSearch] = useState('common.all');
-
   const [multiQueryModal, setMultiQueryModal] = useState(false);
-
   const [queryConditions, setQueryConditions] = useState([
     { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
     { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
@@ -159,11 +158,11 @@ const Consultings = () => {
   const handleAddNewConsultingClicked = useCallback(() => {
     setCurrentLead(defaultLead);
     setInitAddConsulting(true);
-  }, [defaultLead]);
+  }, []);
 
   const handleClickConsulting = useCallback((code) => {
-    console.log("[Consulting] set current consulting : ", code);
     setCurrentConsulting(code);
+    setSelectedItem({category: 'consulting', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
       keyboard: false
     })
@@ -171,8 +170,8 @@ const Consultings = () => {
   }, []);
 
   const handleClickCompany = useCallback((code) => {
-    console.log("[Consulting] set current company : ", code);
     setCurrentCompany(code);
+    setSelectedItem({category: 'company', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
       keyboard: false
     })
@@ -180,8 +179,8 @@ const Consultings = () => {
   }, []);
 
   const handleClickLead = useCallback((code) => {
-    console.log("[Consulting] set current lead : ", code);
-    setCurrentCompany(code);
+    setCurrentLead(code);
+    setSelectedItem({category: 'lead', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
       keyboard: false
     })
@@ -367,55 +366,29 @@ const Consultings = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive activity-tables">
-                    {searchCondition === "" ?
-                      <Table
-                        pagination={{
-                          total: allConsultingData.length,
-                          showTotal: ShowTotal,
-                          showSizeChanger: true,
-                          onShowSizeChange: onShowSizeChange,
-                          ItemRender: ItemRender,
-                        }}
-                        loading={nowLoading}
-                        style={{ overflowX: "auto" }}
-                        columns={columns}
-                        bordered
-                        dataSource={allConsultingData}
-                        rowKey={(record) => record.consulting_code}
-                        onRow={(record, rowIndex) => {
-                          return {
-                            onClick: (event) => {
-                              if(event.target.className === 'table_company' || event.target.className === 'table_lead') return;
-                              handleClickConsulting(record.consulting_code);
-                            },
-                          };
-                        }}
-                      />
-                      :
-                      <Table
-                        pagination={{
-                          total: filteredConsulting.length > 0 ? filteredConsulting.length : 0,
-                          showTotal: ShowTotal,
-                          showSizeChanger: true,
-                          onShowSizeChange: onShowSizeChange,
-                          ItemRender: ItemRender,
-                        }}
-                        loading={nowLoading}
-                        style={{ overflowX: "auto" }}
-                        columns={columns}
-                        bordered
-                        dataSource={filteredConsulting.length > 0 ? filteredConsulting : null}
-                        rowKey={(record) => record.consulting_code}
-                        onRow={(record, rowIndex) => {
-                          return {
-                            onClick: (event) => {
-                              if(event.target.className === 'table_company' || event.target.className === 'table_lead') return;
-                              handleClickConsulting(record.consulting_code);
-                            },
-                          };
-                        }}
-                      />
-                    }
+                    <Table
+                      pagination={{
+                        total: filteredConsulting.length > 0 ? filteredConsulting.length : 0,
+                        showTotal: ShowTotal,
+                        showSizeChanger: true,
+                        onShowSizeChange: onShowSizeChange,
+                        ItemRender: ItemRender,
+                      }}
+                      loading={nowLoading}
+                      style={{ overflowX: "auto" }}
+                      columns={columns}
+                      bordered
+                      dataSource={filteredConsulting.length > 0 ? filteredConsulting : null}
+                      rowKey={(record) => record.consulting_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onClick: (event) => {
+                            if(event.target.className === 'table_company' || event.target.className === 'table_lead') return;
+                            handleClickConsulting(record.consulting_code);
+                          },
+                        };
+                      }}
+                    />
                   </div>
                 </div>
               </div>

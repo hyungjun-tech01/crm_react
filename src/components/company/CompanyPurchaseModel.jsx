@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useRecoilValue, useRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
@@ -8,37 +8,23 @@ import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Add } from "@mui/icons-material";
 
 import {
-    atomProductClassList,
-    atomProductClassListState,
-    atomAllProducts,
-    atomProductsState,
-    atomProductOptions,
+    atomCurrentPurchase,
+    defaultPurchase,
+    atomPurchaseByCompany,
 } from "../../atoms/atoms";
-import { PurchaseRepo } from "../../repository/purchase";
-import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 
 
 const CompanyPurchaseModel = (props) => {
-    const { purchases, handleInitAddPurchase } = props;
+    const { handleInitAddPurchase } = props;
     const { t } = useTranslation();
 
 
-    //===== [RecoilState] Related with Product ==========================================
-    const productClassState = useRecoilValue(atomProductClassListState);
-    const { tryLoadAllProductClassList } = useRecoilValue(ProductClassListRepo);
-    const allProductClassList = useRecoilValue(atomProductClassList);
-    const productState = useRecoilValue(atomProductsState);
-    const allProducts = useRecoilValue(atomAllProducts);
-    const { tryLoadAllProducts } = useRecoilValue(ProductRepo);
-    const [ productOptions, setProductOptions ] = useRecoilState(atomProductOptions);
-
-
     //===== [RecoilState] Related with Purchase =========================================
-    const { setCurrentPurchase } = useRecoilValue(PurchaseRepo);
+    const purchaseByCompany = useRecoilValue(atomPurchaseByCompany);
+    const setCurrentPurchase = useSetRecoilState(atomCurrentPurchase);
 
 
     //===== Handles to this =============================================================
-    const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
     const [selectedPurchaseRowKeys, setSelectedPurchaseRowKeys] = useState([]);
 
     const transferToOtherModal = (id) => {
@@ -48,13 +34,13 @@ const CompanyPurchaseModel = (props) => {
         myModal.show();
     };
 
-    const handleSelectPurchase = (code) => {
-        setCurrentPurchase(code);
+    const handleSelectPurchase = (selected) => {
+        setCurrentPurchase(selected);
         transferToOtherModal('purchase-details');
     };
 
     const handleAddNewPurchase = () => {
-        setCurrentPurchase();
+        setCurrentPurchase(defaultPurchase);
         handleInitAddPurchase(true);
         transferToOtherModal('add_purchase');
     };
@@ -101,7 +87,7 @@ const CompanyPurchaseModel = (props) => {
             if (selectedRows.length > 0) {
                 // Set data to edit selected purchase ----------------------
                 const selectedValue = selectedRows.at(0);
-                handleSelectPurchase(selectedValue.purchase_code);
+                handleSelectPurchase(selectedValue);
             } else {
                 setCurrentPurchase();
             };
@@ -114,43 +100,9 @@ const CompanyPurchaseModel = (props) => {
     };
 
 
-    // ----- useEffect for Production -----------------------------------
     useEffect(() => {
-        tryLoadAllProductClassList();
-        tryLoadAllProducts();
-        if (((productClassState & 1) === 1)
-            && ((productState & 1) === 1)
-        ){
-            if(productOptions.length === 0) {
-                const productOptionsValue = allProductClassList.map(proClass => {
-                    const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
-                    const subOptions = foundProducts.map(item => {
-                        return {
-                            label: <span>{item.product_name}</span>,
-                            value: { product_code: item.product_code,
-                                product_name: item.product_name,
-                                product_class_name: item.product_class_name,
-                                detail_desc: item.detail_desc,
-                                cost_price: item.const_price,
-                                reseller_price: item.reseller_price,
-                                list_price: item.list_price,
-                            }
-                        }
-                    });
-                    return {
-                        label: <span>{proClass.product_class_name}</span>,
-                        title: proClass.product_class_name,
-                        options: subOptions,
-                    };
-                });
-                setProductOptions(productOptionsValue);
-            };
-            setIsAllNeededDataLoaded(true);
-        };
-    }, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions]);
-
-    if (!isAllNeededDataLoaded)
-        return <div>&nbsp;</div>;
+        console.log('[CompanyPurchaseModel] called!');
+    }, [purchaseByCompany]);
 
     return (
         <div className="row">
@@ -160,7 +112,7 @@ const CompanyPurchaseModel = (props) => {
                         <Table
                             rowSelection={purchaseRowSelection}
                             pagination={{
-                                total: purchases.length,
+                                total: purchaseByCompany.length,
                                 showTotal: ShowTotal,
                                 showSizeChanger: true,
                                 ItemRender: ItemRender,
@@ -168,7 +120,7 @@ const CompanyPurchaseModel = (props) => {
                             className="table"
                             style={{ overflowX: "auto" }}
                             columns={columns_purchase}
-                            dataSource={purchases}
+                            dataSource={purchaseByCompany}
                             rowKey={(record) => record.purchase_code}
                             title={() =>
                                 <div style={{
@@ -190,7 +142,7 @@ const CompanyPurchaseModel = (props) => {
                                 return {
                                     onClick: (event) => {
                                         setSelectedPurchaseRowKeys([record.purchase_code]);
-                                        handleSelectPurchase(record.purchase_code);
+                                        handleSelectPurchase(record);
                                     },
                                 };
                             }}

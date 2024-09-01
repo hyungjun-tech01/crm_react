@@ -1,28 +1,162 @@
-import React, { useEffect } from 'react';
-import { useRecoilState, useRecoilValue } from "recoil";
-import { Button, Modal, Spin } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { useTranslation } from "react-i18next";
+import { Button, Input, List, Modal, Spin } from 'antd';
+import classNames from 'classnames';
+import { CompanyRepo } from '../repository/company';
+import { LeadRepo } from '../repository/lead';
+import styles from './SelectListModal.module.scss';
+import { FiSearch } from 'react-icons/fi';
 
-import {
-    atomProductClassList,
-    atomProductClassListState,
-    atomProductsState,
-    atomProductOptions,
-    atomAllProducts,
-} from "../../atoms/atoms";
-import { ProductClassListRepo, ProductRepo } from "../../repository/product";
-import DetailCardItem from './DetailCardItem';
+// const { Search } = Input;
 
 const SelectListModal = (props) => {
-    const { title, open, item, original, edited, handleEdited, handleOk, handleCancel } = props;
+    const { title, condition, open, handleChange, handleClose } = props;
+    const { t } = useTranslation();
 
-    //===== [RecoilState] Related with Product ==========================================
-    const productClassState = useRecoilValue(atomProductClassListState);
-    const allProductClassList = useRecoilValue(atomProductClassList);
-    const productState = useRecoilValue(atomProductsState);
-    const allProducts = useRecoilValue(atomAllProducts);
-    const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
-    const { tryLoadAllProductClassList } = useRecoilValue(ProductClassListRepo);
-    const { tryLoadAllProducts } = useRecoilValue(ProductRepo);
+    const { searchCompanies } = useRecoilValue(CompanyRepo);
+    const { searchLeads } = useRecoilValue(LeadRepo);
+
+    const [ inputText, setInputText ] = useState('');
+    const [ loadingState, setLoadingState ] = useState(false);
+    const [ listItems, setListItems ] = useState([]);
+    const [ selectedItem, setSelectedItem ] = useState(null);
+
+    const inputRef = useRef(null);
+
+    const handleSearch = (input) => {
+        if(!condition || !condition['category'] || !condition['item']) {
+            console.log('Input data is not proper');
+            return;
+        };
+        setLoadingState(true);
+
+        let response = null;
+        switch(condition.category)
+        {
+            case 'company':
+            case 'transaction':
+            case 'purchase':
+            case 'tax_invoice':
+                if(condition.item === 'company_name')
+                    response = searchCompanies(condition.item, input);
+                break;
+            case 'consulting':
+            case 'quotation':
+                if(condition.item === 'lead_name')
+                    response = searchLeads(condition.item, input);
+                break;
+            default:
+                break;
+        };
+        response.then( res => {
+            if(res.result === false) {
+                console.log('Fail to search :', res.message);
+                setLoadingState(false);
+                return;
+            };
+
+            let tempItems = null;
+            if(condition.item === 'lead_name') {
+                tempItems = res.data.map((item, idx) => ({
+                    ...item,
+                    index: idx,
+                    component: <div>{item.lead_name} | {item.company_name}</div>,
+                }));
+            } else {
+                tempItems = res.data.map((item, idx) => ({
+                    ...item,
+                    index: idx,
+                    component: <div>{item[condition.item]}</div>,
+                }));
+            };
+            
+            setListItems(tempItems);
+            setLoadingState(false);
+        })
+    };
+
+    const handleClickRow = (data) => {
+        let modifiedData = {index: data.index};
+        switch(condition.category)
+        {
+            case 'company':
+                if(condition.item === 'company_name') {
+                    modifiedData['company_code'] = data.company_code;
+                    modifiedData['company_index'] = data.company_index;
+                    modifiedData['company_name'] = data.company_name;
+                    modifiedData['company_name_en'] = data.company_name_en;
+                    modifiedData['company_zip_code'] = data.company_zip_code;
+                    modifiedData['company_address'] = data.company_address;
+                    modifiedData['company_phone_number'] = data.company_phone_number;
+                    modifiedData['company_fax_number'] = data.company_fax_number;
+                };
+                break;
+            case 'consulting':
+            case 'quotation':
+                if(condition.item === 'lead_name') {
+                    modifiedData['company_code'] = data.company_code;
+                    modifiedData['company_name'] = data.company_name;
+                    modifiedData['lead_code'] = data.lead_code;
+                    modifiedData['lead_name'] = data.lead_name;
+                    modifiedData['department'] = data.department;
+                    modifiedData['position'] = data.position;
+                    modifiedData['mobile_number'] = data.mobile_number;
+                    modifiedData['phone_number'] = data.phone_number;
+                    modifiedData['email'] = data.email;
+                };
+                break;
+            case 'transaction':
+                if(condition.item === 'company_name') {
+                    modifiedData['company_code'] = data.company_code;
+                    modifiedData['company_name'] = data.company_name;
+                    modifiedData['company_address'] = data.company_address;
+                    modifiedData['ceo_name'] = data.ceo_name;
+                    modifiedData['business_type'] = data.business_type;
+                    modifiedData['business_item'] = data.business_item;
+                    modifiedData['business_registration_code'] = data.business_registration_code;
+                };
+                break;
+            case 'purchase':
+                if(condition.item === 'company_name') {
+                    modifiedData['company_code'] = data.company_code;
+                    modifiedData['company_name'] = data.company_name;
+                };
+                break;
+            case 'tax_invoice':
+                if(condition.item === 'company_name') {
+                    modifiedData['company_code'] = data.company_code;
+                    modifiedData['company_name'] = data.company_name;
+                    modifiedData['company_address'] = data.company_address;
+                    modifiedData['ceo_name'] = data.ceo_name;
+                    modifiedData['business_type'] = data.business_type;
+                    modifiedData['business_item'] = data.business_item;
+                    modifiedData['business_registration_code'] = data.business_registration_code;
+                };
+                break;
+            default:
+                break;
+        };
+        setSelectedItem(modifiedData);
+    };
+    
+    const handleOk = () => {
+        if(!selectedItem || selectedItem.length === 0) return;
+        handleChange(selectedItem);
+        handleCancel();
+    };
+
+    const handleCancel = () => {
+        setListItems([]);
+        setSelectedItem({});
+        handleClose();
+    };
+
+    useEffect(() => {
+        if(open && inputRef.current !== null) {
+            inputRef.current.focus();
+        };
+    }, [open]);
 
     return (
         <Modal
@@ -30,41 +164,63 @@ const SelectListModal = (props) => {
             open={open}
             onOk={handleOk}
             onCancel={handleCancel}
-            footer={edited ? [
+            footer={[
                 <Button key="cancel" onClick={handleCancel}>
                     Cancel
                 </Button>,
                 <Button key="submit" type="primary" onClick={handleOk}>
                     Submit
                 </Button>,
-            ] : [
-                <Button key="cancel" onClick={handleCancel}>
-                    Cancel
-                </Button>,
             ]}
-            style={{ top: 120, width: 240 }}
+            width={520}
+            style={{ top: 120 }}
             zIndex={2001}
         >
-            {item && item.map((item, index) => {
-                let modifiedDetail = { ...item.detail };
-                if (item.detail.type === 'date') {
-                    modifiedDetail['editing'] = handleTime;
-                } else if (item.detail.type === 'select') {
-                    modifiedDetail['editing'] = handleSelect;
-                } else {
-                    modifiedDetail['editing'] = handleValue;
-                };
-                return (
-                    <DetailCardItem
-                        key={index}
-                        title={item.title}
-                        defaultValue={original[item.name]}
-                        name={item.name}
-                        edited={edited}
-                        detail={modifiedDetail}
+            <Input
+                ref={inputRef}
+                placeholder={t('comment.input_search_text')}
+                allowClear
+                value={inputText}
+                addonAfter={<div><FiSearch onClick={(e) => handleSearch(inputText)} /></div>}
+                onChange={(e) => setInputText(e.target.value)}
+                onPressEnter={(e) => handleSearch(inputText)}
+            />
+            <div
+                id="scrollableDiv"
+                style={{
+                    height: 400,
+                    overflow: 'auto',
+                    padding: '0',
+                    border: '1px solid rgba(140, 140, 140, 0.35)',
+                    marginTop: '0.5rem'
+                }}
+            >
+                { loadingState ? 
+                    <Spin tip="Loading" size="large">
+                        <div
+                        style={{
+                            padding: 50,
+                            background: "rgba(0, 0, 0, 0.05)",
+                            borderRadius: 4,
+                        }}
+                        />
+                    </Spin>
+                    :
+                    <List
+                        dataSource={listItems}
+                        renderItem={(item) => 
+                            <List.Item
+                                className={(selectedItem && (item.index === selectedItem.index)) ?
+                                    classNames(styles.ListRow, styles.selected) : styles.ListRow }
+                                onClick={() => handleClickRow(item)}
+                                onDoubleClick={()=>{handleClickRow(item);handleOk();}}
+                            >
+                                {item.component}
+                            </List.Item>
+                        }
                     />
-                );
-            })}
+                }
+            </div>
         </Modal>
     );
 };

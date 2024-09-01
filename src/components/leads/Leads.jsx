@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
@@ -8,15 +8,12 @@ import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import LeadDetailsModel from "./LeadDetailsModel";
 import { CompanyRepo } from "../../repository/company";
-import { ConsultingRepo } from "../../repository/consulting";
-import { QuotationRepo } from "../../repository/quotation";
-import { PurchaseRepo } from "../../repository/purchase";
 import { LeadRepo } from "../../repository/lead";
-import { 
-  atomAllLeads,
-  atomFilteredLead,
+import {
+  atomFilteredLeadArray,
   atomCompanyState,
   atomLeadState,
+  atomSelectedItem,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { compareCompanyName, compareText } from "../../constants/functions";
@@ -38,21 +35,8 @@ const Leads = () => {
 
   //===== [RecoilState] Related with Lead =============================================
   const leadState = useRecoilValue(atomLeadState);
-  const allLeadData = useRecoilValue(atomAllLeads);
-  const filteredLead = useRecoilValue(atomFilteredLead);
+  const filteredLead = useRecoilValue(atomFilteredLeadArray);
   const { tryLoadAllLeads, loadAllLeads, setCurrentLead, filterLeads } = useRecoilValue(LeadRepo);
-
-
-  //===== [RecoilState] Related with Consulting =======================================
-  const { loadCompanyConsultings} = useRecoilValue(ConsultingRepo);
-
-
-  //===== [RecoilState] Related with Quotation ========================================
-  const { loadCompanyQuotations} = useRecoilValue(QuotationRepo);
-
-
-  //===== [RecoilState] Related with Purchase =========================================
-  const { loadCompanyPurchases }  = useRecoilValue(PurchaseRepo);
 
 
   //===== [RecoilState] Related with User ================================================
@@ -63,6 +47,8 @@ const Leads = () => {
   //===== Handles to this =============================================================
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ initToAddLead, setInitToAddLead ] = useState(false);
+  const [ initToEditLead, setInitToEditLead ] = useState(false);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
@@ -165,17 +151,16 @@ const Leads = () => {
   }, [setInitToAddLead]);
 
   const handleClickLeadName = useCallback((leadCode, companyCode) => {
-    console.log("[Lead] set current lead : ", leadCode);
+    setInitToEditLead(true);
     setCurrentLead(leadCode);
+    setSelectedItem({category: 'lead', item_code: leadCode});
     setCurrentCompany(companyCode);   // 현재 company 세팅 
-    loadCompanyConsultings(companyCode);  // 현재 company에 해당하는 consulting 조회 
-    loadCompanyQuotations(companyCode);  // 현재 company에 해당하는 quotation 조회 
-    loadCompanyPurchases(companyCode);  // 현재 company에 해당하는 purchase 조회 
+    
     let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
       keyboard: false
     });
     myModal.show();
-  }, []);
+  }, [setCurrentCompany, setCurrentLead, setSelectedItem]);
 
 
   const [ expanded, setExpaned ] = useState(false);
@@ -487,30 +472,6 @@ const Leads = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive">
-                    {searchCondition === "" ? 
-                    <Table
-                      className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
-                      loading={nowLoading}
-                      pagination={{
-                        total: allLeadData.length,
-                        showTotal: ShowTotal,
-                        showSizeChanger: true,
-                        onShowSizeChange: onShowSizeChange,
-                        ItemRender: ItemRender,
-                      }}
-                      style={{ overflowX: "auto" }}
-                      columns={columns}
-                      dataSource={allLeadData}
-                      rowKey={(record) => record.lead_code}
-                      onRow={(record, rowIndex) => {
-                        return {
-                          onClick: () => {
-                            handleClickLeadName(record.lead_code, record.company_code);
-                          }, // double click row
-                        };
-                      }}
-                    /> 
-                    :
                     <Table
                       className="table table-striped table-nowrap custom-table mb-0 datatable dataTable no-footer"
                       loading={nowLoading}
@@ -532,8 +493,7 @@ const Leads = () => {
                           },
                         };
                       }}
-                    /> 
-                    }
+                    />
                   </div>
                 </div>
               </div>
@@ -555,7 +515,7 @@ const Leads = () => {
           </div>
         </div>
         <LeadAddModel init={initToAddLead} handleInit={setInitToAddLead} />
-        <LeadDetailsModel />
+        <LeadDetailsModel init={initToEditLead} handleInit={setInitToEditLead} />
         <MultiQueryModal 
           title= {t('lead.lead_multi_query')}
           open={multiQueryModal}

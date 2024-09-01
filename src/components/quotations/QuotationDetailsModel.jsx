@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Collapse, Space, Switch } from "antd";
@@ -10,15 +10,14 @@ import { atomCurrentQuotation,
   atomProductClassList,
   atomProductClassListState,
   atomProductsState,
-  atomProductOptions,
   atomAllProducts,
+  atomSelectedItem,
 } from "../../atoms/atoms";
 import { atomUserState,
   atomUsersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
 import { QuotationRepo, QuotationSendTypes, QuotationTypes } from "../../repository/quotation";
-import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
@@ -30,7 +29,7 @@ import { Add, Remove } from '@mui/icons-material';
 const content_indices = ['3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18'];
 
 
-const QuotationDetailsModel = () => {
+const QuotationDetailsModel = ({init, handleInit}) => {
   const [ t ] = useTranslation();
   const [ cookies ] = useCookies(["myLationCrmUserId"]);
   const { Panel } = Collapse;
@@ -47,9 +46,6 @@ const QuotationDetailsModel = () => {
   const allProductClassList = useRecoilValue(atomProductClassList);
   const productState = useRecoilValue(atomProductsState);
   const allProducts = useRecoilValue(atomAllProducts);
-  const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
-  const { tryLoadAllProductClassList } = useRecoilValue(ProductClassListRepo);
-  const { tryLoadAllProducts } = useRecoilValue(ProductRepo);
 
 
   //===== [RecoilState] Related with Users ============================================
@@ -59,9 +55,9 @@ const QuotationDetailsModel = () => {
 
 
   //===== Handles to deal this component ==============================================
-  const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
   const [ isFullScreen, setIsFullScreen ] = useState(false);
   const [ currentQuotationCode, setCurrentQuotationCode ] = useState('');
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -363,9 +359,10 @@ const QuotationDetailsModel = () => {
   
 
   const handleClose = useCallback(() => {
+    setSelectedItem({category: null, item_code: null});
     setEditedDetailValues(null);
     setCurrentQuotation();
-  }, [setCurrentQuotation]);
+  }, [setCurrentQuotation, setSelectedItem]);
 
   const qotation_items_info = [
     { key:'quotation_type', title:'quotation.quotation_type', detail:{ type:'select', options:QuotationTypes, editing:handleDetailChange }},
@@ -404,7 +401,7 @@ const QuotationDetailsModel = () => {
     if((selectedQuotation !== defaultQuotation)
       && (selectedQuotation.quotation_code !== currentQuotationCode)
     ){
-      console.log('[QuotationDetailsModel] useEffect / quotation!');
+      console.log('[QuotationDetailsModel] new quotation is loading!');
 
       const headerValues = selectedQuotation.quotation_table.split('|');
       if(headerValues && Array.isArray(headerValues)){
@@ -445,45 +442,15 @@ const QuotationDetailsModel = () => {
 
   // ----- useEffect for Production -----------------------------------
   useEffect(() => {
-    tryLoadAllProductClassList();
-    tryLoadAllProducts();
     if (((userState & 1) === 1)
       && ((quotationState & 1) === 1)
-      && ((productClassState & 1) === 1)
-      && ((productState & 1) === 1)
     ) {
-      if((productOptions.length === 0)) {
-        console.log('[PurchaseAddModel] set companies for selection');
-        const productOptionsValue = allProductClassList.map(proClass => {
-            const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
-            const subOptions = foundProducts.map(item => {
-                return {
-                    label: <span>{item.product_name}</span>,
-                    value: { product_code: item.product_code,
-                      product_name: item.product_name,
-                      product_class_name: item.product_class_name,
-                      detail_desc: item.detail_desc,
-                      cost_price: item.const_price,
-                      reseller_price: item.reseller_price,
-                      list_price: item.list_price,
-                  }
-                }
-            });
-            return {
-                label: <span>{proClass.product_class_name}</span>,
-                title: proClass.product_class_name,
-                options: subOptions,
-            };
-        });
-        setProductOptions(productOptionsValue);
-      }
-        
       console.log('[QuotationDetailsModel] all needed data is loaded');
-      setIsAllNeededDataLoaded(true);
+      handleInit(false);
     };
-}, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions, userState, quotationState]);
+}, [allProductClassList, allProducts, productClassState, productState, userState, quotationState, handleInit]);
 
-if (!isAllNeededDataLoaded)
+if (init)
   return <div>&nbsp;</div>;
 
   return (
@@ -501,19 +468,19 @@ if (!isAllNeededDataLoaded)
             <div className="modal-header">
               <div className="row w-100">
                 <DetailTitleItem
-                  original={selectedQuotation.quotation_title}
-                  name='title'
+                  original={selectedQuotation}
+                  name='quotation_title'
                   title={t('common.title')}
                   onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
-                  original={selectedQuotation.quotation_number}
+                  original={selectedQuotation}
                   name='quotation_number'
                   title={t('quotation.doc_no')}
                   onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
-                  original={selectedQuotation.status}
+                  original={selectedQuotation}
                   name='status'
                   title={t('common.status')}
                   onEditing={handleDetailChange}

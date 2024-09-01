@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Table } from "antd";
@@ -12,10 +12,11 @@ import SystemUserModel from "../task/SystemUserModel";
 import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
 import {
-  atomAllTransactions,
-  atomFilteredTransaction,
+  atomAllTransactionObj,
+  atomFilteredTransactionArray,
   atomCompanyState,
   atomTransactionState,
+  atomSelectedItem,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { UserRepo } from "../../repository/user";
@@ -33,14 +34,12 @@ const Transactions = () => {
   //===== [RecoilState] Related with Company ==========================================
   const companyState = useRecoilValue(atomCompanyState);
   const { tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
-  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Transaction ======================================
   const transactionState = useRecoilValue(atomTransactionState);
-  const allTransactionData = useRecoilValue(atomAllTransactions);
-  const filteredTransaction = useRecoilValue(atomFilteredTransaction);
-  const { tryLoadAllTransactions, setCurrentTransaction, filterTransactions, loadAllTransactions } = useRecoilValue(TransactionRepo);
+  const filteredTransaction= useRecoilValue(atomFilteredTransactionArray);
+  const { tryLoadAllTransactions, setCurrentTransaction , filterTransactions, loadAllTransactions} = useRecoilValue(TransactionRepo);
 
 
   //===== [RecoilState] Related with User =============================================
@@ -55,6 +54,7 @@ const Transactions = () => {
   const [taxInvoiceData, setTaxInvoiceData] = useState(null);
   const [taxInvoiceContents, setTaxInvoiceContents] = useState(null);
   const [needSaveTaxInvoice, setNeedSaveTaxxInvoice] = useState(false);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -226,6 +226,7 @@ const Transactions = () => {
   const handleOpenTransactoin = (code) => {
     setCurrentTransaction(code)
     setOpenTransaction(true);
+    setSelectedItem({category: 'transaction', item_code: code});
 
     setTimeout(() => {
       let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
@@ -322,54 +323,29 @@ const Transactions = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive activity-tables">
-                    {searchCondition === "" ?
-                      <Table
-                        pagination={{
-                          total: allTransactionData.length,
-                          showTotal: ShowTotal,
-                          showSizeChanger: true,
-                          onShowSizeChange: onShowSizeChange,
-                          ItemRender: ItemRender,
-                        }}
-                        loading={nowLoading}
-                        style={{ overflowX: "auto" }}
-                        columns={columns}
-                        bordered
-                        dataSource={allTransactionData}
-                        rowKey={(record) => record.transaction_code}
-                        onRow={(record, rowIndex) => {
-                          return {
-                            onClick: (event) => {
-                              if (event.target.className === 'table_company') return;
-                              handleOpenTransactoin(record.transaction_code)
-                            }, // double click row
-                          };
-                        }}
-                      /> :
-                      <Table
-                        pagination={{
-                          total: filteredTransaction.length > 0 ? filteredTransaction.length : 0,
-                          showTotal: ShowTotal,
-                          showSizeChanger: true,
-                          onShowSizeChange: onShowSizeChange,
-                          ItemRender: ItemRender,
-                        }}
-                        loading={nowLoading}
-                        style={{ overflowX: "auto" }}
-                        columns={columns}
-                        bordered
-                        dataSource={filteredTransaction.length > 0 ? filteredTransaction : null}
-                        rowKey={(record) => record.transaction_code}
-                        onRow={(record, rowIndex) => {
-                          return {
-                            onClick: (event) => {
-                              if (event.target.className === 'table_company') return;
-                              handleOpenTransactoin(record.transaction_code)
-                            }, // double click row
-                          };
-                        }}
-                      />
-                    }
+                    <Table
+                      pagination={{
+                        total: filteredTransaction.length >0 ? filteredTransaction.length:0,
+                        showTotal: ShowTotal,
+                        showSizeChanger: true,
+                        onShowSizeChange: onShowSizeChange,
+                        ItemRender: ItemRender,
+                      }}
+                      loading={nowLoading}
+                      style={{ overflowX: "auto" }}
+                      columns={columns}
+                      bordered
+                      dataSource={filteredTransaction.length >0 ? filteredTransaction:null}
+                      rowKey={(record) => record.transaction_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onClick: (event) => {
+                            if(event.target.className === 'table_company') return;
+                            handleOpenTransactoin(record.transaction_code)
+                          }, // double click row
+                        };
+                      }}
+                    />
                   </div>
                 </div>
               </div>

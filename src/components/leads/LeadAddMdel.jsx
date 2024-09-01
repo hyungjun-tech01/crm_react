@@ -3,13 +3,14 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
 import * as bootstrap from "../../assets/js/bootstrap.bundle";
-import { atomCompanyForSelection, atomCompanyState, defaultLead } from "../../atoms/atoms";
+import { defaultLead } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { option_locations } from "../../constants/constants";
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddAddressItem from '../../constants/AddAddressItem';
+import AddSearchItem from '../../constants/AddSearchItem';
 import MessageModal from "../../constants/MessageModal";
 
 const LeadAddModel = (props) => {
@@ -18,11 +19,6 @@ const LeadAddModel = (props) => {
     const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
     const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
     const [message, setMessage] = useState({ title: "", message: "" });
-
-
-    //===== [RecoilState] Related with Company =============================================
-    const companyState = useRecoilValue(atomCompanyState);
-    const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
     //===== [RecoilState] Related with Lead ================================================
@@ -36,12 +32,11 @@ const LeadAddModel = (props) => {
 
 
     //===== Handles to edit 'Lead Add' =====================================================
-    const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
-    const [leadChange, setLeadChange] = useState(defaultLead);
-    const [disabledItems, setDisabledItems] = useState({});
+    const [ leadChange, setLeadChange ] = useState({...defaultLead});
+    const [ disabledItems, setDisabledItems ] = useState({});
 
     const initializeLeadTemplate = useCallback(() => {
-        setLeadChange(defaultLead);
+        setLeadChange({...defaultLead});
         setDisabledItems({});
         document.querySelector("#add_new_lead_form").reset();
     }, []);
@@ -131,22 +126,19 @@ const LeadAddModel = (props) => {
             };
         };
         setLeadChange(modifiedData);
-    }, [leadChange, disabledItems]);
+    }, [leadChange]);
 
     useEffect(() => {
-        if (((companyState & 1) === 1) && ((userState & 1) === 1)) {
-            setIsAllNeededDataLoaded(true);
-            if (init) {
-                console.log('[LeadAddModel] initialize!');
-                if (handleInit) handleInit(!init);
-                setTimeout(() => {
-                    initializeLeadTemplate();
-                }, 500);
-            };
+        if (init && (userState & 1) === 1) {
+            console.log('[LeadAddModel] initialize!');
+            if(handleInit) handleInit(!init);
+            setTimeout(() => {
+                initializeLeadTemplate();
+            }, 500);
         }
-    }, [companyState, userState, init])
+    }, [userState, init]);
 
-    if (!isAllNeededDataLoaded)
+    if (init)
         return <div>&nbsp;</div>;
 
     return (
@@ -156,6 +148,7 @@ const LeadAddModel = (props) => {
             tabIndex={-1}
             role="dialog"
             aria-modal="true"
+            data-bs-focus="false"
         >
             <div className="modal-dialog" role="document">
                 <button
@@ -215,13 +208,13 @@ const LeadAddModel = (props) => {
                                         />
                                     </div>
                                     <div className="form-group row">
-                                        <AddBasicItem
+                                        <AddSearchItem
                                             title={t('company.company_name')}
-                                            type='select'
+                                            category='company'
                                             name='company_name'
                                             defaultValue={leadChange.company_name}
-                                            options={companyForSelection}
-                                            onChange={handleSelectChange}
+                                            edited={leadChange}
+                                            setEdited={setLeadChange}
                                         />
                                         <AddBasicItem
                                             title={t('company.company_name_en')}

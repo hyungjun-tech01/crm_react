@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useSetRecoilState, useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
@@ -7,15 +7,16 @@ import { ItemRender, ShowTotal } from "../paginationfunction";
 import { formatDate, ConvertCurrency } from "../../constants/functions";
 import { Add } from "@mui/icons-material";
 
-import { QuotationRepo } from "../../repository/quotation";
+import { atomCurrentQuotation, atomQuotationByLead, defaultQuotation } from "../../atoms/atoms";
 
-const LeadQuotationModel = (props) => {
-    const { quotations, handleInitAddQuotation } = props;
+
+const LeadQuotationModel = ({ handleInitAddQuotation }) => {
     const { t } = useTranslation();
 
 
     //===== [RecoilState] Related with Quotation ===========================================
-    const { setCurrentQuotation } = useRecoilValue(QuotationRepo);
+    const quotationsByLead = useRecoilValue(atomQuotationByLead);
+    const setCurrentQuotation = useSetRecoilState(atomCurrentQuotation);
 
 
     //===== Handles to deal this component =================================================
@@ -86,10 +87,10 @@ const LeadQuotationModel = (props) => {
             if (selectedRows.length > 0) {
                 // Set data to edit selected quotation ----------------------
                 const selectedValue = selectedRows.at(0);
-                setCurrentQuotation(selectedValue.quotation_code);
+                setCurrentQuotation(selectedValue);
                 setSelectedRowKeys([]);   //initialize the selected list about contract
             } else {
-                setCurrentQuotation();
+                setCurrentQuotation(defaultQuotation);
             };
         },
         getCheckboxProps: (record) => ({
@@ -107,7 +108,7 @@ const LeadQuotationModel = (props) => {
                         <Table
                             rowSelection={quotationRowSelection}
                             pagination={{
-                                total: quotations.length,
+                                total: quotationsByLead.length,
                                 showTotal: ShowTotal,
                                 showSizeChanger: true,
                                 ItemRender: ItemRender,
@@ -115,7 +116,7 @@ const LeadQuotationModel = (props) => {
                             className="table"
                             style={{ overflowX: "auto" }}
                             columns={columns_quotation}
-                            dataSource={quotations}
+                            dataSource={quotationsByLead}
                             rowKey={(record) => record.quotation_code}
                             title={() =>
                                 <div style={{
@@ -137,7 +138,7 @@ const LeadQuotationModel = (props) => {
                                 return {
                                     onClick: (event) => {
                                         setSelectedRowKeys([record.quotation_code]);
-                                        setCurrentQuotation(record.quotation_code);
+                                        setCurrentQuotation(record);
                                         transferToOtherModal('quotation-details');
                                         setSelectedRowKeys([]);   //initialize the selected list about contract
                                     }, // click row

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { useTranslation } from "react-i18next";
@@ -7,7 +7,7 @@ import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { CompanyRepo } from "../../repository/company";
-import { atomAllCompanies, atomCompanyState, atomFilteredCompany } from "../../atoms/atoms";
+import { atomCompanyState, atomFilteredCompanyArray, atomSelectedItem } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 import { UserRepo } from '../../repository/user';
 
@@ -27,9 +27,8 @@ const Companies = () => {
 
   //===== [RecoilState] Related with Company ==========================================
   const [ companyState, setCompanyState] = useRecoilState(atomCompanyState);
-  const { tryLoadAllCompanies, filterCompanies, setCurrentCompany, loadAllCompanies } = useRecoilValue(CompanyRepo);
-  const allCompanyData = useRecoilValue(atomAllCompanies);
-  const filteredCompany = useRecoilValue(atomFilteredCompany);
+  const { tryLoadAllCompanies, filterCompanies, setCurrentCompany , loadAllCompanies } = useRecoilValue(CompanyRepo);
+  const filteredCompany = useRecoilValue(atomFilteredCompanyArray);
 
 
   //===== [RecoilState] Related with User =============================================
@@ -43,11 +42,14 @@ const Companies = () => {
   const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
   const [ taxInvoiceData, setTaxInvoiceData ] = useState(null);
   const [ taxInvoiceContents, setTaxInvoiceContents ] = useState(null);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
+
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
   const [ expanded, setExpaned ] = useState(false);
 
   const [initToAddCompany, setInitToAddCompany] = useState(false);
+  const [initToEditCompany, setInitToEditCompany] = useState(false);
 
   const [multiQueryModal, setMultiQueryModal] = useState(false);
 
@@ -148,14 +150,18 @@ const Companies = () => {
 
     setExpaned(false);
     setSearchCondition("");
-  }
+  };
 
   // --- Functions used for Table ------------------------------
   const handleClickCompanyName = useCallback((id) => {
     console.log('[Company] set current company : ', id);
+    setInitToEditCompany(true);
     setCurrentCompany(id);
+    setSelectedItem({category: 'company', item_code: id});
     setTimeout(()=>{
-      let myModal = bootstrap.Modal.getOrCreateInstance('#company-details');
+      let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
+        keyboard: false
+      });
       myModal.show();
     }, 500);
     
@@ -335,53 +341,28 @@ const Companies = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive">
-                    {searchCondition === "" ?
-                      <Table
-                        pagination={{
-                          total: allCompanyData.length,
-                          showTotal: ShowTotal,
-                          showSizeChanger: true,
-                          onShowSizeChange: onShowSizeChange,
-                          ItemRender: ItemRender,
-                        }}
-                        className="table"
-                        loading={nowLoading}
-                        style={{ overflowX: "auto" }}
-                        columns={columns}
-                        dataSource={allCompanyData}
-                        rowKey={(record) => record.company_code}
-                        onRow={(record, rowIndex) => {
-                          return {
-                            onClick: () => {
-                              handleClickCompanyName(record.company_code);
-                            },
-                          };
-                        }}
-                      />
-                      :
-                      <Table
-                        pagination={{
-                          total: filteredCompany.length > 0 ? filteredCompany.length : 0,
-                          showTotal: ShowTotal,
-                          showSizeChanger: true,
-                          onShowSizeChange: onShowSizeChange,
-                          ItemRender: ItemRender,
-                        }}
-                        className="table"
-                        loading={nowLoading}
-                        style={{ overflowX: "auto" }}
-                        columns={columns}
-                        dataSource={filteredCompany.length > 0 ? filteredCompany : null}
-                        rowKey={(record) => record.company_code}
-                        onRow={(record, rowIndex) => {
-                          return {
-                            onClick: () => {
-                              handleClickCompanyName(record.company_code);
-                            },
-                          };
-                        }}
-                      />
-                    }
+                    <Table
+                      pagination={{
+                        total: filteredCompany.length > 0 ? filteredCompany.length : 0,
+                        showTotal: ShowTotal,
+                        showSizeChanger: true,
+                        onShowSizeChange: onShowSizeChange,
+                        ItemRender: ItemRender,
+                      }}
+                      className="table"
+                      loading={nowLoading}
+                      style={{ overflowX: "auto" }}
+                      columns={columns}
+                      dataSource={filteredCompany.length > 0 ? filteredCompany : null}
+                      rowKey={(record) => record.company_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onClick: () => {
+                            handleClickCompanyName(record.company_code);
+                          },
+                        };
+                      }}
+                    />
                   </div>
                 </div>
               </div>
@@ -471,6 +452,8 @@ const Companies = () => {
         {/* Modal */}
         <CompanyAddModel init={initToAddCompany} handleInit={setInitToAddCompany} />
         <CompanyDetailsModel
+          init={initToEditCompany}
+          handleInit={setInitToEditCompany}
           openTransaction={() =>setOpenTransaction(true)}
           openTaxInvoice={()=>setOpenTaxInvoice(true)}
         />

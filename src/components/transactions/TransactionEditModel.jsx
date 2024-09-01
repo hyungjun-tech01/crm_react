@@ -15,12 +15,14 @@ import classNames from 'classnames';
 
 import {
   atomCompanyState,
-  atomCompanyForSelection,
+  atomCurrentCompany,
   atomCurrentTransaction,
+  atomSelectedItem,
+  defaultCompany,
   defaultTransaction,
 } from "../../atoms/atoms";
 import { DefaultTransactionContent, TransactionRepo } from "../../repository/transaction";
-
+import AddSearchItem from "../../constants/AddSearchItem";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
 import TransactionContentModal from "./TransactionContentModal";
 import TransactionReceiptModal from "./TransactionReceiptModal";
@@ -66,8 +68,8 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
 
 
   //===== [RecoilState] Related with Company =========================================
-  const [companyState] = useRecoilState(atomCompanyState);
-  const companyForSelection = useRecoilValue(atomCompanyForSelection);
+  const companyState = useRecoilValue(atomCompanyState);
+  const currentCompany = useRecoilValue(atomCurrentCompany);
 
 
   //===== Handles to edit 'TransactionEditModel' ======================================
@@ -79,6 +81,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   const [showDecimal, setShowDecimal] = useState(0);
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
   const [selectData, setSelectData] = useState({});
+  const [selectedItem, setSelectedItem] = useRecoilState(atomSelectedItem);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
@@ -501,7 +504,23 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setIsVatIncluded(true);
     setShowDecimal(0);
     setDataForTransaction({...default_transaction_data});
-    setTransactionChange({});
+
+    if((selectedItem.category === 'company')
+      && (currentCompany !== defaultCompany)
+      && (selectedItem.item_code === currentCompany.company_code))
+    {
+      setTransactionChange({
+        company_code: currentCompany.company_code,
+        company_name: currentCompany.company_name,
+        ceo_name: currentCompany.ceo_name,
+        company_address: currentCompany.company_address,
+        business_type: currentCompany.business_type,
+        business_item: currentCompany.business_item,
+        business_registration_code: currentCompany.business_registration_code,
+      });
+    } else {
+      setTransactionChange({});
+    };
     setTransactionContents([]);
     setOrgReceiptModalData({...default_receipt_data});
     setEditedReceiptModalData({});
@@ -511,7 +530,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setTransactionForPrint(null);
     setContentsForPrint(null);
     document.querySelector("#add_new_transaction_form").reset();
-  }, []);
+  }, [selectedItem, currentCompany]);
 
   const handleShowPrint = () => {
     const tempTransactionData = {
@@ -664,6 +683,9 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   };
 
   const handleClose = () => {
+    if(selectedItem.category && (selectedItem.category === 'transaction')){
+      setSelectedItem({category: null, item_code: null});
+    };
     handleInitialize();
     close();
   };
@@ -691,11 +713,9 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
         const tempIsVatIncluded = currentTransaction.tax_price && currentTransaction.tax_price > 0;
         setIsVatIncluded(tempIsVatIncluded);
 
-        const tempCurrentCompany = companyForSelection.filter(item => item.value.company_code === currentTransaction.company_code);
         const tempData = {
           trans_type: tempIsSale ? trans_types[0] : trans_types[1],
           tax_type: tempIsVatIncluded ? 'vat_included' : 'vat_excluded',
-          company_selection: tempCurrentCompany.length > 0 ? tempCurrentCompany[0]: null,
         };
         setSelectData(tempData);
 
@@ -817,13 +837,14 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
                                 </Col>
                                 <Col>{t('transaction.publish_date')} : </Col>
                               </Row>
-                              <Row style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
-                                <Col>
-                                  <Select
-                                    className={styles.select}
-                                    value={selectData.company_selection}
-                                    onChange={selected => handleSelectChange('company_name', selected)}
-                                    options={companyForSelection}
+                              <Row justify="start" style={{ fontSize: 15, padding: '0.25rem 0.5rem' }}>
+                                <Col span={16}>
+                                  <AddSearchItem
+                                    category='transaction'
+                                    name='company_name'
+                                    defaultValue={orgTransaction.company_name}
+                                    edited={transactionChange}
+                                    setEdited={setTransactionChange}
                                   />
                                 </Col>
                               </Row>

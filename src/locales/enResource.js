@@ -64,6 +64,7 @@ const enResource = {
             new_company:'New Company',
             phone_number : 'Company Phone Number',
             salesman:'SalesMan',
+            search_name: 'Search Company Name',
             zip_code : 'Company Postal Code',
             company_multi_query:'Company MultiQuery',
             ma_non_extended: 'MA Non Extended',
@@ -341,6 +342,7 @@ const enResource = {
             modify_date:'Modify Date'
         },
         comment: {
+            input_search_text: 'Input search text',
             search_address_first: 'Please search address...',
             title_check: 'Check',
             msg_fail_save: 'Failed to save.'

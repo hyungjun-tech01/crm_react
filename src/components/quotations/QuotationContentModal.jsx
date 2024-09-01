@@ -1,33 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useRecoilState, useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Button, Modal } from 'antd';
-import {
-    atomProductClassList,
-    atomProductClassListState,
-    atomProductsState,
-    atomProductOptions,
-    atomAllProducts,
-} from "../../atoms/atoms";
-import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 
 import DetailCardItem from '../../constants/DetailCardItem';
+import DetailSelectProduct from '../../constants/DetailSelectProduct';
 
 
 const QuotationContentModal = (props) => {
     const { setting, open, original, edited, handleEdited, handleOk, handleCancel } = props;
     const [t] = useTranslation();
-    const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
-    
-
-    //===== [RecoilState] Related with Product ==========================================
-    const productClassState = useRecoilValue(atomProductClassListState);
-    const allProductClassList = useRecoilValue(atomProductClassList);
-    const { tryLoadAllProductClassList } = useRecoilValue(ProductClassListRepo);
-    const productState = useRecoilValue(atomProductsState);
-    const allProducts = useRecoilValue(atomAllProducts);
-    const { tryLoadAllProducts } = useRecoilValue(ProductRepo);
-    const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
 
 
     //===== Handles to edit 'Contents' ==================================================
@@ -37,11 +18,7 @@ const QuotationContentModal = (props) => {
     const detail_spec_desc_select = [{ label: t('common.na'), value: '없음' }, { label: t('common.avail'), value: '있음' }]
     const content_items = showDetailDesc ?
         [
-            {
-                name: 'product_name', title: t('purchase.product_name'), detail: {
-                    type: 'select', options: productOptions, group: 'product_class_name', extra: 'long'
-                }
-            },
+            { name: 'product_name', title: t('purchase.product_name'), detail: {type: 'select', extra: 'long'} },
             { name: 'detail_desc_on_off', title: t('quotation.detail_desc_on_off'), detail: { type: 'select', options: detail_spec_desc_select, extra: 'long' } },
             { name: 'detail_desc', title: t('quotation.detail_desc'), detail: { type: 'textarea', row_no: 8, extra: 'long' } },
             { name: 'quantity', title: t('common.quantity'), detail: { type: 'label', extra: 'long' } },
@@ -49,11 +26,7 @@ const QuotationContentModal = (props) => {
             { name: 'quotation_amount', title: t('quotation.quotation_amount'), detail: { type: 'label', extra: 'long', disabled: true, price: true, decimal: setting.show_decimal } },
         ] :
         [
-            {
-                name: 'product_name', title: t('purchase.product_name'), detail: {
-                    type: 'select', options: productOptions, group: 'product_class_name', extra: 'long'
-                }
-            },
+            { name: 'product_name', title: t('purchase.product_name'), detail: {type: 'select', extra: 'long'} },
             { name: 'detail_desc_on_off', title: t('quotation.detail_desc_on_off'), detail: { type: 'select', options: detail_spec_desc_select, extra: 'long' } },
             { name: 'quantity', title: t('common.quantity'), detail: { type: 'label', extra: 'long' } },
             { name: 'list_price', title: t('quotation.list_price'), detail: { type: 'label', extra: 'long', price: true, decimal: setting.show_decimal } },
@@ -71,17 +44,17 @@ const QuotationContentModal = (props) => {
         let tempData = { ...edited };
         switch (name) {
             case 'product_name':
-                tempData['product_code'] = value.value.product_code;
-                tempData['product_class_name'] = value.value.product_class_name;
-                tempData['product_name'] = value.value.product_name;
-                tempData['cost_price'] = Number(value.value.cost_price);
-                tempData['reseller_price'] = Number(value.value.reseller_price);
-                tempData['list_price'] = setting.unit_vat_included ? Number(value.value.list_price) / 1.1 : Number(value.value.list_price);
-                tempData['org_unit_prce'] = Number(value.value.list_price);
+                tempData['product_code'] = value.product_code;
+                tempData['product_class_name'] = value.product_class_name;
+                tempData['product_name'] = value.product_name;
+                tempData['cost_price'] = Number(value.cost_price);
+                tempData['reseller_price'] = Number(value.reseller_price);
+                tempData['list_price'] = setting.unit_vat_included ? Number(value.list_price) / 1.1 : Number(value.list_price);
+                tempData['org_unit_prce'] = Number(value.list_price);
 
-                setTempDetailSpec(value.value.detail_desc);
+                setTempDetailSpec(value.detail_desc);
                 if (showDetailDesc) {
-                    tempData['detail_desc'] = value.value.detail_desc;
+                    tempData['detail_desc'] = value.detail_desc;
                 };
                 break;
             case 'detail_desc_on_off':
@@ -140,41 +113,8 @@ const QuotationContentModal = (props) => {
 
     // ----- useEffect for Production -----------------------------------
     useEffect(() => {
-        tryLoadAllProductClassList();
-        tryLoadAllProducts();
-        if (((productClassState & 1) === 1) && ((productState & 1) === 1)) {
-            if (productOptions.length === 0) {
-                const productOptionsValue = allProductClassList.map(proClass => {
-                    const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
-                    const subOptions = foundProducts.map(item => {
-                        return {
-                            label: <span>{item.product_name}</span>,
-                            value: {
-                                product_code: item.product_code,
-                                product_name: item.product_name,
-                                product_class_name: item.product_class_name,
-                                detail_desc: item.detail_desc,
-                                cost_price: item.const_price,
-                                reseller_price: item.reseller_price,
-                                list_price: item.list_price,
-                            }
-                        }
-                    });
-                    return {
-                        label: <span>{proClass.product_class_name}</span>,
-                        title: proClass.product_class_name,
-                        options: subOptions,
-                    };
-                });
-                setProductOptions(productOptionsValue);
-            };
-            setIsAllNeededDataLoaded(true);
-        };
         setShowDetailDesc(original.detail_desc_on_off === '있음');
-    }, [allProductClassList, allProducts, productClassState, productOptions, productState, original.detail_desc_on_off]);
-
-    if (!isAllNeededDataLoaded)
-        return <div>&nbsp;</div>;
+    }, [original.detail_desc_on_off]);
 
     return (
         <Modal
@@ -207,6 +147,20 @@ const QuotationContentModal = (props) => {
                 } else {
                     modifiedDetail['editing'] = handleValue;
                 };
+                
+                if(item.name === 'product_name') {
+                    return (
+                        <DetailSelectProduct
+                            key={index}
+                            title={item.title}
+                            defaultValue={original[item.name]}
+                            name={item.name}
+                            edited={edited}
+                            detail={modifiedDetail}
+                        />
+                    );
+                };
+                
                 return (
                     <div key={index} style={{padding: '0.25rem 0'}}>
                         <DetailCardItem

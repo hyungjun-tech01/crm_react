@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Table } from "antd";
@@ -9,10 +9,10 @@ import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 
 import {
-  atomTaxInvoiceSet,
   atomCompanyState,
-  atomFilteredTaxInvoices,
+  atomFilteredTaxInvoiceArray,
   atomTaxInvoiceState,
+  atomSelectedItem,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 
@@ -37,8 +37,7 @@ const TaxInovices = () => {
 
   //===== [RecoilState] Related with Tax Invoice ======================================
   const taxInvoiceState = useRecoilValue(atomTaxInvoiceState);
-  const allTaxInvoicesData = useRecoilValue(atomTaxInvoiceSet);
-  const filteredTaxInvoices= useRecoilValue(atomFilteredTaxInvoices);
+  const filteredTaxInvoices= useRecoilValue(atomFilteredTaxInvoiceArray);
   const { tryLoadTaxInvoices, setCurrentTaxInvoice , filterTaxInvoices, loadAllTaxInvoices} = useRecoilValue(TaxInvoiceRepo);
 
 
@@ -50,11 +49,11 @@ const TaxInovices = () => {
   //===== Handles to edit this ========================================================
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
+
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
-
   const [statusSearch, setStatusSearch] = useState('common.all');
-
   const [multiQueryModal, setMultiQueryModal] = useState(false);
 
   const [queryConditions, setQueryConditions] = useState([
@@ -209,7 +208,7 @@ const TaxInovices = () => {
     },
   ];
 
-  const handleAddNewTransaction = useCallback(() => {
+  const handleAddNewTaxInvoice = useCallback(() => {
     setCurrentTaxInvoice();
     setOpenTaxInvoice(true);
 
@@ -224,6 +223,7 @@ const TaxInovices = () => {
   const handleOpenTaxInvoice = (code) => {
     setCurrentTaxInvoice(code);
     setOpenTaxInvoice(true);
+    setSelectedItem({category: 'tax_invoice', item_code: code});
 
     setTimeout(()=>{
       let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
@@ -308,7 +308,7 @@ const TaxInovices = () => {
                       id="add-task"
                       // data-bs-toggle="modal"
                       // data-bs-target="#edit_transaction"
-                      onClick={handleAddNewTransaction}
+                      onClick={handleAddNewTaxInvoice}
                     >
                       {t('taxinvoice.add_taxinvoice')}
                     </button>
@@ -323,10 +323,9 @@ const TaxInovices = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive activity-tables">
-                  { searchCondition === "" ?  
                     <Table
                       pagination={{
-                        total: allTaxInvoicesData.length,
+                        total: filteredTaxInvoices.length,
                         showTotal: ShowTotal,
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
@@ -336,30 +335,7 @@ const TaxInovices = () => {
                       style={{ overflowX: "auto" }}
                       columns={columns}
                       bordered
-                      dataSource={allTaxInvoicesData}
-                      rowKey={(record) => record.tax_invoice_code}
-                      onRow={(record, rowIndex) => {
-                        return {
-                          onClick: (event) => {
-                            if(event.target.className === 'table_company') return;
-                            handleOpenTaxInvoice(record.tax_invoice_code)
-                          }, // double click row
-                        };
-                      }}
-                    />:
-                    <Table
-                      pagination={{
-                        total: filteredTaxInvoices.length >0 ? filteredTaxInvoices.length:0,
-                        showTotal: ShowTotal,
-                        showSizeChanger: true,
-                        onShowSizeChange: onShowSizeChange,
-                        ItemRender: ItemRender,
-                      }}
-                      loading={nowLoading}
-                      style={{ overflowX: "auto" }}
-                      columns={columns}
-                      bordered
-                      dataSource={filteredTaxInvoices.length >0 ? filteredTaxInvoices:null}
+                      dataSource={filteredTaxInvoices}
                       rowKey={(record) => record.tax_invoice_code}
                       onRow={(record, rowIndex) => {
                         return {
@@ -370,7 +346,6 @@ const TaxInovices = () => {
                         };
                       }}
                     />
-                  }
                   </div>
                 </div>
               </div>

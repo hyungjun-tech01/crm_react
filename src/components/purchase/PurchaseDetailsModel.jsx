@@ -1,21 +1,21 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch, Table } from "antd";
 import { Add } from "@mui/icons-material";
 
 import {
-  atomCompanyState,
-  atomCompanyForSelection,
   atomProductClassListState,
   atomProductsState,
-  atomProductOptions,
   atomMAContractSet,
   defaultMAContract,
   atomCurrentPurchase,
   defaultPurchase,
+  atomCurrentCompany,
+  defaultCompany,
+  atomSelectedItem,
 } from "../../atoms/atoms";
 import { PurchaseRepo } from "../../repository/purchase";
 import { ProductTypeOptions } from "../../repository/product";
@@ -24,8 +24,10 @@ import { ContractTypes, MAContractRepo } from "../../repository/ma_contract";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import DetailSubModal from "../../constants/DetailSubModal";
+
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
+import { CompanyRepo } from "../../repository/company";
 
 
 const PurchaseDetailsModel = () => {
@@ -34,19 +36,18 @@ const PurchaseDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Purchase =========================================
-  const currentPurchase = useRecoilValue(atomCurrentPurchase);
-  const { modifyPurchase, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
+  const [currentPurchase, setCurrentPurchase] = useRecoilState(atomCurrentPurchase);
+  const { modifyPurchase } = useRecoilValue(PurchaseRepo);
 
 
   //===== [RecoilState] Related with Company ==========================================
-  const companyState = useRecoilValue(atomCompanyState);
-  const companyForSelection = useRecoilValue(atomCompanyForSelection);
+  const currentCompany = useRecoilValue(atomCurrentCompany);
+  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Product ==========================================
   const productClassState = useRecoilValue(atomProductClassListState);
   const productState = useRecoilValue(atomProductsState);
-  const productOptions = useRecoilValue(atomProductOptions);
 
 
   //===== [RecoilState] Related with MA Contract ======================================
@@ -56,6 +57,7 @@ const PurchaseDetailsModel = () => {
   
   //===== Handles to deal this component ==============================================
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -92,12 +94,21 @@ const PurchaseDetailsModel = () => {
   }, [editedDetailValues, currentPurchase]);
 
   const handleDetailSelectChange = useCallback((name, selected) => {
-    if (currentPurchase[name] !== selected.value) {
+    if(name === 'product_name') {
       const tempEdited = {
         ...editedDetailValues,
-        [name]: selected.value,
+        ...selected,
       };
+      console.log('handleDetailSelectChange : ', tempEdited);
       setEditedDetailValues(tempEdited);
+    } else {
+      if (currentPurchase[name] !== selected.value) {
+        const tempEdited = {
+          ...editedDetailValues,
+          [name]: selected.value,
+        };
+        setEditedDetailValues(tempEdited);
+      };
     };
   }, [editedDetailValues]);
 
@@ -133,8 +144,9 @@ const PurchaseDetailsModel = () => {
   }, []);
 
   const handleClose = useCallback(() => {
+    setSelectedItem({category: null, item_code: null});
     setEditedDetailValues(null);
-    setCurrentPurchase();
+    setCurrentPurchase(defaultPurchase);
   }, []);
 
   const purchase_items_info = [
@@ -316,7 +328,7 @@ const PurchaseDetailsModel = () => {
   useEffect(() => {
     if ((currentPurchase !== defaultPurchase)
       && (currentPurchase.purchase_code !== currentPurchaseCode)
-   ){
+    ){
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {
         localStorage.setItem("isFullScreen", '0');
@@ -329,18 +341,20 @@ const PurchaseDetailsModel = () => {
 
       loadPurchaseMAContracts(currentPurchase.purchase_code);
       setCurrentPurchaseCode(currentPurchase.purchase_code);
-    };
-  }, [currentPurchase, loadPurchaseMAContracts, currentPurchaseCode]);
 
+      if(currentCompany === defaultCompany) {
+        setCurrentCompany(currentPurchase.company_code);
+      };
+    };
+  }, [currentPurchase, currentCompany, loadPurchaseMAContracts, currentPurchaseCode]);
 
   useEffect(() => {
-    if (((companyState & 1) === 1)
-      && ((productClassState & 1) === 1)
+    if (((productClassState & 1) === 1)
       && ((productState & 1) === 1)
     ) {
       setIsAllNeededDataLoaded(true);
     };
-  }, [companyState, productClassState, productState]);
+  }, [productClassState, productState]);
 
   if (!isAllNeededDataLoaded)
     return <div>&nbsp;</div>;
@@ -357,175 +371,178 @@ const PurchaseDetailsModel = () => {
       >
         <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
           <div className="modal-content">
-            {(currentPurchase !== defaultPurchase) &&
-              <>
-                <div className="modal-header">
-                  <div className="row w-100">
-                    <DetailTitleItem
-                      original={currentPurchase.product_name}
-                      name='product_name'
-                      title={t('purchase.product_name')}
-                      size='col-md-6'
-                      type='select'
-                      options={productOptions}
-                      group={currentPurchase.product_class_name}
-                      onEditing={handleDetailSelectChange}
-                    />
-                    <DetailTitleItem
-                      original={currentPurchase.company_name}
-                      name='company_name'
-                      title={t('company.company_name')}
-                      size='col-md-4'
-                      type='select'
-                      options={companyForSelection}
-                      onEditing={handleDetailChange}
-                    />
+            <div className="modal-header">
+              <div className="row w-100">
+                <DetailTitleItem
+                  original={currentPurchase}
+                  name='product_name'
+                  title={t('purchase.product_name')}
+                  size='col-md-6'
+                  type='product'
+                  edited={editedDetailValues}
+                  onEditing={handleDetailSelectChange}
+                />
+                {/* <DetailTitleItem
+                  original={currentPurchase.company_name}
+                  name='company_name'
+                  title={t('company.company_name')}
+                  size='col-md-4'
+                  type='select'
+                  options={companyForSelection}
+                  onEditing={handleDetailChange}
+                /> */}
+                <div className='col-md-4'>
+                  <span><b>{t('company.company_name')}</b></span>
+                  <div style={{display: 'flex'}}>
+                    <label className='detail-title-input'>
+                      {currentCompany.company_name}
+                    </label>
                   </div>
-                  <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange} />
-                  <button
-                    type="button"
-                    className="btn-close xs-close"
-                    data-bs-dismiss="modal"
-                    onClick={handleClose}
-                  />
-                </div>
-                <div className="modal-body">
-                  <div className="task-infos">
-                    <ul className="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified">
-                      <li className="nav-item">
-                        <Link
-                          className="nav-link active"
-                          to="#task-details"
-                          data-bs-toggle="tab"
-                        >
-                          {t('common.details')}
-                        </Link>
-                      </li>
-                      <li className="nav-item">
-                        &nbsp;
-                      </li>
-                      <li className="nav-item">
-                        &nbsp;
-                      </li>
-                      {/* <li className="nav-item">
-                        <Link
-                          className="nav-link"
-                          to="#task-activity"
-                          data-bs-toggle="tab"
-                        >
-                          Activity
-                        </Link>
-                      </li>
-                      <li className="nav-item">
-                        <Link
-                          className="nav-link"
-                          to="#task-news"
-                          data-bs-toggle="tab"
-                        >
-                          News
-                        </Link>
-                      </li> */}
-                    </ul>
-                    <div className="tab-content">
-                      <div className="tab-pane show active" id="task-details">
-                        <div className="crms-tasks">
-                          <div className="tasks__item crms-task-item active">
-                            <div className="row">
-                              <div className="card pt-3 mb-2">
-                                <Space
-                                  align="start"
-                                  direction="horizontal"
-                                  size="small"
-                                  style={{ display: 'flex', marginBottom: '0.5rem' }}
-                                  wrap
-                                >
-                                  {purchase_items_info.map((item, index) =>
-                                    <DetailCardItem
-                                      key={index}
-                                      defaultValue={currentPurchase[item.key]}
-                                      edited={editedDetailValues}
-                                      name={item.key}
-                                      title={t(item.title)}
-                                      detail={item.detail}
-                                    />
-                                  )}
-                                </Space>
-                              </div>
-                            </div>
-                            <div className="row">
-                              <div className="card mb-0">
-                                <div className="table-body">
-                                  <div className="table-responsive">
-                                    <Table
-                                      rowSelection={maContractRowSelection}
-                                      pagination={{
-                                        total: maContractSet.length,
-                                        showTotal: ShowTotal,
-                                        showSizeChanger: true,
-                                        ItemRender: ItemRender,
-                                      }}
-                                      className="table"
-                                      style={{ overflowX: "auto" }}
-                                      columns={columns_ma_contract}
-                                      dataSource={maContractSet}
-                                      rowKey={(record) => record.ma_code}
-                                      title={() =>
-                                        <div style={{
-                                          display: 'flex',
-                                          justifyContent: 'space-between',
-                                          backgroundColor: '#cccccc',
-                                          fontWeight: 600,
-                                          lineHeight: 1.5,
-                                          height: '2.5rem',
-                                          padding: '0.5rem 0.8rem',
-                                          borderRadius: '5px',
-                                        }}
-                                        >
-                                          <div>{t('contract.contract_info')}</div>
-                                          <Add onClick={() => handleAddMAContract(currentPurchase.company_code, currentPurchase.purchase_code)} />
-                                        </div>
-                                      }
-                                      onRow={(record, rowIndex) => {
-                                        return {
-                                          onClick: (event) => {
-                                            setSelectedMAContractRowKeys([record.ma_code]);
-                                            handleModifyMAContract(record.ma_code);
-                                          }, // click row
-                                        };
-                                      }}
-                                    />
-                                  </div>
-                                </div>
+              </div>
+              </div>
+              <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange} />
+              <button
+                type="button"
+                className="btn-close xs-close"
+                data-bs-dismiss="modal"
+                onClick={handleClose}
+              />
+            </div>
+            <div className="modal-body">
+              <div className="task-infos">
+                <ul className="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified">
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link active"
+                      to="#task-details"
+                      data-bs-toggle="tab"
+                    >
+                      {t('common.details')}
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    &nbsp;
+                  </li>
+                  <li className="nav-item">
+                    &nbsp;
+                  </li>
+                  {/* <li className="nav-item">
+                    <Link
+                      className="nav-link"
+                      to="#task-activity"
+                      data-bs-toggle="tab"
+                    >
+                      Activity
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link"
+                      to="#task-news"
+                      data-bs-toggle="tab"
+                    >
+                      News
+                    </Link>
+                  </li> */}
+                </ul>
+                <div className="tab-content">
+                  <div className="tab-pane show active" id="task-details">
+                    <div className="crms-tasks">
+                      <div className="tasks__item crms-task-item active">
+                        <div className="row">
+                          <div className="card pt-3 mb-2">
+                            <Space
+                              align="start"
+                              direction="horizontal"
+                              size="small"
+                              style={{ display: 'flex', marginBottom: '0.5rem' }}
+                              wrap
+                            >
+                              {purchase_items_info.map((item, index) =>
+                                <DetailCardItem
+                                  key={index}
+                                  defaultValue={currentPurchase[item.key]}
+                                  edited={editedDetailValues}
+                                  name={item.key}
+                                  title={t(item.title)}
+                                  detail={item.detail}
+                                />
+                              )}
+                            </Space>
+                          </div>
+                        </div>
+                        <div className="row">
+                          <div className="card mb-0">
+                            <div className="table-body">
+                              <div className="table-responsive">
+                                <Table
+                                  rowSelection={maContractRowSelection}
+                                  pagination={{
+                                    total: maContractSet.length,
+                                    showTotal: ShowTotal,
+                                    showSizeChanger: true,
+                                    ItemRender: ItemRender,
+                                  }}
+                                  className="table"
+                                  style={{ overflowX: "auto" }}
+                                  columns={columns_ma_contract}
+                                  dataSource={maContractSet}
+                                  rowKey={(record) => record.ma_code}
+                                  title={() =>
+                                    <div style={{
+                                      display: 'flex',
+                                      justifyContent: 'space-between',
+                                      backgroundColor: '#cccccc',
+                                      fontWeight: 600,
+                                      lineHeight: 1.5,
+                                      height: '2.5rem',
+                                      padding: '0.5rem 0.8rem',
+                                      borderRadius: '5px',
+                                    }}
+                                    >
+                                      <div>{t('contract.contract_info')}</div>
+                                      <Add onClick={() => handleAddMAContract(currentPurchase.company_code, currentPurchase.purchase_code)} />
+                                    </div>
+                                  }
+                                  onRow={(record, rowIndex) => {
+                                    return {
+                                      onClick: (event) => {
+                                        setSelectedMAContractRowKeys([record.ma_code]);
+                                        handleModifyMAContract(record.ma_code);
+                                      }, // click row
+                                    };
+                                  }}
+                                />
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    {editedDetailValues !== null &&
-                      Object.keys(editedDetailValues).length !== 0 && (
-                        <div className="text-center py-3">
-                          <button
-                            type="button"
-                            className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                            onClick={handleSaveAll}
-                          >
-                            {t('common.save')}
-                          </button>
-                          &nbsp;&nbsp;
-                          <button
-                            type="button"
-                            className="btn btn-secondary btn-rounded"
-                            onClick={handleCancelAll}
-                          >
-                            {t('common.cancel')}
-                          </button>
-                        </div>
-                      )}
                   </div>
                 </div>
-              </>
-            }
+                {editedDetailValues !== null &&
+                  Object.keys(editedDetailValues).length !== 0 && (
+                    <div className="text-center py-3">
+                      <button
+                        type="button"
+                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                        onClick={handleSaveAll}
+                      >
+                        {t('common.save')}
+                      </button>
+                      &nbsp;&nbsp;
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-rounded"
+                        onClick={handleCancelAll}
+                      >
+                        {t('common.cancel')}
+                      </button>
+                    </div>
+                  )}
+              </div>
+            </div>
           </div>
           {/* modal-content */}
         </div>

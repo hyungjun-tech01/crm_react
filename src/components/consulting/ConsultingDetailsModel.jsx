@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
@@ -11,7 +11,7 @@ import {
   atomEngineersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
-import { atomConsultingState, atomCurrentConsulting, defaultConsulting } from "../../atoms/atoms";
+import { atomConsultingState, atomCurrentConsulting, atomSelectedItem, defaultConsulting } from "../../atoms/atoms";
 import {
   ConsultingRepo,
   ConsultingTypes,
@@ -45,6 +45,7 @@ const ConsultingDetailsModel = () => {
   //===== Handles to deal this component ==============================================
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentConsultingCode, setCurrentConsultingCode] = useState('');
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -127,6 +128,7 @@ const ConsultingDetailsModel = () => {
   }, []);
 
   const handleClose = useCallback(() => {
+    setSelectedItem({category: null, item_code: null});
     setEditedDetailValues(null);
     setCurrentConsulting();
   }, [setCurrentConsulting]);
@@ -172,7 +174,7 @@ const ConsultingDetailsModel = () => {
   }, [consultingState, cookies.myLationCrmUserId, currentConsultingCode, selectedConsulting]);
 
   useEffect(() => {
-    if (((userState & 1) === 1) && ((consultingState & 1) === 1)) {
+    if ((userState & 1) === 1) {
       setIsAllNeededDataLoaded(true);
     };
   }, [userState, consultingState])
@@ -194,19 +196,19 @@ const ConsultingDetailsModel = () => {
           <div className="modal-header">
             <div className="row w-100">
               <DetailTitleItem
-                original={selectedConsulting.lead_name}
+                original={selectedConsulting}
                 name='lead_name'
                 title={t('lead.lead_name')}
                 onEditing={handleDetailChange}
               />
               <DetailTitleItem
-                original={selectedConsulting.company_name}
+                original={selectedConsulting}
                 name='company_name'
                 title={t('company.company_name')}
                 onEditing={handleDetailChange}
               />
               <DetailTitleItem
-                original={selectedConsulting.position}
+                original={selectedConsulting}
                 name='position'
                 title={t('lead.position')}
                 onEditing={handleDetailChange}
@@ -263,7 +265,7 @@ const ConsultingDetailsModel = () => {
                               style={{ display: 'flex', marginBottom: '0.5rem' }}
                               wrap
                             >
-                              {consulting_items_info.map((item, index) =>
+                              { consulting_items_info.map((item, index) =>
                                 <DetailCardItem
                                   key={index}
                                   title={t(item.title)}
@@ -278,7 +280,7 @@ const ConsultingDetailsModel = () => {
                         </div>
                       </div>
                     </div>
-                    {editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&
+                    { editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&
                       <div className="text-center py-3">
                         <button
                           type="button"

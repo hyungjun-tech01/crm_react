@@ -1,15 +1,16 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Avatar, Space, Switch } from "antd";
 import {
   atomCurrentLead, defaultLead,
-  atomAllCompanies, atomCurrentCompany, atomCompanyState, atomCompanyForSelection,
-  atomPurchaseState, atomAllPurchases,
-  atomConsultingState, atomAllConsultings,
-  atomQuotationState, atomAllQuotations,
+  atomCurrentCompany,
+  atomPurchaseByCompany,
+  atomConsultingByLead,
+  atomQuotationByLead,
+  atomSelectedItem,
 } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo } from "../../repository/company";
@@ -34,9 +35,12 @@ import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
 import PurchaseAddModel from "../purchase/PurchaseAddModel";
 
 
-const LeadDetailsModel = () => {
+const LeadDetailsModel = ({init, handleInit}) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+  const [checkState,  setCheckState] = useState({
+    purchase: false, consulting: false, quotation: false,
+  });
 
 
   //===== [RecoilState] Related with Lead ==========================================
@@ -45,30 +49,24 @@ const LeadDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Company =======================================
-  const companyState = useRecoilValue(atomCompanyState);
-  const allCompanies = useRecoilValue(atomAllCompanies);
   const currentCompany = useRecoilValue(atomCurrentCompany);
   const { modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
-  const companyForSelection = useRecoilValue(atomCompanyForSelection);
 
 
   //===== [RecoilState] Related with Purchase =======================================
-  const purchaseState = useRecoilValue(atomPurchaseState);
-  const { tryLoadAllPurchases } = useRecoilValue(PurchaseRepo)
-  const allPurchases = useRecoilValue(atomAllPurchases);
+  const [ purchaseByCompany, setPurchasesByCompany ] = useRecoilState(atomPurchaseByCompany);
+  const { searchPurchases } = useRecoilValue(PurchaseRepo)
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
 
   //===== [RecoilState] Related with Consulting =======================================
-  const consultingState = useRecoilValue(atomConsultingState);
-  const { tryLoadAllConsultings } = useRecoilValue(ConsultingRepo);
-  const allConsultings = useRecoilValue(atomAllConsultings);
+  const [ consultingByLead, setConsultingsByLead ] = useRecoilState(atomConsultingByLead);
+  const { searchConsultings } = useRecoilValue(ConsultingRepo);
 
 
   //===== [RecoilState] Related with Quotation ========================================
-  const quotationState = useRecoilValue(atomQuotationState);
-  const { tryLoadAllQuotations } = useRecoilValue(QuotationRepo);
-  const allQuotations = useRecoilValue(atomAllQuotations);
+  const [ quotationByLead, setQuotationsByLead ] = useRecoilState(atomQuotationByLead);
+  const { searchQuotations } = useRecoilValue(QuotationRepo);
 
 
   //===== [RecoilState] Related with Users ==========================================
@@ -81,6 +79,7 @@ const LeadDetailsModel = () => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentLeadCode, setCurrentLeadCode] = useState('');
   const [validMACount, setValidMACount] = useState(0);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -92,7 +91,7 @@ const LeadDetailsModel = () => {
 
 
   //===== Handles to edit 'Lead Details' ===============================================
-  const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
+  // const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
   const [editedDetailValues, setEditedDetailValues] = useState({});
 
   const handleDetailChange = useCallback((e) => {
@@ -148,14 +147,14 @@ const LeadDetailsModel = () => {
     };
   }, [editedDetailValues, selectedLead]);
 
-  const handleDetailAddressChange = useCallback((obj) => {
-    const tempEdited = {
-      ...editedDetailValues,
-      ...obj,
-    };
-    console.log("handleDetailAddressChange :", tempEdited);
-    setEditedDetailValues(tempEdited);
-  },
+  const handleDetailObjectChange = useCallback((obj) => {
+      const tempEdited = {
+        ...editedDetailValues,
+        ...obj,
+      };
+      console.log("handleDetailAddressChange :", tempEdited);
+      setEditedDetailValues(tempEdited);
+    },
     [editedDetailValues]
   );
 
@@ -178,6 +177,7 @@ const LeadDetailsModel = () => {
   };
 
   const handleClose = useCallback(() => {
+    setSelectedItem({category: null, item_code: null});
     setEditedDetailValues(null);
     setCurrentLead();
     setCurrentLeadCode('');
@@ -241,7 +241,7 @@ const LeadDetailsModel = () => {
     { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'is_keyman', title: 'lead.is_keyman', detail: { type: 'select', options: KeyManForSelection, editing: handleDetailSelectChange } },
     { key: 'region', title: 'common.region', detail: { type: 'select', options: option_locations.ko, editing: handleDetailSelectChange } },
-    { key: 'company_name', title: 'company.company_name', detail: { type: 'select', options: companyForSelection, key: 'company_name', editing: handleDetailSelectChange } },
+    { key: 'company_name', title: 'company.company_name', detail: { type: 'search', key_name: 'company', editing: handleDetailObjectChange } },
     { key: 'company_name_en', title: 'company.company_name_en', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'department', title: 'lead.department', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
@@ -251,7 +251,7 @@ const LeadDetailsModel = () => {
     { key: 'email', title: 'lead.email', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'homepage', title: 'lead.homepage', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'company_zip_code', title: 'company.zip_code', detail: { type: 'label', editing: handleDetailChange, disabled: true } },
-    { key: 'company_address', title: 'company.address', detail: { type: 'address', extra: 'long', key_zip: "company_zip_code", editing: handleDetailAddressChange, } },
+    { key: 'company_address', title: 'company.address', detail: { type: 'address', extra: 'long', key_zip: "company_zip_code", editing: handleDetailObjectChange, } },
     { key: 'sales_resource', title: 'lead.lead_sales', detail: { type: 'select', options: salespersonsForSelection, editing: handleDetailSelectChange } },
     { key: 'application_engineer', title: 'company.engineer', detail: { type: 'select', options: engineersForSelection, editing: handleDetailSelectChange } },
     { key: 'create_date', title: 'common.regist_date', detail: { type: 'date', editing: handleDetailDateChange } },
@@ -260,18 +260,16 @@ const LeadDetailsModel = () => {
 
 
   //===== Handles to edit 'Purchase Add/Details' ===============================================
-  const [purchasesByCompany, setPurchasesByCompany] = useState([]);
   const [initAddPurchase, setInitAddPurchase] = useState(false);
 
 
   //===== Handles to edit 'Consulting Add/Details' ===============================================
-  const [consultingsByLead, setConsultingsByLead] = useState([]);
   const [initAddConsulting, setInitAddConsulting] = useState(false);
 
 
   //===== Handles to edit 'Quotation Add/Details' ===============================================
-  const [quotationsByLead, setQuotationsByLead] = useState([]);
   const [initAddQuotation, setInitAddQuotation] = useState(false);
+  const [initEditQuotation, setInitEditQuotation] = useState(false);
 
 
   //===== Handles related with Search ===============================================  
@@ -305,12 +303,11 @@ const LeadDetailsModel = () => {
 
   //===== useEffect functions ===============================================  
   useEffect(() => {
-    if (isAllNeededDataLoaded
+    if (init
       && (selectedLead !== defaultLead)
       && (selectedLead.lead_code !== currentLeadCode)
-      && ((companyState & 1) === 1)
     ) {
-      console.log('[LeadDetailsModel] useEffect / lead');
+      console.log('[LeadDetailsModel] new lead is loaded');
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {
@@ -321,66 +318,93 @@ const LeadDetailsModel = () => {
       } else {
         setIsFullScreen(true);
       };
-
-      setCurrentLeadCode(selectedLead.company_code);
-      const companyByLeadArray = allCompanies.filter(company => company.company_code === selectedLead.company_code);
-      if (companyByLeadArray.length > 0) {
-        setCurrentCompany(companyByLeadArray[0]);
-        loadCompanyMAContracts(companyByLeadArray[0].company_code);
-      };
+      
+      setCurrentCompany(selectedLead.company_code);
+      loadCompanyMAContracts(selectedLead.company_code);
+      setCurrentLeadCode(selectedLead.lead_code);
+      setCheckState({purchase:false, consulting:false, quotation:false});
     };
-  }, [isAllNeededDataLoaded, selectedLead, currentLeadCode, companyState, allCompanies, setCurrentCompany, loadCompanyMAContracts]);
+  }, [selectedLead, currentLeadCode, setCurrentCompany, loadCompanyMAContracts]);
 
+  //===== useEffect for Purchase =======================================================
   useEffect(() => {
-    tryLoadAllPurchases();
-    if ((purchaseState & 1) === 1) {
-      const tempCompanyPurchases = allPurchases.filter(purchase => purchase.company_code === currentCompany.company_code);
-      if (purchasesByCompany.length !== tempCompanyPurchases.length) {
-        console.log('[CompanyDetailsModel] set purchasesBycompany / set MA Count');
-        setPurchasesByCompany(tempCompanyPurchases);
-
-        let valid_count = 0;
-        tempCompanyPurchases.forEach(item => {
-          if (item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now())) valid_count++;
+    if(!!selectedLead.company_code  && !checkState.purchase) {
+      setCheckState({
+        ...checkState,
+        purchase: true,
+      });
+      const queryPromise = searchPurchases('company_code', selectedLead.company_code, true);
+      queryPromise
+        .then(res => {
+          if(res.result) {
+            setPurchasesByCompany(res.data);
+  
+            let valid_count = 0;
+            res.data.forEach((item) => {
+              if (item.ma_finish_date && new Date(item.ma_finish_date) > Date.now())
+                valid_count++;
+            });
+            setValidMACount(valid_count);
+          } else {
+            console.log('[LeadDetailsModel] fail to get purchase :', res.message);
+            setPurchasesByCompany([]);
+            setValidMACount(0);
+          };
         });
-        setValidMACount(valid_count);
-      };
+    }
+  }, [selectedLead.company_code, searchPurchases, checkState]);
+
+  //===== useEffect for Consulting =======================================================
+  useEffect(() => {
+    if(!!selectedLead.lead_code  && !checkState.consulting) {
+      setCheckState({
+        ...checkState,
+        consulting: true,
+      });
+      const queryPromise = searchConsultings('lead_code', selectedLead.lead_code, true);
+      queryPromise
+        .then(res => {
+          if(res.result) {
+            setConsultingsByLead(res.data);
+          } else {
+            console.log('[LeadDetailsModel] fail to get consulting :', res.message);
+            setConsultingsByLead([]);
+          };
+        });
     };
-  }, [purchaseState, allPurchases, purchasesByCompany, currentCompany.company_code]);
+  }, [checkState, searchConsultings, selectedLead.lead_code]);
+
+  //===== useEffect for Quotation =======================================================
+  useEffect(() => {
+    if(!!selectedLead.lead_code  && !checkState.quotation) {
+      setCheckState({
+        ...checkState,
+        quotation: true,
+      });
+      const queryPromise = searchQuotations('lead_code', selectedLead.lead_code, true);
+      queryPromise
+        .then(res => {
+          if(res.result) {
+            setQuotationsByLead(res.data);
+          } else {
+            console.log('[LeadDetailsModel] fail to get quotation :', res.message);
+            setQuotationsByLead([]);
+          };
+        });
+    };
+  }, [checkState, searchQuotations, selectedLead.lead_code]);
 
   useEffect(() => {
-    tryLoadAllConsultings();
-    if ((consultingState & 1) === 1) {
-      const tempConsultingByLead = allConsultings.filter(consulting => consulting.lead_code === selectedLead.lead_code);
-      if (consultingsByLead.length !== tempConsultingByLead.length) {
-        setConsultingsByLead(tempConsultingByLead);
-      };
-    };
-  }, [allConsultings, consultingState, consultingsByLead.length, selectedLead.lead_code]);
-
-  useEffect(() => {
-    tryLoadAllQuotations();
-    if ((quotationState & 1) === 1) {
-      const tempQuotationsByLead = allQuotations.filter(item => item.lead_code === selectedLead.lead_code);
-      if (quotationsByLead.length !== tempQuotationsByLead.length) {
-        setQuotationsByLead(tempQuotationsByLead);
-      };
-    };
-  }, [allQuotations, quotationState, quotationsByLead, selectedLead.lead_code]);
-
-  useEffect(() => {
-    if (((companyState & 1) === 1)
+    if (init && checkState.purchase && checkState.consulting && checkState.quotation
       && ((userState & 1) === 1)
-      && ((purchaseState & 1) === 1)
-      && ((consultingState & 1) === 1)
-      && ((quotationState & 1) === 1)
     ) {
       console.log('[LeadDetailModel] all needed data is loaded');
-      setIsAllNeededDataLoaded(true);
+      // setIsAllNeededDataLoaded(true);
+      handleInit(false);
     };
-  }, [userState, companyState, purchaseState, consultingState, quotationState]);
+  }, [userState, checkState, handleInit]);
 
-  if (!isAllNeededDataLoaded)
+  if (init)
     return <div>&nbsp;</div>;
 
   return (
@@ -403,19 +427,19 @@ const LeadDetailsModel = () => {
                   </div>
                 </div>
                 <DetailTitleItem
-                  original={selectedLead.lead_name}
+                  original={selectedLead}
                   name='lead_name'
                   title={t('lead.lead_name')}
                   onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
-                  original={selectedLead.company_name}
+                  original={selectedLead}
                   name='company_name'
                   title={t('company.company_name')}
                   onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
-                  original={selectedLead.position}
+                  original={selectedLead}
                   name='position'
                   title={t('lead.position')}
                   onEditing={handleDetailChange}
@@ -518,7 +542,7 @@ const LeadDetailsModel = () => {
                             to="#sub-lead-purchases"
                             data-bs-toggle="tab"
                           >
-                            {t('purchase.product_info') + "(" + validMACount + "/" + purchasesByCompany.length + ")"}
+                            {t('purchase.product_info') + "(" + validMACount + "/" + purchaseByCompany.length + ")"}
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -527,7 +551,7 @@ const LeadDetailsModel = () => {
                             to="#sub-lead-consultings"
                             data-bs-toggle="tab"
                           >
-                            {t('lead.consulting_history') + '('} {consultingsByLead.length}{')'}
+                            {t('lead.consulting_history') + '('} {consultingByLead.length}{')'}
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -536,7 +560,7 @@ const LeadDetailsModel = () => {
                             to="#sub-lead-quotation"
                             data-bs-toggle="tab"
                           >
-                            {t('lead.quotation_history') + '('} {quotationsByLead.length}{')'}
+                            {t('lead.quotation_history') + '('} {quotationByLead.length}{')'}
                           </Link>
                         </li>
                       </ul>
@@ -570,21 +594,18 @@ const LeadDetailsModel = () => {
                         <div className="tab-pane task-related p-0"
                           id="sub-lead-purchases" >
                           <CompanyPurchaseModel
-                            purchases={purchasesByCompany}
                             handleInitAddPurchase={setInitAddPurchase}
                           />
                         </div>
                         <div className="tab-pane task-related p-0"
                           id="sub-lead-consultings" >
                           <LeadConsultingModel
-                            consultings={consultingsByLead}
                             handleInitAddConsulting={setInitAddConsulting}
                           />
                         </div>
                         <div className="tab-pane task-related p-0"
                           id="sub-lead-quotation" >
                           <LeadQuotationModel
-                            quotations={quotationsByLead}
                             handleInitAddQuotation={setInitAddQuotation}
                           />
                         </div>
@@ -618,11 +639,11 @@ const LeadDetailsModel = () => {
         </div>
         {/* modal-dialog */}
       </div>
-      <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} leadCode={selectedLead.lead_code} />
+      <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} />
       <ConsultingDetailsModel />
-      <QuotationAddModel init={initAddQuotation} handleInit={setInitAddQuotation} leadCode={selectedLead.lead_code} />
-      <QuotationDetailsModel />
-      <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} companyCode={selectedLead.company_code} />
+      <QuotationAddModel init={initAddQuotation} handleInit={setInitAddQuotation} />
+      <QuotationDetailsModel  init={initEditQuotation} handleInit={setInitEditQuotation}/>
+      <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} />
       <PurchaseDetailsModel />
     </>
   );

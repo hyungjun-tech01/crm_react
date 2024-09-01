@@ -7,17 +7,17 @@ import { ConvertCurrency, formatDate } from "../../constants/functions";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Add } from "@mui/icons-material";
 
-import { TransactionRepo } from "../../repository/transaction";
-
+import { atomTransactionByCompany, defaultTransaction } from '../../atoms/atoms';
+import { TransactionRepo } from '../../repository/transaction';
 
 const CompanyTransactionModel = (props) => {
-    const { transactions, openTransaction } = props;
+    const { openTransaction } = props;
     const { t } = useTranslation();
 
 
     //===== [RecoilState] Related with Transaction ======================================
+    const transactionByCompany = useRecoilValue(atomTransactionByCompany);
     const { setCurrentTransaction } = useRecoilValue(TransactionRepo);
-
     
     // --- Variables for only Transaction ------------------------------------------------
     const [selectedTransactionRowKeys, setSelectedTransactionRowKeys] = useState([]);
@@ -58,7 +58,7 @@ const CompanyTransactionModel = (props) => {
                 const selectedValue = selectedRows.at(0);
                 handleSelectTransaction(selectedValue);
             } else {
-                setCurrentTransaction();
+                setCurrentTransaction(defaultTransaction);
             };
         },
         getCheckboxProps: (record) => ({
@@ -118,7 +118,7 @@ const CompanyTransactionModel = (props) => {
 
     useEffect(() => {
         console.log('[CompanyTransactionModel] called!');
-    }, [transactions]);
+    }, [transactionByCompany]);
 
     return (
         <div className="row">
@@ -128,7 +128,7 @@ const CompanyTransactionModel = (props) => {
                         <Table
                             rowSelection={transactionRowSelection}
                             pagination={{
-                                total: transactions.length,
+                                total: transactionByCompany.length,
                                 showTotal: ShowTotal,
                                 showSizeChanger: true,
                                 ItemRender: ItemRender,
@@ -136,7 +136,7 @@ const CompanyTransactionModel = (props) => {
                             className="table"
                             style={{ overflowX: "auto" }}
                             columns={columns_transaction}
-                            dataSource={transactions}
+                            dataSource={transactionByCompany}
                             rowKey={(record) => record.transaction_code}  // publish_date
                             title={() =>
                                 <div style={{

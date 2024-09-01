@@ -1,11 +1,14 @@
 import React from 'react';
 import { selector } from "recoil";
 import { atomCurrentQuotation
-    , atomAllQuotations
+    , atomAllQuotationObj
     , defaultQuotation
     , atomCompanyQuotations
-    , atomFilteredQuotation
-    , atomQuotationState
+    , atomFilteredQuotationArray
+    , atomQuotationState,
+    atomCurrentLead,
+    defaultLead,
+    atomQuotationByLead
 } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
@@ -58,19 +61,26 @@ export const QuotationRepo = selector({
                     headers:{'Content-Type':'application/json'},
                     body: input_json,
                 });
-
-
                 const data = await response.json();
                 if(data.message){
                     console.log('loadAllQuotations message:', data.message);
-                    set(atomAllQuotations, []);
+                    set(atomAllQuotationObj, {});
                     return false;
-                }
-                set(atomAllQuotations, data);
+                };
+                let allQuotations = {};
+                let filteredQuotations = [];
+                data.forEach(item => {
+                    allQuotations[item.quotation_code] = item;
+                    filteredQuotations.push(item);
+                });
+                set(atomAllQuotationObj, allQuotations);
+                set(atomFilteredQuotationArray, filteredQuotations);
                 return true;
             }
             catch(err){
                 console.error(`loadAllQuotations / Error : ${err}`);
+                set(atomAllQuotationObj, {});
+                set(atomFilteredQuotationArray, []);
                 return false;
             };
         });
@@ -112,12 +122,12 @@ export const QuotationRepo = selector({
                                                 item.lead_name && item.lead_name.includes(filterText)                        
                 ));
             }
-            set(atomFilteredQuotation, allQuotation);
+            set(atomFilteredQuotationArray, allQuotation);
             return true;
         });
 
         const filterQuotations = getCallback(({set, snapshot }) => async (itemName, filterText) => {
-            const allQuotationList = await snapshot.getPromise(atomAllQuotations);
+            const allQuotationList = await snapshot.getPromise(atomAllQuotationObj);
             let  allQuotation ;
             console.log('filterQuotations', itemName, filterText);
             if(itemName === 'common.all'){
@@ -151,7 +161,7 @@ export const QuotationRepo = selector({
                 allQuotation = allQuotationList.filter(item => (item.email &&item.email.includes(filterText))
                 );    
             }
-            set(atomFilteredQuotation, allQuotation);
+            set(atomFilteredQuotationArray, allQuotation);
             return true;
         });     
         const modifyQuotation = getCallback(({set, snapshot}) => async (newQuotation) => {
@@ -167,7 +177,7 @@ export const QuotationRepo = selector({
                     return {result:false, data: data.message};
                 };
 
-                const allQuotations = await snapshot.getPromise(atomAllQuotations);
+                const allQuotations = await snapshot.getPromise(atomAllQuotationObj);
                 if(newQuotation.action_type === 'ADD'){
                     delete newQuotation.action_type;
                     const updatedNewQuotation = {
@@ -178,7 +188,29 @@ export const QuotationRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomAllQuotations, [updatedNewQuotation, ...allQuotations]);
+                    //----- Update AllQuotationObj --------------------------//
+                    const updatedAllObj = {
+                        ...allQuotations,
+                        [data.out_quotation_code]: updatedNewQuotation,
+                    };
+                    set(atomAllQuotationObj, updatedAllObj);
+
+                    //----- Update FilteredQuotationArry -----------------------//
+                    set(atomFilteredQuotationArray, Object.values(updatedAllObj));
+
+                    //----- Update QuotationByLead -----------------------//
+                    const currentLead = await snapshot.getPromise(atomCurrentLead);
+                    if((currentLead !== defaultLead)
+                        && (currentLead.lead_code === updatedNewQuotation.lead_code))
+                    {
+                        const quotationByLead = await snapshot.getPromise(atomQuotationByLead);
+                        const updated = [
+                            updatedNewQuotation,
+                            ...quotationByLead,
+                        ];
+                        set(atomQuotationByLead, updated);
+                    };
+
                     return {result: true};
                 } else if(newQuotation.action_type === 'UPDATE'){
                     const currentQuotation = await snapshot.getPromise(atomCurrentQuotation);
@@ -192,18 +224,32 @@ export const QuotationRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCurrentQuotation, modifiedQuotation);
-                    const foundIdx = allQuotations.findIndex(quotation => 
-                        quotation.quotation_code === modifiedQuotation.quotation_code);
-                    if(foundIdx !== -1){
-                        const updatedAllQuotations = [
-                            ...allQuotations.slice(0, foundIdx),
-                            modifiedQuotation,
-                            ...allQuotations.slice(foundIdx + 1,),
-                        ];
-                        set(atomAllQuotations, updatedAllQuotations);
-                        return {result: true};
-                    } else {
-                        return {result:false, data: "No Data"};
+
+                    //----- Update AllQuotationObj --------------------------//
+                    const updatedAllObj = {
+                        ...allQuotations,
+                        [modifiedQuotation.consulting_code]: modifiedQuotation,
+                    };
+                    set(atomAllQuotationObj, updatedAllObj);
+
+                    //----- Update FilteredQuotationArry -----------------------//
+                    set(atomFilteredQuotationArray, Object.values(updatedAllObj));
+
+                    //----- Update QuotationByLead -----------------------//
+                    const currentLead = await snapshot.getPromise(atomCurrentLead);
+                    if((currentLead !== defaultLead)
+                        && (currentLead.lead_code === modifiedQuotation.lead_code))
+                    {
+                        const quotationsByLead = await snapshot.getPromise(atomQuotationByLead);
+                        const foundIdx = quotationsByLead.findIndex(item => item.quotation_code === modifiedQuotation.quotation_code);
+                        if(foundIdx !== -1) {
+                            const updated = [
+                                ...quotationsByLead.slice(0, foundIdx),
+                                modifiedQuotation,
+                                ...quotationsByLead.slice(foundIdx + 1, ),
+                            ];
+                            set(atomQuotationByLead, updated);
+                        }
                     }
                 }
             }
@@ -216,19 +262,87 @@ export const QuotationRepo = selector({
                 if(quotation_code === undefined || quotation_code === null) {
                     set(atomCurrentQuotation, defaultQuotation);
                     return;
+                }; 
+                const allQuotations = await snapshot.getPromise(atomAllQuotationObj);
+                if(!allQuotations[quotation_code]){
+                    const found = await searchQuotations('quotation_code', quotation_code, true);
+                    if(found.result) {
+                        let foundObj = {};
+                        found.data.forEach(item => {
+                            foundObj[item.quotation_code] = item;
+                        });
+                        const updatedAllConsultings = {
+                            ...allQuotations,
+                            ...foundObj,
+                        };
+                        set(atomAllQuotationObj, updatedAllConsultings);
+
+                        const allFiltered = await snapshot.getPromise(atomFilteredQuotationArray);
+                        set(atomFilteredQuotationArray, [...allFiltered, ...found.data]);
+                    } else {
+                        set(atomCurrentQuotation, defaultQuotation);
+                    };
+                } else {
+                    set(atomCurrentQuotation, allQuotations[quotation_code]);
                 };
-                let queriedQotations = await snapshot.getPromise(atomAllQuotations);
-                if(queriedQotations.length === 0){
-                    queriedQotations = await snapshot.getPromise(atomCompanyQuotations);
-                };
-                const selected_arrary = queriedQotations.filter(quotation => quotation.quotation_code === quotation_code);
-                if(selected_arrary.length > 0){
-                    set(atomCurrentQuotation, selected_arrary[0]);
-                }
             }
             catch(err){
                 console.error(`setCurrentQuotation / Error : ${err}`);
+                set(atomCurrentQuotation, defaultQuotation);
             };
+        });
+        const searchQuotations = getCallback(() => async (itemName, filterText, isAccurate = false) => {
+            // At first, request data to server
+            let foundInServer = {};
+            let foundData = [];
+            const query_obj = {
+                queryConditions: [{
+                    column: { value: itemName},
+                    columnQueryCondition: { value: isAccurate ? '=' : 'like'},
+                    multiQueryInput: filterText,
+                    andOr: 'And',
+                }],
+            };
+            const input_json = JSON.stringify(query_obj);
+            try{
+                const response = await fetch(`${BASE_PATH}/quotations`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+
+                const data = await response.json();
+                if(data.message){
+                    console.log('\t[ searchQuotations ] message:', data.message);
+                    return { result: false, message: data.message};
+                } else {
+                    for(const item of data) {
+                        foundInServer[item.quotation_code] = item;
+                    };
+                    foundData = data.sort((a, b) => {
+                        if(a.quotation_name > b.quotation_name) return 1;
+                        if(a.quotation_name < b.quotation_name) return -1;
+                        return 0;
+                    });
+                };
+            } catch(e) {
+                console.log('\t[ searchQuotations ] error occurs on searching');
+                return { result: false, message: 'fail to query'};
+            };
+
+            // //----- Update AllQuotationObj --------------------------//
+            // const allQuotationData = await snapshot.getPromise(atomAllQuotationObj);
+            // const updatedAllQuotationData = {
+            //     ...allQuotationData,
+            //     ...foundInServer,
+            // };
+            // set(atomAllQuotationObj, updatedAllQuotationData);
+
+            // //----- Update FilteredQuotationArray --------------------//
+            // const updatedList = Object.values(updatedAllQuotationData);
+            // set(atomFilteredQuotationArrayArray, updatedList);
+
+            return { result: true, data: foundData};
         });
         return {
             tryLoadAllQuotations,
@@ -238,6 +352,7 @@ export const QuotationRepo = selector({
             filterQuotations,
             loadCompanyQuotations,
             filterCompanyQuotation,
+            searchQuotations,
         };
     }
 });

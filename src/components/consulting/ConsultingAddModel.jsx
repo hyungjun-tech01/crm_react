@@ -5,9 +5,9 @@ import { useTranslation } from "react-i18next";
 import "react-datepicker/dist/react-datepicker.css";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import {
-  defaultConsulting,
-  atomLeadsForSelection,
-  atomLeadState,
+  atomCurrentLead,
+  atomSelectedItem,
+  defaultLead,
 } from "../../atoms/atoms";
 import {
   atomUserState,
@@ -24,11 +24,13 @@ import {
 } from "../../repository/consulting";
 
 import AddBasicItem from "../../constants/AddBasicItem";
+import AddSearchItem from "../../constants/AddSearchItem";
 import MessageModal from "../../constants/MessageModal";
+import { CompanyRepo } from "../../repository/company";
 
 
 const ConsultingAddModel = (props) => {
-  const { init, handleInit, leadCode } = props;
+  const { init, handleInit } = props;
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId", "myLationCrmUserName"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -40,8 +42,11 @@ const ConsultingAddModel = (props) => {
 
 
   //===== [RecoilState] Related with Lead =============================================
-  const leadsState = useRecoilValue(atomLeadState);
-  const leadsForSelection = useRecoilValue(atomLeadsForSelection);
+  const currentLead = useRecoilValue(atomCurrentLead);
+
+
+  //===== [RecoilState] Related with Company ==========================================
+  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Users ============================================
@@ -52,43 +57,41 @@ const ConsultingAddModel = (props) => {
 
 
   //===== Handles to edit 'ConsultingAddModel' ========================================
-  const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
-  const [consultingChange, setConsultingChange] = useState({ ...defaultConsulting });
+  const [consultingChange, setConsultingChange] = useState({});
+  const selectedItem = useRecoilValue(atomSelectedItem);
 
   const initializeConsultingTemplate = useCallback(() => {
     document.querySelector("#add_new_consulting_form").reset();
 
     // set Receipt date -------------
     const tempDate = new Date();
-    let modified = null;
+    let modified = {
+      receiver: cookies.myLationCrmUserName,
+      receipt_date: tempDate,
+    };
 
-    if (leadCode && leadCode !== "") {
-      const foundIdx = leadsForSelection.findIndex(item => item.value.lead_code === leadCode);
-      if (foundIdx !== -1) {
-        const found_lead_info = leadsForSelection.at(foundIdx);
-        modified = {
-          ...defaultConsulting,
-          ...found_lead_info.value,
-          receiver: cookies.myLationCrmUserName,
-          receipt_date: tempDate,
-        };
-      };
-    } else {
-      modified = {
-        ...defaultConsulting,
-        receiver: cookies.myLationCrmUserName,
-        receipt_date: tempDate,
-      };
+    if ((selectedItem.category === 'lead')
+      && (currentLead !== defaultLead)
+      && (selectedItem.item_code === currentLead.lead_code)
+    ) {
+      modified['lead_code'] = currentLead.lead_code;
+      modified['lead_name'] = currentLead.lead_name;
+      modified['department'] = currentLead.department;
+      modified['position'] = currentLead.position;
+      modified['mobile_number'] = currentLead.mobile_number;
+      modified['phone_number'] = currentLead.phone_number;
+      modified['email'] = currentLead.email;
+      modified['company_code'] = currentLead.company_code;
+      modified['company_name'] = currentLead.company_name;
     };
     setConsultingChange(modified);
-  }, [cookies.myLationCrmUserName, leadsForSelection, leadCode]);
+  }, [cookies.myLationCrmUserName, currentLead, setCurrentCompany, selectedItem]);
 
   const handleDateChange = (name, date) => {
     const modifiedData = {
       ...consultingChange,
       [name]: date
     };
-    console.log('handleDateChange : ', modifiedData);
     setConsultingChange(modifiedData);
   };
 
@@ -97,32 +100,14 @@ const ConsultingAddModel = (props) => {
       ...consultingChange,
       [e.target.name]: e.target.value,
     };
-    console.log('handleItemChange : ', modifiedData);
     setConsultingChange(modifiedData);
   };
 
   const handleSelectChange = (name, selected) => {
-    let modifiedData = null;
-    if (name === 'lead_name') {
-      modifiedData = {
-        ...consultingChange,
-        lead_code: selected.value.lead_code,
-        lead_name: selected.value.lead_name,
-        department: selected.value.department,
-        position: selected.value.position,
-        mobile_number: selected.value.mobile_number,
-        phone_number: selected.value.phone_number,
-        email: selected.value.email,
-        company_name: selected.value.company_name,
-        company_code: selected.value.company_code,
-      };
-    } else {
-      modifiedData = {
-        ...consultingChange,
-        [name]: selected.value,
-      };
+    const modifiedData = {
+      ...consultingChange,
+      [name]: selected.value,
     };
-    console.log('handleSelectChange : ', modifiedData);
     setConsultingChange(modifiedData);
   };
 
@@ -132,7 +117,7 @@ const ConsultingAddModel = (props) => {
       || consultingChange.lead_name === ''
       || consultingChange.consulting_type === null
     ) {
-      setMessage({title:'필요 정보 누락', message:'필요 입력 항목이 누락되었습니다.'});
+      setMessage({ title: '필요 정보 누락', message: '필요 입력 항목이 누락되었습니다.' });
       setIsMessageModalOpen(true);
       return;
     };
@@ -140,17 +125,17 @@ const ConsultingAddModel = (props) => {
     const newConsultingData = {
       ...consultingChange,
       action_type: 'ADD',
-      lead_number: '99999',// Temporary
       counter: 0,
       modify_user: cookies.myLationCrmUserId,
     };
+
     const result = modifyConsulting(newConsultingData);
     result.then((res) => {
-      if(res.result) {
+      if (res.result) {
         let thisModal = bootstrap.Modal.getInstance('#add_consulting');
-        if(thisModal) thisModal.hide();
+        if (thisModal) thisModal.hide();
       } else {
-        setMessage({title:'저장 실패', message:'정보 저장에 실패하였습니다.'});
+        setMessage({ title: '저장 실패', message: '정보 저장에 실패하였습니다.' });
         setIsMessageModalOpen(true);
       };
     });
@@ -159,19 +144,16 @@ const ConsultingAddModel = (props) => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    if (((leadsState & 1) === 1) && ((userState & 1) === 1)) {
-      setIsAllNeededDataLoaded(true);
-      if (init) {
-        console.log('[ConsultingAddModel] initialize!');
-        // setTimeout(()=>{
-          initializeConsultingTemplate();
-          if(handleInit) handleInit(!init);
-        // }, 500);
-      };
+    if (init && ((userState & 1) === 1)) {
+      console.log('[ConsultingAddModel] initialize!');
+      if (handleInit) handleInit(!init);
+      setTimeout(() => {
+        initializeConsultingTemplate();
+      }, 500);
     };
-  }, [leadsState, userState, init, initializeConsultingTemplate, handleInit]);
+  }, [userState, init, initializeConsultingTemplate, handleInit]);
 
-  if (!isAllNeededDataLoaded)
+  if (init)
     return <div>&nbsp;</div>;
 
   return (
@@ -243,14 +225,14 @@ const ConsultingAddModel = (props) => {
                 />
               </div>
               <div className="form-group row">
-                <AddBasicItem
+                <AddSearchItem
                   title={t('lead.lead_name')}
-                  type='select'
+                  category='consulting'
                   name='lead_name'
-                  defaultValue={consultingChange.lead_name}
-                  options={leadsForSelection}
                   required
-                  onChange={handleSelectChange}
+                  defaultValue={consultingChange.lead_name}
+                  edited={consultingChange}
+                  setEdited={setConsultingChange}
                 />
               </div>
               {!!consultingChange.lead_name &&

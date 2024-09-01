@@ -7,15 +7,16 @@ import { ConvertCurrency, formatDate } from "../../constants/functions";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Add } from "@mui/icons-material";
 
-import { TaxInvoiceRepo } from "../../repository/tax_invoice";
-
+import { atomTaxInvoiceByCompany } from '../../atoms/atoms';
+import { TaxInvoiceRepo } from '../../repository/tax_invoice';
 
 const CompanyTaxInvoiceModel = (props) => {
-    const { taxInvoices, openTaxInvoice } = props;
+    const { openTaxInvoice } = props;
     const { t } = useTranslation();
 
 
     //===== [RecoilState] Related with TaxInvoice ======================================
+    const taxInvoiceByCompany = useRecoilValue(atomTaxInvoiceByCompany);
     const { setCurrentTaxInvoice } = useRecoilValue(TaxInvoiceRepo);
 
     
@@ -56,7 +57,7 @@ const CompanyTaxInvoiceModel = (props) => {
             if (selectedRows.length > 0) {
                 // Set data to edit selected purchase ----------------------
                 const selectedValue = selectedRows.at(0);
-                handleSelectTaxInvoice(selectedValue);
+                handleSelectTaxInvoice(selectedValue.tax_invoice_code);
             } else {
                 setCurrentTaxInvoice();
             };
@@ -118,7 +119,7 @@ const CompanyTaxInvoiceModel = (props) => {
 
     useEffect(() => {
         console.log('[CompanyTaxInvoiceModel] called!');
-    }, [taxInvoices]);
+    }, [taxInvoiceByCompany]);
 
     return (
         <div className="row">
@@ -128,7 +129,7 @@ const CompanyTaxInvoiceModel = (props) => {
                         <Table
                             rowSelection={taxInvoiceRowSelection}
                             pagination={{
-                                total: taxInvoices.length,
+                                total: taxInvoiceByCompany.length,
                                 showTotal: ShowTotal,
                                 showSizeChanger: true,
                                 ItemRender: ItemRender,
@@ -136,7 +137,7 @@ const CompanyTaxInvoiceModel = (props) => {
                             className="table"
                             style={{ overflowX: "auto" }}
                             columns={columns_tax_invoice}
-                            dataSource={taxInvoices}
+                            dataSource={taxInvoiceByCompany}
                             rowKey={(record) => record.tax_invoice_code}
                             title={() =>
                                 <div style={{

@@ -6,13 +6,13 @@ import { Table } from 'antd';
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import * as bootstrap from "../../assets/js/bootstrap.bundle";
 import {
-    atomCompanyState,
-    atomCompanyForSelection,
     atomCurrentPurchase,
     defaultMAContract,
-    atomProductClassListState,
-    atomProductsState,
-    atomProductOptions,
+    atomCurrentCompany,
+    atomSelectedItem,
+    defaultCompany,
+    defaultPurchase,
+    atomCurrentLead,
 } from '../../atoms/atoms';
 import { PurchaseRepo } from '../../repository/purchase';
 import { ProductTypeOptions } from '../../repository/product';
@@ -22,20 +22,26 @@ import { ConvertCurrency, formatDate } from '../../constants/functions';
 import { Add } from "@mui/icons-material";
 
 import AddBasicItem from "../../constants/AddBasicItem";
+import AddSearchItem from '../../constants/AddSearchItem';
+import AddSearchProduct from '../../constants/AddSearchProduct';
 import DetailSubModal from '../../constants/DetailSubModal';
 import MessageModal from "../../constants/MessageModal";
 
 
 const PurchaseAddModel = (props) => {
-    const { init, handleInit, companyCode } = props;
+    const { init, handleInit } = props;
     const { t } = useTranslation();
     const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
     const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
     const [message, setMessage] = useState({ title: "", message: "" });
+    
 
     //===== [RecoilState] Related with Company =============================================
-    const companyState = useRecoilValue(atomCompanyState);
-    const companyForSelection = useRecoilValue(atomCompanyForSelection);
+    const currentCompany = useRecoilValue(atomCurrentCompany);
+
+
+    //===== [RecoilState] Related with Company =============================================
+    const currentLead = useRecoilValue(atomCurrentLead);
 
 
     //===== [RecoilState] Related with Purcahse ============================================
@@ -47,37 +53,34 @@ const PurchaseAddModel = (props) => {
     const { modifyMAContract, setCurrentMAContract } = useRecoilValue(MAContractRepo);
 
 
-    //===== [RecoilState] Related with Product =============================================
-    const productClassState = useRecoilValue(atomProductClassListState);
-    const productState = useRecoilValue(atomProductsState);
-    const productOptions = useRecoilValue(atomProductOptions);
-
     //===== Handles to edit 'Purchase Add' =================================================
-    const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
     const [purchaseChange, setPurchaseChange] = useState({});
     const [companyData, setCompanyData] = useState({ company_name: '', company_code: '' });
     const [needInit, setNeedInit] = useState(false);
+    const selectedItem = useRecoilValue(atomSelectedItem);
 
     const initializePurchaseTemplate = useCallback(() => {
         document.querySelector("#add_new_purchase_form").reset();
-        
-        if(companyCode && companyCode !== "") {
-            const foundIdx = companyForSelection.findIndex(item => item.value.company_code === companyCode);
-            if(foundIdx !== -1) {
-                setPurchaseChange({
-                    company_code: companyCode,
-                });
-                const found_company_info = companyForSelection.at(foundIdx);
-                setCompanyData({
-                    company_code: found_company_info.value.company_code,
-                    company_name: found_company_info.value.company_name,
-                });
-            };
+
+        if((currentCompany !== defaultCompany)
+            && (
+                ((selectedItem.category === 'company') && (selectedItem.item_code === currentCompany.company_code))
+                || ((selectedItem.category === 'lead') && (selectedItem.item_code === currentLead.lead_code))
+            )
+        ){
+            setPurchaseChange({
+                ...defaultPurchase,
+                company_code: currentCompany.company_code,
+            });
+            setCompanyData({
+                company_code: currentCompany.company_code,
+                company_name: currentCompany.company_name,
+            });
         } else {
-            setPurchaseChange({});
+            setPurchaseChange({...defaultPurchase});
         }
         setNeedInit(false);
-    }, [companyCode, companyForSelection]);
+    }, [currentCompany, selectedItem]);
 
     const handleItemChange = useCallback((e) => {
         const modifiedData = {
@@ -309,22 +312,16 @@ const PurchaseAddModel = (props) => {
 
     //===== useEffect functions ===========================================================
     useEffect(() => {
-        if (((companyState & 1) === 1)
-            && ((productClassState & 1) === 1)
-            && ((productState & 1) === 1)
-        ) {
-            setIsAllNeededDataLoaded(true);
-            if (init) {
-                console.log('[PurchaseAddModel] initialize!');
-                if(handleInit) handleInit(!init);
-                setTimeout(()=>{
-                    initializePurchaseTemplate();
-                }, 500);
-            };
+        if (init){
+            console.log('[PurchaseAddModel] initialize!');
+            if(handleInit) handleInit(!init);
+            setTimeout(()=>{
+                initializePurchaseTemplate();
+            }, 500);
         };
-    }, [companyState, productClassState, productState, init]);
+    }, [init, handleInit, initializePurchaseTemplate]);
 
-    if (!isAllNeededDataLoaded)
+    if (init)
         return <div>&nbsp;</div>;
 
     return (
@@ -359,26 +356,24 @@ const PurchaseAddModel = (props) => {
                             <div className="col-md-12">
                                 <form id="add_new_purchase_form">
                                     <div className="form-group row">
-                                        <AddBasicItem
+                                        <AddSearchItem
                                             title={t('company.company_name')}
-                                            type='select'
-                                            name="company_name"
+                                            category='purchase'
+                                            name='company_name'
                                             defaultValue={companyData.company_name}
                                             required
                                             long
-                                            options={companyForSelection}
-                                            onChange={handleSelectChange}
+                                            edited={companyData}
+                                            setEdited={setCompanyData}
                                         />
                                     </div>
                                     <div className="form-group row">
-                                        <AddBasicItem
+                                        <AddSearchProduct
                                             title={t('purchase.product_name')}
-                                            type='select'
                                             name="product_name"
-                                            defaultValue={purchaseChange.product_name}
                                             required
-                                            options={productOptions}
-                                            onChange={handleSelectChange}
+                                            edited={purchaseChange}
+                                            setEdited={setPurchaseChange}
                                         />
                                         <AddBasicItem
                                             title={t('purchase.product_type')}

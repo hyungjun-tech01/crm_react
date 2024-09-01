@@ -2,10 +2,13 @@ import React from 'react';
 import { selector } from "recoil";
 import {
     atomCurrentTransaction
-    , atomAllTransactions
-    , atomFilteredTransaction
-    , atomTransactionState,
-    defaultTransaction
+    , atomAllTransactionObj
+    , atomFilteredTransactionArray
+    , atomTransactionState
+    , defaultTransaction
+    , atomCurrentCompany
+    , defaultCompany,
+    atomTransactionByCompany
 } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
@@ -72,21 +75,31 @@ export const TransactionRepo = selector({
                 });
 
                 const data = await response.json();
-                if (data.message) {
+                if(data.message){
                     console.log('loadAllTransactions message:', data.message);
-                    set(atomAllTransactions, []);
+                    set(atomAllTransactionObj, {});
+                    set(atomFilteredTransactionArray, []);
                     return false;
-                }
-                set(atomAllTransactions, data);
+                };
+                let allconsultings = {};
+                let filteredTransactions = [];
+                data.forEach(item => {
+                    allconsultings[item.transaction_code] = item;
+                    filteredTransactions.push(item);
+                });
+                set(atomAllTransactionObj, allconsultings);
+                set(atomFilteredTransactionArray, filteredTransactions);
                 return true;
             }
-            catch (err) {
+            catch(err){
                 console.error(`loadAllTransactions / Error : ${err}`);
+                set(atomAllTransactionObj, {});
+                set(atomFilteredTransactionArray, []);
                 return false;
             };
         });
         const filterTransactions = getCallback(({ set, snapshot }) => async (itemName, filterText) => {
-            const allTransactionList = await snapshot.getPromise(atomAllTransactions);
+            const allTransactionList = await snapshot.getPromise(atomAllTransactionObj);
             let allTransaction;
             console.log('filterTransactions', itemName, filterText);
             if (itemName === 'common.all') {
@@ -112,7 +125,7 @@ export const TransactionRepo = selector({
                 allTransaction = allTransactionList.filter(item => (item.payment_type && item.payment_type.includes(filterText))
                 );
             }
-            set(atomFilteredTransaction, allTransaction);
+            set(atomFilteredTransactionArray, allTransaction);
             return true;
         });
         const modifyTransaction = getCallback(({ set, snapshot }) => async (newTransaction) => {
@@ -128,7 +141,7 @@ export const TransactionRepo = selector({
                     return {result:false, data: data.message};
                 };
 
-                const allTransactions = await snapshot.getPromise(atomAllTransactions);
+                const allTransactions = await snapshot.getPromise(atomAllTransactionObj);
                 if (newTransaction.action_type === 'ADD') {
                     delete newTransaction.action_type;
                     const updatedNewTransaction = {
@@ -138,8 +151,28 @@ export const TransactionRepo = selector({
                         modify_date: data.out_modify_date,
                         recent_user: data.out_recent_user,
                     };
-                    set(atomAllTransactions, [updatedNewTransaction, ...allTransactions]);
-                    return {result: true, code: data.out_transaction_code};
+                    //----- Update AllTransactionObj --------------------------//
+                    const updatedAllObj = {
+                        ...allTransactions,
+                        [updatedNewTransaction.transaction_code] : updatedNewTransaction,
+                    };
+                    set(atomAllTransactionObj, updatedAllObj);
+
+                    //----- Update FilteredTransactionArray --------------------//
+                    set(atomFilteredTransactionArray, Object.values(updatedAllObj));
+
+                    //----- Update TransactionByCompany --------------------//
+                    const currentCompany = await snapshot.getPromise(atomCurrentCompany);
+                    if((currentCompany !== defaultCompany)
+                        && (currentCompany.company_code === updatedNewTransaction.company_code)) {
+                        const transactionByCompany = await snapshot.getPromise(atomTransactionByCompany);
+                        const updated = [
+                            updatedNewTransaction,
+                            ...transactionByCompany,
+                        ];
+                        set(atomTransactionByCompany, updated);
+                    };
+                    return {result: true};
                 } else if (newTransaction.action_type === 'UPDATE') {
                     const currentTransaction = await snapshot.getPromise(atomCurrentTransaction);
                     delete newTransaction.action_type;
@@ -152,42 +185,126 @@ export const TransactionRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCurrentTransaction, modifiedTransaction);
-                    const foundIdx = allTransactions.findIndex(transaction =>
-                        transaction.transaction_code === modifiedTransaction.transaction_code);
-                    if (foundIdx !== -1) {
-                        const updatedAllTransactions = [
-                            ...allTransactions.slice(0, foundIdx),
+
+                    //----- Update AllTransactionObj --------------------------//
+                    const updatedAllObj = {
+                        ...allTransactions,
+                        [modifiedTransaction.transaction_code] : modifiedTransaction,
+                    };
+                    set(atomAllTransactionObj, updatedAllObj);
+
+                    //----- Update FilteredTransactionArray --------------------//
+                    set(atomFilteredTransactionArray, Object.values(updatedAllObj));
+
+                    //----- Update TransactionByCompany --------------------//
+                    const currentCompany = await snapshot.getPromise(atomCurrentCompany);
+                    if((currentCompany !== defaultCompany)
+                        && (currentCompany.company_code === modifiedTransaction.company_code)) {
+                        const transactionByCompany = await snapshot.getPromise(atomTransactionByCompany);
+                        const foundIdx = transactionByCompany.findIndex(item => item.transaction_code === modifiedTransaction.transaction_code);
+                        const updated = [
+                            ...transactionByCompany.slice(0, foundIdx),
                             modifiedTransaction,
-                            ...allTransactions.slice(foundIdx + 1,),
+                            ...transactionByCompany.slice(foundIdx + 1, ),
                         ];
-                        set(atomAllTransactions, updatedAllTransactions);
-                        return {result: true};
-                    } else {
-                        return {result:false, data: "No Data"};
-                    }
-                }
+                        set(atomTransactionByCompany, updated);
+                    };
+                    return {result: true};
+                };
             }
             catch (err) {
                 return {result:false, data: err};
             };
         });
-        const setCurrentTransaction = getCallback(({ set, snapshot }) => async (transaction_code) => {
-            try {
+        const setCurrentTransaction = getCallback(({set, snapshot}) => async (transaction_code) => {
+            try{
                 if(transaction_code === undefined || transaction_code === null) {
                     set(atomCurrentTransaction, defaultTransaction);
                     return;
                 };
-                const allTransactions = await snapshot.getPromise(atomAllTransactions);
-                const selected_arrary = allTransactions.filter(transaction => transaction.transaction_code === transaction_code);
-                if (selected_arrary.length > 0) {
-                    set(atomCurrentTransaction, selected_arrary[0]);
-                } else {
-                    set(atomCurrentTransaction, defaultTransaction);
+                const allTransactions = await snapshot.getPromise(atomAllTransactionObj);
+                if(!allTransactions[transaction_code]){
+                    // consulting이 없다면 쿼리 
+                    const found = await searchTransactions('transaction_code', transaction_code, true);
+                    if(found.result) {
+                        set(atomCurrentTransaction, found.data[0]);
+                        let foundObj = {};
+                        found.data.forEach(item => {
+                            foundObj[item.transaction_code] = item;
+                        });
+                        const updatedAllTransactions = {
+                            ...allTransactions,
+                            ...foundObj,
+                        };
+                        set(atomAllTransactionObj, updatedAllTransactions);
+
+                        const allFiltered = await snapshot.getPromise(atomFilteredTransactionArray);
+                        set(atomFilteredTransactionArray, [...allFiltered, ...found.data]);
+                    } else {
+                        set(atomCurrentTransaction, defaultTransaction);
+                    };
+                }else{
+                    set(atomCurrentTransaction, allTransactions[transaction_code]);
                 }
             }
-            catch (err) {
+            catch(err){
                 console.error(`setCurrentTransaction / Error : ${err}`);
+                set(atomCurrentTransaction, defaultTransaction);
             };
+        });
+        const searchTransactions = getCallback(() => async (itemName, filterText, isAccurate = false) => {
+            // At first, request data to server
+            let foundInServer = {};
+            let foundData = [];
+            const query_obj = {
+                queryConditions: [{
+                    column: { value: itemName},
+                    columnQueryCondition: { value: isAccurate ? '=' : 'like'},
+                    multiQueryInput: filterText,
+                    andOr: 'And',
+                }],
+            };
+            const input_json = JSON.stringify(query_obj);
+            try{
+                const response = await fetch(`${BASE_PATH}/transactions`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+                const data = await response.json();
+                if(data.message){
+                    console.log('\t[ searchTransactions ] message:', data.message);
+                    return { result: false, message: data.message};
+                } else {
+                    for(const item of data) {
+                        foundInServer[item.purchase_code] = item;
+                    };
+                    foundData = data.sort((a, b) => {
+                        const a_date = new Date(a.modify_date);
+                        const b_date = new Date(b.modify_date);
+                        if(a_date > b_date) return 1;
+                        if(a_date < b_date) return -1;
+                        return 0;
+                    });
+                };
+            } catch(e) {
+                console.log('\t[ searchTransactions ] error occurs on searching');
+                return { result: false, message: 'fail to query'};
+            };
+
+            // //----- Update AllTransactionObj --------------------------//
+            // const allTransactionData = await snapshot.getPromise(atomAllTransactionObj);
+            // const updatedAllTransactionData = {
+            //     ...allTransactionData,
+            //     ...foundInServer,
+            // };
+            // set(atomAllTransactionObj, updatedAllTransactionData);
+
+            // //----- Update FilteredTransactions -----------------------//
+            // const updatedList = Object.values(updatedAllTransactionData);
+            // set(atomFilteredTransactionArrayArray, updatedList);
+            
+            return { result: true, data: foundData};
         });
         return {
             tryLoadAllTransactions,
@@ -195,6 +312,7 @@ export const TransactionRepo = selector({
             modifyTransaction,
             setCurrentTransaction,
             filterTransactions,
+            searchTransactions,
         };
     }
 });

@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { FiSearch } from "react-icons/fi";
 
 import PopupPostCode from "./PostCode";
+import SelectListModal from './SelectListModal';
 
 
 const DateInput = (props) => {
@@ -180,7 +181,56 @@ const AddressInput = (props) => {
             </span>
         </div>
     );
-}
+};
+
+const SearchInput = (props) => {
+    const { addonBefore, title, name, value, disabled, key_name, onChange, style } = props;
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+    const handleData = (data) =>{
+        onChange({...data});
+    };
+
+    return (
+        <div className="ant-space-item" style={style}>
+            <span className='ant-input-group-wrapper
+                ant-input-group-wrapper-outlined
+                css-dev-only-do-not-override-1uweeqc'
+            >
+                <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-1uweeqc'>
+                    <span className='ant-input-group-addon'>
+                        { addonBefore }
+                    </span>
+                    <input
+                        className="ant-input detail-input-extra"
+                        name={ name }
+                        placeholder={ title }
+                        style={{ backgroundColor: 'white', borderTopRightRadius: '5px', borderBottomRightRadius: '5px' }}
+                        value={ value }
+                        disabled
+                    />
+                    <div className="add-basic-btn" onClick={() => {
+                            if(!disabled) setIsPopupOpen(!isPopupOpen)
+                        }}
+                    >
+                        <FiSearch />
+                    </div>
+                    <SelectListModal
+                        title={title}
+                        condition={{category: key_name, item: name}}
+                        open={isPopupOpen}
+                        handleChange={(data) => {
+                            delete data.index;
+                            delete data.component;
+                            handleData(data);
+                        }}
+                        handleClose={()=>setIsPopupOpen(false)}
+                    />
+                </span>
+            </span>
+        </div>
+    );
+};
 
 const DetailCardItem = (props) => {
     const { title, name, defaultValue, groupValue, edited, detail} = props;
@@ -216,6 +266,8 @@ const DetailCardItem = (props) => {
             return <SelectInput {...SharedProps} options={detail.options} group={group} onChange={(selected)=>detail.editing(name, selected)} style={{width: widthValue, height: 38}}/>;
         case 'address':
             return <AddressInput {...SharedProps} title={title} key_zip={detail.key_zip} onChange={detail.editing} style={{width: widthValue, height: 38}} />
+        case 'search':
+            return <SearchInput {...SharedProps} title={title} key_name={detail.key_name} onChange={detail.editing} style={{width: widthValue, height: 38}} />
         default:
             return null;
     };

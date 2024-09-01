@@ -1,29 +1,21 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
-import { atomAllPurchases,
-  atomFilteredPurchase,
-  atomCompanyState,
+import {
+  atomFilteredPurchaseArray,
   atomPurchaseState,
-  atomAllCompanies,
-  atomProductClassListState,
-  atomProductClassList,
-  atomProductsState,
-  atomAllProducts,
-  atomProductOptions
+  atomSelectedItem,
 } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
 import { PurchaseRepo } from "../../repository/purchase";
-import { ProductClassListRepo, ProductRepo } from "../../repository/product";
 import { compareText, formatDate } from "../../constants/functions";
 
 import PurchaseAddModel from "./PurchaseAddModel";
 import PurchaseDetailsModel from "./PurchaseDetailsModel";
-import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import { atomUserState } from "../../atoms/atomsUser";
 import { UserRepo } from "../../repository/user";
 
@@ -36,27 +28,14 @@ const Purchase = () => {
 
 
   //===== [RecoilState] Related with Company =============================================
-  const companyState = useRecoilValue(atomCompanyState);
-  const { setCurrentCompany, tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
-  const allCompanyData = useRecoilValue(atomAllCompanies);
+  const { setCurrentCompany, searchCompanies } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Purchase ============================================
   const purchaseState = useRecoilValue(atomPurchaseState);
-  const allPurchaseData = useRecoilValue(atomAllPurchases);
-  const filteredPurchase = useRecoilValue(atomFilteredPurchase);
-  const { tryLoadAllPurchases, filterPurchases, setCurrentPurchase , loadAllPurchases} = useRecoilValue(PurchaseRepo);
+  const filteredPurchase = useRecoilValue(atomFilteredPurchaseArray);
+  const { tryLoadAllPurchases, filterPurchases, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
   
-
-  //===== [RecoilState] Related with Product =============================================
-  const productClassState = useRecoilValue(atomProductClassListState);
-  const allProductClassList = useRecoilValue(atomProductClassList);
-  const { tryLoadAllProductClassList } = useRecoilValue(ProductClassListRepo);
-  const productState = useRecoilValue(atomProductsState);
-  const allProducts = useRecoilValue(atomAllProducts);
-  const { tryLoadAllProducts } = useRecoilValue(ProductRepo);
-  const [productOptions, setProductOptions] = useRecoilState(atomProductOptions);
-
 
   //===== [RecoilState] Related with User ================================================
   const userState = useRecoilValue(atomUserState);
@@ -67,6 +46,7 @@ const Purchase = () => {
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ initAddNewPurchase, setInitAddNewPurchase ] = useState(false);
   const [ tableData, setTableData ] = useState([]);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
   
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -142,7 +122,7 @@ const Purchase = () => {
   
       console.log('multiQueryCondi',multiQueryCondi);
   
-      loadAllPurchases(multiQueryCondi);
+      tryLoadAllPurchases(multiQueryCondi);
        
     };
     const handleMultiQueryModalCancel = () => {
@@ -169,23 +149,15 @@ const Purchase = () => {
   // --- Functions used for Table ------------------------------
   const handleClickPurchase = useCallback((code)=>{
     setCurrentPurchase(code);
+    setSelectedItem({category: 'purchase', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('purchase-details'), {
       keyboard: false
     })
     myModal.show();
-  },[setCurrentPurchase]);
+  },[setCurrentPurchase, setSelectedItem]);
 
   const handleAddNewPurchaseClicked = useCallback(() => {
     setInitAddNewPurchase(true);
-  }, []);
-
-  const handleClickCompany = useCallback((code) => {
-    console.log("[Consulting] set current company : ", code);
-    setCurrentCompany(code);
-    let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
-      keyboard: false
-    })
-    myModal.show();
   }, []);
 
   const columns = [
@@ -198,27 +170,13 @@ const Purchase = () => {
     {
       title: t('company.company_name'),
       dataIndex: "company_name",
-      render: (text, record) =>
-        <div className="table_company" style={{color:'#0d6efd'}}
-          onClick={() => {
-            handleClickCompany(record.company_code);
-          }}
-        >
-          {text}
-        </div>,
+      render: (text, record) =><>{text}</>,
       sorter: (a, b) => compareText(a.company_name, b.company_name),
     },
     {
       title: t('company.company_name_en'),
       dataIndex: "company_name_en",
-      render: (text, record) =>
-        <div className="table_company" style={{color:'#0d6efd'}}
-          onClick={() => {
-            handleClickCompany(record.company_code);
-          }}
-        >
-          {text}
-        </div>,
+      render: (text, record) =><>{text}</>,
       sorter: (a, b) => compareText(a.company_name_en, b.company_name_en),
     },
     {
@@ -264,8 +222,6 @@ const Purchase = () => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    tryLoadAllCompanies();
-
      // query condition 세팅 후 query
     
     const multiQueryCondi = {
@@ -276,68 +232,38 @@ const Purchase = () => {
 
   //  console.log('tryLoadAllQuotations multiQueryCondi',multiQueryCondi);   
     tryLoadAllPurchases(multiQueryCondi);
-
     tryLoadAllUsers();
 
-    if(((companyState & 1) === 1)
-      && ((purchaseState & 1) === 1)
+    if(((purchaseState & 1) === 1)
       && ((userState & 1) === 1)
     ){
       setNowLoading(false);
-      const modifiedData = allPurchaseData.map(purchase => {
-        const foundIdx = allCompanyData.findIndex(company => company.company_code === purchase.company_code);
-        if(foundIdx !== -1){
-          let remain_date = '';
-          if(purchase.ma_finish_date) {
-            const calc_remain_date = Math.ceil((new Date(purchase.ma_finish_date).getTime() - new Date().getTime())/86400000);
-            if(calc_remain_date >= 0){
-              remain_date = calc_remain_date;
+      const modifiedData = filteredPurchase.map(purchase => {
+        // const foundIdx = allCompanyData.findIndex(company => company.company_code === purchase.company_code);
+        const found = searchCompanies('company_code', purchase.company_code, true);
+        found.then(res => {
+          if(res.result) {
+            let remain_date = '';
+            if(purchase.ma_finish_date) {
+              const calc_remain_date = Math.ceil((new Date(purchase.ma_finish_date).getTime() - new Date().getTime())/86400000);
+              if(calc_remain_date >= 0){
+                remain_date = calc_remain_date;
+              };
             };
+            return {
+              ...purchase,
+              company_name: res.data[0].company_name,
+              company_name_en: res.data[0].company_name_en,
+              ma_remain_date: remain_date,
+            }
+          } else {
+            return null;
           };
-          return {
-            ...purchase,
-            company_name: allCompanyData[foundIdx].company_name,
-            company_name_en: allCompanyData[foundIdx].company_name_en,
-            ma_remain_date: remain_date,
-          }
-        } else {
-          return null;
-        };
+        });
       });
       setTableData(modifiedData);
     };
-  }, [companyState, purchaseState, userState, allPurchaseData, allCompanyData]);
-
-  // ----- useEffect for Production -----------------------------------
-  useEffect(() => {
-    tryLoadAllProductClassList();
-    tryLoadAllProducts();
-    if (((productClassState & 1) === 1) && ((productState & 1) === 1) && (productOptions.length === 0)) {
-        console.log('[Purchase] set product options for selection');
-        const productOptionsValue = allProductClassList.map(proClass => {
-            const foundProducts = allProducts.filter(product => product.product_class_name === proClass.product_class_name);
-            const subOptions = foundProducts.map(item => {
-                return {
-                    label: <span>{item.product_name}</span>,
-                    value: { product_code: item.product_code,
-                        product_name: item.product_name,
-                        product_class_name: item.product_class_name,
-                        detail_desc: item.detail_desc,
-                        cost_price: item.const_price,
-                        reseller_price: item.reseller_price,
-                        list_price: item.list_price,
-                    }
-                }
-            });
-            return {
-                label: <span>{proClass.product_class_name}</span>,
-                title: proClass.product_class_name,
-                options: subOptions,
-            };
-        });
-        setProductOptions(productOptionsValue);
-    };
-}, [allProductClassList, allProducts, productClassState, productOptions, productState, setProductOptions]);
+  }, [dates, filteredPurchase, purchaseState, queryConditions, searchCompanies, singleDate, userState]);
 
 
   return (
@@ -432,31 +358,6 @@ const Purchase = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive">
-                  {searchCondition === "" ? 
-                    <Table
-                      pagination={{
-                        total: tableData.length,
-                        showTotal: ShowTotal,
-                        showSizeChanger: true,
-                        onShowSizeChange: onShowSizeChange,
-                        ItemRender: ItemRender,
-                      }}
-                      loading={nowLoading}
-                      className="table"
-                      style={{ overflowX: "auto" }}
-                      columns={columns}
-                      dataSource={tableData}
-                      rowKey={(record) => record ? record.purchase_code : ''}
-                      onRow={(record, rowIndex) => {
-                        return {
-                          onClick: (event) => {
-                            if(event.target.className === 'table_company') return;
-                            handleClickPurchase(record.purchase_code);
-                          },
-                        };
-                      }}
-                    />
-                    :
                     <Table
                       pagination={{
                         total: filteredPurchase.length >0 ? filteredPurchase.length:0,
@@ -469,7 +370,7 @@ const Purchase = () => {
                       style={{ overflowX: "auto" }}
                       columns={columns}
                       dataSource={filteredPurchase.length >0 ? filteredPurchase : null}
-                      rowKey={(record) => record.lead_code}
+                      rowKey={(record) => record.purchase_code}
                       onRow={(record, rowIndex) => {
                         return {
                           onClick: (event) => {
@@ -479,7 +380,6 @@ const Purchase = () => {
                         };
                       }}
                     /> 
-                    }
                   </div>
                 </div>
               </div>
@@ -569,7 +469,6 @@ const Purchase = () => {
         {/* Modal */}
         <PurchaseAddModel init={initAddNewPurchase} handleInit={setInitAddNewPurchase} />
         <PurchaseDetailsModel />
-        <CompanyDetailsModel />
         <MultiQueryModal 
           title= {t('purchase.purchase_multi_query')}
           open={multiQueryModal}

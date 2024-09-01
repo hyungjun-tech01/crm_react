@@ -39,20 +39,28 @@ export const atomCurrentCompany = atom({
     key: "currentCompany",
     default: defaultCompany,
 });
-export const atomAllCompanies = atom({
-    key: "allCompanies",
-    default: [],
+export const atomAllCompanyObj = atom({
+    key: "allCompanyObj",
+    default: {},
 });
-export const atomFilteredCompany = atom({
-    key: "filteredCompanies",
+export const atomFilteredCompanyArray = atom({
+    key: "filteredCompanyArray",
     default: [],
 });
 export const atomCompanyState = atom({
     key: "companyState",
     default: 0,
 });
-export const atomCompanyForSelection = atom({
-    key: "companySelection",
+export const atomPurchaseByCompany = atom({
+    key: "purchaseByCompany",
+    default: [],
+});
+export const atomTransactionByCompany = atom({
+    key: "transactionByCompany",
+    default: [],
+});
+export const atomTaxInvoiceByCompany = atom({
+    key: "taxInvoiceByCompany",
     default: [],
 });
 
@@ -95,21 +103,25 @@ export const atomCurrentLead = atom({
     key: "currentLead",
     default: defaultLead,
 });
-export const atomAllLeads = atom({
-    key: "allLeads",
+export const atomAllLeadObj = atom({
+    key: "allLeadObj",
+    default: {},
+});
+export const atomFilteredLeadArray  = atom({
+    key: "filteredLeadArray",
     default: [],
 });
-export const atomFilteredLead  = atom({
-    key: "filteredLeads",
+export const atomConsultingByLead = atom({
+    key: "consultingByLead",
+    default: [],
+});
+export const atomQuotationByLead = atom({
+    key: "quotationByLead",
     default: [],
 });
 export const atomLeadState = atom({
     key: "leadState",
     default: 0,
-});
-export const atomLeadsForSelection = atom({
-    key: "leadsForSelection",
-    default: [],
 });
 
 //----- Consulting ------------------------
@@ -148,15 +160,15 @@ export const atomCurrentConsulting = atom({
     key: "currentConsulting",
     default: defaultConsulting,
 });
-export const atomAllConsultings = atom({
+export const atomAllConsultingObj = atom({
     key: "allConsultings",
-    default: [],
+    default: {},
 });
 export const atomCompanyConsultings = atom({
     key: "companyConsultings",
     default: [],
 });
-export const atomFilteredConsulting = atom({
+export const atomFilteredConsultingArray = atom({
     key: "filteredConsultings",
     default: [],
 });
@@ -224,15 +236,15 @@ export const atomCurrentQuotation = atom({
     key: "currentQuotation",
     default: defaultQuotation,
 });
-export const atomAllQuotations = atom({
+export const atomAllQuotationObj = atom({
     key: "allQuotations",
-    default: [],
+    default: {},
 });
 export const atomCompanyQuotations = atom({
     key: "companyQuotations",
     default: [],
 });
-export const atomFilteredQuotation = atom({
+export const atomFilteredQuotationArray = atom({
     key: "filteredQuotations",
     default: [],
 });
@@ -278,11 +290,11 @@ export const atomCurrentTransaction = atom({
     key: "currentTransaction",
     default: defaultTransaction,
 });
-export const atomAllTransactions = atom({
+export const atomAllTransactionObj = atom({
     key: "allTransactions",
-    default: [],
+    default: {},
 });
-export const atomFilteredTransaction = atom({
+export const atomFilteredTransactionArray = atom({
     key: "allFilteredTransactions",
     default: [],
 });
@@ -328,15 +340,15 @@ export const atomCurrentPurchase = atom({
     key: "currentPurchase",
     default: defaultPurchase,
 });
-export const atomAllPurchases = atom({
+export const atomAllPurchaseObj = atom({
     key: "allPurchases",
-    default: [],
+    default: {},
 });
 export const atomCompanyPurchases = atom({
     key: "companyPurchases",
     default: [],
 });
-export const atomFilteredPurchase = atom({
+export const atomFilteredPurchaseArray = atom({
     key: "allFilteredPurchases",
     default: [],
 });
@@ -389,7 +401,7 @@ export const atomProductClassListState = atom({
 //----- Product  -----------------------------
 export const defaultProduct = {
     product_code : null,
-    product_class : null,
+    product_class_name : null,
     manufacturer : null,
     model_name : null,
     product_name : null,
@@ -410,11 +422,6 @@ export const atomProductsState = atom({
     default: 0,
 });
 
-//----- Product Options for Select  -----------------------------
-export const atomProductOptions = atom({
-    key: "productOptions",
-    default: [],
-});
 
 //----- Tax Invoice ------------------------
 export const defaultTaxInvoice = {
@@ -456,19 +463,25 @@ export const atomCurrentTaxInvoice = atom({
     key: "currentTaxInvoice",
     default: defaultTaxInvoice,
 });
-export const atomTaxInvoiceSet = atom({
-    key: "taxInvoiceSet",
+export const atomAllTaxInvoiceObj = atom({
+    key: "taxInvoiceObj",
+    default: {},
+});
+export const atomTaxInvoiceArray = atom({
+    key: "taxInvoiceArray",
     default: [],
 });
-export const atomFilteredTaxInvoices = atom({
-    key: "filteredTaxxInvoices",
-    default: [],
-});
-export const atomTaxInvoiceByCompany = atom({
-    key: "taxInvoiceByCompany",
+export const atomFilteredTaxInvoiceArray = atom({
+    key: "filteredTaxInvoiceArray",
     default: [],
 });
 export const atomTaxInvoiceState = atom({
     key: "taxInvoiceState",
     default: 0,
+});
+
+//----- Selected Item ------------------------
+export const atomSelectedItem = atom({
+    key: "selectedItem",
+    default: { category: null, item_code: null },
 });

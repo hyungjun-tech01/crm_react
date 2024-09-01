@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
@@ -10,20 +10,15 @@ import "../antdstyle.css";
 import QuotationDetailsModel from "./QuotationDetailsModel";
 import QuotationAddModel from "./QuotationAddModel";
 import SystemUserModel from "../task/SystemUserModel";
-import CompanyDetailsModel from "../company/CompanyDetailsModel";
-import LeadDetailsModel from "../leads/LeadDetailsModel";
 
-import { CompanyRepo } from "../../repository/company";
-import { LeadRepo } from "../../repository/lead";
+// import { CompanyRepo } from "../../repository/company";
 import { QuotationRepo } from "../../repository/quotation";
 import { UserRepo } from "../../repository/user";
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import {
-  atomCompanyState,
-  atomAllQuotations,
-  atomFilteredQuotation,
-  atomLeadState,
+  atomFilteredQuotationArray,
   atomQuotationState,
+  atomSelectedItem,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { compareCompanyName, compareText, ConvertCurrency, formatDate } from "../../constants/functions";
@@ -34,20 +29,12 @@ const Quotations = () => {
 
 
   //===== [RecoilState] Related with Company ==========================================
-  const companyState = useRecoilValue(atomCompanyState);
-  const { tryLoadAllCompanies } = useRecoilValue(CompanyRepo);
-  const { setCurrentCompany } = useRecoilValue(CompanyRepo);
-
-
-  //===== [RecoilState] Related with Lead =============================================
-  const leadState = useRecoilValue(atomLeadState);
-  const { tryLoadAllLeads } = useRecoilValue(LeadRepo);
+  // const { setCurrentCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Quotation ========================================
   const quotationState = useRecoilValue(atomQuotationState);
-  const allQuotationData = useRecoilValue(atomAllQuotations);
-  const filteredQuotation = useRecoilValue(atomFilteredQuotation);
+  const filteredQuotation = useRecoilValue(atomFilteredQuotationArray);
   const { tryLoadAllQuotations, setCurrentQuotation, filterQuotations , loadAllQuotations} = useRecoilValue(QuotationRepo);
 
 
@@ -59,6 +46,8 @@ const Quotations = () => {
   //===== Handles to edit this ========================================================
   const [ nowLoading, setNowLoading ] = useState(true);
   const [initAddNewQuotation, setInitAddNewQuotation] = useState(false);
+  const [initEditQuotation, setInitEditQuotation] = useState(false);
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -161,27 +150,29 @@ const Quotations = () => {
     filterQuotations(statusSearch, newValue);
   };
 
-  const handleClickCompany = useCallback((code) => {
-    console.log("[Consulting] set current company : ", code);
-    setCurrentCompany(code);
-    let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
-      keyboard: false
-    })
-    myModal.show();
-  }, []);
+  // const handleClickCompany = useCallback((code) => {
+  //   console.log("[Consulting] set current company : ", code);
+  //   setCurrentCompany(code);
+  //   setSelectedItem({category: 'company', item_code: code});
+  //   let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
+  //     keyboard: false
+  //   })
+  //   myModal.show();
+  // }, []);
 
-  const handleClickLead = useCallback((code) => {
-    console.log("[Consulting] set current lead : ", code);
-    setCurrentCompany(code);
-    let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
-      keyboard: false
-    })
-    myModal.show();
-  }, []);
+  // const handleClickLead = useCallback((code) => {
+  //   console.log("[Consulting] set current lead : ", code);
+  //   setCurrentLead(code);
+  //   setSelectedItem({category: 'lead', item_code: code});
+  //   let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
+  //     keyboard: false
+  //   })
+  //   myModal.show();
+  // }, []);
 
   const handleClickQuotation = useCallback((code) => {
-    console.log("[Quotation] set current quotation : ", code);
     setCurrentQuotation(code);
+    setSelectedItem({category: 'quotation', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('quotation-details'), {
       keyboard: false
     })
@@ -206,7 +197,7 @@ const Quotations = () => {
       render: (text, record) => (
         <div className="table_company" style={{color:'#0d6efd'}}
           onClick={() => {
-            handleClickCompany(record.company_code);
+            // handleClickCompany(record.company_code);
           }}
         >
           {text}
@@ -220,7 +211,7 @@ const Quotations = () => {
       render: (text, record) => (
         <div className="table_lead" style={{color:'#0d6efd'}}
           onClick={() => {
-            handleClickLead(record.lead_code);
+            // handleClickLead(record.lead_code);
           }}
         >
           {text}
@@ -271,10 +262,8 @@ const Quotations = () => {
   }, [initAddNewQuotation]);
 
   useEffect(() => {
-    tryLoadAllCompanies();
-    tryLoadAllLeads();
-
- 
+    // tryLoadAllCompanies();
+    // tryLoadAllLeads();
     
     const multiQueryCondi = {
       queryConditions:queryConditions,
@@ -282,19 +271,16 @@ const Quotations = () => {
       singleDate:checkedSingleDates
     }
 
-    console.log('tryLoadAllQuotations multiQueryCondi',multiQueryCondi);
+    console.log('[Quotation] useEffect : ', multiQueryCondi);
     tryLoadAllQuotations(multiQueryCondi);
-
     tryLoadAllUsers();
     
-    if(((companyState & 1) === 1)
-      && ((leadState & 1) === 1)
-      && ((quotationState & 1) === 1)
+    if(((quotationState & 1) === 1)
       && ((userState & 1) === 1)
     ){
       setNowLoading(false);
     };
-  }, [companyState, leadState, quotationState, userState]);
+  }, [dates, queryConditions, quotationState, singleDate, tryLoadAllQuotations, tryLoadAllUsers, userState]);
 
   return (
     <HelmetProvider>
@@ -365,55 +351,29 @@ const Quotations = () => {
               <div className="card mb-0">
                 <div className="card-body">
                   <div className="table-responsive activity-tables">
-                    {searchCondition === "" ?
-                      <Table
-                        pagination={{
-                          total: allQuotationData.length,
-                          showTotal: ShowTotal,
-                          showSizeChanger: true,
-                          onShowSizeChange: onShowSizeChange,
-                          ItemRender: ItemRender,
-                        }}
-                        loading={nowLoading}
-                        style={{ overflowX: "auto" }}
-                        columns={columns}
-                        bordered
-                        dataSource={allQuotationData}
-                        rowKey={(record) => record.quotation_code}
-                        onRow={(record, rowIndex) => {
-                          return {
-                            onClick: (event) => {
-                              if(event.target.className === 'table_company' || event.target.className === 'table_lead') return;
-                              handleClickQuotation(record.quotation_code);
-                            },
-                          };
-                        }}
-                      />
-                      :
-                      <Table
-                        pagination={{
-                          total: filteredQuotation.length > 0 ? filteredQuotation.length : 0,
-                          showTotal: ShowTotal,
-                          showSizeChanger: true,
-                          onShowSizeChange: onShowSizeChange,
-                          ItemRender: ItemRender,
-                        }}
-                        loading={nowLoading}
-                        style={{ overflowX: "auto" }}
-                        columns={columns}
-                        bordered
-                        dataSource={filteredQuotation.length > 0 ? filteredQuotation : null}
-                        rowKey={(record) => record.quotation_code}
-                        onRow={(record, rowIndex) => {
-                          return {
-                            onClick: (event) => {
-                              if(event.target.className === 'table_company' || event.target.className === 'table_lead') return;
-                              handleClickQuotation(record.quotation_code);
-                            },
-                          };
-                        }}
-                      />
-                    }
+                    <Table
+                      pagination={{
+                        total: filteredQuotation.length > 0 ? filteredQuotation.length : 0,
+                        showTotal: ShowTotal,
+                        showSizeChanger: true,
+                        onShowSizeChange: onShowSizeChange,
+                        ItemRender: ItemRender,
+                      }}
+                      loading={nowLoading}
+                      style={{ overflowX: "auto" }}
+                      columns={columns}
+                      bordered
+                      dataSource={filteredQuotation.length > 0 ? filteredQuotation : null}
+                      rowKey={(record) => record.quotation_code}
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onClick: (event) => {
+                            if(event.target.className === 'table_company' || event.target.className === 'table_lead') return;
+                            handleClickQuotation(record.quotation_code);
+                          },
+                        };
+                      }}
+                    />
                   </div>
                 </div>
               </div>
@@ -468,10 +428,10 @@ const Quotations = () => {
           </div>
         </div>
         <SystemUserModel />
-        <CompanyDetailsModel />
-        <LeadDetailsModel />
+        {/* <CompanyDetailsModel /> */}
+        {/* <LeadDetailsModel /> */}
         <QuotationAddModel init={initAddNewQuotation} handleInit={setInitAddNewQuotation} />
-        <QuotationDetailsModel />
+        <QuotationDetailsModel init={initEditQuotation} handleInit={setInitEditQuotation} />
         <MultiQueryModal 
           title= {t('quotation.quotation_multi_query')}
           open={multiQueryModal}

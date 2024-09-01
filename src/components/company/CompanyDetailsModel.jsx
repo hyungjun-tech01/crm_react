@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
@@ -9,14 +9,11 @@ import { option_locations, option_deal_type } from "../../constants/constants";
 
 import {
   atomCurrentCompany,
-  defaultCompany,
-  atomAllPurchases,
-  atomPurchaseState,
-  atomAllTransactions,
-  atomTransactionState,
-  atomTaxInvoiceState,
-  atomTaxInvoiceSet,
+  atomPurchaseByCompany,
+  atomSelectedItem,
   atomTaxInvoiceByCompany,
+  atomTransactionByCompany,
+  defaultCompany,
 } from "../../atoms/atoms";
 import {
   atomUserState,
@@ -38,9 +35,12 @@ import PurchaseAddModel from "../purchase/PurchaseAddModel";
 import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
 
 
-const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
+const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+  const [checkState,  setCheckState] = useState({
+    purchase: false, transaction: false, taxInvoice: false,
+  });
 
 
   //===== [RecoilState] Related with Company ==========================================
@@ -49,23 +49,19 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
 
 
   //===== [RecoilState] Related with Purchase =========================================
-  const purchaseState = useRecoilValue(atomPurchaseState);
-  const { tryLoadAllPurchases } = useRecoilValue(PurchaseRepo);
-  const allPurchases = useRecoilValue(atomAllPurchases);
+  const [ purchaseByCompany, setPurchasesByCompany ] = useRecoilState(atomPurchaseByCompany);
+  const { searchPurchases } = useRecoilValue(PurchaseRepo);
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
 
   //===== [RecoilState] Related with Transaction ======================================
-  const transactionState = useRecoilValue(atomTransactionState);
-  const { tryLoadAllTransactions } = useRecoilValue(TransactionRepo);
-  const allTransactions = useRecoilValue(atomAllTransactions);
+  const [ transactionByCompany, setTransactionByCompany ] = useRecoilState(atomTransactionByCompany);
+  const { searchTransactions } = useRecoilValue(TransactionRepo);
 
 
   //===== [RecoilState] Related with Tax Invoice ======================================
-  const taxInvoiceState = useRecoilValue(atomTaxInvoiceState);
-  const [taxInvoiceByCompany, setTaxInvoiceByCompany] = useRecoilState(atomTaxInvoiceByCompany);
-  const { tryLoadTaxInvoices } = useRecoilValue(TaxInvoiceRepo);
-  const allTaxInvoice = useRecoilValue(atomTaxInvoiceSet);
+  const [ taxInvoiceByCompany, setTaxInvoiceByCompany ] = useRecoilState(atomTaxInvoiceByCompany);
+  const { searchTaxInvoices } = useRecoilValue(TaxInvoiceRepo);
 
 
   //===== [RecoilState] Related with Users ============================================
@@ -75,9 +71,9 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
 
 
   //===== Handles to deal this component ==============================================
-  const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentCompanyCode, setCurrentCompanyCode] = useState("");
+  const setSelectedItem = useSetRecoilState(atomSelectedItem);
 
   const handleWindowWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -88,9 +84,7 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
 
   //===== Handles to edit 'Company Details' ============================================
   const [editedDetailValues, setEditedDetailValues] = useState(null);
-  const [purchasesByCompany, setPurchasesByCompany] = useState([]);
   const [initAddPurchase, setInitAddPurchase] = useState(false);
-  const [transactionByCompany, setTransactionByCompany] = useState([]);
   const [validMACount, setValidMACount] = useState(0);
 
   const handleDetailChange = useCallback(
@@ -156,7 +150,7 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
         modify_user: cookies.myLationCrmUserId,
         company_code: selectedCompany.company_code,
       };
-      const resp = modifyCompany(temp_all_saved)
+      const resp = modifyCompany(temp_all_saved);
       resp.then(res => {
         if (res.result) {
           console.log(`Succeeded to modify company`);
@@ -180,6 +174,7 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
   }, []);
 
   const handleClose = useCallback(() => {
+    setSelectedItem({category: null, item_code: null});
     setEditedDetailValues(null);
     setCurrentCompany();
     setCurrentCompanyCode("");
@@ -306,11 +301,11 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
 
   //===== useEffect for Company ========================================================
   useEffect(() => {
-    if (
-      selectedCompany !== defaultCompany &&
-      selectedCompany.company_code !== currentCompanyCode
+    if (init
+      && (selectedCompany !== defaultCompany)
+      && (selectedCompany.company_code !== currentCompanyCode)
     ) {
-      console.log("[CompanyDetailsModel] new company is loaded!");
+      console.log("[CompanyDetailsModel] new company is loading!");
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {
@@ -320,96 +315,95 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
         setIsFullScreen(false);
       } else {
         setIsFullScreen(true);
-      }
+      };
 
       loadCompanyMAContracts(selectedCompany.company_code);
       setCurrentCompanyCode(selectedCompany.company_code);
+      setCheckState({purchase:false, transaction:false, taxInvoice:false});
     }
   }, [selectedCompany, currentCompanyCode, loadCompanyMAContracts]);
 
   //===== useEffect for Purchase =======================================================
   useEffect(() => {
-    tryLoadAllPurchases();
-    if ((purchaseState & 1) === 1) {
-      console.log("[CompanyDetailModel] useEffect / Purchase");
-      const tempCompanyPurchases = allPurchases.filter(
-        (purchase) => purchase.company_code === selectedCompany.company_code
-      );
-      if (purchasesByCompany.length !== tempCompanyPurchases.length) {
-        console.log(
-          "[CompanyDetailsModel] set purchasesBycompany / set MA Count"
-        );
-        setPurchasesByCompany(tempCompanyPurchases);
-
-        let valid_count = 0;
-        tempCompanyPurchases.forEach((item) => {
-          if (item.ma_finish_date && new Date(item.ma_finish_date) > Date.now())
-            valid_count++;
+    if(!!selectedCompany.company_code && !checkState.purchase) {
+      setCheckState({
+        ...checkState,
+        purchase: true,
+      });
+      const queryPromise = searchPurchases('company_code', selectedCompany.company_code, true);
+      queryPromise
+        .then(res => {
+          if(res.result) {
+            setPurchasesByCompany(res.data);
+          } else {
+            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
+            setPurchasesByCompany([]);
+          };
         });
-        setValidMACount(valid_count);
-      }
     }
-  }, [
-    purchaseState,
-    allPurchases,
-    purchasesByCompany,
-    selectedCompany.company_code,
-  ]);
+  }, [checkState, searchPurchases, selectedCompany.company_code]);
+
+  //===== useEffect for Purchase =======================================================
+  useEffect(() => {
+    let valid_count = 0;
+    purchaseByCompany.forEach((item) => {
+      if (!!item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now()))
+        valid_count++;
+    });
+    setValidMACount(valid_count);
+  }, [purchaseByCompany]);
 
   //===== useEffect for Transaction ====================================================
   useEffect(() => {
-    tryLoadAllTransactions();
-    if ((transactionState & 1) === 1) {
-      const tempCompanyTransactions = allTransactions.filter(
-        (transaction) =>
-          transaction.company_name === selectedCompany.company_name
-      );
-      if (transactionByCompany.length !== tempCompanyTransactions.length) {
-        console.log("CompanyDetailsModel / update setTransactionByCompany");
-        setTransactionByCompany(tempCompanyTransactions);
-      }
+    if(!!selectedCompany.company_code && !checkState.transaction) {
+      setCheckState({
+        ...checkState,
+        transaction: true,
+      });
+      const queryPromise = searchTransactions('company_code', selectedCompany.company_code, true);
+      queryPromise
+        .then(res => {
+          if(res.result) {
+            setTransactionByCompany(res.data);
+          } else {
+            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
+            setTransactionByCompany([]);
+          };
+        });
     }
-  }, [
-    transactionState,
-    allTransactions,
-    transactionByCompany.length,
-    selectedCompany.company_name,
-  ]);
+  }, [checkState, searchTransactions, selectedCompany.company_code]);
 
   //===== useEffect for Tax Invoice ====================================================
   useEffect(() => {
-    tryLoadTaxInvoices();
-    if ((taxInvoiceState & 1) === 1) {
-      const tempCompanyTaxInvocies = allTaxInvoice.filter(
-        (item) =>
-          item.company_code === selectedCompany.company_code
-      );
-      if (taxInvoiceByCompany.length !== tempCompanyTaxInvocies.length) {
-        console.log("CompanyDetailsModel / update setTaxInvoiceByCompany");
-        setTaxInvoiceByCompany(tempCompanyTaxInvocies);
-      }
+    if(!!selectedCompany.company_code && !checkState.taxInvoice) {
+      setCheckState({
+        ...checkState,
+        taxInvoice: true,
+      });
+      const queryPromise = searchTaxInvoices('company_code', selectedCompany.company_code, true);
+      queryPromise
+        .then(res => {
+          if(res.result) {
+            setTaxInvoiceByCompany(res.data);
+          } else {
+            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
+            setTaxInvoiceByCompany([]);
+          };
+        });
     }
-  }, [
-    taxInvoiceState,
-    allTaxInvoice,
-    taxInvoiceByCompany.length,
-    selectedCompany.company_name,
-  ]);
-
+  }, [checkState, searchTransactions, selectedCompany.company_code]);
 
   //===== useEffect for User ==========================================================
   useEffect(() => {
-    console.log('[CompanyDetailsModel] useEffect / userState :', userState);
-    if (((purchaseState & 1) === 1)
-      && ((transactionState & 1) === 1)
-      && ((taxInvoiceState & 1) === 1)
+    if (init && checkState.purchase && checkState.transaction && checkState.taxInvoice
       && ((userState & 1) === 1)
      ){
-          setIsAllNeededDataLoaded(true);
-      }
-  }, [purchaseState, transactionState, taxInvoiceState, userState, taxInvoiceState]);
+      console.log('[CompanyDetailModel] all needed data is loaded');
+      handleInit(false);
+    };
+  }, [checkState, userState, handleInit]);
 
-  if (!isAllNeededDataLoaded)
+  if (init)
     return <div>&nbsp;</div>;
 
   return (
@@ -443,13 +437,13 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
                   </div>
                 </div>
                 <DetailTitleItem
-                  original={selectedCompany.company_name_en}
+                  original={selectedCompany}
                   name="company_name_en"
                   title={t("company.company_name_en")}
                   onEditing={handleDetailChange}
                 />
                 <DetailTitleItem
-                  original={selectedCompany.business_registration_code}
+                  original={selectedCompany}
                   name="business_registration_code"
                   title={t("company.business_registration_code")}
                   onEditing={handleDetailChange}
@@ -489,7 +483,7 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
                         "(" +
                         validMACount +
                         "/" +
-                        purchasesByCompany.length +
+                        purchaseByCompany.length +
                         ")"}
                     </Link>
                   </li>
@@ -559,7 +553,6 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
                     id="company-details-product"
                   >
                     <CompanyPurchaseModel
-                      purchases={purchasesByCompany}
                       handleInitAddPurchase={setInitAddPurchase}
                     />
                   </div>
@@ -568,7 +561,6 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
                     id="company-details-transaction"
                   >
                     <CompanyTransactionModel
-                      transactions={transactionByCompany}
                       openTransaction={openTransaction}
                     />
                   </div>
@@ -577,7 +569,6 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
                     id="company-details-taxinvoice"
                   >
                     <CompanyTaxInvoiceModel
-                      taxInvoices={taxInvoiceByCompany}
                       openTaxInvoice={openTaxInvoice}
                     />
                   </div>
@@ -608,7 +599,7 @@ const CompanyDetailsModel = ({ openTransaction, openTaxInvoice }) => {
           {/* modal-content */}
         </div>
       </div>
-      <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} companyCode={selectedCompany.company_code} />
+      <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} />
       <PurchaseDetailsModel />
     </>
   );
