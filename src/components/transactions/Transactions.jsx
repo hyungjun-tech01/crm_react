@@ -361,7 +361,7 @@ const Transactions = () => {
           openTaxInvoice={() => setOpenTaxInvoice(true)}
           setTaxInvoiceData={setTaxInvoiceData}
           setTaxInvoiceContents={setTaxInvoiceContents}
-          setNeedSaveTaxInvoice={setNeedSaveTaxxInvoice}
+          setNeedSaveTaxInvoice={setNeedSaveTaxInvoice}
         />
         <TaxInvoiceEditModel
           open={openTaxInvoice}
