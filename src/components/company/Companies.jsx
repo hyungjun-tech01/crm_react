@@ -29,6 +29,7 @@ const Companies = () => {
   const [ companyState, setCompanyState] = useRecoilState(atomCompanyState);
   const { tryLoadAllCompanies, filterCompanies, setCurrentCompany , loadAllCompanies } = useRecoilValue(CompanyRepo);
   const filteredCompany = useRecoilValue(atomFilteredCompanyArray);
+  const [needSaveTaxInvoice, setNeedSaveTaxInvoice] = useState(false);
 
 
   //===== [RecoilState] Related with User =============================================
@@ -475,6 +476,7 @@ const Companies = () => {
           openTaxInvoice={()=>setOpenTaxInvoice(true)} 
           setTaxInvoiceData={setTaxInvoiceData}
           setTaxInvoiceContents={setTaxInvoiceContents}
+          setNeedSaveTaxInvoice={setNeedSaveTaxInvoice}
         />
         <TaxInvoiceEditModel
           open={openTaxInvoice}
