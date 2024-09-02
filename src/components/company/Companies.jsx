@@ -184,10 +184,16 @@ const Companies = () => {
       sorter: (a, b) => compareCompanyName(a.company_name, b.company_name),
     },
     {
-      title: t('common.phone_no'),
-      dataIndex: "company_phone_number",
+      title: t('company.company_name_en'),
+      dataIndex: "company_name_en",
       render: (text, record) => <>{text}</>,
-      sorter: (a, b) => compareText(a.company_phone_number, b.company_phone_number),
+      sorter: (a, b) => compareText(a.company_name_en, b.company_name_en),
+    },
+    {
+      title: t('company.ceo_name'),
+      dataIndex: "ceo_name",
+      render: (text, record) => <>{text}</>,
+      sorter: (a, b) => compareText(a.ceo_name, b.ceo_name),
     },
     {
       title: t('company.address'),
@@ -196,16 +202,22 @@ const Companies = () => {
       sorter: (a, b) => compareText(a.company_address, b.company_address),
     },
     {
+      title: t('company.business_registration_code'),
+      dataIndex: "business_registration_code",
+      render: (text, record) => <>{text}</>,
+      sorter: (a, b) => compareText(a.business_registration_code, b.business_registration_code),
+    },
+    {
+      title: t('common.site_id'),
+      dataIndex: "site_id",
+      render: (text, record) => <>{text}</>,
+      sorter: (a, b) => compareText(a.site_id, b.site_id),
+    },
+    {
       title: t('company.salesman'),
       dataIndex: "sales_resource",
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.sales_resource, b.sales_resource),
-    },
-    {
-      title: t('company.engineer'),
-      dataIndex: "application_engineer",
-      render: (text, record) => <>{text}</>,
-      sorter: (a, b) => compareText(a.application_engineer, b.application_engineer),
     },
   ];
 

@@ -13,6 +13,7 @@ export const defaultCompany = {
     business_registration_code: null,
     establishment_date: null,
     closure_date: null,
+    site_id: null,
     ceo_name: null,
     business_type: null,
     business_item: null,

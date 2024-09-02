@@ -325,6 +325,7 @@ const koResource = {
             sales: '매출',
             save: '저장',
             search: '검색',
+            site_id: 'Site ID',
             size: '크기',
             search_here :'검색 키워드',
             standard: '규격',

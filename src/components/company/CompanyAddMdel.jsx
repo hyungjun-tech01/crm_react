@@ -199,6 +199,7 @@ const CompanyAddModel = (props) => {
                       title={t("company.address")}
                       key_address="company_address"
                       key_zip="company_zip_code"
+                      required
                       edited={companyChange}
                       setEdited={setCompanyChange}
                     />
@@ -216,6 +217,7 @@ const CompanyAddModel = (props) => {
                       type="text"
                       name="company_zip_code"
                       defaultValue={companyChange.company_zip_code}
+                      required
                       disabled={true}
                       onChange={handleItemChange}
                     />
@@ -224,6 +226,7 @@ const CompanyAddModel = (props) => {
                       type="text"
                       name="company_fax_number"
                       defaultValue={companyChange.company_fax_number}
+                      required
                       onChange={handleItemChange}
                     />
                   </div>
@@ -232,6 +235,7 @@ const CompanyAddModel = (props) => {
                       title={t("company.homepage")}
                       type="text"
                       name="homepage"
+                      required
                       defaultValue={companyChange.homepage}
                       onChange={handleItemChange}
                     />
@@ -285,6 +289,14 @@ const CompanyAddModel = (props) => {
                       defaultValue={companyChange.establishment_date}
                       onChange={handleDateChange}
                     />
+                    <AddBasicItem
+                      title={t("common.site_id")}
+                      type="text"
+                      name="site_id"
+                      defaultValue={companyChange.site_id}
+                      required
+                      onChange={handleDateChange}
+                    />
                   </div>
                   <div className="form-group row">
                     <AddBasicItem
@@ -315,6 +327,7 @@ const CompanyAddModel = (props) => {
                       type="select"
                       name="sales_resource"
                       defaultValue={companyChange.sales_resource}
+                      required
                       options={salespersonsForSelection}
                       onChange={handleSelectChange}
                     />

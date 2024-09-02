@@ -4,7 +4,7 @@ import PopupPostCode from "./PostCode";
 
 
 const AddAddressItem = (props) => {
-    const { title, long, key_address, key_zip, disabled, edited,  setEdited } = props;
+    const { title, long, key_address, key_zip, disabled, required, edited, setEdited } = props;
     const [isPopupOpen, setIsPopupOpen] = useState(false);
 
     const handleChange = (event) => {
@@ -29,6 +29,7 @@ const AddAddressItem = (props) => {
             <div className="add-basic-item">
                 <div className="add-basic-title" >
                     {title}
+                    {required && <span className="text-danger">*</span>}
                 </div>
                 <input
                     className="add-basic-content"
