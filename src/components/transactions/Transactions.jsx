@@ -53,7 +53,7 @@ const Transactions = () => {
   const [openTaxInvoice, setOpenTaxInvoice] = useState(false);
   const [taxInvoiceData, setTaxInvoiceData] = useState(null);
   const [taxInvoiceContents, setTaxInvoiceContents] = useState(null);
-  const [needSaveTaxInvoice, setNeedSaveTaxxInvoice] = useState(false);
+  const [needSaveTaxInvoice, setNeedSaveTaxInvoice] = useState(false);
   const setSelectedItem = useSetRecoilState(atomSelectedItem);
 
   const [searchCondition, setSearchCondition] = useState("");
