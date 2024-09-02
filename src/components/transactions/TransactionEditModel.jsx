@@ -61,7 +61,6 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   const [ message, setMessage ] = useState({title:'', message: ''});
   const [ isAdd, setIsAdd ] = useState(true);
 
-
   //===== [RecoilState] Related with Transaction =====================================
   const currentTransaction = useRecoilValue(atomCurrentTransaction);
   const { modifyTransaction } = useRecoilValue(TransactionRepo);
