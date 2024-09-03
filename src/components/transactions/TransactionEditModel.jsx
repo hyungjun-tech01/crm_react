@@ -618,8 +618,10 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     if (newTransactionData.company_name === null
       || newTransactionData.company_name === ''
       || newTransactionData.length === 0
+      || newTransactionData.publish_date === null 
+      || newTransactionData.publish_date === ''
     ) {
-      setMessage({title: '*필수 입력 누락*', message: '업체 정보나 품목 정보가 누락되었습니다.'});
+      setMessage({title: '*필수 입력 누락*', message: '업체 정보나 품목 정보나 발행일자가 누락되었습니다.'});
       setIsMessageModalOpen(true);
       return;
     };
