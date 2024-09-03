@@ -10,7 +10,7 @@ import { option_locations, option_deal_type } from "../../constants/constants";
 import {
   atomCurrentCompany,
   atomPurchaseByCompany,
-  atomSelectedItem,
+  atomSelectedCategory,
   atomTaxInvoiceByCompany,
   atomTransactionByCompany,
   defaultCompany,
@@ -73,7 +73,7 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
   //===== Handles to deal this component ==============================================
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentCompanyCode, setCurrentCompanyCode] = useState("");
-  const setSelectedItem = useSetRecoilState(atomSelectedItem);
+  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const handleWindowWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -174,7 +174,7 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
   }, []);
 
   const handleClose = useCallback(() => {
-    setSelectedItem({category: null, item_code: null});
+    setSelectedCategory({category: null, item_code: null});
     setEditedDetailValues(null);
     setCurrentCompany();
     setCurrentCompanyCode("");

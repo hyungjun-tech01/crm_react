@@ -18,7 +18,7 @@ import MultiQueryModal from "../../constants/MultiQueryModal";
 import {
   atomFilteredQuotationArray,
   atomQuotationState,
-  atomSelectedItem,
+  atomSelectedCategory,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { compareCompanyName, compareText, ConvertCurrency, formatDate } from "../../constants/functions";
@@ -47,7 +47,7 @@ const Quotations = () => {
   const [ nowLoading, setNowLoading ] = useState(true);
   const [initAddNewQuotation, setInitAddNewQuotation] = useState(false);
   const [initEditQuotation, setInitEditQuotation] = useState(false);
-  const setSelectedItem = useSetRecoilState(atomSelectedItem);
+  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -153,7 +153,7 @@ const Quotations = () => {
   // const handleClickCompany = useCallback((code) => {
   //   console.log("[Consulting] set current company : ", code);
   //   setCurrentCompany(code);
-  //   setSelectedItem({category: 'company', item_code: code});
+  //   setSelectedCategory({category: 'company', item_code: code});
   //   let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
   //     keyboard: false
   //   })
@@ -163,7 +163,7 @@ const Quotations = () => {
   // const handleClickLead = useCallback((code) => {
   //   console.log("[Consulting] set current lead : ", code);
   //   setCurrentLead(code);
-  //   setSelectedItem({category: 'lead', item_code: code});
+  //   setSelectedCategory({category: 'lead', item_code: code});
   //   let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
   //     keyboard: false
   //   })
@@ -172,7 +172,7 @@ const Quotations = () => {
 
   const handleClickQuotation = useCallback((code) => {
     setCurrentQuotation(code);
-    setSelectedItem({category: 'quotation', item_code: code});
+    setSelectedCategory({category: 'quotation', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('quotation-details'), {
       keyboard: false
     })

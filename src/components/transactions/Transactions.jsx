@@ -15,7 +15,7 @@ import {
   atomFilteredTransactionArray,
   atomCompanyState,
   atomTransactionState,
-  atomSelectedItem,
+  atomSelectedCategory,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { UserRepo } from "../../repository/user";
@@ -53,7 +53,7 @@ const Transactions = () => {
   const [taxInvoiceData, setTaxInvoiceData] = useState(null);
   const [taxInvoiceContents, setTaxInvoiceContents] = useState(null);
   const [needSaveTaxInvoice, setNeedSaveTaxInvoice] = useState(false);
-  const setSelectedItem = useSetRecoilState(atomSelectedItem);
+  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -225,7 +225,7 @@ const Transactions = () => {
   const handleOpenTransactoin = (code) => {
     setCurrentTransaction(code)
     setOpenTransaction(true);
-    setSelectedItem({category: 'transaction', item_code: code});
+    setSelectedCategory({category: 'transaction', item_code: code});
 
     setTimeout(() => {
       let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {

@@ -12,7 +12,7 @@ import {
   atomCompanyState,
   atomFilteredTaxInvoiceArray,
   atomTaxInvoiceState,
-  atomSelectedItem,
+  atomSelectedCategory,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 
@@ -49,7 +49,7 @@ const TaxInovices = () => {
   //===== Handles to edit this ========================================================
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
-  const setSelectedItem = useSetRecoilState(atomSelectedItem);
+  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -223,7 +223,7 @@ const TaxInovices = () => {
   const handleOpenTaxInvoice = (code) => {
     setCurrentTaxInvoice(code);
     setOpenTaxInvoice(true);
-    setSelectedItem({category: 'tax_invoice', item_code: code});
+    setSelectedCategory({category: 'tax_invoice', item_code: code});
 
     setTimeout(()=>{
       let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {

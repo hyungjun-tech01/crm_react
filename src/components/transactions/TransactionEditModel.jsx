@@ -17,7 +17,7 @@ import {
   atomCompanyState,
   atomCurrentCompany,
   atomCurrentTransaction,
-  atomSelectedItem,
+  atomSelectedCategory,
   defaultCompany,
   defaultTransaction,
 } from "../../atoms/atoms";
@@ -80,7 +80,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   const [showDecimal, setShowDecimal] = useState(0);
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
   const [selectData, setSelectData] = useState({});
-  const [selectedItem, setSelectedItem] = useRecoilState(atomSelectedItem);
+  const [selectedCategory, setSelectedCategory] = useRecoilState(atomSelectedCategory);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
@@ -504,9 +504,9 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setShowDecimal(0);
     setDataForTransaction({...default_transaction_data});
 
-    if((selectedItem.category === 'company')
+    if((selectedCategory.category === 'company')
       && (currentCompany !== defaultCompany)
-      && (selectedItem.item_code === currentCompany.company_code))
+      && (selectedCategory.item_code === currentCompany.company_code))
     {
       setTransactionChange({
         company_code: currentCompany.company_code,
@@ -529,7 +529,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setTransactionForPrint(null);
     setContentsForPrint(null);
     document.querySelector("#add_new_transaction_form").reset();
-  }, [selectedItem, currentCompany]);
+  }, [selectedCategory, currentCompany]);
 
   const handleShowPrint = () => {
     const tempTransactionData = {
@@ -684,8 +684,8 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   };
 
   const handleClose = () => {
-    if(selectedItem.category && (selectedItem.category === 'transaction')){
-      setSelectedItem({category: null, item_code: null});
+    if(selectedCategory.category && (selectedCategory.category === 'transaction')){
+      setSelectedCategory({category: null, item_code: null});
     };
     handleInitialize();
     close();

@@ -13,7 +13,7 @@ import {
   atomFilteredLeadArray,
   atomCompanyState,
   atomLeadState,
-  atomSelectedItem,
+  atomSelectedCategory,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { compareCompanyName, compareText } from "../../constants/functions";
@@ -48,7 +48,7 @@ const Leads = () => {
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ initToAddLead, setInitToAddLead ] = useState(false);
   const [ initToEditLead, setInitToEditLead ] = useState(false);
-  const setSelectedItem = useSetRecoilState(atomSelectedItem);
+  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
@@ -153,14 +153,14 @@ const Leads = () => {
   const handleClickLeadName = useCallback((leadCode, companyCode) => {
     setInitToEditLead(true);
     setCurrentLead(leadCode);
-    setSelectedItem({category: 'lead', item_code: leadCode});
+    setSelectedCategory({category: 'lead', item_code: leadCode});
     setCurrentCompany(companyCode);   // 현재 company 세팅 
     
     let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
       keyboard: false
     });
     myModal.show();
-  }, [setCurrentCompany, setCurrentLead, setSelectedItem]);
+  }, [setCurrentCompany, setCurrentLead, setSelectedCategory]);
 
 
   const [ expanded, setExpaned ] = useState(false);

@@ -6,7 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import {
   atomCurrentLead,
-  atomSelectedItem,
+  atomSelectedCategory,
   defaultLead,
 } from "../../atoms/atoms";
 import {
@@ -58,7 +58,7 @@ const ConsultingAddModel = (props) => {
 
   //===== Handles to edit 'ConsultingAddModel' ========================================
   const [consultingChange, setConsultingChange] = useState({});
-  const selectedItem = useRecoilValue(atomSelectedItem);
+  const selectedCategory = useRecoilValue(atomSelectedCategory);
 
   const initializeConsultingTemplate = useCallback(() => {
     document.querySelector("#add_new_consulting_form").reset();
@@ -70,9 +70,9 @@ const ConsultingAddModel = (props) => {
       receipt_date: tempDate,
     };
 
-    if ((selectedItem.category === 'lead')
+    if ((selectedCategory.category === 'lead')
       && (currentLead !== defaultLead)
-      && (selectedItem.item_code === currentLead.lead_code)
+      && (selectedCategory.item_code === currentLead.lead_code)
     ) {
       modified['lead_code'] = currentLead.lead_code;
       modified['lead_name'] = currentLead.lead_name;
@@ -85,7 +85,7 @@ const ConsultingAddModel = (props) => {
       modified['company_name'] = currentLead.company_name;
     };
     setConsultingChange(modified);
-  }, [cookies.myLationCrmUserName, currentLead, setCurrentCompany, selectedItem]);
+  }, [cookies.myLationCrmUserName, currentLead, setCurrentCompany, selectedCategory]);
 
   const handleDateChange = (name, date) => {
     const modifiedData = {

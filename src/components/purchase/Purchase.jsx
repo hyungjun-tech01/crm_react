@@ -8,7 +8,7 @@ import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import {
   atomFilteredPurchaseArray,
   atomPurchaseState,
-  atomSelectedItem,
+  atomSelectedCategory,
 } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
 import { PurchaseRepo } from "../../repository/purchase";
@@ -46,7 +46,7 @@ const Purchase = () => {
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ initAddNewPurchase, setInitAddNewPurchase ] = useState(false);
   const [ tableData, setTableData ] = useState([]);
-  const setSelectedItem = useSetRecoilState(atomSelectedItem);
+  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
   
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -149,12 +149,12 @@ const Purchase = () => {
   // --- Functions used for Table ------------------------------
   const handleClickPurchase = useCallback((code)=>{
     setCurrentPurchase(code);
-    setSelectedItem({category: 'purchase', item_code: code});
+    setSelectedCategory({category: 'purchase', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('purchase-details'), {
       keyboard: false
     })
     myModal.show();
-  },[setCurrentPurchase, setSelectedItem]);
+  },[setCurrentPurchase, setSelectedCategory]);
 
   const handleAddNewPurchaseClicked = useCallback(() => {
     setInitAddNewPurchase(true);

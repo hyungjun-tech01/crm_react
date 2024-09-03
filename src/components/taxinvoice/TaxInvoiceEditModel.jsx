@@ -17,7 +17,7 @@ import {
   atomCompanyState,
   atomCurrentCompany,
   atomCurrentTaxInvoice,
-  atomSelectedItem,
+  atomSelectedCategory,
   defaultCompany,
   defaultTaxInvoice,
 } from "../../atoms/atoms";
@@ -88,7 +88,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
   const [isTaxInvoice, setIsTaxInvoice] = useState(true);
   const [selectValues, setSelectValue] = useState({})
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
-  const [selectedItem, setSelectedItem] = useRecoilState(atomSelectedItem);
+  const [selectedCategory, setSelectedCategory] = useRecoilState(atomSelectedCategory);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
@@ -587,8 +587,8 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
   };
 
   const handleClose = () => {
-    if(selectedItem.category && (selectedItem.category === 'tax_invoice')){
-      setSelectedItem({category: null, item_code: null});
+    if(selectedCategory.category && (selectedCategory.category === 'tax_invoice')){
+      setSelectedCategory({category: null, item_code: null});
     };
     handleInitialize();
     close();
@@ -606,9 +606,9 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
         if(currentTaxInvoice !== defaultTaxInvoice) {
           inputData = {...currentTaxInvoice};
         } else {
-          if((selectedItem.category === 'company')
+          if((selectedCategory.category === 'company')
             && (currentCompany !== defaultCompany)
-            && (selectedItem.item_code === currentCompany.company_code)
+            && (selectedCategory.item_code === currentCompany.company_code)
           ){
             inputData = {
               ...default_invoice_data,
@@ -722,7 +722,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
       setInvoiceChange({});
     };
 
-  }, [contents, data, companyState, open, currentTaxInvoice, selectedItem, currentCompany]);
+  }, [contents, data, companyState, open, currentTaxInvoice, selectedCategory, currentCompany]);
 
   if (!open) return (
     <div>&nbsp;</div>

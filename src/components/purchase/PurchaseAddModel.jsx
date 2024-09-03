@@ -9,7 +9,7 @@ import {
     atomCurrentPurchase,
     defaultMAContract,
     atomCurrentCompany,
-    atomSelectedItem,
+    atomSelectedCategory,
     defaultCompany,
     defaultPurchase,
     atomCurrentLead,
@@ -57,15 +57,15 @@ const PurchaseAddModel = (props) => {
     const [purchaseChange, setPurchaseChange] = useState({});
     const [companyData, setCompanyData] = useState({ company_name: '', company_code: '' });
     const [needInit, setNeedInit] = useState(false);
-    const selectedItem = useRecoilValue(atomSelectedItem);
+    const selectedCategory = useRecoilValue(atomSelectedCategory);
 
     const initializePurchaseTemplate = useCallback(() => {
         document.querySelector("#add_new_purchase_form").reset();
 
         if((currentCompany !== defaultCompany)
             && (
-                ((selectedItem.category === 'company') && (selectedItem.item_code === currentCompany.company_code))
-                || ((selectedItem.category === 'lead') && (selectedItem.item_code === currentLead.lead_code))
+                ((selectedCategory.category === 'company') && (selectedCategory.item_code === currentCompany.company_code))
+                || ((selectedCategory.category === 'lead') && (selectedCategory.item_code === currentLead.lead_code))
             )
         ){
             setPurchaseChange({
@@ -80,7 +80,7 @@ const PurchaseAddModel = (props) => {
             setPurchaseChange({...defaultPurchase});
         }
         setNeedInit(false);
-    }, [currentCompany, selectedItem]);
+    }, [currentCompany, selectedCategory]);
 
     const handleItemChange = useCallback((e) => {
         const modifiedData = {

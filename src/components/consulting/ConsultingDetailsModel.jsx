@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
@@ -11,7 +11,7 @@ import {
   atomEngineersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
-import { atomConsultingState, atomCurrentConsulting, atomSelectedItem, defaultConsulting } from "../../atoms/atoms";
+import { atomConsultingState, atomCurrentConsulting, atomSelectedCategory, defaultConsulting } from "../../atoms/atoms";
 import {
   ConsultingRepo,
   ConsultingTypes,
@@ -45,7 +45,7 @@ const ConsultingDetailsModel = () => {
   //===== Handles to deal this component ==============================================
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentConsultingCode, setCurrentConsultingCode] = useState('');
-  const setSelectedItem = useSetRecoilState(atomSelectedItem);
+  const [ selectedCategory, setSelectedCategory] = useRecoilState(atomSelectedCategory);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -128,7 +128,9 @@ const ConsultingDetailsModel = () => {
   }, []);
 
   const handleClose = useCallback(() => {
-    setSelectedItem({category: null, item_code: null});
+    if(selectedCategory.category === 'consulting'){
+      setSelectedCategory({category: null, item_code: null});
+    };
     setEditedDetailValues(null);
     setCurrentConsulting();
   }, [setCurrentConsulting]);

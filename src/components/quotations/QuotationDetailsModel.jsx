@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Collapse, Space, Switch } from "antd";
@@ -11,7 +11,7 @@ import { atomCurrentQuotation,
   atomProductClassListState,
   atomProductsState,
   atomAllProducts,
-  atomSelectedItem,
+  atomSelectedCategory,
 } from "../../atoms/atoms";
 import { atomUserState,
   atomUsersForSelection,
@@ -57,7 +57,7 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   //===== Handles to deal this component ==============================================
   const [ isFullScreen, setIsFullScreen ] = useState(false);
   const [ currentQuotationCode, setCurrentQuotationCode ] = useState('');
-  const setSelectedItem = useSetRecoilState(atomSelectedItem);
+  const [ selectedCategory, setSelectedCategory ] = useRecoilState(atomSelectedCategory);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -359,10 +359,12 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   
 
   const handleClose = useCallback(() => {
-    setSelectedItem({category: null, item_code: null});
+    if(selectedCategory.category === 'quotation') {
+      setSelectedCategory({category: null, item_code: null});
+    }
     setEditedDetailValues(null);
     setCurrentQuotation();
-  }, [setCurrentQuotation, setSelectedItem]);
+  }, [setCurrentQuotation, setSelectedCategory]);
 
   const qotation_items_info = [
     { key:'quotation_type', title:'quotation.quotation_type', detail:{ type:'select', options:QuotationTypes, editing:handleDetailChange }},

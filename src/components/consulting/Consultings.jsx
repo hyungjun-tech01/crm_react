@@ -22,7 +22,7 @@ import {
   atomFilteredConsultingArray,
   atomLeadState,
   atomConsultingState,
-  atomSelectedItem,
+  atomSelectedCategory,
   defaultLead,
 } from "../../atoms/atoms"; 
 import { compareCompanyName, compareText } from "../../constants/functions";
@@ -58,7 +58,7 @@ const Consultings = () => {
   //===== Handles to deal 'Consultings' ========================================
   const [ nowLoading, setNowLoading ] = useState(true);
   const [initAddConsulting, setInitAddConsulting] = useState(false);
-  const setSelectedItem = useSetRecoilState(atomSelectedItem);
+  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -162,7 +162,7 @@ const Consultings = () => {
 
   const handleClickConsulting = useCallback((code) => {
     setCurrentConsulting(code);
-    setSelectedItem({category: 'consulting', item_code: code});
+    setSelectedCategory({category: 'consulting', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
       keyboard: false
     })
@@ -171,7 +171,7 @@ const Consultings = () => {
 
   const handleClickCompany = useCallback((code) => {
     setCurrentCompany(code);
-    setSelectedItem({category: 'company', item_code: code});
+    setSelectedCategory({category: 'company', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
       keyboard: false
     })
@@ -180,7 +180,7 @@ const Consultings = () => {
 
   const handleClickLead = useCallback((code) => {
     setCurrentLead(code);
-    setSelectedItem({category: 'lead', item_code: code});
+    setSelectedCategory({category: 'lead', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
       keyboard: false
     })

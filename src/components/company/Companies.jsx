@@ -7,7 +7,7 @@ import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { CompanyRepo } from "../../repository/company";
-import { atomCompanyState, atomFilteredCompanyArray, atomSelectedItem } from "../../atoms/atoms";
+import { atomCompanyState, atomFilteredCompanyArray, atomSelectedCategory } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 import { UserRepo } from '../../repository/user';
 
@@ -43,7 +43,7 @@ const Companies = () => {
   const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
   const [ taxInvoiceData, setTaxInvoiceData ] = useState(null);
   const [ taxInvoiceContents, setTaxInvoiceContents ] = useState(null);
-  const setSelectedItem = useSetRecoilState(atomSelectedItem);
+  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
@@ -158,7 +158,7 @@ const Companies = () => {
     console.log('[Company] set current company : ', id);
     setInitToEditCompany(true);
     setCurrentCompany(id);
-    setSelectedItem({category: 'company', item_code: id});
+    setSelectedCategory({category: 'company', item_code: id});
     setTimeout(()=>{
       let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
         keyboard: false

@@ -25,7 +25,7 @@ const SelectProductModal = (props) => {
     
     const [ selectedProductClass, setSelectedProductClass ] = useState(null);
     const [ listItems, setListItems ] = useState([]);
-    const [ selectedItem, setSelectedItem ] = useState(null);
+    const [ selectedCategory, setSelectedCategory ] = useState(null);
 
     const inputRef = useRef(null);
 
@@ -36,16 +36,16 @@ const SelectProductModal = (props) => {
         setListItems(selectedProducts);
     };
     const handleClickRow = (data) => {
-        setSelectedItem({...data});
+        setSelectedCategory({...data});
     };
     const handleOk = () => {
-        if(!selectedItem || selectedItem.length === 0) return;
-        handleChange(selectedItem);
+        if(!selectedCategory || selectedCategory.length === 0) return;
+        handleChange(selectedCategory);
         handleCancel();
     };
     const handleCancel = () => {
         setListItems([]);
-        setSelectedItem({});
+        setSelectedCategory({});
         handleClose();
     };
 
@@ -84,10 +84,10 @@ const SelectProductModal = (props) => {
                             setListItems(selectedProducts);
 
                             if(!!current['product_name']) {
-                                if(!selectedItem || selectedItem.product_name !== current.product_name) {
+                                if(!selectedCategory || selectedCategory.product_name !== current.product_name) {
                                     const foundIdx = selectedProducts.findIndex(item => item.product_name === current.product_name);
                                     if(foundIdx !== -1) {
-                                        setSelectedItem({...selectedProducts.at(foundIdx)});
+                                        setSelectedCategory({...selectedProducts.at(foundIdx)});
                                     };
                                 };
                             };
@@ -96,10 +96,10 @@ const SelectProductModal = (props) => {
                             setListItems(selectedProducts);
 
                             if(!!current['product_name']) {
-                                if(!selectedItem || selectedItem.product_name !== current.product_name) {
+                                if(!selectedCategory || selectedCategory.product_name !== current.product_name) {
                                     const foundIdx = selectedProducts.findIndex(item => item.product_name === current.product_name);
                                     if(foundIdx !== -1) {
-                                        setSelectedItem({...selectedProducts.at(foundIdx)});
+                                        setSelectedCategory({...selectedProducts.at(foundIdx)});
                                     };
                                 };
                             };
@@ -160,7 +160,7 @@ const SelectProductModal = (props) => {
                     dataSource={listItems}
                     renderItem={(item) => 
                         <List.Item
-                            className={(selectedItem && (item.index === selectedItem.index)) ?
+                            className={(selectedCategory && (item.index === selectedCategory.index)) ?
                                 classNames(styles.ListRow, styles.selected) : styles.ListRow }
                             onClick={() => handleClickRow(item)}
                             onDoubleClick={()=>{handleClickRow(item);handleOk();}}

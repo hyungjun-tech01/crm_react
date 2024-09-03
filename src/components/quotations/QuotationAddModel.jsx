@@ -12,7 +12,7 @@ import "antd/dist/reset.css";
 import "../antdstyle.css";
 import {
   defaultQuotation,
-  atomSelectedItem,
+  atomSelectedCategory,
   atomCurrentLead,
   defaultLead,
 } from "../../atoms/atoms";
@@ -65,15 +65,15 @@ const QuotationAddModel = (props) => {
   const [quotationChange, setQuotationChange] = useState({ ...defaultQuotation });
   const [quotationContents, setQuotationContents] = useState([]);
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
-  const selectedItem = useRecoilValue(atomSelectedItem);
+  const selectedCategory = useRecoilValue(atomSelectedCategory);
 
   const initializeQuotationTemplate = useCallback(() => {
     document.querySelector("#add_new_quotation_form").reset();
     setQuotationContents([]);
 
-    if ((selectedItem.category === 'lead')
+    if ((selectedCategory.category === 'lead')
       && (currentLead !== defaultLead)
-      && (selectedItem.item_code === currentLead.lead_code)
+      && (selectedCategory.item_code === currentLead.lead_code)
     ) {
       setQuotationChange({
         ...defaultQuotation,
@@ -95,7 +95,7 @@ const QuotationAddModel = (props) => {
     setAmountsForContent({
       sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
     });
-  }, [cookies.myLationCrmUserName, currentLead, selectedItem]);
+  }, [cookies.myLationCrmUserName, currentLead, selectedCategory]);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {

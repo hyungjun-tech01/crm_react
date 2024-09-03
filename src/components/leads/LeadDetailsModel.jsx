@@ -10,7 +10,7 @@ import {
   atomPurchaseByCompany,
   atomConsultingByLead,
   atomQuotationByLead,
-  atomSelectedItem,
+  atomSelectedCategory,
 } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo } from "../../repository/company";
@@ -79,7 +79,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentLeadCode, setCurrentLeadCode] = useState('');
   const [validMACount, setValidMACount] = useState(0);
-  const setSelectedItem = useSetRecoilState(atomSelectedItem);
+  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -177,7 +177,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
   };
 
   const handleClose = useCallback(() => {
-    setSelectedItem({category: null, item_code: null});
+    setSelectedCategory({category: null, item_code: null});
     setEditedDetailValues(null);
     setCurrentLead();
     setCurrentLeadCode('');
