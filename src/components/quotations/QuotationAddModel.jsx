@@ -164,7 +164,7 @@ const QuotationAddModel = (props) => {
       title: t('quotation.detail_desc'),
       dataIndex: '10',
       size: 10,
-      render: (text, record) => <>{record['10'] ? t('common.avail') : t('common.na')}</>,
+      render: (text, record) => <>{text}</>,
     },
     {
       title: t('common.quantity'),
@@ -591,7 +591,7 @@ const QuotationAddModel = (props) => {
       setIsMessageModalOpen(true);
       return;
     };
-    console.log('[handleContentModalOk] new content :',);
+    console.log('[handleContentModalOk] new content :', finalData);
 
     // update Contents -------------------------------------------------
     if (settingForContent.action === "ADD") {

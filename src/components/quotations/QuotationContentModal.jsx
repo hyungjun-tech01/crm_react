@@ -113,8 +113,9 @@ const QuotationContentModal = (props) => {
 
     // ----- useEffect for Production -----------------------------------
     useEffect(() => {
-        setShowDetailDesc(original.detail_desc_on_off === '있음');
-    }, [original.detail_desc_on_off]);
+        const show_detail = !!edited['detail_desc_on_off'] ? edited.detail_desc_on_off : original.detail_desc_on_off;
+        setShowDetailDesc( show_detail === '있음');
+    }, [edited, original.detail_desc_on_off]);
 
     return (
         <Modal
