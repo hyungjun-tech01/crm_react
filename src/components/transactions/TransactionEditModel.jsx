@@ -597,14 +597,11 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
         memo: item.memo,
       };
     });
-    setTaxInvoiceContents(tempInvoiceContents);
 
-    let oldModal = bootstrap.Modal.getInstance('#edit_transaction');
-    if(oldModal) {
-        oldModal.hide();
-    }
+    setTaxInvoiceContents(tempInvoiceContents);
     setNeedSaveTaxInvoice(true);
     openTaxInvoice();
+
     setTimeout(()=>{
         let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
             keyboard: false
@@ -645,12 +642,15 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
           }));
           setTransactionContents(updatedContents);
         };
+
+        let thisModal = bootstrap.Modal.getInstance('#edit_transaction');
+        if(thisModal) thisModal.hide();
+
         if(value === 'Invoice'){
           handleShowInvoice();
           handleInitialize();
         } else {
-          let thisModal = bootstrap.Modal.getInstance('#edit_transaction');
-          if(thisModal) thisModal.hide();
+          handleClose();  
         };
       }
       else {
@@ -695,7 +695,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     
     if ((companyState & 1) === 0) return;
     
-    if (Object.keys(orgTransaction).length === 0) {
+    // if (Object.keys(orgTransaction).length === 0) {
       
       if (currentTransaction === defaultTransaction) {
         console.log('[TransactionEditModel] Add New Transaction~');
@@ -744,8 +744,8 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
         card_number: currentTransaction.card_number,
       }
       setOrgReceiptModalData(tempReceiptData);
-    };
-  }, [open, companyState, orgTransaction, currentTransaction]);
+    // };
+  }, [open, companyState, currentTransaction]);
 
   if(!open) return (
     <div>&nbsp;</div>

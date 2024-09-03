@@ -12,7 +12,6 @@ import SystemUserModel from "../task/SystemUserModel";
 import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
 import {
-  atomAllTransactionObj,
   atomFilteredTransactionArray,
   atomCompanyState,
   atomTransactionState,
