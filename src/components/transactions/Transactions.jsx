@@ -52,7 +52,6 @@ const Transactions = () => {
   const [openTaxInvoice, setOpenTaxInvoice] = useState(false);
   const [taxInvoiceData, setTaxInvoiceData] = useState(null);
   const [taxInvoiceContents, setTaxInvoiceContents] = useState(null);
-  const [needSaveTaxInvoice, setNeedSaveTaxInvoice] = useState(false);
   const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const [searchCondition, setSearchCondition] = useState("");
@@ -360,14 +359,16 @@ const Transactions = () => {
           openTaxInvoice={() => setOpenTaxInvoice(true)}
           setTaxInvoiceData={setTaxInvoiceData}
           setTaxInvoiceContents={setTaxInvoiceContents}
-          setNeedSaveTaxInvoice={setNeedSaveTaxInvoice}
         />
         <TaxInvoiceEditModel
           open={openTaxInvoice}
-          close={() => setOpenTaxInvoice(false)}
+          close={() => {
+            setOpenTaxInvoice(false);
+            setTaxInvoiceData(null);
+            setTaxInvoiceContents(null);
+          }}
           data={taxInvoiceData}
           contents={taxInvoiceContents}
-          needSave={needSaveTaxInvoice}
         />
         <MultiQueryModal
           title={t('quotation.quotation_multi_query')}
