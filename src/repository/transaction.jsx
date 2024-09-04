@@ -99,8 +99,12 @@ export const TransactionRepo = selector({
             };
         });
         const filterTransactions = getCallback(({ set, snapshot }) => async (itemName, filterText) => {
-            const allTransactionList = await snapshot.getPromise(atomAllTransactionObj);
-            let allTransaction;
+            //const allTransactionList = await snapshot.getPromise(atomAllTransactionObj);
+
+            const allTransactionData = await snapshot.getPromise(atomAllTransactionObj);
+            const allTransactionList = Object.values(allTransactionData);
+
+            let allTransaction = [];
             console.log('filterTransactions', itemName, filterText);
             if (itemName === 'common.all') {
                 allTransaction = allTransactionList.filter(item => (item.company_name && item.company_name.includes(filterText)) ||

@@ -127,8 +127,13 @@ export const QuotationRepo = selector({
         });
 
         const filterQuotations = getCallback(({set, snapshot }) => async (itemName, filterText) => {
-            const allQuotationList = await snapshot.getPromise(atomAllQuotationObj);
-            let  allQuotation ;
+           // const allQuotationList = await snapshot.getPromise(atomAllQuotationObj);
+
+            const allQuotationData = await snapshot.getPromise(atomAllQuotationObj);
+            const allQuotationList = Object.values(allQuotationData);
+
+            let allQuotation = [];
+
             console.log('filterQuotations', itemName, filterText);
             if(itemName === 'common.all'){
                 allQuotation = allQuotationList.filter(item => (item.company_name &&item.company_name.includes(filterText))||
