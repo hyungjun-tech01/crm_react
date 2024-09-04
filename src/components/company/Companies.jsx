@@ -483,6 +483,7 @@ const Companies = () => {
           close={() =>setOpenTaxInvoice(false)}
           data={taxInvoiceData}
           contents={taxInvoiceContents}
+          needSave={needSaveTaxInvoice}
         />
         <MultiQueryModal
           title={t('company.company_multi_query')}
