@@ -60,7 +60,7 @@ const default_invoice_data = {
   vacant_count: 0,
 };
 
-const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) => {
+const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -89,6 +89,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
   const [selectValues, setSelectValue] = useState({})
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
   const [selectedCategory, setSelectedCategory] = useRecoilState(atomSelectedCategory);
+  const [ showSaveButton, setShowSaveButton ] = useState(false);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
@@ -540,6 +541,17 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
 
   const handleInitialize = useCallback(() => {
     document.querySelector("#add_new_tax_invoice_form").reset();
+    setInvoiceData({...default_invoice_data});
+    setInvoiceChange({});
+    setInvoiceContents([]);
+    setPrintData({});
+    setIsSale(true);
+    setIsTaxInvoice(true);
+    setSelectValue({});
+    setShowSaveButton(false);
+    setSettingForContentModal({});
+    setOrgContentModalData({});
+    setEditedContentModalData({});
   }, []);
 
   const handleSaveTaxInvoice = () => {
@@ -602,14 +614,17 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
       let inputData = null;
       if (!!data) {
         inputData = data;
+        setShowSaveButton(true);
       } else {
         if(currentTaxInvoice !== defaultTaxInvoice) {
           inputData = {...currentTaxInvoice};
+          setShowSaveButton(false);
         } else {
           if((selectedCategory.category === 'company')
             && (currentCompany !== defaultCompany)
             && (selectedCategory.item_code === currentCompany.company_code)
           ){
+            setShowSaveButton(true);
             inputData = {
               ...default_invoice_data,
               ...defaultTaxInvoice,
@@ -627,10 +642,12 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
               business_type : currentCompany.business_type,
               business_item : currentCompany.business_item,
             }
+          } else {
+            setShowSaveButton(false);
           };
         }
       };
-      console.log('TaxInvoiceEditModel / useEffect : ', inputData);
+      
       if(!!inputData && Object.keys(inputData).length > 0) {
         // invoiceData ------------------------------
         const tempSelectValues = {
@@ -756,6 +773,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
               type="button"
               className="btn-close"
               data-bs-dismiss="modal"
+              onClick={handleClose}
             ></button>
           </div>
           <div className="modal-body">
@@ -1407,7 +1425,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents, needSave=false }) =>
                         </div>
                       </div>
                     </div>
-                    { (Object.keys(invoiceChange).length > 0 || needSave) &&
+                    { (Object.keys(invoiceChange).length > 0 || showSaveButton) &&
                       <div className="text-center">
                         <button
                           type="button"

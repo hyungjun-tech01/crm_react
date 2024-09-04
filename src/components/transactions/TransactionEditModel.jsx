@@ -54,7 +54,7 @@ const default_receipt_data = {
   card_number: '',
 };
 
-const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, setTaxInvoiceContents, setNeedSaveTaxInvoice}) => {
+const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, setTaxInvoiceContents}) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [ isMessageModalOpen, setIsMessageModalOpen ] = useState(false);
@@ -599,15 +599,14 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     });
 
     setTaxInvoiceContents(tempInvoiceContents);
-    setNeedSaveTaxInvoice(true);
     openTaxInvoice();
 
-    setTimeout(()=>{
-        let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
-            keyboard: false
-        });
-        myModal.show();
-    }, 500);
+    // setTimeout(()=>{
+    //     let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
+    //         keyboard: false
+    //     });
+    //     myModal.show();
+    // }, 500);
   };
 
   const handleSaveTransaction = (value) => {

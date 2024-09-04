@@ -77,8 +77,8 @@ const CompanyTaxInvoiceModel = (props) => {
         },
         {
             title: t('transaction.publish_date'),
-            dataIndex: "publish_date",
-            render: (text, record) => <>{formatDate(record.publish_date)}</>,
+            dataIndex: "create_date",
+            render: (text, record) => <>{formatDate(record.create_date)}</>,
         },
         {
             title: t('company.business_registration_code'),
