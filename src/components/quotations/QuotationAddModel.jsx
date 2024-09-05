@@ -679,12 +679,14 @@ const QuotationAddModel = (props) => {
 
 
   //===== Function for Final Actions  ==========================================
-  const handleAddNewQuotation = useCallback((event) => {
+  const handleAddNewQuotation = useCallback(async (event) => {
     // Check data if they are available
     if (quotationChange.lead_name === null
       || quotationChange.lead_name === ''
       || quotationChange.quotation_type === null
       || quotationContents.length === 0
+      || quotationChange.company_code === ''
+      || quotationChange.company_code === null
     ) {
       setMessage({ title: '필요 항목 누락', message: '필요 값이 없습니다.' });
       setIsMessageModalOpen(true);
@@ -709,7 +711,7 @@ const QuotationAddModel = (props) => {
       status: '견적진행', // Temporary
       modify_user: cookies.myLationCrmUserId,
     };
-    const result = modifyQuotation(newQuotationData);
+    const result = await modifyQuotation(newQuotationData);
     result.then((res) => {
       if (res.result) {
         let thisModal = bootstrap.Modal.getInstance('#add_quotation');
