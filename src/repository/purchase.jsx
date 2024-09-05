@@ -160,8 +160,8 @@ export const PurchaseRepo = selector({
                     };
                     //----- Update AllPurchaseObj --------------------------//
                     const updatedAllObj = {
-                        ...allPurchases,
                         [data.out_purchase_code]: updatedNewPurchase,
+                        ...allPurchases,
                     };
                     set(atomAllPurchaseObj, updatedAllObj);
 

@@ -152,8 +152,8 @@ export const TaxInvoiceRepo = selector({
                     };
                     //----- Update AllTaxInvoiceObj --------------------------//
                     const updatedAllObj = {
-                        ...allTaxInvoices,
                         [data.out_tax_invoice_code]: updatedTaxInvoice,
+                        ...allTaxInvoices,
                     };
                     set(atomAllTaxInvoiceObj, updatedAllObj);
 
