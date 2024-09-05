@@ -243,8 +243,8 @@ export const ConsultingRepo = selector({
                     };
                     //----- Update AllConsultingObj --------------------------//
                     const updatedAllObj = {
-                        ...allConsultings,
                         [data.out_consulting_code]: updatedNewConsulting,
+                        ...allConsultings,
                     };
                     set(atomAllConsultingObj, updatedAllObj);
 

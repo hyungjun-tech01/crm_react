@@ -157,8 +157,8 @@ export const TransactionRepo = selector({
                     };
                     //----- Update AllTransactionObj --------------------------//
                     const updatedAllObj = {
-                        ...allTransactions,
                         [updatedNewTransaction.transaction_code] : updatedNewTransaction,
+                        ...allTransactions,
                     };
                     set(atomAllTransactionObj, updatedAllObj);
 
