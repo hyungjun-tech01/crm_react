@@ -158,8 +158,8 @@ export const LeadRepo = selector({
                     };
                     //----- Update AllLeadObj --------------------------//
                     const updatedAllLeads = {
-                        [data.out_lead_code] : updatedNewLead,
                         ...allLeads,
+                        [data.out_lead_code] : updatedNewLead,
                     }
                     set(atomAllLeadObj, updatedAllLeads);
 
