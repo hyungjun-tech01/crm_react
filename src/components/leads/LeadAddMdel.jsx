@@ -32,14 +32,8 @@ const LeadAddModel = (props) => {
 
 
     //===== Handles to edit 'Lead Add' =====================================================
+    const [ disableItems, setDisableItems ] = useState(false);
     const [ leadChange, setLeadChange ] = useState({...defaultLead});
-    const [ disabledItems, setDisabledItems ] = useState({});
-
-    const initializeLeadTemplate = useCallback(() => {
-        setLeadChange({...defaultLead});
-        setDisabledItems({});
-        document.querySelector("#add_new_lead_form").reset();
-    }, []);
 
     const handleLeadChange = useCallback((e) => {
         const modifiedData = {
@@ -48,6 +42,35 @@ const LeadAddModel = (props) => {
         };
         setLeadChange(modifiedData);
     }, [leadChange]);
+
+    const handleSelectChange = useCallback((name, selected) => {
+        const modifiedData = {
+            ...leadChange,
+            [name]: selected.value,
+        };
+        setLeadChange(modifiedData);
+    }, [leadChange]);
+
+    const handleCompanySelected = (data) => {
+        setLeadChange(data);
+        setDisableItems(true);
+    };
+
+    const initializeLeadTemplate = useCallback(() => {
+        document.querySelector("#add_new_lead_form").reset();
+
+        setLeadChange({...defaultLead});
+        setDisableItems(false);
+        // setDisableItemsChecked({
+        //     company_name_en': false,
+        //     company_address': false,
+        //     company_zip_code': false,
+        //     homepage': false,
+        //     company_fax_number': false,
+        //     site_id': false,
+        //     sales_resource': false,
+        // });
+    }, []);
 
     const handleAddNewLead = useCallback((event) => {
         // Check data if they are available
@@ -94,39 +117,6 @@ const LeadAddModel = (props) => {
             }
         });
     }, [cookies.myLationCrmUserId, initializeLeadTemplate, leadChange, modifyLead]);
-
-    const handleSelectChange = useCallback((name, selected) => {
-        console.log('[LeadAddModel] handleSelectChange :', selected);
-        let modifiedData = null;
-        if (name === 'company_name') {
-            modifiedData = {
-                ...leadChange,
-                company_code: selected.value.company_code,
-                company_name: selected.value.company_name,
-                company_name_en: selected.value.company_name_en,
-                company_zip_code: selected.value.company_zip_code,
-                company_address: selected.value.company_address,
-                company_phone_number: selected.value.company_phone_number,
-                company_fax_number: selected.value.company_fax_number,
-            };
-            let tempDisabled = {
-                ...disabledItems,
-            };
-            if (selected.value.company_name_en) {
-                tempDisabled['company_name_en'] = true;
-            };
-            if (selected.value.company_address) {
-                tempDisabled['company_address'] = true;
-            };
-            setDisabledItems(tempDisabled);
-        } else {
-            modifiedData = {
-                ...leadChange,
-                [name]: selected.value,
-            };
-        };
-        setLeadChange(modifiedData);
-    }, [leadChange]);
 
     useEffect(() => {
         if (init && (userState & 1) === 1) {
@@ -182,21 +172,21 @@ const LeadAddModel = (props) => {
                                             onChange={handleLeadChange}
                                         />
                                         <AddBasicItem
-                                            title={t('lead.position')}
-                                            type='text'
-                                            name="position"
-                                            defaultValue={leadChange.position}
-                                            onChange={handleLeadChange}
-                                        />
-                                    </div>
-                                    <div className="form-group row">
-                                        <AddBasicItem
                                             title={t('lead.is_keyman')}
                                             type='select'
                                             name='is_keyman'
                                             defaultValue={leadChange.is_keyman}
                                             options={KeyManForSelection}
                                             onChange={handleSelectChange}
+                                        />
+                                    </div>
+                                    <div className="form-group row">
+                                        <AddBasicItem
+                                            title={t('lead.position')}
+                                            type='text'
+                                            name="position"
+                                            defaultValue={leadChange.position}
+                                            onChange={handleLeadChange}
                                         />
                                         <AddBasicItem
                                             title={t('common.region')}
@@ -210,70 +200,31 @@ const LeadAddModel = (props) => {
                                     <div className="form-group row">
                                         <AddSearchItem
                                             title={t('company.company_name')}
-                                            category='company'
+                                            category='lead'
                                             name='company_name'
                                             defaultValue={leadChange.company_name}
                                             edited={leadChange}
-                                            setEdited={setLeadChange}
+                                            setEdited={handleCompanySelected}
                                         />
+                                        <AddBasicItem
+                                            title={t('common.site_id')}
+                                            type='text'
+                                            name="site_id"
+                                            defaultValue={leadChange.site_id}
+                                            options={salespersonsForSelection}
+                                            disabled={disableItems}
+                                            onChange={handleLeadChange}
+                                        />
+                                    </div>
+                                    <div className="form-group row">
                                         <AddBasicItem
                                             title={t('company.company_name_en')}
                                             type='text'
                                             name="company_name_en"
                                             defaultValue={leadChange.company_name_en}
-                                            disabled={(disabledItems && disabledItems['company_name_en']) ? disabledItems.company_name_en : false}
+                                            disabled={disableItems}
                                             onChange={handleLeadChange}
                                         />
-                                    </div>
-                                    <div className="form-group row">
-                                        <AddBasicItem
-                                            title={t('lead.department')}
-                                            type='text'
-                                            name="department"
-                                            defaultValue={leadChange.department}
-                                            onChange={handleLeadChange}
-                                        />
-                                        <AddBasicItem
-                                            title={t('lead.mobile')}
-                                            type='text'
-                                            name="mobile_number"
-                                            defaultValue={leadChange.mobile_number}
-                                            onChange={handleLeadChange}
-                                        />
-                                    </div>
-                                    <div className="form-group row">
-                                        <AddBasicItem
-                                            title={t('company.phone_number')}
-                                            type='text'
-                                            name="company_phone_number"
-                                            defaultValue={leadChange.company_phone_number}
-                                            onChange={handleLeadChange}
-                                        />
-                                        <AddBasicItem
-                                            title={t('lead.fax_number')}
-                                            type='text'
-                                            name="company_fax_number"
-                                            defaultValue={leadChange.company_fax_number}
-                                            onChange={handleLeadChange}
-                                        />
-                                    </div>
-                                    <div className="form-group row">
-                                        <AddBasicItem
-                                            name="email"
-                                            type='text'
-                                            title={t('lead.email')}
-                                            defaultValue={leadChange.email}
-                                            onChange={handleLeadChange}
-                                        />
-                                        <AddBasicItem
-                                            title={t('lead.homepage')}
-                                            type='text'
-                                            name="homepage"
-                                            defaultValue={leadChange.homepage}
-                                            onChange={handleLeadChange}
-                                        />
-                                    </div>
-                                    <div className="form-group row">
                                         <AddBasicItem
                                             title={t('lead.zip_code')}
                                             type='text'
@@ -282,13 +233,73 @@ const LeadAddModel = (props) => {
                                             disabled={true}
                                             onChange={handleLeadChange}
                                         />
+                                    </div>
+                                    <div className="form-group row">
+                                        <AddBasicItem
+                                            title={t('lead.mobile')}
+                                            type='text'
+                                            name="mobile_number"
+                                            defaultValue={leadChange.mobile_number}
+                                            onChange={handleLeadChange}
+                                        />
                                         <AddAddressItem
                                             title={t('company.address')}
                                             key_address='company_address'
                                             key_zip='company_zip_code'
-                                            disabled={(disabledItems && disabledItems['company_address']) ? disabledItems.company_address : false}
+                                            disabled={disableItems}
                                             edited={leadChange}
                                             setEdited={setLeadChange}
+                                        />
+                                    </div>
+                                    <div className="form-group row">
+                                        <AddBasicItem
+                                            title={t('company.phone_number')}
+                                            type='text'
+                                            name="company_phone_number"
+                                            defaultValue={leadChange.company_phone_number}
+                                            disabled={disableItems}
+                                            onChange={handleLeadChange}
+                                        />
+                                        <AddBasicItem
+                                            title={t('lead.fax_number')}
+                                            type='text'
+                                            name="company_fax_number"
+                                            defaultValue={leadChange.company_fax_number}
+                                            disabled={disableItems}
+                                            onChange={handleLeadChange}
+                                        />
+                                    </div>
+                                    <div className="form-group row">
+                                        <AddBasicItem
+                                            name="email"
+                                            type='text'
+                                            title={t('lead.email1')}
+                                            defaultValue={leadChange.email}
+                                            onChange={handleLeadChange}
+                                        />
+                                        <AddBasicItem
+                                            title={t('lead.homepage')}
+                                            type='text'
+                                            name="homepage"
+                                            defaultValue={leadChange.homepage}
+                                            disabled={disableItems}
+                                            onChange={handleLeadChange}
+                                        />
+                                    </div>
+                                    <div className="form-group row">
+                                        <AddBasicItem
+                                            name="email2"
+                                            type='text'
+                                            title={t('lead.email2')}
+                                            defaultValue={leadChange.email2}
+                                            onChange={handleLeadChange}
+                                        />
+                                        <AddBasicItem
+                                            title={t('lead.DMexist')}
+                                            type='text'
+                                            name='dm_exist'
+                                            defaultValue={leadChange.dm_exist}
+                                            onChange={handleSelectChange}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -298,6 +309,7 @@ const LeadAddModel = (props) => {
                                             name='sales_resource'
                                             defaultValue={leadChange.sales_resource}
                                             options={salespersonsForSelection}
+                                            disabled={disableItems}
                                             onChange={handleSelectChange}
                                         />
                                         <AddBasicItem
@@ -308,20 +320,6 @@ const LeadAddModel = (props) => {
                                             options={engineersForSelection}
                                             onChange={handleSelectChange}
                                         />
-                                    </div>
-                                    <div className="form-group row">
-                                        <div className={"col-sm-6"} >
-                                            <div className="add-basic-item">
-                                                <div className={"add-basic-title"} >
-                                                    {t('lead.DMexist')}
-                                                </div>
-                                                <input
-                                                    className={"add-basic-content"}
-                                                    type="text"
-                                                    placeholder={t('lead.DMexist')}
-                                                />
-                                            </div>
-                                        </div>
                                     </div>
                                     <div className="form-group row">
                                         <AddBasicItem

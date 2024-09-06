@@ -83,6 +83,8 @@ const koResource = {
             detail_information:'고객상세정보',
             DMexist:'DM여부',
             email:'고객이메일',
+            email1:'고객이메일(1)',
+            email2:'고객이메일(2)',
             fax_number: '고객팩스번호',
             full_name:'고객명',
             homepage:'고객홈페이지',

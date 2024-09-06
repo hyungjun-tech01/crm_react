@@ -35,6 +35,7 @@ const SelectListModal = (props) => {
         switch(condition.category)
         {
             case 'company':
+            case 'lead':
             case 'transaction':
             case 'purchase':
             case 'tax_invoice':
@@ -81,6 +82,7 @@ const SelectListModal = (props) => {
         switch(condition.category)
         {
             case 'company':
+            case 'lead':
                 if(condition.item === 'company_name') {
                     modifiedData['company_code'] = data.company_code;
                     modifiedData['company_index'] = data.company_index;
@@ -90,6 +92,9 @@ const SelectListModal = (props) => {
                     modifiedData['company_address'] = data.company_address;
                     modifiedData['company_phone_number'] = data.company_phone_number;
                     modifiedData['company_fax_number'] = data.company_fax_number;
+                    modifiedData['homepage'] = data.homepage;
+                    modifiedData['site_id'] = data.site_id;
+                    modifiedData['sales_resource'] = data.sales_resource;
                 };
                 break;
             case 'consulting':

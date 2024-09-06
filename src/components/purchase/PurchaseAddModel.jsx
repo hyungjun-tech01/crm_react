@@ -59,29 +59,6 @@ const PurchaseAddModel = (props) => {
     const [needInit, setNeedInit] = useState(false);
     const selectedCategory = useRecoilValue(atomSelectedCategory);
 
-    const initializePurchaseTemplate = useCallback(() => {
-        document.querySelector("#add_new_purchase_form").reset();
-
-        if((currentCompany !== defaultCompany)
-            && (
-                ((selectedCategory.category === 'company') && (selectedCategory.item_code === currentCompany.company_code))
-                || ((selectedCategory.category === 'lead') && (selectedCategory.item_code === currentLead.lead_code))
-            )
-        ){
-            setPurchaseChange({
-                ...defaultPurchase,
-                company_code: currentCompany.company_code,
-            });
-            setCompanyData({
-                company_code: currentCompany.company_code,
-                company_name: currentCompany.company_name,
-            });
-        } else {
-            setPurchaseChange({...defaultPurchase});
-        }
-        setNeedInit(false);
-    }, [currentCompany, selectedCategory]);
-
     const handleItemChange = useCallback((e) => {
         const modifiedData = {
             ...purchaseChange,
@@ -128,6 +105,29 @@ const PurchaseAddModel = (props) => {
         };
         setPurchaseChange(modifiedData);
     }, [purchaseChange]);
+
+    const initializePurchaseTemplate = useCallback(() => {
+        document.querySelector("#add_new_purchase_form").reset();
+
+        if((currentCompany !== defaultCompany)
+            && (
+                ((selectedCategory.category === 'company') && (selectedCategory.item_code === currentCompany.company_code))
+                || ((selectedCategory.category === 'lead') && (selectedCategory.item_code === currentLead.lead_code))
+            )
+        ){
+            setPurchaseChange({
+                ...defaultPurchase,
+                company_code: currentCompany.company_code,
+            });
+            setCompanyData({
+                company_code: currentCompany.company_code,
+                company_name: currentCompany.company_name,
+            });
+        } else {
+            setPurchaseChange({...defaultPurchase});
+        }
+        setNeedInit(false);
+    }, [currentCompany, selectedCategory]);
 
     const handleAddNewPurchase = useCallback((event) => {
         // Check data if they are available
@@ -364,7 +364,7 @@ const PurchaseAddModel = (props) => {
                                             required
                                             long
                                             edited={companyData}
-                                            setEdited={setCompanyData}
+                                            setEdited={setPurchaseChange}
                                         />
                                     </div>
                                     <div className="form-group row">
