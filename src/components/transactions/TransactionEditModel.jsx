@@ -72,6 +72,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
 
 
   //===== Handles to edit 'TransactionEditModel' ======================================
+  const [ disableItems, setDisableItems ] = useState(false);
   const [orgTransaction, setOrgTransaction] = useState({});
   const [transactionChange, setTransactionChange] = useState({});
   const [transactionContents, setTransactionContents] = useState([]);
@@ -132,6 +133,11 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     };
     setSelectData(tempSelect);
   }, [transactionChange, selectData]);
+
+  const handleCompanySelected = (data) => {
+    setTransactionChange(data);
+    setDisableItems(true);
+};
 
   const trans_types = [
     { value: '매출', label: t('company.deal_type_sales') },
@@ -503,6 +509,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setIsVatIncluded(true);
     setShowDecimal(0);
     setDataForTransaction({...default_transaction_data});
+    setDisableItems(false);
 
     if((selectedCategory.category === 'company')
       && (currentCompany !== defaultCompany)
@@ -601,12 +608,12 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setTaxInvoiceContents(tempInvoiceContents);
     openTaxInvoice();
 
-    setTimeout(()=>{
-        let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
-            keyboard: false
-        });
-        myModal.show();
-    }, 500);
+    // setTimeout(()=>{
+    //     let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
+    //         keyboard: false
+    //     });
+    //     myModal.show();
+    // }, 500);
   };
 
   const handleSaveTransaction = (value) => {
@@ -844,7 +851,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
                                     name='company_name'
                                     defaultValue={orgTransaction.company_name}
                                     edited={transactionChange}
-                                    setEdited={setTransactionChange}
+                                    setEdited={handleCompanySelected}
                                   />
                                 </Col>
                               </Row>
@@ -885,6 +892,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
                                   value={transactionChange['business_registration_code']
                                     ? transactionChange['business_registration_code']
                                     : orgTransaction.business_registration_code}
+                                  disabled={disableItems}
                                   onChange={handleItemChange}
                                 />
                               </div>
@@ -908,6 +916,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
                                 <Input
                                   name='ceo_name'
                                   value={transactionChange['ceo_name'] ? transactionChange['ceo_name'] : orgTransaction.ceo_name}
+                                  disabled={disableItems}
                                   onChange={handleItemChange}
                                 />
                               </div>
@@ -922,6 +931,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
                                   value={transactionChange['company_address']
                                     ? transactionChange['company_address']
                                     : orgTransaction.company_address}
+                                  disabled={disableItems}
                                   onChange={handleItemChange}
                                 />
                               </div>
@@ -934,6 +944,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
                                 <Input
                                   name='business_type'
                                   value={transactionChange['business_type'] ? transactionChange['business_type'] : orgTransaction.business_type}
+                                  disabled={disableItems}
                                   onChange={handleItemChange}
                                 />
                               </div>
@@ -944,6 +955,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
                                 <Input
                                   name='business_item'
                                   value={transactionChange['business_item'] ? transactionChange['business_item'] : orgTransaction.business_item}
+                                  disabled={disableItems}
                                   onChange={handleItemChange}
                                 />
                               </div>

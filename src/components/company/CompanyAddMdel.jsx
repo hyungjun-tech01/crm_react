@@ -73,12 +73,12 @@ const CompanyAddModel = (props) => {
     (event) => {
       // Check data if they are available
       if (
-        companyChange.company_name === null ||
-        companyChange.company_name === ""
+        !!companyChange.company_name || companyChange.company_name === ""
+        || !!companyChange.company_address || companyChange.company_address === ""
       ) {
         const tempMsg = {
           title: t('comment.title_check'),
-          message: "회사이름이 누락되었습니다.",
+          message: "회사이름이나 주소가 누락되었습니다.",
         };
         setMessage(tempMsg);
         setIsMessageModalOpen(true);

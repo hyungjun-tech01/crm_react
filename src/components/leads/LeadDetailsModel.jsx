@@ -244,17 +244,18 @@ const LeadDetailsModel = ({init, handleInit}) => {
     { key: 'company_name', title: 'company.company_name', detail: { type: 'search', key_name: 'company', editing: handleDetailObjectChange } },
     { key: 'company_name_en', title: 'company.company_name_en', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'department', title: 'lead.department', detail: { type: 'label', editing: handleDetailChange } },
-    { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'email', title: 'lead.email1', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'mobile_number', title: 'lead.mobile', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'company_phone_number', title: 'company.phone_number', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'company_fax_number', title: 'company.fax_number', detail: { type: 'label', editing: handleDetailChange } },
-    { key: 'email', title: 'lead.email', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'email2', title: 'lead.email2', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'homepage', title: 'lead.homepage', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'company_zip_code', title: 'company.zip_code', detail: { type: 'label', editing: handleDetailChange, disabled: true } },
     { key: 'company_address', title: 'company.address', detail: { type: 'address', extra: 'long', key_zip: "company_zip_code", editing: handleDetailObjectChange, } },
     { key: 'sales_resource', title: 'lead.lead_sales', detail: { type: 'select', options: salespersonsForSelection, editing: handleDetailSelectChange } },
     { key: 'application_engineer', title: 'company.engineer', detail: { type: 'select', options: engineersForSelection, editing: handleDetailSelectChange } },
     { key: 'create_date', title: 'common.regist_date', detail: { type: 'date', editing: handleDetailDateChange } },
+    { key: 'site_id', title: 'common.site_id', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'memo', title: 'common.memo', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
   ];
 
@@ -436,12 +437,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
                   original={selectedLead}
                   name='company_name'
                   title={t('company.company_name')}
-                  onEditing={handleDetailChange}
-                />
-                <DetailTitleItem
-                  original={selectedLead}
-                  name='position'
-                  title={t('lead.position')}
                   onEditing={handleDetailChange}
                 />
               </div>

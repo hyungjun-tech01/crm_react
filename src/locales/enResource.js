@@ -83,6 +83,8 @@ const enResource = {
             detail_information:'Lead Detail',
             DMexist:'DM',
             email:'Email Address',
+            email1:'Email Address(1)',
+            email2:'Email Address(2)',
             fax_number: 'Fax No.',
             full_name:'Full Name',
             homepage:'Lead Homepage',

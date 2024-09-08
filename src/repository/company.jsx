@@ -144,8 +144,8 @@ export const CompanyRepo = selector({
                     };
                     //----- Update AllCompanyObj --------------------------//
                     const updatedAllCompanies = {
-                        [data.out_company_code]: updatedNewCompany,
                         ...allCompanies,
+                        [data.out_company_code]: updatedNewCompany,
                     };
                     set(atomAllCompanyObj, updatedAllCompanies);
 

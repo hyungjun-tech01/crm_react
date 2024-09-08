@@ -195,8 +195,8 @@ export const QuotationRepo = selector({
                     };
                     //----- Update AllQuotationObj --------------------------//
                     const updatedAllObj = {
-                        [data.out_quotation_code]: updatedNewQuotation,
                         ...allQuotations,
+                        [data.out_quotation_code]: updatedNewQuotation,
                     };
                     set(atomAllQuotationObj, updatedAllObj);
 
@@ -256,7 +256,6 @@ export const QuotationRepo = selector({
                             set(atomQuotationByLead, updated);
                         }
                     }
-                    return {result: true};
                 }
             }
             catch(err){

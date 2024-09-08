@@ -7,6 +7,7 @@ import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import {
   atomCurrentLead,
   atomSelectedCategory,
+  defaultConsulting,
   defaultLead,
 } from "../../atoms/atoms";
 import {
@@ -60,12 +61,41 @@ const ConsultingAddModel = (props) => {
   const [consultingChange, setConsultingChange] = useState({});
   const selectedCategory = useRecoilValue(atomSelectedCategory);
 
+  const handleItemChange = (e) => {
+    const modifiedData = {
+      ...consultingChange,
+      [e.target.name]: e.target.value,
+    };
+    setConsultingChange(modifiedData);
+  };
+
+  const handleSelectChange = (name, selected) => {
+    const modifiedData = {
+      ...consultingChange,
+      [name]: selected.value,
+    };
+    setConsultingChange(modifiedData);
+  };
+
+  const handleDateChange = (name, date) => {
+    const modifiedData = {
+      ...consultingChange,
+      [name]: date
+    };
+    setConsultingChange(modifiedData);
+  };
+
+  const handleLeadSelected = (data) => {
+    setConsultingChange(data);
+};
+
   const initializeConsultingTemplate = useCallback(() => {
     document.querySelector("#add_new_consulting_form").reset();
 
     // set Receipt date -------------
     const tempDate = new Date();
     let modified = {
+      ...defaultConsulting,
       receiver: cookies.myLationCrmUserName,
       receipt_date: tempDate,
     };
@@ -87,29 +117,6 @@ const ConsultingAddModel = (props) => {
     setConsultingChange(modified);
   }, [cookies.myLationCrmUserName, currentLead, setCurrentCompany, selectedCategory]);
 
-  const handleDateChange = (name, date) => {
-    const modifiedData = {
-      ...consultingChange,
-      [name]: date
-    };
-    setConsultingChange(modifiedData);
-  };
-
-  const handleItemChange = (e) => {
-    const modifiedData = {
-      ...consultingChange,
-      [e.target.name]: e.target.value,
-    };
-    setConsultingChange(modifiedData);
-  };
-
-  const handleSelectChange = (name, selected) => {
-    const modifiedData = {
-      ...consultingChange,
-      [name]: selected.value,
-    };
-    setConsultingChange(modifiedData);
-  };
 
   const handleAddNewConsulting = useCallback(() => {
     // Check data if they are available
@@ -232,7 +239,7 @@ const ConsultingAddModel = (props) => {
                   required
                   defaultValue={consultingChange.lead_name}
                   edited={consultingChange}
-                  setEdited={setConsultingChange}
+                  setEdited={handleLeadSelected}
                 />
               </div>
               {!!consultingChange.lead_name &&

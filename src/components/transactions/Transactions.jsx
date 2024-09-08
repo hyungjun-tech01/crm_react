@@ -28,6 +28,7 @@ import { transactionColumn } from "../../repository/transaction";
 
 const Transactions = () => {
   const { t } = useTranslation();
+  const [ modalIDs, setModalIDs ] = useState([]);
 
 
   //===== [RecoilState] Related with Company ==========================================
@@ -56,11 +57,8 @@ const Transactions = () => {
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
-
   const [statusSearch, setStatusSearch] = useState('common.all');
-
   const [multiQueryModal, setMultiQueryModal] = useState(false);
-
   const [queryConditions, setQueryConditions] = useState([
     { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
     { column: '', columnQueryCondition: '', multiQueryInput: '', andOr: 'And' },
@@ -209,30 +207,92 @@ const Transactions = () => {
     },
   ];
 
-  const handleAddNewTransaction = useCallback(() => {
+  const handleAddNewTransaction = () => {
     setCurrentTransaction()
     setOpenTransaction(true);
 
+    setModalIDs([
+      ...modalIDs,
+      'edit_transaction'
+    ]);
+
     setTimeout(() => {
+      handleNeutralizeBack(handleCloseModal);
       let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
         keyboard: false
       })
       myModal.show();
-    }, 1000);
-  }, [setCurrentTransaction]);
+    }, 500);
+  };
 
   const handleOpenTransactoin = (code) => {
+    console.log('handleOpenTransactoin');
     setCurrentTransaction(code)
     setOpenTransaction(true);
     setSelectedCategory({category: 'transaction', item_code: code});
 
+    if(modalIDs.length === 0) handleNeutralizeBack(handleCloseModal);
+
+    const tempModalIDS = modalIDs.concat('edit_transaction');
+    setModalIDs(tempModalIDS);
+
     setTimeout(() => {
       let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
         keyboard: false
       })
       myModal.show();
-    }, 1000);
+    }, 500);
+  };
+
+  const handleCloseModal = () => {
+    const lastModalID = modalIDs.at(-1);
+    console.log('handleCloaseTransaction / Modal ids : ', modalIDs);
+    console.log('handleCloaseTransaction / last Modal id : ', lastModalID);
+
+    let myModal = bootstrap.Modal.getInstance('#' + lastModalID);
+    if(myModal) myModal.hide();
+
+    setTimeout(() => {
+      if(lastModalID === 'edit_transaction') setOpenTransaction(false);
+      else if(lastModalID === 'edit_tax_invoice') setOpenTaxInvoice(false);
+      
+      if(modalIDs.length === 1) handleRevivalBack();
+
+      setModalIDs([
+        ...modalIDs.slice(0, -1)
+      ]);
+    }, 500);
+  };
+
+  const handleOpenTaxInvoice = () => {
+    console.log('hnadleOpenTaxInvoice');
+    setOpenTaxInvoice(true);
+
+    if(modalIDs.length === 0) handleNeutralizeBack(handleCloseModal);
+
+    const tempModalIDS = modalIDs.concat('edit_tax_invoice');
+    setModalIDs(tempModalIDS);
+
+    setTimeout(() => {
+      let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
+        keyboard: false
+      })
+      myModal.show();
+    }, 500);
   }
+
+  const handleNeutralizeBack = (callback) => {
+    window.history.pushState(null, "", window.location.href);
+    window.onpopstate = () => {
+      window.history.pushState(null, "", window.location.href);
+      callback();
+    };
+  };
+
+  const handleRevivalBack = () => {
+    window.onpopstate = undefined;
+    // window.history.back();
+  };
 
   useEffect(() => {
     tryLoadAllCompanies();
@@ -355,15 +415,15 @@ const Transactions = () => {
         <SystemUserModel />
         <TransactionEditModel
           open={openTransaction}
-          close={() => setOpenTransaction(false)}
-          openTaxInvoice={() => setOpenTaxInvoice(true)}
+          close={handleCloseModal}
+          openTaxInvoice={handleOpenTaxInvoice}
           setTaxInvoiceData={setTaxInvoiceData}
           setTaxInvoiceContents={setTaxInvoiceContents}
         />
         <TaxInvoiceEditModel
           open={openTaxInvoice}
           close={() => {
-            setOpenTaxInvoice(false);
+            handleCloseModal();
             setTaxInvoiceData(null);
             setTaxInvoiceContents(null);
           }}
