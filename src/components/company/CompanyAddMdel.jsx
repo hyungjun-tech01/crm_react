@@ -295,7 +295,7 @@ const CompanyAddModel = (props) => {
                       name="site_id"
                       defaultValue={companyChange.site_id}
                       required
-                      onChange={handleDateChange}
+                      onChange={handleItemChange}
                     />
                   </div>
                   <div className="form-group row">

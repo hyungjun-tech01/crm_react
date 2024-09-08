@@ -244,7 +244,12 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
       key: "establishment_date",
       title: "company.establishment_date",
       detail: { type: "date", editing: handleDetailDateChange },
-    },
+    }, 
+    {
+      key: "site_id",
+      title: "common.site_id",
+      detail: { type: "label", editing: handleDetailChange },
+    },     
     {
       key: "ceo_name",
       title: "company.ceo_name",
@@ -273,7 +278,7 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
         options: salespersonsForSelection,
         editing: handleDetailSelectChange,
       },
-    },
+    },        
     {
       key: "application_engineer",
       title: "company.engineer",
@@ -295,7 +300,7 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
     {
       key: "memo",
       title: "common.memo",
-      detail: { type: "textarea", extra: "long", editing: handleDetailChange },
+      detail: { type: "textarea", extra:"long",  editing: handleDetailChange },
     },
   ];
 
