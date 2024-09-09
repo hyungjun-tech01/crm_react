@@ -608,12 +608,12 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setTaxInvoiceContents(tempInvoiceContents);
     openTaxInvoice();
 
-    // setTimeout(()=>{
-    //     let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
-    //         keyboard: false
-    //     });
-    //     myModal.show();
-    // }, 500);
+    setTimeout(()=>{
+        let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
+            keyboard: false
+        });
+        myModal.show();
+    }, 500);
   };
 
   const handleSaveTransaction = (value) => {

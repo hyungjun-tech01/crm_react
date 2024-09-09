@@ -33,9 +33,11 @@ import CompanyTransactionModel from "./CompanyTransactionModel";
 import CompanyTaxInvoiceModel from "./CompanyTaxInvoiceModel";
 import PurchaseAddModel from "../purchase/PurchaseAddModel";
 import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
+import TransactionEditModel from "../transactions/TransactionEditModel";
+import TaxInvoiceEditModel from "../taxinvoice/TaxInvoiceEditModel";
 
 
-const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice }) => {
+const CompanyDetailsModel = ({ init, handleInit }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
   const [checkState,  setCheckState] = useState({
@@ -73,6 +75,10 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
   //===== Handles to deal this component ==============================================
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentCompanyCode, setCurrentCompanyCode] = useState("");
+  const [ openTransaction, setOpenTransaction ] = useState(false);
+  const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
+  const [ taxInvoiceData, setTaxInvoiceData ] = useState(null);
+  const [ taxInvoiceContents, setTaxInvoiceContents ] = useState(null);
   const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const handleWindowWidthChange = useCallback((checked) => {
@@ -566,7 +572,7 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
                     id="company-details-transaction"
                   >
                     <CompanyTransactionModel
-                      openTransaction={openTransaction}
+                      openTransaction={setOpenTransaction}
                     />
                   </div>
                   <div
@@ -574,7 +580,7 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
                     id="company-details-taxinvoice"
                   >
                     <CompanyTaxInvoiceModel
-                      openTaxInvoice={openTaxInvoice}
+                      openTaxInvoice={setOpenTaxInvoice}
                     />
                   </div>
                 </div>
@@ -606,6 +612,23 @@ const CompanyDetailsModel = ({ init, handleInit, openTransaction, openTaxInvoice
       </div>
       <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} />
       <PurchaseDetailsModel />
+      <TransactionEditModel
+        open={openTransaction}
+        close={() =>setOpenTransaction(false)}
+        openTaxInvoice={()=>setOpenTaxInvoice(true)} 
+        setTaxInvoiceData={setTaxInvoiceData}
+        setTaxInvoiceContents={setTaxInvoiceContents}
+      />
+      <TaxInvoiceEditModel
+        open={openTaxInvoice}
+        close={() => {
+          setOpenTaxInvoice(false);
+          setTaxInvoiceData(null);
+          setTaxInvoiceContents(null);
+        }}
+        data={taxInvoiceData}
+        contents={taxInvoiceContents}
+      />
     </>
   );
 };
