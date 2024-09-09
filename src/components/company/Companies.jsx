@@ -274,6 +274,7 @@ const Companies = () => {
                       <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
                         <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.all')}>{t('common.all')}</button>
                         <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
+                        <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.company_name_en')}>{t('company.company_name_en')}</button>
                         <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.phone_no')}>{t('common.phone_no')}</button>
                         <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.address')}>{t('company.address')}</button>
                         <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.salesman')}>{t('company.salesman')}</button>

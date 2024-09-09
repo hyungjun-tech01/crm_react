@@ -166,6 +166,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
       lead_code: selectedLead.lead_code,
     };
 
+    console.log('tempEdited', tempEdited);
     const resp = modifyLead(tempEdited);
     resp.then(res => {
       if (res.result) {
@@ -192,6 +193,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
         modify_user: cookies.myLationCrmUserId,
         lead_code: selectedLead.lead_code,
       };
+      console.log('temp_all_saved', temp_all_saved);
       if (modifyLead(temp_all_saved)) {
         console.log(`Succeeded to modify lead`);
         let temp_update_company = {};

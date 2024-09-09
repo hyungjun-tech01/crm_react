@@ -174,7 +174,7 @@ export const LeadRepo = selector({
                 } else if(newLead.action_type === 'UPDATE'){
                     const currentLead = await snapshot.getPromise(atomCurrentLead);
                     delete newLead.action_type;
-                    delete newLead.company_code;
+                    delete newLead.company_code; 
                     delete newLead.modify_user;
                     const modifiedLead = {
                         ...currentLead,
@@ -183,6 +183,13 @@ export const LeadRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCurrentLead, modifiedLead);
+                    console.log('modifed lead',modifiedLead );
+
+                    // 혹시 몰라 추가. 중복 되었다고 메세지가 발생하여 
+                    //if (allLeads[modifiedLead.lead_code]) {
+                    //    console.log('modifiedLead.lead_code', modifiedLead.lead_code);
+                    //    delete allLeads[modifiedLead.lead_code];
+                   // }
 
                     //----- Update AllLeadObj --------------------------//
                     const updatedAllLeads = {

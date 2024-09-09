@@ -89,6 +89,7 @@ export const CompanyRepo = selector({
                 allCompanies = allCompanyList.filter(item =>
                     (item.company_name && item.company_name.includes(filterText))
                     || (item.company_phone_number && item.company_phone_number.includes(filterText))
+                    || (item.company_name_en && item.company_name_en.includes(filterText))
                     || (item.company_address && item.company_address.includes(filterText))
                     || (item.sales_resource && item.sales_resource.includes(filterText))
                     || (item.application_engineer && item.application_engineer.includes(filterText))
@@ -97,6 +98,10 @@ export const CompanyRepo = selector({
                 allCompanies = allCompanyList.filter(item =>
                     (item.company_name &&item.company_name.includes(filterText))
                 );
+            }else if(itemName === 'company.company_name_en' ){
+                allCompanies = allCompanyList.filter(item =>
+                    (item.company_name_en &&item.company_name_en.toLowerCase().includes(filterText.toLowerCase()))
+                );  
             }else if(itemName === 'common.phone_no' ){
                 allCompanies = allCompanyList.filter(item =>
                     (item.company_phone_number &&item.company_phone_number.includes(filterText))
