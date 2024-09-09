@@ -5,6 +5,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FiSearch } from "react-icons/fi";
 
+import { ConvertCurrency } from './functions';
 import PopupPostCode from "./PostCode";
 import SelectListModal from './SelectListModal';
 
@@ -248,7 +249,7 @@ const DetailCardItem = (props) => {
     const SharedProps = {
         name: name,
         addonBefore: <div className='detail-card-before'>{title}</div>,
-        value: currentValue,
+        value: !!detail['price'] ? ConvertCurrency(currentValue) : currentValue,
         disabled: detail.disabled ? detail.disabled : false,
     };
 
