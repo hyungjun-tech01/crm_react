@@ -57,7 +57,7 @@ const Consultings = () => {
 
   //===== Handles to deal 'Consultings' ========================================
   const [ nowLoading, setNowLoading ] = useState(true);
-  const [initAddConsulting, setInitAddConsulting] = useState(false);
+  const [ openAddConsulting, setOpenAddConsulting ] = useState(false);
   const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const [searchCondition, setSearchCondition] = useState("");
@@ -157,7 +157,13 @@ const Consultings = () => {
   // --- Functions used for Add New Consulting ------------------------------
   const handleAddNewConsultingClicked = useCallback(() => {
     setCurrentLead(defaultLead);
-    setInitAddConsulting(true);
+    setOpenAddConsulting(true);
+    setTimeout(()=>{
+      let myModal = new bootstrap.Modal(document.getElementById('add_consulting'), {
+        keyboard: false
+      })
+      myModal.show();
+    }, 500)
   }, []);
 
   const handleClickConsulting = useCallback((code) => {
@@ -349,8 +355,6 @@ const Consultings = () => {
                     <button
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                       id="add-task"
-                      data-bs-toggle="modal"
-                      data-bs-target="#add_consulting"
                       onClick={handleAddNewConsultingClicked}
                     >
                       {t('consulting.add_consulting')}
@@ -403,7 +407,7 @@ const Consultings = () => {
         <CompanyDetailsModel />
         <LeadDetailsModel />
         <ConsultingDetailsModel />
-        <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} />
+        <ConsultingAddModel open={openAddConsulting} handleOpen={setOpenAddConsulting} />
         <MultiQueryModal 
           title= {t('consulting.consulting_multi_query')}
           open={multiQueryModal}

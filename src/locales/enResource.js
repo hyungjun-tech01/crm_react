@@ -113,6 +113,7 @@ const enResource = {
             add_consulting:'Add Consulting',
             consulting:'Consultings',
             consulting_manage: 'Consulting Management',
+            consulting_product: 'Consulting Product',
             generator: 'Generator',
             information: 'Information',
             lead_time: 'Lead Time',
