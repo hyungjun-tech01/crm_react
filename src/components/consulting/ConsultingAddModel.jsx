@@ -31,7 +31,7 @@ import { CompanyRepo } from "../../repository/company";
 
 
 const ConsultingAddModel = (props) => {
-  const { init, handleInit } = props;
+  const { open, handleOpen } = props;
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId", "myLationCrmUserName"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -58,6 +58,7 @@ const ConsultingAddModel = (props) => {
 
 
   //===== Handles to edit 'ConsultingAddModel' ========================================
+  const [ needInit, setNeedInit ] = useState(true);
   const [consultingChange, setConsultingChange] = useState({});
   const selectedCategory = useRecoilValue(atomSelectedCategory);
 
@@ -90,7 +91,7 @@ const ConsultingAddModel = (props) => {
 };
 
   const initializeConsultingTemplate = useCallback(() => {
-    document.querySelector("#add_new_consulting_form").reset();
+    // document.querySelector("#add_new_consulting_form").reset();
 
     // set Receipt date -------------
     const tempDate = new Date();
@@ -115,6 +116,7 @@ const ConsultingAddModel = (props) => {
       modified['company_name'] = currentLead.company_name;
     };
     setConsultingChange(modified);
+    setNeedInit(false);
   }, [cookies.myLationCrmUserName, currentLead, setCurrentCompany, selectedCategory]);
 
 
@@ -141,6 +143,7 @@ const ConsultingAddModel = (props) => {
       if (res.result) {
         let thisModal = bootstrap.Modal.getInstance('#add_consulting');
         if (thisModal) thisModal.hide();
+        handleClose();
       } else {
         setMessage({ title: '저장 실패', message: '정보 저장에 실패하였습니다.' });
         setIsMessageModalOpen(true);
@@ -148,19 +151,21 @@ const ConsultingAddModel = (props) => {
     });
   }, [cookies.myLationCrmUserId, consultingChange, modifyConsulting]);
 
+  const handleClose = () => {
+    setNeedInit(true);
+  };
+
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    if (init && ((userState & 1) === 1)) {
+    if (open && needInit && ((userState & 1) === 1)) {
       console.log('[ConsultingAddModel] initialize!');
-      if (handleInit) handleInit(!init);
-      setTimeout(() => {
-        initializeConsultingTemplate();
-      }, 500);
+      if (handleOpen) handleOpen(!open);
+      initializeConsultingTemplate();
     };
-  }, [userState, init, initializeConsultingTemplate, handleInit]);
+  }, [open, userState, initializeConsultingTemplate, handleOpen, needInit]);
 
-  if (init)
+  if (needInit)
     return <div>&nbsp;</div>;
 
   return (
@@ -180,6 +185,7 @@ const ConsultingAddModel = (props) => {
           className="close md-close"
           data-bs-dismiss="modal"
           aria-label="Close"
+          onClick={handleClose}
         >
           <span aria-hidden="true">×</span>
         </button>
@@ -190,6 +196,7 @@ const ConsultingAddModel = (props) => {
               type="button"
               className="btn-close"
               data-bs-dismiss="modal"
+              onClick={handleClose}
             ></button>
           </div>
           <div className="modal-body">
@@ -223,7 +230,7 @@ const ConsultingAddModel = (props) => {
                   onChange={handleSelectChange}
                 />
                 <AddBasicItem
-                  title={t('consulting.product_type')}
+                  title={t('consulting.consulting_product')}
                   type='select'
                   name='product_type'
                   defaultValue={consultingChange.product_type}
@@ -290,16 +297,6 @@ const ConsultingAddModel = (props) => {
               </div>
               <div className="form-group row">
                 <AddBasicItem
-                  title={t('consulting.request_content')}
-                  type='textarea'
-                  long
-                  name='request_content'
-                  defaultValue={consultingChange.request_content}
-                  onChange={handleItemChange}
-                />
-              </div>
-              <div className="form-group row">
-                <AddBasicItem
                   title={t('consulting.status')}
                   type='select'
                   name='status'
@@ -318,8 +315,17 @@ const ConsultingAddModel = (props) => {
               </div>
               <div className="form-group row">
                 <AddBasicItem
+                  title={t('consulting.request_content')}
+                  type='textarea'
+                  row_no={5}
+                  name='request_content'
+                  defaultValue={consultingChange.request_content}
+                  onChange={handleItemChange}
+                />
+                <AddBasicItem
                   title={t('consulting.action_content')}
                   type='textarea'
+                  row_no={5}
                   name='action_content'
                   defaultValue={consultingChange.action_content}
                   onChange={handleItemChange}
@@ -338,6 +344,7 @@ const ConsultingAddModel = (props) => {
                   type="button"
                   className="btn btn-secondary btn-rounded"
                   data-bs-dismiss="modal"
+                  onClick={handleClose}
                 >
                   {t('common.cancel')}
                 </button>

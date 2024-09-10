@@ -15,8 +15,6 @@ import CompanyAddModel from "./CompanyAddMdel";
 import CompanyDetailsModel from "./CompanyDetailsModel";
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import { companyColumn } from "../../repository/company";
-import TransactionEditModel from "../transactions/TransactionEditModel";
-import TaxInvoiceEditModel from "../taxinvoice/TaxInvoiceEditModel";
 import { atomUserState } from "../../atoms/atomsUser";
 
 // import { MoreVert } from '@mui/icons-material';
@@ -38,10 +36,6 @@ const Companies = () => {
 
   //===== Handles to this =============================================================
   const [ nowLoading, setNowLoading ] = useState(true);
-  const [ openTransaction, setOpenTransaction ] = useState(false);
-  const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
-  const [ taxInvoiceData, setTaxInvoiceData ] = useState(null);
-  const [ taxInvoiceContents, setTaxInvoiceContents ] = useState(null);
   const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const [searchCondition, setSearchCondition] = useState("");
@@ -467,25 +461,6 @@ const Companies = () => {
         <CompanyDetailsModel
           init={initToEditCompany}
           handleInit={setInitToEditCompany}
-          openTransaction={() =>setOpenTransaction(true)}
-          openTaxInvoice={()=>setOpenTaxInvoice(true)}
-        />
-        <TransactionEditModel
-          open={openTransaction}
-          close={() =>setOpenTransaction(false)}
-          openTaxInvoice={()=>setOpenTaxInvoice(true)} 
-          setTaxInvoiceData={setTaxInvoiceData}
-          setTaxInvoiceContents={setTaxInvoiceContents}
-        />
-        <TaxInvoiceEditModel
-          open={openTaxInvoice}
-          close={() => {
-            setOpenTaxInvoice(false);
-            setTaxInvoiceData(null);
-            setTaxInvoiceContents(null);
-          }}
-          data={taxInvoiceData}
-          contents={taxInvoiceContents}
         />
         <MultiQueryModal
           title={t('company.company_multi_query')}

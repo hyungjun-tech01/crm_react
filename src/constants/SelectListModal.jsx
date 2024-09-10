@@ -62,7 +62,7 @@ const SelectListModal = (props) => {
                 tempItems = res.data.map((item, idx) => ({
                     ...item,
                     index: idx,
-                    component: <div>{item.lead_name} | {item.company_name}</div>,
+                    component: <div>{item.lead_name} / {item.company_name}</div>,
                 }));
             } else {
                 tempItems = res.data.map((item, idx) => ({

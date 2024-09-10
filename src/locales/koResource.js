@@ -115,6 +115,7 @@ const koResource = {
             add_consulting: '상담 등록',
             consulting: '상담',
             consulting_manage: '상담관리',
+            consulting_product: '상담 제품',
             generator: '작성자',
             information: '상담 정보',
             lead_time: '소요 시간',

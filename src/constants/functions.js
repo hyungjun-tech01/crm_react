@@ -1,4 +1,4 @@
-const delete_text = [' ','㈜','(주)','(유)','(의)','(학)'];
+const delete_text = [' ','㈜','(사)','(주)','(유)','(의)','(학)'];
 
 export const compareCompanyName = (name1, name2) => {
     // At first, remove text not used to sort from input name.
