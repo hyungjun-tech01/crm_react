@@ -214,7 +214,8 @@ const TaxInovices = () => {
 
     setTimeout(()=>{
       let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
-        keyboard: false
+        keyboard: true,
+        focus: true,
       })
       myModal.show();
     }, 1000);
@@ -227,7 +228,8 @@ const TaxInovices = () => {
 
     setTimeout(()=>{
       let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
-        keyboard: false
+        keyboard: true,
+        focus: true,
       })
       myModal.show();
     }, 1000);

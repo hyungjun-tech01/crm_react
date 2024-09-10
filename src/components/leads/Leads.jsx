@@ -157,7 +157,8 @@ const Leads = () => {
     setCurrentCompany(companyCode);   // 현재 company 세팅 
     
     let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
-      keyboard: false
+      keyboard: true,
+      focus: true,
     });
     myModal.show();
   }, [setCurrentCompany, setCurrentLead, setSelectedCategory]);

@@ -154,7 +154,8 @@ const Companies = () => {
     setSelectedCategory({category: 'company', item_code: id});
     setTimeout(()=>{
       let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
-        keyboard: false
+        keyboard: true,
+        focus: true,
       });
       myModal.show();
     }, 500);
@@ -376,92 +377,9 @@ const Companies = () => {
             </div>
           </div>
         </div>
-        {/*modal section starts here*/}
-        <div className="modal fade" id="add-new-list">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              {/* Modal Header */}
-              <div className="modal-header">
-                <h4 className="modal-title">Add New List View</h4>
-                <button type="button" className="close" data-bs-dismiss="modal">
-                  ×
-                </button>
-              </div>
-              {/* Modal body */}
-              <div className="modal-body">
-                <form className="forms-sample">
-                  <div className="form-group row">
-                    <label
-                      htmlFor="view-name"
-                      className="col-sm-4 col-form-label"
-                    >
-                      New View Name
-                    </label>
-                    <div className="col-sm-8">
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="view-name"
-                        placeholder="New View Name"
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group row pt-4">
-                    <label className="col-sm-4 col-form-label">
-                      Sharing Settings
-                    </label>
-                    <div className="col-sm-8">
-                      <div className="form-group">
-                        <div className="form-check">
-                          <label className="form-check-label">
-                            <input
-                              type="radio"
-                              className="form-check-input"
-                              name="optionsRadios"
-                              id="optionsRadios1"
-                              defaultValue
-                            />{" "}
-                            Just For Me <i className="input-helper" />
-                          </label>
-                        </div>
-                        <br />
-                        <div className="form-check">
-                          <label className="form-check-label">
-                            <input
-                              type="radio"
-                              className="form-check-input"
-                              name="optionsRadios"
-                              id="optionsRadios2"
-                              defaultValue="option2"
-                              defaultChecked
-                            />{" "}
-                            Share Filter with Everyone{" "}
-                            <i className="input-helper" />
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <button
-                      type="submit"
-                      className="btn btn-gradient-primary me-2"
-                    >
-                      Submit
-                    </button>
-                    <button className="btn btn-light">Cancel</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
         {/* Modal */}
         <CompanyAddModel init={initToAddCompany} handleInit={setInitToAddCompany} />
-        <CompanyDetailsModel
-          init={initToEditCompany}
-          handleInit={setInitToEditCompany}
-        />
+        <CompanyDetailsModel init={initToEditCompany} handleInit={setInitToEditCompany} />
         <MultiQueryModal
           title={t('company.company_multi_query')}
           open={multiQueryModal}

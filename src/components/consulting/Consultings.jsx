@@ -23,7 +23,6 @@ import {
   atomLeadState,
   atomConsultingState,
   atomSelectedCategory,
-  defaultLead,
 } from "../../atoms/atoms"; 
 import { compareCompanyName, compareText } from "../../constants/functions";
 import MultiQueryModal from "../../constants/MultiQueryModal";
@@ -156,11 +155,12 @@ const Consultings = () => {
 
   // --- Functions used for Add New Consulting ------------------------------
   const handleAddNewConsultingClicked = useCallback(() => {
-    setCurrentLead(defaultLead);
+    setCurrentLead();
     setOpenAddConsulting(true);
     setTimeout(()=>{
       let myModal = new bootstrap.Modal(document.getElementById('add_consulting'), {
-        keyboard: false
+        keyboard: true,
+        focus: true,
       })
       myModal.show();
     }, 500)
@@ -170,7 +170,8 @@ const Consultings = () => {
     setCurrentConsulting(code);
     setSelectedCategory({category: 'consulting', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
-      keyboard: false
+      keyboard: true,
+      focus: true,
     })
     myModal.show();
   }, []);
@@ -179,7 +180,8 @@ const Consultings = () => {
     setCurrentCompany(code);
     setSelectedCategory({category: 'company', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
-      keyboard: false
+      keyboard: true,
+      focus: true,
     })
     myModal.show();
   }, []);
@@ -188,7 +190,8 @@ const Consultings = () => {
     setCurrentLead(code);
     setSelectedCategory({category: 'lead', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
-      keyboard: false
+      keyboard: true,
+      focus: true,
     })
     myModal.show();
   }, []);

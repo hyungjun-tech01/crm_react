@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
 import { C_logo } from "../imagepath";
 import { option_locations, option_deal_type } from "../../constants/constants";
+import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import {
   atomCurrentCompany,
@@ -179,13 +180,6 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     setEditedDetailValues(null);
   }, []);
 
-  const handleClose = useCallback(() => {
-    setSelectedCategory({category: null, item_code: null});
-    setEditedDetailValues(null);
-    setCurrentCompany();
-    setCurrentCompanyCode("");
-  }, [setCurrentCompany]);
-
   const company_items_info = [
     {
       key: "company_address",
@@ -331,8 +325,9 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
       loadCompanyMAContracts(selectedCompany.company_code);
       setCurrentCompanyCode(selectedCompany.company_code);
       setCheckState({purchase:false, transaction:false, taxInvoice:false});
+      setEditedDetailValues(null);
     }
-  }, [selectedCompany, currentCompanyCode, loadCompanyMAContracts]);
+  }, [selectedCompany, currentCompanyCode, init]);
 
   //===== useEffect for Purchase =======================================================
   useEffect(() => {
@@ -412,7 +407,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
       console.log('[CompanyDetailModel] all needed data is loaded');
       handleInit(false);
     };
-  }, [checkState, userState, handleInit]);
+  }, [checkState, userState, handleInit, init]);
 
   if (init)
     return <div>&nbsp;</div>;
@@ -469,7 +464,6 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
                 type="button"
                 className="btn-close xs-close"
                 data-bs-dismiss="modal"
-                onClick={handleClose}
               />
             </div>
             <div className="modal-body">

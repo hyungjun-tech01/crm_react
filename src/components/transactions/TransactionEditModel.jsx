@@ -610,7 +610,8 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
 
     setTimeout(()=>{
         let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
-            keyboard: false
+            keyboard: true,
+            focus: true,
         });
         myModal.show();
     }, 500);

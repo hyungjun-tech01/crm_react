@@ -22,7 +22,8 @@ const LeadConsultingModel = ({ handleInitAddConsulting }) => {
     
     const transferToOtherModal = (id) => {
         let myModal = new bootstrap.Modal(document.getElementById(id), {
-            keyboard: false
+            keyboard: true,
+            focus: true,
         });
         myModal.show();
     };

@@ -237,12 +237,12 @@ const DetailCardItem = (props) => {
     const { title, name, defaultValue, groupValue, edited, detail} = props;
     
     const currentValue = (edited && (edited[name] !== undefined) && (edited[name] !== null))
-            ? edited[name]
-            : (defaultValue === null ? "" :
-                (detail.type === 'date'
-                    ? ((new Date(defaultValue)).toString() === 'Invalid Date' ? "" : new Date(defaultValue))
-                    : defaultValue
-                ));
+        ? edited[name]
+        : (defaultValue === null ? "" :
+            (detail.type === 'date'
+                ? ((new Date(defaultValue)).toString() === 'Invalid Date' ? "" : new Date(defaultValue))
+                : defaultValue
+            ));
 
     const widthValue = detail['extra'] ? ( detail.extra === 'long' ? 768 : (detail.extra === 'modal' ? 470 : 380)) : 380;
 
