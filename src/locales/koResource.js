@@ -107,6 +107,8 @@ const koResource = {
             zip_code:'고객우편번호',
             _loading_add: '신규 고객 추가를 위한 기반 정보를 불러오고 있습니다.',
             _loading_detail: '고객에 대한 상세 정보를 불러오고 있습니다.',
+            on_time :'On Time',
+            not_on_time :'Not On Time',
         },
         consulting:{
             action_content: '상담 결과',

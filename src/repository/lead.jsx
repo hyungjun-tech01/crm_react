@@ -174,7 +174,7 @@ export const LeadRepo = selector({
                 } else if(newLead.action_type === 'UPDATE'){
                     const currentLead = await snapshot.getPromise(atomCurrentLead);
                     delete newLead.action_type;
-                    delete newLead.company_code; 
+                    delete newLead.lead_code; 
                     delete newLead.modify_user;
                     const modifiedLead = {
                         ...currentLead,
@@ -183,13 +183,6 @@ export const LeadRepo = selector({
                         recent_user: data.out_recent_user,
                     };
                     set(atomCurrentLead, modifiedLead);
-                    console.log('modifed lead',modifiedLead );
-
-                    // 혹시 몰라 추가. 중복 되었다고 메세지가 발생하여 
-                    //if (allLeads[modifiedLead.lead_code]) {
-                    //    console.log('modifiedLead.lead_code', modifiedLead.lead_code);
-                    //    delete allLeads[modifiedLead.lead_code];
-                   // }
 
                     //----- Update AllLeadObj --------------------------//
                     const updatedAllLeads = {
@@ -200,18 +193,36 @@ export const LeadRepo = selector({
 
                     //----- Update FilteredLeadArray --------------------//
                     const filteredAllLeads = await snapshot.getPromise(atomFilteredLeadArray);
-                    const foundIdx = filteredAllLeads.filter(item => item.lead_code === modifiedLead.lead_code);
-                    if(foundIdx !== -1){
+                    // const foundIdx = filteredAllLeads.filter(item => item.lead_code === modifiedLead.lead_code);
+                    // if(foundIdx !== -1){
+                    //     const updatedFiltered = [
+                    //         ...filteredAllLeads.slice(0, foundIdx),
+                    //         modifiedLead,
+                    //         ...filteredAllLeads.slice(foundIdx + 1,),
+                    //     ];
+                    //     set(atomFilteredLeadArray, updatedFiltered);
+                    //     return {result: true};
+                    // } else {
+                    //     return {result:false, data: "No Data"};
+                    // };
+
+                    // findIndex를 사용하여 lead_code에 맞는 항목의 인덱스를 찾음
+                    const foundIdx = filteredAllLeads.findIndex(item => item.lead_code === modifiedLead.lead_code);
+
+                    if (foundIdx !== -1) {
+                        // 해당 인덱스를 기반으로 배열을 업데이트
                         const updatedFiltered = [
                             ...filteredAllLeads.slice(0, foundIdx),
-                            modifiedLead,
-                            ...filteredAllLeads.slice(foundIdx + 1,),
+                            modifiedLead,  // 해당 항목을 수정된 항목으로 교체
+                            ...filteredAllLeads.slice(foundIdx + 1),
                         ];
-                        set(atomFilteredLeadArray, updatedFiltered);
-                        return {result: true};
+
+                        set(atomFilteredLeadArray, updatedFiltered);  // 배열을 업데이트
+                        return { result: true };
                     } else {
-                        return {result:false, data: "No Data"};
-                    };
+                        return { result: false, data: "No Data" };  // 해당 lead_code를 찾지 못했을 때
+                    }
+
                 }
             }
             catch(err){

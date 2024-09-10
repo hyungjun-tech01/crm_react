@@ -107,6 +107,8 @@ const enResource = {
             zip_code:'Lead Postal Code',
             _loading_add: 'Now, loading the needed data to add new lead ...',
             _loading_detail: 'Now, loading the details of lead...',
+            on_time :'On Time',
+            not_on_time :'Not On Time',            
         },
         consulting:{
             action_content: 'Consulting Conclusion',

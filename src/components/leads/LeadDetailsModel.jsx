@@ -159,22 +159,34 @@ const LeadDetailsModel = ({init, handleInit}) => {
   );
 
   const handleChangeStatus = (newStatus) => {
-    const tempEdited = {
-      status: newStatus,
-      action_type: "UPDATE",
-      modify_user: cookies.myLationCrmUserId,
-      lead_code: selectedLead.lead_code,
+    if (newStatus !== selectedLead['status']) {
+      const tempEdited = {
+        ...editedDetailValues,
+        ['status']: newStatus,
+      };
+      setEditedDetailValues(tempEdited);
+    } else {
+      if (editedDetailValues['status']) {
+        delete editedDetailValues['status'];
+      };
     };
 
-    console.log('tempEdited', tempEdited);
-    const resp = modifyLead(tempEdited);
-    resp.then(res => {
-      if (res.result) {
-        console.log(`Succeeded to lead change status`);
-      } else {
-        console.error('Failed to modify lead : ', res.data);
-      };
-    })
+    // const tempEdited = {
+    //   status: newStatus,
+    //   action_type: "UPDATE",
+    //   modify_user: cookies.myLationCrmUserId,
+    //   lead_code: selectedLead.lead_code,
+    // };
+
+    // console.log('tempEdited', tempEdited);
+    // const resp = modifyLead(tempEdited);
+    // resp.then(res => {
+    //   if (res.result) {
+    //     console.log(`Succeeded to lead change status`);
+    //   } else {
+    //     console.error('Failed to modify lead : ', res.data);
+    //   };
+    // })
   };
 
   const handleClose = useCallback(() => {
@@ -457,35 +469,37 @@ const LeadDetailsModel = ({init, handleInit}) => {
                     className="cd-breadcrumb triangle nav nav-tabs w-100 crms-steps"
                     role="tablist"
                   >
-                    <li role="presentation">
+                    <li role="presentation"  style={{ flex: 1, textAlign: "center" }}>
                       <Link
-                        to="#not-contacted"
-                        className={selectedLead.status === "Not Contacted" || selectedLead.status === null ? "active" : ""}
+                        to="#not-on-time"
+                        className={selectedLead.status === "Not On Time" || selectedLead.status === null ? "active" : ""}
+                        style={{ width: "300px" }} 
                         aria-controls="not-contacted"
                         role="tab"
                         data-bs-toggle="tab"
-                        aria-expanded={selectedLead.status === "Not Contacted" ? "true" : "false"}
-                        onClick={() => handleChangeStatus("Not Contacted")}
+                        aria-expanded={selectedLead.status === "Not On Time" ? "true" : "false"}
+                        onClick={() => handleChangeStatus("Not On Time")}
                       >
                         <span className="octicon octicon-light-bulb" />
-                        {t('lead.not_contacted')}
+                        {t('lead.not_on_time')}
                       </Link>
                     </li>
-                    <li role="presentation" className="">
+                    <li role="presentation" className=""  style={{ flex: 1, textAlign: "center" }}>
                       <Link
-                        to="#attempted-contact"
-                        className={selectedLead.status === "Attempted Contact" ? "active" : "inactive"}
+                        to="#on-time"
+                        className={selectedLead.status === "On Time" ? "active" : "inactive"}
+                        style={{ width: "300px" }} 
                         aria-controls="attempted-contact"
                         role="tab"
                         data-bs-toggle="tab"
-                        aria-expanded={selectedLead.status === "Attempted Contact" ? "true" : "false"}
-                        onClick={() => handleChangeStatus("Attempted Contact")}
+                        aria-expanded={selectedLead.status === "On Time" ? "true" : "false"}
+                        onClick={() => handleChangeStatus("On Time")}
                       >
                         <span className="octicon octicon-diff-added" />
-                        {t('lead.attempted_contact')}
+                        {t('lead.on_time')}
                       </Link>
                     </li>
-                    <li role="presentation" className="">
+                    {/* <li role="presentation" className="">
                       <Link
                         to="#contact"
                         className={selectedLead.status === "Contact" ? "active" : "inactive"}
@@ -512,7 +526,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
                         <span className="octicon octicon-comment-discussion" />
                         {t('lead.converted')}
                       </Link>
-                    </li>
+                    </li> */}
                   </ul>
                 </div>
               </div>
