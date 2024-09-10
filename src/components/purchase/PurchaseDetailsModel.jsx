@@ -165,7 +165,7 @@ const PurchaseDetailsModel = () => {
     { key: 'price', title: 'common.price_1', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'invoice_number', title: 'purchase.invoice_no', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'status', title: 'common.status', detail: { type: 'label', editing: handleDetailChange } },
-    { key: 'purchase_memo', title: 'common.memo', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
+    // { key: 'purchase_memo', title: 'common.memo', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
   ];
 
 
@@ -453,24 +453,37 @@ const PurchaseDetailsModel = () => {
                       <div className="tasks__item crms-task-item active">
                         <div className="row">
                           <div className="card pt-3 mb-2">
-                            <Space
-                              align="start"
-                              direction="horizontal"
-                              size="small"
-                              style={{ display: 'flex', marginBottom: '0.5rem' }}
-                              wrap
-                            >
-                              {purchase_items_info.map((item, index) =>
+                            <div style={{display:'flex', justifyContent:'space-between'}}>
+                              <div style={{flex: '1'}}>
+                                <Space
+                                  align="start"
+                                  direction="horizontal"
+                                  size="small"
+                                  style={{ display: 'flex', marginBottom: '0.5rem' }}
+                                  wrap
+                                >
+                                  {purchase_items_info.map((item, index) =>
+                                    <DetailCardItem
+                                      key={index}
+                                      defaultValue={currentPurchase[item.key]}
+                                      edited={editedDetailValues}
+                                      name={item.key}
+                                      title={t(item.title)}
+                                      detail={item.detail}
+                                    />
+                                  )}
+                                </Space>
+                              </div>
+                              <div style={{flex: '0 768px'}}>
                                 <DetailCardItem
-                                  key={index}
-                                  defaultValue={currentPurchase[item.key]}
+                                  defaultValue={currentPurchase['purchase_memo']}
                                   edited={editedDetailValues}
-                                  name={item.key}
-                                  title={t(item.title)}
-                                  detail={item.detail}
+                                  name='purchase_memo'
+                                  title={t('common.memo')}
+                                  detail={{ type: 'textarea', extra: 'long', row_no: 14, editing: handleDetailChange }}
                                 />
-                              )}
-                            </Space>
+                              </div>
+                            </div>
                           </div>
                         </div>
                         <div className="row">
