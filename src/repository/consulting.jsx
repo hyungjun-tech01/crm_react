@@ -62,10 +62,16 @@ export const ConsultingTimeTypes = [
 
 export const consultingColumn = [
     { value: 'company_name', label: '회사명'},
+    { value: 'receiver', label: '접수자'},
     { value: 'consulting_type', label: '상담 유형'},
+    { value: 'product_type', label: '물품 유형'},
     { value: 'lead_name', label: '고객명'},
     { value: 'mobile_number', label: '고객휴대전화'},
-    { value: 'region', label: '전화번호'},
+    { value: 'phone_number', label: '전화번호'},
+    { value: 'department', label: '부서'},
+    { value: 'position', label: '직위'},
+    { value: 'email', label: '전자우편'},
+    { value: 'request_type', label: '요청유형'},
     { value: 'request_content', label: '상담내역'},
     { value: 'action_content', label: '상담 결과'},
 ];
