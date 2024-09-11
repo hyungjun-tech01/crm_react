@@ -239,19 +239,20 @@ const ConsultingDetailsModel = () => {
                           className="nav-link active"
                           to="#not-contact-task-details"
                           data-bs-toggle="tab"
+                          style={{width:"50%"}}
                         >
                           {t('common.details')}
                         </Link>
                       </li>
-                      <li className="nav-item">
+                      {/*<li className="nav-item">
                         <Link
                           className="nav-link"
                           to="#not-contact-task-related"
                           data-bs-toggle="tab"
                         >
                           {t('common.related')}
-                        </Link>
-                      </li>
+                        </Link> 
+                      </li> */}
                     </ul>
                     <div className="tab-content">
                       <div
