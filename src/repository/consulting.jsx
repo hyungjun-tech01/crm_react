@@ -62,7 +62,7 @@ export const ConsultingTimeTypes = [
 
 export const consultingColumn = [
     { value: 'company_name', label: '회사명'},
-    { value: 'receiver', label: '접수자'},
+    { value: 'receiver', label: '상담진행자'},
     { value: 'consulting_type', label: '상담 유형'},
     { value: 'product_type', label: '물품 유형'},
     { value: 'lead_name', label: '고객명'},
@@ -72,6 +72,10 @@ export const consultingColumn = [
     { value: 'position', label: '직위'},
     { value: 'email', label: '전자우편'},
     { value: 'request_type', label: '요청유형'},
+    { value: 'status', label: '상태'},
+    { value: 'lead_time', label: '소요시간'},
+    { value: 'sales_representative', label: '고객영업담당'},
+    { value: 'application_engineer', label: '기술담당'},
     { value: 'request_content', label: '상담내역'},
     { value: 'action_content', label: '상담 결과'},
 ];
@@ -255,20 +259,29 @@ export const ConsultingRepo = selector({
                     set(atomAllConsultingObj, updatedAllObj);
 
                     //----- Update FilteredConsultings -----------------------//
-                    set(atomFilteredConsultingArray, Object.values(updatedAllObj));
+                    //set(atomFilteredConsultingArray, Object.values(updatedAllObj));
+
+                    //----- Update FilteredLeadArray --------------------//
+                    const filteredAllConsultings = await snapshot.getPromise(atomFilteredConsultingArray);
+                    const updatedFiltered = [
+                        updatedNewConsulting,
+                        ...filteredAllConsultings
+                    ];
+                    set(atomFilteredConsultingArray, updatedFiltered);
+                    return {result: true};
 
                     //----- Update ConsultingByLead -----------------------//
-                    const currentLead = await snapshot.getPromise(atomCurrentLead);
-                    if((currentLead !== defaultLead)
-                        && (currentLead.lead_code === updatedNewConsulting.lead_code))
-                    {
-                        const consultingByCompany = await snapshot.getPromise(atomConsultingByLead);
-                        const updated = [
-                            updatedNewConsulting,
-                            ...consultingByCompany,
-                        ];
-                        set(atomConsultingByLead, updated);
-                    };
+                    //const currentLead = await snapshot.getPromise(atomCurrentLead);
+                    //if((currentLead !== defaultLead)
+                    //    && (currentLead.lead_code === updatedNewConsulting.lead_code))
+                    //{
+                    //    const consultingByCompany = await snapshot.getPromise(atomConsultingByLead);
+                    //    const updated = [
+                    //        updatedNewConsulting,
+                    //        ...consultingByCompany,
+                    //    ];
+                    //    set(atomConsultingByLead, updated);
+                    //};
 
                     return {result: true};
                 } else if(newConsulting.action_type === 'UPDATE'){

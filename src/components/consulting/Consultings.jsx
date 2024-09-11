@@ -79,12 +79,14 @@ const Consultings = () => {
   // from date + to date picking 만들기 
 
   const initialState = {
+    receipt_date: { fromDate: oneYearAgo, toDate: today, checked: false },
     modify_date: { fromDate: oneYearAgo, toDate: today, checked: true },
   }
 
   const [dates, setDates] = useState(initialState);
 
   const dateRangeSettings = [
+    { label: t('consulting.receipt_date'), stateKey: 'receipt_date', checked: false },
     { label: t('common.modify_date'), stateKey: 'modify_date', checked: true },
   ];
 
