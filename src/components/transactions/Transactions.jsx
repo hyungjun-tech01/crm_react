@@ -212,8 +212,7 @@ const Transactions = () => {
 
     setTimeout(() => {
       let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
-        keyboard: true,
-        focus: true,
+        keyboard: false
       })
       myModal.show();
     }, 500);
@@ -227,8 +226,7 @@ const Transactions = () => {
 
     setTimeout(() => {
       let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
-        keyboard: true,
-        focus: true,
+        keyboard: false
       })
       myModal.show();
     }, 500);

@@ -151,8 +151,7 @@ const Purchase = () => {
     setCurrentPurchase(code);
     setSelectedCategory({category: 'purchase', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('purchase-details'), {
-      keyboard: true,
-      focus: true,
+      keyboard: false
     })
     myModal.show();
   },[setCurrentPurchase, setSelectedCategory]);

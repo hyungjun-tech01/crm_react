@@ -25,8 +25,7 @@ const CompanyTaxInvoiceModel = (props) => {
 
     const transferToOtherModal = (id) => {
         let myModal = new bootstrap.Modal(document.getElementById(id), {
-            keyboard: true,
-            focus: true,
+            keyboard: false
         });
         myModal.show();
     };

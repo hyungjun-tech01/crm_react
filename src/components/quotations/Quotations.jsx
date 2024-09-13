@@ -155,7 +155,7 @@ const Quotations = () => {
   //   setCurrentCompany(code);
   //   setSelectedCategory({category: 'company', item_code: code});
   //   let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
-  //     keyboard: true
+  //     keyboard: false
   //   })
   //   myModal.show();
   // }, []);
@@ -165,7 +165,7 @@ const Quotations = () => {
   //   setCurrentLead(code);
   //   setSelectedCategory({category: 'lead', item_code: code});
   //   let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
-  //     keyboard: true
+  //     keyboard: false
   //   })
   //   myModal.show();
   // }, []);
@@ -174,8 +174,7 @@ const Quotations = () => {
     setCurrentQuotation(code);
     setSelectedCategory({category: 'quotation', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('quotation-details'), {
-      keyboard: true,
-      focus: true,
+      keyboard: false
     })
     myModal.show();
   }, []);
