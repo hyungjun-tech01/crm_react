@@ -24,7 +24,10 @@ import {
 import {
   QuotationRepo,
   QuotationTypes,
-  QuotationSendTypes
+  QuotationSendTypes,
+  quotationDelivery,
+  quotationExpiry,
+  quotationPayment
 } from "../../repository/quotation";
 
 import AddBasicItem from "../../constants/AddBasicItem";
@@ -880,10 +883,11 @@ const QuotationAddModel = (props) => {
               <div className="form-group row">
                 <AddBasicItem
                   title={t('quotation.expiry_date')}
-                  type='text'
+                  type='select'
                   name='quotation_expiration_date'
+                  options={quotationExpiry}
                   defaultValue={quotationChange.quotation_expiration_date}
-                  onChange={handleItemChange}
+                  onChange={handleSelectChange}
                 />
                 <AddBasicItem
                   title={t('quotation.confirm_date')}
@@ -903,10 +907,11 @@ const QuotationAddModel = (props) => {
                 />
                 <AddBasicItem
                   title={t('quotation.delivery_period')}
-                  type='text'
+                  type='select'
                   name='delivery_period'
+                  options={quotationDelivery}
                   defaultValue={quotationChange.delivery_period}
-                  onChange={handleItemChange}
+                  onChange={handleSelectChange}
                 />
               </div>
               <div className="form-group row">
@@ -929,10 +934,11 @@ const QuotationAddModel = (props) => {
               <div className="form-group row">
                 <AddBasicItem
                   title={t('quotation.payment_type')}
-                  type='text'
+                  type='select'
                   name='payment_type'
+                  options={quotationPayment}
                   defaultValue={quotationChange.payment_type}
-                  onChange={handleItemChange}
+                  onChange={handleSelectChange}
                 />
                 <AddBasicItem
                   title={t('common.status')}

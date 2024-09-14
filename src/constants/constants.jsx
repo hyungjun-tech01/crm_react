@@ -56,4 +56,4 @@ export const option_industry_type = {
         {value: 'defence', label: '방위산업'},
         {value: 'education', label: '교육'},
     ],
-}
+};

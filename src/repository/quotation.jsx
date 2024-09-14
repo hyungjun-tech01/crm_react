@@ -32,6 +32,33 @@ export const quotationColumn = [
     { value: 'quotation_contents', label: '견적 내용'},
 ];
 
+export const quotationExpiry = [
+    { value: '5일', label: '견적일로부터 5일 이내'},
+    { value: '10일', label: '견적일로부터 10일 이내'},
+    { value: '15일', label: '견적일로부터 15일 이내'},
+    { value: '20일', label: '견적일로부터 20일 이내'},
+    { value: '30일', label: '견적일로부터 30일 이내'},
+    { value: '45일', label: '견적일로부터 45일 이내'},
+    { value: '60일', label: '견적일로부터 60일 이내'},
+];
+
+export const quotationDelivery = [
+    { value: '5일', label: '발주일로부터 5일 이내'},
+    { value: '10일', label: '발주일로부터 10일 이내'},
+    { value: '15일', label: '발주일로부터 15일 이내'},
+    { value: '20일', label: '발주일로부터 20일 이내'},
+    { value: '30일', label: '발주일로부터 30일 이내'},
+    { value: '45일', label: '발주일로부터 45일 이내'},
+    { value: '60일', label: '발주일로부터 60일 이내'},
+];
+
+export const quotationPayment = [
+    { value: 'ThisDayCard', label: '당일 카드 결제'},
+    { value: 'ThisDayCash', label: '당일 현금 결제'},
+    { value: 'ThisMonthLastDayCash', label: '당월말 현금 결제'},
+    { value: 'NextMonthLastDayCash', label: '익월말 현금 결제'},
+];
+
 
 export const QuotationRepo = selector({
     key: "QuotationRepository",

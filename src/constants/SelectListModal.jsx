@@ -109,6 +109,7 @@ const SelectListModal = (props) => {
                     modifiedData['mobile_number'] = data.mobile_number;
                     modifiedData['phone_number'] = data.phone_number;
                     modifiedData['email'] = data.email;
+                    modifiedData['sales_representative'] = data.sales_resource;
                 };
                 break;
             case 'transaction':
