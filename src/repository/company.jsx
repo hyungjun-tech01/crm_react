@@ -184,7 +184,7 @@ export const CompanyRepo = selector({
 
                     //----- Update FilteredCompanies -----------------------//
                     const filteredAllCompanies = await snapshot.getPromise(atomFilteredCompanyArray);
-                    const foundIdx = filteredAllCompanies.filter(item => item.company_code === modifiedCompany.company_code);
+                    const foundIdx = filteredAllCompanies.findIndex(item => item.company_code === modifiedCompany.company_code);
                     if(foundIdx !== -1){
                         const updatedFiltered = [
                             ...filteredAllCompanies.slice(0, foundIdx),
@@ -192,8 +192,10 @@ export const CompanyRepo = selector({
                             ...filteredAllCompanies.slice(foundIdx + 1,),
                         ];
                         set(atomFilteredCompanyArray, updatedFiltered);
-                    };
-                    return {result:true};
+                        return { result: true };
+                    } else {
+                        return { result: false, data: "No Data" };  // 해당 lead_code를 찾지 못했을 때
+                    }
                 }
             }
             catch(err){

@@ -193,18 +193,6 @@ export const LeadRepo = selector({
 
                     //----- Update FilteredLeadArray --------------------//
                     const filteredAllLeads = await snapshot.getPromise(atomFilteredLeadArray);
-                    // const foundIdx = filteredAllLeads.filter(item => item.lead_code === modifiedLead.lead_code);
-                    // if(foundIdx !== -1){
-                    //     const updatedFiltered = [
-                    //         ...filteredAllLeads.slice(0, foundIdx),
-                    //         modifiedLead,
-                    //         ...filteredAllLeads.slice(foundIdx + 1,),
-                    //     ];
-                    //     set(atomFilteredLeadArray, updatedFiltered);
-                    //     return {result: true};
-                    // } else {
-                    //     return {result:false, data: "No Data"};
-                    // };
 
                     // findIndex를 사용하여 lead_code에 맞는 항목의 인덱스를 찾음
                     const foundIdx = filteredAllLeads.findIndex(item => item.lead_code === modifiedLead.lead_code);
