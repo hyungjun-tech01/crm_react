@@ -120,13 +120,32 @@ const ConsultingAddModel = (props) => {
   }, [cookies.myLationCrmUserName, currentLead, setCurrentCompany, selectedCategory]);
 
 
-  const handleAddNewConsulting = useCallback(() => {
+  const handleAddNewConsulting = () => {
     // Check data if they are available
-    if (consultingChange.lead_name === null
-      || consultingChange.lead_name === ''
-      || consultingChange.consulting_type === null
-    ) {
-      setMessage({ title: '필요 정보 누락', message: '필요 입력 항목이 누락되었습니다.' });
+    let numberOfNoInputItems = 0;
+    let noReceiptDate = false;
+    if(!consultingChange.receipt_date || consultingChange.receipt_date === ""){
+      numberOfNoInputItems++;
+      noReceiptDate = true;
+    };
+    let noLeadName = false;
+    if(!consultingChange.lead_name || consultingChange.lead_name === ""){
+      numberOfNoInputItems++;
+      noLeadName = true;
+    };
+    if(numberOfNoInputItems > 0){
+      const contents = (
+        <>
+          <p>하기 정보는 필수 입력 사항입니다.</p>
+          { noReceiptDate && <div> - 접수 일자</div> }
+          { noLeadName && <div> - 고객 이름</div> }
+        </>
+      );
+      const tempMsg = {
+        title: t('comment.title_check'),
+        message: contents,
+      };
+      setMessage(tempMsg);
       setIsMessageModalOpen(true);
       return;
     };
@@ -149,7 +168,7 @@ const ConsultingAddModel = (props) => {
         setIsMessageModalOpen(true);
       };
     });
-  }, [cookies.myLationCrmUserId, consultingChange, modifyConsulting]);
+  };
 
   const handleClose = () => {
     setNeedInit(true);

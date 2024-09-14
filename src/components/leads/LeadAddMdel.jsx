@@ -72,22 +72,43 @@ const LeadAddModel = (props) => {
         // });
     }, []);
 
-    const handleAddNewLead = useCallback((event) => {
+    const handleAddNewLead = () => {
         // Check data if they are available
-        if (leadChange.lead_name === null
-            || leadChange.lead_name === '') {
-            const tempMsg = {
-                title: t('comment.title_check'),
-                message: "고객이름은 필수 입력 항목입니다.",
-            };
-            setMessage(tempMsg);
-            setIsMessageModalOpen(true);
-            return;
+        let numberOfNoInputItems = 0;
+        let noLeadName = false;
+        if(!leadChange.lead_name || leadChange.lead_name === ""){
+            numberOfNoInputItems++;
+            noLeadName = true;
         };
-        if (leadChange.company_code === null) {
+        let noCompanyCode = false;
+        if(!leadChange.company_code || leadChange.company_code === ""){
+            numberOfNoInputItems++;
+            noCompanyCode = true;
+        };
+        let noLeadMobile = false;
+        if(!leadChange.mobile_number || leadChange.mobile_number === ""){
+            numberOfNoInputItems++;
+            noLeadMobile = true;
+        };
+        let noLeadEmail = false;
+        if(!leadChange.email || leadChange.email === ""){
+            numberOfNoInputItems++;
+            noLeadEmail = true;
+        };
+
+        if(numberOfNoInputItems > 0){
+            const contents = (
+              <>
+                <p>하기 정보는 필수 입력 사항입니다.</p>
+                { noLeadName && <div> - 고객 이름</div> }
+                { noCompanyCode && <div> - 회사 이름</div> }
+                { noLeadMobile && <div> - 고객 휴대전화</div> }
+                { noLeadEmail && <div> - 고객 Email(1)</div> }
+              </>
+            );
             const tempMsg = {
                 title: t('comment.title_check'),
-                message: "고객의 회사 정보는 필수 입력 항목입니다.",
+                message: contents,
             };
             setMessage(tempMsg);
             setIsMessageModalOpen(true);
@@ -116,7 +137,7 @@ const LeadAddModel = (props) => {
                 setIsMessageModalOpen(true);
             }
         });
-    }, [cookies.myLationCrmUserId, initializeLeadTemplate, leadChange, modifyLead]);
+    };
 
     useEffect(() => {
         if (init && (userState & 1) === 1) {
@@ -202,6 +223,7 @@ const LeadAddModel = (props) => {
                                             title={t('company.company_name')}
                                             category='lead'
                                             name='company_name'
+                                            required
                                             defaultValue={leadChange.company_name}
                                             edited={leadChange}
                                             setEdited={handleCompanySelected}
@@ -239,6 +261,7 @@ const LeadAddModel = (props) => {
                                             title={t('lead.mobile')}
                                             type='text'
                                             name="mobile_number"
+                                            required
                                             defaultValue={leadChange.mobile_number}
                                             onChange={handleLeadChange}
                                         />
@@ -274,6 +297,7 @@ const LeadAddModel = (props) => {
                                             name="email"
                                             type='text'
                                             title={t('lead.email1')}
+                                            required
                                             defaultValue={leadChange.email}
                                             onChange={handleLeadChange}
                                         />

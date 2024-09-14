@@ -69,52 +69,84 @@ const CompanyAddModel = (props) => {
     setCompanyChange(modifiedData);
   };
 
-  const handleAddNewCompany = useCallback(
-    (event) => {
-      // Check data if they are available
-      if (
-        !!companyChange.company_name || companyChange.company_name === ""
-        || !!companyChange.company_address || companyChange.company_address === ""
-      ) {
+  const handleAddNewCompany = () => {
+    // Check data if they are available
+    let numberOfNoInputItems = 0;
+    let noCompanyName = false;
+    if(!companyChange.company_name || companyChange.company_name === ""){
+      numberOfNoInputItems++;
+      noCompanyName = true;
+    };
+    let noCompanyAddress = false;
+    if(!companyChange.company_address || companyChange.company_address === ""){
+      numberOfNoInputItems++;
+      noCompanyAddress = true;
+    };
+    let noCompanyFaxNumber = false;
+    if(!companyChange.company_fax_number || companyChange.company_fax_number === ""){
+      numberOfNoInputItems++;
+      noCompanyFaxNumber = true;
+    };
+    let noCompanyHomepage = false;
+    if(!companyChange.homepage || companyChange.homepage === ""){
+      numberOfNoInputItems++;
+      noCompanyHomepage = true;
+    };
+    let noCompanySiteId = false;
+    if(!companyChange.site_id || companyChange.site_id === ""){
+      numberOfNoInputItems++;
+      noCompanySiteId = true;
+    };
+    let noSalesResource = false;
+    if(!companyChange.sales_resource || companyChange.sales_resource === ""){
+      numberOfNoInputItems++;
+      noSalesResource = true;
+    };
+
+    if(numberOfNoInputItems > 0){
+      const contents = (
+        <>
+          <p>하기 정보는 필수 입력 사항입니다.</p>
+          { noCompanyName && <div> - 회사 이름</div> }
+          { noCompanyAddress && <div> - 회사 주소</div> }
+          { noCompanyFaxNumber && <div> - 회사 팩스 번호</div> }
+          { noCompanyHomepage && <div> - 회사 홈페이지</div> }
+          { noCompanySiteId && <div> - 회사 Site ID</div> }
+          { noSalesResource && <div> - 담당 영업 사원</div> }
+        </>
+      );
+      const tempMsg = {
+        title: t('comment.title_check'),
+        message: contents,
+      };
+      setMessage(tempMsg);
+      setIsMessageModalOpen(true);
+      return;
+    };
+
+    const newComData = {
+      ...companyChange,
+      action_type: "ADD",
+      counter: 0,
+      modify_user: cookies.myLationCrmUserId,
+    };
+    console.log(`[ handleAddNewCompany ]`, newComData);
+    const result = modifyCompany(newComData);
+    result.then((res) => {
+      if (res.result) {
+        initializeCompanyTemplate();
+        let thisModal = bootstrap.Modal.getInstance('#add_company');
+        if (thisModal) thisModal.hide();
+      } else {
         const tempMsg = {
           title: t('comment.title_check'),
-          message: "회사이름이나 주소가 누락되었습니다.",
+          message: `${t('comment.msg_fail_save')} - 오류 이유 : ${res.data}`,
         };
         setMessage(tempMsg);
         setIsMessageModalOpen(true);
-        return;
       }
-
-      const newComData = {
-        ...companyChange,
-        action_type: "ADD",
-        counter: 0,
-        modify_user: cookies.myLationCrmUserId,
-      };
-      console.log(`[ handleAddNewCompany ]`, newComData);
-      const result = modifyCompany(newComData);
-      result.then((res) => {
-        if (res.result) {
-          initializeCompanyTemplate();
-          let thisModal = bootstrap.Modal.getInstance('#add_company');
-          if (thisModal) thisModal.hide();
-        } else {
-          const tempMsg = {
-            title: t('comment.title_check'),
-            message: `${t('comment.msg_fail_save')} - 오류 이유 : ${res.data}`,
-          };
-          setMessage(tempMsg);
-          setIsMessageModalOpen(true);
-        }
-      });
-    },
-    [
-      companyChange,
-      cookies.myLationCrmUserId,
-      initializeCompanyTemplate,
-      modifyCompany,
-    ]
-  );
+    });
+  };
 
   useEffect(() => {
     if (init && (userState & 1) === 1) {

@@ -129,13 +129,49 @@ const PurchaseAddModel = (props) => {
         setNeedInit(false);
     }, [currentCompany, selectedCategory]);
 
-    const handleAddNewPurchase = useCallback((event) => {
+    const handleAddNewPurchase = () => {
         // Check data if they are available
-        if (purchaseChange.company_code === null
-            || purchaseChange.product_code === null) {
-            console.log("Necessary inputs must be available!");
+        let numberOfNoInputItems = 0;
+        let noCompanyName = false;
+        if(!purchaseChange.company_name || purchaseChange.company_name === ""){
+            numberOfNoInputItems++;
+            noCompanyName = true;
+        };
+        let noProductName = false;
+        if(!purchaseChange.product_name || purchaseChange.product_name === ""){
+            numberOfNoInputItems++;
+            noProductName = true;
+        };
+        let noQuantity = false;
+        if(!purchaseChange.quantity || purchaseChange.quantity === ""){
+            numberOfNoInputItems++;
+            noQuantity = true;
+        };
+        let noPrice = false;
+        if(!purchaseChange.price || purchaseChange.price === ""){
+            numberOfNoInputItems++;
+            noPrice = true;
+        };
+
+        if(numberOfNoInputItems > 0){
+            const contents = (
+                <>
+                    <p>하기 정보는 필수 입력 사항입니다.</p>
+                    { noCompanyName && <div> - 회사 이름</div> }
+                    { noProductName && <div> - 제품 이름</div> }
+                    { noQuantity && <div> - 제품 수량</div> }
+                    { noPrice && <div> - 제품 가격</div> }
+                </>
+            );
+            const tempMsg = {
+                title: t('comment.title_check'),
+                message: contents,
+            };
+            setMessage(tempMsg);
+            setIsMessageModalOpen(true);
             return;
         };
+
         const newPurchaseData = {
             ...purchaseChange,
             action_type: 'ADD',
@@ -153,7 +189,7 @@ const PurchaseAddModel = (props) => {
                 console.log('[PurchaseAddModel] fail to add purchase :', res.data);
             }
         });
-    }, [purchaseChange, cookies.myLationCrmUserId, modifyPurchase, setCurrentPurchase]);
+    };
 
 
     //===== Handles to edit 'MA contract' =================================================
@@ -412,6 +448,7 @@ const PurchaseAddModel = (props) => {
                                             title={t('common.quantity')}
                                             type='text'
                                             name="quantity"
+                                            required
                                             defaultValue={purchaseChange.quantity}
                                             onChange={handleItemChange}
                                         />
@@ -460,6 +497,7 @@ const PurchaseAddModel = (props) => {
                                             title={t('common.price_1')}
                                             type='text'
                                             name="price"
+                                            required
                                             defaultValue={purchaseChange.price}
                                             onChange={handleItemChange}
                                         />

@@ -54,12 +54,12 @@ const default_receipt_data = {
   card_number: '',
 };
 
-const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, setTaxInvoiceContents}) => {
+const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, setTaxInvoiceContents }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
-  const [ isMessageModalOpen, setIsMessageModalOpen ] = useState(false);
-  const [ message, setMessage ] = useState({title:'', message: ''});
-  const [ isAdd, setIsAdd ] = useState(true);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [message, setMessage] = useState({ title: '', message: '' });
+  const [isAdd, setIsAdd] = useState(true);
 
   //===== [RecoilState] Related with Transaction =====================================
   const currentTransaction = useRecoilValue(atomCurrentTransaction);
@@ -72,7 +72,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
 
 
   //===== Handles to edit 'TransactionEditModel' ======================================
-  const [ disableItems, setDisableItems ] = useState(false);
+  const [disableItems, setDisableItems] = useState(false);
   const [orgTransaction, setOrgTransaction] = useState({});
   const [transactionChange, setTransactionChange] = useState({});
   const [transactionContents, setTransactionContents] = useState([]);
@@ -137,7 +137,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   const handleCompanySelected = (data) => {
     setTransactionChange(data);
     setDisableItems(true);
-};
+  };
 
   const trans_types = [
     { value: '매출', label: t('company.deal_type_sales') },
@@ -203,19 +203,19 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
 
 
   //===== Handles to edit 'Contents' =================================================
-  const [dataForTransaction, setDataForTransaction] = useState({...default_transaction_data});
+  const [dataForTransaction, setDataForTransaction] = useState({ ...default_transaction_data });
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [orgContentModalData, setOrgContentModalData] = useState({});
   const [editedContentModalData, setEditedContentModalData] = useState({});
 
   const handleFormatter = useCallback((value) => {
-    if(value === undefined || value === null || value === '') return '';
+    if (value === undefined || value === null || value === '') return '';
     let ret = value;
-    if(typeof value === 'string') {
+    if (typeof value === 'string') {
       ret = Number(value);
-      if(isNaN(ret)) return;
+      if (isNaN(ret)) return;
     };
-    
+
     return showDecimal === 0
       ? ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
       : ret?.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,');
@@ -229,11 +229,11 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
       total_price += item.total_price;
     });
     let tempEdited = { ...transactionChange };
-    if((!tempEdited['supply_price'] && currentTransaction.supply_price !== supply_price)
+    if ((!tempEdited['supply_price'] && currentTransaction.supply_price !== supply_price)
       || (tempEdited['supply_price'])) tempEdited['supply_price'] = supply_price;
-    if((!tempEdited['tax_price'] && currentTransaction.tax_price !== tax_price)
+    if ((!tempEdited['tax_price'] && currentTransaction.tax_price !== tax_price)
       || (tempEdited['tax_price'])) tempEdited['tax_price'] = tax_price;
-    if((!tempEdited['total_price'] && currentTransaction.total_price !== total_price)
+    if ((!tempEdited['total_price'] && currentTransaction.total_price !== total_price)
       || (tempEdited['total_price'])) tempEdited['total_price'] = total_price;
     setTransactionChange(tempEdited);
 
@@ -250,7 +250,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     };
     setDataForTransaction(tempData);
   };
-  
+
   const handleStartAddContent = () => {
     console.log('add transaction');
     //if(!transactionChange['company_code']) return;
@@ -259,7 +259,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
       title: t('quotation.add_content'),
     };
     setDataForTransaction(tempData);
-    setOrgContentModalData({...DefaultTransactionContent});
+    setOrgContentModalData({ ...DefaultTransactionContent });
     setEditedContentModalData({});
     setIsContentModalOpen(true);
   };
@@ -272,7 +272,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setDataForTransaction(tempData);
 
     let trans_date = new Date();
-    if(!!data.month_day){
+    if (!!data.month_day) {
       const splitted = data.month_day.split('.');
       trans_date.setMonth(splitted[0] - 1);
       trans_date.setDate(splitted[1]);
@@ -287,13 +287,13 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   };
 
   const handleContentModalOk = () => {
-    if(!editedContentModalData['transaction_date']){
-      const tempMsg = {title: '확인', message: '거래일 정보가 누락되었습니다.'}
+    if (!editedContentModalData['transaction_date']) {
+      const tempMsg = { title: '확인', message: '거래일 정보가 누락되었습니다.' }
       setMessage(tempMsg);
       setIsMessageModalOpen(true);
       return;
     };
-    const monthDay = `${editedContentModalData.transaction_date.getMonth() -1}
+    const monthDay = `${editedContentModalData.transaction_date.getMonth() - 1}
       .${editedContentModalData.transaction_date.getDate()}`;
 
     setIsContentModalOpen(false);
@@ -314,7 +314,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setTransactionContents(tempContents);
     handleAmountCalculation(tempContents);
     setIsContentModalOpen(false);
-    setOrgContentModalData({...DefaultTransactionContent});
+    setOrgContentModalData({ ...DefaultTransactionContent });
     setEditedContentModalData({});
   };
 
@@ -326,22 +326,22 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   };
 
   const handleContentDelete = () => {
-    if(selectedContentRowKeys.length ===0) return;
+    if (selectedContentRowKeys.length === 0) return;
     const tempContents = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) === -1);
     setTransactionContents(tempContents);
     setSelectedContentRowKeys([]);
   };
 
   const handleContentMoveUp = () => {
-    if(selectedContentRowKeys.length === 0) return;
+    if (selectedContentRowKeys.length === 0) return;
     selectedContentRowKeys.sort();
-    
+
     let tempContents = null;
     let startIdx = 0;
     const selecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) !== -1);
     const unselecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) === -1);
     const firstIdx = selectedContentRowKeys[0];
-    if(firstIdx === 1){
+    if (firstIdx === 1) {
       tempContents = [
         ...selecteds,
         ...unselecteds,
@@ -351,7 +351,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
       tempContents = [
         ...unselecteds.slice(0, firstIdx - 2),
         ...selecteds,
-        ...unselecteds.slice(firstIdx - 2, ),
+        ...unselecteds.slice(firstIdx - 2,),
       ];
       startIdx = firstIdx - 1;
     };
@@ -365,14 +365,14 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setTransactionContents(finalContents);
 
     let tempKeys = [];
-    for(let i = 0; i<selecteds.length; i++, startIdx++){
+    for (let i = 0; i < selecteds.length; i++, startIdx++) {
       tempKeys.push(startIdx);
     }
     setSelectedContentRowKeys(tempKeys);
   };
 
   const handleContentMoveDown = () => {
-    if(selectedContentRowKeys.length === 0) return;
+    if (selectedContentRowKeys.length === 0) return;
     selectedContentRowKeys.sort();
 
     let tempContents = null;
@@ -380,19 +380,19 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     const selecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) !== -1);
     const unselecteds = transactionContents.filter(item => selectedContentRowKeys.indexOf(item.transaction_sub_index) === -1);
     const lastIdx = selectedContentRowKeys.at(-1);
-    if(lastIdx === transactionContents.length){
+    if (lastIdx === transactionContents.length) {
       tempContents = [
         ...unselecteds,
         ...selecteds,
       ];
-      startIdx=lastIdx;
+      startIdx = lastIdx;
     } else {
       tempContents = [
         ...unselecteds.slice(0, lastIdx),
         ...selecteds,
-        ...unselecteds.slice(lastIdx, ),
+        ...unselecteds.slice(lastIdx,),
       ];
-      startIdx=lastIdx + 1;
+      startIdx = lastIdx + 1;
     };
     const finalContents = tempContents.map((item, index) => {
       const temp3 = {
@@ -404,7 +404,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setTransactionContents(finalContents);
 
     let tempKeys = [];
-    for(let i = 0; i<selecteds.length; i++){
+    for (let i = 0; i < selecteds.length; i++) {
       tempKeys.push(startIdx--);
     }
     setSelectedContentRowKeys(tempKeys);
@@ -416,11 +416,11 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   const [orgReceiptModalData, setOrgReceiptModalData] = useState({});
   const [editedReceiptModalData, setEditedReceiptModalData] = useState({});
 
-  const handleVATChange = (e)=>{
+  const handleVATChange = (e) => {
     const tempVatInclude = e.target.value === 'vat_included';
-    if(isVatIncluded !== tempVatInclude){
+    if (isVatIncluded !== tempVatInclude) {
       setIsVatIncluded(tempVatInclude);
-      if(tempVatInclude){
+      if (tempVatInclude) {
         const tempContents = transactionContents.map(item => {
           return {
             ...item,
@@ -463,31 +463,31 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setEditedReceiptModalData({});
 
     let tempEdited = { ...transactionChange };
-    if(currentTransaction.payment_type !== tempOrgData.payment_type){
+    if (currentTransaction.payment_type !== tempOrgData.payment_type) {
       tempEdited['payment_type'] = tempOrgData.payment_type;
     };
-    if(currentTransaction.paid_money !== tempOrgData.paid_money){
+    if (currentTransaction.paid_money !== tempOrgData.paid_money) {
       tempEdited['paid_money'] = tempOrgData.paid_money;
     };
-    if(currentTransaction.bank_name !== tempOrgData.bank_name){
+    if (currentTransaction.bank_name !== tempOrgData.bank_name) {
       tempEdited['bank_name'] = tempOrgData.bank_name;
     };
-    if(currentTransaction.account_owner !== tempOrgData.account_owner){
+    if (currentTransaction.account_owner !== tempOrgData.account_owner) {
       tempEdited['account_owner'] = tempOrgData.account_owner;
     };
-    if(currentTransaction.account_number !== tempOrgData.account_number){
+    if (currentTransaction.account_number !== tempOrgData.account_number) {
       tempEdited['account_number'] = tempOrgData.account_number;
     };
-    if(currentTransaction.card_name !== tempOrgData.card_name){
+    if (currentTransaction.card_name !== tempOrgData.card_name) {
       tempEdited['card_name'] = tempOrgData.card_name;
     };
-    if(currentTransaction.card_number !== tempOrgData.card_number){
+    if (currentTransaction.card_number !== tempOrgData.card_number) {
       tempEdited['card_number'] = tempOrgData.card_number;
     };
     setTransactionChange(tempEdited);
 
-    const temp_valance= Number(dataForTransaction.valance_prev) + Number(currentTransaction.total_price) - Number(tempOrgData.paid_money);
-    let tempData={
+    const temp_valance = Number(dataForTransaction.valance_prev) + Number(currentTransaction.total_price) - Number(tempOrgData.paid_money);
+    let tempData = {
       ...dataForTransaction,
       valance_final: temp_valance,
     };
@@ -508,13 +508,12 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setIsSale(true);
     setIsVatIncluded(true);
     setShowDecimal(0);
-    setDataForTransaction({...default_transaction_data});
+    setDataForTransaction({ ...default_transaction_data });
     setDisableItems(false);
 
-    if((selectedCategory.category === 'company')
+    if ((selectedCategory.category === 'company')
       && (currentCompany !== defaultCompany)
-      && (selectedCategory.item_code === currentCompany.company_code))
-    {
+      && (selectedCategory.item_code === currentCompany.company_code)) {
       setTransactionChange({
         company_code: currentCompany.company_code,
         company_name: currentCompany.company_name,
@@ -528,10 +527,10 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
       setTransactionChange({});
     };
     setTransactionContents([]);
-    setOrgReceiptModalData({...default_receipt_data});
+    setOrgReceiptModalData({ ...default_receipt_data });
     setEditedReceiptModalData({});
     // setCurrentTransaction(defaultTransaction);
-    setSelectData({trans_type: trans_types[0], tax_type: 'vat_included', company_selection: null});
+    setSelectData({ trans_type: trans_types[0], tax_type: 'vat_included', company_selection: null });
     setOrgTransaction({});
     setTransactionForPrint(null);
     setContentsForPrint(null);
@@ -556,35 +555,35 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
       ...dataForTransaction,
     };
     const tempTaxInvoiceData = {
-      tax_invoice_code : null,
-      publish_type : null,
-      transaction_type : tempTransactionData.transaction_type,
-      invoice_type : tempTransactionData.vat_included ? '세금계산서' : '계산서',
-      index1 : null,
-      index2 : null,
-      receive_type : null,
-      invoice_contents : null,
+      tax_invoice_code: null,
+      publish_type: null,
+      transaction_type: tempTransactionData.transaction_type,
+      invoice_type: tempTransactionData.vat_included ? '세금계산서' : '계산서',
+      index1: null,
+      index2: null,
+      receive_type: null,
+      invoice_contents: null,
       //----- Company info --------------
-      company_code : tempTransactionData.company_code,
-      business_registration_code : tempTransactionData.business_registration_code,
-      company_name : tempTransactionData.company_name,
-      ceo_name : tempTransactionData.ceo_name,
-      company_address : tempTransactionData.company_address,
-      business_type : tempTransactionData.business_type,
-      business_item : tempTransactionData.business_item,
+      company_code: tempTransactionData.company_code,
+      business_registration_code: tempTransactionData.business_registration_code,
+      company_name: tempTransactionData.company_name,
+      ceo_name: tempTransactionData.ceo_name,
+      company_address: tempTransactionData.company_address,
+      business_type: tempTransactionData.business_type,
+      business_item: tempTransactionData.business_item,
       //----- Price info --------------
-      supply_price : tempTransactionData.supply_price,
-      tax_price : tempTransactionData.tax_price,
-      total_price : tempTransactionData.total_price,
-      cash_amount : 0,
-      check_amount : 0,
-      note_amount : 0,
-      receivable_amount : 0,
+      supply_price: tempTransactionData.supply_price,
+      tax_price: tempTransactionData.tax_price,
+      total_price: tempTransactionData.total_price,
+      cash_amount: 0,
+      check_amount: 0,
+      note_amount: 0,
+      receivable_amount: 0,
       //----- Etc info --------------
       sequence_number: null,
-      memo : '',
-      summary : '',
-      create_date : tempTransactionData.publish_date,
+      memo: '',
+      summary: '',
+      create_date: tempTransactionData.publish_date,
     };
     setTaxInvoiceData(tempTaxInvoiceData);
 
@@ -608,11 +607,11 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     setTaxInvoiceContents(tempInvoiceContents);
     openTaxInvoice();
 
-    setTimeout(()=>{
-        let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
-            keyboard: false
-        });
-        myModal.show();
+    setTimeout(() => {
+      let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
+        keyboard: false
+      });
+      myModal.show();
     }, 500);
   };
 
@@ -621,20 +620,46 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
       ...orgTransaction,
       ...transactionChange,
     };
-    if (newTransactionData.company_name === null
-      || newTransactionData.company_name === ''
-      || newTransactionData.length === 0
-      || newTransactionData.publish_date === null 
-      || newTransactionData.publish_date === ''
-    ) {
-      setMessage({title: '*필수 입력 누락*', message: '업체 정보나 품목 정보나 발행일자가 누락되었습니다.'});
+    // Check data if they are available -----------------------------------
+    let numberOfNoInputItems = 0;
+    let noCompanyCode = false;
+    if (!newTransactionData.company_code || newTransactionData.company_code === "") {
+      numberOfNoInputItems++;
+      noCompanyCode = true;
+    };
+    let noPublishDate = false;
+    if (!newTransactionData.publish_date || newTransactionData.publish_date === "") {
+      numberOfNoInputItems++;
+      noPublishDate = true;
+    };
+    let noTransactionContents = false;
+    if (transactionContents.length === 0) {
+      numberOfNoInputItems++;
+      noTransactionContents = true;
+    }
+
+    if(numberOfNoInputItems > 0){
+      const contents = (
+        <>
+          <p>하기 정보는 필수 입력 사항입니다.</p>
+          { noCompanyCode && <div> - 회사 이름</div> }
+          { noPublishDate && <div> - 발행일</div> }
+          { noTransactionContents && <div> - 거래 항목</div> }
+        </>
+      );
+      const tempMsg = {
+        title: t('comment.title_check'),
+        message: contents,
+      };
+      setMessage(tempMsg);
       setIsMessageModalOpen(true);
       return;
     };
-    newTransactionData['transaction_contents']= JSON.stringify(transactionContents);
+
+    newTransactionData['transaction_contents'] = JSON.stringify(transactionContents);
     newTransactionData['modify_user'] = cookies.myLationCrmUserId;
 
-    if (isAdd){
+    if (isAdd) {
       newTransactionData['transaction_title'] = transactionContents.at(0).product_name + ' 외';
       newTransactionData['action_type'] = 'ADD';
     } else {
@@ -642,8 +667,8 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
     }
     const resp = modifyTransaction(newTransactionData);
     resp.then((res) => {
-      if(res.result){
-        if(isAdd) {
+      if (res.result) {
+        if (isAdd) {
           const updatedContents = transactionContents.map(item => ({
             ...item,
             transaction_code: res.code
@@ -652,17 +677,17 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
         };
 
         let thisModal = bootstrap.Modal.getInstance('#edit_transaction');
-        if(thisModal) thisModal.hide();
+        if (thisModal) thisModal.hide();
 
-        if(value === 'Invoice'){
+        if (value === 'Invoice') {
           handleShowInvoice();
           handleInitialize();
         } else {
-          handleClose();  
+          handleClose();
         };
       }
       else {
-        setMessage({title: '저장 중 오류', message: `오류가 발생하여 저장하지 못했습니다.`});
+        setMessage({ title: '저장 중 오류', message: `오류가 발생하여 저장하지 못했습니다.` });
         setIsMessageModalOpen(true);
       };
     });
@@ -670,7 +695,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
 
   const handleIssueInvoice = () => {
     // Save this transactions -------------------------
-    if(transactionChange && Object.keys(transactionChange).length > 0) {
+    if (transactionChange && Object.keys(transactionChange).length > 0) {
       handleSaveTransaction('Invoice');
     } else {
       handleShowInvoice();
@@ -678,20 +703,20 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
   };
 
   const handleShowDecimal = (e) => {
-    if(e.target.checked && showDecimal === 0) {
+    if (e.target.checked && showDecimal === 0) {
       setShowDecimal(4);
-      const tempData = {...dataForTransaction, show_decimal: 4};
+      const tempData = { ...dataForTransaction, show_decimal: 4 };
       setDataForTransaction(tempData);
-    } else if(!e.target.checked && showDecimal !== 0) {
+    } else if (!e.target.checked && showDecimal !== 0) {
       setShowDecimal(0);
-      const tempData = {...dataForTransaction, show_decimal: 0};
+      const tempData = { ...dataForTransaction, show_decimal: 0 };
       setDataForTransaction(tempData);
     };
   };
 
   const handleClose = () => {
-    if(selectedCategory.category && (selectedCategory.category === 'transaction')){
-      setSelectedCategory({category: null, item_code: null});
+    if (selectedCategory.category && (selectedCategory.category === 'transaction')) {
+      setSelectedCategory({ category: null, item_code: null });
     };
     handleInitialize();
     close();
@@ -699,63 +724,63 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
 
   //===== useEffect ==============================================================
   useEffect(() => {
-    if(!open) return;
-    
+    if (!open) return;
+
     if ((companyState & 1) === 0) return;
-    
+
     // if (Object.keys(orgTransaction).length === 0) {
-      
-      if (currentTransaction === defaultTransaction) {
-        console.log('[TransactionEditModel] Add New Transaction~');
-        handleInitialize();
-      } else {
-        console.log('[TransactionEditModel] Modify Transaction~', currentTransaction);
-        setIsAdd(false);
-        const currentContents = JSON.parse(currentTransaction.transaction_contents);
-        setTransactionContents(currentContents);
-        
-        const tempIsSale = !(currentTransaction.transaction_type === '매입' || currentTransaction.transaction_type === 'purchase');
-        setIsSale(tempIsSale);
 
-        const tempIsVatIncluded = currentTransaction.tax_price && currentTransaction.tax_price > 0;
-        setIsVatIncluded(tempIsVatIncluded);
+    if (currentTransaction === defaultTransaction) {
+      console.log('[TransactionEditModel] Add New Transaction~');
+      handleInitialize();
+    } else {
+      console.log('[TransactionEditModel] Modify Transaction~', currentTransaction);
+      setIsAdd(false);
+      const currentContents = JSON.parse(currentTransaction.transaction_contents);
+      setTransactionContents(currentContents);
 
+      const tempIsSale = !(currentTransaction.transaction_type === '매입' || currentTransaction.transaction_type === 'purchase');
+      setIsSale(tempIsSale);
+
+      const tempIsVatIncluded = currentTransaction.tax_price && currentTransaction.tax_price > 0;
+      setIsVatIncluded(tempIsVatIncluded);
+
+      const tempData = {
+        trans_type: tempIsSale ? trans_types[0] : trans_types[1],
+        tax_type: tempIsVatIncluded ? 'vat_included' : 'vat_excluded',
+      };
+      setSelectData(tempData);
+
+      if (currentTransaction.paid_money > 0) {
         const tempData = {
-          trans_type: tempIsSale ? trans_types[0] : trans_types[1],
-          tax_type: tempIsVatIncluded ? 'vat_included' : 'vat_excluded',
+          ...dataForTransaction,
+          valance_final: Number(currentTransaction.paid_money) - Number(currentTransaction.total_price),
         };
-        setSelectData(tempData);
-
-        if(currentTransaction.paid_money > 0){
-          const tempData = {
-            ...dataForTransaction,
-            valance_final: Number(currentTransaction.paid_money) - Number(currentTransaction.total_price),
-          };
-          setDataForTransaction(tempData);
-        };
+        setDataForTransaction(tempData);
       };
-  
-      const tempTransaction = {
-        ...currentTransaction,
-        transaction_type: currentTransaction.transaction_type ? currentTransaction.transaction_type : '매출',
-        publish_date: currentTransaction.publish_date ? new Date(currentTransaction.publish_date) : null,
-      };
-      setOrgTransaction(tempTransaction);
+    };
 
-      const tempReceiptData = {
-        paid_money: currentTransaction.paid_money,
-        payment_type: currentTransaction.payment_type,
-        bank_name: currentTransaction.bank_name,
-        account_owner: currentTransaction.account_owner,
-        account_number: currentTransaction.account_number,
-        card_no: currentTransaction.card_no,
-        card_number: currentTransaction.card_number,
-      }
-      setOrgReceiptModalData(tempReceiptData);
+    const tempTransaction = {
+      ...currentTransaction,
+      transaction_type: currentTransaction.transaction_type ? currentTransaction.transaction_type : '매출',
+      publish_date: currentTransaction.publish_date ? new Date(currentTransaction.publish_date) : null,
+    };
+    setOrgTransaction(tempTransaction);
+
+    const tempReceiptData = {
+      paid_money: currentTransaction.paid_money,
+      payment_type: currentTransaction.payment_type,
+      bank_name: currentTransaction.bank_name,
+      account_owner: currentTransaction.account_owner,
+      account_number: currentTransaction.account_number,
+      card_no: currentTransaction.card_no,
+      card_number: currentTransaction.card_number,
+    }
+    setOrgReceiptModalData(tempReceiptData);
     // };
   }, [open, companyState, currentTransaction]);
 
-  if(!open) return (
+  if (!open) return (
     <div>&nbsp;</div>
   );
 
@@ -777,7 +802,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
           className="close md-close"
           data-bs-dismiss="modal"
           aria-label="Close"
-          onClick = {handleClose}
+          onClick={handleClose}
         >
           <span aria-hidden="true">×</span>
         </button>
@@ -788,7 +813,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
               type="button"
               className="btn-close"
               data-bs-dismiss="modal"
-              onClick = {handleClose}
+              onClick={handleClose}
             ></button>
           </div>
           <div className="modal-body">
@@ -878,7 +903,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
                           </Row>
                         </div>
                         <div className={classNames(styles.upperRight, { 'trans_pur': !isSale })}>
-                          <div className={classNames(styles.sm_title, styles.title_wrapper, {'trans_pur': !isSale })}>
+                          <div className={classNames(styles.sm_title, styles.title_wrapper, { 'trans_pur': !isSale })}>
                             <div>{isSale ? t('transaction.receiver') : t('transaction.supplier')}</div>
                           </div>
                           <div className={styles.upperItems}>
@@ -1026,13 +1051,13 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
                                 value={dataForTransaction.valance_prev}
                                 formatter={handleFormatter}
                                 parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                                style={{width:'180px', height:'30px',border:0,textAlign:'end'}}
-                                onChange={(input)=>{
+                                style={{ width: '180px', height: '30px', border: 0, textAlign: 'end' }}
+                                onChange={(input) => {
                                   const value = Number(input);
-                                  if(isNaN(value)) return;
+                                  if (isNaN(value)) return;
                                   const temp_paid_money = transactionChange['paid_money'] ? transactionChange.paid_money : currentTransaction.paid_money;
                                   const temp_valance_final = value + Number(currentTransaction.total_price) - Number(temp_paid_money);
-                                  const temp={
+                                  const temp = {
                                     ...dataForTransaction,
                                     valance_prev: value,
                                     valance_final: temp_valance_final,
@@ -1098,9 +1123,9 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
                             <Col flex='auto' className={`trans_amt low right ${!isSale && "trans_pur"}`}>
                               <Input
                                 value={dataForTransaction.receiver}
-                                style={{height:'30px',border:0,textAlign:'end'}}
-                                onChange={(e)=>{
-                                  const temp={...dataForTransaction, receiver: e.target.value};
+                                style={{ height: '30px', border: 0, textAlign: 'end' }}
+                                onChange={(e) => {
+                                  const temp = { ...dataForTransaction, receiver: e.target.value };
                                   setDataForTransaction(temp);
                                 }}
                               />
@@ -1144,7 +1169,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
                         type="button"
                         className="btn btn-secondary btn-rounded"
                         data-bs-dismiss="modal"
-                        onClick = {handleClose}
+                        onClick={handleClose}
                       >
                         {t('common.cancel')}
                       </button>
@@ -1152,8 +1177,8 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
                   </form>
                 </div>
                 <div className="tab-pane show" id="transaction-print">
-                  {transactionForPrint && 
-                    <TransactionPrint data={transactionForPrint} contents={contentsForPrint}/>
+                  {transactionForPrint &&
+                    <TransactionPrint data={transactionForPrint} contents={contentsForPrint} />
                   }
                 </div>
               </div>
@@ -1182,7 +1207,7 @@ const TransactionEditModel = ({open, close, openTaxInvoice, setTaxInvoiceData, s
         title={message.title}
         message={message.message}
         open={isMessageModalOpen}
-        handleOk={()=>setIsMessageModalOpen(false)}
+        handleOk={() => setIsMessageModalOpen(false)}
       />
     </div>
   );

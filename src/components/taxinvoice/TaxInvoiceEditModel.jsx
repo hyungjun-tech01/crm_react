@@ -62,9 +62,9 @@ const default_invoice_data = {
 
 const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
   const { t } = useTranslation();
-  const [cookies] = useCookies(["myLationCrmUserId"]);
-  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
-  const [message, setMessage] = useState({ title: '', message: '' });
+  const [ cookies ] = useCookies(["myLationCrmUserId"]);
+  const [ isMessageModalOpen, setIsMessageModalOpen ] = useState(false);
+  const [ message, setMessage ] = useState({ title: '', message: '' });
 
 
   //===== [RecoilState] Related with Tax Invoice =====================================
@@ -78,17 +78,17 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
 
 
   //===== Handles to edit 'TaxInvoiceEditModel' ======================================
-  const [receiver, setReceiver] = useState({});
-  const [supplier, setSupplier] = useState({});
-  const [invoiceData, setInvoiceData] = useState({ ...default_invoice_data });
-  const [invoiceChange, setInvoiceChange] = useState({});
-  const [invoiceContents, setInvoiceContents] = useState([]);
-  const [printData, setPrintData] = useState({})
-  const [isSale, setIsSale] = useState(true);
-  const [isTaxInvoice, setIsTaxInvoice] = useState(true);
-  const [selectValues, setSelectValue] = useState({})
-  const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useRecoilState(atomSelectedCategory);
+  const [ receiver, setReceiver ] = useState({});
+  const [ supplier, setSupplier ] = useState({});
+  const [ invoiceData, setInvoiceData ] = useState({ ...default_invoice_data });
+  const [ invoiceChange, setInvoiceChange ] = useState({});
+  const [ invoiceContents, setInvoiceContents ] = useState([]);
+  const [ printData, setPrintData ] = useState({})
+  const [ isSale, setIsSale ] = useState(true);
+  const [ isTaxInvoice, setIsTaxInvoice ] = useState(true);
+  const [ selectValues, setSelectValue ] = useState({})
+  const [ selectedContentRowKeys, setSelectedContentRowKeys ] = useState([]);
+  const [ selectedCategory, setSelectedCategory ] = useRecoilState(atomSelectedCategory);
   const [ showSaveButton, setShowSaveButton ] = useState(false);
 
   const handleItemChange = useCallback((e) => {
@@ -559,9 +559,11 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
       ...invoiceData,
       ...invoiceChange,
     };
+
     let newTaxInvoice = {
       modify_user: cookies.myLationCrmUserId,
     };
+
     Object.keys(defaultTaxInvoice).forEach(item => {
       if ((finalData[item] !== undefined) && (finalData[item] !== null)) {
         newTaxInvoice[item] = finalData[item];
@@ -571,12 +573,50 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
         newTaxInvoice[item] = companyData[item];
       };
     });
+
+    // Check data if they are available -----------------------------------
+    let numberOfNoInputItems = 0;
+    let noCompanyCode = false;
+    if(!newTaxInvoice.company_code || newTaxInvoice.company_code === ""){
+      numberOfNoInputItems++;
+      noCompanyCode = true;
+    };
+    let noCreateDate = false;
+    if(!newTaxInvoice.create_date || newTaxInvoice.create_date === ""){
+      numberOfNoInputItems++;
+      noCreateDate = true;
+    };
+    let noInvoiceContents = false;
+    if(invoiceContents.length === 0){
+      numberOfNoInputItems++;
+      noInvoiceContents = true;
+    };
+
+    if(numberOfNoInputItems > 0){
+      const contents = (
+        <>
+          <p>하기 정보는 필수 입력 사항입니다.</p>
+          { noCompanyCode && <div> - 회사 이름</div> }
+          { noCreateDate && <div> - 작성일</div> }
+          { noInvoiceContents && <div> - 세금계산서 항목</div> }
+        </>
+      );
+      const tempMsg = {
+        title: t('comment.title_check'),
+        message: contents,
+      };
+      setMessage(tempMsg);
+      setIsMessageModalOpen(true);
+      return;
+    };
+
     const updatedContents = invoiceContents.map(item => {
       const newItem = { ...item };
       delete newItem.sub_index;
       delete newItem.invoice_date;
       return newItem;
     });
+
     newTaxInvoice['invoice_contents'] = JSON.stringify(updatedContents);
     if (currentTaxInvoice === defaultTaxInvoice) {
       newTaxInvoice['action_type'] = 'ADD';

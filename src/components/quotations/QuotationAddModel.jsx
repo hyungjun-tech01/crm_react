@@ -679,17 +679,43 @@ const QuotationAddModel = (props) => {
 
 
   //===== Function for Final Actions  ==========================================
-  const handleAddNewQuotation = useCallback((event) => {
+  const handleAddNewQuotation = () => {
     // Check data if they are available
-    if (quotationChange.lead_name === null
-      || quotationChange.lead_name === ''
-      || quotationChange.quotation_type === null
-      || quotationContents.length === 0
-    ) {
-      setMessage({ title: '필요 항목 누락', message: '필요 값이 없습니다.' });
+    let numberOfNoInputItems = 0;
+    let noLeadName = false;
+    if(!quotationChange.lead_name || quotationChange.lead_name === ""){
+      numberOfNoInputItems++;
+      noLeadName = true;
+    };
+    let noQuotationTitle = false;
+    if(!quotationChange.quotation_title || quotationChange.quotation_title === ""){
+      numberOfNoInputItems++;
+      noQuotationTitle = true;
+    };
+    let noQuotationContents = false;
+    if(quotationContents.length === 0){
+      numberOfNoInputItems++;
+      noQuotationContents = true;
+    };
+
+    if(numberOfNoInputItems > 0){
+      const contents = (
+        <>
+          <p>하기 정보는 필수 입력 사항입니다.</p>
+          { noLeadName && <div> - 고객 이름</div> }
+          { noQuotationTitle && <div> - 견적 제목</div> }
+          { noQuotationContents && <div> - 견적 Items</div> }
+        </>
+      );
+      const tempMsg = {
+        title: t('comment.title_check'),
+        message: contents,
+      };
+      setMessage(tempMsg);
       setIsMessageModalOpen(true);
       return;
     };
+
     const newQuotationData = {
       ...quotationChange,
       sub_total_amount: amountsForContent.sub_total_amount,
@@ -719,14 +745,12 @@ const QuotationAddModel = (props) => {
         setIsMessageModalOpen(true);
       };
     });
-  }, [ConvertHeaderInfosToString, amountsForContent.cut_off_amount, amountsForContent.dc_amount, amountsForContent.sub_total_amount, amountsForContent.sum_dc_applied, amountsForContent.sum_final, amountsForContent.total_cost_price, amountsForContent.vat_amount, contentColumns, cookies.myLationCrmUserId, modifyQuotation, quotationChange, quotationContents, settingForContent.dc_rate]);
+  };
 
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    if (init
-      && ((userState & 1) === 1)
-    ) {
+    if (init && ((userState & 1) === 1)) {
       if (handleInit) handleInit(!init);
       setTimeout(() => {
         initializeQuotationTemplate();
