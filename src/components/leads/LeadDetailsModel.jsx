@@ -471,9 +471,9 @@ const LeadDetailsModel = ({init, handleInit}) => {
                   >
                     <li role="presentation"  style={{ flex: 1, textAlign: "center" }}>
                       <Link
-                        to="#not-on-time"
-                        className={selectedLead.status === "Not On Time" || selectedLead.status === null ? "active" : ""}
-                        style={{ width: "300px" }} 
+                        to="#on-time"
+                        className={selectedLead.status === "Not On Time" || selectedLead.status === null ? "active" : "inactive"}
+                        style={{ width: "400px" }} 
                         aria-controls="not-contacted"
                         role="tab"
                         data-bs-toggle="tab"
@@ -484,18 +484,19 @@ const LeadDetailsModel = ({init, handleInit}) => {
                         {t('lead.not_on_time')}
                       </Link>
                     </li>
-                    <li role="presentation" className=""  style={{ flex: 1, textAlign: "center" }}>
+                    <li role="presentation" style={{ flex: 1, textAlign: "center" }}>
                       <Link
                         to="#on-time"
                         className={selectedLead.status === "On Time" ? "active" : "inactive"}
-                        style={{ width: "300px" }} 
-                        aria-controls="attempted-contact"
+                        style={{ width: "400px" }} 
+                        aria-controls="not-contacted"
                         role="tab"
                         data-bs-toggle="tab"
                         aria-expanded={selectedLead.status === "On Time" ? "true" : "false"}
                         onClick={() => handleChangeStatus("On Time")}
                       >
-                        <span className="octicon octicon-diff-added" />
+                        {/* <span className="octicon octicon-diff-added" /> */}
+                        <span className="octicon octicon-light-bulb" />
                         {t('lead.on_time')}
                       </Link>
                     </li>
