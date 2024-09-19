@@ -51,7 +51,7 @@ const QuotationAddModel = (props) => {
 
 
   //===== [RecoilState] Related with Quotation =======================================
-  const { modifyQuotation } = useRecoilValue(QuotationRepo);
+  const { modifyQuotation, getQuotationDocNo } = useRecoilValue(QuotationRepo);
 
 
   //===== [RecoilState] Related with Lead ============================================
@@ -71,34 +71,49 @@ const QuotationAddModel = (props) => {
   const selectedCategory = useRecoilValue(atomSelectedCategory);
 
   const initializeQuotationTemplate = useCallback(() => {
-    document.querySelector("#add_new_quotation_form").reset();
     setQuotationContents([]);
+
+    let modifiedData = {
+      ...defaultQuotation,
+      receiver: cookies.myLationCrmUserName,
+    };
 
     if ((selectedCategory.category === 'lead')
       && (currentLead !== defaultLead)
       && (selectedCategory.item_code === currentLead.lead_code)
     ) {
-      setQuotationChange({
-        ...defaultQuotation,
-        lead_code: currentLead.lead_code,
-        lead_name: currentLead.lead_name,
-        department: currentLead.department,
-        position: currentLead.position,
-        mobile_number: currentLead.mobile_number,
-        phone_number: currentLead.phone_number,
-        email: currentLead.email,
-        receiver: cookies.myLationCrmUserName,
-      });
-    } else {
-      setQuotationChange({
-        receiver: cookies.myLationCrmUserName,
-      });
-      handleContentModalCancel();
+        modifiedData['lead_code'] = currentLead.lead_code;
+        modifiedData['lead_name'] = currentLead.lead_name;
+        modifiedData['department'] = currentLead.department;
+        modifiedData['position'] = currentLead.position;
+        modifiedData['mobile_number'] = currentLead.mobile_number;
+        modifiedData['phone_number'] = currentLead.phone_number;
+        modifiedData['email'] = currentLead.email;
     };
+
     setAmountsForContent({
       sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
     });
-  }, [cookies.myLationCrmUserName, currentLead, selectedCategory]);
+
+    handleContentModalCancel();
+
+    let newDocNo = "";
+    const response = getQuotationDocNo({modify_user: cookies.myLationCrmUserId});
+    response
+      .then((res) => {
+        if(res.result){
+          newDocNo = res.docNo;
+        }
+        modifiedData['quotation_number'] = newDocNo;
+        setQuotationChange(modifiedData);
+      })
+      .catch(err => {
+        console.log('initializeQuotationTemplate / getQuotationDocNo :', err);
+        modifiedData['quotation_number'] = newDocNo;
+        setQuotationChange(modifiedData);
+      })
+
+  }, [cookies.myLationCrmUserId, cookies.myLationCrmUserName, currentLead, getQuotationDocNo]);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {

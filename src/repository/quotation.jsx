@@ -111,30 +111,6 @@ export const QuotationRepo = selector({
                 return false;
             };
         });
-        
-        const loadCompanyQuotations = getCallback(({set}) => async (company_code) => {
-            const input_json = {company_code:company_code};
-            //JSON.stringify(company_code);
-            try{
-                console.log('loadCompanyConsultings' ,company_code);
-                const response = await fetch(`${BASE_PATH}/companyQuotations`, {
-                    method: "POST",
-                    headers:{'Content-Type':'application/json'},
-                    body: JSON.stringify(input_json),
-                });
-                const data = await response.json();
-                if(data.message){
-                    console.log('loadCompanyConsultings message:', data.message);
-                    set(atomCompanyQuotations, input_json);
-                    return;
-                }
-                set(atomCompanyQuotations, data);
-            }
-            catch(err){
-                console.error(`loadCompanyConsultings / Error : ${err}`);
-            };
-        });
-
         const filterCompanyQuotation = getCallback(({set, snapshot }) => async (filterText) => {
             const allQuotationList = await snapshot.getPromise(atomCompanyQuotations);
             
@@ -152,7 +128,6 @@ export const QuotationRepo = selector({
             set(atomFilteredQuotationArray, allQuotation);
             return true;
         });
-
         const filterQuotations = getCallback(({set, snapshot }) => async (itemName, filterText) => {
            // const allQuotationList = await snapshot.getPromise(atomAllQuotationObj);
 
@@ -376,15 +351,36 @@ export const QuotationRepo = selector({
 
             return { result: true, data: foundData};
         });
+        const getQuotationDocNo = getCallback(()=> async (user) => {
+            const input_json = JSON.stringify(user);
+            try{
+                const response = await fetch(`${BASE_PATH}/getSequenceNext`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+
+                const data = await response.json();
+                if(data.message){
+                    console.log('\t[ getQuotationDocNo ] message:', data.message);
+                    return { result: false, message: data.message};
+                } else {
+                    return { result: true, docNo: data.out_quotation_number};
+                };
+            } catch(e) {
+                console.log('\t[ searchQuotations ] error occurs on searching');
+                return { result: false, message: 'fail to query'};
+            };
+        });
         return {
             tryLoadAllQuotations,
             loadAllQuotations,
             modifyQuotation,
             setCurrentQuotation,
             filterQuotations,
-            loadCompanyQuotations,
             filterCompanyQuotation,
             searchQuotations,
+            getQuotationDocNo,
         };
     }
 });
