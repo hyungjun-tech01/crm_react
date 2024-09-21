@@ -283,6 +283,7 @@ export const QuotationRepo = selector({
                             set(atomQuotationByLead, updated);
                         }
                     }
+                    return {result: true};
                 }
             }
             catch(err){
