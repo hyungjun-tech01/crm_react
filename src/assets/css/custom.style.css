@@ -196,6 +196,51 @@
     display: flex;
     flex-direction: row;
 }
+.add-upload-item {
+    width: 100%;
+    min-height: 36px;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    padding: 0;
+    position: relative;
+}
+.add-upload-title {
+    width: 30%;
+    margin: 0;
+    padding: 8px 10px;
+    font-size: inherit;
+    font-weight: 600;
+    line-height: 1.5;
+    border: solid 1px #777777;
+    border-bottom: 0;
+    background-color: #f3f1f1;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+.add-upload-content {
+    width: 100%;
+    margin: 0;
+    padding: 2px;
+    font-size: inherit;
+    line-height: 1.5;
+    border: solid 1px #777777;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    display: flex;
+    flex-direction: column;
+}
+.add-upload-textarea {
+    width: 100%;
+    margin: 0;
+    padding: 6px 10px;
+    font-size: inherit;
+    line-height: 1.5;
+    border: 0;
+    display: flex;
+    flex-direction: row;
+}
 .add-basic-content.label {
     color: #999;
 }

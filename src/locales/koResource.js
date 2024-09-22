@@ -351,7 +351,8 @@ const koResource = {
             input_search_text: '검색 문구를 입력하세요.',
             search_address_first: '먼저 주소 검색하시기 바랍니다.',
             title_check: '확인',
-            msg_fail_save: '저장하지 못했습니다.'
+            msg_fail_save: '저장하지 못했습니다.',
+            click_drag_file_upload: '파일을 올리기 위해 클릭 또는 파일을 끝어다 놓으세요',
         },
         user :{
             phone:'전화번호',

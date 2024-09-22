@@ -351,14 +351,15 @@ const enResource = {
             input_search_text: 'Input search text',
             search_address_first: 'Please search address...',
             title_check: 'Check',
-            msg_fail_save: 'Failed to save.'
+            msg_fail_save: 'Failed to save.',
+            click_drag_file_upload: 'Click or drag file to this area to upload',
         },
         user :{
             phone:'Phone Number',
             mobile:'Mobile Phone',
             e_mail:'E Mail Address',
             private_group:'Group',
-            memo:'Memp',
+            memo:'Memo',
             name:'Name',
             department:'Department',
             position:'Position',

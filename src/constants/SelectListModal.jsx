@@ -145,17 +145,17 @@ const SelectListModal = (props) => {
         };
         setSelectedCategory(modifiedData);
     };
-    
-    const handleOk = () => {
-        if(!selectedCategory || selectedCategory.length === 0) return;
-        handleChange(selectedCategory);
-        handleCancel();
-    };
 
     const handleCancel = () => {
         setListItems([]);
         setSelectedCategory({});
         handleClose();
+    };
+    
+    const handleOk = () => {
+        if(!selectedCategory || selectedCategory.length === 0) return;
+        handleChange(selectedCategory);
+        handleCancel();
     };
 
     useEffect(() => {

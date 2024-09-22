@@ -4,6 +4,9 @@ import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "react-datepicker/dist/react-datepicker.css";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
+import { Upload } from "antd";
+import AddToPhotosOutlinedIcon from '@mui/icons-material/AddToPhotosOutlined';
+
 import {
   atomCurrentLead,
   atomSelectedCategory,
@@ -23,15 +26,17 @@ import {
   ConsultingTimeTypes,
   ProductTypes
 } from "../../repository/consulting";
+import { CompanyRepo } from "../../repository/company";
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddSearchItem from "../../constants/AddSearchItem";
 import MessageModal from "../../constants/MessageModal";
-import { CompanyRepo } from "../../repository/company";
+
+import Paths from "../../constants/Paths";
+const BASE_PATH = Paths.BASE_PATH;
 
 
-const ConsultingAddModel = (props) => {
-  const { open, handleOpen } = props;
+const ConsultingAddModel = ({ open, handleOpen }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId", "myLationCrmUserName"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -39,7 +44,7 @@ const ConsultingAddModel = (props) => {
 
 
   //===== [RecoilState] Related with Consulting =======================================
-  const { modifyConsulting } = useRecoilValue(ConsultingRepo);
+  const { modifyConsulting, uploadAttachment } = useRecoilValue(ConsultingRepo);
 
 
   //===== [RecoilState] Related with Lead =============================================
@@ -55,6 +60,122 @@ const ConsultingAddModel = (props) => {
   const usersForSelection = useRecoilValue(atomUsersForSelection);
   const engineersForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
+
+
+  //===== Handles to attachment ========================================
+  const [attachments, setAttachments] = useState([]);
+  const { Dragger } = Upload;
+
+  const handleUpload = (file) => {
+    console.log('handleUpload : ', file);
+    const fileName = file.name;
+    const ext_index = fileName.lastIndexOf('.');
+    const fileExt = ext_index !== -1 ? fileName.slice(ext_index + 1) : "";
+    
+    // let imageInfo = null;
+
+    const upload = (data) => {
+      const response = uploadAttachment(data);
+      response
+        .then((result) => {
+          console.log('Succeeded to upload file :', result);
+          // const newAttachment: IAttachment = {
+          //   cardAttachementId: result.outAttachmentId,
+          //   creatorUserId: cookies.UserId,
+          //   creatorUserName: cookies.UserName,
+          //   dirName: result.dirName,
+          //   fileName: fileName,
+          //   cardAttachmentName: fileName,
+          //   createdAt: result.outAttachmentCreatedAt,
+          //   updatedAt: null,
+          //   image: imageInfo,
+          //   url: result.outAttachmentUrl,
+          //   coverUrl: result.outAttachmentCoverUrl,
+          //   isCover: false,
+          //   isPersisted: false,
+          // };
+          // const newCard = {
+          //   ...card,
+          //   attachments: [newAttachment, ...card.attachments],
+          // };
+          // updateCard(newCard);
+          // setCard(newCard);
+        })
+        .catch((error) => {
+          console.log('Fail to upload file :', error);
+        });
+    };
+
+    const formData = new FormData();
+    formData.append('userId', cookies.myLationCrmUserId);
+    formData.append('fileName', fileName);
+    formData.append('fileExt', fileExt);
+    formData.append('file', file);
+
+    if (file.type.startsWith('image/')) {
+      const image = new Image();
+      image.src = URL.createObjectURL(file);
+      image.onload = () => {
+        const width = image.width;
+        const height = image.height;
+
+        formData.append('width', width.toString());
+        formData.append('height', height.toString());
+
+        // imageInfo = {
+        //   width: width,
+        //   height: height,
+        //   thumbnailsExtension: fileExt,
+        // };
+        upload(formData);    
+        URL.revokeObjectURL(image.src);
+      };
+    } else {
+      upload(formData);
+    };
+  };
+  
+  const uploadRequestProps = {
+    name: 'file',
+    multiple: true,
+    action: handleUpload,
+    onChange(info) {
+      const { status } = info.file;
+
+      if (status === 'done') {
+        setMessage({title: 'Success', message: `${info.file.name} file uploaded successfully.`});
+        setIsMessageModalOpen(true);
+      } else if (status === 'error') {
+        setMessage({title: 'Error', message: `${info.file.name} file upload failed.`});
+        setIsMessageModalOpen(true);
+      }
+    },
+    onDrop(e) {
+      console.log('Dropped files : ', e.dataTransfer.files);
+    },
+  };
+
+  const uploadActionProps = {
+    name: 'file',
+    multiple: true,
+    action: handleUpload,
+    onChange(info) {
+      const { status } = info.file;
+
+      if (status === 'done') {
+        setMessage({title: 'Success', message: `${info.file.name} file uploaded successfully.`});
+        setIsMessageModalOpen(true);
+      } else if (status === 'error') {
+        setMessage({title: 'Error', message: `${info.file.name} file upload failed.`});
+        setIsMessageModalOpen(true);
+      }
+    },
+    onDrop(e) {
+      console.log('Dropped files : ', e.dataTransfer.files);
+    },
+  };
+
+  
 
 
   //===== Handles to edit 'ConsultingAddModel' ========================================
@@ -333,22 +454,56 @@ const ConsultingAddModel = (props) => {
                 />
               </div>
               <div className="form-group row">
-                <AddBasicItem
-                  title={t('consulting.request_content')}
-                  type='textarea'
-                  row_no={5}
-                  name='request_content'
-                  defaultValue={consultingChange.request_content}
-                  onChange={handleItemChange}
-                />
-                <AddBasicItem
-                  title={t('consulting.action_content')}
-                  type='textarea'
-                  row_no={5}
-                  name='action_content'
-                  defaultValue={consultingChange.action_content}
-                  onChange={handleItemChange}
-                />
+                <div className="col-sm-6" >
+                  <div className="add-upload-item">
+                    <div className="add-upload-title" >
+                      {t('consulting.request_content')}
+                    </div>
+                    <div className="add-upload-content">
+                      <Dragger {...uploadRequestProps}>
+                        <span>
+                          <AddToPhotosOutlinedIcon style={{color: "#777777"}}/>
+                        </span>
+                        <span style={{marginLeft: '1rem'}}>
+                          {t('comment.click_drag_file_upload')}
+                        </span>
+                      </Dragger>
+                      <textarea
+                        className="add-upload-textarea"
+                        name = 'request_content'
+                        placeholder={t('consulting.request_content')}
+                        rows={8}
+                        value={consultingChange.request_content ? consultingChange.request_content : ""}
+                        onChange={handleItemChange}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="col-sm-6" >
+                  <div className="add-upload-item">
+                    <div className="add-upload-title" >
+                      {t('consulting.action_content')}
+                    </div>
+                    <div className="add-upload-content">
+                      <Dragger {...uploadActionProps}>
+                        <span>
+                          <AddToPhotosOutlinedIcon style={{color: "#777777"}}/>
+                        </span>
+                        <span style={{marginLeft: '1rem'}}>
+                          {t('comment.click_drag_file_upload')}
+                        </span>
+                      </Dragger>
+                      <textarea
+                        className="add-upload-textarea"
+                        name = 'action_content'
+                        placeholder={t('consulting.action_content')}
+                        rows={8}
+                        value={consultingChange.action_content ? consultingChange.action_content : ""}
+                        onChange={handleItemChange}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
               <div className="text-center">
                 <button
