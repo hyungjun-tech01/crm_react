@@ -101,6 +101,7 @@ const ConsultingAddModel = (props) => {
       receipt_date: tempDate,
     };
 
+
     if ((selectedCategory.category === 'lead')
       && (currentLead !== defaultLead)
       && (selectedCategory.item_code === currentLead.lead_code)
@@ -117,6 +118,8 @@ const ConsultingAddModel = (props) => {
     };
     setConsultingChange(modified);
     setNeedInit(false);
+
+    
   }, [cookies.myLationCrmUserName, currentLead, setCurrentCompany, selectedCategory]);
 
 
@@ -182,6 +185,7 @@ const ConsultingAddModel = (props) => {
       if (handleOpen) handleOpen(!open);
       initializeConsultingTemplate();
     };
+
   }, [open, userState, initializeConsultingTemplate, handleOpen, needInit]);
 
   if (needInit)
