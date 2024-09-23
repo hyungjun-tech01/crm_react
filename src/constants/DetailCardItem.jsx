@@ -258,7 +258,7 @@ const DetailCardItem = (props) => {
         case 'label':
             return <Input {...SharedProps} onChange={detail.editing} style={{width: widthValue, height: 38}}/>;
         case 'date':
-            const timeformat = detail.time ? "yyyy-MM-dd HH:mm:ss" : "yyyy-MM-dd";
+            const timeformat = detail.time ? "yyyy-MM-dd hh:mm:ss" : "yyyy-MM-dd";
             return <DateInput {...SharedProps} format={ timeformat } showTime={ detail.time } onChange={(date) =>detail.editing(name, date)} style={{width: widthValue, height: 38}}/>;
         case 'textarea':
             return <TextareaInput {...SharedProps} row_no={ detail.row_no ? detail.row_no : 2} onChange={detail.editing} style={detail.extra === 'memo' ? {width: `calc(100% - 380px)`, flexGrow: 1} : {width: widthValue}}/>;

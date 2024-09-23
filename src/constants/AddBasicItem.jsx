@@ -87,7 +87,7 @@ const AddBasicItem = (props) => {
                                 selected={defaultValue}
                                 disabled={disabled ? disabled : false}
                                 onChange={(date) => onChange(name, date)}
-                                dateFormat="yyyy-MM-dd HH:mm:ss"
+                                dateFormat="yyyy-MM-dd hh:mm:ss"
                                 showTimeSelect
                             /> : 
                             <DatePicker

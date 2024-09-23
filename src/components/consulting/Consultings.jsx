@@ -201,16 +201,7 @@ const Consultings = () => {
       title: t('consulting.receipt_date'),
       dataIndex: 'receipt_date',
       render: (text, record) => 
-        <>{record === null  ? '' : new Date(text.replace(' ', 'T')).toLocaleString('ko-KR',  {
-          timeZone: 'Asia/Seoul',  // 한국 표준시를 설정
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-          hour12: true  // 12시간 형식으로 표시
-      })}</>,
+        <>{record === null  ? '' : new Date(text).toLocaleString('ko-KR', {timeZone:'UTC'})}</>,
     },
     {
       title: t('consulting.receiver'),
