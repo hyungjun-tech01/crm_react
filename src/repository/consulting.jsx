@@ -136,6 +136,40 @@ export const ConsultingRepo = selector({
                 return false;
             };
         });
+        const loadCompanyConsultings = getCallback(({set, snapshot}) => async (company_code) => {
+            const input_json = {company_code:company_code};
+            try{
+                const response = await fetch(`${BASE_PATH}/companyConsultings`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify(input_json),
+                });
+
+                const data = await response.json();
+                if(data.message){
+                    console.log('loadCompanyConsultings message:', data.message);
+                    set(atomCompanyConsultings, input_json);
+                    return;
+                }
+                set(atomCompanyConsultings, data);
+
+                ///////////////////// update all consulting object ////////////////////////////
+                let foundInServer = {};
+                for(const item of data) {
+                    foundInServer[item.lead_code] = item;
+                };
+
+                const allConsultingData = await snapshot.getPromise(atomAllConsultingObj);
+                const updatedAllConsultingData = {
+                    ...allConsultingData,
+                    ...foundInServer,
+                };
+                set(atomAllConsultingObj, updatedAllConsultingData);
+            }
+            catch(err){
+                console.error(`loadAllConsultings / Error : ${err}`);
+            };
+        });
         const filterConsulting = getCallback(({set, snapshot }) => async (filterText) => {
             const allConsultingList = await snapshot.getPromise(atomCompanyConsultings);
             
@@ -384,6 +418,7 @@ export const ConsultingRepo = selector({
             loadAllConsultings,
             modifyConsulting,
             setCurrentConsulting,
+            loadCompanyConsultings,
             filterConsulting,
             filterConsultingOri,
             searchConsultings,
