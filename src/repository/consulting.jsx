@@ -379,74 +379,6 @@ export const ConsultingRepo = selector({
 
             return { result: true, data: foundData };
         });
-        const uploadAttachment = getCallback(({set, snapshot}) => async (data) => {
-            let userId  = "";
-            let fileName = "";
-            let fileExt = "";
-            let width = 0;
-            let height = 0;
-        
-            for (const [key, value] of data.entries()) {
-                if (key === "userId"  && typeof value === 'string'){
-                    userId = value;
-                }
-                if(key === 'fileName'  && typeof value === 'string'){
-                    fileName = value;
-                }
-                if(key === 'fileExt'  && typeof value === 'string'){
-                    fileExt = value;
-                }
-                if(key === 'width'  && typeof value === 'string'){
-                    width = parseInt(value,10);
-                }
-                if(key === 'height'  && typeof value === 'string'){
-                    height = parseInt( value, 10);
-                }
-            }
-            try{
-                const attachmentImage = {width:width, height:height, thumbnailsExtension: fileExt};
-                const response = await fetch(`${BASE_PATH}/upload`,{
-                    method: "POST", 
-                    body:data
-                });
-                const responseMessage = await response.json();
-                if(responseMessage)
-                    if(responseMessage.status === 500){
-                        return ({message:'파일 업로드 중 오류가 발생했습니다.'});
-                    } else {
-                        // 성공시DB 처리 
-                        const tempConsulting = {
-                            userId : userId,
-                            aattachmentId : responseMessage.id,
-                            attachmentDirname : responseMessage.dirName, 
-                            attachmentFilename : responseMessage.fileName,
-                            attachmentCreatedAt: responseMessage.createdAt,
-                            attachmentUpdatedAt: responseMessage.updatedAt,
-                            attachmentUrl: responseMessage.url,
-                            attachmentCoverUrl: responseMessage.coverUrl,
-                            attachmentName : fileName,
-                            attachmentImage : attachmentImage,
-                        };
-                        return tempConsulting;
-                                 
-                        // const result = await modifyConsulting(tempConsulting);
-                        // return({
-                        //     fileName:responseMessage.fileName,
-                        //     dirName :responseMessage.dirName,
-                        //     outAttachmentId:responseMessage.outAttachmentId,
-                        //     outAttachmentCreatedAt:result.outAttachmentCreatedAt,
-                        //     outAttachmentUpdatedAt:result.outAttachmentUpdatedAt,
-                        //     outAttachmentUrl:result.outAttachmentUrl,
-                        //     outAttachmentCoverUrl: result.outAttachmentCoverUrl
-                        // })
-                      }
-                    else
-                        return ({message:'파일 업로드 중 오류가 발생했습니다.'});
-             }catch(err){
-                console.error(err);
-                return ({message:'파일 업로드 중 오류가 발생했습니다.'});
-            }
-        });
         return {
             tryLoadAllConsultings,
             loadAllConsultings,
@@ -455,7 +387,6 @@ export const ConsultingRepo = selector({
             filterConsulting,
             filterConsultingOri,
             searchConsultings,
-            uploadAttachment,
         };
     }
 });

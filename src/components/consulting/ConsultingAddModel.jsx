@@ -44,7 +44,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
 
 
   //===== [RecoilState] Related with Consulting =======================================
-  const { modifyConsulting, uploadAttachment } = useRecoilValue(ConsultingRepo);
+  const { modifyConsulting } = useRecoilValue(ConsultingRepo);
 
 
   //===== [RecoilState] Related with Lead =============================================
@@ -63,115 +63,85 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
 
 
   //===== Handles to attachment ========================================
-  const [attachments, setAttachments] = useState([]);
+  const [attachmentsForRequest, setAttachmentsForRequest] = useState([]);
+  const [attachmentsForAction, setAttachmentsForAction] = useState([]);
   const { Dragger } = Upload;
 
-  const handleUpload = (file) => {
-    console.log('handleUpload : ', file);
+  const handleUploadData = (file) => {
+    console.log('handleUploadData : ', file);
     const fileName = file.name;
     const ext_index = fileName.lastIndexOf('.');
     const fileExt = ext_index !== -1 ? fileName.slice(ext_index + 1) : "";
-    
-    // let imageInfo = null;
 
-    const upload = (data) => {
-      const response = uploadAttachment(data);
-      response
-        .then((result) => {
-          console.log('Succeeded to upload file :', result);
-          // const newAttachment: IAttachment = {
-          //   cardAttachementId: result.outAttachmentId,
-          //   creatorUserId: cookies.UserId,
-          //   creatorUserName: cookies.UserName,
-          //   dirName: result.dirName,
-          //   fileName: fileName,
-          //   cardAttachmentName: fileName,
-          //   createdAt: result.outAttachmentCreatedAt,
-          //   updatedAt: null,
-          //   image: imageInfo,
-          //   url: result.outAttachmentUrl,
-          //   coverUrl: result.outAttachmentCoverUrl,
-          //   isCover: false,
-          //   isPersisted: false,
-          // };
-          // const newCard = {
-          //   ...card,
-          //   attachments: [newAttachment, ...card.attachments],
-          // };
-          // updateCard(newCard);
-          // setCard(newCard);
-        })
-        .catch((error) => {
-          console.log('Fail to upload file :', error);
-        });
+    let ret = {
+      fileName : fileName,
+      fileExt : fileExt,
+      width: '0',
+      height: '0',
     };
-
-    const formData = new FormData();
-    formData.append('userId', cookies.myLationCrmUserId);
-    formData.append('fileName', fileName);
-    formData.append('fileExt', fileExt);
-    formData.append('file', file);
 
     if (file.type.startsWith('image/')) {
       const image = new Image();
       image.src = URL.createObjectURL(file);
       image.onload = () => {
-        const width = image.width;
-        const height = image.height;
+        ret.width = image.width;
+        ret.height = image.height;
 
-        formData.append('width', width.toString());
-        formData.append('height', height.toString());
-
-        // imageInfo = {
-        //   width: width,
-        //   height: height,
-        //   thumbnailsExtension: fileExt,
-        // };
-        upload(formData);    
         URL.revokeObjectURL(image.src);
       };
-    } else {
-      upload(formData);
     };
+    return ret;
   };
-  
+
   const uploadRequestProps = {
     name: 'file',
     multiple: true,
-    action: handleUpload,
+    action: `${BASE_PATH}/upload`,
+    data: handleUploadData,
     onChange(info) {
-      const { status } = info.file;
+      const { lastModifiedDate, status, response } = info.file;
 
       if (status === 'done') {
-        setMessage({title: 'Success', message: `${info.file.name} file uploaded successfully.`});
-        setIsMessageModalOpen(true);
+        const tempAttachment = {
+          createdBy: cookies.myLationCrmUserId,
+          attachmentId : response.id,
+          attachmentDirname : response.dirName, 
+          attachmentFilename : response.fileName,
+          attachmentCreatedAt: lastModifiedDate,
+          attachmentUrl: response.url,
+          attachmentCoverUrl: response.coverUrl,
+        }
+        setAttachmentsForRequest(attachmentsForRequest.concat(tempAttachment));
       } else if (status === 'error') {
         setMessage({title: 'Error', message: `${info.file.name} file upload failed.`});
         setIsMessageModalOpen(true);
       }
-    },
-    onDrop(e) {
-      console.log('Dropped files : ', e.dataTransfer.files);
     },
   };
 
   const uploadActionProps = {
     name: 'file',
     multiple: true,
-    action: handleUpload,
+    action: `${BASE_PATH}/upload`,
+    data: handleUploadData,
     onChange(info) {
-      const { status } = info.file;
+      const { lastModifiedDate, status, response } = info.file;
 
       if (status === 'done') {
-        setMessage({title: 'Success', message: `${info.file.name} file uploaded successfully.`});
-        setIsMessageModalOpen(true);
+        const tempAttachment = {
+          createdBy: cookies.myLationCrmUserId,
+          attachmentId : response.id,
+          attachmentDirname : response.dirName, 
+          attachmentFilename : response.fileName,
+          attachmentCreatedAt: lastModifiedDate,
+          attachmentUrl: response.url,
+          attachmentCoverUrl: response.coverUrl,
+        }
+        setAttachmentsForAction(attachmentsForAction.concat(tempAttachment));
       } else if (status === 'error') {
         setMessage({title: 'Error', message: `${info.file.name} file upload failed.`});
         setIsMessageModalOpen(true);
       }
-    },
-    onDrop(e) {
-      console.log('Dropped files : ', e.dataTransfer.files);
     },
   };
 
@@ -222,6 +192,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
       receipt_date: tempDate,
     };
 
+
     if ((selectedCategory.category === 'lead')
       && (currentLead !== defaultLead)
       && (selectedCategory.item_code === currentLead.lead_code)
@@ -238,6 +209,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
     };
     setConsultingChange(modified);
     setNeedInit(false);
+
   }, [cookies.myLationCrmUserName, currentLead, setCurrentCompany, selectedCategory]);
 
 
@@ -303,6 +275,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
       if (handleOpen) handleOpen(!open);
       initializeConsultingTemplate();
     };
+
   }, [open, userState, initializeConsultingTemplate, handleOpen, needInit]);
 
   if (needInit)
