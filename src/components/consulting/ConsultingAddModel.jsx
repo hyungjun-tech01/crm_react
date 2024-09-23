@@ -4,7 +4,7 @@ import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "react-datepicker/dist/react-datepicker.css";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
-import { Upload } from "antd";
+import { Modal, Upload } from "antd";
 import AddToPhotosOutlinedIcon from '@mui/icons-material/AddToPhotosOutlined';
 
 import {
@@ -32,6 +32,7 @@ import AddBasicItem from "../../constants/AddBasicItem";
 import AddSearchItem from "../../constants/AddSearchItem";
 import MessageModal from "../../constants/MessageModal";
 
+import { getBase64 } from "../../constants/functions";
 import Paths from "../../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
@@ -65,6 +66,9 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
   //===== Handles to attachment ========================================
   const [attachmentsForRequest, setAttachmentsForRequest] = useState([]);
   const [attachmentsForAction, setAttachmentsForAction] = useState([]);
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewImage, setPreviewImage] = useState('');
+  const [previewWidth, setPreviewWidth] = useState(256);
   const { Dragger } = Upload;
 
   const handleUploadData = (file) => {
@@ -80,22 +84,30 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
       height: '0',
     };
 
-    if (file.type.startsWith('image/')) {
-      const image = new Image();
-      image.src = URL.createObjectURL(file);
-      image.onload = () => {
-        ret.width = image.width;
-        ret.height = image.height;
+    const getImageInfo = (file) => {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.src = URL.createObjectURL(file);
+        image.onload = () => {
+          resolve({width:image.width, height: image.height});
+          URL.revokeObjectURL(image.src);  
+        };
+        image.onerror = error => reject(error);
+      });
+    }
 
-        URL.revokeObjectURL(image.src);
-      };
+    if (file.type.startsWith('image/')) {
+      const result = async getImageInfo(file);
+    } else {
+      return ret;
     };
-    return ret;
   };
 
   const uploadRequestProps = {
     name: 'file',
     multiple: true,
+    listType: "picture-card",
+    // fileList: attachmentsForRequest,
     action: `${BASE_PATH}/upload`,
     data: handleUploadData,
     onChange(info) {
@@ -103,13 +115,17 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
 
       if (status === 'done') {
         const tempAttachment = {
-          createdBy: cookies.myLationCrmUserId,
+          uid: info.file.uid,
+          name: response.fileName,
+          status: 'done',
           attachmentId : response.id,
           attachmentDirname : response.dirName, 
           attachmentFilename : response.fileName,
           attachmentCreatedAt: lastModifiedDate,
           attachmentUrl: response.url,
           attachmentCoverUrl: response.coverUrl,
+          attachmentImageWidth: response.imageWidth,
+          createdBy: cookies.myLationCrmUserId,
         }
         setAttachmentsForRequest(attachmentsForRequest.concat(tempAttachment));
       } else if (status === 'error') {
@@ -117,11 +133,24 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
         setIsMessageModalOpen(true);
       }
     },
+    onPreview : async (file) => {
+      console.log('onPreview: ', file);
+      if (!file.url && !file.preview) {
+        file.preview = await getBase64(file.originFileObj);
+      };
+  
+      setPreviewImage(file.url || file.preview);
+      setPreviewVisible(true);
+      if(file.response.imageWidth) setPreviewWidth(file.response.imageWidth);
+      else if(file.attachmentImageWidth) setPreviewWidth(file.attachmentImageWidth);
+    }
   };
 
   const uploadActionProps = {
     name: 'file',
     multiple: true,
+    listType: "picture-card",
+    // fileList: attachmentsForAction,
     action: `${BASE_PATH}/upload`,
     data: handleUploadData,
     onChange(info) {
@@ -129,6 +158,9 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
 
       if (status === 'done') {
         const tempAttachment = {
+          uid: info.file.uid,
+          name: response.fileName,
+          status: 'done',
           createdBy: cookies.myLationCrmUserId,
           attachmentId : response.id,
           attachmentDirname : response.dirName, 
@@ -143,9 +175,15 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
         setIsMessageModalOpen(true);
       }
     },
-  };
-
+    onPreview : async (file) => {
+      if (!file.url && !file.preview) {
+        file.preview = await getBase64(file.originFileObj);
+      };
   
+      setPreviewImage(file.url || file.preview);
+      setPreviewVisible(true);
+    }
+  };
 
 
   //===== Handles to edit 'ConsultingAddModel' ========================================
@@ -433,14 +471,6 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                       {t('consulting.request_content')}
                     </div>
                     <div className="add-upload-content">
-                      <Dragger {...uploadRequestProps}>
-                        <span>
-                          <AddToPhotosOutlinedIcon style={{color: "#777777"}}/>
-                        </span>
-                        <span style={{marginLeft: '1rem'}}>
-                          {t('comment.click_drag_file_upload')}
-                        </span>
-                      </Dragger>
                       <textarea
                         className="add-upload-textarea"
                         name = 'request_content'
@@ -449,6 +479,14 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                         value={consultingChange.request_content ? consultingChange.request_content : ""}
                         onChange={handleItemChange}
                       />
+                      <Dragger {...uploadRequestProps}>
+                        <span>
+                          <AddToPhotosOutlinedIcon style={{color: "#777777"}}/>
+                        </span>
+                        <span style={{marginLeft: '1rem'}}>
+                          {t('comment.click_drag_file_upload')}
+                        </span>
+                      </Dragger>
                     </div>
                   </div>
                 </div>
@@ -458,14 +496,6 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                       {t('consulting.action_content')}
                     </div>
                     <div className="add-upload-content">
-                      <Dragger {...uploadActionProps}>
-                        <span>
-                          <AddToPhotosOutlinedIcon style={{color: "#777777"}}/>
-                        </span>
-                        <span style={{marginLeft: '1rem'}}>
-                          {t('comment.click_drag_file_upload')}
-                        </span>
-                      </Dragger>
                       <textarea
                         className="add-upload-textarea"
                         name = 'action_content'
@@ -474,6 +504,14 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                         value={consultingChange.action_content ? consultingChange.action_content : ""}
                         onChange={handleItemChange}
                       />
+                      <Dragger {...uploadActionProps}>
+                        <span>
+                          <AddToPhotosOutlinedIcon style={{color: "#777777"}}/>
+                        </span>
+                        <span style={{marginLeft: '1rem'}}>
+                          {t('comment.click_drag_file_upload')}
+                        </span>
+                      </Dragger>
                     </div>
                   </div>
                 </div>
@@ -500,6 +538,15 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
           </div>
         </div>
       </div>
+      <Modal
+        open={previewVisible}
+        footer={null}
+        onCancel={() =>{setPreviewVisible(false)}}
+        width={previewWidth}
+        zIndex={2005}
+      >
+        <img alt="preview" style={{ width: '100%' }} src={previewImage} />
+      </Modal>
       <MessageModal
         title={message.title}
         message={message.message}
