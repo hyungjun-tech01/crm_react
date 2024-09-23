@@ -71,8 +71,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
   const [previewWidth, setPreviewWidth] = useState(256);
   const { Dragger } = Upload;
 
-  const handleUploadData = (file) => {
-    console.log('handleUploadData : ', file);
+  const handleUploadData = async (file) => {
     const fileName = file.name;
     const ext_index = fileName.lastIndexOf('.');
     const fileExt = ext_index !== -1 ? fileName.slice(ext_index + 1) : "";
@@ -97,7 +96,10 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
     }
 
     if (file.type.startsWith('image/')) {
-      const result = async getImageInfo(file);
+      const result = await getImageInfo(file);
+      ret.width = result.width;
+      ret.height = result.height;
+      return ret;
     } else {
       return ret;
     };
@@ -125,6 +127,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
           attachmentUrl: response.url,
           attachmentCoverUrl: response.coverUrl,
           attachmentImageWidth: response.imageWidth,
+          attachmentImageHeight: response.imageHeight,
           createdBy: cookies.myLationCrmUserId,
         }
         setAttachmentsForRequest(attachmentsForRequest.concat(tempAttachment));
@@ -134,7 +137,6 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
       }
     },
     onPreview : async (file) => {
-      console.log('onPreview: ', file);
       if (!file.url && !file.preview) {
         file.preview = await getBase64(file.originFileObj);
       };
@@ -168,6 +170,8 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
           attachmentCreatedAt: lastModifiedDate,
           attachmentUrl: response.url,
           attachmentCoverUrl: response.coverUrl,
+          attachmentImageWidth: response.imageWidth,
+          attachmentImageHeight: response.imageHeight,
         }
         setAttachmentsForAction(attachmentsForAction.concat(tempAttachment));
       } else if (status === 'error') {
