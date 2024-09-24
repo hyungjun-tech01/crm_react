@@ -45,7 +45,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
 
 
   //===== [RecoilState] Related with Consulting =======================================
-  const { modifyConsulting } = useRecoilValue(ConsultingRepo);
+  const { modifyConsulting, deleteAttachment } = useRecoilValue(ConsultingRepo);
 
 
   //===== [RecoilState] Related with Lead =============================================
@@ -112,7 +112,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
     // fileList: attachmentsForRequest,
     action: `${BASE_PATH}/upload`,
     data: handleUploadData,
-    onChange(info) {
+    onChange: (info) => {
       const { lastModifiedDate, status, response } = info.file;
 
       if (status === 'done') {
@@ -123,6 +123,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
           attachmentId : response.id,
           attachmentDirname : response.dirName, 
           attachmentFilename : response.fileName,
+          attachmentFileExt : response.fileExt,
           attachmentCreatedAt: lastModifiedDate,
           attachmentUrl: response.url,
           attachmentCoverUrl: response.coverUrl,
@@ -130,6 +131,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
           attachmentImageHeight: response.imageHeight,
           createdBy: cookies.myLationCrmUserId,
         }
+        console.log('new attachment :', tempAttachment);
         setAttachmentsForRequest(attachmentsForRequest.concat(tempAttachment));
       } else if (status === 'error') {
         setMessage({title: 'Error', message: `${info.file.name} file upload failed.`});
@@ -145,6 +147,25 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
       setPreviewVisible(true);
       if(file.response.imageWidth) setPreviewWidth(file.response.imageWidth);
       else if(file.attachmentImageWidth) setPreviewWidth(file.attachmentImageWidth);
+    },
+    onRemove: async (file) => {
+      const foundAttachment = attachmentsForRequest.filter(item => item.uid === file.uid);
+      if(foundAttachment.length === 0 || foundAttachment.length > 1){
+        console.log('Something wrong on the way to remove attachment');
+        return false;
+      };
+      const foundOne = foundAttachment[0];
+      const response = deleteAttachment(foundOne.attachmentDirname, foundOne.attachmentFilename, foundOne.attachmentFileExt);
+      response
+        .then(result => {
+          if(!result.result) {
+            console.log('Error occurs on the way to remove attachment :', result.result.message);
+            return false;
+          };
+          const remainAttachments = attachmentsForRequest.filter(item => item.uid !== file.uid);
+          setAttachmentsForRequest(remainAttachments);
+          return true;
+        })
     }
   };
 
