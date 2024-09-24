@@ -184,11 +184,11 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
           uid: info.file.uid,
           name: response.fileName,
           status: 'done',
-          createdBy: cookies.myLationCrmUserId,
-          attachmentId : response.id,
+          attachmentCode : response.code,
+          attachmentCreator: cookies.myLationCrmUserId,
+          attachmentCreateDate: lastModifiedDate,
           attachmentDirname : response.dirName, 
           attachmentFilename : response.fileName,
-          attachmentCreatedAt: lastModifiedDate,
           attachmentUrl: response.url,
           attachmentCoverUrl: response.coverUrl,
           attachmentImageWidth: response.imageWidth,
@@ -496,14 +496,6 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                       {t('consulting.request_content')}
                     </div>
                     <div className="add-upload-content">
-                      <textarea
-                        className="add-upload-textarea"
-                        name = 'request_content'
-                        placeholder={t('consulting.request_content')}
-                        rows={8}
-                        value={consultingChange.request_content ? consultingChange.request_content : ""}
-                        onChange={handleItemChange}
-                      />
                       <Dragger {...uploadRequestProps}>
                         <span>
                           <AddToPhotosOutlinedIcon style={{color: "#777777"}}/>
@@ -512,6 +504,14 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                           {t('comment.click_drag_file_upload')}
                         </span>
                       </Dragger>
+                      <textarea
+                        className="add-upload-textarea"
+                        name = 'request_content'
+                        placeholder={t('consulting.request_content')}
+                        rows={8}
+                        value={consultingChange.request_content ? consultingChange.request_content : ""}
+                        onChange={handleItemChange}
+                      />
                     </div>
                   </div>
                 </div>
@@ -521,14 +521,6 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                       {t('consulting.action_content')}
                     </div>
                     <div className="add-upload-content">
-                      <textarea
-                        className="add-upload-textarea"
-                        name = 'action_content'
-                        placeholder={t('consulting.action_content')}
-                        rows={8}
-                        value={consultingChange.action_content ? consultingChange.action_content : ""}
-                        onChange={handleItemChange}
-                      />
                       <Dragger {...uploadActionProps}>
                         <span>
                           <AddToPhotosOutlinedIcon style={{color: "#777777"}}/>
@@ -537,6 +529,14 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                           {t('comment.click_drag_file_upload')}
                         </span>
                       </Dragger>
+                      <textarea
+                        className="add-upload-textarea"
+                        name = 'action_content'
+                        placeholder={t('consulting.action_content')}
+                        rows={8}
+                        value={consultingChange.action_content ? consultingChange.action_content : ""}
+                        onChange={handleItemChange}
+                      />
                     </div>
                   </div>
                 </div>
