@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "react-datepicker/dist/react-datepicker.css";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
-import { Modal, Upload } from "antd";
-import AddToPhotosOutlinedIcon from '@mui/icons-material/AddToPhotosOutlined';
+// import ReactQuill from 'react-quill';
+// import 'react-quill/dist/quill.snow.css';
 
 import {
   atomCurrentLead,
@@ -31,10 +31,9 @@ import { CompanyRepo } from "../../repository/company";
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddSearchItem from "../../constants/AddSearchItem";
 import MessageModal from "../../constants/MessageModal";
+import QuillEditor from "../../constants/QuillEditor";
 
 import { getBase64 } from "../../constants/functions";
-import Paths from "../../constants/Paths";
-const BASE_PATH = Paths.BASE_PATH;
 
 
 const ConsultingAddModel = ({ open, handleOpen }) => {
@@ -66,152 +65,16 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
   //===== Handles to attachment ========================================
   const [attachmentsForRequest, setAttachmentsForRequest] = useState([]);
   const [attachmentsForAction, setAttachmentsForAction] = useState([]);
-  const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewImage, setPreviewImage] = useState('');
-  const [previewWidth, setPreviewWidth] = useState(256);
-  const { Dragger } = Upload;
-
-  const handleUploadData = async (file) => {
-    const fileName = file.name;
-    const ext_index = fileName.lastIndexOf('.');
-    const fileExt = ext_index !== -1 ? fileName.slice(ext_index + 1) : "";
-
-    let ret = {
-      fileName : fileName,
-      fileExt : fileExt,
-      width: '0',
-      height: '0',
-    };
-
-    const getImageInfo = (file) => {
-      return new Promise((resolve, reject) => {
-        const image = new Image();
-        image.src = URL.createObjectURL(file);
-        image.onload = () => {
-          resolve({width:image.width, height: image.height});
-          URL.revokeObjectURL(image.src);  
-        };
-        image.onerror = error => reject(error);
-      });
-    }
-
-    if (file.type.startsWith('image/')) {
-      const result = await getImageInfo(file);
-      ret.width = result.width;
-      ret.height = result.height;
-      return ret;
-    } else {
-      return ret;
-    };
+  const [ requestAttchmentCode, setRequestAttachmentCode] = useState(null);
+    
+  const handleAddRequestAttachment = (data) => {
+    setAttachmentsForRequest(attachmentsForRequest.concat(data));
   };
 
-  const uploadRequestProps = {
-    name: 'file',
-    multiple: true,
-    listType: "picture-card",
-    // fileList: attachmentsForRequest,
-    action: `${BASE_PATH}/upload`,
-    data: handleUploadData,
-    onChange: (info) => {
-      const { lastModifiedDate, status, response } = info.file;
-
-      if (status === 'done') {
-        const tempAttachment = {
-          uid: info.file.uid,
-          name: response.fileName,
-          status: 'done',
-          attachmentId : response.id,
-          attachmentDirname : response.dirName, 
-          attachmentFilename : response.fileName,
-          attachmentFileExt : response.fileExt,
-          attachmentCreatedAt: lastModifiedDate,
-          attachmentUrl: response.url,
-          attachmentCoverUrl: response.coverUrl,
-          attachmentImageWidth: response.imageWidth,
-          attachmentImageHeight: response.imageHeight,
-          createdBy: cookies.myLationCrmUserId,
-        }
-        console.log('new attachment :', tempAttachment);
-        setAttachmentsForRequest(attachmentsForRequest.concat(tempAttachment));
-      } else if (status === 'error') {
-        setMessage({title: 'Error', message: `${info.file.name} file upload failed.`});
-        setIsMessageModalOpen(true);
-      }
-    },
-    onPreview : async (file) => {
-      if (!file.url && !file.preview) {
-        file.preview = await getBase64(file.originFileObj);
-      };
-  
-      setPreviewImage(file.url || file.preview);
-      setPreviewVisible(true);
-      if(file.response.imageWidth) setPreviewWidth(file.response.imageWidth);
-      else if(file.attachmentImageWidth) setPreviewWidth(file.attachmentImageWidth);
-    },
-    onRemove: async (file) => {
-      const foundAttachment = attachmentsForRequest.filter(item => item.uid === file.uid);
-      if(foundAttachment.length === 0 || foundAttachment.length > 1){
-        console.log('Something wrong on the way to remove attachment');
-        return false;
-      };
-      const foundOne = foundAttachment[0];
-      const response = deleteAttachment(foundOne.attachmentDirname, foundOne.attachmentFilename, foundOne.attachmentFileExt);
-      response
-        .then(result => {
-          if(!result.result) {
-            console.log('Error occurs on the way to remove attachment :', result.result.message);
-            return false;
-          };
-          const remainAttachments = attachmentsForRequest.filter(item => item.uid !== file.uid);
-          setAttachmentsForRequest(remainAttachments);
-          return true;
-        })
-    }
+  const handleAddActionAttachment = (data) => {
+    setAttachmentsForAction(attachmentsForAction.concat(data));
   };
 
-  const uploadActionProps = {
-    name: 'file',
-    multiple: true,
-    listType: "picture-card",
-    // fileList: attachmentsForAction,
-    action: `${BASE_PATH}/upload`,
-    data: handleUploadData,
-    onChange(info) {
-      const { lastModifiedDate, status, response } = info.file;
-
-      if (status === 'done') {
-        const tempAttachment = {
-          uid: info.file.uid,
-          name: response.fileName,
-          status: 'done',
-          attachmentCode : response.code,
-          attachmentCreator: cookies.myLationCrmUserId,
-          attachmentCreateDate: lastModifiedDate,
-          attachmentDirname : response.dirName, 
-          attachmentFilename : response.fileName,
-          attachmentUrl: response.url,
-          attachmentCoverUrl: response.coverUrl,
-          attachmentImageWidth: response.imageWidth,
-          attachmentImageHeight: response.imageHeight,
-        }
-        setAttachmentsForAction(attachmentsForAction.concat(tempAttachment));
-      } else if (status === 'error') {
-        setMessage({title: 'Error', message: `${info.file.name} file upload failed.`});
-        setIsMessageModalOpen(true);
-      }
-    },
-    onPreview : async (file) => {
-      if (!file.url && !file.preview) {
-        file.preview = await getBase64(file.originFileObj);
-      };
-  
-      setPreviewImage(file.url || file.preview);
-      setPreviewVisible(true);
-    }
-  };
-
-
-  //===== Handles to edit 'ConsultingAddModel' ========================================
   const [ needInit, setNeedInit ] = useState(true);
   const [consultingChange, setConsultingChange] = useState({});
   const selectedCategory = useRecoilValue(atomSelectedCategory);
@@ -495,24 +358,21 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                     <div className="add-upload-title" >
                       {t('consulting.request_content')}
                     </div>
-                    <div className="add-upload-content">
-                      <Dragger {...uploadRequestProps}>
-                        <span>
-                          <AddToPhotosOutlinedIcon style={{color: "#777777"}}/>
-                        </span>
-                        <span style={{marginLeft: '1rem'}}>
-                          {t('comment.click_drag_file_upload')}
-                        </span>
-                      </Dragger>
-                      <textarea
-                        className="add-upload-textarea"
-                        name = 'request_content'
-                        placeholder={t('consulting.request_content')}
-                        rows={8}
-                        value={consultingChange.request_content ? consultingChange.request_content : ""}
-                        onChange={handleItemChange}
-                      />
-                    </div>
+                    <QuillEditor
+                      content={consultingChange.request_content || ''}
+                      handleContent={(data)=>handleDateChange('request_content', data)}
+                      attachmentCode={requestAttchmentCode}
+                      handleAttachmentCode={setRequestAttachmentCode}
+                      handleAddAttachment={handleAddRequestAttachment}
+                    />
+                    {/* <ReactQuill 
+                      className="add-upload-content"
+                      theme="snow"
+                      modules={editorModules} 
+                      formats={editorFormats} 
+                      value={requestValue || ''} 
+                      onChange={(content, delta, source, editor) => setRequestValue(editor.getHTML())}
+                    /> */}
                   </div>
                 </div>
                 <div className="col-sm-6" >
@@ -521,14 +381,6 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                       {t('consulting.action_content')}
                     </div>
                     <div className="add-upload-content">
-                      <Dragger {...uploadActionProps}>
-                        <span>
-                          <AddToPhotosOutlinedIcon style={{color: "#777777"}}/>
-                        </span>
-                        <span style={{marginLeft: '1rem'}}>
-                          {t('comment.click_drag_file_upload')}
-                        </span>
-                      </Dragger>
                       <textarea
                         className="add-upload-textarea"
                         name = 'action_content'
@@ -563,15 +415,6 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
           </div>
         </div>
       </div>
-      <Modal
-        open={previewVisible}
-        footer={null}
-        onCancel={() =>{setPreviewVisible(false)}}
-        width={previewWidth}
-        zIndex={2005}
-      >
-        <img alt="preview" style={{ width: '100%' }} src={previewImage} />
-      </Modal>
       <MessageModal
         title={message.title}
         message={message.message}
