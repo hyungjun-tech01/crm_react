@@ -200,17 +200,42 @@ const Consultings = () => {
     {
       title: t('consulting.receipt_date'),
       dataIndex: 'receipt_date',
-      render: (text, record) => 
-        <>{record === null  ? '' : new Date(text.replace(' ', 'T')).toLocaleString('ko-KR',  {
-          timeZone: 'Asia/Seoul',  // 한국 표준시를 설정
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-          hour12: true  // 12시간 형식으로 표시
-      })}</>,
+      render: (text, record) => { 
+        console.log(typeof text, text);
+        // text가 유효한 문자열인지 확인
+        if (record === null || !text ) {
+          return '';
+        }
+
+        if ( typeof text !== 'string' ){
+          const formattedDate = new Date(text).toLocaleString('ko-KR', {
+            timeZone: 'Asia/Seoul',  // 한국 표준시 설정
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true  // 12시간 형식으로 표시
+          });
+  
+          return <>{formattedDate}</>;
+        }else{
+          // text가 유효한 경우 날짜 변환 및 출력
+          const formattedDate = new Date(text.replace(' ', 'T')).toLocaleString('ko-KR', {
+            timeZone: 'Asia/Seoul',  // 한국 표준시 설정
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true  // 12시간 형식으로 표시
+          });
+
+          return <>{formattedDate}</>;
+        }
+      }
     },
     {
       title: t('consulting.receiver'),
