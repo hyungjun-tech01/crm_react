@@ -64,7 +64,8 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
   const [ attachmentsForRequest, setAttachmentsForRequest ] = useState([]);
   const [ attachmentsForAction, setAttachmentsForAction ] = useState([]);
   const [ requestAttchmentCode, setRequestAttachmentCode ] = useState(null);
-    
+  const [ actionAttachmentCode, setActionAttachmentCode ] = useState(null);
+      
   const handleAddRequestAttachment = (data) => {
     setAttachmentsForRequest(attachmentsForRequest.concat(data));
   };
@@ -76,7 +77,13 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
   //===== Handles to This ========================================
   const [ needInit, setNeedInit ] = useState(true);
   const [ consultingChange, setConsultingChange] = useState({});
+  const [ showEditor, setShowEditor ] = useState(0);
+
   const selectedCategory = useRecoilValue(atomSelectedCategory);
+
+  const CLOSE_EDITOR = 0;
+  const EDIT_REQUEST_CONTENT = 1;
+  const EDIT_ACTION_CONTENT = 2;
 
   const handleItemChange = (e) => {
     const modifiedData = {
@@ -104,7 +111,17 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
 
   const handleLeadSelected = (data) => {
     setConsultingChange(data);
-};
+  };
+
+  const handleClickRequestContent = () => {
+    console.log('handleClickRequestContent');
+    setShowEditor(EDIT_REQUEST_CONTENT);
+  };
+
+  const handleClickActionContent = () => {
+    console.log('handleClickActionContent');
+    setShowEditor(EDIT_ACTION_CONTENT);
+  };
 
   const initializeConsultingTemplate = useCallback(() => {
     // document.querySelector("#add_new_consulting_form").reset();
@@ -357,21 +374,22 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                     <div className="add-upload-title" >
                       {t('consulting.request_content')}
                     </div>
-                    <QuillEditor
-                      content={consultingChange.request_content || ''}
-                      handleContent={(data)=>handleDateChange('request_content', data)}
-                      attachmentCode={requestAttchmentCode}
-                      handleAttachmentCode={setRequestAttachmentCode}
-                      handleAddAttachment={handleAddRequestAttachment}
-                    />
-                    {/* <ReactQuill 
-                      className="add-upload-content"
-                      theme="snow"
-                      modules={editorModules} 
-                      formats={editorFormats} 
-                      value={requestValue || ''} 
-                      onChange={(content, delta, source, editor) => setRequestValue(editor.getHTML())}
-                    /> */}
+                    { !(showEditor & EDIT_REQUEST_CONTENT) ?
+                      <div
+                        className="add-upload-button"
+                        onClick={handleClickRequestContent}
+                      >
+                        {consultingChange.request_content || ''}
+                      </div>
+                      :
+                      <QuillEditor
+                        content={consultingChange.request_content || ''}
+                        handleContent={(data)=>handleDateChange('request_content', data)}
+                        attachmentCode={requestAttchmentCode}
+                        handleAttachmentCode={setRequestAttachmentCode}
+                        handleAddAttachment={handleAddRequestAttachment}
+                      />
+                    }
                   </div>
                 </div>
                 <div className="col-sm-6" >
@@ -379,16 +397,22 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                     <div className="add-upload-title" >
                       {t('consulting.action_content')}
                     </div>
-                    <div className="add-upload-content">
-                      <textarea
+                    { !(showEditor & EDIT_ACTION_CONTENT) ?
+                      <div
                         className="add-upload-button"
-                        name = 'action_content'
-                        placeholder={t('consulting.action_content')}
-                        rows={8}
-                        value={consultingChange.action_content ? consultingChange.action_content : ""}
-                        onChange={handleItemChange}
+                        onClick={handleClickActionContent}
+                      >
+                        {consultingChange.actiion_content || ''}
+                      </div>
+                      :
+                      <QuillEditor
+                        content={consultingChange.actiion_content || ''}
+                        handleContent={(data)=>handleDateChange('actiion_content', data)}
+                        attachmentCode={actionAttachmentCode}
+                        handleAttachmentCode={setActionAttachmentCode}
+                        handleAddAttachment={handleAddActionAttachment}
                       />
-                    </div>
+                    }
                   </div>
                 </div>
               </div>
