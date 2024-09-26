@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
@@ -33,8 +33,6 @@ import AddSearchItem from "../../constants/AddSearchItem";
 import MessageModal from "../../constants/MessageModal";
 import QuillEditor from "../../constants/QuillEditor";
 
-import { getBase64 } from "../../constants/functions";
-
 
 const ConsultingAddModel = ({ open, handleOpen }) => {
   const { t } = useTranslation();
@@ -63,9 +61,9 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
 
 
   //===== Handles to attachment ========================================
-  const [attachmentsForRequest, setAttachmentsForRequest] = useState([]);
-  const [attachmentsForAction, setAttachmentsForAction] = useState([]);
-  const [ requestAttchmentCode, setRequestAttachmentCode] = useState(null);
+  const [ attachmentsForRequest, setAttachmentsForRequest ] = useState([]);
+  const [ attachmentsForAction, setAttachmentsForAction ] = useState([]);
+  const [ requestAttchmentCode, setRequestAttachmentCode ] = useState(null);
     
   const handleAddRequestAttachment = (data) => {
     setAttachmentsForRequest(attachmentsForRequest.concat(data));
@@ -75,8 +73,9 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
     setAttachmentsForAction(attachmentsForAction.concat(data));
   };
 
+  //===== Handles to This ========================================
   const [ needInit, setNeedInit ] = useState(true);
-  const [consultingChange, setConsultingChange] = useState({});
+  const [ consultingChange, setConsultingChange] = useState({});
   const selectedCategory = useRecoilValue(atomSelectedCategory);
 
   const handleItemChange = (e) => {
@@ -382,7 +381,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                     </div>
                     <div className="add-upload-content">
                       <textarea
-                        className="add-upload-textarea"
+                        className="add-upload-button"
                         name = 'action_content'
                         placeholder={t('consulting.action_content')}
                         rows={8}

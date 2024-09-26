@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useMemo, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { Button } from 'antd';
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
 
@@ -9,6 +11,7 @@ import Paths from "./Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
 const QuillEditor = ({ content, handleContent, attachmentCode, handleAttachmentCode, handleAddAttachment }) => {
+    const { t } = useTranslation();
     const quillRef = useRef(null);
 
     const changeImageHandler = () => {
@@ -97,12 +100,16 @@ const QuillEditor = ({ content, handleContent, attachmentCode, handleAttachmentC
             <ReactQuill
                 ref={quillRef}
                 theme="snow"
-                className="add-upload-content"
+                className="add-upload-editor"
                 modules={modules}
                 formats={formats}
                 value={content}
                 onChange={handleContent}
             />
+            <div style={{display:'flex', flexDirection:'row'}}>
+                <Button>{t('common.save')}</Button>
+                <Button>{t('common.cancel')}</Button>
+            </div>
         </div>
     )
 }

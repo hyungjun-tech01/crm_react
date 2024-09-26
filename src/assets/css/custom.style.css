@@ -218,7 +218,15 @@
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
 }
-.add-upload-content {
+.add-upload-button {
+    width: 100%;
+    height: 120px;
+    margin: 0;
+    padding: 5px;
+    border: solid 1px #777777;
+    background-color: white;
+}
+.add-upload-editor {
     width: 100%;
     height: 420px;
     margin: 0;
