@@ -1,20 +1,45 @@
 'use client';
 
-import React, { useMemo, useRef } from "react";
+import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useRecoilValue } from 'recoil';
 import { Button } from 'antd';
 import ReactQuill from "react-quill";
+import QuillModule from "./QuillModule";
 import 'react-quill/dist/quill.snow.css';
 
-import QuillModule from "./QuillModule";
+import { AttachmentRepo } from "../repository/attachment";
 import Paths from "./Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
-const QuillEditor = ({ content, handleContent, attachmentCode, handleAttachmentCode, handleAddAttachment }) => {
+const QuillEditor = ({ originalContent, handleData }) => {
     const { t } = useTranslation();
+    const [ content, setContent ] = useState('');
+    const [ attachmentData, setAttachmentData ] = useState([]);
+    const { deleteAttachmentFile } = useRecoilValue(AttachmentRepo);
+    
     const quillRef = useRef(null);
 
-    const changeImageHandler = () => {
+    const handleSave = () => {
+        handleData({
+            content: content,
+            attachmentData: attachmentData,
+        });
+    };
+    const handleCancel = () => {
+        if(attachmentData.length > 0){
+            const tempAttachmentData = attachmentData.filter(item => {
+                const result = deleteAttachmentFile(item.dirName, item.fileName, item.fileExt);
+                return result.result
+            });
+            if(tempAttachmentData.length > 0) {
+                console.log('There is(are) attachment(s) could not be deleted');
+            };
+            setAttachmentData(tempAttachmentData);
+        };
+    };
+
+    const imageHandler = useCallback(() => {
         const input = document.createElement("input");
         input.setAttribute("type", "file");
         input.setAttribute("accept", "image/jpg,image/png,image/jpeg");
@@ -26,24 +51,15 @@ const QuillEditor = ({ content, handleContent, attachmentCode, handleAttachmentC
             const editor = quillRef.current.getEditor();
             const range = editor.getSelection();
 
-            if (files !== null) {
-                let tempCode = attachmentCode;
-                const reader = new FileReader();
+            if (range && (files !== null)) {
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
-                    reader.readAsDataURL(file);
-                    reader.onloadend = () => {
-                        editor.insertEmbed(range.index, 'image', reader.result);
-                        editor.setSelection(range.index + 1);
-                    };
-
                     const fileName = file.name;
                     const ext_index = fileName.lastIndexOf('.');
                     const fileExt = ext_index !== -1 ? fileName.slice(ext_index + 1) : "";
 
                     // formData 추가
                     const formData = new FormData();
-                    formData.append('attachmentCode', tempCode);
                     formData.append('fileName', fileName);
                     formData.append('fileExt', fileExt);
                     formData.append('file', file);
@@ -55,9 +71,11 @@ const QuillEditor = ({ content, handleContent, attachmentCode, handleAttachmentC
                             body: formData,
                         })
                         const result = await response.json();
-                        if(!attachmentCode){
-                            handleAttachmentCode(result.code);
-                        };
+                        const upldateUrl = `${BASE_PATH}/${result.url}`;
+                        
+                        editor.insertEmbed(range.index, 'image', upldateUrl);
+                        // editor.setSelection(range.index + 1);
+
                         const tempAttachment = {
                             attachmentCode : result.code,
                             dirName: result.dirName,
@@ -65,15 +83,18 @@ const QuillEditor = ({ content, handleContent, attachmentCode, handleAttachmentC
                             fileExt: result.fileExt,
                             url: result.url
                         };
-                        handleAddAttachment(tempAttachment);
+                        setAttachmentData(attachmentData.concat(tempAttachment));
                     }
                     catch (err) {
-
+                        alert('Image 올리는 중 error가 발생했습니다.');
+                        console.log('Failed to upload', err);
                     }
                 }
+            } else {
+                alert('Editor를 선택하고 다시 시도해 주시기 바랍니다.')
             }
         }
-    }
+    }, [ attachmentData]);
 
     const formats = [
         "header", "size", "font",
@@ -87,10 +108,14 @@ const QuillEditor = ({ content, handleContent, attachmentCode, handleAttachmentC
         toolbar: {
             container: "#toolBar",
             handlers: {
-                image: changeImageHandler
+                image: imageHandler
             }
         },
-    }), []);
+    }), [imageHandler]);
+
+    useEffect(() => {
+        setContent(originalContent);
+    }, [originalContent])
 
     return (
         <div>
@@ -104,11 +129,11 @@ const QuillEditor = ({ content, handleContent, attachmentCode, handleAttachmentC
                 modules={modules}
                 formats={formats}
                 value={content}
-                onChange={handleContent}
+                onChange={setContent}
             />
-            <div style={{display:'flex', flexDirection:'row'}}>
-                <Button>{t('common.save')}</Button>
-                <Button>{t('common.cancel')}</Button>
+            <div style={{display:'flex', flexDirection:'row', width:'160px', marginTop:'0.5rem', justifyContent:'space-evenly'}}>
+                <Button type='primary' onClick={handleSave}>{t('common.save')}</Button>
+                <Button onClick={handleCancel}>{t('common.cancel')}</Button>
             </div>
         </div>
     )

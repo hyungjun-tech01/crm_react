@@ -378,26 +378,7 @@ export const ConsultingRepo = selector({
 
             return { result: true, data: foundData };
         });
-        const deleteAttachment = getCallback(() => async (dirName, fileName, fileExt) => {
-            const queryObj = {
-                dirName : dirName,
-                fileName : fileName,
-                fileExt : fileExt,
-            };
-            const input_json = JSON.stringify(queryObj);
-            try{
-                const response = await fetch(`${BASE_PATH}/deleteFile`, {
-                    method: "POST",
-                    headers:{'Content-Type':'application/json'},
-                    body: input_json,
-                });
-                const result = await response.json();
-                return { result: true, data: {fileName: result.fileName, filePath: result.filePath} };
-            } catch(e) {
-                console.log('\t[ deleteAttachment ] error occurs');
-                return { result: false, message: 'fail to query'};
-            };
-        });
+        
         return {
             tryLoadAllConsultings,
             loadAllConsultings,
@@ -406,7 +387,6 @@ export const ConsultingRepo = selector({
             filterConsulting,
             filterConsultingOri,
             searchConsultings,
-            deleteAttachment,
         };
     }
 });

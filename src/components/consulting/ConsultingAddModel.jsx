@@ -27,6 +27,7 @@ import {
   ProductTypes
 } from "../../repository/consulting";
 import { CompanyRepo } from "../../repository/company";
+import { AttachmentRepo } from "../../repository/attachment";
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddSearchItem from "../../constants/AddSearchItem";
@@ -61,17 +62,84 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
 
 
   //===== Handles to attachment ========================================
+  const { modifyAttachmentInfo } = useRecoilValue(AttachmentRepo);
   const [ attachmentsForRequest, setAttachmentsForRequest ] = useState([]);
   const [ attachmentsForAction, setAttachmentsForAction ] = useState([]);
-  const [ requestAttchmentCode, setRequestAttachmentCode ] = useState(null);
-  const [ actionAttachmentCode, setActionAttachmentCode ] = useState(null);
       
-  const handleAddRequestAttachment = (data) => {
-    setAttachmentsForRequest(attachmentsForRequest.concat(data));
+  const handleAddRequestContent = (data) => {
+    const {content, attachmentData} = data;
+    
+    handleDataChange('request_content', content);
+    
+    // Check if content has all attachments ------------------------
+    const totalAttachments = [
+      ...attachmentsForRequest,
+      ...attachmentData
+    ];
+    console.log('handleAddRequestContent / before checking :', totalAttachments);
+
+    let foundAttachments = [];
+    let removedAttachments = [];
+    totalAttachments.forEach(item => {
+      if(content.includes(item.url)){
+        foundAttachments.push(item);
+      } else {
+        removedAttachments.push(item);
+      };
+    })
+    console.log('handleAddRequestContent / after checking :', foundAttachments);
+
+    setAttachmentsForRequest(foundAttachments);
+
+    if(removedAttachments.length > 0) {
+      removedAttachments.forEach(item => {
+        const resp = deleteAttachment(item.dirName, item.fileName, item.fileExt);
+        if(!resp.result){
+          console.log('Failed to remove uploaded file :', item);
+        };
+      });
+    };
+
+    // Close editor ------------------------------------------------
+    setShowEditor(CLOSE_EDITOR);
   };
 
-  const handleAddActionAttachment = (data) => {
-    setAttachmentsForAction(attachmentsForAction.concat(data));
+  const handleAddActionContent = (data) => {
+    const {content, attachmentData} = data;
+    
+    handleDataChange('action_content', content);
+
+    // Check if content has all attachments ------------------------
+    const totalAttachments = [
+      ...attachmentsForAction,
+      ...attachmentData
+    ];
+    console.log('handleAddRequestContent / before checking :', totalAttachments);
+
+    let foundAttachments = [];
+    let removedAttachments = [];
+    totalAttachments.forEach(item => {
+      if(content.includes(item.url)){
+        foundAttachments.push(item);
+      } else {
+        removedAttachments.push(item);
+      };
+    })
+    console.log('handleAddActionContent / after checking :', foundAttachments);
+
+    setAttachmentsForAction(foundAttachments);
+
+    if(removedAttachments.length > 0) {
+      removedAttachments.forEach(item => {
+        const resp = deleteAttachment(item.dirName, item.fileName, item.fileExt);
+        if(!resp.result){
+          console.log('Failed to remove uploaded file :', item);
+        };
+      });
+    };
+
+    // Close editor ------------------------------------------------
+    setShowEditor(CLOSE_EDITOR);
   };
 
   //===== Handles to This ========================================
@@ -101,10 +169,10 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
     setConsultingChange(modifiedData);
   };
 
-  const handleDateChange = (name, date) => {
+  const handleDataChange = (name, data) => {
     const modifiedData = {
       ...consultingChange,
-      [name]: date
+      [name]: data
     };
     setConsultingChange(modifiedData);
   };
@@ -114,12 +182,10 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
   };
 
   const handleClickRequestContent = () => {
-    console.log('handleClickRequestContent');
     setShowEditor(EDIT_REQUEST_CONTENT);
   };
 
   const handleClickActionContent = () => {
-    console.log('handleClickActionContent');
     setShowEditor(EDIT_ACTION_CONTENT);
   };
 
@@ -150,13 +216,15 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
       modified['company_name'] = currentLead.company_name;
     };
     setConsultingChange(modified);
+    setAttachmentsForAction([]);
+    setAttachmentsForRequest([]);
     setNeedInit(false);
 
   }, [cookies.myLationCrmUserName, currentLead, setCurrentCompany, selectedCategory]);
 
 
   const handleAddNewConsulting = () => {
-    // Check data if they are available
+    // Check data if they are available ------------------------------------
     let numberOfNoInputItems = 0;
     let noReceiptDate = false;
     if(!consultingChange.receipt_date || consultingChange.receipt_date === ""){
@@ -183,6 +251,51 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
       setMessage(tempMsg);
       setIsMessageModalOpen(true);
       return;
+    };
+
+    // Check attachments and upload them to server if they exist-------------
+    if(attachmentsForAction.length > 0) {
+      attachmentsForAction.forEach(item => {
+        const resp = modifyAttachmentInfo({
+          attachmentCode: consultingChange['action_attachment_code'],
+          actionType: 'ADD',
+          dirName: item.dirName,
+          fileName: item.fileName,
+          fileExt: item.fileExt,
+          creator : cookies.myLationCrmUserId,
+        });
+        if(resp.result){
+          if(!consultingChange['action_attachment_code']){
+            const tempData = {
+              ...consultingChange,
+              action_attachment_code : resp.data.attachmentCode,
+            };
+            setConsultingChange(tempData);
+          }
+        }
+      })
+    };
+
+    if(attachmentsForRequest.length > 0) {
+      attachmentsForRequest.forEach(item => {
+        const resp = modifyAttachmentInfo({
+          attachmentCode: consultingChange['request_attachment_code'],
+          actionType: 'ADD',
+          dirName: item.dirName,
+          fileName: item.fileName,
+          fileExt: item.fileExt,
+          creator : cookies.myLationCrmUserId,
+        });
+        if(resp.result){
+          if(!consultingChange['request_attachment_code']){
+            const tempData = {
+              ...consultingChange,
+              request_attachment_code : resp.data.attachmentCode,
+            };
+            setConsultingChange(tempData);
+          }
+        }
+      })
     };
 
     const newConsultingData = {
@@ -264,7 +377,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                   defaultValue={consultingChange.receipt_date}
                   time
                   required
-                  onChange={handleDateChange}
+                  onChange={handleDataChange}
                 />
                 <AddBasicItem
                   title={t('consulting.receiver')}
@@ -371,8 +484,14 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
               <div className="form-group row">
                 <div className="col-sm-6" >
                   <div className="add-upload-item">
-                    <div className="add-upload-title" >
-                      {t('consulting.request_content')}
+                    <div style={{ display:'flex',flexDirection:'row',justifyContent:'space-between',alignItems:'end' }}>
+                      <div className="add-upload-title" >
+                        {t('consulting.request_content')}
+                      </div>
+                      { !(showEditor & EDIT_REQUEST_CONTENT) && <div style={{fontSize:'13px', fontWeight: 'bold', color: '#999999'}}>
+                          {t('comment.click_below_to_edit')}
+                        </div>
+                      }
                     </div>
                     { !(showEditor & EDIT_REQUEST_CONTENT) ?
                       <div
@@ -383,34 +502,34 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                       </div>
                       :
                       <QuillEditor
-                        content={consultingChange.request_content || ''}
-                        handleContent={(data)=>handleDateChange('request_content', data)}
-                        attachmentCode={requestAttchmentCode}
-                        handleAttachmentCode={setRequestAttachmentCode}
-                        handleAddAttachment={handleAddRequestAttachment}
+                        originalContent={consultingChange.request_content || ''}
+                        handleData={handleAddRequestContent}
                       />
                     }
                   </div>
                 </div>
                 <div className="col-sm-6" >
                   <div className="add-upload-item">
-                    <div className="add-upload-title" >
-                      {t('consulting.action_content')}
+                    <div style={{ display:'flex',flexDirection:'row',justifyContent:'space-between',alignItems:'end' }}>
+                      <div className="add-upload-title" >
+                        {t('consulting.action_content')}
+                      </div>
+                      { !(showEditor & EDIT_ACTION_CONTENT) && <div style={{fontSize:'13px', fontWeight: 'bold', color: '#999999'}}>
+                          {t('comment.click_below_to_edit')}
+                        </div>
+                      }
                     </div>
                     { !(showEditor & EDIT_ACTION_CONTENT) ?
                       <div
                         className="add-upload-button"
                         onClick={handleClickActionContent}
                       >
-                        {consultingChange.actiion_content || ''}
+                        {consultingChange.action_content || ''}
                       </div>
                       :
                       <QuillEditor
-                        content={consultingChange.actiion_content || ''}
-                        handleContent={(data)=>handleDateChange('actiion_content', data)}
-                        attachmentCode={actionAttachmentCode}
-                        handleAttachmentCode={setActionAttachmentCode}
-                        handleAddAttachment={handleAddActionAttachment}
+                        originalContent={consultingChange.action_content || ''}
+                        handleData={handleAddActionContent}
                       />
                     }
                   </div>

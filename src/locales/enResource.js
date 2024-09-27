@@ -353,6 +353,7 @@ const enResource = {
             title_check: 'Check',
             msg_fail_save: 'Failed to save.',
             click_drag_file_upload: 'Click or drag file to this area to upload',
+            click_below_to_edit: '👉 Click the below to edit',
         },
         user :{
             phone:'Phone Number',
