@@ -4,8 +4,7 @@ import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "react-datepicker/dist/react-datepicker.css";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
-// import ReactQuill from 'react-quill';
-// import 'react-quill/dist/quill.snow.css';
+import * as DOMPurify from "dompurify";
 
 import {
   atomCurrentLead,
@@ -62,7 +61,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
 
 
   //===== Handles to attachment ========================================
-  const { modifyAttachmentInfo } = useRecoilValue(AttachmentRepo);
+  const { deleteFile, modifyAttachmentInfo } = useRecoilValue(AttachmentRepo);
   const [ attachmentsForRequest, setAttachmentsForRequest ] = useState([]);
   const [ attachmentsForAction, setAttachmentsForAction ] = useState([]);
       
@@ -93,7 +92,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
 
     if(removedAttachments.length > 0) {
       removedAttachments.forEach(item => {
-        const resp = deleteAttachment(item.dirName, item.fileName, item.fileExt);
+        const resp = deleteFile(item.dirName, item.fileName, item.fileExt);
         if(!resp.result){
           console.log('Failed to remove uploaded file :', item);
         };
@@ -343,7 +342,6 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
       tabIndex={-1}
       role="dialog"
       aria-modal="true"
-      data-bs-focus="false"
     >
       <div
         className="modal-dialog" role="document"
@@ -497,13 +495,15 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                       <div
                         className="add-upload-button"
                         onClick={handleClickRequestContent}
-                      >
-                        {consultingChange.request_content || ''}
-                      </div>
+                        dangerouslySetInnerHTML={{
+                          __html: DOMPurify.sanitize(String(consultingChange.request_content || '')),
+                        }}
+                      />
                       :
                       <QuillEditor
                         originalContent={consultingChange.request_content || ''}
                         handleData={handleAddRequestContent}
+                        handleClose={()=>setShowEditor(CLOSE_EDITOR)}
                       />
                     }
                   </div>
@@ -523,13 +523,15 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                       <div
                         className="add-upload-button"
                         onClick={handleClickActionContent}
-                      >
-                        {consultingChange.action_content || ''}
-                      </div>
+                        dangerouslySetInnerHTML={{
+                          __html: DOMPurify.sanitize(String(consultingChange.action_content || '')),
+                        }}
+                      />
                       :
                       <QuillEditor
                         originalContent={consultingChange.action_content || ''}
                         handleData={handleAddActionContent}
+                        handleClose={()=>setShowEditor(CLOSE_EDITOR)}
                       />
                     }
                   </div>

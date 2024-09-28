@@ -7,7 +7,40 @@ const BASE_PATH = Paths.BASE_PATH;
 export const AttachmentRepo = selector({
     key: "AttachmentRepository",
     get: ({getCallback}) => {
-        const deleteAttachmentFile = getCallback(() => async (dirName, fileName, fileExt) => {
+        const uploadFile = getCallback(() => async (file) => {
+            const fileName = file.name;
+            const ext_index = fileName.lastIndexOf('.');
+            const fileExt = ext_index !== -1 ? fileName.slice(ext_index + 1) : "";
+
+            const formData = new FormData();
+            formData.append('fileName', fileName);
+            formData.append('fileExt', fileExt);
+            formData.append("file", file); // 위에서 만든 폼데이터에 이미지 추가
+            
+            try {
+                const response = await fetch(`${BASE_PATH}/upload`, {
+                    method: "POST",
+                    body: formData,
+                })
+                const result = await response.json();
+
+                if(result.status === 500) {
+                    return { result: false, message: 'Image 올리는 중 error가 발생했습니다.'};
+                };
+                return {
+                    result: true,
+                    data: {
+                        dirName: result.dirName,
+                        fileName: result.fileName,
+                        fileExt: result.fileExt,
+                        url: result.url
+                    }
+                };
+            } catch(err) {
+                return { result: false, message: 'Image 올리는 중 error가 발생했습니다.'};
+            };
+        });
+        const deleteFile = getCallback(() => async (dirName, fileName, fileExt) => {
             const queryObj = {
                 dirName : dirName,
                 fileName : fileName,
@@ -67,7 +100,8 @@ export const AttachmentRepo = selector({
         })
 
         return {
-            deleteAttachmentFile,
+            uploadFile,
+            deleteFile,
             modifyAttachmentInfo,
         }
     }

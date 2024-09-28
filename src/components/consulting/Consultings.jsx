@@ -162,7 +162,8 @@ const Consultings = () => {
     setOpenAddConsulting(true);
     setTimeout(()=>{
       let myModal = new bootstrap.Modal(document.getElementById('add_consulting'), {
-        keyboard: false
+        keyboard: false,
+        focus: true
       })
       myModal.show();
     }, 500)

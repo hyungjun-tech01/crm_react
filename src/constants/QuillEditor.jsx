@@ -4,23 +4,24 @@ import React, { useCallback, useMemo, useRef, useState, useEffect } from "react"
 import { useTranslation } from "react-i18next";
 import { useRecoilValue } from 'recoil';
 import { Button } from 'antd';
-import ReactQuill from "react-quill";
+import ReactQuill from "react-quill-new";
 import QuillModule from "./QuillModule";
-import 'react-quill/dist/quill.snow.css';
+import 'react-quill-new/dist/quill.snow.css';
 
 import { AttachmentRepo } from "../repository/attachment";
 import Paths from "./Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
-const QuillEditor = ({ originalContent, handleData }) => {
+const QuillEditor = ({ originalContent, handleData, handleClose }) => {
     const { t } = useTranslation();
     const [ content, setContent ] = useState('');
     const [ attachmentData, setAttachmentData ] = useState([]);
-    const { deleteAttachmentFile } = useRecoilValue(AttachmentRepo);
+    const { uploadFile, deleteFile } = useRecoilValue(AttachmentRepo);
     
     const quillRef = useRef(null);
 
     const handleSave = () => {
+        console.log('QuillEditor / content :', content);
         handleData({
             content: content,
             attachmentData: attachmentData,
@@ -29,7 +30,7 @@ const QuillEditor = ({ originalContent, handleData }) => {
     const handleCancel = () => {
         if(attachmentData.length > 0){
             const tempAttachmentData = attachmentData.filter(item => {
-                const result = deleteAttachmentFile(item.dirName, item.fileName, item.fileExt);
+                const result = deleteFile(item.dirName, item.fileName, item.fileExt);
                 return result.result
             });
             if(tempAttachmentData.length > 0) {
@@ -37,71 +38,62 @@ const QuillEditor = ({ originalContent, handleData }) => {
             };
             setAttachmentData(tempAttachmentData);
         };
+        handleClose();
     };
 
     const imageHandler = useCallback(() => {
         const input = document.createElement("input");
         input.setAttribute("type", "file");
-        input.setAttribute("accept", "image/jpg,image/png,image/jpeg");
-        input.setAttribute("multiple", "multiple");
+        input.setAttribute("accept", "image/*");
+        // input.setAttribute("multiple", "multiple");
+        input.setAttribute("name", "image");
         input.click();
 
         input.onchange = async () => { // onChange 추가
-            let files = input.files;
-            const editor = quillRef.current.getEditor();
-            const range = editor.getSelection();
-
-            if (range && (files !== null)) {
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    const fileName = file.name;
-                    const ext_index = fileName.lastIndexOf('.');
-                    const fileExt = ext_index !== -1 ? fileName.slice(ext_index + 1) : "";
-
-                    // formData 추가
-                    const formData = new FormData();
-                    formData.append('fileName', fileName);
-                    formData.append('fileExt', fileExt);
-                    formData.append('file', file);
-
-                    try {
-                        const response = await fetch(`${BASE_PATH}/upload`, {
-                            method: "POST",
-                            // headers: { 'Content-Type': 'multipart/form-data' },
-                            body: formData,
-                        })
-                        const result = await response.json();
-                        const upldateUrl = `${BASE_PATH}/${result.url}`;
-                        
-                        editor.insertEmbed(range.index, 'image', upldateUrl);
-                        // editor.setSelection(range.index + 1);
-
-                        const tempAttachment = {
-                            attachmentCode : result.code,
-                            dirName: result.dirName,
-                            fileName: result.fileName,
-                            fileExt: result.fileExt,
-                            url: result.url
-                        };
-                        setAttachmentData(attachmentData.concat(tempAttachment));
-                    }
-                    catch (err) {
-                        alert('Image 올리는 중 error가 발생했습니다.');
-                        console.log('Failed to upload', err);
-                    }
+            const file = input.files[0];
+            const result = uploadFile(file);
+            
+            result.then(res => {
+                if(!res.result){
+                    alert(result.message);
+                    return;
                 }
-            } else {
-                alert('Editor를 선택하고 다시 시도해 주시기 바랍니다.')
-            }
+    
+                const tempAttachment = {
+                    dirName: res.data.dirName,
+                    fileName: res.data.fileName,
+                    fileExt: res.data.fileExt,
+                    url: res.data.url
+                };
+                setAttachmentData(attachmentData.concat(tempAttachment));
+    
+                const editor = quillRef.current.getEditor();
+                quillRef.current.focus();
+    
+                const imageUrl = `${BASE_PATH}/${res.data.url}`;
+                const range = editor.getSelection();
+                if (range) {
+                    editor.insertEmbed(range.index, 'image', imageUrl);
+                    quillRef.current.blur();
+                } else {
+                    // 범위가 없을 때 커서를 맨 끝에 두고 이미지 삽입
+                    editor.setSelection(editor.getLength(), 0);
+                    // editor.insertEmbed(editor.getLength(), 'image', imageUrl);
+                    editor.clipboard.dangerouslyPasteHTML(
+                        editor.getSelection().index,
+                        `<img src=${imageUrl} alt="image" />`
+                    );
+                };
+            });
         }
-    }, [ attachmentData]);
+    }, [attachmentData, uploadFile, quillRef, setContent]);
 
     const formats = [
         "header", "size", "font",
         "bold", "italic", "underline", "strike", "blockquote",
-        "list", "bullet", "indent", "link", "image",
+        "list", "indent", "link", "image",
         "color", "background", "align",
-        "script", "code-block", "clean"
+        "script", "code-block"
     ];
 
     const modules = useMemo(() => ({
@@ -115,6 +107,9 @@ const QuillEditor = ({ originalContent, handleData }) => {
 
     useEffect(() => {
         setContent(originalContent);
+        if(quillRef.current){
+            quillRef.current.focus();
+        }
     }, [originalContent])
 
     return (
