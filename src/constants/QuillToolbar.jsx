@@ -1,8 +1,10 @@
 import React from "react";
 
-const QuillModule = () => {
+const QuillToolbar = () => {
     return (
-        <>
+        <div id="QuillToolbar"
+            style={{ width: '100%', border: '1px solid #777777', borderBottom: '0' }}
+        >
             <div className="ql-formats">
                 <select className="ql-header" defaultValue="7">
                     <option value="1">Header 1</option>
@@ -44,8 +46,8 @@ const QuillModule = () => {
                 <button className="ql-link" />
                 <button className="ql-image" />
             </div>
-        </>
+        </div>
     )
 }
 
-export default QuillModule;
+export default QuillToolbar;

@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useRecoilValue } from 'recoil';
 import { Button } from 'antd';
 import ReactQuill from "react-quill-new";
-import QuillModule from "./QuillModule";
+import QuillToolbar from "./QuillToolbar";
 import 'react-quill-new/dist/quill.snow.css';
 
 import { AttachmentRepo } from "../repository/attachment";
@@ -75,6 +75,7 @@ const QuillEditor = ({ originalContent, handleData, handleClose }) => {
                 if (range) {
                     editor.insertEmbed(range.index, 'image', imageUrl);
                     quillRef.current.blur();
+                    editor.setSelection(range.index + 1, 1);
                 } else {
                     // 범위가 없을 때 커서를 맨 끝에 두고 이미지 삽입
                     editor.setSelection(editor.getLength(), 0);
@@ -86,7 +87,7 @@ const QuillEditor = ({ originalContent, handleData, handleClose }) => {
                 };
             });
         }
-    }, [attachmentData, uploadFile, quillRef, setContent]);
+    }, [attachmentData, uploadFile, quillRef]);
 
     const formats = [
         "header", "size", "font",
@@ -97,13 +98,13 @@ const QuillEditor = ({ originalContent, handleData, handleClose }) => {
     ];
 
     const modules = useMemo(() => ({
-        toolbar: {
-            container: "#toolBar",
-            handlers: {
-                image: imageHandler
-            }
+        toolbar: { // 툴바에 넣을 기능들을 순서대로 나열하면 된다.
+            container: '#QuillToolbar',
+            handlers: { // 위에서 만든 이미지 핸들러 사용하도록 설정
+                image: imageHandler,
+            },
         },
-    }), [imageHandler]);
+    }), []);
 
     useEffect(() => {
         setContent(originalContent);
@@ -114,9 +115,7 @@ const QuillEditor = ({ originalContent, handleData, handleClose }) => {
 
     return (
         <div>
-            <div id="toolBar" style={{ width: '100%', border: '1px solid #777777', borderBottom: '0' }}>
-                <QuillModule />
-            </div>
+            <QuillToolbar />
             <ReactQuill
                 ref={quillRef}
                 theme="snow"
