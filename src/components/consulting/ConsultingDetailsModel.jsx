@@ -135,7 +135,7 @@ const ConsultingDetailsModel = () => {
     setCurrentConsulting();
   }, [setCurrentConsulting]);
 
-  const consulting_items_info = [
+  const consultingItemsInfo = [
     { key: 'department', title: 'lead.department', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'mobile_number', title: 'lead.mobile', detail: { type: 'label', editing: handleDetailChange } },
@@ -150,8 +150,11 @@ const ConsultingDetailsModel = () => {
     { key: 'lead_sales', title: 'lead.lead_sales', detail: { type: 'select', options: salespersonsForSelection, editing: handleDetailSelectChange } },
     { key: 'application_engineer', title: 'company.engineer', detail: { type: 'select', options: engineersForSelection, editing: handleDetailSelectChange } },
     { key: 'receiver', title: 'consulting.receiver', detail: { type: 'select', options: usersForSelection, editing: handleDetailSelectChange } },
-    { key: 'request_content', title: 'consulting.request_content', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
-    { key: 'action_content', title: 'consulting.action_content', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
+  ];
+
+  const consultingItemsInfo2 = [
+    { key: 'request_content', title: 'consulting.request_content', detail: { type: 'content', extra: 'long', editing: handleDetailChange } },
+    { key: 'action_content', title: 'consulting.action_content', detail: { type: 'content', extra: 'long', editing: handleDetailChange } },
     { key: 'memo', title: 'common.memo', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
   ];
 
@@ -268,7 +271,25 @@ const ConsultingDetailsModel = () => {
                               style={{ display: 'flex', marginBottom: '0.5rem' }}
                               wrap
                             >
-                              { consulting_items_info.map((item, index) =>
+                              { consultingItemsInfo.map((item, index) =>
+                                <DetailCardItem
+                                  key={index}
+                                  title={t(item.title)}
+                                  defaultValue={selectedConsulting[item.key]}
+                                  edited={editedDetailValues}
+                                  name={item.key}
+                                  detail={item.detail}
+                                />
+                              )}
+                            </Space>
+                            <Space
+                              align="start"
+                              direction="horizontal"
+                              size="small"
+                              style={{ display: 'flex', marginBottom: '0.5rem' }}
+                              wrap
+                            >
+                              { consultingItemsInfo2.map((item, index) =>
                                 <DetailCardItem
                                   key={index}
                                   title={t(item.title)}

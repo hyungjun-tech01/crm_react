@@ -316,6 +316,7 @@ export const ConsultingRepo = selector({
                         set(atomCurrentConsulting, defaultConsulting);
                     };
                 }else{
+                    console.log('Check data :', allConsultings[consulting_code]);
                     set(atomCurrentConsulting, allConsultings[consulting_code]);
                 }
             }
