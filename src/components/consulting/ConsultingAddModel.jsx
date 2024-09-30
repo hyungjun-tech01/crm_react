@@ -42,7 +42,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
 
 
   //===== [RecoilState] Related with Consulting =======================================
-  const { modifyConsulting, deleteAttachment } = useRecoilValue(ConsultingRepo);
+  const { modifyConsulting } = useRecoilValue(ConsultingRepo);
 
 
   //===== [RecoilState] Related with Lead =============================================
@@ -64,6 +64,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
   const { deleteFile, modifyAttachmentInfo } = useRecoilValue(AttachmentRepo);
   const [ attachmentsForRequest, setAttachmentsForRequest ] = useState([]);
   const [ attachmentsForAction, setAttachmentsForAction ] = useState([]);
+  const [ attachmentCodeChecked, setAttachmentCodeChecked ] = useState({request: false, action: false});
       
   const handleAddRequestContent = (data) => {
     const {content, attachmentData} = data;
@@ -93,14 +94,14 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
     if(removedAttachments.length > 0) {
       removedAttachments.forEach(item => {
         const resp = deleteFile(item.dirName, item.fileName, item.fileExt);
-        if(!resp.result){
-          console.log('Failed to remove uploaded file :', item);
-        };
+        resp.then(res => {
+          if(!res.result){
+            alert('Failed to remove uploaded file :', item);
+            // ToDo: Then, what should we do to deal this condition!
+          };
+        })
       });
     };
-
-    // Close editor ------------------------------------------------
-    setShowEditor(CLOSE_EDITOR);
   };
 
   const handleAddActionContent = (data) => {
@@ -130,15 +131,15 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
 
     if(removedAttachments.length > 0) {
       removedAttachments.forEach(item => {
-        const resp = deleteAttachment(item.dirName, item.fileName, item.fileExt);
-        if(!resp.result){
-          console.log('Failed to remove uploaded file :', item);
-        };
+        const resp = deleteFile(item.dirName, item.fileName, item.fileExt);
+        resp.then(res => {
+          if(!res.result){
+            alert('Failed to remove uploaded file :', item);
+            // ToDo: Then, what should we do to deal this condition!
+          };
+        })
       });
     };
-
-    // Close editor ------------------------------------------------
-    setShowEditor(CLOSE_EDITOR);
   };
 
   //===== Handles to This ========================================
@@ -253,6 +254,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
     };
 
     // Check attachments and upload them to server if they exist-------------
+    let actionAttachmentChecked = false;
     if(attachmentsForAction.length > 0) {
       attachmentsForAction.forEach(item => {
         const resp = modifyAttachmentInfo({
@@ -263,18 +265,25 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
           fileExt: item.fileExt,
           creator : cookies.myLationCrmUserId,
         });
-        if(resp.result){
-          if(!consultingChange['action_attachment_code']){
-            const tempData = {
-              ...consultingChange,
-              action_attachment_code : resp.data.attachmentCode,
-            };
-            setConsultingChange(tempData);
+        resp.then(res => {
+          if(res.result){
+            if(!consultingChange['action_attachment_code']){
+              const tempData = {
+                ...consultingChange,
+                action_attachment_code : res.data.attachmentCode,
+              };
+              setConsultingChange(tempData);
+              actionAttachmentChecked = true;
+            }
           }
-        }
+        });
       })
+    } else {
+      actionAttachmentChecked = true;
     };
+    console.log('handleAddNewConsulting / check action attachment :', actionAttachmentChecked);
 
+    let requestAttachmentChecked = false;
     if(attachmentsForRequest.length > 0) {
       attachmentsForRequest.forEach(item => {
         const resp = modifyAttachmentInfo({
@@ -285,17 +294,23 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
           fileExt: item.fileExt,
           creator : cookies.myLationCrmUserId,
         });
-        if(resp.result){
-          if(!consultingChange['request_attachment_code']){
-            const tempData = {
-              ...consultingChange,
-              request_attachment_code : resp.data.attachmentCode,
-            };
-            setConsultingChange(tempData);
+        resp.then(res => {
+          if(res.result){
+            if(!consultingChange['request_attachment_code']){
+              const tempData = {
+                ...consultingChange,
+                request_attachment_code : res.data.attachmentCode,
+              };
+              setConsultingChange(tempData);
+              requestAttachmentChecked = true;
+            }
           }
-        }
+        });
       })
+    } else {
+      requestAttachmentChecked = true;
     };
+    console.log('handleAddNewConsulting / check request attachment :', requestAttachmentChecked);
 
     const newConsultingData = {
       ...consultingChange,

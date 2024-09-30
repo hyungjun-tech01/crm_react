@@ -139,7 +139,9 @@ export const defaultConsulting = {
     lead_time: null,
     request_type: null,
     request_content: null,
+    request_attachment_code: null,
     action_content: null,
+    action_attachment_code: null,
     sales_representative: null,
     application_engineer: null,
     status: null,
@@ -482,6 +484,16 @@ export const atomFilteredTaxInvoiceArray = atom({
 export const atomTaxInvoiceState = atom({
     key: "taxInvoiceState",
     default: 0,
+});
+
+//----- Attchment Codes for Consulting ------------------------
+export const atomRequestAttachments = atom({
+    key: "atomRequestAttachments",
+    default: [],
+});
+export const atomActionAttachments = atom({
+    key: "atomActionAttachments",
+    default: [],
 });
 
 //----- Selected Item ------------------------

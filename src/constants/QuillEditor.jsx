@@ -26,6 +26,7 @@ const QuillEditor = ({ originalContent, handleData, handleClose }) => {
             content: content,
             attachmentData: attachmentData,
         });
+        handleClose();
     };
     const handleCancel = () => {
         if(attachmentData.length > 0){

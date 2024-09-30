@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input } from 'antd';
 import Select from 'react-select';
 import DatePicker from "react-datepicker";
@@ -10,6 +10,7 @@ import * as DOMPurify from "dompurify";
 import { ConvertCurrency } from './functions';
 import PopupPostCode from "./PostCode";
 import SelectListModal from './SelectListModal';
+import QuillEditor from "./QuillEditor";
 
 
 const DateInput = (props) => {
@@ -240,19 +241,34 @@ const SearchInput = (props) => {
 };
 
 const ContentInput = (props) => {
-    const { name, addonBefore, title, value, onChange, disabled } = props;
+    const { addonBefore, title, value, onChange } = props;
+    const [ editable, setEditable ] = useState(false);
+
+    useEffect(()=>{
+        setEditable(false);
+    }, []);
+
     return (
         <div className="detail-content-item">
             <div className='detail-content-title'>
                 {addonBefore}
             </div>
-            <div
-                className='detail-content-editor'
-                placeholder={title}
-                dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(String(value || '')),
-                }}
-            />
+            { editable ? 
+                <QuillEditor
+                    originalContent={value || ''}
+                    handleData={onChange}
+                    handleClose={()=>setEditable(false)}
+                />
+                :
+                <div
+                    className='detail-content-editor'
+                    placeholder={title}
+                    dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(String(value || '')),
+                    }}
+                    onClick={()=>setEditable(true)}
+                />
+            }
         </div>
     );
 };

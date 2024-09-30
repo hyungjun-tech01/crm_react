@@ -7,6 +7,8 @@ import { atomCurrentConsulting
     , atomFilteredConsultingArray
     , atomConsultingState
     , atomCurrentLead
+    , atomRequestAttachments
+    , atomActionAttachments
     , defaultLead,
     atomConsultingByLead
 } from '../atoms/atoms';
@@ -301,6 +303,8 @@ export const ConsultingRepo = selector({
                     return;
                 };
                 const allConsultings = await snapshot.getPromise(atomAllConsultingObj);
+
+                let foundConsulting = null;
                 if(!allConsultings[consulting_code]){
                     // consulting이 없다면 쿼리 
                     const found = await searchConsultings('consuliting_code', consulting_code, true);
@@ -312,12 +316,51 @@ export const ConsultingRepo = selector({
                         };
                         set(atomAllConsultingObj, updatedAllConsultings);
                         set(atomFilteredConsultingArray, Object.values(updatedAllConsultings));
+                        foundConsulting = found.data[0];
                     } else {
                         set(atomCurrentConsulting, defaultConsulting);
                     };
                 }else{
-                    console.log('Check data :', allConsultings[consulting_code]);
                     set(atomCurrentConsulting, allConsultings[consulting_code]);
+                    foundConsulting = allConsultings[consulting_code];
+                };
+
+                // Chack attachment code and load attachment info.
+                if(!!foundConsulting) {
+                    console.log('Check if this consulting has attachment(s)');
+                    if(foundConsulting.request_attachment_code && foundConsulting.request_attachment_code !== ''){
+                        const input_json = JSON.stringify({attachment_code: foundConsulting.request_attachment_code});
+                        const response = await fetch(`${BASE_PATH}/attachment`, {
+                            method: "POST",
+                            headers:{'Content-Type':'application/json'},
+                            body: input_json,
+                        });
+                        const data = await response.json();
+                        if(data.message){
+                            console.log('Error to set request attachment :', data.message);
+                            return;
+                        };
+                        set(atomRequestAttachments, data);
+                        console.log(`This has ${data.length} of attachment for request`);
+                    };
+                    if(foundConsulting.action_attachment_code && foundConsulting.action_attachment_code !== ''){
+                        const input_json = JSON.stringify({attachment_code: foundConsulting.action_attachment_code});
+                        const response = await fetch(`${BASE_PATH}/attachment`, {
+                            method: "POST",
+                            headers:{'Content-Type':'application/json'},
+                            body: input_json,
+                        });
+                        const data = await response.json();
+                        if(data.message){
+                            console.log('Error to set action attachment :', data.message);
+                            return;
+                        };
+                        set(atomActionAttachments, data);
+                        console.log(`This has ${data.length} of attachment for action`);
+                    };
+                } else {
+                    set(atomRequestAttachments, []);  //default
+                    set(atomActionAttachments, []);   //default
                 }
             }
             catch(err){

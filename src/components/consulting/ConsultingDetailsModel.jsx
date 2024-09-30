@@ -11,7 +11,13 @@ import {
   atomEngineersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
-import { atomConsultingState, atomCurrentConsulting, atomSelectedCategory, defaultConsulting } from "../../atoms/atoms";
+import {
+  atomConsultingState,
+  atomCurrentConsulting,
+  atomSelectedCategory,
+  atomRequestAttachments,
+  atomActionAttachments,
+  defaultConsulting } from "../../atoms/atoms";
 import {
   ConsultingRepo,
   ConsultingTypes,
@@ -19,6 +25,7 @@ import {
   ConsultingTimeTypes,
   ProductTypes
 } from "../../repository/consulting";
+import { AttachmentRepo } from "../../repository/attachment";
 
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
@@ -75,7 +82,7 @@ const ConsultingDetailsModel = () => {
     };
   }, [editedDetailValues, selectedConsulting]);
 
-  const handleDetailDateChange = useCallback((name, date) => {
+  const handleDetailDataChange = useCallback((name, date) => {
     if (date !== new Date(selectedConsulting[name])) {
       const tempEdited = {
         ...editedDetailValues,
@@ -98,6 +105,89 @@ const ConsultingDetailsModel = () => {
     };
   }, [editedDetailValues, selectedConsulting]);
 
+  //===== Handles to attachment ========================================
+  const orgRequestAttachments = useRecoilState(atomRequestAttachments);
+  const orgActionAttachments = useRecoilValue(atomActionAttachments);
+  const { deleteFile, modifyAttachmentInfo } = useRecoilValue(AttachmentRepo);
+  const [ attachmentsForRequest, setAttachmentsForRequest ] = useState([]);
+  const [ attachmentsForAction, setAttachmentsForAction ] = useState([]);
+
+  const handleAddRequestContent = (data) => {
+    const {content, attachmentData} = data;
+    
+    handleDetailDataChange('request_content', content);
+    
+    // Check if content has all attachments ------------------------
+    const totalAttachments = [
+      ...attachmentsForRequest,
+      ...attachmentData
+    ];
+    console.log('handleAddRequestContent / before checking :', totalAttachments);
+
+    let foundAttachments = [];
+    let removedAttachments = [];
+    totalAttachments.forEach(item => {
+      if(content.includes(item.url)){
+        foundAttachments.push(item);
+      } else {
+        removedAttachments.push(item);
+      };
+    })
+    console.log('handleAddRequestContent / after checking :', foundAttachments);
+
+    setAttachmentsForRequest(foundAttachments);
+
+    if(removedAttachments.length > 0) {
+      removedAttachments.forEach(item => {
+        const resp = deleteFile(item.dirName, item.fileName, item.fileExt);
+        resp.then(res => {
+          if(!res.result){
+            alert('Failed to remove uploaded file :', item);
+            // ToDo: Then, what should we do to deal this condition!
+          };
+        })
+      });
+    };
+  };
+
+  const handleAddActionContent = (data) => {
+    const {content, attachmentData} = data;
+    
+    handleDetailDataChange('action_content', content);
+
+    // Check if content has all attachments ------------------------
+    const totalAttachments = [
+      ...attachmentsForAction,
+      ...attachmentData
+    ];
+    console.log('handleAddRequestContent / before checking :', totalAttachments);
+
+    let foundAttachments = [];
+    let removedAttachments = [];
+    totalAttachments.forEach(item => {
+      if(content.includes(item.url)){
+        foundAttachments.push(item);
+      } else {
+        removedAttachments.push(item);
+      };
+    })
+    console.log('handleAddActionContent / after checking :', foundAttachments);
+
+    setAttachmentsForAction(foundAttachments);
+
+    if(removedAttachments.length > 0) {
+      removedAttachments.forEach(item => {
+        const resp = deleteFile(item.dirName, item.fileName, item.fileExt);
+        resp.then(res => {
+          if(!res.result){
+            alert('Failed to remove uploaded file :', item);
+            // ToDo: Then, what should we do to deal this condition!
+          };
+        })
+      });
+    };
+  };
+
   const handleSaveAll = useCallback(() => {
     if (editedDetailValues !== null
       && selectedConsulting
@@ -113,6 +203,88 @@ const ConsultingDetailsModel = () => {
       resp.then(res => {
         if (res.result) {
           console.log(`Succeeded to modify company`);
+          if(attachmentsForRequest.length > 0) {
+            // check if org item is deleted ----------------------------
+            orgRequestAttachments.forEach(orgItem => {
+              const foundOrg = attachmentsForRequest.filter(item => orgItem.uuid === item.uuid);
+              if(foundOrg.length === 0) { // org item is deleted
+                const response = modifyAttachmentInfo({
+                  attachmentCode: orgItem.attachment_code,
+                  actionType:'DELETE',
+                  uuid: orgItem.uuid,
+                  creator: cookies.myLationCrmUserId,
+                });
+                response.then(res => {
+                  if(!res.result){
+                    alert('Failed to delete attachment :' + res.message);
+                  };
+                })
+              }
+            });
+
+            // check if new item is added ----------------------------
+            let requestAttachmentCode = orgRequestAttachments.length > 0 ? orgRequestAttachments[0].request_attachment_code : null;
+            attachmentsForRequest.forEach(item => {
+              const foundOrg = orgRequestAttachments.filter(orgItem => orgItem.uuid === item.uuid);
+              if(foundOrg.length === 0) { // new item is added
+                const response = modifyAttachmentInfo({
+                  attachmentCode: requestAttachmentCode,
+                  actionType:'ADD',
+                  dirName: item.dirName,
+                  fileName: item.fileName,
+                  fileExt: item.fileExt,
+                  creator: cookies.myLationCrmUserId,
+                });
+                response.then(res => {
+                  if(!res.result){
+                    alert('Failed to delete attachment :' + res.message);
+                  };
+                })
+              }
+            })
+          };
+
+          if(attachmentsForAction.length > 0) {
+            // check if org item is deleted ----------------------------
+            orgActionAttachments.forEach(orgItem => {
+              const foundOrg = attachmentsForAction.filter(item => orgItem.uuid === item.uuid);
+              if(foundOrg.length === 0) { // org item is deleted
+                const response = modifyAttachmentInfo({
+                  attachmentCode: orgItem.attachment_code,
+                  actionType:'DELETE',
+                  uuid: orgItem.uuid,
+                  creator: cookies.myLationCrmUserId,
+                });
+                response.then(res => {
+                  if(!res.result){
+                    alert('Failed to delete attachment :' + res.message);
+                  };
+                })
+              }
+            });
+
+            // check if new item is added ----------------------------
+            let actionAttachmentCode = orgActionAttachments.length > 0 ? orgActionAttachments[0].action_attachment_code : null;
+            attachmentsForAction.forEach(item => {
+              const foundOrg = orgActionAttachments.filter(orgItem => orgItem.uuid === item.uuid);
+              if(foundOrg.length === 0) { // new item is added
+                const response = modifyAttachmentInfo({
+                  attachmentCode: actionAttachmentCode,
+                  actionType:'ADD',
+                  dirName: item.dirName,
+                  fileName: item.fileName,
+                  fileExt: item.fileExt,
+                  creator: cookies.myLationCrmUserId,
+                });
+                response.then(res => {
+                  if(!res.result){
+                    alert('Failed to delete attachment :' + res.message);
+                  };
+                })
+              }
+            })
+          }
+
         } else {
           console.error('Failed to modify company : ', res.data);
         };
@@ -132,6 +304,8 @@ const ConsultingDetailsModel = () => {
       setSelectedCategory({category: null, item_code: null});
     };
     setEditedDetailValues(null);
+    setAttachmentsForAction([]);
+    setAttachmentsForRequest([]);
     setCurrentConsulting();
   }, [setCurrentConsulting]);
 
@@ -142,7 +316,7 @@ const ConsultingDetailsModel = () => {
     { key: 'phone_number', title: 'common.phone_no', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'email', title: 'lead.email', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'status', title: 'common.status', detail: { type: 'select', options: ConsultingStatusTypes, editing: handleDetailSelectChange } },
-    { key: 'receipt_date', title: 'consulting.receipt_date', detail: { type: 'date', editing: handleDetailDateChange } },
+    { key: 'receipt_date', title: 'consulting.receipt_date', detail: { type: 'date', editing: handleDetailDataChange } },
     { key: 'consulting_type', title: 'consulting.type', detail: { type: 'select', options: ConsultingTypes, editing: handleDetailSelectChange } },
     { key: 'lead_time', title: 'consulting.lead_time', detail: { type: 'select', options: ConsultingTimeTypes, editing: handleDetailSelectChange } },
     { key: 'product_type', title: 'consulting.product_type', detail: { type: 'select', options: ProductTypes, editing: handleDetailSelectChange } },
@@ -153,8 +327,8 @@ const ConsultingDetailsModel = () => {
   ];
 
   const consultingItemsInfo2 = [
-    { key: 'request_content', title: 'consulting.request_content', detail: { type: 'content', extra: 'long', editing: handleDetailChange } },
-    { key: 'action_content', title: 'consulting.action_content', detail: { type: 'content', extra: 'long', editing: handleDetailChange } },
+    { key: 'request_content', title: 'consulting.request_content', detail: { type: 'content', extra: 'long', editing: handleAddRequestContent } },
+    { key: 'action_content', title: 'consulting.action_content', detail: { type: 'content', extra: 'long', editing: handleAddActionContent } },
     { key: 'memo', title: 'common.memo', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
   ];
 
