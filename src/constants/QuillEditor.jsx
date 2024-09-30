@@ -75,7 +75,6 @@ const QuillEditor = ({ originalContent, handleData, handleClose }) => {
                 const range = editor.getSelection();
                 if (range) {
                     editor.insertEmbed(range.index, 'image', imageUrl);
-                    quillRef.current.blur();
                     editor.setSelection(range.index + 1, 1);
                 } else {
                     // 범위가 없을 때 커서를 맨 끝에 두고 이미지 삽입

@@ -64,19 +64,20 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
   const { deleteFile, modifyAttachmentInfo } = useRecoilValue(AttachmentRepo);
   const [ attachmentsForRequest, setAttachmentsForRequest ] = useState([]);
   const [ attachmentsForAction, setAttachmentsForAction ] = useState([]);
-  const [ attachmentCodeChecked, setAttachmentCodeChecked ] = useState({request: false, action: false});
-      
+
   const handleAddRequestContent = (data) => {
     const {content, attachmentData} = data;
-    
-    handleDataChange('request_content', content);
+    let needSaveConsultingChange = true;
+    let modifedData = {
+      ...consultingChange,
+      request_content: content
+    };
     
     // Check if content has all attachments ------------------------
     const totalAttachments = [
       ...attachmentsForRequest,
       ...attachmentData
     ];
-    console.log('handleAddRequestContent / before checking :', totalAttachments);
 
     let foundAttachments = [];
     let removedAttachments = [];
@@ -87,34 +88,90 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
         removedAttachments.push(item);
       };
     })
-    console.log('handleAddRequestContent / after checking :', foundAttachments);
+    console.log('handleAddRequestContent / after checking / found :', foundAttachments);
+    console.log('handleAddRequestContent / after checking / removed :', removedAttachments);  
 
-    setAttachmentsForRequest(foundAttachments);
-
-    if(removedAttachments.length > 0) {
+    // delete attachment info
+    if(removedAttachments.length > 0){
       removedAttachments.forEach(item => {
         const resp = deleteFile(item.dirName, item.fileName, item.fileExt);
         resp.then(res => {
           if(!res.result){
-            alert('Failed to remove uploaded file :', item);
+            console.log('Failed to remove uploaded file :', item);
             // ToDo: Then, what should we do to deal this condition!
+            return;
+          };
+          if(!!item.uuid){
+            // This is in attachment table
+            const resp = modifyAttachmentInfo({
+              actionType: 'DELETE',
+              uuid: item.uuid,
+              creator : cookies.myLationCrmUserId,
+            });
+            resp.then(res => {
+              console.log('delete files :', res);
+            });
           };
         })
+      });
+    };
+
+    // add attachment info
+    setAttachmentsForRequest([]);
+    if(foundAttachments.length > 0){
+      foundAttachments.forEach(item => {
+        if(!item.uuid) {
+          // This is not in attachment table
+          const resp = modifyAttachmentInfo({
+            attachmentCode: consultingChange['request_attachment_code'],
+            actionType: 'ADD',
+            dirName: item.dirName,
+            fileName: item.fileName,
+            fileExt: item.fileExt,
+            creator : cookies.myLationCrmUserId,
+          });
+          resp.then(res => {
+            const tempAttachment = {
+              ...item,
+              uuid: res.out_uuid,
+              attachmentCode: res.out_attachment_code,
+              attachmentIndex: res.out_attachment_index ,
+            };
+            if(needSaveConsultingChange){
+              if(!consultingChange.request_attachment_code) {
+                modifedData.request_attachment_code = res.out_attachment_code;
+              };
+              setConsultingChange(modifedData);
+              needSaveConsultingChange = false;
+            };
+            setAttachmentsForRequest([
+              ...attachmentsForRequest,
+              tempAttachment
+            ]);
+          });
+        } else {
+          setAttachmentsForRequest([
+            ...attachmentsForRequest,
+            item
+          ]);
+        };
       });
     };
   };
 
   const handleAddActionContent = (data) => {
     const {content, attachmentData} = data;
-    
-    handleDataChange('action_content', content);
+    let needSaveConsultingChange = true;
+    let modifedData = {
+      ...consultingChange,
+      action_content: content
+    };
 
     // Check if content has all attachments ------------------------
     const totalAttachments = [
       ...attachmentsForAction,
       ...attachmentData
     ];
-    console.log('handleAddRequestContent / before checking :', totalAttachments);
 
     let foundAttachments = [];
     let removedAttachments = [];
@@ -127,17 +184,69 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
     })
     console.log('handleAddActionContent / after checking :', foundAttachments);
 
-    setAttachmentsForAction(foundAttachments);
-
+    // delete attachment info
     if(removedAttachments.length > 0) {
       removedAttachments.forEach(item => {
         const resp = deleteFile(item.dirName, item.fileName, item.fileExt);
         resp.then(res => {
           if(!res.result){
-            alert('Failed to remove uploaded file :', item);
+            console.log('Failed to remove uploaded file :', item);
             // ToDo: Then, what should we do to deal this condition!
+            return;
+          };
+          if(!!item.uuid){
+            // This is in attachment table
+            const resp = modifyAttachmentInfo({
+              actionType: 'DELETE',
+              uuid: item.uuid,
+              creator : cookies.myLationCrmUserId,
+            });
+            resp.then(res => {
+              console.log('delete files :', res);
+            });
           };
         })
+      });
+    };
+
+    // add attachment info
+    setAttachmentsForAction([]);
+    if(foundAttachments.length > 0) {
+      foundAttachments.forEach(item => {
+        if(!item.uuid) {
+          // This is not in attachment table
+          const resp = modifyAttachmentInfo({
+            attachmentCode: consultingChange['action_attachment_code'],
+            actionType: 'ADD',
+            dirName: item.dirName,
+            fileName: item.fileName,
+            fileExt: item.fileExt,
+            creator : cookies.myLationCrmUserId,
+          });
+          resp.then(res => {
+            const tempAttachment = {
+              ...item,
+              uuid: res.out_uuid,
+              attachmentCode: res.out_attachment_code,
+            };
+            if(needSaveConsultingChange){
+              if(!consultingChange.action_attachment_code) {
+                modifedData.action_attachment_code = res.out_attachment_code;
+              };
+              setConsultingChange(modifedData);
+            }
+            
+            setAttachmentsForAction([
+              ...attachmentsForAction,
+              tempAttachment
+            ]);
+          });
+        } else {
+          setAttachmentsForAction([
+              ...attachmentsForAction,
+              item
+            ]);
+        };
       });
     };
   };
@@ -252,65 +361,6 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
       setIsMessageModalOpen(true);
       return;
     };
-
-    // Check attachments and upload them to server if they exist-------------
-    let actionAttachmentChecked = false;
-    if(attachmentsForAction.length > 0) {
-      attachmentsForAction.forEach(item => {
-        const resp = modifyAttachmentInfo({
-          attachmentCode: consultingChange['action_attachment_code'],
-          actionType: 'ADD',
-          dirName: item.dirName,
-          fileName: item.fileName,
-          fileExt: item.fileExt,
-          creator : cookies.myLationCrmUserId,
-        });
-        resp.then(res => {
-          if(res.result){
-            if(!consultingChange['action_attachment_code']){
-              const tempData = {
-                ...consultingChange,
-                action_attachment_code : res.data.attachmentCode,
-              };
-              setConsultingChange(tempData);
-              actionAttachmentChecked = true;
-            }
-          }
-        });
-      })
-    } else {
-      actionAttachmentChecked = true;
-    };
-    console.log('handleAddNewConsulting / check action attachment :', actionAttachmentChecked);
-
-    let requestAttachmentChecked = false;
-    if(attachmentsForRequest.length > 0) {
-      attachmentsForRequest.forEach(item => {
-        const resp = modifyAttachmentInfo({
-          attachmentCode: consultingChange['request_attachment_code'],
-          actionType: 'ADD',
-          dirName: item.dirName,
-          fileName: item.fileName,
-          fileExt: item.fileExt,
-          creator : cookies.myLationCrmUserId,
-        });
-        resp.then(res => {
-          if(res.result){
-            if(!consultingChange['request_attachment_code']){
-              const tempData = {
-                ...consultingChange,
-                request_attachment_code : res.data.attachmentCode,
-              };
-              setConsultingChange(tempData);
-              requestAttachmentChecked = true;
-            }
-          }
-        });
-      })
-    } else {
-      requestAttachmentChecked = true;
-    };
-    console.log('handleAddNewConsulting / check request attachment :', requestAttachmentChecked);
 
     const newConsultingData = {
       ...consultingChange,
@@ -512,7 +562,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                         className="add-upload-button"
                         onClick={handleClickRequestContent}
                         dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize(String(consultingChange.request_content || '')),
+                          __html: DOMPurify.sanitize(consultingChange.request_content || ''),
                         }}
                       />
                       :
@@ -540,7 +590,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
                         className="add-upload-button"
                         onClick={handleClickActionContent}
                         dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize(String(consultingChange.action_content || '')),
+                          __html: DOMPurify.sanitize(consultingChange.action_content || ''),
                         }}
                       />
                       :
