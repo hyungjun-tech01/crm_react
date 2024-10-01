@@ -340,8 +340,9 @@ export const ConsultingRepo = selector({
                             console.log('Error to set request attachment :', data.message);
                             return;
                         };
-                        set(atomRequestAttachments, data);
                         console.log(`This has ${data.length} of attachment for request`);
+                        console.log(`- Data : `, data);
+                        set(atomRequestAttachments, data);
                     };
                     if(foundConsulting.action_attachment_code && foundConsulting.action_attachment_code !== ''){
                         const input_json = JSON.stringify({attachment_code: foundConsulting.action_attachment_code});

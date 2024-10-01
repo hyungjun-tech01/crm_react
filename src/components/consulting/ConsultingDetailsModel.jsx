@@ -113,27 +113,29 @@ const ConsultingDetailsModel = () => {
   const [ attachmentsForAction, setAttachmentsForAction ] = useState([]);
 
   const handleAddRequestContent = (data) => {
-    const {content, attachmentData} = data;
+    const {content, attachments} = data;
     
     handleDetailDataChange('request_content', content);
     
     // Check if content has all attachments ------------------------
     const totalAttachments = [
+      ...orgRequestAttachments,
       ...attachmentsForRequest,
-      ...attachmentData
+      ...attachments
     ];
-    console.log('handleAddRequestContent / before checking :', totalAttachments);
+    console.log('handleAddRequestContent / initial attachment :', totalAttachments);
 
     let foundAttachments = [];
     let removedAttachments = [];
     totalAttachments.forEach(item => {
-      if(content.includes(item.url)){
+      if(content.includes(item.dirName)){
         foundAttachments.push(item);
       } else {
         removedAttachments.push(item);
       };
     })
-    console.log('handleAddRequestContent / after checking :', foundAttachments);
+    console.log('handleAddRequestContent / after checking / found :', foundAttachments);
+    console.log('handleAddRequestContent / after checking / removed :', removedAttachments);
 
     setAttachmentsForRequest(foundAttachments);
 
@@ -142,8 +144,20 @@ const ConsultingDetailsModel = () => {
         const resp = deleteFile(item.dirName, item.fileName, item.fileExt);
         resp.then(res => {
           if(!res.result){
-            alert('Failed to remove uploaded file :', item);
+            console.log('Failed to remove uploaded file :', item);
             // ToDo: Then, what should we do to deal this condition!
+            return;
+          };
+          if(!!item.uuid){
+            // This is in attachment table
+            const resp = modifyAttachmentInfo({
+              actionType: 'DELETE',
+              uuid: item.uuid,
+              creator : cookies.myLationCrmUserId,
+            });
+            resp.then(res => {
+              console.log('delete files :', res);
+            });
           };
         })
       });
@@ -151,14 +165,15 @@ const ConsultingDetailsModel = () => {
   };
 
   const handleAddActionContent = (data) => {
-    const {content, attachmentData} = data;
+    const {content, attachments} = data;
     
     handleDetailDataChange('action_content', content);
 
     // Check if content has all attachments ------------------------
     const totalAttachments = [
+      ...orgActionAttachments,
       ...attachmentsForAction,
-      ...attachmentData
+      ...attachments
     ];
     console.log('handleAddRequestContent / before checking :', totalAttachments);
 

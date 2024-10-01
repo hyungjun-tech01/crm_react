@@ -62,34 +62,30 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
 
   //===== Handles to attachment ========================================
   const { deleteFile, modifyAttachmentInfo } = useRecoilValue(AttachmentRepo);
+  const [ requestAttachmentCode, setRequestAttachmentCode ] = useState(null);
+  const [ actionAttachmentCode, setActionAttachmentCode ] = useState(null);
   const [ attachmentsForRequest, setAttachmentsForRequest ] = useState([]);
   const [ attachmentsForAction, setAttachmentsForAction ] = useState([]);
 
-  const handleAddRequestContent = (data) => {
-    const {content, attachmentData} = data;
-    let needSaveConsultingChange = true;
-    let modifedData = {
-      ...consultingChange,
-      request_content: content
-    };
-    
+
+  const handleAddRequestContent = async (data) => {
+    const { content, attachments } = data;
+
     // Check if content has all attachments ------------------------
     const totalAttachments = [
       ...attachmentsForRequest,
-      ...attachmentData
+      ...attachments
     ];
 
     let foundAttachments = [];
     let removedAttachments = [];
     totalAttachments.forEach(item => {
-      if(content.includes(item.url)){
+      if(content.includes(item.dirName)){
         foundAttachments.push(item);
       } else {
         removedAttachments.push(item);
       };
-    })
-    console.log('handleAddRequestContent / after checking / found :', foundAttachments);
-    console.log('handleAddRequestContent / after checking / removed :', removedAttachments);  
+    });
 
     // delete attachment info
     if(removedAttachments.length > 0){
@@ -117,60 +113,112 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
     };
 
     // add attachment info
-    setAttachmentsForRequest([]);
+    let finalAttachments = [];
+
     if(foundAttachments.length > 0){
-      foundAttachments.forEach(item => {
-        if(!item.uuid) {
-          // This is not in attachment table
-          const resp = modifyAttachmentInfo({
-            attachmentCode: consultingChange['request_attachment_code'],
-            actionType: 'ADD',
-            dirName: item.dirName,
-            fileName: item.fileName,
-            fileExt: item.fileExt,
-            creator : cookies.myLationCrmUserId,
-          });
-          resp.then(res => {
-            const tempAttachment = {
-              ...item,
-              uuid: res.out_uuid,
-              attachmentCode: res.out_attachment_code,
-              attachmentIndex: res.out_attachment_index ,
-            };
-            if(needSaveConsultingChange){
-              if(!consultingChange.request_attachment_code) {
-                modifedData.request_attachment_code = res.out_attachment_code;
-              };
-              setConsultingChange(modifedData);
-              needSaveConsultingChange = false;
-            };
-            setAttachmentsForRequest([
-              ...attachmentsForRequest,
-              tempAttachment
-            ]);
-          });
-        } else {
-          setAttachmentsForRequest([
-            ...attachmentsForRequest,
-            item
-          ]);
+      if(!requestAttachmentCode) {
+        // attachmentCode가 없는 경우, 첫번째 정보를 upload 후 code를 받아오자.
+        const firstAttachment = foundAttachments[0];
+        const firstResp = await modifyAttachmentInfo({
+          attachmentCode: null,
+          actionType: 'ADD',
+          dirName: firstAttachment.dirName,
+          fileName: firstAttachment.fileName,
+          fileExt: firstAttachment.fileExt,
+          creator : cookies.myLationCrmUserId,
+        });
+        if(!firstResp.result){
+          console.log('handleAddRequestContent / after modifyAttachmentInfo ', firstResp.message);
+          return;
         };
-      });
+        finalAttachments.push({
+          ...firstAttachment,
+          uuid: firstResp.data.uuid,
+          attachmentCode: firstResp.data.attachmentCode,
+          attachmentIndex: firstResp.data.index ,
+        });
+        setRequestAttachmentCode(firstResp.data.attachmentCode);
+
+        if(foundAttachments.length > 1) {
+        // 나머지 정보를 upload하자.
+          const remainAttachments = [
+            ...foundAttachments.slice(1, )
+          ];
+          const tempAttachments = await Promise.all(remainAttachments.map(async (item) => {
+            const resp = await modifyAttachmentInfo({
+              attachmentCode: firstResp.data.attachmentCode,
+              actionType: 'ADD',
+              dirName: item.dirName,
+              fileName: item.fileName,
+              fileExt: item.fileExt,
+              creator : cookies.myLationCrmUserId,
+            });
+
+            if(resp.result){
+              return {
+                ...item,
+                uuid: resp.data.uuid,
+                attachmentCode: resp.data.attachmentCode,
+                attachmentIndex: resp.data.index ,
+              };
+            } else {
+              console.log('handleAddRequestContent / after modifyAttachmentInfo ', resp.message);
+            }
+          }));
+          finalAttachments.push(tempAttachments);
+        }
+
+        const modifedData = {
+          ...consultingChange,
+          request_content: content,
+          request_attachment_code: firstResp.data.attachmentCode,
+        };
+        setConsultingChange(modifedData);
+      } else {
+        finalAttachments = await Promise.all(foundAttachments.map(async (item) => {
+          if(!item.uuid) {
+            // This is not in attachment table
+            const resp = await modifyAttachmentInfo({
+              attachmentCode: requestAttachmentCode,
+              actionType: 'ADD',
+              dirName: item.dirName,
+              fileName: item.fileName,
+              fileExt: item.fileExt,
+              creator : cookies.myLationCrmUserId,
+            });
+
+            if(resp.result){
+              return {
+                ...item,
+                uuid: resp.data.uuid,
+                attachmentCode: resp.data.attachmentCode,
+                attachmentIndex: resp.data.index ,
+              };
+            } else {
+              console.log('handleAddRequestContent / after modifyAttachmentInfo ', resp.message);
+            }
+          } else {
+            return { ...item};
+          };
+        }));
+        const modifedData = {
+          ...consultingChange,
+          request_content: content,
+        };
+        setConsultingChange(modifedData);
+      }
+      
+      setAttachmentsForRequest(finalAttachments);
     };
   };
 
-  const handleAddActionContent = (data) => {
-    const {content, attachmentData} = data;
-    let needSaveConsultingChange = true;
-    let modifedData = {
-      ...consultingChange,
-      action_content: content
-    };
+  const handleAddActionContent = async (data) => {
+    const { content, attachments, attachmentCode } = data;
 
     // Check if content has all attachments ------------------------
     const totalAttachments = [
       ...attachmentsForAction,
-      ...attachmentData
+      ...attachments
     ];
 
     let foundAttachments = [];
@@ -182,7 +230,6 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
         removedAttachments.push(item);
       };
     })
-    console.log('handleAddActionContent / after checking :', foundAttachments);
 
     // delete attachment info
     if(removedAttachments.length > 0) {
@@ -210,44 +257,102 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
     };
 
     // add attachment info
-    setAttachmentsForAction([]);
-    if(foundAttachments.length > 0) {
-      foundAttachments.forEach(item => {
-        if(!item.uuid) {
-          // This is not in attachment table
-          const resp = modifyAttachmentInfo({
-            attachmentCode: consultingChange['action_attachment_code'],
-            actionType: 'ADD',
-            dirName: item.dirName,
-            fileName: item.fileName,
-            fileExt: item.fileExt,
-            creator : cookies.myLationCrmUserId,
-          });
-          resp.then(res => {
-            const tempAttachment = {
-              ...item,
-              uuid: res.out_uuid,
-              attachmentCode: res.out_attachment_code,
-            };
-            if(needSaveConsultingChange){
-              if(!consultingChange.action_attachment_code) {
-                modifedData.action_attachment_code = res.out_attachment_code;
-              };
-              setConsultingChange(modifedData);
-            }
-            
-            setAttachmentsForAction([
-              ...attachmentsForAction,
-              tempAttachment
-            ]);
-          });
-        } else {
-          setAttachmentsForAction([
-              ...attachmentsForAction,
-              item
-            ]);
+    let finalAttachments = [];
+
+    if(foundAttachments.length > 0){
+      if(!actionAttachmentCode) {
+        // attachmentCode가 없는 경우, 첫번째 정보를 upload 후 code를 받아오자.
+        const firstAttachment = foundAttachments[0];
+        const firstResp = await modifyAttachmentInfo({
+          attachmentCode: null,
+          actionType: 'ADD',
+          dirName: firstAttachment.dirName,
+          fileName: firstAttachment.fileName,
+          fileExt: firstAttachment.fileExt,
+          creator : cookies.myLationCrmUserId,
+        });
+        if(!firstResp.result){
+          console.log('handleAddRequestContent / after modifyAttachmentInfo ', firstResp.message);
+          return;
         };
-      });
+        finalAttachments.push({
+          ...firstAttachment,
+          uuid: firstResp.data.uuid,
+          attachmentCode: firstResp.data.attachmentCode,
+          attachmentIndex: firstResp.data.index ,
+        });
+        setActionAttachmentCode(firstResp.data.attachmentCode);
+
+        if(foundAttachments.length > 1) {
+        // 나머지 정보를 upload하자.
+          const remainAttachments = [
+            ...foundAttachments.slice(1, )
+          ];
+          const tempAttachments = await Promise.all(remainAttachments.map(async (item) => {
+            const resp = await modifyAttachmentInfo({
+              attachmentCode: firstResp.data.attachmentCode,
+              actionType: 'ADD',
+              dirName: item.dirName,
+              fileName: item.fileName,
+              fileExt: item.fileExt,
+              creator : cookies.myLationCrmUserId,
+            });
+
+            if(resp.result){
+              return {
+                ...item,
+                uuid: resp.data.uuid,
+                attachmentCode: resp.data.attachmentCode,
+                attachmentIndex: resp.data.index ,
+              };
+            } else {
+              console.log('handleAddRequestContent / after modifyAttachmentInfo ', resp.message);
+            }
+          }));
+          finalAttachments.push(tempAttachments);
+        }
+
+        const modifedData = {
+          ...consultingChange,
+          action_content: content,
+          action_attachment_code: firstResp.data.attachmentCode,
+        };
+        setConsultingChange(modifedData);
+      } else {
+        finalAttachments = await Promise.all(foundAttachments.map(async (item) => {
+          if(!item.uuid) {
+            // This is not in attachment table
+            const resp = await modifyAttachmentInfo({
+              attachmentCode: actionAttachmentCode,
+              actionType: 'ADD',
+              dirName: item.dirName,
+              fileName: item.fileName,
+              fileExt: item.fileExt,
+              creator : cookies.myLationCrmUserId,
+            });
+
+            if(resp.result){
+              return {
+                ...item,
+                uuid: resp.data.uuid,
+                attachmentCode: resp.data.attachmentCode,
+                attachmentIndex: resp.data.index ,
+              };
+            } else {
+              console.log('handleAddRequestContent / after modifyAttachmentInfo ', resp.message);
+            }
+          } else {
+            return { ...item};
+          };
+        }));
+        const modifedData = {
+          ...consultingChange,
+          action_content: content,
+        };
+        setConsultingChange(modifedData);
+      }
+      
+      setAttachmentsForAction(finalAttachments);
     };
   };
 
@@ -395,7 +500,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
       initializeConsultingTemplate();
     };
 
-  }, [open, userState, initializeConsultingTemplate, handleOpen, needInit]);
+  }, [open, userState, initializeConsultingTemplate, handleOpen, needInit, attachmentsForRequest, attachmentsForAction]);
 
   if (needInit)
     return <div>&nbsp;</div>;

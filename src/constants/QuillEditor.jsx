@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
+import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useRecoilValue } from 'recoil';
 import { Button } from 'antd';
@@ -15,34 +15,41 @@ const BASE_PATH = Paths.BASE_PATH;
 const QuillEditor = ({ originalContent, handleData, handleClose }) => {
     const { t } = useTranslation();
     const [ content, setContent ] = useState('');
-    const [ attachmentData, setAttachmentData ] = useState([]);
+    const [ attachments, setAttachments ] = useState([]);
     const { uploadFile, deleteFile } = useRecoilValue(AttachmentRepo);
     
     const quillRef = useRef(null);
 
+    const handleAttachment = (data) => {
+        setAttachments(prev => [
+            ...prev,
+            data
+        ]);
+    };
+
     const handleSave = () => {
-        console.log('QuillEditor / content :', content);
         handleData({
             content: content,
-            attachmentData: attachmentData,
+            attachments: attachments,
         });
         handleClose();
     };
+
     const handleCancel = () => {
-        if(attachmentData.length > 0){
-            const tempAttachmentData = attachmentData.filter(item => {
+        if(attachments.length > 0){
+            const tempAttachmentData = attachments.filter(item => {
                 const result = deleteFile(item.dirName, item.fileName, item.fileExt);
                 return result.result
             });
             if(tempAttachmentData.length > 0) {
                 console.log('There is(are) attachment(s) could not be deleted');
             };
-            setAttachmentData(tempAttachmentData);
+            setAttachments(tempAttachmentData);
         };
         handleClose();
     };
 
-    const imageHandler = useCallback(() => {
+    const imageHandler = () => {
         const input = document.createElement("input");
         input.setAttribute("type", "file");
         input.setAttribute("accept", "image/*");
@@ -52,42 +59,41 @@ const QuillEditor = ({ originalContent, handleData, handleClose }) => {
 
         input.onchange = async () => { // onChange 추가
             const file = input.files[0];
-            const result = uploadFile(file);
+            const res = await uploadFile(file);
             
-            result.then(res => {
-                if(!res.result){
-                    alert(result.message);
-                    return;
-                }
-    
-                const tempAttachment = {
-                    dirName: res.data.dirName,
-                    fileName: res.data.fileName,
-                    fileExt: res.data.fileExt,
-                    url: res.data.url
-                };
-                setAttachmentData(attachmentData.concat(tempAttachment));
-    
-                const editor = quillRef.current.getEditor();
-                quillRef.current.focus();
-    
-                const imageUrl = `${BASE_PATH}/${res.data.url}`;
-                const range = editor.getSelection();
-                if (range) {
-                    editor.insertEmbed(range.index, 'image', imageUrl);
-                    editor.setSelection(range.index + 1, 1);
-                } else {
-                    // 범위가 없을 때 커서를 맨 끝에 두고 이미지 삽입
-                    editor.setSelection(editor.getLength(), 0);
-                    // editor.insertEmbed(editor.getLength(), 'image', imageUrl);
-                    editor.clipboard.dangerouslyPasteHTML(
-                        editor.getSelection().index,
-                        `<img src=${imageUrl} alt="image" />`
-                    );
-                };
-            });
-        }
-    }, [attachmentData, uploadFile, quillRef]);
+            if(!res.result){
+                alert(res.result.message);
+                return;
+            };
+
+            const tempAttachment = {
+                code: res.data.code,
+                dirName: res.data.dirName,
+                fileName: res.data.fileName,
+                fileExt: res.data.fileExt,
+                url: res.data.url
+            };
+            handleAttachment(tempAttachment);
+            
+            const editor = quillRef.current.getEditor();
+            quillRef.current.focus();
+
+            const imageUrl = `${BASE_PATH}/${res.data.url}`;
+            const range = editor.getSelection();
+            if (range) {
+                editor.insertEmbed(range.index, 'image', imageUrl);
+                editor.setSelection(range.index + 1, 1);
+            } else {
+                // 범위가 없을 때 커서를 맨 끝에 두고 이미지 삽입
+                editor.setSelection(editor.getLength(), 0);
+                // editor.insertEmbed(editor.getLength(), 'image', imageUrl);
+                editor.clipboard.dangerouslyPasteHTML(
+                    editor.getSelection().index,
+                    `<img src=${imageUrl} alt="image" />`
+                );
+            };
+        };
+    };
 
     const formats = [
         "header", "size", "font",
@@ -111,7 +117,7 @@ const QuillEditor = ({ originalContent, handleData, handleClose }) => {
         if(quillRef.current){
             quillRef.current.focus();
         }
-    }, [originalContent])
+    }, [originalContent]);
 
     return (
         <div>
