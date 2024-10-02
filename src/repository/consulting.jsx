@@ -85,12 +85,12 @@ export const ConsultingRepo = selector({
     key: "ConsultingRepository",
     get: ({getCallback}) => {
         /////////////////////try to load all Consultings /////////////////////////////
-        const tryLoadAllConsultings = getCallback(({ set, snapshot }) => async () => {
+        const tryLoadAllConsultings = getCallback(({ set, snapshot }) => async (multiQueryCondi) => {
             const loadStates = await snapshot.getPromise(atomConsultingState);
             if((loadStates & 3) === 0){
                 console.log('[tryLoadAllConsultings] Try to load all Consultings');
                 set(atomConsultingState, (loadStates | 2));   // state : loading
-                const ret = await loadAllConsultings();
+                const ret = await loadAllConsultings(multiQueryCondi);
                 if(ret){
                     // succeeded to load
                     set(atomConsultingState, (loadStates | 3));

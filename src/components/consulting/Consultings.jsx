@@ -213,7 +213,7 @@ const Consultings = () => {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
-            hour: '2-digit',
+            hour: '2-digit', 
             minute: '2-digit',
             second: '2-digit',
             hour12: true  // 12시간 형식으로 표시
@@ -296,8 +296,8 @@ const Consultings = () => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    tryLoadAllCompanies();
-    tryLoadAllLeads();
+    //tryLoadAllCompanies();
+    //tryLoadAllLeads();
 
      // query condition 세팅 후 query
      let tommorow = new Date();
@@ -323,7 +323,9 @@ const Consultings = () => {
      }
  
     console.log('multiQueryCondi',multiQueryCondi);
-
+    
+    tryLoadAllCompanies(multiQueryCondi);
+    tryLoadAllLeads(multiQueryCondi);
     tryLoadAllConsultings(multiQueryCondi);
 
     tryLoadAllUsers();
