@@ -366,7 +366,7 @@ export const QuotationRepo = selector({
         const getQuotationDocNo = getCallback(()=> async (user) => {
             const input_json = JSON.stringify(user);
             try{
-                const response = await fetch(`${BASE_PATH}/getSequenceNext`, {
+                const response = await fetch(`${BASE_PATH}/getQuotationNumber`, {
                     method: "POST",
                     headers:{'Content-Type':'application/json'},
                     body: input_json,
