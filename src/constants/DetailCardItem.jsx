@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input } from 'antd';
 import Select from 'react-select';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FiSearch } from "react-icons/fi";
 
+import * as DOMPurify from "dompurify";
+
 import { ConvertCurrency } from './functions';
 import PopupPostCode from "./PostCode";
 import SelectListModal from './SelectListModal';
+import QuillEditor from "./QuillEditor";
 
 
 const DateInput = (props) => {
@@ -16,29 +19,29 @@ const DateInput = (props) => {
         <div className="ant-space-item">
             <span className='ant-input-group-wrapper
                 ant-input-group-wrapper-outlined
-                css-dev-only-do-not-override-1uweeqc'
+                css-dev-only-do-not-override-5wsri9'
                 style={style}
             >
-                <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-1uweeqc'>
+                <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-5wsri9'>
                     <span className='ant-input-group-addon'>
                         {addonBefore}
                     </span>
-                    {showTime ? 
+                    {showTime ?
                         <DatePicker
-                            className="ant-input css-dev-only-do-not-override-1uweeqc ant-input-outlined"
-                            name={ name }
-                            selected={ value }
-                            onChange={ onChange }
-                            dateFormat={ format }
+                            className="ant-input css-dev-only-do-not-override-5wsri9 ant-input-outlined"
+                            name={name}
+                            selected={value}
+                            onChange={onChange}
+                            dateFormat={format}
                             showTimeSelect
                             disabled={disabled}
                         /> :
                         <DatePicker
-                            className="ant-input css-dev-only-do-not-override-1uweeqc ant-input-outlined"
-                            name={ name }
-                            selected={ value }
-                            onChange={ onChange }
-                            dateFormat={ format }
+                            className="ant-input css-dev-only-do-not-override-5wsri9 ant-input-outlined"
+                            name={name}
+                            selected={value}
+                            onChange={onChange}
+                            dateFormat={format}
                             disabled={disabled}
                         />
                     }
@@ -51,23 +54,24 @@ const DateInput = (props) => {
 const TextareaInput = (props) => {
     const { name, addonBefore, style, row_no, title, value, onChange, disabled } = props;
     return (
-        <div className="ant-space-item" style={style}>
+        <div className="ant-space-item">
             <span className='ant-input-group-wrapper
                 ant-input-group-wrapper-outlined
-                css-dev-only-do-not-override-1uweeqc'
+                css-dev-only-do-not-override-5wsri9'
+                style={style}
             >
-                <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-1uweeqc'>
+                <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-5wsri9'>
                     <span className='ant-input-group-addon'>
-                        { addonBefore }
+                        {addonBefore}
                     </span>
                     <Input.TextArea
                         // className="ant-input detail-input-extra"
-                        name={ name }
-                        rows={ row_no }
-                        placeholder={ title }
-                        onChange={ onChange }
+                        name={name}
+                        rows={row_no}
+                        placeholder={title}
+                        onChange={onChange}
                         style={{ backgroundColor: 'white' }}
-                        value={ value }
+                        value={value}
                         disabled={disabled}
                     />
                 </span>
@@ -80,40 +84,41 @@ const SelectInput = (props) => {
     const { addonBefore, name, style, value, onChange, options, disabled, group } = props;
 
     let defaultOption = null;
-    if(value) {
-        if(group.key) {
+    if (value) {
+        if (group.key) {
             const groupOptions = options.filter(item => item.title === group.value);
-            if(groupOptions && groupOptions.length > 0) {
+            if (groupOptions && groupOptions.length > 0) {
                 const foundValue = groupOptions[0].options.filter(item => item.value[name] === value);
-                if(foundValue && foundValue.length > 0){
+                if (foundValue && foundValue.length > 0) {
                     defaultOption = foundValue[0];
                 };
             };
-        } else if(typeof options[0].value === 'object'){
+        } else if (typeof options[0].value === 'object') {
             const optionFiltered = options.filter(item => item.value[name] === value);
-            if(optionFiltered && optionFiltered.length > 0) {
+            if (optionFiltered && optionFiltered.length > 0) {
                 defaultOption = optionFiltered[0];
             };
         } else {
             const optionFiltered = options.filter(item => item.value === value);
-            if(optionFiltered && optionFiltered.length > 0) {
+            if (optionFiltered && optionFiltered.length > 0) {
                 defaultOption = optionFiltered[0];
             };
         };
     };
-    
+
     return (
-        <div className="ant-space-item"  style={style}>
+        <div className="ant-space-item">
             <span className='ant-input-group-wrapper
                 ant-input-group-wrapper-outlined
-                css-dev-only-do-not-override-1uweeqc'
+                css-dev-only-do-not-override-5wsri9'
+                style={style}
             >
-                <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-1uweeqc'>
+                <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-5wsri9'>
                     <span className='ant-input-group-addon'>
                         {addonBefore}
                     </span>
                     <Select
-                        // className="css-dev-only-do-not-override-1uweeqc detail-input-extra"
+                        // className="css-dev-only-do-not-override-5wsri9 detail-input-extra"
                         value={defaultOption}
                         options={options}
                         onChange={onChange}
@@ -130,13 +135,13 @@ const AddressInput = (props) => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
 
     const handleChange = (event) => {
-        const tempInput={
+        const tempInput = {
             [name]: event.target.value
         };
         onChange(tempInput);
     };
 
-    const handleData = (data) =>{
+    const handleData = (data) => {
         const tempInput = {
             [name]: data.address,
             [key_zip]: data.zip,
@@ -145,33 +150,34 @@ const AddressInput = (props) => {
     };
 
     return (
-        <div className="ant-space-item" style={style}>
+        <div className="ant-space-item">
             <span className='ant-input-group-wrapper
                 ant-input-group-wrapper-outlined
-                css-dev-only-do-not-override-1uweeqc'
+                css-dev-only-do-not-override-5wsri9'
+                style={style}
             >
-                <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-1uweeqc'>
+                <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-5wsri9'>
                     <span className='ant-input-group-addon'>
-                        { addonBefore }
+                        {addonBefore}
                     </span>
                     <input
                         className="ant-input detail-input-extra"
-                        name={ name }
-                        placeholder={ title }
-                        onChange={ handleChange }
+                        name={name}
+                        placeholder={title}
+                        onChange={handleChange}
                         style={{ backgroundColor: 'white', borderTopRightRadius: '5px', borderBottomRightRadius: '5px' }}
-                        value={ value }
-                        disabled={ disabled }
+                        value={value}
+                        disabled={disabled}
                     />
                     <div className="add-basic-btn" onClick={() => {
-                            console.log('Check click!', disabled);
-                            if(!disabled) setIsPopupOpen(!isPopupOpen)
-                        }}
+                        console.log('Check click!', disabled);
+                        if (!disabled) setIsPopupOpen(!isPopupOpen)
+                    }}
                     >
                         <FiSearch />
                     </div>
                     {isPopupOpen && (
-                        <div style={{position:"absolute",top:"45px",right:"650px"}} >
+                        <div style={{ position: "absolute", top: "45px", right: "650px" }} >
                             <PopupPostCode
                                 onSetData={handleData}
                                 onClose={() => setIsPopupOpen(false)}
@@ -188,44 +194,45 @@ const SearchInput = (props) => {
     const { addonBefore, title, name, value, disabled, key_name, onChange, style } = props;
     const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-    const handleData = (data) =>{
-        onChange({...data});
+    const handleData = (data) => {
+        onChange({ ...data });
     };
 
     return (
-        <div className="ant-space-item" style={style}>
+        <div className="ant-space-item">
             <span className='ant-input-group-wrapper
                 ant-input-group-wrapper-outlined
-                css-dev-only-do-not-override-1uweeqc'
+                css-dev-only-do-not-override-5wsri9'
+                style={style}
             >
-                <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-1uweeqc'>
+                <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-5wsri9'>
                     <span className='ant-input-group-addon'>
-                        { addonBefore }
+                        {addonBefore}
                     </span>
                     <input
                         className="ant-input detail-input-extra"
-                        name={ name }
-                        placeholder={ title }
+                        name={name}
+                        placeholder={title}
                         style={{ backgroundColor: 'white', borderTopRightRadius: '5px', borderBottomRightRadius: '5px' }}
-                        value={ value }
+                        value={value}
                         disabled
                     />
                     <div className="add-basic-btn" onClick={() => {
-                            if(!disabled) setIsPopupOpen(!isPopupOpen)
-                        }}
+                        if (!disabled) setIsPopupOpen(!isPopupOpen)
+                    }}
                     >
                         <FiSearch />
                     </div>
                     <SelectListModal
                         title={title}
-                        condition={{category: key_name, item: name}}
+                        condition={{ category: key_name, item: name }}
                         open={isPopupOpen}
                         handleChange={(data) => {
                             delete data.index;
                             delete data.component;
                             handleData(data);
                         }}
-                        handleClose={()=>setIsPopupOpen(false)}
+                        handleClose={() => setIsPopupOpen(false)}
                     />
                 </span>
             </span>
@@ -233,18 +240,48 @@ const SearchInput = (props) => {
     );
 };
 
-const DetailCardItem = (props) => {
-    const { title, name, defaultValue, groupValue, edited, detail} = props;
-    
-    const currentValue = (edited && (edited[name] !== undefined) && (edited[name] !== null))
-            ? edited[name]
-            : (defaultValue === null ? "" :
-                (detail.type === 'date'
-                    ? ((new Date(defaultValue)).toString() === 'Invalid Date' ? "" : new Date(defaultValue))
-                    : defaultValue
-                ));
+const ContentInput = (props) => {
+    const { addonBefore, title, value, editable, editableKey, handleEditable, onChange } = props;
 
-    const widthValue = detail['extra'] ? ( detail.extra === 'long' ? 768 : (detail.extra === 'modal' ? 470 : 380)) : 380;
+    return (
+        <div className="detail-content-item">
+            <div className='detail-content-title'>
+                {addonBefore}
+            </div>
+            { editable ?
+                <div className='detail-content-editor'>
+                    <QuillEditor
+                        originalContent={value || ''}
+                        handleData={onChange}
+                        handleClose={()=>handleEditable(0)}
+                    />
+                </div>
+                :
+                <div
+                    className='detail-content-view'
+                    placeholder={title}
+                    dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(String(value || '')),
+                    }}
+                    onClick={()=>handleEditable(editableKey)}
+                />
+            }
+        </div>
+    );
+};
+
+const DetailCardItem = (props) => {
+    const { title, name, defaultValue, groupValue, edited, detail } = props;
+
+    const currentValue = (edited && (edited[name] !== undefined) && (edited[name] !== null))
+        ? edited[name]
+        : (defaultValue === null ? "" :
+            (detail.type === 'date'
+                ? ((new Date(defaultValue)).toString() === 'Invalid Date' ? "" : new Date(defaultValue))
+                : defaultValue
+            ));
+
+    const widthValue = detail['extra'] ? (detail.extra === 'long' ? 768 : (detail.extra === 'modal' ? 470 : 380)) : 380;
 
     const SharedProps = {
         name: name,
@@ -253,22 +290,23 @@ const DetailCardItem = (props) => {
         disabled: detail.disabled ? detail.disabled : false,
     };
 
-    switch(detail.type)
-    {
+    switch (detail.type) {
         case 'label':
-            return <Input {...SharedProps} onChange={detail.editing} style={{width: widthValue, height: 38}}/>;
+            return <Input {...SharedProps} onChange={detail.editing} style={{ width: widthValue, height: 38 }} />;
         case 'date':
-            const timeformat = detail.time ? "yyyy-MM-dd HH:mm:ss" : "yyyy-MM-dd";
-            return <DateInput {...SharedProps} format={ timeformat } showTime={ detail.time } onChange={(date) =>detail.editing(name, date)} style={{width: widthValue, height: 38}}/>;
+            const timeformat = detail.time ? "yyyy-MM-dd hh:mm:ss" : "yyyy-MM-dd";
+            return <DateInput {...SharedProps} format={timeformat} showTime={detail.time} onChange={(date) => detail.editing(name, date)} style={{ width: widthValue, height: 38 }} />;
         case 'textarea':
-            return <TextareaInput {...SharedProps} row_no={ detail.row_no ? detail.row_no : 2} onChange={detail.editing} style={detail.extra === 'memo' ? {width: `calc(100% - 380px)`, flexGrow: 1} : {width: widthValue}}/>;
+            return <TextareaInput {...SharedProps} row_no={detail.row_no ? detail.row_no : 2} onChange={detail.editing} style={detail.extra === 'memo' ? { width: `calc(100% - 380px)`, flexGrow: 1 } : { width: widthValue }} />;
         case 'select':
-            const group = {key: detail.group, value: (edited && edited[detail.group]) ? edited[detail.group] : groupValue};
-            return <SelectInput {...SharedProps} options={detail.options} group={group} onChange={(selected)=>detail.editing(name, selected)} style={{width: widthValue, height: 38}}/>;
+            const group = { key: detail.group, value: (edited && edited[detail.group]) ? edited[detail.group] : groupValue };
+            return <SelectInput {...SharedProps} options={detail.options} group={group} onChange={(selected) => detail.editing(name, selected)} style={{ width: widthValue, height: 38 }} />;
         case 'address':
-            return <AddressInput {...SharedProps} title={title} key_zip={detail.key_zip} onChange={detail.editing} style={{width: widthValue, height: 38}} />
+            return <AddressInput {...SharedProps} title={title} key_zip={detail.key_zip} onChange={detail.editing} style={{ width: widthValue, height: 38 }} />
         case 'search':
-            return <SearchInput {...SharedProps} title={title} key_name={detail.key_name} onChange={detail.editing} style={{width: widthValue, height: 38}} />
+            return <SearchInput {...SharedProps} title={title} key_name={detail.key_name} onChange={detail.editing} style={{ width: widthValue, height: 38 }} />
+        case 'content':
+            return <ContentInput {...SharedProps} title={title} editable={detail.editable} editableKey={detail.editableKey} handleEditable={detail.handleEditable} onChange={detail.editing} />
         default:
             return null;
     };

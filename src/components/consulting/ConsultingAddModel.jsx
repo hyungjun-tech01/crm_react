@@ -4,6 +4,8 @@ import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "react-datepicker/dist/react-datepicker.css";
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
+import * as DOMPurify from "dompurify";
+
 import {
   atomCurrentLead,
   atomSelectedCategory,
@@ -23,11 +25,13 @@ import {
   ConsultingTimeTypes,
   ProductTypes
 } from "../../repository/consulting";
+import { CompanyRepo } from "../../repository/company";
+import { AttachmentRepo } from "../../repository/attachment";
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddSearchItem from "../../constants/AddSearchItem";
 import MessageModal from "../../constants/MessageModal";
-import { CompanyRepo } from "../../repository/company";
+import QuillEditor from "../../constants/QuillEditor";
 
 
 const ConsultingAddModel = (props) => {
@@ -57,10 +61,306 @@ const ConsultingAddModel = (props) => {
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
 
-  //===== Handles to edit 'ConsultingAddModel' ========================================
+  //===== Handles to attachment ========================================
+  const { deleteFile, modifyAttachmentInfo } = useRecoilValue(AttachmentRepo);
+  const [ requestAttachmentCode, setRequestAttachmentCode ] = useState(null);
+  const [ actionAttachmentCode, setActionAttachmentCode ] = useState(null);
+  const [ attachmentsForRequest, setAttachmentsForRequest ] = useState([]);
+  const [ attachmentsForAction, setAttachmentsForAction ] = useState([]);
+
+  const handleAddRequestContent = async (data) => {
+    const { content, attachments } = data;
+
+    // Check if content has all attachments ------------------------
+    const totalAttachments = [
+      ...attachmentsForRequest,
+      ...attachments
+    ];
+
+    let foundAttachments = [];
+    let removedAttachments = [];
+    totalAttachments.forEach(item => {
+      if(content.includes(item.dirName)){
+        foundAttachments.push(item);
+      } else {
+        removedAttachments.push(item);
+      };
+    });
+
+    console.log('handleAddRequestContent / totalAttachments ', totalAttachments);
+    console.log('handleAddRequestContent / content ', content);
+    console.log('handleAddRequestContent / foundAttachments ', foundAttachments);
+    console.log('handleAddRequestContent / removedAttachments ', removedAttachments);
+
+    // delete attachment info
+    if(removedAttachments.length > 0){
+      removedAttachments.forEach(async item => {
+        const res = await deleteFile(item.dirName, item.fileName, item.fileExt);
+        if(!res.result){
+          console.log('Failed to remove uploaded file :', item);
+          // ToDo: Then, what should we do to deal this condition!
+          return;
+        };
+        if(!!item.uuid){
+          // This is in attachment table
+          const resp = await modifyAttachmentInfo({
+            actionType: 'DELETE',
+            uuid: item.uuid,
+            creator : cookies.myLationCrmUserId,
+          });
+          console.log('delete files :', resp);
+        };
+      })
+    };
+
+    // add attachment info
+    let finalAttachments = [];
+
+    if(foundAttachments.length > 0){
+      if(!requestAttachmentCode) {
+        // attachmentCode가 없는 경우, 첫번째 정보를 upload 후 code를 받아오자.
+        const firstAttachment = foundAttachments[0];
+        const firstResp = await modifyAttachmentInfo({
+          attachmentCode: null,
+          actionType: 'ADD',
+          dirName: firstAttachment.dirName,
+          fileName: firstAttachment.fileName,
+          fileExt: firstAttachment.fileExt,
+          creator : cookies.myLationCrmUserId,
+        });
+        if(!firstResp.result){
+          console.log('handleAddRequestContent / after modifyAttachmentInfo ', firstResp.message);
+          return;
+        };
+        finalAttachments.push({
+          ...firstAttachment,
+          uuid: firstResp.data.uuid,
+          attachmentCode: firstResp.data.attachmentCode,
+          attachmentIndex: firstResp.data.index ,
+        });
+        setRequestAttachmentCode(firstResp.data.attachmentCode);
+
+        if(foundAttachments.length > 1) {
+        // 나머지 정보를 upload하자.
+          const remainAttachments = [
+            ...foundAttachments.slice(1, )
+          ];
+          const tempAttachments = await Promise.all(remainAttachments.map(async (item) => {
+            const resp = await modifyAttachmentInfo({
+              attachmentCode: firstResp.data.attachmentCode,
+              actionType: 'ADD',
+              dirName: item.dirName,
+              fileName: item.fileName,
+              fileExt: item.fileExt,
+              creator : cookies.myLationCrmUserId,
+            });
+
+            if(resp.result){
+              return {
+                ...item,
+                uuid: resp.data.uuid,
+                attachmentCode: resp.data.attachmentCode,
+                attachmentIndex: resp.data.index ,
+              };
+            } else {
+              console.log('handleAddRequestContent / after modifyAttachmentInfo ', resp.message);
+            }
+          }));
+          finalAttachments.push(...tempAttachments);
+        }
+
+        const modifedData = {
+          ...consultingChange,
+          request_content: content,
+          request_attachment_code: firstResp.data.attachmentCode,
+        };
+        setConsultingChange(modifedData);
+      } else {
+        finalAttachments = await Promise.all(foundAttachments.map(async (item) => {
+          if(!item.uuid) {
+            // This is not in attachment table
+            const resp = await modifyAttachmentInfo({
+              attachmentCode: requestAttachmentCode,
+              actionType: 'ADD',
+              dirName: item.dirName,
+              fileName: item.fileName,
+              fileExt: item.fileExt,
+              creator : cookies.myLationCrmUserId,
+            });
+
+            if(resp.result){
+              return {
+                ...item,
+                uuid: resp.data.uuid,
+                attachmentCode: resp.data.attachmentCode,
+                attachmentIndex: resp.data.index ,
+              };
+            } else {
+              console.log('handleAddRequestContent / after modifyAttachmentInfo ', resp.message);
+            }
+          } else {
+            return { ...item};
+          };
+        }));
+        const modifedData = {
+          ...consultingChange,
+          request_content: content,
+        };
+        setConsultingChange(modifedData);
+      };
+      setAttachmentsForRequest(finalAttachments);
+    };
+  };
+
+  const handleAddActionContent = async (data) => {
+    const { content, attachments } = data;
+
+    // Check if content has all attachments ------------------------
+    const totalAttachments = [
+      ...attachmentsForAction,
+      ...attachments
+    ];
+
+    let foundAttachments = [];
+    let removedAttachments = [];
+    totalAttachments.forEach(item => {
+      if(content.includes(item.url)){
+        foundAttachments.push(item);
+      } else {
+        removedAttachments.push(item);
+      };
+    })
+
+    // delete attachment info
+    if(removedAttachments.length > 0) {
+      removedAttachments.forEach(async item => {
+        const res = await deleteFile(item.dirName, item.fileName, item.fileExt);
+        if(!res.result){
+          console.log('Failed to remove uploaded file :', item);
+          // ToDo: Then, what should we do to deal this condition!
+          return;
+        };
+        if(!!item.uuid){
+          // This is in attachment table
+          const resp = await modifyAttachmentInfo({
+            actionType: 'DELETE',
+            uuid: item.uuid,
+            creator : cookies.myLationCrmUserId,
+          });
+          console.log('delete files :', resp);
+        };
+      });
+    };
+
+    // add attachment info
+    let finalAttachments = [];
+
+    if(foundAttachments.length > 0){
+      if(!actionAttachmentCode) {
+        // attachmentCode가 없는 경우, 첫번째 정보를 upload 후 code를 받아오자.
+        const firstAttachment = foundAttachments[0];
+        const firstResp = await modifyAttachmentInfo({
+          attachmentCode: null,
+          actionType: 'ADD',
+          dirName: firstAttachment.dirName,
+          fileName: firstAttachment.fileName,
+          fileExt: firstAttachment.fileExt,
+          creator : cookies.myLationCrmUserId,
+        });
+        if(!firstResp.result){
+          console.log('handleAddRequestContent / after modifyAttachmentInfo ', firstResp.message);
+          return;
+        };
+        finalAttachments.push({
+          ...firstAttachment,
+          uuid: firstResp.data.uuid,
+          attachmentCode: firstResp.data.attachmentCode,
+          attachmentIndex: firstResp.data.index ,
+        });
+        setActionAttachmentCode(firstResp.data.attachmentCode);
+
+        if(foundAttachments.length > 1) {
+        // 나머지 정보를 upload하자.
+          const remainAttachments = [
+            ...foundAttachments.slice(1, )
+          ];
+          const tempAttachments = await Promise.all(remainAttachments.map(async (item) => {
+            const resp = await modifyAttachmentInfo({
+              attachmentCode: firstResp.data.attachmentCode,
+              actionType: 'ADD',
+              dirName: item.dirName,
+              fileName: item.fileName,
+              fileExt: item.fileExt,
+              creator : cookies.myLationCrmUserId,
+            });
+
+            if(resp.result){
+              return {
+                ...item,
+                uuid: resp.data.uuid,
+                attachmentCode: resp.data.attachmentCode,
+                attachmentIndex: resp.data.index ,
+              };
+            } else {
+              console.log('handleAddRequestContent / after modifyAttachmentInfo ', resp.message);
+            }
+          }));
+          finalAttachments.push(...tempAttachments);
+        }
+
+        const modifedData = {
+          ...consultingChange,
+          action_content: content,
+          action_attachment_code: firstResp.data.attachmentCode,
+        };
+        setConsultingChange(modifedData);
+      } else {
+        finalAttachments = await Promise.all(foundAttachments.map(async (item) => {
+          if(!item.uuid) {
+            // This is not in attachment table
+            const resp = await modifyAttachmentInfo({
+              attachmentCode: actionAttachmentCode,
+              actionType: 'ADD',
+              dirName: item.dirName,
+              fileName: item.fileName,
+              fileExt: item.fileExt,
+              creator : cookies.myLationCrmUserId,
+            });
+            if(resp.result){
+              return {
+                ...item,
+                uuid: resp.data.uuid,
+                attachmentCode: resp.data.attachmentCode,
+                attachmentIndex: resp.data.index ,
+              };
+            } else {
+              console.log('handleAddRequestContent / after modifyAttachmentInfo ', resp.message);
+            }
+          } else {
+            return { ...item};
+          };
+        }));
+        const modifedData = {
+          ...consultingChange,
+          action_content: content,
+        };
+        setConsultingChange(modifedData);
+      }
+      console.log('Check : ', finalAttachments);
+      setAttachmentsForAction(finalAttachments);
+    };
+  };
+
+  //===== Handles to This ========================================
   const [ needInit, setNeedInit ] = useState(true);
-  const [consultingChange, setConsultingChange] = useState({});
+  const [ consultingChange, setConsultingChange] = useState({});
+  const [ showEditor, setShowEditor ] = useState(0);
+
   const selectedCategory = useRecoilValue(atomSelectedCategory);
+
+  const CLOSE_EDITOR = 0;
+  const EDIT_REQUEST_CONTENT = 1;
+  const EDIT_ACTION_CONTENT = 2;
 
   const handleItemChange = (e) => {
     const modifiedData = {
@@ -78,17 +378,25 @@ const ConsultingAddModel = (props) => {
     setConsultingChange(modifiedData);
   };
 
-  const handleDateChange = (name, date) => {
+  const handleDataChange = (name, data) => {
     const modifiedData = {
       ...consultingChange,
-      [name]: date
+      [name]: data
     };
     setConsultingChange(modifiedData);
   };
 
   const handleLeadSelected = (data) => {
     setConsultingChange(data);
-};
+  };
+
+  const handleClickRequestContent = () => {
+    setShowEditor(EDIT_REQUEST_CONTENT);
+  };
+
+  const handleClickActionContent = () => {
+    setShowEditor(EDIT_ACTION_CONTENT);
+  };
 
   const initializeConsultingTemplate = useCallback(() => {
     // document.querySelector("#add_new_consulting_form").reset();
@@ -117,6 +425,8 @@ const ConsultingAddModel = (props) => {
       modified['company_name'] = currentLead.company_name;
     };
     setConsultingChange(modified);
+    setAttachmentsForAction([]);
+    setAttachmentsForRequest([]);
     setNeedInit(false);
 
     
@@ -124,7 +434,7 @@ const ConsultingAddModel = (props) => {
 
 
   const handleAddNewConsulting = () => {
-    // Check data if they are available
+    // Check data if they are available ------------------------------------
     let numberOfNoInputItems = 0;
     let noReceiptDate = false;
     if(!consultingChange.receipt_date || consultingChange.receipt_date === ""){
@@ -186,7 +496,7 @@ const ConsultingAddModel = (props) => {
       initializeConsultingTemplate();
     };
 
-  }, [open, userState, initializeConsultingTemplate, handleOpen, needInit]);
+  }, [open, userState, initializeConsultingTemplate, handleOpen, needInit, attachmentsForRequest, attachmentsForAction]);
 
   if (needInit)
     return <div>&nbsp;</div>;
@@ -232,7 +542,7 @@ const ConsultingAddModel = (props) => {
                   defaultValue={consultingChange.receipt_date}
                   time
                   required
-                  onChange={handleDateChange}
+                  onChange={handleDataChange}
                 />
                 <AddBasicItem
                   title={t('consulting.receiver')}
@@ -337,22 +647,62 @@ const ConsultingAddModel = (props) => {
                 />
               </div>
               <div className="form-group row">
-                <AddBasicItem
-                  title={t('consulting.request_content')}
-                  type='textarea'
-                  row_no={5}
-                  name='request_content'
-                  defaultValue={consultingChange.request_content}
-                  onChange={handleItemChange}
-                />
-                <AddBasicItem
-                  title={t('consulting.action_content')}
-                  type='textarea'
-                  row_no={5}
-                  name='action_content'
-                  defaultValue={consultingChange.action_content}
-                  onChange={handleItemChange}
-                />
+                <div className="col-sm-6" >
+                  <div className="add-upload-item">
+                    <div style={{ display:'flex',flexDirection:'row',justifyContent:'space-between',alignItems:'end' }}>
+                      <div className="add-upload-title" >
+                        {t('consulting.request_content')}
+                      </div>
+                      { !(showEditor & EDIT_REQUEST_CONTENT) && <div style={{fontSize:'13px', fontWeight: 'bold', color: '#999999'}}>
+                          {t('comment.click_below_to_edit')}
+                        </div>
+                      }
+                    </div>
+                    { !(showEditor & EDIT_REQUEST_CONTENT) ?
+                      <div
+                        className="add-upload-button"
+                        onClick={handleClickRequestContent}
+                        dangerouslySetInnerHTML={{
+                          __html: DOMPurify.sanitize(consultingChange.request_content || ''),
+                        }}
+                      />
+                      :
+                      <QuillEditor
+                        originalContent={consultingChange.request_content || ''}
+                        handleData={handleAddRequestContent}
+                        handleClose={()=>setShowEditor(CLOSE_EDITOR)}
+                      />
+                    }
+                  </div>
+                </div>
+                <div className="col-sm-6" >
+                  <div className="add-upload-item">
+                    <div style={{ display:'flex',flexDirection:'row',justifyContent:'space-between',alignItems:'end' }}>
+                      <div className="add-upload-title" >
+                        {t('consulting.action_content')}
+                      </div>
+                      { !(showEditor & EDIT_ACTION_CONTENT) && <div style={{fontSize:'13px', fontWeight: 'bold', color: '#999999'}}>
+                          {t('comment.click_below_to_edit')}
+                        </div>
+                      }
+                    </div>
+                    { !(showEditor & EDIT_ACTION_CONTENT) ?
+                      <div
+                        className="add-upload-button"
+                        onClick={handleClickActionContent}
+                        dangerouslySetInnerHTML={{
+                          __html: DOMPurify.sanitize(consultingChange.action_content || ''),
+                        }}
+                      />
+                      :
+                      <QuillEditor
+                        originalContent={consultingChange.action_content || ''}
+                        handleData={handleAddActionContent}
+                        handleClose={()=>setShowEditor(CLOSE_EDITOR)}
+                      />
+                    }
+                  </div>
+                </div>
               </div>
               <div className="text-center">
                 <button

@@ -7,6 +7,10 @@ import { atomCurrentConsulting
     , atomFilteredConsultingArray
     , atomConsultingState
     , atomCurrentLead
+    , atomRequestAttachmentCode
+    , atomActionAttachmentCode
+    , atomRequestAttachments
+    , atomActionAttachments
     , defaultLead,
     atomConsultingByLead
 } from '../atoms/atoms';
@@ -283,7 +287,6 @@ export const ConsultingRepo = selector({
                     //    set(atomConsultingByLead, updated);
                     //};
 
-                    return {result: true};
                 } else if(newConsulting.action_type === 'UPDATE'){
                     const currentConsulting = await snapshot.getPromise(atomCurrentConsulting);
                     delete newConsulting.action_type;
@@ -336,6 +339,8 @@ export const ConsultingRepo = selector({
                     return;
                 };
                 const allConsultings = await snapshot.getPromise(atomAllConsultingObj);
+
+                let foundConsulting = null;
                 if(!allConsultings[consulting_code]){
                     // consulting이 없다면 쿼리 
                     const found = await searchConsultings('consuliting_code', consulting_code, true);
@@ -347,16 +352,67 @@ export const ConsultingRepo = selector({
                         };
                         set(atomAllConsultingObj, updatedAllConsultings);
                         set(atomFilteredConsultingArray, Object.values(updatedAllConsultings));
+                        foundConsulting = found.data[0];
                     } else {
                         set(atomCurrentConsulting, defaultConsulting);
                     };
                 }else{
                     set(atomCurrentConsulting, allConsultings[consulting_code]);
+                    foundConsulting = allConsultings[consulting_code];
+                };
+
+                // Chack attachment code and load attachment info.
+                if(!!foundConsulting) {
+                    console.log('Check if this consulting has attachment(s)');
+                    if(foundConsulting.request_attachment_code && foundConsulting.request_attachment_code !== ''){
+                        set(atomRequestAttachmentCode, foundConsulting.request_attachment_code);
+
+                        const input_json = JSON.stringify({attachment_code: foundConsulting.request_attachment_code});
+                        const response = await fetch(`${BASE_PATH}/attachment`, {
+                            method: "POST",
+                            headers:{'Content-Type':'application/json'},
+                            body: input_json,
+                        });
+                        const data = await response.json();
+                        if(data.message){
+                            console.log('Error to set request attachment :', data.message);
+                            return;
+                        };
+                        console.log(`This has ${data.length} of attachment for request`);
+                        console.log(`- Data : `, data);
+                        set(atomRequestAttachments, data);
+                    };
+                    if(foundConsulting.action_attachment_code && foundConsulting.action_attachment_code !== ''){
+                        set(atomActionAttachmentCode, foundConsulting.action_attachment_code);
+                        
+                        const input_json = JSON.stringify({attachment_code: foundConsulting.action_attachment_code});
+                        const response = await fetch(`${BASE_PATH}/attachment`, {
+                            method: "POST",
+                            headers:{'Content-Type':'application/json'},
+                            body: input_json,
+                        });
+                        const data = await response.json();
+                        if(data.message){
+                            console.log('Error to set action attachment :', data.message);
+                            return;
+                        };
+                        set(atomActionAttachments, data);
+                        console.log(`This has ${data.length} of attachment for action`);
+                    };
+                } else {
+                    set(atomRequestAttachments, []);  //default
+                    set(atomActionAttachments, []);   //default
+                    set(atomRequestAttachments, null);
+                    set(atomActionAttachments, null);
                 }
             }
             catch(err){
                 console.error(`setCurrentConsulting / Error : ${err}`);
                 set(atomCurrentConsulting, defaultConsulting);
+                set(atomRequestAttachments, []);  //default
+                set(atomActionAttachments, []);   //default
+                set(atomRequestAttachments, null);
+                set(atomActionAttachments, null);
             };
         });
         const searchConsultings = getCallback(() => async (itemName, filterText, isAccurate = false) => {
@@ -413,6 +469,7 @@ export const ConsultingRepo = selector({
 
             return { result: true, data: foundData };
         });
+        
         return {
             tryLoadAllConsultings,
             loadAllConsultings,
