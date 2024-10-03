@@ -241,32 +241,29 @@ const SearchInput = (props) => {
 };
 
 const ContentInput = (props) => {
-    const { addonBefore, title, value, onChange } = props;
-    const [ editable, setEditable ] = useState(false);
-
-    useEffect(()=>{
-        setEditable(false);
-    }, []);
+    const { addonBefore, title, value, editable, editableKey, handleEditable, onChange } = props;
 
     return (
         <div className="detail-content-item">
             <div className='detail-content-title'>
                 {addonBefore}
             </div>
-            { editable ? 
-                <QuillEditor
-                    originalContent={value || ''}
-                    handleData={onChange}
-                    handleClose={()=>setEditable(false)}
-                />
+            { editable ?
+                <div className='detail-content-editor'>
+                    <QuillEditor
+                        originalContent={value || ''}
+                        handleData={onChange}
+                        handleClose={()=>handleEditable(0)}
+                    />
+                </div>
                 :
                 <div
-                    className='detail-content-editor'
+                    className='detail-content-view'
                     placeholder={title}
                     dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(String(value || '')),
                     }}
-                    onClick={()=>setEditable(true)}
+                    onClick={()=>handleEditable(editableKey)}
                 />
             }
         </div>
@@ -309,7 +306,7 @@ const DetailCardItem = (props) => {
         case 'search':
             return <SearchInput {...SharedProps} title={title} key_name={detail.key_name} onChange={detail.editing} style={{ width: widthValue, height: 38 }} />
         case 'content':
-            return <ContentInput {...SharedProps} title={title} key_name={detail.key_name} onChange={detail.editing} />
+            return <ContentInput {...SharedProps} title={title} editable={detail.editable} editableKey={detail.editableKey} handleEditable={detail.handleEditable} onChange={detail.editing} />
         default:
             return null;
     };

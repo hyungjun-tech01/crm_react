@@ -378,6 +378,14 @@
     width: 768px;
     height: 420px;
     margin: 0;
+    padding: 0px;
+    border: 0;
+}
+.detail-content-view
+{
+    width: 768px;
+    height: 500px;
+    margin: 0;
     padding: 5px;
     border: solid 1px #d9d9d9;
     border-top-right-radius: 5px;

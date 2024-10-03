@@ -67,7 +67,6 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
   const [ attachmentsForRequest, setAttachmentsForRequest ] = useState([]);
   const [ attachmentsForAction, setAttachmentsForAction ] = useState([]);
 
-
   const handleAddRequestContent = async (data) => {
     const { content, attachments } = data;
 
@@ -87,29 +86,30 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
       };
     });
 
+    console.log('handleAddRequestContent / totalAttachments ', totalAttachments);
+    console.log('handleAddRequestContent / content ', content);
+    console.log('handleAddRequestContent / foundAttachments ', foundAttachments);
+    console.log('handleAddRequestContent / removedAttachments ', removedAttachments);
+
     // delete attachment info
     if(removedAttachments.length > 0){
-      removedAttachments.forEach(item => {
-        const resp = deleteFile(item.dirName, item.fileName, item.fileExt);
-        resp.then(res => {
-          if(!res.result){
-            console.log('Failed to remove uploaded file :', item);
-            // ToDo: Then, what should we do to deal this condition!
-            return;
-          };
-          if(!!item.uuid){
-            // This is in attachment table
-            const resp = modifyAttachmentInfo({
-              actionType: 'DELETE',
-              uuid: item.uuid,
-              creator : cookies.myLationCrmUserId,
-            });
-            resp.then(res => {
-              console.log('delete files :', res);
-            });
-          };
-        })
-      });
+      removedAttachments.forEach(async item => {
+        const res = await deleteFile(item.dirName, item.fileName, item.fileExt);
+        if(!res.result){
+          console.log('Failed to remove uploaded file :', item);
+          // ToDo: Then, what should we do to deal this condition!
+          return;
+        };
+        if(!!item.uuid){
+          // This is in attachment table
+          const resp = await modifyAttachmentInfo({
+            actionType: 'DELETE',
+            uuid: item.uuid,
+            creator : cookies.myLationCrmUserId,
+          });
+          console.log('delete files :', resp);
+        };
+      })
     };
 
     // add attachment info
@@ -165,7 +165,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
               console.log('handleAddRequestContent / after modifyAttachmentInfo ', resp.message);
             }
           }));
-          finalAttachments.push(tempAttachments);
+          finalAttachments.push(...tempAttachments);
         }
 
         const modifedData = {
@@ -206,14 +206,13 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
           request_content: content,
         };
         setConsultingChange(modifedData);
-      }
-      
+      };
       setAttachmentsForRequest(finalAttachments);
     };
   };
 
   const handleAddActionContent = async (data) => {
-    const { content, attachments, attachmentCode } = data;
+    const { content, attachments } = data;
 
     // Check if content has all attachments ------------------------
     const totalAttachments = [
@@ -233,26 +232,22 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
 
     // delete attachment info
     if(removedAttachments.length > 0) {
-      removedAttachments.forEach(item => {
-        const resp = deleteFile(item.dirName, item.fileName, item.fileExt);
-        resp.then(res => {
-          if(!res.result){
-            console.log('Failed to remove uploaded file :', item);
-            // ToDo: Then, what should we do to deal this condition!
-            return;
-          };
-          if(!!item.uuid){
-            // This is in attachment table
-            const resp = modifyAttachmentInfo({
-              actionType: 'DELETE',
-              uuid: item.uuid,
-              creator : cookies.myLationCrmUserId,
-            });
-            resp.then(res => {
-              console.log('delete files :', res);
-            });
-          };
-        })
+      removedAttachments.forEach(async item => {
+        const res = await deleteFile(item.dirName, item.fileName, item.fileExt);
+        if(!res.result){
+          console.log('Failed to remove uploaded file :', item);
+          // ToDo: Then, what should we do to deal this condition!
+          return;
+        };
+        if(!!item.uuid){
+          // This is in attachment table
+          const resp = await modifyAttachmentInfo({
+            actionType: 'DELETE',
+            uuid: item.uuid,
+            creator : cookies.myLationCrmUserId,
+          });
+          console.log('delete files :', resp);
+        };
       });
     };
 
@@ -309,7 +304,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
               console.log('handleAddRequestContent / after modifyAttachmentInfo ', resp.message);
             }
           }));
-          finalAttachments.push(tempAttachments);
+          finalAttachments.push(...tempAttachments);
         }
 
         const modifedData = {
@@ -330,7 +325,6 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
               fileExt: item.fileExt,
               creator : cookies.myLationCrmUserId,
             });
-
             if(resp.result){
               return {
                 ...item,
@@ -351,7 +345,7 @@ const ConsultingAddModel = ({ open, handleOpen }) => {
         };
         setConsultingChange(modifedData);
       }
-      
+      console.log('Check : ', finalAttachments);
       setAttachmentsForAction(finalAttachments);
     };
   };

@@ -486,13 +486,21 @@ export const atomTaxInvoiceState = atom({
     default: 0,
 });
 
-//----- Attchment Codes for Consulting ------------------------
+//----- Attchments for Consulting ------------------------
+export const atomRequestAttachmentCode = atom({
+    key: "requestAttachmentCode",
+    default: null,
+});
+export const atomActionAttachmentCode = atom({
+    key: "actionAttachmentCode",
+    default: null,
+});
 export const atomRequestAttachments = atom({
-    key: "atomRequestAttachments",
+    key: "requestAttachments",
     default: [],
 });
 export const atomActionAttachments = atom({
-    key: "atomActionAttachments",
+    key: "actionAttachments",
     default: [],
 });
 

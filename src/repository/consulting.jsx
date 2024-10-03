@@ -7,6 +7,8 @@ import { atomCurrentConsulting
     , atomFilteredConsultingArray
     , atomConsultingState
     , atomCurrentLead
+    , atomRequestAttachmentCode
+    , atomActionAttachmentCode
     , atomRequestAttachments
     , atomActionAttachments
     , defaultLead,
@@ -329,6 +331,8 @@ export const ConsultingRepo = selector({
                 if(!!foundConsulting) {
                     console.log('Check if this consulting has attachment(s)');
                     if(foundConsulting.request_attachment_code && foundConsulting.request_attachment_code !== ''){
+                        set(atomRequestAttachmentCode, foundConsulting.request_attachment_code);
+
                         const input_json = JSON.stringify({attachment_code: foundConsulting.request_attachment_code});
                         const response = await fetch(`${BASE_PATH}/attachment`, {
                             method: "POST",
@@ -345,6 +349,8 @@ export const ConsultingRepo = selector({
                         set(atomRequestAttachments, data);
                     };
                     if(foundConsulting.action_attachment_code && foundConsulting.action_attachment_code !== ''){
+                        set(atomActionAttachmentCode, foundConsulting.action_attachment_code);
+                        
                         const input_json = JSON.stringify({attachment_code: foundConsulting.action_attachment_code});
                         const response = await fetch(`${BASE_PATH}/attachment`, {
                             method: "POST",
@@ -362,11 +368,17 @@ export const ConsultingRepo = selector({
                 } else {
                     set(atomRequestAttachments, []);  //default
                     set(atomActionAttachments, []);   //default
+                    set(atomRequestAttachments, null);
+                    set(atomActionAttachments, null);
                 }
             }
             catch(err){
                 console.error(`setCurrentConsulting / Error : ${err}`);
                 set(atomCurrentConsulting, defaultConsulting);
+                set(atomRequestAttachments, []);  //default
+                set(atomActionAttachments, []);   //default
+                set(atomRequestAttachments, null);
+                set(atomActionAttachments, null);
             };
         });
         const searchConsultings = getCallback(() => async (itemName, filterText, isAccurate = false) => {

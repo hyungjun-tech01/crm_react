@@ -67,7 +67,7 @@ const QuillEditor = ({ originalContent, handleData, handleClose }) => {
             };
 
             const tempAttachment = {
-                code: res.data.code,
+                attachmentCode: res.data.code,
                 dirName: res.data.dirName,
                 fileName: res.data.fileName,
                 fileExt: res.data.fileExt,
