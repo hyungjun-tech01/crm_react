@@ -78,7 +78,6 @@ const ConsultingDetailsModel = () => {
         ...editedDetailValues,
         [e.target.name]: e.target.value,
       };
-      console.log('handleDetailChange : ', tempEdited);
       setEditedDetailValues(tempEdited);
     } else {
       if (editedDetailValues[e.target.name]) {
@@ -98,14 +97,11 @@ const ConsultingDetailsModel = () => {
   }, [editedDetailValues, selectedConsulting]);
 
   const handleDetailSelectChange = useCallback((name, selected) => {
-    console.log('handleDetailSelectChange / start : ', selected);
-
     if (selectedConsulting[name] !== selected.value) {
       const tempEdited = {
         ...editedDetailValues,
         [name]: selected.value,
       };
-      console.log('handleDetailSelectChange : ', tempEdited);
       setEditedDetailValues(tempEdited);
     };
   }, [editedDetailValues, selectedConsulting]);
@@ -154,9 +150,6 @@ const ConsultingDetailsModel = () => {
         removedAttachments.push(item);
       };
     });
-
-    console.log('handleAddRequestContent / foundAttachments ', foundAttachments);
-    console.log('handleAddRequestContent / removedAttachments ', removedAttachments);
 
     if(removedAttachments.length > 0) {
       removedAttachments.forEach(async item => {

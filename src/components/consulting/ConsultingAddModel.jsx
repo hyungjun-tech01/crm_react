@@ -87,11 +87,6 @@ const ConsultingAddModel = (props) => {
       };
     });
 
-    console.log('handleAddRequestContent / totalAttachments ', totalAttachments);
-    console.log('handleAddRequestContent / content ', content);
-    console.log('handleAddRequestContent / foundAttachments ', foundAttachments);
-    console.log('handleAddRequestContent / removedAttachments ', removedAttachments);
-
     // delete attachment info
     if(removedAttachments.length > 0){
       removedAttachments.forEach(async item => {
@@ -346,7 +341,6 @@ const ConsultingAddModel = (props) => {
         };
         setConsultingChange(modifedData);
       }
-      console.log('Check : ', finalAttachments);
       setAttachmentsForAction(finalAttachments);
     };
   };
