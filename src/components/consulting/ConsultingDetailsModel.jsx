@@ -11,7 +11,14 @@ import {
   atomEngineersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
-import { atomConsultingState, atomCurrentConsulting, atomSelectedCategory, defaultConsulting } from "../../atoms/atoms";
+import {
+  atomCurrentConsulting,
+  atomSelectedCategory,
+  atomRequestAttachments,
+  atomActionAttachments,
+  defaultConsulting, 
+  atomRequestAttachmentCode,
+  atomActionAttachmentCode} from "../../atoms/atoms";
 import {
   ConsultingRepo,
   ConsultingTypes,
@@ -19,6 +26,7 @@ import {
   ConsultingTimeTypes,
   ProductTypes
 } from "../../repository/consulting";
+import { AttachmentRepo } from "../../repository/attachment";
 
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
@@ -30,7 +38,6 @@ const ConsultingDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Consulting =======================================
-  const consultingState = useRecoilValue(atomConsultingState);
   const selectedConsulting = useRecoilValue(atomCurrentConsulting);
   const { modifyConsulting, setCurrentConsulting } = useRecoilValue(ConsultingRepo);
 
@@ -46,6 +53,11 @@ const ConsultingDetailsModel = () => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentConsultingCode, setCurrentConsultingCode] = useState('');
   const [ selectedCategory, setSelectedCategory] = useRecoilState(atomSelectedCategory);
+  const [ showEditor, setShowEditor ] = useState(0);
+
+  const CLOSE_EDITOR = 0;
+  const EDIT_REQUEST_CONTENT = 1;
+  const EDIT_ACTION_CONTENT = 2;
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -66,7 +78,6 @@ const ConsultingDetailsModel = () => {
         ...editedDetailValues,
         [e.target.name]: e.target.value,
       };
-      console.log('handleDetailChange : ', tempEdited);
       setEditedDetailValues(tempEdited);
     } else {
       if (editedDetailValues[e.target.name]) {
@@ -75,7 +86,7 @@ const ConsultingDetailsModel = () => {
     };
   }, [editedDetailValues, selectedConsulting]);
 
-  const handleDetailDateChange = useCallback((name, date) => {
+  const handleDetailDataChange = useCallback((name, date) => {
     if (date !== new Date(selectedConsulting[name])) {
       const tempEdited = {
         ...editedDetailValues,
@@ -86,17 +97,263 @@ const ConsultingDetailsModel = () => {
   }, [editedDetailValues, selectedConsulting]);
 
   const handleDetailSelectChange = useCallback((name, selected) => {
-    console.log('handleDetailSelectChange / start : ', selected);
-
     if (selectedConsulting[name] !== selected.value) {
       const tempEdited = {
         ...editedDetailValues,
         [name]: selected.value,
       };
-      console.log('handleDetailSelectChange : ', tempEdited);
       setEditedDetailValues(tempEdited);
     };
   }, [editedDetailValues, selectedConsulting]);
+
+  //===== Handles to attachment ========================================
+  const orgRequestAttachments = useRecoilValue(atomRequestAttachments);
+  const orgActionAttachments = useRecoilValue(atomActionAttachments);
+  const [ requestAttachmentCode, setRequestAttachmentCode ] = useRecoilState(atomRequestAttachmentCode);
+  const [ actionAttachmentCode, setActionAttachmentCode ] = useRecoilState(atomActionAttachmentCode);
+  const { deleteFile, modifyAttachmentInfo } = useRecoilValue(AttachmentRepo);
+  const [ requestAttachments, setRequestAttachments ] = useState([]);
+  const [ actionAttachments, setActionAttachments ] = useState([]);
+
+  const handleAddRequestContent = async (data) => {
+    const {content, attachments} = data;
+    
+    handleDetailDataChange('request_content', content);
+    
+    // Check if content has all attachments ------------------------
+    const totalAttachments = [
+      ...requestAttachments,
+      ...attachments
+    ];
+
+    let foundAttachments = [];
+    let removedAttachments = [];
+    orgRequestAttachments.forEach(item => {
+      const coverted = {
+        attachmentCode: item.attachment_code,
+        attachmentIndex: item.attachemnt_index,
+        dirName: item.dir_name,
+        fileName: item.file_name,
+        fileExxt: item.file_ext,
+        uuid: item.uuid,
+      };
+      if(content.includes(item.dir_name)){
+        foundAttachments.push(coverted);
+      } else {
+        removedAttachments.push(coverted);
+      };
+    });
+    totalAttachments.forEach(item => {
+      if(content.includes(item.dirName)){
+        foundAttachments.push(item);
+      } else {
+        removedAttachments.push(item);
+      };
+    });
+
+    if(removedAttachments.length > 0) {
+      removedAttachments.forEach(async item => {
+        const deleteResp = await deleteFile(item.dirName, item.fileName, item.fileExt);
+        if(!deleteResp.result){
+          console.log('Failed to remove uploaded file :', item);
+          // ToDo: Then, what should we do to deal this condition!
+          return;
+        };
+        if(!!item.uuid){
+          // This is in attachment table
+          const attachmentResp = await modifyAttachmentInfo({
+            actionType: 'DELETE',
+            uuid: item.uuid,
+            creator : cookies.myLationCrmUserId,
+          });
+          console.log('delete files :', attachmentResp);
+        };
+      });
+    };
+
+    // add attachment info
+    let finalAttachments = [];
+
+    if(foundAttachments.length > 0){
+      let tempAttachmentCode = '';
+      let tempAttachments = null;
+
+      if(!requestAttachmentCode) {
+        // attachmentCode가 없는 경우, 첫번째 정보를 upload 후 code를 받아오자.
+        const firstAttachment = foundAttachments[0];
+        const firstResp = await modifyAttachmentInfo({
+          attachmentCode: null,
+          actionType: 'ADD',
+          dirName: firstAttachment.dirName,
+          fileName: firstAttachment.fileName,
+          fileExt: firstAttachment.fileExt,
+          creator : cookies.myLationCrmUserId,
+        });
+        if(!firstResp.result){
+          console.log('handleAddRequestContent / after modifyAttachmentInfo ', firstResp.message);
+          return;
+        };
+        finalAttachments.push({
+          ...firstAttachment,
+          uuid: firstResp.data.uuid,
+          attachmentCode: firstResp.data.attachmentCode,
+          attachmentIndex: firstResp.data.index ,
+        });
+        tempAttachments = [ ...foundAttachments.slice(1,)];
+
+        tempAttachmentCode = firstResp.data.attachmentCode;
+        setRequestAttachmentCode(firstResp.data.attachmentCode);
+      } else {
+        tempAttachmentCode = requestAttachmentCode;
+        tempAttachments = [ ...foundAttachments ];
+      };
+
+      const remainAttachments = await Promise.all(tempAttachments.map(async item => {
+        if(!item.uuid){
+          const resp = await modifyAttachmentInfo({
+            attachmentCode: tempAttachmentCode,
+            actionType: 'ADD',
+            dirName: item.dirName,
+            fileName: item.fileName,
+            fileExt: item.fileExt,
+            creator : cookies.myLationCrmUserId,
+          });
+          if(resp.result){
+            return {
+              ...item,
+              uuid: resp.data.uuid,
+              attachmentCode: resp.data.attachmentCode,
+              attachmentIndex: resp.data.index ,
+            };
+          } else {
+            console.log('handleAddRequestContent / after modifyAttachmentInfo ', resp.message);
+          }
+        }
+      }));
+      finalAttachments.push(...remainAttachments);
+      setRequestAttachments(finalAttachments);
+    };
+  };
+
+  const handleAddActionContent = async (data) => {
+    const {content, attachments} = data;
+    
+    handleDetailDataChange('action_content', content);
+
+    // Check if content has all attachments ------------------------
+    const totalAttachments = [
+      ...actionAttachments,
+      ...attachments
+    ];
+
+    let foundAttachments = [];
+    let removedAttachments = [];
+    orgActionAttachments.forEach(item => {
+      const coverted = {
+        attachmentCode: item.attachment_code,
+        attachmentIndex: item.attachemnt_index,
+        dirName: item.dir_name,
+        fileName: item.file_name,
+        fileExxt: item.file_ext,
+        uuid: item.uuid,
+      };
+      if(content.includes(item.dir_name)){
+        foundAttachments.push(coverted);
+      } else {
+        removedAttachments.push(coverted);
+      };
+    });
+    totalAttachments.forEach(item => {
+      if(content.includes(item.dirName)){
+        foundAttachments.push(item);
+      } else {
+        removedAttachments.push(item);
+      };
+    });
+
+    if(removedAttachments.length > 0) {
+      removedAttachments.forEach(async item => {
+        const deleteResp = await deleteFile(item.dirName, item.fileName, item.fileExt);
+        if(!deleteResp.result){
+          console.log('Failed to remove uploaded file :', item);
+          // ToDo: Then, what should we do to deal this condition!
+          return;
+        };
+        if(!!item.uuid){
+          // This is in attachment table
+          const attachmentResp = await modifyAttachmentInfo({
+            actionType: 'DELETE',
+            uuid: item.uuid,
+            creator : cookies.myLationCrmUserId,
+          });
+          console.log('delete files :', attachmentResp);
+        };
+      });
+    };
+
+    // add attachment info
+    let finalAttachments = [];
+
+    if(foundAttachments.length > 0){
+      let tempAttachmentCode = '';
+      let tempAttachments = null;
+
+      if(!actionAttachmentCode) {
+        // attachmentCode가 없는 경우, 첫번째 정보를 upload 후 code를 받아오자.
+        const firstAttachment = foundAttachments[0];
+        const firstResp = await modifyAttachmentInfo({
+          attachmentCode: null,
+          actionType: 'ADD',
+          dirName: firstAttachment.dirName,
+          fileName: firstAttachment.fileName,
+          fileExt: firstAttachment.fileExt,
+          creator : cookies.myLationCrmUserId,
+        });
+        if(!firstResp.result){
+          console.log('handleAddRequestContent / after modifyAttachmentInfo ', firstResp.message);
+          return;
+        };
+        finalAttachments.push({
+          ...firstAttachment,
+          uuid: firstResp.data.uuid,
+          attachmentCode: firstResp.data.attachmentCode,
+          attachmentIndex: firstResp.data.index ,
+        });
+        tempAttachments = [ ...foundAttachments.slice(1,)];
+
+        tempAttachmentCode = firstResp.data.attachmentCode;
+        setActionAttachmentCode(firstResp.data.attachmentCode);
+      } else {
+        tempAttachmentCode = actionAttachmentCode;
+        tempAttachments = [ ...foundAttachments ];
+      };
+
+      const remainAttachments = await Promise.all(tempAttachments.map(async item => {
+        if(!item.uuid){
+          const resp = await modifyAttachmentInfo({
+            attachmentCode: tempAttachmentCode,
+            actionType: 'ADD',
+            dirName: item.dirName,
+            fileName: item.fileName,
+            fileExt: item.fileExt,
+            creator : cookies.myLationCrmUserId,
+          });
+          if(resp.result){
+            return {
+              ...item,
+              uuid: resp.data.uuid,
+              attachmentCode: resp.data.attachmentCode,
+              attachmentIndex: resp.data.index ,
+            };
+          } else {
+            console.log('handleAddRequestContent / after modifyAttachmentInfo ', resp.message);
+          }
+        }
+      }));
+      finalAttachments.push(...remainAttachments);
+      setActionAttachments(finalAttachments);
+    };
+  };
 
   const handleSaveAll = useCallback(() => {
     if (editedDetailValues !== null
@@ -132,17 +389,19 @@ const ConsultingDetailsModel = () => {
       setSelectedCategory({category: null, item_code: null});
     };
     setEditedDetailValues(null);
+    setActionAttachments([]);
+    setRequestAttachments([]);
     setCurrentConsulting();
   }, [setCurrentConsulting]);
 
-  const consulting_items_info = [
+  const consultingItemsInfo = [
     { key: 'department', title: 'lead.department', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'mobile_number', title: 'lead.mobile', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'phone_number', title: 'common.phone_no', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'email', title: 'lead.email', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'status', title: 'common.status', detail: { type: 'select', options: ConsultingStatusTypes, editing: handleDetailSelectChange } },
-    { key: 'receipt_date', title: 'consulting.receipt_date', detail: { type: 'date', time:true, editing: handleDetailDateChange } },
+    { key: 'receipt_date', title: 'consulting.receipt_date', detail: { type: 'date', editing: handleDetailDataChange } },
     { key: 'consulting_type', title: 'consulting.type', detail: { type: 'select', options: ConsultingTypes, editing: handleDetailSelectChange } },
     { key: 'lead_time', title: 'consulting.lead_time', detail: { type: 'select', options: ConsultingTimeTypes, editing: handleDetailSelectChange } },
     { key: 'product_type', title: 'consulting.product_type', detail: { type: 'select', options: ProductTypes, editing: handleDetailSelectChange } },
@@ -150,8 +409,11 @@ const ConsultingDetailsModel = () => {
     { key: 'lead_sales', title: 'lead.lead_sales', detail: { type: 'select', options: salespersonsForSelection, editing: handleDetailSelectChange } },
     { key: 'application_engineer', title: 'company.engineer', detail: { type: 'select', options: engineersForSelection, editing: handleDetailSelectChange } },
     { key: 'receiver', title: 'consulting.receiver', detail: { type: 'select', options: usersForSelection, editing: handleDetailSelectChange } },
-    { key: 'request_content', title: 'consulting.request_content', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
-    { key: 'action_content', title: 'consulting.action_content', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
+  ];
+
+  const consultingItemsInfo2 = [
+    { key: 'request_content', title: 'consulting.request_content', detail: { type: 'content', editable: (showEditor & EDIT_REQUEST_CONTENT), editableKey: EDIT_REQUEST_CONTENT, handleEditable: setShowEditor, editing: handleAddRequestContent } },
+    { key: 'action_content', title: 'consulting.action_content', detail: { type: 'content', editable: (showEditor & EDIT_ACTION_CONTENT), editableKey: EDIT_ACTION_CONTENT, handleEditable: setShowEditor, editing: handleAddActionContent } },
     { key: 'memo', title: 'common.memo', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
   ];
 
@@ -173,13 +435,13 @@ const ConsultingDetailsModel = () => {
 
       setCurrentConsultingCode(selectedConsulting.consulting_code);
     };
-  }, [consultingState, cookies.myLationCrmUserId, currentConsultingCode, selectedConsulting]);
+  }, [cookies.myLationCrmUserId, currentConsultingCode, selectedConsulting]);
 
   useEffect(() => {
     if ((userState & 1) === 1) {
       setIsAllNeededDataLoaded(true);
     };
-  }, [userState, consultingState])
+  }, [userState])
 
   if (!isAllNeededDataLoaded)
     return <div>&nbsp;</div>;
@@ -268,7 +530,25 @@ const ConsultingDetailsModel = () => {
                               style={{ display: 'flex', marginBottom: '0.5rem' }}
                               wrap
                             >
-                              { consulting_items_info.map((item, index) =>
+                              { consultingItemsInfo.map((item, index) =>
+                                <DetailCardItem
+                                  key={index}
+                                  title={t(item.title)}
+                                  defaultValue={selectedConsulting[item.key]}
+                                  edited={editedDetailValues}
+                                  name={item.key}
+                                  detail={item.detail}
+                                />
+                              )}
+                            </Space>
+                            <Space
+                              align="start"
+                              direction="horizontal"
+                              size="small"
+                              style={{ display: 'flex', marginBottom: '0.5rem' }}
+                              wrap
+                            >
+                              { consultingItemsInfo2.map((item, index) =>
                                 <DetailCardItem
                                   key={index}
                                   title={t(item.title)}
