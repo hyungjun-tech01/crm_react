@@ -183,6 +183,7 @@ const enResource = {
             _loading_add: 'Now, loading the needed data to add new quotation ...',
             _loading_detail: 'Now, loading the details of quotation...',
             quotation_multi_query:'Quotation Multi Query',
+            quotation_contents : 'Quotation Contents',
         },
         transaction:{
             add_content: 'Add Content',

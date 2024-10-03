@@ -305,6 +305,8 @@ const Quotations = () => {
                     <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('lead.mobile')}>{t('lead.mobile')}</button>
                     <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('common.phone_no')}>{t('common.phone_no')}</button>
                     <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('lead.email')}>{t('lead.email')}</button>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('quotation.quotation_manager')}>{t('quotation.quotation_manager')}</button>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('quotation.quotation_contents')}>{t('quotation.quotation_contents')}</button>
                   </div>
                 </div>
               </div>

@@ -26,9 +26,12 @@ export const QuotationSendTypes = [
 
 export const quotationColumn = [
     { value: 'company_name', label: '회사명'},
+    { value: 'quotation_type', label: '견적구분'},
     { value: 'lead_name', label: '고객명'},
+    { value: 'mobile_number', label: '고객휴대전화'},
+    { value: 'phone_number', label: '전화번호'},
+    { value: 'email', label: '고객이메일'},
     { value: 'quotation_manager', label: '견적 책임자'},
-    { value: 'quotation_title', label: '견적 제목'},
     { value: 'quotation_contents', label: '견적 내용'},
 ];
 
@@ -144,7 +147,9 @@ export const QuotationRepo = selector({
                                             (item.lead_name && item.lead_name.includes(filterText)) ||
                                             (item.mobile_number && item.mobile_number.includes(filterText)) || 
                                             (item.phone_number && item.phone_number.includes(filterText)) || 
-                                            (item.email && item.email.includes(filterText)) 
+                                            (item.email && item.email.includes(filterText)) ||
+                                            (item.quotation_manager && item.quotation_manager.includes(filterText))||
+                                            (item.quotation_contents && item.quotation_contents.includes(filterText))
                 );
             }else if(itemName === 'company.company_name'){
                 allQuotation = allQuotationList.filter(item => (item.company_name &&item.company_name.includes(filterText))
@@ -166,6 +171,12 @@ export const QuotationRepo = selector({
                 );    
             }else if(itemName === 'lead.email'){
                 allQuotation = allQuotationList.filter(item => (item.email &&item.email.includes(filterText))
+                );    
+            }else if(itemName === 'quotation.quotation_manager'){
+                allQuotation = allQuotationList.filter(item => (item.quotation_manager &&item.quotation_manager.includes(filterText))
+                );    
+            }else if(itemName === 'quotation.quotation_contents'){
+                allQuotation = allQuotationList.filter(item => (Array.isArray(item.quotation_contents) &&item.quotation_contents.some(content => content.includes(filterText)))
                 );    
             }
             set(atomFilteredQuotationArray, allQuotation);

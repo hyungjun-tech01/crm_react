@@ -183,6 +183,7 @@ const koResource = {
             _loading_add: '신규 견적 작성을 위한 기반 정보를 불러오고 있습니다.',
             _loading_detail: '견적에 대한 상세 정보를 불러오고 있습니다.',
             quotation_multi_query:'견적 다중검색',
+            quotation_contents : '견적 내용',
         },
         transaction:{
             add_content: '항목 추가',
