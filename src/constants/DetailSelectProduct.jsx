@@ -11,9 +11,9 @@ const SearchInput = (props) => {
         <div className="ant-space-item" style={style}>
             <span className='ant-input-group-wrapper
                 ant-input-group-wrapper-outlined
-                css-dev-only-do-not-override-1uweeqc'
+                css-dev-only-do-not-override-5wsri9'
             >
-                <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-1uweeqc'>
+                <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-5wsri9'>
                     <span className='ant-input-group-addon'>
                         { addonBefore }
                     </span>
