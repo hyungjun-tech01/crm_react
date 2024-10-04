@@ -52,17 +52,20 @@ const SelectProductModal = (props) => {
     useEffect(() => {
         tryLoadAllProductClassList();
         tryLoadAllProducts();
+
         
         if(((productState & 1) === 1) 
             && ((productClassListState & 1) ===  1)
         ) {
+
             if(productClassOptions.length === 0 || Object.keys(productOptionObj).length === 0) {
                 const found = productClassList.map(item => ({
                     label: item.product_class_name,
                     value: item.product_class_name,
                 }));
+
                 setProductClassOptions(found);
-    
+                
                 let foundObj = {};
                 productClassList.forEach(item => {
                     const foundProducts = allProducts.filter(product => product.product_class_name === item.product_class_name);
@@ -73,7 +76,9 @@ const SelectProductModal = (props) => {
                     }));
                     foundObj[item.product_class_name] = tempItems;
                 });
+                
                 setProductOptionObj(foundObj);
+
             } else {
                 if(!!current) {
                     if(!!current['product_class_name']) {
