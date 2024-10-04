@@ -214,7 +214,12 @@ export const QuotationRepo = selector({
                     set(atomAllQuotationObj, updatedAllObj);
 
                     //----- Update FilteredQuotationArry -----------------------//
-                    set(atomFilteredQuotationArray, Object.values(updatedAllObj));
+                    const currentFiltered = await snapshot.getPromise(atomFilteredQuotationArray);
+                    const updatedFiltered = [
+                        updatedNewQuotation,
+                        ...currentFiltered,
+                    ]
+                    set(atomFilteredQuotationArray, updatedFiltered);
 
                     //----- Update QuotationByLead -----------------------//
                     const currentLead = await snapshot.getPromise(atomCurrentLead);

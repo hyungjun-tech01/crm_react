@@ -163,7 +163,12 @@ export const TransactionRepo = selector({
                     set(atomAllTransactionObj, updatedAllObj);
 
                     //----- Update FilteredTransactionArray --------------------//
-                    set(atomFilteredTransactionArray, Object.values(updatedAllObj));
+                    const currentFiltered = await snapshot.getPromise(atomFilteredTransactionArray);
+                    const updatedFiltered = [
+                        updatedNewTransaction,
+                        ...currentFiltered,
+                    ]
+                    set(atomFilteredTransactionArray, updatedFiltered);
 
                     //----- Update TransactionByCompany --------------------//
                     const currentCompany = await snapshot.getPromise(atomCurrentCompany);
