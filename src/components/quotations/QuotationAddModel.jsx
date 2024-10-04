@@ -336,7 +336,7 @@ const QuotationAddModel = (props) => {
           tempSetting.total_only_disabled = !target_value;
           let updatedEachSums = 0;
           const updatedContents = quotationContents.map(item => {
-            const newPrice = (target_value && !settingForContent.total_only) ? item['org_unit_prce'] / 1.1 : item['org_unit_prce'];
+            const newPrice = (target_value && !settingForContent.total_only) ? item['org_unit_price'] / 1.1 : item['org_unit_price'];
             const updatedAmount = newPrice * item['12'];
             updatedEachSums += updatedAmount;
             return {
@@ -355,7 +355,7 @@ const QuotationAddModel = (props) => {
           tempSetting.total_only = target_value;
           let updatedEachSums = 0;
           const updatedContents = quotationContents.map(item => {
-            const newPrice = (!target_value && settingForContent.unit_vat_included) ? item['org_unit_prce'] / 1.1 : item['org_unit_prce'];
+            const newPrice = (!target_value && settingForContent.unit_vat_included) ? item['org_unit_price'] / 1.1 : item['org_unit_price'];
             const updatedAmount = newPrice * item['12'];
             updatedEachSums += updatedAmount;
             return {
@@ -626,8 +626,9 @@ const QuotationAddModel = (props) => {
         '16': finalData.quotation_amount,
         '17': finalData.cost_price,
         '998': finalData.detail_desc ? finalData.detail_desc : '',
-        'org_price': finalData.org_unit_price,
+        'org_unit_price': finalData.org_unit_price,
       };
+      console.log('upldatedContent:', updatedContent);
       const updatedContents = quotationContents.concat(updatedContent);
       setQuotationContents(updatedContents);
 
@@ -648,7 +649,7 @@ const QuotationAddModel = (props) => {
         '16': finalData.quotation_amount,
         '17': finalData.cost_price,
         '998': finalData.detail_desc ? finalData.detail_desc : '',
-        'org_price': finalData.org_unit_price,
+        'org_unit_price': finalData.org_unit_price,
       };
       const foundIdx = quotationContents.findIndex(item => item['1'] === settingForContent.index);
       if (foundIdx === -1) {

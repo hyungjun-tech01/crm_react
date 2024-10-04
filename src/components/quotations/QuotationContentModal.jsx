@@ -50,7 +50,7 @@ const QuotationContentModal = (props) => {
                 tempData['cost_price'] = Number(value.cost_price);
                 tempData['reseller_price'] = Number(value.reseller_price);
                 tempData['list_price'] = setting.unit_vat_included ? Number(value.list_price) / 1.1 : Number(value.list_price);
-                tempData['org_unit_prce'] = Number(value.list_price);
+                tempData['org_unit_price'] = Number(value.list_price);
 
                 setTempDetailSpec(value.detail_desc);
                 if (showDetailDesc) {
