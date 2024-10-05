@@ -262,10 +262,7 @@ export const ConsultingRepo = selector({
                     };
                     set(atomAllConsultingObj, updatedAllObj);
 
-                    //----- Update FilteredConsultings -----------------------//
-                    //set(atomFilteredConsultingArray, Object.values(updatedAllObj));
-
-                    //----- Update FilteredLeadArray --------------------//
+                    //----- Update FilteredConsultings --------------------//
                     const filteredAllConsultings = await snapshot.getPromise(atomFilteredConsultingArray);
                     const updatedFiltered = [
                         updatedNewConsulting,

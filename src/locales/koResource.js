@@ -174,6 +174,7 @@ const koResource = {
             sub_total_amount: '중간 총금액',
             tax_amount: '세액',
             total_applied_only: '합계에만 적용',
+            total_cost_price: '총소비자가',
             total_quotation_amount: '견적가합계',
             unit_vat_included: '단가에 부가세 포함',
             upper_memo: '상단 메모',

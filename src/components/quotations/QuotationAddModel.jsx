@@ -128,7 +128,6 @@ const QuotationAddModel = (props) => {
       ...quotationChange,
       [name]: date
     };
-    console.log('[handleDateChange] : ', modifiedData);
     setQuotationChange(modifiedData);
   };
 
@@ -187,6 +186,12 @@ const QuotationAddModel = (props) => {
     {
       title: t('common.quantity'),
       dataIndex: '12',
+      size: 10,
+      render: (text, record) => <>{text}</>,
+    },
+    {
+      title: t('quotation.consumer_price'),
+      dataIndex: '13',
       size: 10,
       render: (text, record) => <>{text}</>,
     },
@@ -336,7 +341,7 @@ const QuotationAddModel = (props) => {
           tempSetting.total_only_disabled = !target_value;
           let updatedEachSums = 0;
           const updatedContents = quotationContents.map(item => {
-            const newPrice = (target_value && !settingForContent.total_only) ? item['org_unit_prce'] / 1.1 : item['org_unit_prce'];
+            const newPrice = (target_value && !settingForContent.total_only) ? item['org_unit_price'] / 1.1 : item['org_unit_price'];
             const updatedAmount = newPrice * item['12'];
             updatedEachSums += updatedAmount;
             return {
@@ -355,7 +360,7 @@ const QuotationAddModel = (props) => {
           tempSetting.total_only = target_value;
           let updatedEachSums = 0;
           const updatedContents = quotationContents.map(item => {
-            const newPrice = (!target_value && settingForContent.unit_vat_included) ? item['org_unit_prce'] / 1.1 : item['org_unit_prce'];
+            const newPrice = (!target_value && settingForContent.unit_vat_included) ? item['org_unit_price'] / 1.1 : item['org_unit_price'];
             const updatedAmount = newPrice * item['12'];
             updatedEachSums += updatedAmount;
             return {
@@ -441,7 +446,6 @@ const QuotationAddModel = (props) => {
         vat_amount: vat_amount,
         sum_final: sum_dc_applied + vat_amount - amountsForContent.cut_off_amount,
       };
-      console.log('[handleChangeDCRate] calcualted amount :', tempAmount);
       setAmountsForContent(tempAmount);
     };
   };
@@ -503,6 +507,14 @@ const QuotationAddModel = (props) => {
     };
     setAmountsForContent(updatedSetting);
   };
+
+  const handleChangeTotalCostPrice = (value) => {
+    const updatedSetting = {
+      ...amountsForContent,
+      total_cost_price: value,
+    };
+    setAmountsForContent(updatedSetting);
+  }
 
   // --- Functions used for editing content ------------------------------
   const handleAddNewContent = useCallback(() => {
@@ -577,7 +589,6 @@ const QuotationAddModel = (props) => {
     ];
 
     selectedContentRowKeys.forEach(row => {
-      console.log('[handleDeleteSelectedConetents] row :', row);
       const filteredContents = tempContents.filter(item => item['1'] !== row);
       tempContents = filteredContents;
     });
@@ -609,7 +620,6 @@ const QuotationAddModel = (props) => {
       setIsMessageModalOpen(true);
       return;
     };
-    console.log('[handleContentModalOk] new content :', finalData);
 
     // update Contents -------------------------------------------------
     if (settingForContent.action === "ADD") {
@@ -626,7 +636,7 @@ const QuotationAddModel = (props) => {
         '16': finalData.quotation_amount,
         '17': finalData.cost_price,
         '998': finalData.detail_desc ? finalData.detail_desc : '',
-        'org_price': finalData.org_unit_price,
+        'org_unit_price': finalData.org_unit_price,
       };
       const updatedContents = quotationContents.concat(updatedContent);
       setQuotationContents(updatedContents);
@@ -648,7 +658,7 @@ const QuotationAddModel = (props) => {
         '16': finalData.quotation_amount,
         '17': finalData.cost_price,
         '998': finalData.detail_desc ? finalData.detail_desc : '',
-        'org_price': finalData.org_unit_price,
+        'org_unit_price': finalData.org_unit_price,
       };
       const foundIdx = quotationContents.findIndex(item => item['1'] === settingForContent.index);
       if (foundIdx === -1) {
@@ -678,7 +688,6 @@ const QuotationAddModel = (props) => {
   };
 
   const handleContentItemChange = useCallback(data => {
-    console.log('handleContentItemChange : ', data);
     setEditedContentModalValues(data);
   }, []);
 
@@ -1178,6 +1187,21 @@ const QuotationAddModel = (props) => {
                       formatter={handleFormatter}
                       parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                       onChange={handleChangeFinalAmount}
+                      style={{
+                        width: 180,
+                      }}
+                    />
+                  </Space.Compact>
+                  <Space.Compact direction="vertical">
+                    <label >{t('quotation.total_cost_price')}</label>
+                    <InputNumber
+                      name='total_cost_price'
+                      defaultValue={0}
+                      value={amountsForContent.total_cost_price}
+                      disabled={settingForContent.auto_calc}
+                      formatter={handleFormatter}
+                      parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                      onChange={handleChangeTotalCostPrice}
                       style={{
                         width: 180,
                       }}

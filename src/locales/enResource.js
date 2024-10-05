@@ -174,6 +174,7 @@ const enResource = {
             sub_total_amount: 'Sub Total Amount',
             tax_amount: 'Tax Amount',
             total_applied_only: 'Apply to total amount only',
+            total_cost_price: 'Total Consumer Price',
             total_quotation_amount: 'Total Quotation Amount',
             unit_vat_included: 'VAT included in Unit Price',
             upper_memo: 'Upper Note',

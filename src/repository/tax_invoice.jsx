@@ -158,7 +158,12 @@ export const TaxInvoiceRepo = selector({
                     set(atomAllTaxInvoiceObj, updatedAllObj);
 
                     //----- Update FilteredTaxInvoiceArray --------------------//
-                    set(atomFilteredTaxInvoiceArray, Object.values(updatedAllObj));
+                    const currentFiltered = await snapshot.getPromise(atomFilteredTaxInvoiceArray);
+                    const updatedFiltered = [
+                        updatedTaxInvoice,
+                        ...currentFiltered
+                    ];
+                    set(atomFilteredTaxInvoiceArray, updatedFiltered);
 
                     //----- Update TaxInvoiceByCompany --------------------//
                     const currentCompany = await snapshot.getPromise(atomCurrentCompany);
