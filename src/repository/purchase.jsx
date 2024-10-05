@@ -18,6 +18,7 @@ export const purchaseColumn = [
     { value: 'company_name', label: '회사명'},
     { value: 'product_class_name', label: '제품분류명'},
     { value: 'product_name', label: '제품명'},
+    { value: 'licence_info', label: '라인센스정보'},
     { value: 'purchase_memo', label: '구매 메모'},
 ];
 
@@ -117,18 +118,26 @@ export const PurchaseRepo = selector({
             let  allQPurchase = [];
             
             if(itemName === 'common.all'){
-                allQPurchase = allPurchaseList.filter(item => (item.product_type &&item.product_type.includes(filterText))||
+                allQPurchase = allPurchaseList.filter(item => (item.product_class_name &&item.product_class_name.includes(filterText))||
                                             (item.product_name && item.product_name.includes(filterText)) ||
-                                            (item.company_name && item.company_name.includes(filterText)) 
+                                            (item.company_name && item.company_name.includes(filterText)) ||
+                                            (item.licence_info  && item.licence_info.includes(filterText)) ||
+                                            (item.purchase_memo  && item.purchase_memo.includes(filterText)) 
                 );
-            }else if(itemName === 'purchase.product_type'){
-                allQPurchase = allPurchaseList.filter(item => (item.product_type &&item.product_type.includes(filterText))
+            }else if(itemName === 'purchase.product_class_name'){
+                allQPurchase = allPurchaseList.filter(item => (item.product_class_name &&item.product_class_name.includes(filterText))
                 );    
             }else if(itemName === 'purchase.product_name'){
                 allQPurchase = allPurchaseList.filter(item => (item.product_name &&item.product_name.includes(filterText))
                 );  
             }else if(itemName === 'company.company_name'){
                 allQPurchase = allPurchaseList.filter(item => (item.company_name &&item.company_name.includes(filterText))
+                );  
+            }else if(itemName === 'purchase.licence_info'){
+                allQPurchase = allPurchaseList.filter(item => (item.licence_info &&item.licence_info.includes(filterText))
+                );  
+            }else if(itemName ==='common.memo'){
+                allQPurchase = allPurchaseList.filter(item => (item.purchase_memo &&item.purchase_memo.includes(filterText))
                 );  
             }
             set(atomFilteredPurchaseArray, allQPurchase);

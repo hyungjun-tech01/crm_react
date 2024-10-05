@@ -34,7 +34,7 @@ const Purchase = () => {
   //===== [RecoilState] Related with Purchase ============================================
   const purchaseState = useRecoilValue(atomPurchaseState);
   const filteredPurchase = useRecoilValue(atomFilteredPurchaseArray);
-  const { tryLoadAllPurchases, filterPurchases, setCurrentPurchase } = useRecoilValue(PurchaseRepo);
+  const { tryLoadAllPurchases, filterPurchases, setCurrentPurchase, loadAllPurchases } = useRecoilValue(PurchaseRepo);
   
 
   //===== [RecoilState] Related with User ================================================
@@ -122,7 +122,7 @@ const Purchase = () => {
   
       console.log('multiQueryCondi',multiQueryCondi);
   
-      tryLoadAllPurchases(multiQueryCondi);
+      loadAllPurchases(multiQueryCondi);
        
     };
     const handleMultiQueryModalCancel = () => {
@@ -239,11 +239,7 @@ const Purchase = () => {
     ){
       setNowLoading(false);
       const modifiedData = filteredPurchase.map(purchase => {
-        // const foundIdx = allCompanyData.findIndex(company => company.company_code === purchase.company_code);
-        const found = searchCompanies('company_code', purchase.company_code, true);
-        found.then(res => {
-          if(res.result) {
-            let remain_date = '';
+        let remain_date = '';
             if(purchase.ma_finish_date) {
               const calc_remain_date = Math.ceil((new Date(purchase.ma_finish_date).getTime() - new Date().getTime())/86400000);
               if(calc_remain_date >= 0){
@@ -252,15 +248,33 @@ const Purchase = () => {
             };
             return {
               ...purchase,
-              company_name: res.data[0].company_name,
-              company_name_en: res.data[0].company_name_en,
+              //company_name: res.data[0].company_name,
+              //company_name_en: res.data[0].company_name_en,
               ma_remain_date: remain_date,
             }
-          } else {
-            return null;
-          };
-        });
       });
+        // const foundIdx = allCompanyData.findIndex(company => company.company_code === purchase.company_code);
+        // const found = searchCompanies('company_code', purchase.company_code, true);
+        //found.then(res => {
+        //  if(res.result) {
+            // let remain_date = '';
+            // if(purchase.ma_finish_date) {
+            //   const calc_remain_date = Math.ceil((new Date(purchase.ma_finish_date).getTime() - new Date().getTime())/86400000);
+            //   if(calc_remain_date >= 0){
+            //     remain_date = calc_remain_date;
+            //   };
+            // };
+            // return {
+            //   ...purchase,
+            //   //company_name: res.data[0].company_name,
+            //   //company_name_en: res.data[0].company_name_en,
+            //   ma_remain_date: remain_date,
+            // }
+        //  } else {
+        //    return null;
+        //  };
+      //  });
+      // });
       setTableData(modifiedData);
     };
   }, [dates, filteredPurchase, purchaseState, queryConditions, searchCompanies, singleDate, userState]);
@@ -282,9 +296,11 @@ const Purchase = () => {
                   <button className="dropdown-toggle recently-viewed" type="button" onClick={()=>setExpaned(!expanded)}data-bs-toggle="dropdown" aria-expanded={expanded}style={{ backgroundColor: 'transparent',  border: 'none', outline: 'none' }}> {statusSearch === "" ? t('common.all'):t(statusSearch)}</button>
                     <div className={`dropdown-menu${expanded ? ' show' : ''}`}>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.all')}>{t('common.all')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('purchase.product_type')}>{t('purchase.product_type')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('purchase.product_name')}>{t('purchase.product_name')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('purchase.product_class_name')}>{t('purchase.product_class_name')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('purchase.product_name')}>{t('purchase.product_name')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('purchase.licence_info')}>{t('purchase.licence_info')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('common.memo')}>{t('common.memo')}</button>
                     </div>
                 </div>
               </div>

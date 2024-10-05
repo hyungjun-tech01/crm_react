@@ -264,6 +264,7 @@ const koResource = {
             serial_number:'기번',
             type:'구매유형',
             purchase_multi_query:'구매제품 다중검색',
+            product_class_name:'제품분류명',
         },
         contract:{
             add_contract: '계약 추가',

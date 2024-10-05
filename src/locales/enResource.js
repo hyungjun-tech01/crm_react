@@ -264,6 +264,7 @@ const enResource = {
             serial_number:'Serial Number',
             type:'Purchase Type',
             purchase_multi_query:'Purchase Multi Query',
+            product_class_name:'Product Class Name',
         },
         contract:{
             add_contract: 'Add Contract',
