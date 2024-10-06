@@ -322,7 +322,7 @@ export const defaultPurchase = {
     product_class_name: null,
     product_name: null,
     serial_number: null,
-    licence_info: null,
+    licence_info: null, 
     po_number: null,
     product_type: null,
     module: null,

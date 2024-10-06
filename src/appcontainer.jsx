@@ -117,6 +117,7 @@ import Socialmedia from "./components/settings/socialmedia";
 import FormValidation from "./components/forms/form-validation";
 import Profile from "./components/profile";
 import UserInfo from "./components/userinfo";
+import Users from "./components/userinfo/Users.jsx";
 import Contacts from "./components/contact";
 import Sidebarnav from "./components/sidebar";
 // Login & Register
@@ -351,6 +352,7 @@ const AppUniversal = (props) => {
           <Route path="/tables-basic" exact component={BasicTable} />
           <Route path="/data-tables" exact component={DataTable} />
           <Route path="/profile" exact component={Profile} />
+          <Route path="/users" exact component={Users} />
           <Route path="/settings" exact component={Settings} />
           <Route path="/login" exact component={Login} />
           <Route path="/register" exact component={Register} />

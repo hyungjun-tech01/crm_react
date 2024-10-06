@@ -12,7 +12,8 @@ export const defaultUser = {
     private_group: "",
     memo: "",
     jobType: "",
-    isWork: ""
+    isWork: "",
+    userRole:"",
 }
 
 export const atomCurrentUser = atom({
