@@ -4,7 +4,7 @@ import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Checkbox, InputNumber, Space, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
-import { AddBoxOutlined, IndeterminateCheckBoxOutlined } from '@mui/icons-material';
+import { AddBoxOutlined, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
 import { option_locations } from '../../constants/constants';
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
@@ -103,7 +103,7 @@ const QuotationAddModel = (props) => {
       .then((res) => {
         if(res.result){
           newDocNo = res.docNo;
-        }
+        };
         modifiedData['quotation_number'] = newDocNo;
         setQuotationChange(modifiedData);
       })
@@ -168,43 +168,37 @@ const QuotationAddModel = (props) => {
     {
       title: "No",
       dataIndex: '1',
-      size: 5,
+      width: 50,
       render: (text, record) => <>{text}</>,
     },
     {
       title: t('common.product'),
       dataIndex: '5',
-      size: 50,
+      width: 300,
       render: (text, record) => <>{text}</>,
     },
     {
       title: t('quotation.detail_desc'),
       dataIndex: '10',
-      size: 10,
+      width: 100,
       render: (text, record) => <>{text}</>,
     },
     {
       title: t('common.quantity'),
       dataIndex: '12',
-      size: 10,
-      render: (text, record) => <>{text}</>,
-    },
-    {
-      title: t('quotation.consumer_price'),
-      dataIndex: '13',
-      size: 10,
+      width: 50,
       render: (text, record) => <>{text}</>,
     },
     {
       title: t('quotation.quotation_unit_price'),
       dataIndex: '15',
-      size: 15,
+      width: 150,
       render: (text, record) => <>{handleFormatter(record['15'])}</>,
     },
     {
       title: t('quotation.quotation_amount'),
       dataIndex: '16',
-      size: 15,
+      width: 150,
       render: (text, record) => <>{handleFormatter(record['16'])}</>,
     },
     // {
@@ -262,6 +256,8 @@ const QuotationAddModel = (props) => {
 
   const handleHeaderSizeChange = useCallback((event) => {
     const targetName = event.target.name;
+    let totalSize = 0;
+
     const foundIndex = contentColumns.findIndex(
       item => item.dataIndex === targetName);
     if (foundIndex !== -1) {
@@ -1003,10 +999,10 @@ const QuotationAddModel = (props) => {
                       onClick={handleDeleteSelectedConetents}
                       disabled={!selectedContentRowKeys}
                     />
-                    {/* <SettingsOutlined
+                    <SettingsOutlined
                       style={{ height: 32, width: 32, color: 'gray' }}
                       onClick={() => { setEditHeaders(!editHeaders); }}
-                    /> */}
+                    />
                   </div>
                 </div>
               </h4>
@@ -1068,7 +1064,7 @@ const QuotationAddModel = (props) => {
                     ItemRender: ItemRender,
                   }}
                   style={{ overflowX: "auto" }}
-                  columns={default_columns}
+                  columns={contentColumns}
                   bordered
                   dataSource={quotationContents}
                   rowKey={(record) => record['1']}

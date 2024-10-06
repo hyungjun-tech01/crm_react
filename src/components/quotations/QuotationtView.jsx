@@ -3,6 +3,7 @@ import { useRecoilValue } from 'recoil';
 import { PDFViewer } from '@react-pdf/renderer';
 import { Page, Text, View, Document, StyleSheet, Font } from '@react-pdf/renderer';
 import { atomCurrentQuotation, defaultQuotation } from "../../atoms/atoms";
+import { atomAllUsers } from '../../atoms/atomsUser';
 import NotoSansRegular from "../../fonts/NotoSansKR-Regular.ttf";
 import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";
@@ -76,7 +77,6 @@ const ConvertKoreanAmount = (amount) => {
         
         ret = temp_ret + ret;
     };
-    // console.log('\t[ ConvertKoreanAmount ] output : ', ret);
     return ret;
 };
 
@@ -212,9 +212,11 @@ Font.register({
 
 const QuotationView = () => {
     const currentQuotation = useRecoilValue(atomCurrentQuotation);
+    const allUsers = useRecoilValue(atomAllUsers);
     const [ quotationContents, setQuotationContents ] = useState([]);
     const [ quotationTables, setQuotationTables ] = useState([]);
     const [ viewSetting, setViewSetting ] = useState({});
+    const [ salesRespInfo, setSalesRespInfo ] = useState({});
 
     useEffect(() => {
         console.log('[QuotationView] called');
@@ -264,6 +266,19 @@ const QuotationView = () => {
                 };
                 setViewSetting(tempSetting);
             };
+
+            // get info of sales representative
+            if(currentQuotation.sales_representative){
+                const salesman = allUsers.filter(item => item.userName === currentQuotation.sales_representative);
+                console.log('Check :', salesman);
+                if(salesman.length > 0){
+                    setSalesRespInfo({
+                        userID: salesman[0].userId,
+                        userName: salesman[0].userName,
+                        mobileNumber: salesman[0].mobileNumber,
+                    })
+                };
+            }
         }
     }, [currentQuotation]);
 
@@ -273,7 +288,7 @@ const QuotationView = () => {
                 <Page wrap size="A4" style={Styles.body}>
                     {currentQuotation.sales_representative &&
                         <Text style={{fontSize: 10, marginBottom: 20, textAlign: 'start', color: 'grey', fontFamily: 'Noto Sans',}} fixed>
-                            담당자: {currentQuotation.sales_representative}
+                            담당자: 노드데이타 {salesRespInfo.userName} {salesRespInfo.mobileNumber} {salesRespInfo.userID}
                         </Text>
                     }
                     {/*----- Header ---------------------------------------------*/}
