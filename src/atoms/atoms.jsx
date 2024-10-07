@@ -315,12 +315,14 @@ export const defaultPurchase = {
     purchase_code: null,
     //----- Company info --------------
     company_code: null,
+    company_name: null,
+    company_name_en:null,
     //----- Product info --------------
     product_code: null,
     product_class_name: null,
     product_name: null,
     serial_number: null,
-    licence_info: null,
+    licence_info: null, 
     po_number: null,
     product_type: null,
     module: null,

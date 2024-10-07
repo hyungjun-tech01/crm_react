@@ -7,7 +7,6 @@ import SelectProductModal from './SelectProductModal';
 const SearchInput = (props) => {
     const { addonBefore, title, name, value, disabled, onChange, style } = props;
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-
     return (
         <div className="ant-space-item" style={style}>
             <span className='ant-input-group-wrapper
@@ -26,7 +25,8 @@ const SearchInput = (props) => {
                         value={ value }
                         disabled
                     />
-                    <div className="add-basic-btn" onClick={() => {
+                    <div className="add-basic-btn" 
+                    onClick={() => {
                             if(!disabled) setIsPopupOpen(!isPopupOpen)
                         }}
                     >

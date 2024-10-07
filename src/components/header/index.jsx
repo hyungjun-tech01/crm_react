@@ -397,6 +397,9 @@ const Header = (props) => {
             <Link className="dropdown-item" to="/userinfo" >
               My Profile
             </Link>
+              <Link className="dropdown-item" to="/users" >
+              User Management
+              </Link>
             <Link className="dropdown-item" to="/settings">
               Settings
             </Link>

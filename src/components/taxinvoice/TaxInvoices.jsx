@@ -274,8 +274,8 @@ const TaxInovices = () => {
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.ceo_name')}>{t('company.ceo_name')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('company.address')}>{t('company.address')}</button>
-                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('taxinvoice.memo')}>{t('taxinvoice.memo')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('taxinvoice.summary')}>{t('taxinvoice.summary')}</button>
+                      <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('taxinvoice.memo')}>{t('taxinvoice.memo')}</button>
                       <button className="dropdown-item" type="button" onClick={()=>handleStatusSearch('taxinvoice.invoice_contents')}>{t('taxinvoice.invoice_contents')}</button>
                     </div>
                 </div>
