@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Resizable } from 'react-resizable';
-import { Checkbox, InputNumber, Space, Table } from 'antd';
+import { Button, Checkbox, InputNumber, Modal, Space, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { AddBoxOutlined, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
 import { option_locations } from '../../constants/constants';
@@ -63,7 +63,7 @@ const ResizeableTitle = props => {
 const QuotationAddModel = (props) => {
   const { init, handleInit } = props;
   const [t] = useTranslation();
-  const [cookies] = useCookies(["myLationCrmUserId"]);
+  const [cookies, setCookie] = useCookies(["myLationCrmUserId", "myTableSettings"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [message, setMessage] = useState({ title: "", message: "" });
 
@@ -115,6 +115,41 @@ const QuotationAddModel = (props) => {
 
     handleContentModalCancel();
 
+    // load or set setting of column of table -----------
+    if(!cookies.myTableSettings
+        || !cookies.myTableSettings[cookies.myLationCrmUserId]
+    ){
+      const tempQuotationColumn = [
+        ...defaultColumns
+      ];
+      const tempCookieValue = {
+        [cookies.myLationCrmUserId] : {
+          'quotationAdd' : tempQuotationColumn 
+        }
+      }
+      setCookie('myTableSettings', tempCookieValue);
+      setContentColumns(tempQuotationColumn);
+    } else {
+      const tableSettings = cookies.myTableSettings[cookies.myLationCrmUserId];
+      if(!tableSettings.quotationAdd){
+        const tempQuotationColumn = [
+          ...defaultColumns
+        ];
+        const tempSettingValue = {
+          ...tableSettings,
+          quotationAdd: tempQuotationColumn
+        };
+        const tempCookieValue = {
+          ...cookies.myTableSettings,
+          [cookies.myLationCrmUserId]: tempSettingValue
+        };
+        setCookie('myTableSettings', tempCookieValue);
+        setContentColumns(tempQuotationColumn);
+      } else {
+        setContentColumns([...tableSettings.quotationAdd]);
+      };
+    };
+
     let newDocNo = "";
     const response = getQuotationDocNo({modify_user: cookies.myLationCrmUserId});
     response
@@ -159,8 +194,11 @@ const QuotationAddModel = (props) => {
 
 
   //===== Handles to edit 'Content Table' ============================================
+  const [contentColumns, setContentColumns] = useState([]);
+  const [editHeaders, setEditHeaders] = useState(false);
+  
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const default_content_array = [
+  const defaultContentArray = [
     ['1', 'No'],
     ['2', t('common.category')],
     ['3', t('common.maker')],
@@ -182,7 +220,7 @@ const QuotationAddModel = (props) => {
     ['19', t('quotation.note')],
   ];
 
-  const default_columns = [
+  const defaultColumns = [
     {
       title: "No",
       dataIndex: '1',
@@ -231,11 +269,11 @@ const QuotationAddModel = (props) => {
     // },
   ];
 
-  const tableComponents = {
+  const tableComponents = useMemo(() =>({
     header: {
       cell: ResizeableTitle,
     },
-  };
+  }), []);
 
   const rowSelection = {
     selectedRowKeys: selectedContentRowKeys,
@@ -253,9 +291,6 @@ const QuotationAddModel = (props) => {
     setContentColumns(nextColumns);
   };
 
-  const [contentColumns, setContentColumns] = useState(default_columns);
-  const [editHeaders, setEditHeaders] = useState(false);
-
   const handleHeaderCheckChange = useCallback((event) => {
     const targetName = event.target.name;
     const targetIndex = Number(targetName);
@@ -267,9 +302,9 @@ const QuotationAddModel = (props) => {
       const tempColumns = [
         ...contentColumns.slice(0, foundIndex),
         {
-          title: default_content_array[targetIndex - 1][1],
+          title: defaultContentArray[targetIndex - 1][1],
           dataIndex: targetName,
-          size: 0,
+          size: 100,
           render: (text, record) => <>{text}</>,
         },
         ...contentColumns.slice(foundIndex,),
@@ -285,33 +320,13 @@ const QuotationAddModel = (props) => {
       ];
       setContentColumns(tempColumns);
     }
-  }, [contentColumns, default_content_array]);
-
-  const handleHeaderSizeChange = useCallback((event) => {
-    const targetName = event.target.name;
-    let totalSize = 0;
-
-    const foundIndex = contentColumns.findIndex(
-      item => item.dataIndex === targetName);
-    if (foundIndex !== -1) {
-      const tempColumn = {
-        ...contentColumns.at(foundIndex),
-        size: event.target.value,
-      }
-      const tempColumns = [
-        ...contentColumns.slice(0, foundIndex),
-        tempColumn,
-        ...contentColumns.slice(foundIndex + 1,),
-      ];
-      setContentColumns(tempColumns);
-    }
-  }, [contentColumns]);
+  }, [contentColumns, defaultContentArray]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const ConvertHeaderInfosToString = (data) => {
     let ret = '';
 
-    default_content_array.forEach((item, index) => {
+    defaultContentArray.forEach((item, index) => {
       if (index === 0)
         ret += item.at(0);
       else
@@ -330,14 +345,13 @@ const QuotationAddModel = (props) => {
     return ret;
   };
 
-  const resizedContentColumns = contentColumns.map((col, index) => ({
+  const resizedContentColumns = useMemo(() => contentColumns.map((col, index) => ({
     ...col,
     onHeaderCell: column => ({
       width: column.width,
       onResize: handleColumnResize(index),
     }),
-  }));
-
+  })), [contentColumns]);
 
 
   //===== Handles to edit 'Contents' =================================================
@@ -1269,63 +1283,42 @@ const QuotationAddModel = (props) => {
           </div>
         </div>
       </div>
-      {editHeaders &&
-        <div className="edit-content">
-          <div className="edit-content-header">
-            <h4><b>{t('quotation.header_setting')}</b></h4>
-            <button
-              type="button"
-              className="edit-content-close"
-              onClick={() => { setEditHeaders(!editHeaders) }}
-            >
-              {" "}
-            </button>
-          </div>
-          <div className="form-group">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th scope="col">{t('common.title')}</th>
-                  <th scope="col">{t('common.visible')}</th>
-                  <th scope="col">{t('common.size')}</th>
+      <Modal
+        title={t('quotation.header_setting')}
+        open={editHeaders}
+        onOk={() => { setEditHeaders(!editHeaders)}}
+        onCancel={() => { setEditHeaders(!editHeaders)}}
+        footer={[
+          <Button key="submit" type="primary" onClick={() => { setEditHeaders(!editHeaders)}}>
+              Ok
+          </Button>,
+        ]}
+        style={{ top: 120 }}
+        width={360}
+        zIndex={2001}
+      >
+        <table className="table">
+          <tbody>
+            {defaultContentArray.map((item, index) => {
+              const foundItem = contentColumns.filter(column => column.dataIndex === item.at(0))[0];
+              return (
+                <tr key={index}>
+                  <td>
+                  {item.at(1)}
+                  </td>
+                  <td>
+                    <Checkbox
+                      name={item.at(0)}
+                      checked={!!foundItem}
+                      onChange={handleHeaderCheckChange}
+                    />
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {default_content_array.map((item, index) => {
-                  const foundItem = contentColumns.filter(column => column.dataIndex === item.at(0))[0];
-                  return (
-                    <tr key={index}>
-                      <td>
-                        {item.at(1)}
-                      </td>
-                      <td>
-                        <input
-                          type="checkbox"
-                          name={item.at(0)}
-                          checked={!!foundItem}
-                          onChange={handleHeaderCheckChange}
-                        />
-                      </td>
-                      <td>
-                        {foundItem ?
-                          <input
-                            type="text"
-                            name={item.at(0)}
-                            className="input-group-text input-group-text-sm"
-                            defaultValue={foundItem.size}
-                            onChange={handleHeaderSizeChange}
-                          /> :
-                          0
-                        }
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      }
+              )
+            })}
+          </tbody>
+        </table>
+      </Modal>
       <QuotationContentModal
         setting={settingForContent}
         open={isContentModalOpen}
