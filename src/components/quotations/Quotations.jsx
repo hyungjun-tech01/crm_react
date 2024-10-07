@@ -262,8 +262,6 @@ const Quotations = () => {
   }, [initAddNewQuotation]);
 
   useEffect(() => {
-    // tryLoadAllCompanies();
-    // tryLoadAllLeads();
     
     const multiQueryCondi = {
       queryConditions:queryConditions,

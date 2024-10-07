@@ -2,14 +2,13 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
+import { Resizable } from 'react-resizable';
 import { Checkbox, InputNumber, Space, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { AddBoxOutlined, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
 import { option_locations } from '../../constants/constants';
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
-import "antd/dist/reset.css";
-import "../antdstyle.css";
 import {
   defaultQuotation,
   atomSelectedCategory,
@@ -35,11 +34,30 @@ import AddSearchItem from "../../constants/AddSearchItem";
 import QuotationContentModal from "./QuotationContentModal";
 import MessageModal from "../../constants/MessageModal";
 
-const default_quotation_content = {
+const defaultQuotationContent = {
   '1': null, '2': null, '3': null, '4': null, '5': null,
   '6': null, '7': null, '8': null, '9': null, '10': null,
   '11': null, '12': null, '13': null, '14': null, '15': null,
   '16': null, '17': null, '18': null, '19': null, '998': null,
+};
+
+const ResizeableTitle = props => {
+  const { onResize, width, ...restProps } = props;
+
+  if (!width) {
+    return <th {...restProps} />;
+  }
+
+  return (
+    <Resizable
+      width={width}
+      height={0}
+      onResize={onResize}
+      draggableOpts={{ enableUserSelectHack: false }}
+    >
+      <th {...restProps} />
+    </Resizable>
+  );
 };
 
 const QuotationAddModel = (props) => {
@@ -213,11 +231,26 @@ const QuotationAddModel = (props) => {
     // },
   ];
 
+  const tableComponents = {
+    header: {
+      cell: ResizeableTitle,
+    },
+  };
+
   const rowSelection = {
     selectedRowKeys: selectedContentRowKeys,
     onChange: (selectedRowKeys, selectedRows) => {
       setSelectedContentRowKeys(selectedRowKeys);
     },
+  };
+
+  const handleColumnResize = index => (e, { size }) => {
+    const nextColumns = [...contentColumns];
+    nextColumns[index] = {
+      ...nextColumns[index],
+      width: size.width,
+    };
+    setContentColumns(nextColumns);
   };
 
   const [contentColumns, setContentColumns] = useState(default_columns);
@@ -296,6 +329,15 @@ const QuotationAddModel = (props) => {
 
     return ret;
   };
+
+  const resizedContentColumns = contentColumns.map((col, index) => ({
+    ...col,
+    onHeaderCell: column => ({
+      width: column.width,
+      onResize: handleColumnResize(index),
+    }),
+  }));
+
 
 
   //===== Handles to edit 'Contents' =================================================
@@ -620,7 +662,7 @@ const QuotationAddModel = (props) => {
     // update Contents -------------------------------------------------
     if (settingForContent.action === "ADD") {
       const updatedContent = {
-        ...default_quotation_content,
+        ...defaultQuotationContent,
         '1': quotationContents.length + 1,
         '2': finalData.product_class_name,
         '5': finalData.product_name,
@@ -642,7 +684,7 @@ const QuotationAddModel = (props) => {
       };
     } else {  //Update
       const updatedContent = {
-        ...default_quotation_content,
+        ...defaultQuotationContent,
         '1': settingForContent.index,
         '2': finalData.product_class_name,
         '5': finalData.product_name,
@@ -1055,7 +1097,11 @@ const QuotationAddModel = (props) => {
               </div>
               <div className="form-group row">
                 <Table
-                  rowSelection={rowSelection}
+                  bordered
+                  className="resizable-antd-table"
+                  components={tableComponents}
+                  columns={resizedContentColumns}
+                  dataSource={quotationContents}
                   pagination={{
                     total: quotationContents.length,
                     showTotal: ShowTotal,
@@ -1063,10 +1109,7 @@ const QuotationAddModel = (props) => {
                     onShowSizeChange: onShowSizeChange,
                     ItemRender: ItemRender,
                   }}
-                  style={{ overflowX: "auto" }}
-                  columns={contentColumns}
-                  bordered
-                  dataSource={quotationContents}
+                  rowSelection={rowSelection}
                   rowKey={(record) => record['1']}
                   onRow={(record, rowIndex) => {
                     return {

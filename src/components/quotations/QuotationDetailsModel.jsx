@@ -403,8 +403,6 @@ const QuotationDetailsModel = ({init, handleInit}) => {
     if((selectedQuotation !== defaultQuotation)
       && (selectedQuotation.quotation_code !== currentQuotationCode)
     ){
-      console.log('[QuotationDetailsModel] new quotation is loading!');
-
       const headerValues = selectedQuotation.quotation_table.split('|');
       if(headerValues && Array.isArray(headerValues)){
         let tableHeaders = [];
@@ -447,7 +445,6 @@ const QuotationDetailsModel = ({init, handleInit}) => {
     if (((userState & 1) === 1)
       && ((quotationState & 1) === 1)
     ) {
-      console.log('[QuotationDetailsModel] all needed data is loaded');
       handleInit(false);
     };
 }, [allProductClassList, allProducts, productClassState, productState, userState, quotationState, handleInit]);

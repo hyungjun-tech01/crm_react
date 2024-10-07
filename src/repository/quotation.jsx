@@ -70,7 +70,6 @@ export const QuotationRepo = selector({
         const tryLoadAllQuotations = getCallback(({ set, snapshot }) => async (multiQueryCondi) => {
             const loadStates = await snapshot.getPromise(atomQuotationState);
             if((loadStates & 3) === 0){
-                console.log('[tryLoadAllQuotations] Try to load all Quotations');
                 set(atomQuotationState, (loadStates | 2));   // state : loading
                 const ret = await loadAllQuotations(multiQueryCondi);
                 if(ret){
@@ -85,7 +84,6 @@ export const QuotationRepo = selector({
         const loadAllQuotations = getCallback(({set}) => async (multiQueryCondi) => {
             const input_json = JSON.stringify(multiQueryCondi);
             try{
-                console.log('[QuotationRepository] Try loading all')
                 const response = await fetch(`${BASE_PATH}/quotations`, {
                     method: "POST",
                     headers:{'Content-Type':'application/json'},
@@ -139,7 +137,6 @@ export const QuotationRepo = selector({
 
             let allQuotation = [];
 
-            console.log('filterQuotations', itemName, filterText);
             if(itemName === 'common.all'){
                 allQuotation = allQuotationList.filter(item => (item.company_name &&item.company_name.includes(filterText))||
                                             (item.quotation_type && item.quotation_type.includes(filterText)) ||
