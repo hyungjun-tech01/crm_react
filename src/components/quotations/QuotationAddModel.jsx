@@ -63,7 +63,7 @@ const ResizeableTitle = props => {
 const QuotationAddModel = (props) => {
   const { init, handleInit } = props;
   const [t] = useTranslation();
-  const [cookies, setCookie] = useCookies(["myLationCrmUserId", "myTableSettings"]);
+  const [cookies, setCookie] = useCookies(["myLationCrmUserId", "myQuotationAddColumns"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [message, setMessage] = useState({ title: "", message: "" });
 
@@ -115,38 +115,39 @@ const QuotationAddModel = (props) => {
 
     handleContentModalCancel();
 
-    // load or set setting of column of table -----------
-    if(!cookies.myTableSettings
-        || !cookies.myTableSettings[cookies.myLationCrmUserId]
-    ){
+    // load or set setting of column of table ----------------------------------
+    if(!cookies.myQuotationAddColumns){
+
       const tempQuotationColumn = [
         ...defaultColumns
       ];
       const tempCookieValue = {
-        [cookies.myLationCrmUserId] : {
-          'quotationAdd' : tempQuotationColumn 
-        }
+        [cookies.myLationCrmUserId] : tempQuotationColumn 
       }
-      setCookie('myTableSettings', tempCookieValue);
       setContentColumns(tempQuotationColumn);
+      setCookie('myQuotationAddColumns', tempCookieValue);
+      console.log('[QuotationAddModal] no myQuotationAddColumns :', tempCookieValue);
     } else {
-      const tableSettings = cookies.myTableSettings[cookies.myLationCrmUserId];
-      if(!tableSettings.quotationAdd){
+      const columnSettings = cookies.myQuotationAddColumns[cookies.myLationCrmUserId];
+      if(!columnSettings){
         const tempQuotationColumn = [
           ...defaultColumns
         ];
-        const tempSettingValue = {
-          ...tableSettings,
-          quotationAdd: tempQuotationColumn
-        };
         const tempCookieValue = {
-          ...cookies.myTableSettings,
-          [cookies.myLationCrmUserId]: tempSettingValue
+          ...cookies.myQuotationAddColumns,
+          [cookies.myLationCrmUserId]: tempQuotationColumn
         };
-        setCookie('myTableSettings', tempCookieValue);
         setContentColumns(tempQuotationColumn);
+        setCookie('myQuotationAddColumns', tempCookieValue);
+        console.log('[QuotationAddModal] no data in myQuotationAddColumns :', tempCookieValue);
       } else {
-        setContentColumns([...tableSettings.quotationAdd]);
+        console.log('[QuotationAddModal] myQuotationAddComuns data :', columnSettings);
+        const tempQuotationColumn = columnSettings.map(col => ({
+          ...col,
+          render: defaultContentArray[col.dataIndex][2]
+        }));
+        setContentColumns(tempQuotationColumn);
+        console.log('[QuotationAddModal] data from myQuotationAddColumns :', tempQuotationColumn);
       };
     };
 
@@ -199,25 +200,25 @@ const QuotationAddModel = (props) => {
   
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const defaultContentArray = [
-    ['1', 'No'],
-    ['2', t('common.category')],
-    ['3', t('common.maker')],
-    ['4', t('quotation.model_name')],
-    ['5', t('common.product')],
-    ['6', t('common.material')],
-    ['7', t('common.type')],
-    ['8', t('common.color')],
-    ['9', t('common.standard')],
-    ['10', t('quotation.detail_desc')],
-    ['11', t('common.unit')],
-    ['12', t('common.quantity')],
-    ['13', t('quotation.consumer_price')],
-    ['14', t('quotation.discount_rate')],
-    ['15', t('quotation.quotation_unit_price')],
-    ['16', t('quotation.quotation_amount')],
-    ['17', t('quotation.raw_price')],
-    ['18', t('quotation.profit_amount')],
-    ['19', t('quotation.note')],
+    ['1',   'No',                               (text, record) => <>{text}</>],
+    ['2',   t('common.category'),               (text, record) => <>{text}</>],
+    ['3',   t('common.maker'),                  (text, record) => <>{text}</>],
+    ['4',   t('quotation.model_name'),          (text, record) => <>{text}</>],
+    ['5',   t('common.product'),                (text, record) => <>{text}</>],
+    ['6',   t('common.material'),               (text, record) => <>{text}</>],
+    ['7',   t('common.type'),                   (text, record) => <>{text}</>],
+    ['8',   t('common.color'),                  (text, record) => <>{text}</>],
+    ['9',   t('common.standard'),               (text, record) => <>{text}</>],
+    ['10',  t('quotation.detail_desc'),         (text, record) => <>{text}</>],
+    ['11',  t('common.unit'),                   (text, record) => <>{text}</>],
+    ['12',  t('common.quantity'),               (text, record) => <>{handleFormatter(text)}</>],
+    ['13',  t('quotation.consumer_price'),      (text, record) => <>{handleFormatter(text)}</>],
+    ['14',  t('quotation.discount_rate'),       (text, record) => <>{handleFormatter(text)}</>],
+    ['15',  t('quotation.quotation_unit_price'),(text, record) => <>{handleFormatter(text)}</>],
+    ['16',  t('quotation.quotation_amount'),    (text, record) => <>{handleFormatter(text)}</>],
+    ['17',  t('quotation.raw_price'),           (text, record) => <>{handleFormatter(text)}</>],
+    ['18',  t('quotation.profit_amount'),       (text, record) => <>{handleFormatter(text)}</>],
+    ['19',  t('quotation.note'),                (text, record) => <>{text}</>],
   ];
 
   const defaultColumns = [
@@ -269,11 +270,11 @@ const QuotationAddModel = (props) => {
     // },
   ];
 
-  const tableComponents = useMemo(() =>({
+  const tableComponents = {
     header: {
       cell: ResizeableTitle,
     },
-  }), []);
+  };
 
   const rowSelection = {
     selectedRowKeys: selectedContentRowKeys,
@@ -291,36 +292,38 @@ const QuotationAddModel = (props) => {
     setContentColumns(nextColumns);
   };
 
-  const handleHeaderCheckChange = useCallback((event) => {
+  const handleHeaderCheckChange = (event) => {
     const targetName = event.target.name;
     const targetIndex = Number(targetName);
 
+    let tempColumns = null;
     if (event.target.checked) {
       const foundIndex = contentColumns.findIndex(
         item => Number(item.dataIndex) > targetIndex);
 
-      const tempColumns = [
+      tempColumns = [
         ...contentColumns.slice(0, foundIndex),
         {
           title: defaultContentArray[targetIndex - 1][1],
           dataIndex: targetName,
-          size: 100,
-          render: (text, record) => <>{text}</>,
+          width: 100,
+          render: defaultContentArray[targetIndex -1][2],
         },
         ...contentColumns.slice(foundIndex,),
       ];
-      setContentColumns(tempColumns);
     } else {
       const foundIndex = contentColumns.findIndex(
         item => Number(item.dataIndex) === targetIndex);
 
-      const tempColumns = [
+      tempColumns = [
         ...contentColumns.slice(0, foundIndex),
         ...contentColumns.slice(foundIndex + 1,),
       ];
-      setContentColumns(tempColumns);
-    }
-  }, [contentColumns, defaultContentArray]);
+    };
+    
+    setContentColumns(tempColumns);
+    console.log('handleHeaderCheckChange :', tempColumns);
+  };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const ConvertHeaderInfosToString = (data) => {
@@ -344,14 +347,6 @@ const QuotationAddModel = (props) => {
 
     return ret;
   };
-
-  const resizedContentColumns = useMemo(() => contentColumns.map((col, index) => ({
-    ...col,
-    onHeaderCell: column => ({
-      width: column.width,
-      onResize: handleColumnResize(index),
-    }),
-  })), [contentColumns]);
 
 
   //===== Handles to edit 'Contents' =================================================
@@ -824,6 +819,18 @@ const QuotationAddModel = (props) => {
         setIsMessageModalOpen(true);
       };
     });
+    handleClose();
+  };
+
+  const handleClose = () => {
+    const tempCookies = {
+      ...cookies.myQuotationAddColumns,
+      [cookies.myLationCrmUserId] : [
+        ...contentColumns
+      ]
+    };
+    setCookie("myQuotationAddColumns", tempCookies);
+    console.log('handleClose :', tempCookies);
   };
 
 
@@ -858,6 +865,7 @@ const QuotationAddModel = (props) => {
           className="close md-close"
           data-bs-dismiss="modal"
           aria-label="Close"
+          onClick={handleClose}
         >
           <span aria-hidden="true">×</span>
         </button>
@@ -868,6 +876,7 @@ const QuotationAddModel = (props) => {
               type="button"
               className="btn-close"
               data-bs-dismiss="modal"
+              onClick={handleClose}
             ></button>
           </div>
           <div className="modal-body">
@@ -1114,7 +1123,13 @@ const QuotationAddModel = (props) => {
                   bordered
                   className="resizable-antd-table"
                   components={tableComponents}
-                  columns={resizedContentColumns}
+                  columns={contentColumns.map((col, index) => ({
+                    ...col,
+                    onHeaderCell: column => ({
+                      width: column.width,
+                      onResize: handleColumnResize(index),
+                    }),
+                  }))}
                   dataSource={quotationContents}
                   pagination={{
                     total: quotationContents.length,
@@ -1275,6 +1290,7 @@ const QuotationAddModel = (props) => {
                   type="button"
                   className="btn btn-secondary btn-rounded"
                   data-bs-dismiss="modal"
+                  onClick={handleClose}
                 >
                   {t('common.cancel')}
                 </button>
