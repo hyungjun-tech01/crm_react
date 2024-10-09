@@ -355,11 +355,11 @@ const QuotationAddModel = (props) => {
 
       ret += '|' + item.at(1) + '|';
 
-      const foundIdx = data.findIndex(col => col.title === item.at(1));
+      const foundIdx = data.findIndex(col => col.dataIndex === item.at(0));
       if (foundIdx === -1) {
         ret += '0';
       } else {
-        ret += data[foundIdx]['size'];
+        ret += data[foundIdx]['width'] || '100';
       }
     });
 
