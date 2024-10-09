@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
@@ -8,6 +8,7 @@ import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { AddBoxOutlined, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
 import { option_locations } from '../../constants/constants';
 import * as bootstrap from '../../assets/js/bootstrap.bundle';
+import "../antdstyle.css";
 
 import {
   defaultQuotation,
@@ -33,6 +34,7 @@ import AddBasicItem from "../../constants/AddBasicItem";
 import AddSearchItem from "../../constants/AddSearchItem";
 import QuotationContentModal from "./QuotationContentModal";
 import MessageModal from "../../constants/MessageModal";
+import { render } from "@react-pdf/renderer";
 
 const defaultQuotationContent = {
   '1': null, '2': null, '3': null, '4': null, '5': null,
@@ -255,7 +257,6 @@ const QuotationAddModel = (props) => {
     {
       title: t('quotation.quotation_amount'),
       dataIndex: '16',
-      width: 150,
       render: (text, record) => <>{handleFormatter(record['16'])}</>,
     },
     // {
@@ -301,16 +302,33 @@ const QuotationAddModel = (props) => {
       const foundIndex = contentColumns.findIndex(
         item => Number(item.dataIndex) > targetIndex);
 
-      tempColumns = [
-        ...contentColumns.slice(0, foundIndex),
-        {
-          title: defaultContentArray[targetIndex - 1][1],
-          dataIndex: targetName,
-          width: 100,
-          render: defaultContentArray[targetIndex -1][2],
-        },
-        ...contentColumns.slice(foundIndex,),
-      ];
+      if(foundIndex === -1){
+        tempColumns = [
+          ...contentColumns.slice(0, -1),
+          {
+            title: contentColumns.at(-1).title,
+            dataIndex: contentColumns.at(-1).dataIndex,
+            width: 100,
+            render: contentColumns.at(-1).render,
+          },
+          {
+            title: defaultContentArray[targetIndex - 1][1],
+            dataIndex: targetName,
+            render: defaultContentArray[targetIndex -1][2],
+          },  
+        ]
+      } else {
+        tempColumns = [
+          ...contentColumns.slice(0, foundIndex),
+          {
+            title: defaultContentArray[targetIndex - 1][1],
+            dataIndex: targetName,
+            width: 100,
+            render: defaultContentArray[targetIndex -1][2],
+          },
+          ...contentColumns.slice(foundIndex,),
+        ];
+      };
     } else {
       const foundIndex = contentColumns.findIndex(
         item => Number(item.dataIndex) === targetIndex);
