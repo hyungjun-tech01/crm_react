@@ -146,7 +146,7 @@ const QuotationAddModel = (props) => {
         console.log('[QuotationAddModal] myQuotationAddComuns data :', columnSettings);
         const tempQuotationColumn = columnSettings.map(col => ({
           ...col,
-          render: defaultContentArray[col.dataIndex][2]
+          render: defaultContentArray[col.dataIndex - 1][2]
         }));
         setContentColumns(tempQuotationColumn);
         console.log('[QuotationAddModal] data from myQuotationAddColumns :', tempQuotationColumn);

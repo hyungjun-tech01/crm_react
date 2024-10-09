@@ -17,7 +17,13 @@ import { atomUserState,
   atomUsersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
-import { QuotationRepo, QuotationSendTypes, QuotationTypes } from "../../repository/quotation";
+import { QuotationRepo,
+  QuotationSendTypes,
+  QuotationTypes,
+  quotationExpiry,
+  quotationDelivery,
+  quotationPayment
+ } from "../../repository/quotation";
 
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
@@ -371,20 +377,20 @@ const QuotationDetailsModel = ({init, handleInit}) => {
     { key:'quotation_manager', title:'quotation.quotation_manager', detail:{ type:'select', options:usersForSelection, editing:handleDetailChange }},
     { key:'quotation_send_type', title:'quotation.send_type', detail:{ type:'select', options:QuotationSendTypes, editing:handleDetailChange }},
     { key:'quotation_date', title:'quotation.quotation_date', detail:{ type:'date', editing:handleDetailDateChange}},
-    { key:'quotation_expiration_date', title:'quotation.expiry_date', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'quotation_expiration_date', title:'quotation.expiry_date', detail:{ type:'select', options:quotationExpiry, editing:handleDetailChange }},
     { key:'comfirm_date', title:'quotation.confirm_date', detail:{ type:'date', editing:handleDetailDateChange}},
     { key:'delivery_location', title:'quotation.delivery_location', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'delivery_period', title:'quotation.delivery_period', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'delivery_period', title:'quotation.delivery_period', detail:{ type:'select', options:quotationDelivery, editing:handleDetailChange }},
     { key:'warranty_period', title:'quotation.warranty', detail:{ type:'label', editing:handleDetailChange }},
     { key:'sales_representative', title:'quotation.sales_rep', detail:{ type:'select', options:salespersonsForSelection, editing:handleDetailSelectChange }},
-    { key:'payment_type', title:'quotation.payment_type', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'list_price', title:'quotation.list_price', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'payment_type', title:'quotation.payment_type', detail:{ type:'select', options:quotationPayment, editing:handleDetailChange }},
+    { key:'list_price', title:'quotation.list_price', detail:{ type:'label', price: true, editing:handleDetailChange }},
     { key:'list_price_dc', title:'quotation.list_price_dc', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'sub_total_amount', title:'quotation.sub_total_amount', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'sub_total_amount', title:'quotation.sub_total_amount', detail:{ type:'label', price: true, editing:handleDetailChange }},
     { key:'dc_rate', title:'quotation.dc_rate', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'cutoff_amount', title:'quotation.cutoff_amount', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'total_quotation_amount', title:'quotation.total_quotation_amount', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'profit', title:'quotation.profit_amount', detail:{ type:'label', editing:handleDetailChange }},
+    { key:'cutoff_amount', title:'quotation.cutoff_amount', detail:{ type:'label', price: true, editing:handleDetailChange }},
+    { key:'total_quotation_amount', title:'quotation.total_quotation_amount', detail:{ type:'label', price: true, editing:handleDetailChange }},
+    { key:'profit', title:'quotation.profit_amount', detail:{ type:'label', price: true, editing:handleDetailChange }},
     { key:'profit_rate', title:'quotation.profit_rate', detail:{ type:'label', editing:handleDetailChange }},
     { key:'upper_memo', title:'quotation.upper_memo', detail:{ type:'textarea', extra:'long', editing:handleDetailChange }},
     { key:'lower_memo', title:'quotation.lower_memo', detail:{ type:'textarea', extra:'long', editing:handleDetailChange }},
