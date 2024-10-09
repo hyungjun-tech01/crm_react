@@ -4,6 +4,7 @@ import { PDFViewer } from '@react-pdf/renderer';
 import { Page, Text, View, Document, StyleSheet, Font } from '@react-pdf/renderer';
 import { atomCurrentQuotation, defaultQuotation } from "../../atoms/atoms";
 import { atomAllUsers } from '../../atoms/atomsUser';
+import { quotationExpiry, quotationDelivery, quotationPayment } from '../../repository/quotation';
 import NotoSansRegular from "../../fonts/NotoSansKR-Regular.ttf";
 import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";
@@ -217,6 +218,7 @@ const QuotationView = () => {
     const [ quotationTables, setQuotationTables ] = useState([]);
     const [ viewSetting, setViewSetting ] = useState({});
     const [ salesRespInfo, setSalesRespInfo ] = useState({});
+    const [ quotationCondition, setQuotationCondition ] = useState({});
 
     useEffect(() => {
         console.log('[QuotationView] called');
@@ -267,10 +269,9 @@ const QuotationView = () => {
                 setViewSetting(tempSetting);
             };
 
-            // get info of sales representative
+            // get info of sales representative -----------
             if(currentQuotation.sales_representative){
                 const salesman = allUsers.filter(item => item.userName === currentQuotation.sales_representative);
-                console.log('Check :', salesman);
                 if(salesman.length > 0){
                     setSalesRespInfo({
                         userID: salesman[0].userId,
@@ -279,6 +280,12 @@ const QuotationView = () => {
                     })
                 };
             }
+
+            // get info of quotation condition -----------
+            const tempExpiry = quotationExpiry.filter(item => item.value === currentQuotation.quotation_expiration_date)[0].label;
+            const tempDelivery = quotationDelivery.filter(item => item.value === currentQuotation.delivery_period)[0].label;
+            const tempPayment = quotationPayment.filter(item => item.value === currentQuotation.payment_type)[0].label;
+            setQuotationCondition({expiry: tempExpiry, delivery: tempDelivery, payment: tempPayment});
         }
     }, [currentQuotation]);
 
@@ -306,9 +313,9 @@ const QuotationView = () => {
                             <View style={{width:'50%',margin:0,padding:5}}>
                                 <Text style={Styles.text}>받으실 분:  {currentQuotation.department} {currentQuotation.lead_name} {currentQuotation.position}</Text>
                                 <Text style={Styles.text}>견적 일자:  {new Date(currentQuotation.quotation_date).toLocaleDateString('ko-KR', {year:'numeric', month:'short', day:'numeric'})}</Text>
-                                <Text style={Styles.text}>지불 조건:  {currentQuotation.payment_type}</Text>
-                                <Text style={Styles.text}>납품 기간:  {currentQuotation.delivery_period}</Text>
-                                <Text style={Styles.text}>유효 기간:  {currentQuotation.quotation_expiration_date}</Text>
+                                <Text style={Styles.text}>지불 조건:  {quotationCondition.payment}</Text>
+                                <Text style={Styles.text}>납품 기간:  {quotationCondition.delivery}</Text>
+                                <Text style={Styles.text}>유효 기간:  {quotationCondition.expiry}</Text>
                             </View>
                             <View style={{width:'50%',margin:0,padding:0,border:1,flexDirection: 'row'}}>
                                 <View style={{width:20,margin:0,backgroundColor:'#cccccc',borderRight:1,flexDirection:'column',alignItems:'center',justifyContent:'space-around'}}>
@@ -380,7 +387,7 @@ const QuotationView = () => {
                         <View style={{width:'100%',height:20,margin:0,padding:1,borderTop:1,borderLeft:1,borderRight:1,flexGrow:0}}>
                             <Text style={Styles.textBold}>
                                     견적합계: 일금{ConvertKoreanAmount(currentQuotation.total_quotation_amount)}원정
-                                    ({ConvCurrencyMark(currentQuotation.currency)}{ConvertCurrency(currentQuotation.total_quotation_amount)})
+                                    (&#8361;{ConvertCurrency(currentQuotation.total_quotation_amount)})
                                     ({viewSetting.vat_included ? 'VAT포함' : 'VAT별도'})
                             </Text>
                         </View>
