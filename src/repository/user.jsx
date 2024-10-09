@@ -3,6 +3,7 @@ import { selector } from "recoil";
 import { atomCurrentUser,
     defaultUser,
     atomAllUsers,
+    atomFilteredUserArray,
     atomUserState,
     atomUsersForSelection,
     atomSalespersonsForSelection,
@@ -102,6 +103,14 @@ export const UserRepo = selector({
                 }
                 set(atomAllUsers, data);
 
+                let filteredUsers = [];
+                data.forEach(item => {
+                    atomAllUsers[item.userId] = item;
+                    filteredUsers.push(item);
+                });
+              
+                set(atomFilteredUserArray, filteredUsers);
+
                 //----- Store SR, AE data -----------------------------------
                 const workingUsers = data.filter(user => user.isWork === 'Y');
                 workingUsers.sort((a, b) => {
@@ -123,6 +132,44 @@ export const UserRepo = selector({
                 return false;
             };
         });
+        const filterUsers = getCallback(({set, snapshot }) => async (itemName, filterText) => {
+            const allUserData = await snapshot.getPromise(atomAllUsers);
+            const allUserList = Object.values(allUserData);
+            let allUsers = [];
+
+            if( itemName === 'common.all' ) {
+                allUsers = allUserList.filter(item =>
+                    (item.userName && item.userName.includes(filterText))
+                    || (item.posoition && item.posoition.includes(filterText))
+                    || (item.department && item.department.includes(filterText))
+                    || (item.position && item.position.includes(filterText))
+                    || (item.isWork && item.isWork.includes(filterText))
+                    || (item.jobType && item.jobType.includes(filterText))
+                );
+            }else if(itemName === 'user.name' ){
+                allUsers = allUserList.filter(item =>
+                    (item.userName &&item.userName.includes(filterText))
+                );
+            }else if(itemName === 'user.department' ){
+                allUsers = allUserList.filter(item =>
+                    (item.department &&item.department.toLowerCase().includes(filterText.toLowerCase()))
+                );  
+            }else if(itemName === 'user.position' ){
+                allUsers = allUserList.filter(item =>
+                    (item.position &&item.position.includes(filterText))
+                );
+            }else if(itemName === 'user.is_work' ){
+                allUsers = allUserList.filter(item =>
+                    (item.isWork &&item.isWork.includes(filterText))
+                );
+            }else if(itemName === 'user.job_type' ){
+                allUsers = allUserList.filter(item =>
+                    (item.jobType &&item.jobType.includes(filterText))
+                );
+            }
+            set(atomFilteredUserArray, allUsers);
+            return true;
+        });        
         /////////////////////load Users /////////////////////////////
         const loadUsers = getCallback(({ set }) => async (userId) => {
             try {
@@ -266,7 +313,8 @@ export const UserRepo = selector({
             loadUsers,
             modifyUser,
             setCurrentUser,
-            loadAllUsers
+            loadAllUsers,
+            filterUsers
         };
     }
 });

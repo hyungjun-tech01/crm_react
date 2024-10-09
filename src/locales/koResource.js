@@ -359,6 +359,7 @@ const koResource = {
             click_below_to_edit: '👉 편집하려면 하기 창을 클릭하세요',
         },
         user :{
+            user_id:'아이디',
             phone:'전화번호',
             mobile:'휴대전화',
             e_mail:'이메일',
@@ -367,6 +368,10 @@ const koResource = {
             name:'이름',
             department:'부서',
             position:'직급',
+            job_type:'직군',
+            user_role:'권한',
+            is_work:'현재사원',
+            new_user:'사용자등록',
             current_password:'현재 비밀번호',
             change_password:'변경 비밀번호',
             change_password_confirm:'변경 비밀번호 학인',

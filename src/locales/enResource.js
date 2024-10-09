@@ -359,6 +359,7 @@ const enResource = {
             click_below_to_edit: '👉 Click the below to edit',
         },
         user :{
+            user_id:'Id',
             phone:'Phone Number',
             mobile:'Mobile Phone',
             e_mail:'E Mail Address',
@@ -367,6 +368,10 @@ const enResource = {
             name:'Name',
             department:'Department',
             position:'Position',
+            job_type:'Job Type',
+            user_role:'Role',
+            is_work:'Is Work',
+            new_user:'New User',
             current_password:'Current Password',
             change_password:'Change Password',
             change_password_confirm:'Change Password Confirm',

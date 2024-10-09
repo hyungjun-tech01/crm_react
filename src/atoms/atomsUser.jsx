@@ -26,6 +26,11 @@ export const atomAllUsers = atom({
     default: [],
 });
 
+export const atomFilteredUserArray = atom({
+    key: "fileteredUserArray",
+    default: [],
+});
+
 export const atomUserState = atom({
     key: "userState",
     default: 0,
