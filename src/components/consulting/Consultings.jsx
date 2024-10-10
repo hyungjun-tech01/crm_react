@@ -201,7 +201,6 @@ const Consultings = () => {
       title: t('consulting.receipt_date'),
       dataIndex: 'receipt_date',
       render: (text, record) => { 
-        console.log(typeof text, text);
         // text가 유효한 문자열인지 확인
         if (record === null || !text ) {
           return '';

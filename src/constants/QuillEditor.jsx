@@ -95,6 +95,53 @@ const QuillEditor = ({ originalContent, handleData, handleClose }) => {
         };
     };
 
+    const linkHandler = () => {
+        const input = document.createElement("input");
+        input.setAttribute("type", "file");
+        input.setAttribute("accept", "*");
+        input.setAttribute("multiple", "multiple");
+        input.setAttribute("name", "files");
+        input.click();
+
+        input.onchange = async () => { // onChange 추가
+            for(let i = 0; i < input.files.length; i++ ){
+                const file = input.files[i];
+                const res = await uploadFile(file);
+            
+                if(!res.result){
+                    alert(res.result.message);
+                    return;
+                };
+    
+                const tempAttachment = {
+                    attachmentCode: res.data.code,
+                    dirName: res.data.dirName,
+                    fileName: res.data.fileName,
+                    fileExt: res.data.fileExt,
+                    url: res.data.url
+                };
+                handleAttachment(tempAttachment);
+                
+                const editor = quillRef.current.getEditor();
+                quillRef.current.focus();
+    
+                const fileUrl = `${BASE_PATH}/${res.data.url}`;
+                const linkString = `<a href=${fileUrl} download/>${res.data.fileName}</a>`;
+                const range = editor.getSelection();
+                if (range) {
+                    editor.clipboard.dangerouslyPasteHTML(range.index, linkString);
+                    editor.setSelection(range.index + 1, 1);
+                } else {
+                    // 범위가 없을 때 커서를 맨 끝에 두고 이미지 삽입
+                    editor.setSelection(editor.getLength(), 0);
+                    editor.clipboard.dangerouslyPasteHTML(
+                        editor.getSelection().index, linkString
+                    );
+                };
+            };
+        };
+    };
+
     const formats = [
         "header", "size", "font",
         "bold", "italic", "underline", "strike", "blockquote",
@@ -108,6 +155,7 @@ const QuillEditor = ({ originalContent, handleData, handleClose }) => {
             container: '#QuillToolbar',
             handlers: { // 위에서 만든 이미지 핸들러 사용하도록 설정
                 image: imageHandler,
+                link: linkHandler,
             },
         },
     }), []);

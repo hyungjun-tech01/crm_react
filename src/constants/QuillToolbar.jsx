@@ -43,7 +43,7 @@ const QuillToolbar = () => {
             </div>
             <div className="ql-formats">
                 <button className="ql-code-block" />
-                {/* <button className="ql-link" /> */}
+                <button className="ql-link" />
                 <button className="ql-image" />
             </div>
         </div>
