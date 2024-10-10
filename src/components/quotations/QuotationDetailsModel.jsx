@@ -373,17 +373,17 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   }, [setCurrentQuotation, setSelectedCategory]);
 
   const qotation_items_info = [
-    { key:'quotation_type', title:'quotation.quotation_type', detail:{ type:'select', options:QuotationTypes, editing:handleDetailChange }},
-    { key:'quotation_manager', title:'quotation.quotation_manager', detail:{ type:'select', options:usersForSelection, editing:handleDetailChange }},
-    { key:'quotation_send_type', title:'quotation.send_type', detail:{ type:'select', options:QuotationSendTypes, editing:handleDetailChange }},
+    { key:'quotation_type', title:'quotation.quotation_type', detail:{ type:'select', options:QuotationTypes, editing:handleDetailSelectChange }},
+    { key:'quotation_manager', title:'quotation.quotation_manager', detail:{ type:'select', options:usersForSelection, editing:handleDetailSelectChange }},
+    { key:'quotation_send_type', title:'quotation.send_type', detail:{ type:'select', options:QuotationSendTypes, editing:handleDetailSelectChange }},
     { key:'quotation_date', title:'quotation.quotation_date', detail:{ type:'date', editing:handleDetailDateChange}},
-    { key:'quotation_expiration_date', title:'quotation.expiry_date', detail:{ type:'select', options:quotationExpiry, editing:handleDetailChange }},
+    { key:'quotation_expiration_date', title:'quotation.expiry_date', detail:{ type:'select', options:quotationExpiry, editing:handleDetailSelectChange }},
     { key:'comfirm_date', title:'quotation.confirm_date', detail:{ type:'date', editing:handleDetailDateChange}},
     { key:'delivery_location', title:'quotation.delivery_location', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'delivery_period', title:'quotation.delivery_period', detail:{ type:'select', options:quotationDelivery, editing:handleDetailChange }},
+    { key:'delivery_period', title:'quotation.delivery_period', detail:{ type:'select', options:quotationDelivery, editing:handleDetailSelectChange }},
     { key:'warranty_period', title:'quotation.warranty', detail:{ type:'label', editing:handleDetailChange }},
     { key:'sales_representative', title:'quotation.sales_rep', detail:{ type:'select', options:salespersonsForSelection, editing:handleDetailSelectChange }},
-    { key:'payment_type', title:'quotation.payment_type', detail:{ type:'select', options:quotationPayment, editing:handleDetailChange }},
+    { key:'payment_type', title:'quotation.payment_type', detail:{ type:'select', options:quotationPayment, editing:handleDetailSelectChange }},
     { key:'list_price', title:'quotation.list_price', detail:{ type:'label', price: true, editing:handleDetailChange }},
     { key:'list_price_dc', title:'quotation.list_price_dc', detail:{ type:'label', editing:handleDetailChange }},
     { key:'sub_total_amount', title:'quotation.sub_total_amount', detail:{ type:'label', price: true, editing:handleDetailChange }},
