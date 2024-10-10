@@ -282,9 +282,13 @@ const QuotationView = () => {
             }
 
             // get info of quotation condition -----------
-            const tempExpiry = quotationExpiry.filter(item => item.value === currentQuotation.quotation_expiration_date)[0].label;
-            const tempDelivery = quotationDelivery.filter(item => item.value === currentQuotation.delivery_period)[0].label;
-            const tempPayment = quotationPayment.filter(item => item.value === currentQuotation.payment_type)[0].label;
+            console.log('Check data :', currentQuotation);
+            const foundExpiryArray = quotationExpiry.filter(item => item.value === currentQuotation.quotation_expiration_date);
+            const tempExpiry = (foundExpiryArray.length > 0) ? foundExpiryArray[0].label : currentQuotation.quotation_expiration_date;
+            const foundDeliveryArray = quotationDelivery.filter(item => item.value === currentQuotation.delivery_period);
+            const tempDelivery = (foundDeliveryArray.length > 0) ? foundDeliveryArray[0].label : currentQuotation.delivery_period;
+            const foundPaymentArray = quotationPayment.filter(item => item.value === currentQuotation.payment_type);
+            const tempPayment = (foundPaymentArray.length > 0) ? foundPaymentArray[0].label : currentQuotation.payment_type;
             setQuotationCondition({expiry: tempExpiry, delivery: tempDelivery, payment: tempPayment});
         }
     }, [currentQuotation]);
