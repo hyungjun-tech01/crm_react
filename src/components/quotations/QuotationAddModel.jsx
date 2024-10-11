@@ -90,6 +90,24 @@ const QuotationAddModel = (props) => {
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
   const selectedCategory = useRecoilValue(atomSelectedCategory);
 
+  const handlePopupOpen = (open) => {
+    if(open) {
+      const thisModal = bootstrap.Modal.getInstance("#add_quotation");
+      if(thisModal) {
+        thisModal._focustrap.deactivate();
+      } else {
+        console.log('[ConsultingAddModel] fail to get THIS MODAL instance!');
+      };
+    } else {
+      const thisModal = bootstrap.Modal.getInstance("#add_quotation");
+      if(thisModal) {
+        thisModal._focustrap.activate();
+      } else {
+        console.log('[ConsultingAddModel] fail to get THIS MODAL instance!');
+      };
+    }
+  };
+
   const initializeQuotationTemplate = useCallback(() => {
     setQuotationContents([]);
 
@@ -608,6 +626,7 @@ const QuotationAddModel = (props) => {
       quotation_amount: null,
     });
 
+    handlePopupOpen(true);
     setEditedContentModalValues({});
     setIsContentModalOpen(true);
   }, [quotationChange.lead_name, quotationContents.length, settingForContent, t]);
@@ -746,6 +765,7 @@ const QuotationAddModel = (props) => {
   }, [editedContentModalValues, handleCalculateAmounts, orgContentModalValues, quotationContents, settingForContent]);
 
   const handleContentModalCancel = () => {
+    handlePopupOpen(false);
     setIsContentModalOpen(false);
     setEditedContentModalValues({});
     setOrgContentModalValues({});
@@ -872,7 +892,6 @@ const QuotationAddModel = (props) => {
       tabIndex={-1}
       role="dialog"
       aria-modal="true"
-      data-bs-focus="false"
     >
       <div
         className="modal-dialog modal-dialog-centered modal-lg"
@@ -908,6 +927,7 @@ const QuotationAddModel = (props) => {
                   defaultValue={quotationChange.lead_name}
                   edited={quotationChange}
                   setEdited={setQuotationChange}
+                  handleOpen={handlePopupOpen}
                 />
               </div>
               {!!quotationChange.lead_name &&

@@ -392,6 +392,24 @@ const ConsultingAddModel = (props) => {
     setShowEditor(EDIT_ACTION_CONTENT);
   };
 
+  const handlePopupOpen = (open) => {
+    if(open) {
+      const thisModal = bootstrap.Modal.getInstance("#add_consulting");
+      if(thisModal) {
+        thisModal._focustrap.deactivate();
+      } else {
+        console.log('[ConsultingAddModel] fail to get THIS MODAL instance!');
+      };
+    } else {
+      const thisModal = bootstrap.Modal.getInstance("#add_consulting");
+      if(thisModal) {
+        thisModal._focustrap.activate();
+      } else {
+        console.log('[ConsultingAddModel] fail to get THIS MODAL instance!');
+      };
+    }
+  };
+
   const initializeConsultingTemplate = useCallback(() => {
     // document.querySelector("#add_new_consulting_form").reset();
 
@@ -422,7 +440,6 @@ const ConsultingAddModel = (props) => {
     setAttachmentsForAction([]);
     setAttachmentsForRequest([]);
     setNeedInit(false);
-
     
   }, [cookies.myLationCrmUserName, currentLead, setCurrentCompany, selectedCategory]);
 
@@ -502,7 +519,6 @@ const ConsultingAddModel = (props) => {
       tabIndex={-1}
       role="dialog"
       aria-modal="true"
-      data-bs-focus="false"
     >
       <div
         className="modal-dialog" role="document"
@@ -574,6 +590,7 @@ const ConsultingAddModel = (props) => {
                   defaultValue={consultingChange.lead_name}
                   edited={consultingChange}
                   setEdited={handleLeadSelected}
+                  handleOpen={handlePopupOpen}
                 />
               </div>
               {!!consultingChange.lead_name &&

@@ -174,7 +174,7 @@ const Quotations = () => {
     setCurrentQuotation(code);
     setSelectedCategory({category: 'quotation', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('quotation-details'), {
-      keyboard: false
+      keyboard: true,
     })
     myModal.show();
   }, []);
@@ -269,7 +269,7 @@ const Quotations = () => {
       singleDate:checkedSingleDates
     }
 
-    console.log('[Quotation] useEffect : ', multiQueryCondi);
+    // console.log('[Quotation] useEffect : ', multiQueryCondi);
     tryLoadAllQuotations(multiQueryCondi);
     tryLoadAllUsers();
     

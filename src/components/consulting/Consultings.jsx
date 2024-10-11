@@ -111,7 +111,7 @@ const Consultings = () => {
     setMultiQueryModal(false);
 
     // query condition 세팅 후 query
-    console.log("handleMultiQueryModalOk", queryConditions);
+    // console.log("handleMultiQueryModalOk", queryConditions);
     let tommorow = new Date();
     
     const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
@@ -134,7 +134,7 @@ const Consultings = () => {
       singleDate:checkedSingleDates
     }
 
-    console.log('multiQueryCondi',multiQueryCondi);
+    // console.log('multiQueryCondi',multiQueryCondi);
     //tryLoadAllLeads(multiQueryCondi);   
     //loadAllLeads(multiQueryCondi);
     loadAllConsultings(multiQueryCondi);
@@ -162,7 +162,7 @@ const Consultings = () => {
     setOpenAddConsulting(true);
     setTimeout(()=>{
       let myModal = new bootstrap.Modal(document.getElementById('add_consulting'), {
-        keyboard: false,
+        keyboard: true,
       })
       myModal.show();
     }, 500)
@@ -172,7 +172,7 @@ const Consultings = () => {
     setCurrentConsulting(code);
     setSelectedCategory({category: 'consulting', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
-      keyboard: false
+      keyboard: true,
     })
     myModal.show();
   }, []);
@@ -181,7 +181,7 @@ const Consultings = () => {
     setCurrentCompany(code);
     setSelectedCategory({category: 'company', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
-      keyboard: false
+      keyboard: true,
     })
     myModal.show();
   }, []);
@@ -190,7 +190,7 @@ const Consultings = () => {
     setCurrentLead(code);
     setSelectedCategory({category: 'lead', item_code: code});
     let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
-      keyboard: false
+      keyboard: true,
     })
     myModal.show();
   }, []);
@@ -321,7 +321,7 @@ const Consultings = () => {
        singleDate:checkedSingleDates
      }
  
-    console.log('multiQueryCondi',multiQueryCondi);
+    // console.log('multiQueryCondi',multiQueryCondi);
     
     tryLoadAllCompanies(multiQueryCondi);
     tryLoadAllLeads(multiQueryCondi);

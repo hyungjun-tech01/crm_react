@@ -4,6 +4,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
+import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import {
   atomUserState,
@@ -55,7 +56,6 @@ const ConsultingDetailsModel = () => {
   const [ selectedCategory, setSelectedCategory] = useRecoilState(atomSelectedCategory);
   const [ showEditor, setShowEditor ] = useState(0);
 
-  const CLOSE_EDITOR = 0;
   const EDIT_REQUEST_CONTENT = 1;
   const EDIT_ACTION_CONTENT = 2;
 
@@ -66,7 +66,6 @@ const ConsultingDetailsModel = () => {
     else
       localStorage.setItem('isFullScreen', '0');
   }, []);
-
 
   //===== Handles to edit 'Consulting Details' ========================================
   const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
@@ -453,7 +452,6 @@ const ConsultingDetailsModel = () => {
       tabIndex={-1}
       role="dialog"
       aria-modal="true"
-      data-bs-focus="false"
     >
       <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
         <div className="modal-content">

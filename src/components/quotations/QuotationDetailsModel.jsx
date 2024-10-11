@@ -73,6 +73,8 @@ const QuotationDetailsModel = ({init, handleInit}) => {
       localStorage.setItem('isFullScreen', '0');
   }, []);
 
+  
+
 
   //===== Handles to edit 'Quotation Details' =========================================
   const [editedDetailValues, setEditedDetailValues] = useState({});
@@ -466,7 +468,6 @@ if (init)
         tabIndex={-1}
         role="dialog"
         aria-modal="true"
-        data-bs-focus="false"
       >
         <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
           <div className="modal-content">

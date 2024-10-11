@@ -5,7 +5,7 @@ import SelectListModal from './SelectListModal';
 
 
 const AddSearchItem = (props) => {
-    const { title, category, name, defaultValue, edited, setEdited, long, required, disabled, } = props;
+    const { title, category, name, defaultValue, edited, setEdited, long, required, disabled, handleOpen } = props;
     const { t } = useTranslation();
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [ styleName, setStyleName ] = useState('add-basic-content');
@@ -34,7 +34,12 @@ const AddSearchItem = (props) => {
                 <label className={styleName}>
                     {edited[name] ? edited[name] : (defaultValue ? defaultValue : '')}
                 </label>
-                <div className="add-basic-btn" onClick={() => {if(!disabled) setIsPopupOpen(!isPopupOpen)}}>
+                <div className="add-basic-btn" onClick={() => {
+                    if(!disabled){
+                        setIsPopupOpen(!isPopupOpen);
+                        if(handleOpen) handleOpen(!isPopupOpen);
+                    }
+                }}>
                     <FiSearch />
                 </div>
             </div>
@@ -50,7 +55,10 @@ const AddSearchItem = (props) => {
                         ...data,
                     })
                 }}
-                handleClose={()=>setIsPopupOpen(false)}
+                handleClose={()=>{
+                    setIsPopupOpen(false);
+                    if(handleOpen) handleOpen(false);
+                }}
             />
         </div>
     );
