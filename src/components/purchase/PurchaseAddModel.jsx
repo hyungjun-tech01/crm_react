@@ -4,7 +4,6 @@ import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
 import { Table } from 'antd';
 import { ItemRender, ShowTotal } from "../paginationfunction";
-import * as bootstrap from "../../assets/js/bootstrap.bundle";
 import {
     atomCurrentPurchase,
     defaultMAContract,
@@ -17,6 +16,7 @@ import {
 import { PurchaseRepo } from '../../repository/purchase';
 import { ProductTypeOptions } from '../../repository/product';
 import { MAContractRepo, ContractTypes } from "../../repository/ma_contract";
+import { SettingsRepo } from '../../repository/settings';
 
 import { ConvertCurrency, formatDate } from '../../constants/functions';
 import { Add } from "@mui/icons-material";
@@ -51,6 +51,10 @@ const PurchaseAddModel = (props) => {
 
     //===== [RecoilState] Related with MA Contract =========================================
     const { modifyMAContract, setCurrentMAContract } = useRecoilValue(MAContractRepo);
+
+
+    //===== [RecoilState] Related with MA Contract =========================================
+    const { openModal, closeModal } = useRecoilValue(SettingsRepo);
 
 
     //===== Handles to edit 'Purchase Add' =================================================
@@ -105,6 +109,14 @@ const PurchaseAddModel = (props) => {
         };
         setPurchaseChange(modifiedData);
     }, [purchaseChange]);
+
+    const handlePopupOpen = (open) => {
+        if(open) {
+          openModal('antModal');
+        } else {
+          closeModal();
+        }
+      };
 
     const initializePurchaseTemplate = useCallback(() => {
         document.querySelector("#add_new_purchase_form").reset();
@@ -183,8 +195,7 @@ const PurchaseAddModel = (props) => {
             if (res.result) {
                 setCurrentPurchase(res.code);
                 setNeedInit(true);
-                let thisModal = bootstrap.Modal.getInstance('#add_purchase');
-                if(thisModal) thisModal.hide();
+                closeModal();
             } else {
                 console.log('[PurchaseAddModel] fail to add purchase :', res.data);
             }
@@ -270,7 +281,7 @@ const PurchaseAddModel = (props) => {
         resp.then(result => {
             if (result) {
                 const updatedContracts = contractLists.concat(result);
-                console.log(`[ handleSubModalOk ] update contract list : `, updatedContracts);
+                // console.log(`[ handleSubModalOk ] update contract list : `, updatedContracts);
                 setContractLists(updatedContracts);
 
                 // Update MA Contract end date
@@ -285,7 +296,7 @@ const PurchaseAddModel = (props) => {
                     const res_data = modifyPurchase(modifiedPurchase);
                     res_data.then(res => {
                         if (res.result) {
-                            console.log('Succeeded to update MA end date');
+                            // console.log('Succeeded to update MA end date');
                             const updateAddChange = {
                                 ...purchaseChange,
                                 ma_finish_date: finalData.ma_finish_date,
@@ -349,7 +360,7 @@ const PurchaseAddModel = (props) => {
     //===== useEffect functions ===========================================================
     useEffect(() => {
         if (init){
-            console.log('[PurchaseAddModel] initialize!');
+            // console.log('[PurchaseAddModel] initialize!');
             if(handleInit) handleInit(!init);
             setTimeout(()=>{
                 initializePurchaseTemplate();
@@ -400,6 +411,7 @@ const PurchaseAddModel = (props) => {
                                             long
                                             edited={companyData}
                                             setEdited={setPurchaseChange}
+                                            handleOpen={handlePopupOpen}
                                         />
                                     </div>
                                     <div className="form-group row">
@@ -409,6 +421,7 @@ const PurchaseAddModel = (props) => {
                                             required
                                             edited={purchaseChange}
                                             setEdited={setPurchaseChange}
+                                            handleOpen={handlePopupOpen}
                                         />
                                         <AddBasicItem
                                             title={t('purchase.product_type')}

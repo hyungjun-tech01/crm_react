@@ -20,6 +20,7 @@ import {
 import { PurchaseRepo } from "../../repository/purchase";
 import { ProductTypeOptions } from "../../repository/product";
 import { ContractTypes, MAContractRepo } from "../../repository/ma_contract";
+import { SettingsRepo } from "../../repository/settings";
 
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
@@ -53,6 +54,10 @@ const PurchaseDetailsModel = () => {
   //===== [RecoilState] Related with MA Contract ======================================
   const maContractSet = useRecoilValue(atomMAContractSet);
   const { loadPurchaseMAContracts, modifyMAContract, setCurrentMAContract } = useRecoilValue(MAContractRepo);
+
+
+  //===== [RecoilState] Related with MA Contract ======================================
+  const { openModal } = useRecoilValue(SettingsRepo);
 
   
   //===== Handles to deal this component ==============================================
@@ -99,7 +104,6 @@ const PurchaseDetailsModel = () => {
         ...editedDetailValues,
         ...selected,
       };
-      console.log('handleDetailSelectChange : ', tempEdited);
       setEditedDetailValues(tempEdited);
     } else {
       if (currentPurchase[name] !== selected.value) {
@@ -188,8 +192,6 @@ const PurchaseDetailsModel = () => {
     const resp = modifyMAContract(finalData);
     resp.then(result => {
       if (result) {
-        console.log(`[ handleSubModalOk ] update contract`);
-
         // Update MA Contract end date
         if (currentPurchase.purchase_code
           && (!currentPurchase.ma_finish_date || (new Date(currentPurchase.ma_finish_date) < finalData.ma_finish_date))) {

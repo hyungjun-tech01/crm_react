@@ -5,7 +5,7 @@ import SelectProductModal from './SelectProductModal';
 
 
 const AddSearchProduct = (props) => {
-    const { title, name, edited, setEdited, long, required, disabled, } = props;
+    const { title, name, edited, setEdited, long, required, disabled, handleOpen } = props;
     const { t } = useTranslation();
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [ styleName, setStyleName ] = useState('add-basic-content');
@@ -41,7 +41,12 @@ const AddSearchProduct = (props) => {
                 >
                     {edited[name] ? edited[name] : ''}
                 </label>
-                <div className="add-basic-btn" onClick={() => {if(!disabled) setIsPopupOpen(!isPopupOpen)}}>
+                <div className="add-basic-btn" onClick={() => {
+                    if(!disabled){
+                        setIsPopupOpen(!isPopupOpen)
+                        if(handleOpen) handleOpen(!isPopupOpen);
+                    }
+                }}>
                     <FiSearch />
                 </div>
             </div>
@@ -62,7 +67,10 @@ const AddSearchProduct = (props) => {
 
                     setEdited(modified);
                 }}
-                handleClose={()=>setIsPopupOpen(false)}
+                handleClose={()=>{
+                    setIsPopupOpen(false);
+                    if(handleOpen) handleOpen(false);
+                }}
             />
         </div>
     );

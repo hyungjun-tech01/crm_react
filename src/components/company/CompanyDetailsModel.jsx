@@ -142,7 +142,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
         ...editedDetailValues,
         ...obj,
       };
-      console.log("handleDetailAddressChange :", tempEdited);
+      // console.log("handleDetailAddressChange :", tempEdited);
       setEditedDetailValues(tempEdited);
     },
     [editedDetailValues]
@@ -316,7 +316,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
       && (selectedCompany !== defaultCompany)
       && (selectedCompany.company_code !== currentCompanyCode)
     ) {
-      console.log("[CompanyDetailsModel] new company is loading!");
+      // console.log("[CompanyDetailsModel] new company is loading!");
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {
@@ -409,7 +409,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     if (init && checkState.purchase && checkState.transaction && checkState.taxInvoice
       && ((userState & 1) === 1)
      ){
-      console.log('[CompanyDetailModel] all needed data is loaded');
+      // console.log('[CompanyDetailModel] all needed data is loaded');
       handleInit(false);
     };
   }, [checkState, userState, handleInit]);

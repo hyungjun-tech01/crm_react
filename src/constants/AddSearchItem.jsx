@@ -7,7 +7,7 @@ import SelectListModal from './SelectListModal';
 const AddSearchItem = (props) => {
     const { title, category, name, defaultValue, edited, setEdited, long, required, disabled, handleOpen } = props;
     const { t } = useTranslation();
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [ isPopupOpen, setIsPopupOpen ] = useState(false);
     const [ styleName, setStyleName ] = useState('add-basic-content');
     const [ styleLong, setStyleLong ] = useState('col-sm-6');
 
