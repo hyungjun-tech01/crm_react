@@ -4,7 +4,6 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import {
   atomUserState,

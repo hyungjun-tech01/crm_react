@@ -154,7 +154,7 @@ const Companies = () => {
     setSelectedCategory({category: 'company', item_code: id});
     setTimeout(()=>{
       let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
-        keyboard: false
+        keyboard: true
       });
       myModal.show();
     }, 500);

@@ -367,7 +367,6 @@ const PurchaseAddModel = (props) => {
             tabIndex={-1}
             role="dialog"
             aria-modal="true"
-            data-bs-focus="false"
         >
             <div className="modal-dialog" role="document">
                 <button

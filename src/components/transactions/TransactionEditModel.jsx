@@ -609,7 +609,7 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
 
     setTimeout(() => {
       let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
-        keyboard: false
+        keyboard: true
       });
       myModal.show();
     }, 500);
@@ -791,7 +791,6 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
       tabIndex={-1}
       role="dialog"
       aria-modal="true"
-      data-bs-focus="false"
     >
       <div
         className="modal-dialog modal-dialog-centered modal-lg"

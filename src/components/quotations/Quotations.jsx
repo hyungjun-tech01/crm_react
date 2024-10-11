@@ -155,7 +155,7 @@ const Quotations = () => {
   //   setCurrentCompany(code);
   //   setSelectedCategory({category: 'company', item_code: code});
   //   let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
-  //     keyboard: false
+  //     keyboard: true
   //   })
   //   myModal.show();
   // }, []);
@@ -165,7 +165,7 @@ const Quotations = () => {
   //   setCurrentLead(code);
   //   setSelectedCategory({category: 'lead', item_code: code});
   //   let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
-  //     keyboard: false
+  //     keyboard: true
   //   })
   //   myModal.show();
   // }, []);
