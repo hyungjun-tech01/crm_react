@@ -5,18 +5,21 @@ import { UserRepo } from "../../repository/user";
 import {atomCurrentUser} from "../../atoms/atomsUser.jsx";
 import { atomAllUsers, atomUserState, atomFilteredUserArray } from "../../atoms/atomsUser";
 import { compareText } from "../../constants/functions";
+import UserDetailsModel from "./UserDetailsModel";
+import UserDetailModel from "./UserDetailModel";
 
 import { useTranslation } from "react-i18next";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
+import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 
 const Users = () => {
   const { t } = useTranslation();
 
     const currentUser = useRecoilValue(atomCurrentUser);
-    const { loadUsers, setCurrentUser , tryLoadAllUsers, filterUsers} = useRecoilValue(UserRepo);
+    const { loadUsers, setCurrentUser , tryLoadAllUsers, filterUsers, setCurrentModifyUser} = useRecoilValue(UserRepo);
 
     const allUsers = useRecoilValue(atomAllUsers);
     const filteredUser = useRecoilValue(atomFilteredUserArray);
@@ -29,9 +32,8 @@ const [ expanded, setExpaned ] = useState(false);
 
 const userState = useRecoilValue(atomUserState);
 
-const handleClickUser = useCallback((id)=> {
-  console.log('User Click', id);
-}, []);
+const [initToEditUser, setInitToEditUser] = useState(false);
+
 
 const handleAddNewCompanyClicked = useCallback(() => {
   console.log('handle');
@@ -53,6 +55,23 @@ const handleStatusSearch = (newValue) => {
 };
 
 // --- Functions used for Table ------------------------------
+
+const handleClickUser = useCallback((id) => {
+  console.log('[User] set current user : ', id);
+  setInitToEditUser(true);
+  setCurrentModifyUser(id);
+  //setSelectedCategory({category: 'company', item_code: id});
+  setTimeout(()=>{
+    const modalElement = document.getElementById('user-details-modal');
+    console.log('modalElement',modalElement);
+    let myModal = new bootstrap.Modal(document.getElementById('user-details-model'), {
+      keyboard: false
+    });
+    myModal.show();
+  }, 500);
+  
+}, [setCurrentModifyUser]);
+
 const columns = [
   {
     title: t('user.user_id'),
@@ -191,11 +210,11 @@ useEffect(() => {
                           style={{ overflowX: "auto" }}
                           columns={columns}
                           dataSource={filteredUser.length > 0 ? filteredUser : null}
-                          rowKey={(record) => record.user_id}
+                          rowKey={(record) => record.userId}
                           onRow={(record, rowIndex) => {
                             return {
                               onClick: () => {
-                                handleClickUser(record.user_id);
+                                handleClickUser(record.userId);
                               },
                             };
                           }}
@@ -206,8 +225,12 @@ useEffect(() => {
                 </div>
               </div>
           </div>
+        <UserDetailsModel
+          init={initToEditUser}
+          handleInit={setInitToEditUser}
+        />
+        <UserDetailModel/>          
         </div>
-        
       </HelmetProvider>
     );
 };

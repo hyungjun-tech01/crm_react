@@ -3,6 +3,7 @@ import { selector } from "recoil";
 import { atomCurrentUser,
     defaultUser,
     atomAllUsers,
+    atomCurrentModifyUser,
     atomFilteredUserArray,
     atomUserState,
     atomUsersForSelection,
@@ -223,7 +224,7 @@ export const UserRepo = selector({
                         ...currentUser,
                         ...newUser
                     };
-                    set(atomCurrentUser, modifiedUser);
+                   //  set(atomCurrentUser, modifiedUser);
 
                     // update all users
                     const allUsers = await snapshot.getPromise(atomAllUsers);
@@ -236,6 +237,19 @@ export const UserRepo = selector({
                         ];
                         set(atomAllUsers, updatedAllUsers);
                     };
+                    
+                    //update filtered users 
+                    const filteredUser = await snapshot.getPromise(atomFilteredUserArray);
+                    const foundFilteredIdx = filteredUser.findIndex(user => user.userId === modifiedUser.userId);
+                    if (foundIdx !== -1) {
+                        const updatedAllUsers = [
+                            ...filteredUser.slice(0, foundIdx),
+                            modifiedUser,
+                            ...filteredUser.slice(foundIdx + 1,),
+                        ];
+                        set(atomFilteredUserArray, updatedAllUsers);
+                    };
+
 
                     if (modifiedUser.isWork === 'N') {
                         if (modifiedUser.jobType === 'SR') {
@@ -308,13 +322,37 @@ export const UserRepo = selector({
                 console.error(`\t[ setCurrentUser ] Error : ${err}`);
             };
         });
+        const setCurrentModifyUser = getCallback(({set, snapshot}) => async (userId) => {
+            try{
+                if(userId === undefined || userId === null) {
+                    set(atomCurrentModifyUser, defaultUser);
+                    return;
+                };
+                const allUsers = await snapshot.getPromise(atomAllUsers);
+
+                const selected_array = allUsers.filter(user => user.userId === userId);
+                if(selected_array.length > 0){
+                    set(atomCurrentModifyUser, selected_array[0]);
+                }
+
+                //if(allUsers[userId]){
+                //    set(atomCurrentModifyUser, allUsers[userId]);
+                //} 
+                console.log('setCurrentModifyUser',atomCurrentModifyUser, userId );
+            }
+            catch(err){
+                console.error(`\t[ setCurrentCompany ] Error : ${err}`);
+                set(atomCurrentModifyUser, defaultUser);
+            };
+        });        
         return {
             tryLoadAllUsers,
             loadUsers,
             modifyUser,
             setCurrentUser,
             loadAllUsers,
-            filterUsers
+            filterUsers,
+            setCurrentModifyUser
         };
     }
 });
