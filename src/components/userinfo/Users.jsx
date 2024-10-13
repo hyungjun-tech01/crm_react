@@ -7,6 +7,8 @@ import { atomAllUsers, atomUserState, atomFilteredUserArray } from "../../atoms/
 import { compareText } from "../../constants/functions";
 import UserDetailsModel from "./UserDetailsModel";
 import UserDetailModel from "./UserDetailModel";
+import UserAddModal from "./UserAddModal";
+
 
 import { useTranslation } from "react-i18next";
 import { Helmet, HelmetProvider } from "react-helmet-async";
@@ -32,12 +34,13 @@ const [ expanded, setExpaned ] = useState(false);
 
 const userState = useRecoilValue(atomUserState);
 
+const [initToAddUser, setInitToAddUser] = useState(false);
 const [initToEditUser, setInitToEditUser] = useState(false);
 
 
 const handleAddNewCompanyClicked = useCallback(() => {
-  console.log('handle');
-}, []);
+  setInitToAddUser(true);
+}, [setInitToAddUser]);
 
 
 const handleSearchCondition = (newValue) => {
@@ -181,7 +184,7 @@ useEffect(() => {
                         className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                         id="add-task"
                         data-bs-toggle="modal"
-                        data-bs-target="#add_company"
+                        data-bs-target="#add_user"
                         onClick={handleAddNewCompanyClicked}
                       >
                         {t('user.new_user')}
@@ -229,7 +232,8 @@ useEffect(() => {
           init={initToEditUser}
           handleInit={setInitToEditUser}
         />
-        <UserDetailModel/>          
+        <UserDetailModel/> 
+        <UserAddModal init={initToAddUser} handleInit={setInitToAddUser}/>         
         </div>
       </HelmetProvider>
     );
