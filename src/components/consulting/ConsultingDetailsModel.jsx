@@ -373,6 +373,7 @@ const ConsultingDetailsModel = () => {
       resp.then(res => {
         if (res.result) {
           console.log(`Succeeded to modify company`);
+          handleClose();
         } else {
           console.error('Failed to modify company : ', res.data);
         };
@@ -385,6 +386,7 @@ const ConsultingDetailsModel = () => {
 
   const handleCancelAll = useCallback(() => {
     setEditedDetailValues(null);
+    handleClose();
   }, []);
 
   const handleClose = useCallback(() => {
@@ -484,7 +486,6 @@ const ConsultingDetailsModel = () => {
             <button
               type="button"
               className="btn-close xs-close"
-              data-bs-dismiss="modal"
               onClick={handleClose}
             />
           </div>

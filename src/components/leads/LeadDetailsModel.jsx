@@ -208,6 +208,9 @@ const LeadDetailsModel = ({init, handleInit}) => {
     setEditedDetailValues(null);
     setCurrentLead();
     setCurrentLeadCode('');
+    setTimeout(() => {
+      closeModal();
+    }, 500);
   }, [setCurrentLead]);
 
   const handleSaveAll = useCallback(() => {
@@ -245,6 +248,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
           resp.then(res => {
             if (res.result) {
               console.log(`Succeeded to modify company`);
+              handleClose();
             } else {
               console.error('Failed to modify company : ', res.data);
             };
@@ -262,6 +266,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
 
   const handleCancelAll = useCallback(() => {
     setEditedDetailValues(null);
+    handleClose();
   }, []);
 
   const lead_items_info = [
@@ -470,7 +475,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
               <button
                 type="button"
                 className="btn-close xs-close"
-                data-bs-dismiss="modal"
                 onClick={handleClose}
               />
             </div>

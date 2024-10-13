@@ -25,6 +25,7 @@ import { TransactionRepo } from "../../repository/transaction";
 import { PurchaseRepo } from "../../repository/purchase";
 import { MAContractRepo } from "../../repository/ma_contract";
 import { TaxInvoiceRepo } from "../../repository/tax_invoice";
+import { SettingsRepo } from "../../repository/settings";
 
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
@@ -70,6 +71,10 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
   const userState = useRecoilValue(atomUserState);
   const engineerForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
+
+
+  //===== [RecoilState] Related with Users ============================================
+  const { closeModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to deal this component ==============================================
@@ -160,6 +165,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
       resp.then(res => {
         if (res.result) {
           console.log(`Succeeded to modify company`);
+          handleClose();
         } else {
           console.error("Failed to modify company : ", res.data);
         };
@@ -177,6 +183,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
 
   const handleDetailCancel = useCallback(() => {
     setEditedDetailValues(null);
+    handleClose();
   }, []);
 
   const handleClose = useCallback(() => {
@@ -184,6 +191,9 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     setEditedDetailValues(null);
     setCurrentCompany();
     setCurrentCompanyCode("");
+    setTimeout(() => {
+      closeModal();
+    }, 500);
   }, [setCurrentCompany]);
 
   const company_items_info = [
@@ -467,7 +477,6 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
               <button
                 type="button"
                 className="btn-close xs-close"
-                data-bs-dismiss="modal"
                 onClick={handleClose}
               />
             </div>

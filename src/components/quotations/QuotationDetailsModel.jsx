@@ -23,7 +23,8 @@ import { QuotationRepo,
   quotationExpiry,
   quotationDelivery,
   quotationPayment
- } from "../../repository/quotation";
+} from "../../repository/quotation";
+import { SettingsRepo } from "../../repository/settings";
 
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
@@ -58,6 +59,10 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   const userState = useRecoilValue(atomUserState);
   const usersForSelection = useRecoilValue(atomUsersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
+
+
+  //===== [RecoilState] Related with Settings ============================================
+  const { closeModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to deal this component ==============================================
@@ -128,6 +133,7 @@ const QuotationDetailsModel = ({init, handleInit}) => {
       resp.then(res => {
         if (res.result) {
           console.log(`Succeeded to modify Quotation`);
+          handleClose();
         } else {
           console.error("Failed to modify Quotation :", res.data);
         };
@@ -140,6 +146,7 @@ const QuotationDetailsModel = ({init, handleInit}) => {
 
   const handleCancelAll = useCallback(() => {
     setEditedDetailValues({});
+    handleClose();
   }, []);
 
 
@@ -372,6 +379,9 @@ const QuotationDetailsModel = ({init, handleInit}) => {
     }
     setEditedDetailValues(null);
     setCurrentQuotation();
+    setTimeout(() => {
+      closeModal();
+    }, 500);
   }, [setCurrentQuotation, setSelectedCategory]);
 
   const qotation_items_info = [
@@ -496,7 +506,6 @@ if (init)
               <button
                 type="button"
                 className="btn-close xs-close"
-                data-bs-dismiss="modal"
                 onClick={ handleClose }
               />
             </div>

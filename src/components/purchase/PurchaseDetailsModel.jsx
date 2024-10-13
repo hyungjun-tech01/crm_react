@@ -128,6 +128,7 @@ const PurchaseDetailsModel = () => {
       res_data.then(res => {
         if (res.result) {
           console.log(`Succeeded to modify purchase`);
+          handleClose();
         } else {
           console.error("Failed to modify purchase");
         }  
@@ -145,6 +146,7 @@ const PurchaseDetailsModel = () => {
 
   const handleCancelAll = useCallback(() => {
     setEditedDetailValues(null);
+    handleClose();
   }, []);
 
   const handleClose = useCallback(() => {
@@ -153,6 +155,9 @@ const PurchaseDetailsModel = () => {
     };
     setEditedDetailValues(null);
     setCurrentPurchase(defaultPurchase);
+    setTimeout(() => {
+      closeModal();
+    }, 500);
   }, []);
 
   const purchase_items_info = [
@@ -411,7 +416,6 @@ const PurchaseDetailsModel = () => {
               <button
                 type="button"
                 className="btn-close xs-close"
-                data-bs-dismiss="modal"
                 onClick={handleClose}
               />
             </div>
