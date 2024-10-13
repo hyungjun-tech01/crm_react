@@ -136,12 +136,11 @@ const CompanyAddModel = (props) => {
       counter: 0,
       modify_user: cookies.myLationCrmUserId,
     };
-    console.log(`[ handleAddNewCompany ]`, newComData);
+    // console.log(`[ handleAddNewCompany ]`, newComData);
     const result = modifyCompany(newComData);
     result.then((res) => {
       if (res.result) {
-        initializeCompanyTemplate();
-        closeModal();
+        handleClose();
       } else {
         const tempMsg = {
           title: t('comment.title_check'),
@@ -416,7 +415,6 @@ const CompanyAddModel = (props) => {
                     <button
                       type="button"
                       className="btn btn-secondary btn-rounded"
-                      data-bs-dismiss="modal"
                       onClick={handleClose}
                     >
                       {t("common.cancel")}

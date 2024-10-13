@@ -17,12 +17,19 @@ export const SettingsRepo = selector({
             };
             if(modalId){
                 if(modalId !== 'antModal'){
-                    const myModal = new bootstrap.Modal(document.getElementById(modalId), {
-                        keyboard: true,
+                    const modalElement = document.getElementById(modalId);
+                    const myModal = new bootstrap.Modal(modalElement, {
+                        keyboard: false,
                         focus: true,
                     });
-                    if(myModal) myModal.show();
-                }
+                    if(myModal){
+                        modalElement.addEventListener('keydown', (event) => {
+                            if(event.key !== 'Escape') return;
+                            closeModal();
+                        });
+                        myModal.show();  
+                    };
+                };
                 const updatedModalInfoStack = modalInfoStack.concat(modalId);
                 console.log(' - Modals in Stack :', updatedModalInfoStack);
                 set(atomModalInfoStack, updatedModalInfoStack);
@@ -36,6 +43,10 @@ export const SettingsRepo = selector({
                 console.log('closeModal / last modal : ', lastModal);
                 
                 if(lastModal){
+                    // const modalElement = document.getElementById(lastModalId);
+                    // if(modalElement) {
+                    //     modalElement.removeEventListener('keydown')
+                    // }
                     lastModal.hide();
                 };
                 const updatedModalInfoStack = [ ...modalInfoStack.slice(0, -1)];
