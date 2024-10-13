@@ -303,6 +303,18 @@ const UserDetailsModel = () => {
                                   checkSaved={handleCheckSaved}
                                   cancelSaved={handleCancelSaved}
                                 />
+                                <DetailLabelItem
+                                  defaultText={selectedUser.userRole}
+                                  saved={savedValues}
+                                  name="userRole"
+                                  title= {t('user.user_role')}
+                                  checkEdit={handleCheckEditState}
+                                  startEdit={handleStartEdit}
+                                  editing={handleEditing}
+                                  endEdit={handleEndEdit}
+                                  checkSaved={handleCheckSaved}
+                                  cancelSaved={handleCancelSaved}
+                                />                                
                                <DetailLabelItem
                                   defaultText={selectedUser.isWork}
                                   saved={savedValues}
