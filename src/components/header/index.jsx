@@ -17,9 +17,12 @@ const Header = (props) => {
   const currentUser = useRecoilValue(atomCurrentUser);
 
   const exclusionArray = [ "login", "register", "forgot-password", "error-404", "error-500", ];
-  const itemsArray = ["dashboard", "companies", "leads", "consultings", "quotations", "transactions", "purchases", "taxinvoices"];
+  const itemsArray = ["dashboard", "userinfo", "users", "settings",  "companies", "leads", "consultings", "quotations", "transactions", "purchases", "taxinvoices"];
   const headerIcons = {
     dashboard: <FiTable />,
+    userinfo: <FiTable />,
+    users: <FiTable />,
+    settings: <FiTable />,
     companies : <BiBuildings />,
     leads : <BiUser />,
     consultings : <BiClipboard />,
@@ -30,6 +33,9 @@ const Header = (props) => {
   };
   const headerTitles = {
     dashboard: t('dashboard.dashboard'),
+    userinfo: t('dashboard.userinfo'),
+    users: t('dashboard.users'),
+    settings: t('dashboard.settings'),
     companies : t('company.company_manage'),
     leads : t('lead.lead_manage'),
     consultings : t('consulting.consulting_manage'),
@@ -59,8 +65,11 @@ const Header = (props) => {
     return "";
   };
 
+  console.log('addressValue', addressValue);
   const headerTitle = itemsArray.indexOf(addressValue) > 0 ? headerTitles[addressValue] : headerTitles['dashboard'];
   const headerIcon = itemsArray.indexOf(addressValue) > 0 ? headerIcons[addressValue] : headerIcons['dashboard'];
+
+  console.log('headerTitle', headerTitle);
 
   return (
     <div className="header" id="heading">

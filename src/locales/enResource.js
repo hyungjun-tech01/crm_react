@@ -21,6 +21,9 @@ const enResource = {
         },
         dashboard: {
             dashboard: 'Dashboard',
+            userinfo:'User Info',
+            users:'User Management',
+            settings:'Settings',
             completed_tasks: 'Completed Tasks',
             product_yearly_sales: 'Product Yearly Sales',
             sales_overview: 'Sales Overview',

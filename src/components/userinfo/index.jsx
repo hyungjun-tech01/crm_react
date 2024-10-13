@@ -53,22 +53,6 @@ const UserInfo = () => {
         </Helmet>
         {/* Page Content */}
         <div className="content container-fluid">
-          <div className="crms-title row bg-white">
-            <div className="col  p-0">
-              <h3 className="page-title m-0">
-                <span className="page-title-icon bg-gradient-primary text-white me-2">
-                  <i className="feather-user" />
-                </span>{" "}
-                User Information{" "}
-              </h3>
-            </div>
-            <div className="col p-0 text-end">
-              <ul className="breadcrumb bg-white float-end m-0 pl-0 pr-0">
-                {/* <li className="breadcrumb-item"><Link to="/">Dashboard</Link></li> */}
-                <li className="breadcrumb-item active">User Information</li>
-              </ul>
-            </div>
-          </div>
           {/* Page Header */}
           <div className="page-header pt-3 mb-0">
             <div className="card ">

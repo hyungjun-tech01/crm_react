@@ -30,7 +30,7 @@ const Settings = () => {
           </Helmet>
           {/* Page Content */}
           <div className="content container-fluid">
-            <div className="crms-title row bg-white">
+            {/* <div className="crms-title row bg-white">
               <div className="col  p-0">
                 <h3 className="page-title m-0">
                   <span className="page-title-icon bg-gradient-primary text-white me-2">
@@ -47,7 +47,7 @@ const Settings = () => {
                   <li className="breadcrumb-item active">Settings</li>
                 </ul>
               </div>
-            </div>
+            </div> */}
             <div className="settings-menu-links">
               <ul className="nav nav-tabs menu-tabs">
                 <li className="nav-item active">

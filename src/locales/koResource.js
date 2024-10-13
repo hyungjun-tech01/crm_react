@@ -21,6 +21,9 @@ const koResource = {
         },
         dashboard: {
             dashboard: '대시보드',
+            userinfo:'사용자정보',
+            users:'사용자관리',
+            settings:'세팅',
             completed_tasks: '완료 태스크',
             product_yearly_sales: '연 상품 매출',
             sales_overview: '매출 요약',
