@@ -2,32 +2,35 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Table } from "antd";
+
 import "antd/dist/reset.css";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
+import "react-datepicker/dist/react-datepicker.css";
+
 import ConsultingDetailsModel from "./ConsultingDetailsModel";
 import SystemUserModel from "../task/SystemUserModel";
 import CompanyDetailsModel from "../company/CompanyDetailsModel";
 import LeadDetailsModel from "../leads/LeadDetailsModel";
 import ConsultingAddModel from "./ConsultingAddModel";
-import "react-datepicker/dist/react-datepicker.css";
+
 import { CompanyRepo } from "../../repository/company";
 import { LeadRepo } from "../../repository/lead";
 import { ConsultingRepo } from "../../repository/consulting";
 import { UserRepo } from "../../repository/user";
+import { SettingsRepo } from "../../repository/settings";
 import {
   atomCompanyState,
   atomFilteredConsultingArray,
   atomLeadState,
   atomConsultingState,
   atomSelectedCategory,
-  defaultLead,
 } from "../../atoms/atoms"; 
 import { compareCompanyName, compareText } from "../../constants/functions";
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import { consultingColumn } from "../../repository/consulting";
+
 
 const Consultings = () => {
   const { t } = useTranslation();
@@ -53,6 +56,10 @@ const Consultings = () => {
   //===== [RecoilState] Related with User =============================================
   const userState = useRecoilValue(atomLeadState);
   const { tryLoadAllUsers } = useRecoilValue(UserRepo);
+
+
+  //===== [RecoilState] Related with Settings =============================================
+  const { openModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to deal 'Consultings' ========================================
@@ -158,41 +165,34 @@ const Consultings = () => {
 
   // --- Functions used for Add New Consulting ------------------------------
   const handleAddNewConsultingClicked = useCallback(() => {
-    setCurrentLead(defaultLead);
     setOpenAddConsulting(true);
+    setCurrentConsulting();
     setTimeout(()=>{
-      let myModal = new bootstrap.Modal(document.getElementById('add_consulting'), {
-        keyboard: true,
-      })
-      myModal.show();
-    }, 500)
+      openModal('add_consulting')
+    }, 500);
   }, []);
 
   const handleClickConsulting = useCallback((code) => {
     setCurrentConsulting(code);
-    setSelectedCategory({category: 'consulting', item_code: code});
-    let myModal = new bootstrap.Modal(document.getElementById('consulting-details'), {
-      keyboard: true,
-    })
-    myModal.show();
+    setTimeout(()=>{
+      openModal('consulting-details')
+    }, 500);
   }, []);
 
   const handleClickCompany = useCallback((code) => {
     setCurrentCompany(code);
     setSelectedCategory({category: 'company', item_code: code});
-    let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
-      keyboard: true,
-    })
-    myModal.show();
+    setTimeout(()=>{
+      openModal('company-details')
+    }, 500);
   }, []);
 
   const handleClickLead = useCallback((code) => {
     setCurrentLead(code);
     setSelectedCategory({category: 'lead', item_code: code});
-    let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
-      keyboard: true,
-    })
-    myModal.show();
+    setTimeout(()=>{
+      openModal('leads-details')
+    }, 500);
   }, []);
 
   // --- Section for Table ------------------------------

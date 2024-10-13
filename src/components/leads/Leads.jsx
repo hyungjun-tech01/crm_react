@@ -3,7 +3,6 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { Link } from "react-router-dom";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
 import LeadDetailsModel from "./LeadDetailsModel";
@@ -16,12 +15,14 @@ import {
   atomSelectedCategory,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
+import { UserRepo } from "../../repository/user";
+import { SettingsRepo } from "../../repository/settings";
+
 import { compareCompanyName, compareText } from "../../constants/functions";
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import { leadColumn } from "../../repository/lead";
 import { useTranslation } from "react-i18next";
 import LeadAddModel from "./LeadAddMdel";
-import { UserRepo } from "../../repository/user";
 
 
 const Leads = () => {
@@ -42,6 +43,10 @@ const Leads = () => {
   //===== [RecoilState] Related with User ================================================
   const userState = useRecoilValue(atomUserState);
   const { tryLoadAllUsers } = useRecoilValue(UserRepo);
+
+
+  //===== [RecoilState] Related with Settings ===========================================
+  const { openModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to this =============================================================
@@ -99,7 +104,7 @@ const Leads = () => {
     setMultiQueryModal(false);
 
     // query condition 세팅 후 query
-    console.log("handleMultiQueryModalOk", queryConditions);
+    // console.log("handleMultiQueryModalOk", queryConditions);
 
     let tommorow = new Date();
     
@@ -123,7 +128,7 @@ const Leads = () => {
       singleDate:checkedSingleDates
     }
 
-    console.log('multiQueryCondi',multiQueryCondi);
+    // console.log('multiQueryCondi',multiQueryCondi);
     loadAllLeads(multiQueryCondi);
      
   };
@@ -148,6 +153,9 @@ const Leads = () => {
   // --- Functions used for Add New Lead ------------------------------
   const handleAddNewLeadClicked = useCallback(() => {
     setInitToAddLead(true);
+    setTimeout(() => {
+      openModal('add_lead');
+    }, 500);
   }, [setInitToAddLead]);
 
   const handleClickLeadName = useCallback((leadCode, companyCode) => {
@@ -156,10 +164,9 @@ const Leads = () => {
     setSelectedCategory({category: 'lead', item_code: leadCode});
     setCurrentCompany(companyCode);   // 현재 company 세팅 
     
-    let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
-      keyboard: true
-    });
-    myModal.show();
+    setTimeout(() => {
+      openModal('leads-details');
+    }, 500);
   }, [setCurrentCompany, setCurrentLead, setSelectedCategory]);
 
 
@@ -454,8 +461,6 @@ const Leads = () => {
                     <button
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                       id="add-task"
-                      data-bs-toggle="modal"
-                      data-bs-target="#add_lead"
                       onClick={handleAddNewLeadClicked}
                     >
                       {t('lead.add_lead')}

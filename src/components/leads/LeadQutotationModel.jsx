@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useSetRecoilState, useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
+
+import { SettingsRepo } from "../../repository/settings";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { formatDate, ConvertCurrency } from "../../constants/functions";
 import { Add } from "@mui/icons-material";
@@ -19,20 +20,19 @@ const LeadQuotationModel = ({ handleInitAddQuotation }) => {
     const setCurrentQuotation = useSetRecoilState(atomCurrentQuotation);
 
 
+    //===== [RecoilState] Related with Users ==========================================
+    const { openModal } = useRecoilValue(SettingsRepo);
+
+
     //===== Handles to deal this component =================================================
     const [selectedKeys, setSelectedRowKeys] = useState([]);
     
-    const transferToOtherModal = (id) => {
-        let myModal = new bootstrap.Modal(document.getElementById(id), {
-            keyboard: true
-        });
-        myModal.show();
-    };
-
-    const handleAddNewConsulting = () => {
-        console.log('[LeadQuotationModel] handleAddNewQuotation');
+    const handleAddNewQuotataion = () => {
+        setCurrentQuotation(defaultQuotation);
         handleInitAddQuotation(true);
-        transferToOtherModal('add_quotation');
+        setTimeout(() => {
+            openModal('add_quotation');
+        }, 500);
     };
 
     const columns_quotation = [
@@ -131,7 +131,7 @@ const LeadQuotationModel = ({ handleInitAddQuotation }) => {
                                     }}
                                 >
                                     <div>{t('quotation.quotation_information')}</div>
-                                    <Add onClick={() => handleAddNewConsulting()} />
+                                    <Add onClick={() => handleAddNewQuotataion()} />
                                 </div>
                             }
                             onRow={(record, rowIndex) => {
@@ -139,8 +139,10 @@ const LeadQuotationModel = ({ handleInitAddQuotation }) => {
                                     onClick: (event) => {
                                         setSelectedRowKeys([record.quotation_code]);
                                         setCurrentQuotation(record);
-                                        transferToOtherModal('quotation-details');
                                         setSelectedRowKeys([]);   //initialize the selected list about contract
+                                        setTimeout(() => {
+                                            openModal('quotation-details');
+                                        }, 500);
                                     }, // click row
                                 };
                             }}

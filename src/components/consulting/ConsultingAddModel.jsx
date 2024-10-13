@@ -3,7 +3,6 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "react-datepicker/dist/react-datepicker.css";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import * as DOMPurify from "dompurify";
 
 import {
@@ -27,6 +26,7 @@ import {
 } from "../../repository/consulting";
 import { CompanyRepo } from "../../repository/company";
 import { AttachmentRepo } from "../../repository/attachment";
+import { SettingsRepo } from "../../repository/settings";
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddSearchItem from "../../constants/AddSearchItem";
@@ -59,6 +59,10 @@ const ConsultingAddModel = (props) => {
   const usersForSelection = useRecoilValue(atomUsersForSelection);
   const engineersForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
+
+
+  //===== [RecoilState] Related with Users ============================================
+  const { openModal, closeModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to attachment ========================================
@@ -394,19 +398,9 @@ const ConsultingAddModel = (props) => {
 
   const handlePopupOpen = (open) => {
     if(open) {
-      const thisModal = bootstrap.Modal.getInstance("#add_consulting");
-      if(thisModal) {
-        thisModal._focustrap.deactivate();
-      } else {
-        console.log('[ConsultingAddModel] fail to get THIS MODAL instance!');
-      };
+      openModal('antModal');
     } else {
-      const thisModal = bootstrap.Modal.getInstance("#add_consulting");
-      if(thisModal) {
-        thisModal._focustrap.activate();
-      } else {
-        console.log('[ConsultingAddModel] fail to get THIS MODAL instance!');
-      };
+      closeModal();
     }
   };
 
@@ -484,8 +478,7 @@ const ConsultingAddModel = (props) => {
     const result = modifyConsulting(newConsultingData);
     result.then((res) => {
       if (res.result) {
-        let thisModal = bootstrap.Modal.getInstance('#add_consulting');
-        if (thisModal) thisModal.hide();
+        closeModal();
         handleClose();
       } else {
         setMessage({ title: '저장 실패', message: '정보 저장에 실패하였습니다.' });
@@ -496,13 +489,15 @@ const ConsultingAddModel = (props) => {
 
   const handleClose = () => {
     setNeedInit(true);
+    setTimeout(() => {
+      closeModal();
+    }, 500);
   };
 
 
   //===== useEffect functions ==========================================
   useEffect(() => {
     if (open && needInit && ((userState & 1) === 1)) {
-      console.log('[ConsultingAddModel] initialize!');
       if (handleOpen) handleOpen(!open);
       initializeConsultingTemplate();
     };
@@ -526,9 +521,7 @@ const ConsultingAddModel = (props) => {
         <button
           type="button"
           className="close md-close"
-          data-bs-dismiss="modal"
           aria-label="Close"
-          onClick={handleClose}
         >
           <span aria-hidden="true">×</span>
         </button>
@@ -538,7 +531,6 @@ const ConsultingAddModel = (props) => {
             <button
               type="button"
               className="btn-close"
-              data-bs-dismiss="modal"
               onClick={handleClose}
             ></button>
           </div>
@@ -727,7 +719,6 @@ const ConsultingAddModel = (props) => {
                 <button
                   type="button"
                   className="btn btn-secondary btn-rounded"
-                  data-bs-dismiss="modal"
                   onClick={handleClose}
                 >
                   {t('common.cancel')}

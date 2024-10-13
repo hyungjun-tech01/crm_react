@@ -3,7 +3,6 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { useTranslation } from "react-i18next";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { CompanyRepo } from "../../repository/company";

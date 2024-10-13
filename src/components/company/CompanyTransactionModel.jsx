@@ -4,11 +4,11 @@ import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Add } from "@mui/icons-material";
 
 import { atomTransactionByCompany, defaultTransaction } from '../../atoms/atoms';
 import { TransactionRepo } from '../../repository/transaction';
+import { SettingsRepo } from '../../repository/settings';
 
 const CompanyTransactionModel = (props) => {
     const { openTransaction } = props;
@@ -18,23 +18,21 @@ const CompanyTransactionModel = (props) => {
     //===== [RecoilState] Related with Transaction ======================================
     const transactionByCompany = useRecoilValue(atomTransactionByCompany);
     const { setCurrentTransaction } = useRecoilValue(TransactionRepo);
+
+
+    //===== [RecoilState] Related with Settings ======================================
+    const { openModal } = useRecoilValue(SettingsRepo);
+    
     
     // --- Variables for only Transaction ------------------------------------------------
     const [selectedTransactionRowKeys, setSelectedTransactionRowKeys] = useState([]);
-
-    const transferToOtherModal = (id) => {
-        let myModal = new bootstrap.Modal(document.getElementById(id), {
-            keyboard: true
-        });
-        myModal.show();
-    };
 
     const handleSelectTransaction = (value) => {
         setCurrentTransaction(value.transaction_code);
         openTransaction(true);
         
         setTimeout(()=>{
-            transferToOtherModal('edit_transaction');
+            openModal('edit_transaction');
         }, 500);
     };
 
@@ -43,7 +41,7 @@ const CompanyTransactionModel = (props) => {
         openTransaction(true);
 
         setTimeout(()=>{
-            transferToOtherModal('edit_transaction');
+            openModal('edit_transaction');
         }, 500);
     };
 
@@ -117,7 +115,7 @@ const CompanyTransactionModel = (props) => {
     ];
 
     useEffect(() => {
-        console.log('[CompanyTransactionModel] called!');
+        // console.log('[CompanyTransactionModel] called!');
     }, [transactionByCompany]);
 
     return (

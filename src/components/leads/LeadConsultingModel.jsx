@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useSetRecoilState, useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
+import * as DOMPurify from "dompurify";
+
+import { SettingsRepo } from "../../repository/settings";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { Add } from "@mui/icons-material";
 
@@ -12,6 +14,10 @@ const LeadConsultingModel = ({ handleInitAddConsulting }) => {
     const { t } = useTranslation();
 
 
+    //===== [RecoilState] Related with Users ==========================================
+    const { openModal } = useRecoilValue(SettingsRepo);
+
+
     //===== [RecoilState] Related with Consulting ==========================================
     const consultingsByLead = useRecoilValue(atomConsultingByLead);
     const setCurrentConsulting = useSetRecoilState(atomCurrentConsulting);
@@ -19,18 +25,13 @@ const LeadConsultingModel = ({ handleInitAddConsulting }) => {
 
     //===== Handles to deal this component =================================================
     const [selectedKeys, setSelectedRowKeys] = useState([]);
-    
-    const transferToOtherModal = (id) => {
-        let myModal = new bootstrap.Modal(document.getElementById(id), {
-            keyboard: true
-        });
-        myModal.show();
-    };
 
     const handleAddNewConsulting = () => {
-        setCurrentConsulting(defaultConsulting);
         handleInitAddConsulting(true);
-        transferToOtherModal('add_consulting');
+        setCurrentConsulting();
+        setTimeout(() => {
+            openModal('add_consulting');
+        }, 500);
     };
     
     const columns_consulting = [
@@ -53,12 +54,18 @@ const LeadConsultingModel = ({ handleInitAddConsulting }) => {
         {
             title: t('consulting.request_type'),
             dataIndex: "request_type",
-            render: (text, record) => <>{text}</>,
+            render: (text, record) => <div style={{maxHeight: '520px', overflow: 'auto'}}
+                dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(text || ''),
+                }} />,
         },
         {
             title: t('consulting.request_content'),
             dataIndex: "request_content",
-            render: (text, record) => <>{text}</>,
+            render: (text, record) => <div style={{maxHeight: '520px', overflow: 'auto'}}
+                dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(text || ''),
+                }} />,
         },
         {
             title: t('consulting.lead_time'),
@@ -147,8 +154,10 @@ const LeadConsultingModel = ({ handleInitAddConsulting }) => {
                                     onClick: (event) => {
                                         setSelectedRowKeys([record.consulting_code]);
                                         setCurrentConsulting(record);
-                                        transferToOtherModal('consulting-details');
                                         setSelectedRowKeys([]);   //initialize the selected list about contract
+                                        setTimeout(() => {
+                                            openModal('consulting-details');    
+                                        })
                                     }, // click row
                                 };
                             }}

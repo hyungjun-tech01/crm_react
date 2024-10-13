@@ -57,7 +57,7 @@ const PurchaseDetailsModel = () => {
 
 
   //===== [RecoilState] Related with MA Contract ======================================
-  const { openModal } = useRecoilValue(SettingsRepo);
+  const { openModal, closeModal } = useRecoilValue(SettingsRepo);
 
   
   //===== Handles to deal this component ==============================================
@@ -226,11 +226,13 @@ const PurchaseDetailsModel = () => {
       }
     });
 
+    closeModal();
     setSelectedMAContractRowKeys([]);
     setIsSubModalOpen(false);
   }, [cookies.myLationCrmUserId, editedSubModalValues, modifyMAContract, modifyPurchase, orgSubModalValues, currentPurchase]);
 
   const handleSubModalCancel = () => {
+    closeModal();
     setIsSubModalOpen(false);
     setOrgSubModalValues(defaultMAContract);
     setSelectedMAContractRowKeys([]);
@@ -249,6 +251,7 @@ const PurchaseDetailsModel = () => {
       purchase_code: purchase_code,
       modify_user: cookies.myLationCrmUserId,
     });
+    openModal('antModal');
     setSubModalSetting({ title: t('contract.add_contract') });
     setIsSubModalOpen(true);
   }, [cookies.myLationCrmUserId, t]);
@@ -265,6 +268,7 @@ const PurchaseDetailsModel = () => {
         action_type: 'UPDATE',
         modify_user: cookies.myLationCrmUserId,
       });
+      openModal('antModal');
       setSubModalSetting({ title: t('contract.add_contract') });
       setIsSubModalOpen(true);
     } else {

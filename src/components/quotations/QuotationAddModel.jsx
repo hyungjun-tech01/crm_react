@@ -29,12 +29,12 @@ import {
   quotationExpiry,
   quotationPayment
 } from "../../repository/quotation";
+import { SettingsRepo } from '../../repository/settings'
 
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddSearchItem from "../../constants/AddSearchItem";
 import QuotationContentModal from "./QuotationContentModal";
 import MessageModal from "../../constants/MessageModal";
-import { render } from "@react-pdf/renderer";
 
 const defaultQuotationContent = {
   '1': null, '2': null, '3': null, '4': null, '5': null,
@@ -84,6 +84,10 @@ const QuotationAddModel = (props) => {
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
 
+  //===== [RecoilState] Related with Users ===========================================
+  const { openModal, closeModal } = useRecoilValue(SettingsRepo);
+
+
   //===== Handles to edit 'QuotationAddModel' ========================================
   const [quotationChange, setQuotationChange] = useState({ ...defaultQuotation });
   const [quotationContents, setQuotationContents] = useState([]);
@@ -91,20 +95,11 @@ const QuotationAddModel = (props) => {
   const selectedCategory = useRecoilValue(atomSelectedCategory);
 
   const handlePopupOpen = (open) => {
+    console.log('QuotationAdd / handlePopupOpen');
     if(open) {
-      const thisModal = bootstrap.Modal.getInstance("#add_quotation");
-      if(thisModal) {
-        thisModal._focustrap.deactivate();
-      } else {
-        console.log('[ConsultingAddModel] fail to get THIS MODAL instance!');
-      };
+      openModal("antModal");
     } else {
-      const thisModal = bootstrap.Modal.getInstance("#add_quotation");
-      if(thisModal) {
-        thisModal._focustrap.activate();
-      } else {
-        console.log('[ConsultingAddModel] fail to get THIS MODAL instance!');
-      };
+      closeModal();
     }
   };
 
@@ -133,7 +128,10 @@ const QuotationAddModel = (props) => {
       sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
     });
 
-    handleContentModalCancel();
+    setIsContentModalOpen(false);
+    setEditedContentModalValues({});
+    setOrgContentModalValues({});
+    setSelectedContentRowKeys([]);
 
     // load or set setting of column of table ----------------------------------
     if(!cookies.myQuotationAddColumns){
@@ -146,7 +144,6 @@ const QuotationAddModel = (props) => {
       }
       setContentColumns(tempQuotationColumn);
       setCookie('myQuotationAddColumns', tempCookieValue);
-      console.log('[QuotationAddModal] no myQuotationAddColumns :', tempCookieValue);
     } else {
       const columnSettings = cookies.myQuotationAddColumns[cookies.myLationCrmUserId];
       if(!columnSettings){
@@ -159,15 +156,12 @@ const QuotationAddModel = (props) => {
         };
         setContentColumns(tempQuotationColumn);
         setCookie('myQuotationAddColumns', tempCookieValue);
-        console.log('[QuotationAddModal] no data in myQuotationAddColumns :', tempCookieValue);
       } else {
-        console.log('[QuotationAddModal] myQuotationAddComuns data :', columnSettings);
         const tempQuotationColumn = columnSettings.map(col => ({
           ...col,
           render: defaultContentArray[col.dataIndex - 1][2]
         }));
         setContentColumns(tempQuotationColumn);
-        console.log('[QuotationAddModal] data from myQuotationAddColumns :', tempQuotationColumn);
       };
     };
 
@@ -358,7 +352,6 @@ const QuotationAddModel = (props) => {
     };
     
     setContentColumns(tempColumns);
-    console.log('handleHeaderCheckChange :', tempColumns);
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -625,7 +618,7 @@ const QuotationAddModel = (props) => {
       list_price: null,
       quotation_amount: null,
     });
-
+    
     handlePopupOpen(true);
     setEditedContentModalValues({});
     setIsContentModalOpen(true);
@@ -850,8 +843,7 @@ const QuotationAddModel = (props) => {
     const result = modifyQuotation(newQuotationData);
     result.then((res) => {
       if (res.result) {
-        let thisModal = bootstrap.Modal.getInstance('#add_quotation');
-        if (thisModal) thisModal.hide();
+        closeModal();
       } else {
         setMessage({ title: '저장 실패', message: '정보 저장에 실패하였습니다.' });
         setIsMessageModalOpen(true);
@@ -861,6 +853,7 @@ const QuotationAddModel = (props) => {
   };
 
   const handleClose = () => {
+    console.log('QuotationAdd / handleClose');
     const tempCookies = {
       ...cookies.myQuotationAddColumns,
       [cookies.myLationCrmUserId] : [
@@ -868,7 +861,9 @@ const QuotationAddModel = (props) => {
       ]
     };
     setCookie("myQuotationAddColumns", tempCookies);
-    console.log('handleClose :', tempCookies);
+    setTimeout(() => {
+      closeModal();
+    }, 500);
   };
 
 
@@ -1327,7 +1322,6 @@ const QuotationAddModel = (props) => {
                 <button
                   type="button"
                   className="btn btn-secondary btn-rounded"
-                  data-bs-dismiss="modal"
                   onClick={handleClose}
                 >
                   {t('common.cancel')}

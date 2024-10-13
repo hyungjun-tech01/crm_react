@@ -357,6 +357,10 @@ const PurchaseAddModel = (props) => {
         };
     }, [contractLists, cookies.myLationCrmUserId, t]);
 
+    const handleClose = () => {
+        closeModal();
+    };
+
     //===== useEffect functions ===========================================================
     useEffect(() => {
         if (init){
@@ -383,7 +387,6 @@ const PurchaseAddModel = (props) => {
                 <button
                     type="button"
                     className="close md-close"
-                    data-bs-dismiss="modal"
                     aria-label="Close"
                 >
                     <span aria-hidden="true">×</span>
@@ -394,7 +397,7 @@ const PurchaseAddModel = (props) => {
                         <button
                             type="button"
                             className="btn-close"
-                            data-bs-dismiss="modal"
+                            onClick={handleClose}
                         ></button>
                     </div>
                     <div className="modal-body">
@@ -562,7 +565,7 @@ const PurchaseAddModel = (props) => {
                                         <button
                                             type="button"
                                             className="btn btn-secondary btn-rounded"
-                                            data-bs-dismiss="modal"
+                                            onClick={handleClose}
                                         >
                                             {t('common.cancel')}
                                         </button>

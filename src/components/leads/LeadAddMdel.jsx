@@ -2,10 +2,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from 'react-i18next';
-import * as bootstrap from "../../assets/js/bootstrap.bundle";
 import { defaultLead } from "../../atoms/atoms";
 import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
+import { SettingsRepo } from '../../repository/settings';
 import { option_locations } from "../../constants/constants";
 
 import AddBasicItem from "../../constants/AddBasicItem";
@@ -31,6 +31,10 @@ const LeadAddModel = (props) => {
     const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
 
+    //===== [RecoilState] Related with Settings ================================================
+    const { openModal, closeModal } = useRecoilValue(SettingsRepo);
+
+
     //===== Handles to edit 'Lead Add' =====================================================
     const [ disableItems, setDisableItems ] = useState(false);
     const [ leadChange, setLeadChange ] = useState({...defaultLead});
@@ -54,6 +58,22 @@ const LeadAddModel = (props) => {
     const handleCompanySelected = (data) => {
         setLeadChange(data);
         setDisableItems(true);
+    };
+
+    const handlePopupOpen = (open) => {
+        if(open) {
+            openModal('antModal');
+        } else {
+          closeModal();
+        }
+    };
+
+    const handleClose = () => {
+        initializeLeadTemplate();
+        handleInit(false);
+        setTimeout(() => {
+          closeModal();
+        }, 500);
     };
 
     const initializeLeadTemplate = useCallback(() => {
@@ -126,8 +146,7 @@ const LeadAddModel = (props) => {
         resp.then(res => {
             if (res.result) {
                 initializeLeadTemplate();
-                let thisModal = bootstrap.Modal.getInstance('#add_lead');
-                if(thisModal) thisModal.hide();
+                closeModal();
             } else {
                 const tempMsg = {
                     title: t('comment.title_check'),
@@ -164,7 +183,6 @@ const LeadAddModel = (props) => {
                 <button
                     type="button"
                     className="close md-close"
-                    data-bs-dismiss="modal"
                     aria-label="Close"
                 >
                     <span aria-hidden="true">×</span>
@@ -175,7 +193,7 @@ const LeadAddModel = (props) => {
                         <button
                             type="button"
                             className="btn-close"
-                            data-bs-dismiss="modal"
+                            onClick={handleClose}
                         ></button>
                     </div>
                     <div className="modal-body">
@@ -226,6 +244,7 @@ const LeadAddModel = (props) => {
                                             defaultValue={leadChange.company_name}
                                             edited={leadChange}
                                             setEdited={handleCompanySelected}
+                                            handleOpen={handlePopupOpen}
                                         />
                                         <AddBasicItem
                                             title={t('common.site_id')}
@@ -367,8 +386,7 @@ const LeadAddModel = (props) => {
                                         <button
                                             type="button"
                                             className="btn btn-secondary btn-rounded"
-                                            data-bs-dismiss="modal"
-                                            onClick={initializeLeadTemplate}
+                                            onClick={handleClose}
                                         >
                                             {t('common.cancel')}
                                         </button>

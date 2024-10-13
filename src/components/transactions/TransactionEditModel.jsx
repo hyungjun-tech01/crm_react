@@ -4,7 +4,6 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import "antd/dist/reset.css";
 import { Button, Checkbox, Col, Input, InputNumber, Row, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
@@ -22,6 +21,8 @@ import {
   defaultTransaction,
 } from "../../atoms/atoms";
 import { DefaultTransactionContent, TransactionRepo } from "../../repository/transaction";
+import { SettingsRepo } from "../../repository/settings";
+
 import AddSearchItem from "../../constants/AddSearchItem";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
 import TransactionContentModal from "./TransactionContentModal";
@@ -69,6 +70,10 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
   //===== [RecoilState] Related with Company =========================================
   const companyState = useRecoilValue(atomCompanyState);
   const currentCompany = useRecoilValue(atomCurrentCompany);
+
+
+  //===== [RecoilState] Related with Company =========================================
+  const { openModal, closeModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to edit 'TransactionEditModel' ======================================
@@ -258,6 +263,8 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
       ...dataForTransaction,
       title: t('quotation.add_content'),
     };
+
+    openModal('antModal');
     setDataForTransaction(tempData);
     setOrgContentModalData({ ...DefaultTransactionContent });
     setEditedContentModalData({});
@@ -281,6 +288,8 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
       ...data,
       transaction_date: trans_date,
     };
+
+    openModal('antModal');
     setOrgContentModalData(contentData);
     setEditedContentModalData({});
     setIsContentModalOpen(true);
@@ -296,7 +305,6 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
     const monthDay = `${editedContentModalData.transaction_date.getMonth() - 1}
       .${editedContentModalData.transaction_date.getDate()}`;
 
-    setIsContentModalOpen(false);
     const tempContent = {
       ...orgContentModalData,
       ...editedContentModalData,
@@ -310,6 +318,7 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
     delete tempContent.transaction_date;
     delete tempContent.product_class_name;
 
+    closeModal();
     const tempContents = transactionContents.concat(tempContent);
     setTransactionContents(tempContents);
     handleAmountCalculation(tempContents);
@@ -319,6 +328,7 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
   };
 
   const handleContentModalCancel = () => {
+    closeModal();
     setIsContentModalOpen(false);
     setEditedContentModalData({});
     setOrgContentModalData({});
@@ -450,10 +460,12 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
   };
 
   const handleStartEditReceipt = () => {
+    openModal('antModal');
     setIsReceiptModalOpen(true);
   };
 
   const handleReceiptModalOk = () => {
+    closeModal();
     setIsReceiptModalOpen(false);
     const tempOrgData = {
       ...orgReceiptModalData,
@@ -495,6 +507,7 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
   };
 
   const handleReceiptModalCancel = () => {
+    closeModal();
     setIsReceiptModalOpen(false);
     setEditedReceiptModalData({});
   };
@@ -608,10 +621,7 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
     openTaxInvoice();
 
     setTimeout(() => {
-      let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
-        keyboard: true
-      });
-      myModal.show();
+      openModal('edit_tax_invoice');
     }, 500);
   };
 
@@ -676,8 +686,7 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
           setTransactionContents(updatedContents);
         };
 
-        let thisModal = bootstrap.Modal.getInstance('#edit_transaction');
-        if (thisModal) thisModal.hide();
+        closeModal();
 
         if (value === 'Invoice') {
           handleShowInvoice();
@@ -719,7 +728,10 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
       setSelectedCategory({ category: null, item_code: null });
     };
     handleInitialize();
-    close();
+    closeModal();
+    setTimeout(() => {
+      close();
+    }, 500);
   };
 
   //===== useEffect ==============================================================
@@ -799,9 +811,7 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
         <button
           type="button"
           className="close md-close"
-          data-bs-dismiss="modal"
           aria-label="Close"
-          onClick={handleClose}
         >
           <span aria-hidden="true">×</span>
         </button>
@@ -811,7 +821,6 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
             <button
               type="button"
               className="btn-close"
-              data-bs-dismiss="modal"
               onClick={handleClose}
             ></button>
           </div>

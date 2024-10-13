@@ -20,6 +20,7 @@ import AddBasicItem from "../../constants/AddBasicItem";
 import AddAddressItem from "../../constants/AddAddressItem";
 import MessageModal from "../../constants/MessageModal";
 
+
 const CompanyAddModel = (props) => {
   const { init, handleInit } = props;
   const { t } = useTranslation();
@@ -40,6 +41,7 @@ const CompanyAddModel = (props) => {
 
   //===== [RecoilState] Related with Users ============================================
   const { closeModal } = useRecoilValue(SettingsRepo);
+
 
   //===== Handles to edit 'CompanyAddModel' ===========================================
   const [companyChange, setCompanyChange] = useState({ ...defaultCompany });
@@ -151,6 +153,13 @@ const CompanyAddModel = (props) => {
     });
   };
 
+  const handleClose = () => {
+    initializeCompanyTemplate();
+    setTimeout(() => {
+      closeModal();
+    }, 500);
+  };
+
   useEffect(() => {
     if (init && (userState & 1) === 1) {
       // console.log("[CompanyAddModel] initialzie!");
@@ -176,7 +185,6 @@ const CompanyAddModel = (props) => {
         <button
           type="button"
           className="close md-close"
-          data-bs-dismiss="modal"
           aria-label="Close"
         >
           <span aria-hidden="true">×</span>
@@ -189,7 +197,7 @@ const CompanyAddModel = (props) => {
             <button
               type="button"
               className="btn-close"
-              data-bs-dismiss="modal"
+              onClick={handleClose}
             ></button>
           </div>
           <div className="modal-body">
@@ -409,7 +417,7 @@ const CompanyAddModel = (props) => {
                       type="button"
                       className="btn btn-secondary btn-rounded"
                       data-bs-dismiss="modal"
-                      onClick={initializeCompanyTemplate}
+                      onClick={handleClose}
                     >
                       {t("common.cancel")}
                     </button>

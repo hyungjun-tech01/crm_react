@@ -92,7 +92,7 @@ export const ConsultingRepo = selector({
         const tryLoadAllConsultings = getCallback(({ set, snapshot }) => async (multiQueryCondi) => {
             const loadStates = await snapshot.getPromise(atomConsultingState);
             if((loadStates & 3) === 0){
-                console.log('[tryLoadAllConsultings] Try to load all Consultings');
+                // console.log('[tryLoadAllConsultings] Try to load all Consultings');
                 set(atomConsultingState, (loadStates | 2));   // state : loading
                 const ret = await loadAllConsultings(multiQueryCondi);
                 if(ret){
@@ -107,7 +107,7 @@ export const ConsultingRepo = selector({
         const loadAllConsultings = getCallback(({set}) => async (multiQueryCondi) => {
             const input_json = JSON.stringify(multiQueryCondi);
             try{
-                console.log('[ConsultingRepository] Try loading all')
+                // console.log('[ConsultingRepository] Try loading all')
                 const response = await fetch(`${BASE_PATH}/consultings`,{
                     method: "POST",
                     headers:{'Content-Type':'application/json'},
@@ -360,7 +360,6 @@ export const ConsultingRepo = selector({
 
                 // Chack attachment code and load attachment info.
                 if(!!foundConsulting) {
-                    console.log('Check if this consulting has attachment(s)');
                     if(foundConsulting.request_attachment_code && foundConsulting.request_attachment_code !== ''){
                         set(atomRequestAttachmentCode, foundConsulting.request_attachment_code);
 
@@ -375,8 +374,6 @@ export const ConsultingRepo = selector({
                             console.log('Error to set request attachment :', data.message);
                             return;
                         };
-                        console.log(`This has ${data.length} of attachment for request`);
-                        console.log(`- Data : `, data);
                         set(atomRequestAttachments, data);
                     };
                     if(foundConsulting.action_attachment_code && foundConsulting.action_attachment_code !== ''){
@@ -394,7 +391,6 @@ export const ConsultingRepo = selector({
                             return;
                         };
                         set(atomActionAttachments, data);
-                        console.log(`This has ${data.length} of attachment for action`);
                     };
                 } else {
                     set(atomRequestAttachments, []);  //default

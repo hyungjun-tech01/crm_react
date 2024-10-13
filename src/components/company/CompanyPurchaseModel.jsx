@@ -101,7 +101,7 @@ const CompanyPurchaseModel = (props) => {
 
 
     useEffect(() => {
-        console.log('[CompanyPurchaseModel] called!');
+        // console.log('[CompanyPurchaseModel] called!');
     }, [purchaseByCompany]);
 
     return (
