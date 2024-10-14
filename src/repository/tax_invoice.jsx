@@ -44,7 +44,6 @@ export const TaxInvoiceRepo = selector({
         const tryLoadTaxInvoices = getCallback(({ set, snapshot }) => async (multiQueryCondi) => {
             const loadStates = await snapshot.getPromise(atomTaxInvoiceState);
             if((loadStates & 3) === 0){
-                // console.log('[tryLoadTaxInvoices] Try to load all TaxInvoices');
                 set(atomTaxInvoiceState, (loadStates | 2));   // state : loading
                 const ret = await loadAllTaxInvoices(multiQueryCondi);
                 if(ret){
@@ -59,7 +58,6 @@ export const TaxInvoiceRepo = selector({
         const loadAllTaxInvoices = getCallback(({ set }) => async (multiQueryCondi) => {
             const input_json = JSON.stringify(multiQueryCondi);
             try {
-                // console.log('[TaxInvoiceRepository] Try loading all')
                 const response = await fetch(`${BASE_PATH}/taxInvoice`, {
                     method: "POST",
                     headers:{'Content-Type':'application/json'},
@@ -128,7 +126,6 @@ export const TaxInvoiceRepo = selector({
         });
         const modifyTaxInvoice = getCallback(({ set, snapshot }) => async (newTaxInvoice) => {
             const input_json = JSON.stringify(newTaxInvoice);
-            // console.log(`[ modifyTaxInvoice ] input : `, input_json);
             try {
                 const response = await fetch(`${BASE_PATH}/modifyTaxInvoice`, {
                     method: "POST",

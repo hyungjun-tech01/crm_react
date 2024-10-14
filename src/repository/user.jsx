@@ -36,7 +36,6 @@ export async function apiLoginValidate(userId, password) {
         });
         let responseMessage = await response.json();
         responseMessage = { ...responseMessage };
-        console.log('responseMessage', responseMessage);
         return (responseMessage);
     } catch (err) {
         console.error(err);
@@ -60,7 +59,6 @@ export async function apiRegister(userId, userName, Email, password) {
 
         const responseData = await response.json();
         if (responseData.message) {
-            console.log('responseMessage', responseData.message);
             return responseData;
         }
 
@@ -78,7 +76,6 @@ export const UserRepo = selector({
         const tryLoadAllUsers = getCallback(({ set, snapshot }) => async () => {
             const loadStates = await snapshot.getPromise(atomUserState);
             if((loadStates & 3) === 0){
-                console.log('[tryLoadAllUsers] Try to load all users');
                 set(atomUserState, (loadStates | 2));   // state : loading
                 const ret = await loadAllUsers();
                 if(ret){
@@ -93,7 +90,6 @@ export const UserRepo = selector({
         /////////////////////load all Users /////////////////////////////
         const loadAllUsers = getCallback(({ set }) => async () => {
             try {
-                console.log('[UserRepository] Try loading all');
                 const response = await fetch(`${BASE_PATH}/getallusers`);
                 const data = await response.json();
                 if (data.message) {
@@ -197,7 +193,6 @@ export const UserRepo = selector({
         /////////////////////modify User /////////////////////////////
         const modifyUser = getCallback(({ set, snapshot }) => async (newUser) => {
             const input_json = JSON.stringify(newUser);
-            console.log(`[ modifyUser ] input : `, input_json);
             try {
                 const response = await fetch(`${BASE_PATH}/modifyUser`, {
                     method: "POST",
@@ -211,7 +206,7 @@ export const UserRepo = selector({
                 };
 
                 if (newUser.action_type === 'UPDATE_PASSWORD') {
-                    console.log('modified password', );
+                    // console.log('modified password', );
                     return true;
                 }
 
@@ -279,7 +274,7 @@ export const UserRepo = selector({
                         };
                     };
 
-                    console.log('modifiedUser', atomCurrentUser, modifiedUser);
+                    // console.log('modifiedUser', atomCurrentUser, modifiedUser);
 
                     return (true);
                 }

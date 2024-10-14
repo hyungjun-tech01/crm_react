@@ -29,7 +29,6 @@ export const PurchaseRepo = selector({
         const tryLoadAllPurchases = getCallback(({ set, snapshot }) => async (multiQueryCondi) => {
             const loadStates = await snapshot.getPromise(atomPurchaseState);
             if((loadStates & 3) === 0){
-                console.log('[tryLoadAllPurchases] Try to load all Purchases');
                 set(atomPurchaseState, (loadStates | 2));   // state : loading
                 const ret = await loadAllPurchases(multiQueryCondi);
                 if(ret){

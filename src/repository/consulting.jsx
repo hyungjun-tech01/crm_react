@@ -92,7 +92,6 @@ export const ConsultingRepo = selector({
         const tryLoadAllConsultings = getCallback(({ set, snapshot }) => async (multiQueryCondi) => {
             const loadStates = await snapshot.getPromise(atomConsultingState);
             if((loadStates & 3) === 0){
-                // console.log('[tryLoadAllConsultings] Try to load all Consultings');
                 set(atomConsultingState, (loadStates | 2));   // state : loading
                 const ret = await loadAllConsultings(multiQueryCondi);
                 if(ret){
@@ -107,7 +106,6 @@ export const ConsultingRepo = selector({
         const loadAllConsultings = getCallback(({set}) => async (multiQueryCondi) => {
             const input_json = JSON.stringify(multiQueryCondi);
             try{
-                // console.log('[ConsultingRepository] Try loading all')
                 const response = await fetch(`${BASE_PATH}/consultings`,{
                     method: "POST",
                     headers:{'Content-Type':'application/json'},

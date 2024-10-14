@@ -23,7 +23,6 @@ export const MAContractRepo = selector({
         
         const loadCompanyMAContracts = getCallback(({set, snapshot}) => async (code) => {
             const input_json = JSON.stringify({company_code: code});
-            console.log(`[ loadCompanyMAContracts ] input : `, input_json);
             try{
                 const response = await fetch(`${BASE_PATH}/companyMaContract`, {
                     method: "POST",
@@ -50,7 +49,6 @@ export const MAContractRepo = selector({
         });
         const loadPurchaseMAContracts = getCallback(({set, snapshot}) => async (code) => {
             const input_json = JSON.stringify({purchase_code: code});
-            console.log(`[ loadPurchaseMAContracts ] input : `, input_json);
             try{
                 const response = await fetch(`${BASE_PATH}/purchaseMaContract`, {
                     method: "POST",

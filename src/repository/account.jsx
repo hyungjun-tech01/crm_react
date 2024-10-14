@@ -35,7 +35,6 @@ export const AccountRepo = selector({
         /////////////////////modify User /////////////////////////////
         const modifyAccount = getCallback(({ set, snapshot }) => async (newAccount) => {
             const input_json = JSON.stringify(newAccount);
-            console.log(`[ modifyCompany ] input : `, input_json);
             try {
                 const response = await fetch(`${BASE_PATH}/modifyUser`, {
                     method: "POST",
