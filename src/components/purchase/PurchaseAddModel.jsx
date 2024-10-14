@@ -55,7 +55,6 @@ const PurchaseAddModel = (props) => {
 
     //===== Handles to edit 'Purchase Add' =================================================
     const [purchaseChange, setPurchaseChange] = useState({});
-    const [companyData, setCompanyData] = useState({ company_name: '', company_code: '', company_name_en: '' });
     const [needInit, setNeedInit] = useState(false);
     const selectedCategory = useRecoilValue(atomSelectedCategory);
 
@@ -70,16 +69,11 @@ const PurchaseAddModel = (props) => {
     const handleSelectChange = useCallback((name, selected) => {
         let modifiedData = null;
         if (name === 'company_name') {
-            const tempCompany = {
+            modifiedData = {
+                ...purchaseChange,
                 company_code: selected.value.company_code,
                 company_name: selected.value.company_name,
                 company_name_en: selected.value.company_name_en,
-            };
-            setCompanyData(tempCompany);
-
-            modifiedData = {
-                ...purchaseChange,
-                ...tempCompany,
             };
         }
         else if (name === 'product_name') {
@@ -117,11 +111,6 @@ const PurchaseAddModel = (props) => {
         ){
             setPurchaseChange({
                 ...defaultPurchase,
-                company_code: currentCompany.company_code,
-                company_name: currentCompany.company_name,
-                company_name_en: currentCompany.company_name_en,
-            });
-            setCompanyData({
                 company_code: currentCompany.company_code,
                 company_name: currentCompany.company_name,
                 company_name_en: currentCompany.company_name_en,
@@ -399,10 +388,10 @@ const PurchaseAddModel = (props) => {
                                             title={t('company.company_name')}
                                             category='purchase'
                                             name='company_name'
-                                            defaultValue={companyData.company_name}
+                                            defaultValue={purchaseChange.company_name}
                                             required
                                             long
-                                            edited={companyData}
+                                            edited={purchaseChange}
                                             setEdited={setPurchaseChange}
                                         />
                                     </div>
