@@ -12,7 +12,7 @@ import {
   atomQuotationByLead,
   atomSelectedCategory,
 } from "../../atoms/atoms";
-import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
+import { atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo } from "../../repository/company";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { ConsultingRepo } from "../../repository/consulting";
@@ -39,9 +39,6 @@ import PurchaseAddModel from "../purchase/PurchaseAddModel";
 const LeadDetailsModel = ({init, handleInit}) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
-  const [checkState,  setCheckState] = useState({
-    purchase: false, consulting: false, quotation: false,
-  });
 
 
   //===== [RecoilState] Related with Lead ==========================================
@@ -71,7 +68,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
 
 
   //===== [RecoilState] Related with Users ==========================================
-  const userState = useRecoilValue(atomUserState);
   const engineersForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
@@ -96,7 +92,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
 
 
   //===== Handles to edit 'Lead Details' ===============================================
-  // const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
   const [editedDetailValues, setEditedDetailValues] = useState({});
 
   const handleDetailChange = useCallback((e) => {
@@ -175,23 +170,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
         delete editedDetailValues['status'];
       };
     };
-
-    // const tempEdited = {
-    //   status: newStatus,
-    //   action_type: "UPDATE",
-    //   modify_user: cookies.myLationCrmUserId,
-    //   lead_code: selectedLead.lead_code,
-    // };
-
-    // console.log('tempEdited', tempEdited);
-    // const resp = modifyLead(tempEdited);
-    // resp.then(res => {
-    //   if (res.result) {
-    //     console.log(`Succeeded to lead change status`);
-    //   } else {
-    //     console.error('Failed to modify lead : ', res.data);
-    //   };
-    // })
   };
 
   const handlePopupOpen = (open) => {
@@ -202,16 +180,17 @@ const LeadDetailsModel = ({init, handleInit}) => {
     }
   };
 
-  const handleClose = useCallback(() => {
-    closeModal();
-    setSelectedCategory({category: null, item_code: null});
+  const handleInitialize = () => {
     setEditedDetailValues(null);
-    setCurrentLead();
-    setCurrentLeadCode('');
+  };
+  const handleClose = useCallback(() => {
+    // setSelectedCategory({category: null, item_code: null});
+    // setCurrentLead();
+    // setCurrentLeadCode('');
     setTimeout(() => {
       closeModal();
     }, 500);
-  }, [setCurrentLead]);
+  }, []);
 
   const handleSaveAll = useCallback(() => {
     if (editedDetailValues !== null
@@ -337,38 +316,31 @@ const LeadDetailsModel = ({init, handleInit}) => {
 
   //===== useEffect functions ===============================================  
   useEffect(() => {
-    if (init
-      && (selectedLead !== defaultLead)
-      && (selectedLead.lead_code !== currentLeadCode)
-    ) {
-      // console.log('[LeadDetailsModel] new lead is loaded');
-
+    if (init) {
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {
-        localStorage.setItem("isFullScreen", '0');
+        localStorage.setItem("isFullScreen", "0");
         setIsFullScreen(false);
-      } else if (detailViewStatus === '0') {
+      } else if (detailViewStatus === "0") {
         setIsFullScreen(false);
       } else {
         setIsFullScreen(true);
       };
-      
+
+      if ((selectedLead === defaultLead)
+        || (selectedLead.lead_code === currentLeadCode)
+      ) {
+        handleInit(false);
+        return;
+      }
+      // console.log('[LeadDetailsModel] new lead is loaded');
       setCurrentCompany(selectedLead.company_code);
       loadCompanyMAContracts(selectedLead.company_code);
       setCurrentLeadCode(selectedLead.lead_code);
-      setCheckState({purchase:false, consulting:false, quotation:false});
-    };
-  }, [selectedLead, currentLeadCode, setCurrentCompany, loadCompanyMAContracts]);
 
-  //===== useEffect for Purchase =======================================================
-  useEffect(() => {
-    if(!!selectedLead.company_code  && !checkState.purchase) {
-      setCheckState({
-        ...checkState,
-        purchase: true,
-      });
-      const queryPromise = searchPurchases('company_code', selectedLead.company_code, true);
-      queryPromise
+      // load company of selected lead -----------
+      const queryCompany = searchPurchases('company_code', selectedLead.company_code, true);
+      queryCompany
         .then(res => {
           if(res.result) {
             setPurchasesByCompany(res.data);
@@ -385,18 +357,10 @@ const LeadDetailsModel = ({init, handleInit}) => {
             setValidMACount(0);
           };
         });
-    }
-  }, [selectedLead.company_code, searchPurchases, checkState]);
 
-  //===== useEffect for Consulting =======================================================
-  useEffect(() => {
-    if(!!selectedLead.lead_code  && !checkState.consulting) {
-      setCheckState({
-        ...checkState,
-        consulting: true,
-      });
-      const queryPromise = searchConsultings('lead_code', selectedLead.lead_code, true);
-      queryPromise
+      // load consulting of selected lead -----------
+      const queryConsulting = searchConsultings('lead_code', selectedLead.lead_code, true);
+      queryConsulting
         .then(res => {
           if(res.result) {
             setConsultingsByLead(res.data);
@@ -405,18 +369,10 @@ const LeadDetailsModel = ({init, handleInit}) => {
             setConsultingsByLead([]);
           };
         });
-    };
-  }, [checkState, searchConsultings, selectedLead.lead_code]);
 
-  //===== useEffect for Quotation =======================================================
-  useEffect(() => {
-    if(!!selectedLead.lead_code  && !checkState.quotation) {
-      setCheckState({
-        ...checkState,
-        quotation: true,
-      });
-      const queryPromise = searchQuotations('lead_code', selectedLead.lead_code, true);
-      queryPromise
+      // load quotation of selected lead -----------
+      const queryQuotation = searchQuotations('lead_code', selectedLead.lead_code, true);
+      queryQuotation
         .then(res => {
           if(res.result) {
             setQuotationsByLead(res.data);
@@ -425,17 +381,12 @@ const LeadDetailsModel = ({init, handleInit}) => {
             setQuotationsByLead([]);
           };
         });
-    };
-  }, [checkState, searchQuotations, selectedLead.lead_code]);
 
-  useEffect(() => {
-    if (init && checkState.purchase && checkState.consulting && checkState.quotation
-      && ((userState & 1) === 1)
-    ) {
-      // console.log('[LeadDetailModel] all needed data is loaded');
+      handleInitialize();
       handleInit(false);
     };
-  }, [init, userState, checkState, handleInit]);
+  }, [selectedLead, currentLeadCode, setCurrentCompany, loadCompanyMAContracts]);
+  
 
   if (init)
     return <div>&nbsp;</div>;
@@ -449,223 +400,224 @@ const LeadDetailsModel = ({init, handleInit}) => {
         role="dialog"
         aria-modal="true"
       >
-        <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
-          <div className="modal-content">
-            <div className="modal-header">
-              <div className="row w-100">
-                <div className="col-md-1 account d-flex">
-                  <div className="company_img">
-                    <Avatar size={48}>{selectedLead.lead_name === null ? "" : (selectedLead.lead_name).substring(0, 1)}</Avatar>
+        {!init && 
+          <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <div className="row w-100">
+                  <div className="col-md-1 account d-flex">
+                    <div className="company_img">
+                      <Avatar size={48}>{selectedLead.lead_name === null ? "" : (selectedLead.lead_name).substring(0, 1)}</Avatar>
+                    </div>
+                  </div>
+                  <DetailTitleItem
+                    original={selectedLead}
+                    name='lead_name'
+                    title={t('lead.lead_name')}
+                    onEditing={handleDetailChange}
+                  />
+                  <DetailTitleItem
+                    original={selectedLead}
+                    name='company_name'
+                    title={t('company.company_name')}
+                    onEditing={handleDetailChange}
+                  />
+                </div>
+                <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange} />
+                <button
+                  type="button"
+                  className="btn-close xs-close"
+                  onClick={handleClose}
+                />
+              </div>
+              <div className="modal-body">
+                <div className="row">
+                  <div className="col-md-12">
+                    <ul
+                      className="cd-breadcrumb triangle nav nav-tabs w-100 crms-steps"
+                      role="tablist"
+                    >
+                      <li role="presentation"  style={{ flex: 1, textAlign: "center" }}>
+                        <Link
+                          to="#on-time"
+                          className={selectedLead.status === "Not On Time" || selectedLead.status === null ? "active" : "inactive"}
+                          style={{ width: "400px" }} 
+                          aria-controls="not-contacted"
+                          role="tab"
+                          data-bs-toggle="tab"
+                          aria-expanded={selectedLead.status === "Not On Time" ? "true" : "false"}
+                          onClick={() => handleChangeStatus("Not On Time")}
+                        >
+                          <span className="octicon octicon-light-bulb" />
+                          {t('lead.not_on_time')}
+                        </Link>
+                      </li>
+                      <li role="presentation" style={{ flex: 1, textAlign: "center" }}>
+                        <Link
+                          to="#on-time"
+                          className={selectedLead.status === "On Time" ? "active" : "inactive"}
+                          style={{ width: "400px" }} 
+                          aria-controls="not-contacted"
+                          role="tab"
+                          data-bs-toggle="tab"
+                          aria-expanded={selectedLead.status === "On Time" ? "true" : "false"}
+                          onClick={() => handleChangeStatus("On Time")}
+                        >
+                          {/* <span className="octicon octicon-diff-added" /> */}
+                          <span className="octicon octicon-light-bulb" />
+                          {t('lead.on_time')}
+                        </Link>
+                      </li>
+                      {/* <li role="presentation" className="">
+                        <Link
+                          to="#contact"
+                          className={selectedLead.status === "Contact" ? "active" : "inactive"}
+                          aria-controls="contact"
+                          role="tab"
+                          data-bs-toggle="tab"
+                          aria-expanded={selectedLead.status === "Contact" ? "true" : "false"}
+                          onClick={() => handleChangeStatus("Contact")}
+                        >
+                          <span className="octicon octicon-comment-discussion" />
+                          {t('lead.contact')}
+                        </Link>
+                      </li>
+                      <li role="presentation" className="">
+                        <Link
+                          to="#converted"
+                          className={selectedLead.status === "Converted" ? "active" : "inactive"}
+                          aria-controls="contact"
+                          role="tab"
+                          data-bs-toggle="tab"
+                          aria-expanded={selectedLead.status === "Converted" ? "true" : "false"}
+                          onClick={() => handleChangeStatus("Converted")}
+                        >
+                          <span className="octicon octicon-comment-discussion" />
+                          {t('lead.converted')}
+                        </Link>
+                      </li> */}
+                    </ul>
                   </div>
                 </div>
-                <DetailTitleItem
-                  original={selectedLead}
-                  name='lead_name'
-                  title={t('lead.lead_name')}
-                  onEditing={handleDetailChange}
-                />
-                <DetailTitleItem
-                  original={selectedLead}
-                  name='company_name'
-                  title={t('company.company_name')}
-                  onEditing={handleDetailChange}
-                />
-              </div>
-              <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange} />
-              <button
-                type="button"
-                className="btn-close xs-close"
-                onClick={handleClose}
-              />
-            </div>
-            <div className="modal-body">
-              <div className="row">
-                <div className="col-md-12">
-                  <ul
-                    className="cd-breadcrumb triangle nav nav-tabs w-100 crms-steps"
-                    role="tablist"
+                <div className="tab-content pipeline-tabs border-0">
+                  <div
+                    role="tabpanel"
+                    className="tab-pane active p-0"
                   >
-                    <li role="presentation"  style={{ flex: 1, textAlign: "center" }}>
-                      <Link
-                        to="#on-time"
-                        className={selectedLead.status === "Not On Time" || selectedLead.status === null ? "active" : "inactive"}
-                        style={{ width: "400px" }} 
-                        aria-controls="not-contacted"
-                        role="tab"
-                        data-bs-toggle="tab"
-                        aria-expanded={selectedLead.status === "Not On Time" ? "true" : "false"}
-                        onClick={() => handleChangeStatus("Not On Time")}
-                      >
-                        <span className="octicon octicon-light-bulb" />
-                        {t('lead.not_on_time')}
-                      </Link>
-                    </li>
-                    <li role="presentation" style={{ flex: 1, textAlign: "center" }}>
-                      <Link
-                        to="#on-time"
-                        className={selectedLead.status === "On Time" ? "active" : "inactive"}
-                        style={{ width: "400px" }} 
-                        aria-controls="not-contacted"
-                        role="tab"
-                        data-bs-toggle="tab"
-                        aria-expanded={selectedLead.status === "On Time" ? "true" : "false"}
-                        onClick={() => handleChangeStatus("On Time")}
-                      >
-                        {/* <span className="octicon octicon-diff-added" /> */}
-                        <span className="octicon octicon-light-bulb" />
-                        {t('lead.on_time')}
-                      </Link>
-                    </li>
-                    {/* <li role="presentation" className="">
-                      <Link
-                        to="#contact"
-                        className={selectedLead.status === "Contact" ? "active" : "inactive"}
-                        aria-controls="contact"
-                        role="tab"
-                        data-bs-toggle="tab"
-                        aria-expanded={selectedLead.status === "Contact" ? "true" : "false"}
-                        onClick={() => handleChangeStatus("Contact")}
-                      >
-                        <span className="octicon octicon-comment-discussion" />
-                        {t('lead.contact')}
-                      </Link>
-                    </li>
-                    <li role="presentation" className="">
-                      <Link
-                        to="#converted"
-                        className={selectedLead.status === "Converted" ? "active" : "inactive"}
-                        aria-controls="contact"
-                        role="tab"
-                        data-bs-toggle="tab"
-                        aria-expanded={selectedLead.status === "Converted" ? "true" : "false"}
-                        onClick={() => handleChangeStatus("Converted")}
-                      >
-                        <span className="octicon octicon-comment-discussion" />
-                        {t('lead.converted')}
-                      </Link>
-                    </li> */}
-                  </ul>
-                </div>
-              </div>
-              <div className="tab-content pipeline-tabs border-0">
-                <div
-                  role="tabpanel"
-                  className="tab-pane active p-0"
-                >
-                  <div className="">
-                    <div className="task-infos">
-                      <ul className="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified">
-                        <li className="nav-item">
-                          <Link
-                            className="nav-link active"
-                            to="#sub-lead-details"
-                            data-bs-toggle="tab"
-                          >
-                            {t('lead.detail_information')}
-                          </Link>
-                        </li>
-                        <li className="nav-item">
-                          <Link
-                            className="nav-link"
-                            to="#sub-lead-purchases"
-                            data-bs-toggle="tab"
-                          >
-                            {t('purchase.product_info') + "(" + validMACount + "/" + purchaseByCompany.length + ")"}
-                          </Link>
-                        </li>
-                        <li className="nav-item">
-                          <Link
-                            className="nav-link"
-                            to="#sub-lead-consultings"
-                            data-bs-toggle="tab"
-                          >
-                            {t('lead.consulting_history') + '('} {consultingByLead.length}{')'}
-                          </Link>
-                        </li>
-                        <li className="nav-item">
-                          <Link
-                            className="nav-link"
-                            to="#sub-lead-quotation"
-                            data-bs-toggle="tab"
-                          >
-                            {t('lead.quotation_history') + '('} {quotationByLead.length}{')'}
-                          </Link>
-                        </li>
-                      </ul>
-                      <div className="tab-content">
-                        <div
-                          className="tab-pane show active p-0"
-                          id="sub-lead-details" >
-                          <div className="crms-tasks">
-                            <div className="tasks__item crms-task-item">
-                              <Space
-                                align="start"
-                                direction="horizontal"
-                                size="small"
-                                style={{ display: 'flex', marginBottom: '0.5rem' }}
-                                wrap
-                              >
-                                {lead_items_info.map((item, index) =>
-                                  <DetailCardItem
-                                    key={index}
-                                    title={t(item.title)}
-                                    defaultValue={selectedLead[item.key]}
-                                    edited={editedDetailValues}
-                                    name={item.key}
-                                    detail={item.detail}
-                                  />
-                                )}
-                              </Space>
+                    <div className="">
+                      <div className="task-infos">
+                        <ul className="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified">
+                          <li className="nav-item">
+                            <Link
+                              className="nav-link active"
+                              to="#sub-lead-details"
+                              data-bs-toggle="tab"
+                            >
+                              {t('lead.detail_information')}
+                            </Link>
+                          </li>
+                          <li className="nav-item">
+                            <Link
+                              className="nav-link"
+                              to="#sub-lead-purchases"
+                              data-bs-toggle="tab"
+                            >
+                              {t('purchase.product_info') + "(" + validMACount + "/" + purchaseByCompany.length + ")"}
+                            </Link>
+                          </li>
+                          <li className="nav-item">
+                            <Link
+                              className="nav-link"
+                              to="#sub-lead-consultings"
+                              data-bs-toggle="tab"
+                            >
+                              {t('lead.consulting_history') + '('} {consultingByLead.length}{')'}
+                            </Link>
+                          </li>
+                          <li className="nav-item">
+                            <Link
+                              className="nav-link"
+                              to="#sub-lead-quotation"
+                              data-bs-toggle="tab"
+                            >
+                              {t('lead.quotation_history') + '('} {quotationByLead.length}{')'}
+                            </Link>
+                          </li>
+                        </ul>
+                        <div className="tab-content">
+                          <div
+                            className="tab-pane show active p-0"
+                            id="sub-lead-details" >
+                            <div className="crms-tasks">
+                              <div className="tasks__item crms-task-item">
+                                <Space
+                                  align="start"
+                                  direction="horizontal"
+                                  size="small"
+                                  style={{ display: 'flex', marginBottom: '0.5rem' }}
+                                  wrap
+                                >
+                                  {lead_items_info.map((item, index) =>
+                                    <DetailCardItem
+                                      key={index}
+                                      title={t(item.title)}
+                                      defaultValue={selectedLead[item.key]}
+                                      edited={editedDetailValues}
+                                      name={item.key}
+                                      detail={item.detail}
+                                    />
+                                  )}
+                                </Space>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="tab-pane task-related p-0"
-                          id="sub-lead-purchases" >
-                          <CompanyPurchaseModel
-                            handleInitAddPurchase={setInitAddPurchase}
-                          />
-                        </div>
-                        <div className="tab-pane task-related p-0"
-                          id="sub-lead-consultings" >
-                          <LeadConsultingModel
-                            handleInitAddConsulting={setInitAddConsulting}
-                          />
-                        </div>
-                        <div className="tab-pane task-related p-0"
-                          id="sub-lead-quotation" >
-                          <LeadQuotationModel
-                            handleInitAddQuotation={setInitAddQuotation}
-                          />
+                          <div className="tab-pane task-related p-0"
+                            id="sub-lead-purchases" >
+                            <CompanyPurchaseModel
+                              handleInitAddPurchase={setInitAddPurchase}
+                            />
+                          </div>
+                          <div className="tab-pane task-related p-0"
+                            id="sub-lead-consultings" >
+                            <LeadConsultingModel
+                              handleInitAddConsulting={setInitAddConsulting}
+                            />
+                          </div>
+                          <div className="tab-pane task-related p-0"
+                            id="sub-lead-quotation" >
+                            <LeadQuotationModel
+                              handleInitAddQuotation={setInitAddQuotation}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+                {editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&
+                  <div className="text-center py-3">
+                    <button
+                      type="button"
+                      className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                      onClick={handleSaveAll}
+                    >
+                      {t('common.save')}
+                    </button>
+                    &nbsp;&nbsp;
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-rounded"
+                      onClick={handleCancelAll}
+                    >
+                      {t('common.cancel')}
+                    </button>
+                  </div>
+                }
               </div>
-              {editedDetailValues !== null && Object.keys(editedDetailValues).length !== 0 &&
-                <div className="text-center py-3">
-                  <button
-                    type="button"
-                    className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                    onClick={handleSaveAll}
-                  >
-                    {t('common.save')}
-                  </button>
-                  &nbsp;&nbsp;
-                  <button
-                    type="button"
-                    className="btn btn-secondary btn-rounded"
-                    onClick={handleCancelAll}
-                  >
-                    {t('common.cancel')}
-                  </button>
-                </div>
-              }
             </div>
+            {/* modal-content */}
           </div>
-          {/* modal-content */}
-        </div>
-        {/* modal-dialog */}
+        }
       </div>
       <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} />
       <ConsultingDetailsModel />

@@ -3,6 +3,7 @@ import { selector } from "recoil";
 import * as bootstrap from '../assets/js/bootstrap.bundle';
 import { atomModalInfoStack } from '../atoms/atoms';
 
+
 export const SettingsRepo = selector({
     key: "SettingsRepository",
     get: ({getCallback}) => {
@@ -23,15 +24,12 @@ export const SettingsRepo = selector({
                         focus: true,
                     });
                     if(myModal){
-                        modalElement.addEventListener('keydown', (event) => {
-                            if(event.key !== 'Escape') return;
-                            closeModal();
-                        });
+                        modalElement.addEventListener('keydown', _modalEscapeKeyHandler);
                         myModal.show();  
                     };
                 };
                 const updatedModalInfoStack = modalInfoStack.concat(modalId);
-                // console.log(' - Modals in Stack :', updatedModalInfoStack);
+                console.log(' - Modals in Stack :', updatedModalInfoStack);
                 set(atomModalInfoStack, updatedModalInfoStack);
             };
         });
@@ -40,13 +38,13 @@ export const SettingsRepo = selector({
             if(modalInfoStack.length > 0){
                 const lastModalId = modalInfoStack.at(-1);
                 const lastModal = bootstrap.Modal.getInstance('#'+lastModalId);
-                // console.log('closeModal / last modal : ', lastModal);
+                console.log('closeModal / last modal : ', lastModal);
                 
                 if(lastModal){
-                    // const modalElement = document.getElementById(lastModalId);
-                    // if(modalElement) {
-                    //     modalElement.removeEventListener('keydown')
-                    // }
+                    const modalElement = document.getElementById(lastModalId);
+                    if(modalElement) {
+                        modalElement.removeEventListener('keydown', _modalEscapeKeyHandler);
+                    }
                     lastModal.hide();
                 };
                 const updatedModalInfoStack = [ ...modalInfoStack.slice(0, -1)];
@@ -57,10 +55,14 @@ export const SettingsRepo = selector({
                         nextLastModal._focustrap.activate();
                     };
                 };
-                // console.log(' - Modals in Stack :', updatedModalInfoStack);
+                console.log(' - Modals in Stack :', updatedModalInfoStack);
                 set(atomModalInfoStack, updatedModalInfoStack);
             };
         });
+        const _modalEscapeKeyHandler = (event) => {
+            if(event.key !== 'Escape') return;
+            closeModal();
+        };
         return {
             openModal,
             closeModal,

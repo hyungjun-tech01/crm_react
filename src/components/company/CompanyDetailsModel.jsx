@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
@@ -10,13 +10,11 @@ import { option_locations, option_deal_type } from "../../constants/constants";
 import {
   atomCurrentCompany,
   atomPurchaseByCompany,
-  atomSelectedCategory,
   atomTaxInvoiceByCompany,
   atomTransactionByCompany,
   defaultCompany,
 } from "../../atoms/atoms";
 import {
-  atomUserState,
   atomEngineersForSelection,
   atomSalespersonsForSelection,
 } from "../../atoms/atomsUser";
@@ -41,14 +39,11 @@ import TaxInvoiceEditModel from "../taxinvoice/TaxInvoiceEditModel";
 const CompanyDetailsModel = ({ init, handleInit }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
-  const [checkState,  setCheckState] = useState({
-    purchase: false, transaction: false, taxInvoice: false,
-  });
 
 
   //===== [RecoilState] Related with Company ==========================================
   const selectedCompany = useRecoilValue(atomCurrentCompany);
-  const { modifyCompany, setCurrentCompany } = useRecoilValue(CompanyRepo);
+  const { modifyCompany } = useRecoilValue(CompanyRepo);
 
 
   //===== [RecoilState] Related with Purchase =========================================
@@ -68,7 +63,6 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
 
 
   //===== [RecoilState] Related with Users ============================================
-  const userState = useRecoilValue(atomUserState);
   const engineerForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
@@ -84,7 +78,6 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
   const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
   const [ taxInvoiceData, setTaxInvoiceData ] = useState(null);
   const [ taxInvoiceContents, setTaxInvoiceContents ] = useState(null);
-  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const handleWindowWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -181,20 +174,21 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     selectedCompany,
   ]);
 
-  const handleDetailCancel = useCallback(() => {
+  const handleInitialize = () => {
+    console.log('handleInitialize is called');
     setEditedDetailValues(null);
-    handleClose();
-  }, []);
-
+  };
+  
   const handleClose = useCallback(() => {
-    setSelectedCategory({category: null, item_code: null});
-    setEditedDetailValues(null);
-    setCurrentCompany();
-    setCurrentCompanyCode("");
+    console.log('handleClose is called');
+    // setSelectedCategory({category: null, item_code: null});
+    // setEditedDetailValues(null);
+    // setCurrentCompany();
+    // setCurrentCompanyCode("");
     setTimeout(() => {
       closeModal();
     }, 500);
-  }, [setCurrentCompany]);
+  }, [closeModal]);
 
   const company_items_info = [
     {
@@ -322,12 +316,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
 
   //===== useEffect for Company ========================================================
   useEffect(() => {
-    if (init
-      && (selectedCompany !== defaultCompany)
-      && (selectedCompany.company_code !== currentCompanyCode)
-    ) {
-      // console.log("[CompanyDetailsModel] new company is loading!");
-
+    if (init) {
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {
         localStorage.setItem("isFullScreen", "0");
@@ -338,51 +327,39 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
         setIsFullScreen(true);
       };
 
+      if((selectedCompany === defaultCompany)
+        || (selectedCompany.company_code === currentCompanyCode)
+      ){
+        handleInit(false);
+        return;
+      };
+
       loadCompanyMAContracts(selectedCompany.company_code);
       setCurrentCompanyCode(selectedCompany.company_code);
-      setCheckState({purchase:false, transaction:false, taxInvoice:false});
-    }
-  }, [init, selectedCompany, currentCompanyCode, loadCompanyMAContracts]);
 
-  //===== useEffect for Purchase =======================================================
-  useEffect(() => {
-    if(!!selectedCompany.company_code && !checkState.purchase) {
-      setCheckState({
-        ...checkState,
-        purchase: true,
-      });
-      const queryPromise = searchPurchases('company_code', selectedCompany.company_code, true);
-      queryPromise
+      // load purchase of selected company -----------
+      const queryPurchase = searchPurchases('company_code', selectedCompany.company_code, true);
+      queryPurchase
         .then(res => {
           if(res.result) {
             setPurchasesByCompany(res.data);
+
+            let valid_count = 0;
+            res.data.forEach((item) => {
+              if (!!item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now()))
+                valid_count++;
+            });
+            setValidMACount(valid_count);
           } else {
             console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
             setPurchasesByCompany([]);
+            setValidMACount(0);
           };
         });
-    }
-  }, [checkState, searchPurchases, selectedCompany.company_code]);
 
-  //===== useEffect for Purchase =======================================================
-  useEffect(() => {
-    let valid_count = 0;
-    purchaseByCompany.forEach((item) => {
-      if (!!item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now()))
-        valid_count++;
-    });
-    setValidMACount(valid_count);
-  }, [purchaseByCompany]);
-
-  //===== useEffect for Transaction ====================================================
-  useEffect(() => {
-    if(!!selectedCompany.company_code && !checkState.transaction) {
-      setCheckState({
-        ...checkState,
-        transaction: true,
-      });
-      const queryPromise = searchTransactions('company_code', selectedCompany.company_code, true);
-      queryPromise
+      // load transaction of selected company -----------
+      const queryTransaction = searchTransactions('company_code', selectedCompany.company_code, true);
+      queryTransaction
         .then(res => {
           if(res.result) {
             setTransactionByCompany(res.data);
@@ -391,18 +368,10 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
             setTransactionByCompany([]);
           };
         });
-    }
-  }, [checkState, searchTransactions, selectedCompany.company_code]);
 
-  //===== useEffect for Tax Invoice ====================================================
-  useEffect(() => {
-    if(!!selectedCompany.company_code && !checkState.taxInvoice) {
-      setCheckState({
-        ...checkState,
-        taxInvoice: true,
-      });
-      const queryPromise = searchTaxInvoices('company_code', selectedCompany.company_code, true);
-      queryPromise
+      // load tax invoice of selected company -----------
+      const queryTaxInvoice = searchTaxInvoices('company_code', selectedCompany.company_code, true);
+      queryTaxInvoice
         .then(res => {
           if(res.result) {
             setTaxInvoiceByCompany(res.data);
@@ -411,21 +380,12 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
             setTaxInvoiceByCompany([]);
           };
         });
-    }
-  }, [checkState, searchTransactions, selectedCompany.company_code]);
 
-  //===== useEffect for User ==========================================================
-  useEffect(() => {
-    if (init && checkState.purchase && checkState.transaction && checkState.taxInvoice
-      && ((userState & 1) === 1)
-     ){
-      // console.log('[CompanyDetailModel] all needed data is loaded');
+      handleInitialize();
       handleInit(false);
-    };
-  }, [checkState, userState, handleInit]);
+    }
+  }, [init, selectedCompany, currentCompanyCode, loadCompanyMAContracts, searchPurchases, searchTransactions, searchTaxInvoices, handleInit, setPurchasesByCompany, setTransactionByCompany, setTaxInvoiceByCompany]);
 
-  if (init)
-    return <div>&nbsp;</div>;
 
   return (
     <>
@@ -440,182 +400,183 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
           className={isFullScreen ? "modal-fullscreen" : "modal-dialog"}
           role="document"
         >
-          <div className="modal-content">
-            <div className="modal-header">
-              <div className="row w-100">
-                <div className="col-md-4 account d-flex">
-                  <div className="company_img">
-                    <img src={C_logo} alt="User" className="user-image" />
+          {!init &&
+            <div className="modal-content">
+              <div className="modal-header">
+                <div className="row w-100">
+                  <div className="col-md-4 account d-flex">
+                    <div className="company_img">
+                      <img src={C_logo} alt="User" className="user-image" />
+                    </div>
+                    <div>
+                      <p className="mb-0">
+                        <b>{t("company.company")}</b>
+                      </p>
+                      <span className="modal-title">
+                        {selectedCompany.company_name}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <p className="mb-0">
-                      <b>{t("company.company")}</b>
-                    </p>
-                    <span className="modal-title">
-                      {selectedCompany.company_name}
-                    </span>
-                  </div>
+                  <DetailTitleItem
+                    original={selectedCompany}
+                    name="company_name_en"
+                    title={t("company.company_name_en")}
+                    onEditing={handleDetailChange}
+                  />
+                  <DetailTitleItem
+                    original={selectedCompany}
+                    name="business_registration_code"
+                    title={t("company.business_registration_code")}
+                    onEditing={handleDetailChange}
+                  />
                 </div>
-                <DetailTitleItem
-                  original={selectedCompany}
-                  name="company_name_en"
-                  title={t("company.company_name_en")}
-                  onEditing={handleDetailChange}
+                <Switch
+                  checkedChildren="full"
+                  checked={isFullScreen}
+                  onChange={handleWindowWidthChange}
                 />
-                <DetailTitleItem
-                  original={selectedCompany}
-                  name="business_registration_code"
-                  title={t("company.business_registration_code")}
-                  onEditing={handleDetailChange}
+                <button
+                  type="button"
+                  className="btn-close xs-close"
+                  onClick={handleClose}
                 />
               </div>
-              <Switch
-                checkedChildren="full"
-                checked={isFullScreen}
-                onChange={handleWindowWidthChange}
-              />
-              <button
-                type="button"
-                className="btn-close xs-close"
-                onClick={handleClose}
-              />
-            </div>
-            <div className="modal-body">
-              <div className="task-infos">
-                <ul className="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified">
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link active"
-                      to="#company-details-info"
-                      data-bs-toggle="tab"
-                    >
-                      {t("common.details")}
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#company-details-product"
-                      data-bs-toggle="tab"
-                    >
-                      {t("purchase.product_info") +
-                        "(" +
-                        validMACount +
-                        "/" +
-                        purchaseByCompany.length +
-                        ")"}
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#company-details-transaction"
-                      data-bs-toggle="tab"
-                    >
-                      {t("transaction.statement_of_account") +
-                        "(" +
-                        transactionByCompany.length +
-                        ")"}
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#company-details-taxinvoice"
-                      data-bs-toggle="tab"
-                    >
-                      {t("transaction.tax_bill") +
-                        "(" +
-                        taxInvoiceByCompany.length +
-                        ")"}
-                    </Link>
-                  </li>
-                  {/* <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="#task-news"
-                      data-bs-toggle="tab"
-                    >
-                      News
-                    </Link>
-                  </li> */}
-                </ul>
-                <div className="tab-content">
-                  <div className="tab-pane show active" id="company-details-info">
-                    <div className="crms-tasks">
-                      <div className="tasks__item crms-task-item">
-                        <div className="row">
-                          <Space
-                            align="start"
-                            direction="horizontal"
-                            size="small"
-                            style={{ display: "flex", marginBottom: "0.5rem" }}
-                            wrap
-                          >
-                            {company_items_info.map((item, index) => (
-                              <DetailCardItem
-                                key={`${item.title}-${index}`}
-                                title={t(item.title)}
-                                defaultValue={selectedCompany[item.key]}
-                                edited={editedDetailValues}
-                                name={item.key}
-                                detail={item.detail}
-                              />
-                            ))}
-                          </Space>
+              <div className="modal-body">
+                <div className="task-infos">
+                  <ul className="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified">
+                    <li className="nav-item">
+                      <Link
+                        className="nav-link active"
+                        to="#company-details-info"
+                        data-bs-toggle="tab"
+                      >
+                        {t("common.details")}
+                      </Link>
+                    </li>
+                    <li className="nav-item">
+                      <Link
+                        className="nav-link"
+                        to="#company-details-product"
+                        data-bs-toggle="tab"
+                      >
+                        {t("purchase.product_info") +
+                          "(" +
+                          validMACount +
+                          "/" +
+                          purchaseByCompany.length +
+                          ")"}
+                      </Link>
+                    </li>
+                    <li className="nav-item">
+                      <Link
+                        className="nav-link"
+                        to="#company-details-transaction"
+                        data-bs-toggle="tab"
+                      >
+                        {t("transaction.statement_of_account") +
+                          "(" +
+                          transactionByCompany.length +
+                          ")"}
+                      </Link>
+                    </li>
+                    <li className="nav-item">
+                      <Link
+                        className="nav-link"
+                        to="#company-details-taxinvoice"
+                        data-bs-toggle="tab"
+                      >
+                        {t("transaction.tax_bill") +
+                          "(" +
+                          taxInvoiceByCompany.length +
+                          ")"}
+                      </Link>
+                    </li>
+                    {/* <li className="nav-item">
+                      <Link
+                        className="nav-link"
+                        to="#task-news"
+                        data-bs-toggle="tab"
+                      >
+                        News
+                      </Link>
+                    </li> */}
+                  </ul>
+                  <div className="tab-content">
+                    <div className="tab-pane show active" id="company-details-info">
+                      <div className="crms-tasks">
+                        <div className="tasks__item crms-task-item">
+                          <div className="row">
+                            <Space
+                              align="start"
+                              direction="horizontal"
+                              size="small"
+                              style={{ display: "flex", marginBottom: "0.5rem" }}
+                              wrap
+                            >
+                              {company_items_info.map((item, index) => (
+                                <DetailCardItem
+                                  key={`${item.title}-${index}`}
+                                  title={t(item.title)}
+                                  defaultValue={selectedCompany[item.key]}
+                                  edited={editedDetailValues}
+                                  name={item.key}
+                                  detail={item.detail}
+                                />
+                              ))}
+                            </Space>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div
-                    className="tab-pane company-details-product"
-                    id="company-details-product"
-                  >
-                    <CompanyPurchaseModel
-                      handleInitAddPurchase={setInitAddPurchase}
-                    />
-                  </div>
-                  <div
-                    className="tab-pane company-details-transaction"
-                    id="company-details-transaction"
-                  >
-                    <CompanyTransactionModel
-                      openTransaction={setOpenTransaction}
-                    />
-                  </div>
-                  <div
-                    className="tab-pane company-details-taxinvoice"
-                    id="company-details-taxinvoice"
-                  >
-                    <CompanyTaxInvoiceModel
-                      openTaxInvoice={setOpenTaxInvoice}
-                    />
-                  </div>
-                </div>
-                {editedDetailValues !== null &&
-                  Object.keys(editedDetailValues).length !== 0 && (
-                    <div className="text-center py-3">
-                      <button
-                        type="button"
-                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                        onClick={handleDetailSave}
-                      >
-                        {t("common.save")}
-                      </button>
-                      &nbsp;&nbsp;
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-rounded"
-                        onClick={handleDetailCancel}
-                      >
-                        {t("common.cancel")}
-                      </button>
+                    <div
+                      className="tab-pane company-details-product"
+                      id="company-details-product"
+                    >
+                      <CompanyPurchaseModel
+                        handleInitAddPurchase={setInitAddPurchase}
+                      />
                     </div>
-                  )}
+                    <div
+                      className="tab-pane company-details-transaction"
+                      id="company-details-transaction"
+                    >
+                      <CompanyTransactionModel
+                        openTransaction={setOpenTransaction}
+                      />
+                    </div>
+                    <div
+                      className="tab-pane company-details-taxinvoice"
+                      id="company-details-taxinvoice"
+                    >
+                      <CompanyTaxInvoiceModel
+                        openTaxInvoice={setOpenTaxInvoice}
+                      />
+                    </div>
+                  </div>
+                  {editedDetailValues !== null &&
+                    Object.keys(editedDetailValues).length !== 0 && (
+                      <div className="text-center py-3">
+                        <button
+                          type="button"
+                          className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                          onClick={handleDetailSave}
+                        >
+                          {t("common.save")}
+                        </button>
+                        &nbsp;&nbsp;
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-rounded"
+                          onClick={handleClose}
+                        >
+                          {t("common.cancel")}
+                        </button>
+                      </div>
+                    )}
+                </div>
               </div>
             </div>
-          </div>
-          {/* modal-content */}
+          }
         </div>
       </div>
       <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} />

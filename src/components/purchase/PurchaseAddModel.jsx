@@ -145,7 +145,7 @@ const PurchaseAddModel = (props) => {
         // Check data if they are available
         let numberOfNoInputItems = 0;
         let noCompanyName = false;
-        if(!purchaseChange.company_name || purchaseChange.company_name === ""){
+        if(!companyData.company_name || companyData.company_name === ""){
             numberOfNoInputItems++;
             noCompanyName = true;
         };
