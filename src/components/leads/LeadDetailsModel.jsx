@@ -435,7 +435,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
       // console.log('[LeadDetailModel] all needed data is loaded');
       handleInit(false);
     };
-  }, [userState, checkState, handleInit]);
+  }, [init, userState, checkState, handleInit]);
 
   if (init)
     return <div>&nbsp;</div>;

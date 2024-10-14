@@ -342,7 +342,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
       setCurrentCompanyCode(selectedCompany.company_code);
       setCheckState({purchase:false, transaction:false, taxInvoice:false});
     }
-  }, [selectedCompany, currentCompanyCode, loadCompanyMAContracts]);
+  }, [init, selectedCompany, currentCompanyCode, loadCompanyMAContracts]);
 
   //===== useEffect for Purchase =======================================================
   useEffect(() => {
