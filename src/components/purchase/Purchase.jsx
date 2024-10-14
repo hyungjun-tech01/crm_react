@@ -3,7 +3,6 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import {
   atomFilteredPurchaseArray,
@@ -18,6 +17,7 @@ import PurchaseAddModel from "./PurchaseAddModel";
 import PurchaseDetailsModel from "./PurchaseDetailsModel";
 import { atomUserState } from "../../atoms/atomsUser";
 import { UserRepo } from "../../repository/user";
+import { SettingsRepo } from "../../repository/settings";
 
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import { purchaseColumn } from "../../repository/purchase";
@@ -40,6 +40,10 @@ const Purchase = () => {
   //===== [RecoilState] Related with User ================================================
   const userState = useRecoilValue(atomUserState);
   const { tryLoadAllUsers } = useRecoilValue(UserRepo);
+
+
+    //===== [RecoilState] Related with Settings ===========================================
+    const { openModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to deal 'Purcahse' ====================================================
@@ -120,7 +124,7 @@ const Purchase = () => {
         singleDate:checkedSingleDates
       }
   
-      console.log('multiQueryCondi',multiQueryCondi);
+      // console.log('multiQueryCondi',multiQueryCondi);
   
       loadAllPurchases(multiQueryCondi);
        
@@ -150,14 +154,14 @@ const Purchase = () => {
   const handleClickPurchase = useCallback((code)=>{
     setCurrentPurchase(code);
     setSelectedCategory({category: 'purchase', item_code: code});
-    let myModal = new bootstrap.Modal(document.getElementById('purchase-details'), {
-      keyboard: false
-    })
-    myModal.show();
+    openModal('purchase-details');
   },[setCurrentPurchase, setSelectedCategory]);
 
   const handleAddNewPurchaseClicked = useCallback(() => {
     setInitAddNewPurchase(true);
+    setTimeout(() => {
+      openModal('add_purchase');
+    }, 500);
   }, []);
 
   const columns = [
@@ -356,8 +360,6 @@ const Purchase = () => {
                     <button
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                       id="add-task"
-                      data-bs-toggle="modal"
-                      data-bs-target="#add_purchase"
                       onClick={handleAddNewPurchaseClicked}
                     >
                       {t('purchase.add_purchase')}

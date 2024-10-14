@@ -19,6 +19,7 @@ import { ConsultingRepo } from "../../repository/consulting";
 import { QuotationRepo } from "../../repository/quotation";
 import { PurchaseRepo } from "../../repository/purchase";
 import { MAContractRepo } from "../../repository/ma_contract";
+import { SettingsRepo } from "../../repository/settings";
 
 import CompanyPurchaseModel from "../company/CompanyPurchaseModel";
 import ConsultingAddModel from "../consulting/ConsultingAddModel";
@@ -73,6 +74,10 @@ const LeadDetailsModel = ({init, handleInit}) => {
   const userState = useRecoilValue(atomUserState);
   const engineersForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
+
+
+  //===== [RecoilState] Related with Users ==========================================
+  const { openModal, closeModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to deal this component ============================================
@@ -152,7 +157,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
         ...editedDetailValues,
         ...obj,
       };
-      console.log("handleDetailAddressChange :", tempEdited);
+      // console.log("handleDetailAddressChange :", tempEdited);
       setEditedDetailValues(tempEdited);
     },
     [editedDetailValues]
@@ -189,11 +194,23 @@ const LeadDetailsModel = ({init, handleInit}) => {
     // })
   };
 
+  const handlePopupOpen = (open) => {
+    if(open) {
+      openModal('antModal');
+    } else {
+      closeModal();
+    }
+  };
+
   const handleClose = useCallback(() => {
+    closeModal();
     setSelectedCategory({category: null, item_code: null});
     setEditedDetailValues(null);
     setCurrentLead();
     setCurrentLeadCode('');
+    setTimeout(() => {
+      closeModal();
+    }, 500);
   }, [setCurrentLead]);
 
   const handleSaveAll = useCallback(() => {
@@ -205,9 +222,8 @@ const LeadDetailsModel = ({init, handleInit}) => {
         modify_user: cookies.myLationCrmUserId,
         lead_code: selectedLead.lead_code,
       };
-      console.log('temp_all_saved', temp_all_saved);
+      
       if (modifyLead(temp_all_saved)) {
-        console.log(`Succeeded to modify lead`);
         let temp_update_company = {};
         if (editedDetailValues['company_name'])
           temp_update_company['company_name'] = editedDetailValues['company_name'];
@@ -232,11 +248,13 @@ const LeadDetailsModel = ({init, handleInit}) => {
           resp.then(res => {
             if (res.result) {
               console.log(`Succeeded to modify company`);
+              handleClose();
             } else {
               console.error('Failed to modify company : ', res.data);
             };
           });
         };
+        closeModal();
       } else {
         console.error('Failed to modify lead')
       };
@@ -248,6 +266,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
 
   const handleCancelAll = useCallback(() => {
     setEditedDetailValues(null);
+    handleClose();
   }, []);
 
   const lead_items_info = [
@@ -255,7 +274,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
     { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'is_keyman', title: 'lead.is_keyman', detail: { type: 'select', options: KeyManForSelection, editing: handleDetailSelectChange } },
     { key: 'region', title: 'common.region', detail: { type: 'select', options: option_locations.ko, editing: handleDetailSelectChange } },
-    { key: 'company_name', title: 'company.company_name', detail: { type: 'search', key_name: 'company', editing: handleDetailObjectChange } },
+    { key: 'company_name', title: 'company.company_name', detail: { type: 'search', key_name: 'company', editing: handleDetailObjectChange, handleOpen: handlePopupOpen } },
     { key: 'company_name_en', title: 'company.company_name_en', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'department', title: 'lead.department', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'email', title: 'lead.email1', detail: { type: 'label', editing: handleDetailChange } },
@@ -295,7 +314,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
 
   const handleSearchQuotationCondition = (newValue) => {
     setSearchQuotationCondition(newValue);
-    console.log("handleSearchCondition", searchQuotationCondition)
+    // console.log("handleSearchCondition", searchQuotationCondition)
     filterCompanyQuotation(newValue);
   };
 
@@ -322,7 +341,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
       && (selectedLead !== defaultLead)
       && (selectedLead.lead_code !== currentLeadCode)
     ) {
-      console.log('[LeadDetailsModel] new lead is loaded');
+      // console.log('[LeadDetailsModel] new lead is loaded');
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {
@@ -413,11 +432,10 @@ const LeadDetailsModel = ({init, handleInit}) => {
     if (init && checkState.purchase && checkState.consulting && checkState.quotation
       && ((userState & 1) === 1)
     ) {
-      console.log('[LeadDetailModel] all needed data is loaded');
-      // setIsAllNeededDataLoaded(true);
+      // console.log('[LeadDetailModel] all needed data is loaded');
       handleInit(false);
     };
-  }, [userState, checkState, handleInit]);
+  }, [init, userState, checkState, handleInit]);
 
   if (init)
     return <div>&nbsp;</div>;
@@ -430,7 +448,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
         tabIndex={-1}
         role="dialog"
         aria-modal="true"
-        data-bs-focus="false"
       >
         <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
           <div className="modal-content">
@@ -458,7 +475,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
               <button
                 type="button"
                 className="btn-close xs-close"
-                data-bs-dismiss="modal"
                 onClick={handleClose}
               />
             </div>

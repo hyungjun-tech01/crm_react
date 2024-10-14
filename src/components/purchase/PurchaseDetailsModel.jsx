@@ -20,6 +20,7 @@ import {
 import { PurchaseRepo } from "../../repository/purchase";
 import { ProductTypeOptions } from "../../repository/product";
 import { ContractTypes, MAContractRepo } from "../../repository/ma_contract";
+import { SettingsRepo } from "../../repository/settings";
 
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
@@ -53,6 +54,10 @@ const PurchaseDetailsModel = () => {
   //===== [RecoilState] Related with MA Contract ======================================
   const maContractSet = useRecoilValue(atomMAContractSet);
   const { loadPurchaseMAContracts, modifyMAContract, setCurrentMAContract } = useRecoilValue(MAContractRepo);
+
+
+  //===== [RecoilState] Related with MA Contract ======================================
+  const { openModal, closeModal } = useRecoilValue(SettingsRepo);
 
   
   //===== Handles to deal this component ==============================================
@@ -99,7 +104,6 @@ const PurchaseDetailsModel = () => {
         ...editedDetailValues,
         ...selected,
       };
-      console.log('handleDetailSelectChange : ', tempEdited);
       setEditedDetailValues(tempEdited);
     } else {
       if (currentPurchase[name] !== selected.value) {
@@ -124,6 +128,7 @@ const PurchaseDetailsModel = () => {
       res_data.then(res => {
         if (res.result) {
           console.log(`Succeeded to modify purchase`);
+          handleClose();
         } else {
           console.error("Failed to modify purchase");
         }  
@@ -141,6 +146,7 @@ const PurchaseDetailsModel = () => {
 
   const handleCancelAll = useCallback(() => {
     setEditedDetailValues(null);
+    handleClose();
   }, []);
 
   const handleClose = useCallback(() => {
@@ -149,6 +155,9 @@ const PurchaseDetailsModel = () => {
     };
     setEditedDetailValues(null);
     setCurrentPurchase(defaultPurchase);
+    setTimeout(() => {
+      closeModal();
+    }, 500);
   }, []);
 
   const purchase_items_info = [
@@ -188,8 +197,6 @@ const PurchaseDetailsModel = () => {
     const resp = modifyMAContract(finalData);
     resp.then(result => {
       if (result) {
-        console.log(`[ handleSubModalOk ] update contract`);
-
         // Update MA Contract end date
         if (currentPurchase.purchase_code
           && (!currentPurchase.ma_finish_date || (new Date(currentPurchase.ma_finish_date) < finalData.ma_finish_date))) {
@@ -224,11 +231,13 @@ const PurchaseDetailsModel = () => {
       }
     });
 
+    closeModal();
     setSelectedMAContractRowKeys([]);
     setIsSubModalOpen(false);
   }, [cookies.myLationCrmUserId, editedSubModalValues, modifyMAContract, modifyPurchase, orgSubModalValues, currentPurchase]);
 
   const handleSubModalCancel = () => {
+    closeModal();
     setIsSubModalOpen(false);
     setOrgSubModalValues(defaultMAContract);
     setSelectedMAContractRowKeys([]);
@@ -247,6 +256,7 @@ const PurchaseDetailsModel = () => {
       purchase_code: purchase_code,
       modify_user: cookies.myLationCrmUserId,
     });
+    openModal('antModal');
     setSubModalSetting({ title: t('contract.add_contract') });
     setIsSubModalOpen(true);
   }, [cookies.myLationCrmUserId, t]);
@@ -263,6 +273,7 @@ const PurchaseDetailsModel = () => {
         action_type: 'UPDATE',
         modify_user: cookies.myLationCrmUserId,
       });
+      openModal('antModal');
       setSubModalSetting({ title: t('contract.add_contract') });
       setIsSubModalOpen(true);
     } else {
@@ -369,7 +380,6 @@ const PurchaseDetailsModel = () => {
         tabIndex={-1}
         role="dialog"
         aria-modal="true"
-        data-bs-focus="false"
       >
         <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
           <div className="modal-content">
@@ -406,7 +416,6 @@ const PurchaseDetailsModel = () => {
               <button
                 type="button"
                 className="btn-close xs-close"
-                data-bs-dismiss="modal"
                 onClick={handleClose}
               />
             </div>

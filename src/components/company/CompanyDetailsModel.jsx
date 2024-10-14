@@ -25,6 +25,7 @@ import { TransactionRepo } from "../../repository/transaction";
 import { PurchaseRepo } from "../../repository/purchase";
 import { MAContractRepo } from "../../repository/ma_contract";
 import { TaxInvoiceRepo } from "../../repository/tax_invoice";
+import { SettingsRepo } from "../../repository/settings";
 
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
@@ -70,6 +71,10 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
   const userState = useRecoilValue(atomUserState);
   const engineerForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
+
+
+  //===== [RecoilState] Related with Users ============================================
+  const { closeModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to deal this component ==============================================
@@ -142,7 +147,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
         ...editedDetailValues,
         ...obj,
       };
-      console.log("handleDetailAddressChange :", tempEdited);
+      // console.log("handleDetailAddressChange :", tempEdited);
       setEditedDetailValues(tempEdited);
     },
     [editedDetailValues]
@@ -160,6 +165,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
       resp.then(res => {
         if (res.result) {
           console.log(`Succeeded to modify company`);
+          handleClose();
         } else {
           console.error("Failed to modify company : ", res.data);
         };
@@ -177,6 +183,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
 
   const handleDetailCancel = useCallback(() => {
     setEditedDetailValues(null);
+    handleClose();
   }, []);
 
   const handleClose = useCallback(() => {
@@ -184,6 +191,9 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     setEditedDetailValues(null);
     setCurrentCompany();
     setCurrentCompanyCode("");
+    setTimeout(() => {
+      closeModal();
+    }, 500);
   }, [setCurrentCompany]);
 
   const company_items_info = [
@@ -316,7 +326,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
       && (selectedCompany !== defaultCompany)
       && (selectedCompany.company_code !== currentCompanyCode)
     ) {
-      console.log("[CompanyDetailsModel] new company is loading!");
+      // console.log("[CompanyDetailsModel] new company is loading!");
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {
@@ -332,7 +342,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
       setCurrentCompanyCode(selectedCompany.company_code);
       setCheckState({purchase:false, transaction:false, taxInvoice:false});
     }
-  }, [selectedCompany, currentCompanyCode, loadCompanyMAContracts]);
+  }, [init, selectedCompany, currentCompanyCode, loadCompanyMAContracts]);
 
   //===== useEffect for Purchase =======================================================
   useEffect(() => {
@@ -409,7 +419,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     if (init && checkState.purchase && checkState.transaction && checkState.taxInvoice
       && ((userState & 1) === 1)
      ){
-      console.log('[CompanyDetailModel] all needed data is loaded');
+      // console.log('[CompanyDetailModel] all needed data is loaded');
       handleInit(false);
     };
   }, [checkState, userState, handleInit]);
@@ -425,7 +435,6 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
         tabIndex={-1}
         role="dialog"
         aria-modal="true"
-        data-bs-focus="false"
       >
         <div
           className={isFullScreen ? "modal-fullscreen" : "modal-dialog"}
@@ -468,7 +477,6 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
               <button
                 type="button"
                 className="btn-close xs-close"
-                data-bs-dismiss="modal"
                 onClick={handleClose}
               />
             </div>

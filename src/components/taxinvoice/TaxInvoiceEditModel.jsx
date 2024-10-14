@@ -11,7 +11,6 @@ import "../antdstyle.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import classNames from 'classnames';
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import {
   atomCompanyState,
@@ -23,6 +22,7 @@ import {
 } from "../../atoms/atoms";
 import { DefaultTaxInvoiceContent, TaxInvoiceRepo } from "../../repository/tax_invoice";
 import { company_info } from "../../repository/user";
+import { SettingsRepo } from "../../repository/settings";
 
 import TaxInvoiceContentModal from "./TaxInvoiceContentModal";
 import TaxInvoicePrint from "./TaxInvoicePrint";
@@ -75,6 +75,10 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
   //===== [RecoilState] Related with Company =========================================
   const companyState = useRecoilValue(atomCompanyState);
   const currentCompany = useRecoilValue(atomCurrentCompany);
+
+  
+  //===== [RecoilState] Related with Company =========================================
+  const { openModal, closeModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to edit 'TaxInvoiceEditModel' ======================================
@@ -304,6 +308,8 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
       ...DefaultTaxInvoiceContent,
       sub_index: invoiceContents.length,
     });
+
+    openModal('antModal');
     setEditedContentModalData({});
     setIsContentModalOpen(true);
   };
@@ -320,6 +326,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
       tempDate.setDate(splitted[1]);
     };
 
+    openModal('antModal');
     setSettingForContentModal(tempData);
     setOrgContentModalData({ ...data, invoice_date: tempDate });
     setEditedContentModalData({});
@@ -341,8 +348,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
       tempMonthDay = orgContentModalData['month_day'];
     };
 
-    setIsContentModalOpen(false);
-
     const tempContent = {
       ...orgContentModalData,
       ...editedContentModalData,
@@ -362,12 +367,15 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
       setInvoiceContents(tempContents);
       handleAmountCalculation(tempContents);
     };
+
+    closeModal();
     setIsContentModalOpen(false);
     setOrgContentModalData({});
     setEditedContentModalData({});
   };
 
   const handleContentModalCancel = () => {
+    closeModal();
     setIsContentModalOpen(false);
     setEditedContentModalData({});
     setOrgContentModalData({});
@@ -628,8 +636,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
     resp.then((res) => {
       if (res.result) {
         handleInitialize();
-        let thisModal = bootstrap.Modal.getInstance('#edit_tax_invoice');
-        if (thisModal) thisModal.hide();
+        closeModal();
       }
       else {
         setMessage({ title: '저장 중 오류', message: `오류가 발생하여 저장하지 못했습니다. - ${res.message}` });
@@ -643,7 +650,10 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
       setSelectedCategory({category: null, item_code: null});
     };
     handleInitialize();
-    close();
+    closeModal();
+    setTimeout(() => {
+      close();
+    }, 500);
   };
 
   //===== useEffect ==============================================================
@@ -792,7 +802,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
       tabIndex={-1}
       role="dialog"
       aria-modal="true"
-      data-bs-focus="false"
     >
       <div
         className="modal-dialog modal-dialog-centered modal-lg"
@@ -801,7 +810,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
         <button
           type="button"
           className="close md-close"
-          data-bs-dismiss="modal"
           aria-label="Close"
         >
           <span aria-hidden="true">×</span>
@@ -812,7 +820,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
             <button
               type="button"
               className="btn-close"
-              data-bs-dismiss="modal"
               onClick={handleClose}
             ></button>
           </div>
@@ -1478,7 +1485,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
                         <button
                           type="button"
                           className="btn btn-secondary btn-rounded"
-                          data-bs-dismiss="modal"
                           onClick={handleClose}
                         >
                           {t('common.cancel')}

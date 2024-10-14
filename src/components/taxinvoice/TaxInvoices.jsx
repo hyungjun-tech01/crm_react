@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Table } from "antd";
 import "antd/dist/reset.css";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
@@ -19,6 +18,7 @@ import { atomUserState } from "../../atoms/atomsUser";
 import { CompanyRepo } from "../../repository/company";
 import { TaxInvoiceRepo, taxInvoiceColumn } from "../../repository/tax_invoice";
 import { UserRepo } from "../../repository/user";
+import { SettingsRepo } from "../../repository/settings";
 
 import { compareCompanyName , compareText, ConvertCurrency } from "../../constants/functions";
 import TaxInvoiceEditModel from "../taxinvoice/TaxInvoiceEditModel";
@@ -39,6 +39,10 @@ const TaxInovices = () => {
   const taxInvoiceState = useRecoilValue(atomTaxInvoiceState);
   const filteredTaxInvoices= useRecoilValue(atomFilteredTaxInvoiceArray);
   const { tryLoadTaxInvoices, setCurrentTaxInvoice , filterTaxInvoices, loadAllTaxInvoices} = useRecoilValue(TaxInvoiceRepo);
+
+
+  //===== [RecoilState] Related with Settings ===========================================
+  const { openModal } = useRecoilValue(SettingsRepo);
 
 
   //===== [RecoilState] Related with User =============================================
@@ -114,7 +118,7 @@ const TaxInovices = () => {
       setMultiQueryModal(false);
   
       // query condition 세팅 후 query
-      console.log("handleMultiQueryModalOk", queryConditions);
+      // console.log("handleMultiQueryModalOk", queryConditions);
 
       
       const multiQueryCondi = {
@@ -123,7 +127,7 @@ const TaxInovices = () => {
         singleDate:checkedSingleDates
       }
   
-      console.log('multiQueryCondi',multiQueryCondi);
+      // console.log('multiQueryCondi',multiQueryCondi);
   
       loadAllTaxInvoices(multiQueryCondi);
        
@@ -213,11 +217,8 @@ const TaxInovices = () => {
     setOpenTaxInvoice(true);
 
     setTimeout(()=>{
-      let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
-        keyboard: false
-      })
-      myModal.show();
-    }, 1000);
+      openModal('edit_tax_invoice');
+    }, 500);
   }, [setCurrentTaxInvoice]);
 
   const handleOpenTaxInvoice = (code) => {
@@ -226,11 +227,8 @@ const TaxInovices = () => {
     setSelectedCategory({category: 'tax_invoice', item_code: code});
 
     setTimeout(()=>{
-      let myModal = new bootstrap.Modal(document.getElementById('edit_tax_invoice'), {
-        keyboard: false
-      })
-      myModal.show();
-    }, 1000);
+      openModal('edit_tax_invoice');
+    }, 500);
   }
 
   useEffect(() => {
@@ -242,7 +240,7 @@ const TaxInovices = () => {
       singleDate:checkedSingleDates
     }
 
-    console.log('multiQueryCondi',multiQueryCondi);   
+    // console.log('multiQueryCondi',multiQueryCondi);
     tryLoadTaxInvoices(multiQueryCondi);
 
     tryLoadAllUsers();

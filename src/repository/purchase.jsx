@@ -2,7 +2,6 @@ import React from 'react';
 import { selector } from "recoil";
 import { atomCurrentPurchase
     , atomAllPurchaseObj
-    , atomCompanyPurchases
     , atomFilteredPurchaseArray
     , defaultPurchase
     , atomPurchaseState,

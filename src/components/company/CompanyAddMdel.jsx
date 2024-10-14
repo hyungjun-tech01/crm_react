@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import * as bootstrap from "../../assets/js/bootstrap.bundle";
 import { defaultCompany } from "../../atoms/atoms";
 import {
   atomUserState,
@@ -10,6 +9,7 @@ import {
   atomSalespersonsForSelection,
 } from "../../atoms/atomsUser";
 import { CompanyRepo } from "../../repository/company";
+import { SettingsRepo } from "../../repository/settings";
 import {
   option_locations,
   option_deal_type,
@@ -19,6 +19,7 @@ import {
 import AddBasicItem from "../../constants/AddBasicItem";
 import AddAddressItem from "../../constants/AddAddressItem";
 import MessageModal from "../../constants/MessageModal";
+
 
 const CompanyAddModel = (props) => {
   const { init, handleInit } = props;
@@ -36,6 +37,11 @@ const CompanyAddModel = (props) => {
   const userState = useRecoilValue(atomUserState);
   const engineersForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
+
+
+  //===== [RecoilState] Related with Users ============================================
+  const { closeModal } = useRecoilValue(SettingsRepo);
+
 
   //===== Handles to edit 'CompanyAddModel' ===========================================
   const [companyChange, setCompanyChange] = useState({ ...defaultCompany });
@@ -130,13 +136,11 @@ const CompanyAddModel = (props) => {
       counter: 0,
       modify_user: cookies.myLationCrmUserId,
     };
-    console.log(`[ handleAddNewCompany ]`, newComData);
+    // console.log(`[ handleAddNewCompany ]`, newComData);
     const result = modifyCompany(newComData);
     result.then((res) => {
       if (res.result) {
-        initializeCompanyTemplate();
-        let thisModal = bootstrap.Modal.getInstance('#add_company');
-        if (thisModal) thisModal.hide();
+        handleClose();
       } else {
         const tempMsg = {
           title: t('comment.title_check'),
@@ -148,9 +152,16 @@ const CompanyAddModel = (props) => {
     });
   };
 
+  const handleClose = () => {
+    initializeCompanyTemplate();
+    setTimeout(() => {
+      closeModal();
+    }, 500);
+  };
+
   useEffect(() => {
     if (init && (userState & 1) === 1) {
-      console.log("[CompanyAddModel] initialzie!");
+      // console.log("[CompanyAddModel] initialzie!");
       if (handleInit) handleInit(!init);
       setTimeout(() => {
         initializeCompanyTemplate();
@@ -173,7 +184,6 @@ const CompanyAddModel = (props) => {
         <button
           type="button"
           className="close md-close"
-          data-bs-dismiss="modal"
           aria-label="Close"
         >
           <span aria-hidden="true">×</span>
@@ -186,7 +196,7 @@ const CompanyAddModel = (props) => {
             <button
               type="button"
               className="btn-close"
-              data-bs-dismiss="modal"
+              onClick={handleClose}
             ></button>
           </div>
           <div className="modal-body">
@@ -405,8 +415,7 @@ const CompanyAddModel = (props) => {
                     <button
                       type="button"
                       className="btn btn-secondary btn-rounded"
-                      data-bs-dismiss="modal"
-                      onClick={initializeCompanyTemplate}
+                      onClick={handleClose}
                     >
                       {t("common.cancel")}
                     </button>

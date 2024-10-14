@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { formatDate } from "../../constants/functions";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Add } from "@mui/icons-material";
 
 import {
@@ -12,6 +11,7 @@ import {
     defaultPurchase,
     atomPurchaseByCompany,
 } from "../../atoms/atoms";
+import { SettingsRepo } from '../../repository/settings';
 
 
 const CompanyPurchaseModel = (props) => {
@@ -24,25 +24,25 @@ const CompanyPurchaseModel = (props) => {
     const setCurrentPurchase = useSetRecoilState(atomCurrentPurchase);
 
 
+    //===== [RecoilState] Related with Settings =========================================
+    const { openModal } = useRecoilValue(SettingsRepo);
+
     //===== Handles to this =============================================================
     const [selectedPurchaseRowKeys, setSelectedPurchaseRowKeys] = useState([]);
 
-    const transferToOtherModal = (id) => {
-        let myModal = new bootstrap.Modal(document.getElementById(id), {
-            keyboard: false
-        });
-        myModal.show();
-    };
-
     const handleSelectPurchase = (selected) => {
         setCurrentPurchase(selected);
-        transferToOtherModal('purchase-details');
+        setTimeout(() => {
+            openModal('purchase-details');
+        }, 500);
     };
 
     const handleAddNewPurchase = () => {
         setCurrentPurchase(defaultPurchase);
         handleInitAddPurchase(true);
-        transferToOtherModal('add_purchase');
+        setTimeout(() => {
+            openModal('add_purchase');
+        }, 500);
     };
 
     const columns_purchase = [
@@ -101,7 +101,7 @@ const CompanyPurchaseModel = (props) => {
 
 
     useEffect(() => {
-        console.log('[CompanyPurchaseModel] called!');
+        // console.log('[CompanyPurchaseModel] called!');
     }, [purchaseByCompany]);
 
     return (

@@ -3,7 +3,7 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
+
 import "antd/dist/reset.css";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import "../antdstyle.css";
@@ -11,9 +11,10 @@ import QuotationDetailsModel from "./QuotationDetailsModel";
 import QuotationAddModel from "./QuotationAddModel";
 import SystemUserModel from "../task/SystemUserModel";
 
-// import { CompanyRepo } from "../../repository/company";
 import { QuotationRepo } from "../../repository/quotation";
 import { UserRepo } from "../../repository/user";
+import { SettingsRepo } from "../../repository/settings";
+
 import MultiQueryModal from "../../constants/MultiQueryModal";
 import {
   atomFilteredQuotationArray,
@@ -23,6 +24,7 @@ import {
 import { atomUserState } from "../../atoms/atomsUser";
 import { compareCompanyName, compareText, ConvertCurrency, formatDate } from "../../constants/functions";
 import { quotationColumn } from "../../repository/quotation";
+
 
 const Quotations = () => {
   const { t } = useTranslation();
@@ -41,6 +43,10 @@ const Quotations = () => {
   //===== [RecoilState] Related with Lead =============================================
   const userState = useRecoilValue(atomUserState);
   const { tryLoadAllUsers } = useRecoilValue(UserRepo);
+
+
+  //===== [RecoilState] Related with Settings ===========================================
+  const { openModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to edit this ========================================================
@@ -154,29 +160,20 @@ const Quotations = () => {
   //   console.log("[Consulting] set current company : ", code);
   //   setCurrentCompany(code);
   //   setSelectedCategory({category: 'company', item_code: code});
-  //   let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
-  //     keyboard: false
-  //   })
-  //   myModal.show();
+  //   openModal('company-details');
   // }, []);
 
   // const handleClickLead = useCallback((code) => {
   //   console.log("[Consulting] set current lead : ", code);
   //   setCurrentLead(code);
   //   setSelectedCategory({category: 'lead', item_code: code});
-  //   let myModal = new bootstrap.Modal(document.getElementById('leads-details'), {
-  //     keyboard: false
-  //   })
-  //   myModal.show();
+  //   openModal('leads-details');
   // }, []);
 
   const handleClickQuotation = useCallback((code) => {
     setCurrentQuotation(code);
     setSelectedCategory({category: 'quotation', item_code: code});
-    let myModal = new bootstrap.Modal(document.getElementById('quotation-details'), {
-      keyboard: false
-    })
-    myModal.show();
+    openModal('quotation-details');
   }, []);
 
   // --- Section for Table ------------------------------
@@ -258,8 +255,11 @@ const Quotations = () => {
   ];
 
   const handleAddNewQuotation = useCallback(() => {
-    setInitAddNewQuotation(!initAddNewQuotation);
-  }, [initAddNewQuotation]);
+    setInitAddNewQuotation(true);
+    setTimeout(() => {
+      openModal('add_quotation');
+    }, 500);
+  }, []);
 
   useEffect(() => {
     
@@ -269,7 +269,7 @@ const Quotations = () => {
       singleDate:checkedSingleDates
     }
 
-    console.log('[Quotation] useEffect : ', multiQueryCondi);
+    // console.log('[Quotation] useEffect : ', multiQueryCondi);
     tryLoadAllQuotations(multiQueryCondi);
     tryLoadAllUsers();
     
@@ -334,8 +334,6 @@ const Quotations = () => {
                     <button
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                       id="add-task"
-                      data-bs-toggle="modal"
-                      data-bs-target="#add_quotation"
                       onClick={handleAddNewQuotation}
                     >
                       {t('quotation.add_new_quotation')}

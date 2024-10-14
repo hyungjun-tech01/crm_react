@@ -27,6 +27,7 @@ import {
   ProductTypes
 } from "../../repository/consulting";
 import { AttachmentRepo } from "../../repository/attachment";
+import { SettingsRepo } from "../../repository/settings";
 
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
@@ -49,13 +50,16 @@ const ConsultingDetailsModel = () => {
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
 
+  //===== [RecoilState] Related with Users ============================================
+  const { openModal, closeModal } = useRecoilValue(SettingsRepo);
+
+
   //===== Handles to deal this component ==============================================
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentConsultingCode, setCurrentConsultingCode] = useState('');
   const [ selectedCategory, setSelectedCategory] = useRecoilState(atomSelectedCategory);
   const [ showEditor, setShowEditor ] = useState(0);
 
-  const CLOSE_EDITOR = 0;
   const EDIT_REQUEST_CONTENT = 1;
   const EDIT_ACTION_CONTENT = 2;
 
@@ -66,7 +70,6 @@ const ConsultingDetailsModel = () => {
     else
       localStorage.setItem('isFullScreen', '0');
   }, []);
-
 
   //===== Handles to edit 'Consulting Details' ========================================
   const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
@@ -370,6 +373,7 @@ const ConsultingDetailsModel = () => {
       resp.then(res => {
         if (res.result) {
           console.log(`Succeeded to modify company`);
+          handleClose();
         } else {
           console.error('Failed to modify company : ', res.data);
         };
@@ -382,6 +386,7 @@ const ConsultingDetailsModel = () => {
 
   const handleCancelAll = useCallback(() => {
     setEditedDetailValues(null);
+    handleClose();
   }, []);
 
   const handleClose = useCallback(() => {
@@ -453,7 +458,6 @@ const ConsultingDetailsModel = () => {
       tabIndex={-1}
       role="dialog"
       aria-modal="true"
-      data-bs-focus="false"
     >
       <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
         <div className="modal-content">
@@ -482,7 +486,6 @@ const ConsultingDetailsModel = () => {
             <button
               type="button"
               className="btn-close xs-close"
-              data-bs-dismiss="modal"
               onClick={handleClose}
             />
           </div>

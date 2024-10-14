@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Table } from "antd";
 import "antd/dist/reset.css";
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
@@ -11,6 +10,8 @@ import SystemUserModel from "../task/SystemUserModel";
 
 import { CompanyRepo } from "../../repository/company";
 import { TransactionRepo } from "../../repository/transaction";
+import { SettingsRepo } from "../../repository/settings";
+
 import {
   atomFilteredTransactionArray,
   atomCompanyState,
@@ -44,6 +45,10 @@ const Transactions = () => {
   //===== [RecoilState] Related with User =============================================
   const userState = useRecoilValue(atomUserState);
   const { tryLoadAllUsers } = useRecoilValue(UserRepo);
+
+
+  //===== [RecoilState] Related with Settings ===========================================
+  const { openModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to edit this ========================================================
@@ -211,10 +216,7 @@ const Transactions = () => {
     setOpenTransaction(true);
 
     setTimeout(() => {
-      let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
-        keyboard: false
-      })
-      myModal.show();
+      openModal('edit_transaction');
     }, 500);
   };
 
@@ -225,10 +227,7 @@ const Transactions = () => {
     setSelectedCategory({category: 'transaction', item_code: code});
 
     setTimeout(() => {
-      let myModal = new bootstrap.Modal(document.getElementById('edit_transaction'), {
-        keyboard: false
-      })
-      myModal.show();
+      openModal('edit_transaction');
     }, 500);
   };
 
@@ -302,8 +301,6 @@ const Transactions = () => {
                     <button
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                       id="add-task"
-                      // data-bs-toggle="modal"
-                      // data-bs-target="#edit_transaction"
                       onClick={handleAddNewTransaction}
                     >
                       {t('transaction.add_transaction')}

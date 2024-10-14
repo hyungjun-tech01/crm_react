@@ -17,7 +17,6 @@ export const ProductClassListRepo = selector({
         const tryLoadAllProductClassList = getCallback(({ set, snapshot }) => async () => {
             const loadStates = await snapshot.getPromise(atomProductClassListState);
             if((loadStates & 3) === 0){
-                console.log('[tryLoadAllProductClassList] Try to load all ProductClassLists');
                 set(atomProductClassListState, (loadStates | 2));   // state : loading
                 const { loadAllProductClassList } = await snapshot.getPromise(ProductClassListRepo);
                 const ret = await loadAllProductClassList();
@@ -32,7 +31,6 @@ export const ProductClassListRepo = selector({
         });
         const loadAllProductClassList = getCallback(({set}) => async () => {
             try{
-                console.log('[ProductClassListRepository] Try loading all');
                 const response = await fetch(`${BASE_PATH}/productClass`);
                 const data = await response.json();
                 if(data.message){
@@ -50,7 +48,6 @@ export const ProductClassListRepo = selector({
         });
         const modifyProductClass = getCallback(({set, snapshot}) => async (newProductClass) => {
             const input_json = JSON.stringify(newProductClass);
-            console.log(`[ modifyProductClass ] input : `, input_json);
             try{
                 const response = await fetch(`${BASE_PATH}/modifyProductClass`, {
                     method: "POST",
@@ -124,7 +121,6 @@ export const ProductRepo = selector({
         const tryLoadAllProducts = getCallback(({ set, snapshot }) => async () => {
             const loadStates = await snapshot.getPromise(atomProductsState);
             if((loadStates & 3) === 0){
-                console.log('[tryLoadAllProducts] Try to load all Products');
                 set(atomProductsState, (loadStates | 2));   // state : loading
                 const {loadAllProducts} = await snapshot.getPromise(ProductRepo);
                 const ret = await loadAllProducts();
@@ -139,7 +135,6 @@ export const ProductRepo = selector({
         });
         const loadAllProducts = getCallback(({set}) => async () => {
             try{
-                console.log('[ProductRepository] Try loading all')
                 const response = await fetch(`${BASE_PATH}/product`);
                 const data = await response.json();
                 if(data.message){
@@ -158,7 +153,6 @@ export const ProductRepo = selector({
         });
         const modifyProduct = getCallback(({set, snapshot}) => async (newProduct) => {
             const input_json = JSON.stringify(newProduct);
-            console.log(`[ modifyProduct ] input : `, input_json);
             try{
                 const response = await fetch(`${BASE_PATH}/modifyProduct`, {
                     method: "POST",

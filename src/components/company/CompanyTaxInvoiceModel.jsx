@@ -9,6 +9,7 @@ import { Add } from "@mui/icons-material";
 
 import { atomTaxInvoiceByCompany } from '../../atoms/atoms';
 import { TaxInvoiceRepo } from '../../repository/tax_invoice';
+import { SettingsRepo } from '../../repository/settings';
 
 const CompanyTaxInvoiceModel = (props) => {
     const { openTaxInvoice } = props;
@@ -19,23 +20,20 @@ const CompanyTaxInvoiceModel = (props) => {
     const taxInvoiceByCompany = useRecoilValue(atomTaxInvoiceByCompany);
     const { setCurrentTaxInvoice } = useRecoilValue(TaxInvoiceRepo);
 
+
+    //===== [RecoilState] Related with Settings ======================================
+    const { openModal } = useRecoilValue(SettingsRepo);
+
     
     // --- Variables for only TaxInvoice ------------------------------------------------
     const [selectedTaxInvoiceRowKeys, setSelectedTaxInvoiceRowKeys] = useState([]);
-
-    const transferToOtherModal = (id) => {
-        let myModal = new bootstrap.Modal(document.getElementById(id), {
-            keyboard: false
-        });
-        myModal.show();
-    };
 
     const handleSelectTaxInvoice = (code) => {
         setCurrentTaxInvoice(code);
         openTaxInvoice(true);
 
         setTimeout(()=>{
-            transferToOtherModal('edit_tax_invoice');
+            openModal('edit_tax_invoice');
         }, 500);
     };
 
@@ -44,7 +42,7 @@ const CompanyTaxInvoiceModel = (props) => {
         openTaxInvoice(true);
 
         setTimeout(()=>{
-            transferToOtherModal('edit_tax_invoice');
+            openModal('edit_tax_invoice');
         }, 500);
     };
 
@@ -118,7 +116,7 @@ const CompanyTaxInvoiceModel = (props) => {
     ];
 
     useEffect(() => {
-        console.log('[CompanyTaxInvoiceModel] called!');
+        // console.log('[CompanyTaxInvoiceModel] called!');
     }, [taxInvoiceByCompany]);
 
     return (

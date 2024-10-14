@@ -23,7 +23,8 @@ import { QuotationRepo,
   quotationExpiry,
   quotationDelivery,
   quotationPayment
- } from "../../repository/quotation";
+} from "../../repository/quotation";
+import { SettingsRepo } from "../../repository/settings";
 
 import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
@@ -60,6 +61,10 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
 
+  //===== [RecoilState] Related with Settings ============================================
+  const { closeModal } = useRecoilValue(SettingsRepo);
+
+
   //===== Handles to deal this component ==============================================
   const [ isFullScreen, setIsFullScreen ] = useState(false);
   const [ currentQuotationCode, setCurrentQuotationCode ] = useState('');
@@ -72,6 +77,8 @@ const QuotationDetailsModel = ({init, handleInit}) => {
     else
       localStorage.setItem('isFullScreen', '0');
   }, []);
+
+  
 
 
   //===== Handles to edit 'Quotation Details' =========================================
@@ -126,6 +133,7 @@ const QuotationDetailsModel = ({init, handleInit}) => {
       resp.then(res => {
         if (res.result) {
           console.log(`Succeeded to modify Quotation`);
+          handleClose();
         } else {
           console.error("Failed to modify Quotation :", res.data);
         };
@@ -138,6 +146,7 @@ const QuotationDetailsModel = ({init, handleInit}) => {
 
   const handleCancelAll = useCallback(() => {
     setEditedDetailValues({});
+    handleClose();
   }, []);
 
 
@@ -370,6 +379,9 @@ const QuotationDetailsModel = ({init, handleInit}) => {
     }
     setEditedDetailValues(null);
     setCurrentQuotation();
+    setTimeout(() => {
+      closeModal();
+    }, 500);
   }, [setCurrentQuotation, setSelectedCategory]);
 
   const qotation_items_info = [
@@ -466,7 +478,6 @@ if (init)
         tabIndex={-1}
         role="dialog"
         aria-modal="true"
-        data-bs-focus="false"
       >
         <div className={isFullScreen ? 'modal-fullscreen' : 'modal-dialog'} role="document">
           <div className="modal-content">
@@ -495,7 +506,6 @@ if (init)
               <button
                 type="button"
                 className="btn-close xs-close"
-                data-bs-dismiss="modal"
                 onClick={ handleClose }
               />
             </div>

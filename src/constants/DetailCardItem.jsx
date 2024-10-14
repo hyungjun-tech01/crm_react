@@ -191,7 +191,7 @@ const AddressInput = (props) => {
 };
 
 const SearchInput = (props) => {
-    const { addonBefore, title, name, value, disabled, key_name, onChange, style } = props;
+    const { addonBefore, title, name, value, disabled, key_name, onChange, style, handleOpen } = props;
     const [isPopupOpen, setIsPopupOpen] = useState(false);
 
     const handleData = (data) => {
@@ -218,7 +218,10 @@ const SearchInput = (props) => {
                         disabled
                     />
                     <div className="add-basic-btn" onClick={() => {
-                        if (!disabled) setIsPopupOpen(!isPopupOpen)
+                        if (!disabled) {
+                            setIsPopupOpen(!isPopupOpen);
+                            if(handleOpen) handleOpen(!isPopupOpen);
+                        }
                     }}
                     >
                         <FiSearch />
@@ -232,7 +235,10 @@ const SearchInput = (props) => {
                             delete data.component;
                             handleData(data);
                         }}
-                        handleClose={() => setIsPopupOpen(false)}
+                        handleClose={() => {
+                            setIsPopupOpen(false);
+                            if(handleOpen) handleOpen(!isPopupOpen);
+                        }}
                     />
                 </span>
             </span>
@@ -304,7 +310,7 @@ const DetailCardItem = (props) => {
         case 'address':
             return <AddressInput {...SharedProps} title={title} key_zip={detail.key_zip} onChange={detail.editing} style={{ width: widthValue, height: 38 }} />
         case 'search':
-            return <SearchInput {...SharedProps} title={title} key_name={detail.key_name} onChange={detail.editing} style={{ width: widthValue, height: 38 }} />
+            return <SearchInput {...SharedProps} title={title} key_name={detail.key_name} onChange={detail.editing} handleOpen={detail.handleOpen} style={{ width: widthValue, height: 38 }} />
         case 'content':
             return <ContentInput {...SharedProps} title={title} editable={detail.editable} editableKey={detail.editableKey} handleEditable={detail.handleEditable} onChange={detail.editing} />
         default:

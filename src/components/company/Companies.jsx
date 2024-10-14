@@ -3,13 +3,13 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { useTranslation } from "react-i18next";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { CompanyRepo } from "../../repository/company";
 import { atomCompanyState, atomFilteredCompanyArray, atomSelectedCategory } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 import { UserRepo } from '../../repository/user';
+import { SettingsRepo } from "../../repository/settings";
 
 import CompanyAddModel from "./CompanyAddMdel";
 import CompanyDetailsModel from "./CompanyDetailsModel";
@@ -32,6 +32,10 @@ const Companies = () => {
   //===== [RecoilState] Related with User =============================================
   const userState = useRecoilValue(atomUserState);
   const { tryLoadAllUsers } = useRecoilValue(UserRepo);
+
+
+  //===== [RecoilState] Related with Settings =============================================
+  const { openModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to this =============================================================
@@ -102,7 +106,7 @@ const Companies = () => {
     setMultiQueryModal(false);
 
     // query condition 세팅 후 query
-    console.log("queryConditions", queryConditions);
+    // console.log("queryConditions", queryConditions);
     let tommorow = new Date();
 
     const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
@@ -148,15 +152,12 @@ const Companies = () => {
 
   // --- Functions used for Table ------------------------------
   const handleClickCompanyName = useCallback((id) => {
-    console.log('[Company] set current company : ', id);
+    // console.log('[Company] set current company : ', id);
     setInitToEditCompany(true);
     setCurrentCompany(id);
     setSelectedCategory({category: 'company', item_code: id});
     setTimeout(()=>{
-      let myModal = new bootstrap.Modal(document.getElementById('company-details'), {
-        keyboard: false
-      });
-      myModal.show();
+      openModal('company-details');
     }, 500);
     
   }, [setCurrentCompany]);
@@ -217,6 +218,9 @@ const Companies = () => {
 
   const handleAddNewCompanyClicked = useCallback(() => {
     setInitToAddCompany(true);
+    setTimeout(() => {
+      openModal('add_company');
+    }, 500);
   }, [setInitToAddCompany]);
 
   useEffect(() => {
@@ -330,8 +334,6 @@ const Companies = () => {
                     <button
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                       id="add-task"
-                      data-bs-toggle="modal"
-                      data-bs-target="#add_company"
                       onClick={handleAddNewCompanyClicked}
                     >
                       {t('company.new_company')}

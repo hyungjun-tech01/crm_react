@@ -35,7 +35,6 @@ export const CompanyRepo = selector({
         const tryLoadAllCompanies = getCallback(({ set, snapshot }) => async (multiQueryCondi) => {
             const loadStates = await snapshot.getPromise(atomCompanyState);
             if((loadStates & 3) === 0){
-                console.log('[tryLoadAllCompanies] Try to load all Companies');
                 set(atomCompanyState, (loadStates | 2));   // state : loading
                 const ret = await loadAllCompanies(multiQueryCondi);
                 if(ret){
