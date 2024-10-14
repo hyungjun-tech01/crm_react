@@ -114,10 +114,6 @@ const CompanyTransactionModel = (props) => {
         },
     ];
 
-    useEffect(() => {
-        // console.log('[CompanyTransactionModel] called!');
-    }, [transactionByCompany]);
-
     return (
         <div className="row">
             <div className="card mb-0">
@@ -148,7 +144,7 @@ const CompanyTransactionModel = (props) => {
                                     borderRadius: '5px',
                                 }}
                                 >
-                                    <div>{t('purchase.information')}</div>
+                                    <div>{t('transaction.information')}</div>
                                     <Add  onClick={() => handleAddNewTransaction()}/>
                                 </div>
                             }

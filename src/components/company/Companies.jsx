@@ -106,7 +106,6 @@ const Companies = () => {
     setMultiQueryModal(false);
 
     // query condition 세팅 후 query
-    // console.log("queryConditions", queryConditions);
     let tommorow = new Date();
 
     const checkedDates = Object.keys(dates).filter(key => dates[key].checked).map(key => ({
@@ -152,7 +151,6 @@ const Companies = () => {
 
   // --- Functions used for Table ------------------------------
   const handleClickCompanyName = useCallback((id) => {
-    // console.log('[Company] set current company : ', id);
     setInitToEditCompany(true);
     setCurrentCompany(id);
     setSelectedCategory({category: 'company', item_code: id});

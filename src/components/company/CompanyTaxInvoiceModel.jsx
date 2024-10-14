@@ -115,10 +115,6 @@ const CompanyTaxInvoiceModel = (props) => {
         },
     ];
 
-    useEffect(() => {
-        // console.log('[CompanyTaxInvoiceModel] called!');
-    }, [taxInvoiceByCompany]);
-
     return (
         <div className="row">
             <div className="card mb-0">
@@ -149,7 +145,7 @@ const CompanyTaxInvoiceModel = (props) => {
                                     borderRadius: '5px',
                                 }}
                                 >
-                                    <div>{t('purchase.information')}</div>
+                                    <div>{t('taxinvoice.information')}</div>
                                     <Add  onClick={() => handleAddNewTaxInvoice()}/>
                                 </div>
                             }

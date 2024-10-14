@@ -371,16 +371,13 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   }, []);
 
   // --- Funtions for Control Windows ---------------------------------
-  
+  const handleInitialize = () => {
+    setEditedDetailValues(null);
+  }; 
 
   const handleClose = useCallback(() => {
-    if(selectedCategory.category === 'quotation') {
-      setSelectedCategory({category: null, item_code: null});
-    }
-    setEditedDetailValues(null);
-    setCurrentQuotation();
     setTimeout(() => {
-      closeModal();
+      closeModal('initialize_quotation');
     }, 500);
   }, [setCurrentQuotation, setSelectedCategory]);
 
@@ -454,6 +451,7 @@ const QuotationDetailsModel = ({init, handleInit}) => {
       };
     };
 
+    handleInitialize();
     setCurrentQuotationCode(selectedQuotation.quotation_code);
   }, [selectedQuotation, editedDetailValues, currentQuotationCode, quotationState]);
 

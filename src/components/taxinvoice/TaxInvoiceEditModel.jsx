@@ -297,7 +297,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
   };
 
   const handleStartAddContent = () => {
-    console.log('add transaction');
     const tempSetting = {
       title: t('quotation.add_content'),
       vat_included: isTaxInvoice,
@@ -472,7 +471,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const handleSelectCompany = (data) => {
-    console.log('handleSelectCompany', data);
     if (isSale) {
       setReceiver({
         company_code: data.company_code,
@@ -516,7 +514,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
     const tempVacantCount = 11 - tempAmountText.length;
 
     if (tempVacantCount < 0) {
-      console.log('Too high value');
       vacantCount = 0;
       inputAmountText = tempAmountText.slice(-11);
     } else {
@@ -546,6 +543,16 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
       vacant_count: vacantCount,
     };
   };
+
+  const handlePopupOpen = () => {
+    openModal('antModal');
+    setIsPopupOpen(true);
+  };
+
+  const handlePopupClose = () => {
+    closeModal();
+    setIsPopupOpen(false);
+  }
 
   const handleInitialize = useCallback(() => {
     document.querySelector("#add_new_tax_invoice_form").reset();
@@ -635,7 +642,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
     const resp = modifyTaxInvoice(newTaxInvoice);
     resp.then((res) => {
       if (res.result) {
-        handleInitialize();
         closeModal();
       }
       else {
@@ -646,11 +652,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
   };
 
   const handleClose = () => {
-    if(selectedCategory.category && (selectedCategory.category === 'tax_invoice')){
-      setSelectedCategory({category: null, item_code: null});
-    };
-    handleInitialize();
-    closeModal();
+    closeModal('initialize_tax_invoice');
     setTimeout(() => {
       close();
     }, 500);
@@ -660,6 +662,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
   useEffect(() => {
     if (!open) return;
 
+    handleInitialize();
     if ((companyState & 1) === 1) {
       let inputData = null;
       if (!!data) {
@@ -788,7 +791,6 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
       }
       setInvoiceChange({});
     };
-
   }, [contents, data, companyState, open, currentTaxInvoice, selectedCategory, currentCompany]);
 
   if (!open) return (
@@ -961,7 +963,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
                                   :
                                   <div className={styles.searchWarpper}>
                                     <label className={styles.textStart}>{supplier.company_name}</label>
-                                    <div className={styles.searchIcon} onClick={() => setIsPopupOpen(!isPopupOpen)}>
+                                    <div className={styles.searchIcon} onClick={handlePopupOpen}>
                                         <FiSearch />
                                     </div>
                                   </div>
@@ -1065,7 +1067,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
                                 {isSale ?
                                   <div className={styles.searchWarpper}>
                                     <label className={styles.textStart}>{receiver.company_name}</label>
-                                    <div className={styles.searchIcon} onClick={() => setIsPopupOpen(!isPopupOpen)}>
+                                    <div className={styles.searchIcon} onClick={handlePopupOpen}>
                                         <FiSearch />
                                     </div>
                                   </div>
@@ -1530,7 +1532,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
             delete data.component;
             handleSelectCompany(data);
         }}
-        handleClose={()=>setIsPopupOpen(false)}
+        handleClose={handlePopupClose}
     />
     </div>
   );

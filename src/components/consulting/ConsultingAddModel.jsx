@@ -350,7 +350,6 @@ const ConsultingAddModel = (props) => {
   };
 
   //===== Handles to This ========================================
-  const [ needInit, setNeedInit ] = useState(true);
   const [ consultingChange, setConsultingChange] = useState({});
   const [ showEditor, setShowEditor ] = useState(0);
 
@@ -433,7 +432,6 @@ const ConsultingAddModel = (props) => {
     setConsultingChange(modified);
     setAttachmentsForAction([]);
     setAttachmentsForRequest([]);
-    setNeedInit(false);
     
   }, [cookies.myLationCrmUserName, currentLead, setCurrentCompany, selectedCategory]);
 
@@ -488,7 +486,6 @@ const ConsultingAddModel = (props) => {
   };
 
   const handleClose = () => {
-    setNeedInit(true);
     setTimeout(() => {
       closeModal();
     }, 500);
@@ -497,14 +494,14 @@ const ConsultingAddModel = (props) => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    if (open && needInit && ((userState & 1) === 1)) {
+    if (open && ((userState & 1) === 1)) {
       if (handleOpen) handleOpen(!open);
       initializeConsultingTemplate();
     };
 
-  }, [open, userState, initializeConsultingTemplate, handleOpen, needInit, attachmentsForRequest, attachmentsForAction]);
+  }, [open, userState, initializeConsultingTemplate, handleOpen, attachmentsForRequest, attachmentsForAction]);
 
-  if (needInit)
+  if (open)
     return <div>&nbsp;</div>;
 
   return (
@@ -515,9 +512,7 @@ const ConsultingAddModel = (props) => {
       role="dialog"
       aria-modal="true"
     >
-      <div
-        className="modal-dialog" role="document"
-      >
+      <div className="modal-dialog" role="document" >
         <button
           type="button"
           className="close md-close"

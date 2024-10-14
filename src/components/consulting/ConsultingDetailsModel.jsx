@@ -372,7 +372,6 @@ const ConsultingDetailsModel = () => {
       const resp = modifyConsulting(temp_all_saved);
       resp.then(res => {
         if (res.result) {
-          console.log(`Succeeded to modify company`);
           handleClose();
         } else {
           console.error('Failed to modify company : ', res.data);
@@ -384,20 +383,18 @@ const ConsultingDetailsModel = () => {
     setEditedDetailValues(null);
   }, [cookies.myLationCrmUserId, modifyConsulting, editedDetailValues, selectedConsulting]);
 
-  const handleCancelAll = useCallback(() => {
-    setEditedDetailValues(null);
-    handleClose();
-  }, []);
 
-  const handleClose = useCallback(() => {
-    if(selectedCategory.category === 'consulting'){
-      setSelectedCategory({category: null, item_code: null});
-    };
+  const handleInitialize = () => {
     setEditedDetailValues(null);
     setActionAttachments([]);
     setRequestAttachments([]);
-    setCurrentConsulting();
-  }, [setCurrentConsulting]);
+  };
+
+  const handleClose = useCallback(() => {
+    setTimeout(() => {
+      closeModal('initialize_consulting');
+    }, 500);
+  }, []);
 
   const consultingItemsInfo = [
     { key: 'department', title: 'lead.department', detail: { type: 'label', editing: handleDetailChange } },
@@ -438,6 +435,7 @@ const ConsultingDetailsModel = () => {
         setIsFullScreen(true);
       };
 
+      handleInitialize();
       setCurrentConsultingCode(selectedConsulting.consulting_code);
     };
   }, [cookies.myLationCrmUserId, currentConsultingCode, selectedConsulting]);
@@ -579,7 +577,7 @@ const ConsultingDetailsModel = () => {
                         <button
                           type="button"
                           className="btn btn-secondary btn-rounded"
-                          onClick={handleCancelAll}
+                          onClick={handleClose}
                         >
                           {t('common.cancel')}
                         </button>

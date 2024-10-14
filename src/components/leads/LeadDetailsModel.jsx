@@ -10,7 +10,6 @@ import {
   atomPurchaseByCompany,
   atomConsultingByLead,
   atomQuotationByLead,
-  atomSelectedCategory,
 } from "../../atoms/atoms";
 import { atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo } from "../../repository/company";
@@ -80,7 +79,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentLeadCode, setCurrentLeadCode] = useState('');
   const [validMACount, setValidMACount] = useState(0);
-  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -152,7 +150,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
         ...editedDetailValues,
         ...obj,
       };
-      // console.log("handleDetailAddressChange :", tempEdited);
       setEditedDetailValues(tempEdited);
     },
     [editedDetailValues]
@@ -179,18 +176,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
       closeModal();
     }
   };
-
-  const handleInitialize = () => {
-    setEditedDetailValues(null);
-  };
-  const handleClose = useCallback(() => {
-    // setSelectedCategory({category: null, item_code: null});
-    // setCurrentLead();
-    // setCurrentLeadCode('');
-    setTimeout(() => {
-      closeModal();
-    }, 500);
-  }, []);
 
   const handleSaveAll = useCallback(() => {
     if (editedDetailValues !== null
@@ -226,7 +211,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
           const resp = modifyCompany(temp_update_company);
           resp.then(res => {
             if (res.result) {
-              console.log(`Succeeded to modify company`);
               handleClose();
             } else {
               console.error('Failed to modify company : ', res.data);
@@ -243,9 +227,13 @@ const LeadDetailsModel = ({init, handleInit}) => {
     setEditedDetailValues(null);
   }, [cookies.myLationCrmUserId, currentCompany.company_code, editedDetailValues, modifyCompany, modifyLead, selectedLead]);
 
-  const handleCancelAll = useCallback(() => {
+  const handleInitialize = () => {
     setEditedDetailValues(null);
-    handleClose();
+  };
+  const handleClose = useCallback(() => {
+    setTimeout(() => {
+      closeModal('initialize_lead');
+    }, 500);
   }, []);
 
   const lead_items_info = [
@@ -293,7 +281,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
 
   const handleSearchQuotationCondition = (newValue) => {
     setSearchQuotationCondition(newValue);
-    // console.log("handleSearchCondition", searchQuotationCondition)
     filterCompanyQuotation(newValue);
   };
 
@@ -333,7 +320,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
         handleInit(false);
         return;
       }
-      // console.log('[LeadDetailsModel] new lead is loaded');
       setCurrentCompany(selectedLead.company_code);
       loadCompanyMAContracts(selectedLead.company_code);
       setCurrentLeadCode(selectedLead.lead_code);
@@ -387,9 +373,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
     };
   }, [selectedLead, currentLeadCode, setCurrentCompany, loadCompanyMAContracts]);
   
-
-  if (init)
-    return <div>&nbsp;</div>;
 
   return (
     <>
@@ -607,7 +590,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
                     <button
                       type="button"
                       className="btn btn-secondary btn-rounded"
-                      onClick={handleCancelAll}
+                      onClick={handleClose}
                     >
                       {t('common.cancel')}
                     </button>

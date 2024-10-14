@@ -119,7 +119,7 @@ const Transactions = () => {
     setMultiQueryModal(false);
 
     // query condition 세팅 후 query
-    console.log("handleMultiQueryModalOk", queryConditions);
+    // console.log("handleMultiQueryModalOk", queryConditions);
 
     const multiQueryCondi = {
       queryConditions: queryConditions,
@@ -221,7 +221,6 @@ const Transactions = () => {
   };
 
   const handleOpenTransactoin = (code) => {
-    console.log('handleOpenTransactoin');
     setCurrentTransaction(code)
     setOpenTransaction(true);
     setSelectedCategory({category: 'transaction', item_code: code});

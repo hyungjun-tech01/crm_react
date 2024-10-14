@@ -28,7 +28,7 @@ const LeadConsultingModel = ({ handleInitAddConsulting }) => {
 
     const handleAddNewConsulting = () => {
         handleInitAddConsulting(true);
-        setCurrentConsulting();
+        setCurrentConsulting(defaultConsulting);
         setTimeout(() => {
             openModal('add_consulting');
         }, 500);
@@ -110,10 +110,6 @@ const LeadConsultingModel = ({ handleInitAddConsulting }) => {
             className: "checkbox-red",
         }),
     };
-
-    useEffect(()=>{
-        console.log('[LeadConsultingModel] Maybe consultings are updated');
-    }, [consultingsByLead])
 
     return (
         <div className="row">

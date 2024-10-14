@@ -136,7 +136,6 @@ const CompanyAddModel = (props) => {
       counter: 0,
       modify_user: cookies.myLationCrmUserId,
     };
-    // console.log(`[ handleAddNewCompany ]`, newComData);
     const result = modifyCompany(newComData);
     result.then((res) => {
       if (res.result) {
@@ -161,7 +160,6 @@ const CompanyAddModel = (props) => {
 
   useEffect(() => {
     if (init && (userState & 1) === 1) {
-      // console.log("[CompanyAddModel] initialzie!");
       if (handleInit) handleInit(!init);
       setTimeout(() => {
         initializeCompanyTemplate();

@@ -127,7 +127,6 @@ const PurchaseDetailsModel = () => {
       const res_data = modifyPurchase(temp_all_saved);
       res_data.then(res => {
         if (res.result) {
-          console.log(`Succeeded to modify purchase`);
           handleClose();
         } else {
           console.error("Failed to modify purchase");
@@ -144,19 +143,13 @@ const PurchaseDetailsModel = () => {
     currentPurchase,
   ]);
 
-  const handleCancelAll = useCallback(() => {
+  const handleInitialize = () => {
     setEditedDetailValues(null);
-    handleClose();
-  }, []);
+  };
 
   const handleClose = useCallback(() => {
-    if(selectedCategory.category === 'purchase') {
-      setSelectedCategory({category: null, item_code: null});
-    };
-    setEditedDetailValues(null);
-    setCurrentPurchase(defaultPurchase);
     setTimeout(() => {
-      closeModal();
+      closeModal('initialize_purchase');
     }, 500);
   }, []);
 
@@ -352,14 +345,12 @@ const PurchaseDetailsModel = () => {
         setIsFullScreen(true);
       };
 
+      handleInitialize();
       loadPurchaseMAContracts(currentPurchase.purchase_code);
       setCurrentPurchaseCode(currentPurchase.purchase_code);
-
-      if(currentCompany === defaultCompany) {
-        setCurrentCompany(currentPurchase.company_code);
-      };
+      setCurrentCompany(currentPurchase.company_code);
     };
-  }, [currentPurchase, currentCompany, loadPurchaseMAContracts, currentPurchaseCode]);
+  }, [currentPurchase, loadPurchaseMAContracts, currentPurchaseCode]);
 
   useEffect(() => {
     if (((productClassState & 1) === 1)
@@ -559,7 +550,7 @@ const PurchaseDetailsModel = () => {
                       <button
                         type="button"
                         className="btn btn-secondary btn-rounded"
-                        onClick={handleCancelAll}
+                        onClick={handleClose}
                       >
                         {t('common.cancel')}
                       </button>

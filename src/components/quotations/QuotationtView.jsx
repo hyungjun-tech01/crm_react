@@ -221,7 +221,6 @@ const QuotationView = () => {
     const [ quotationCondition, setQuotationCondition ] = useState({});
 
     useEffect(() => {
-        console.log('[QuotationView] called');
         if(currentQuotation && currentQuotation !== defaultQuotation){
             const tempContents = JSON.parse(currentQuotation.quotation_contents);
             if(tempContents && Array.isArray(tempContents)){
@@ -282,7 +281,6 @@ const QuotationView = () => {
             }
 
             // get info of quotation condition -----------
-            console.log('Check data :', currentQuotation);
             const foundExpiryArray = quotationExpiry.filter(item => item.value === currentQuotation.quotation_expiration_date);
             const tempExpiry = (foundExpiryArray.length > 0) ? foundExpiryArray[0].label : currentQuotation.quotation_expiration_date;
             const foundDeliveryArray = quotationDelivery.filter(item => item.value === currentQuotation.delivery_period);

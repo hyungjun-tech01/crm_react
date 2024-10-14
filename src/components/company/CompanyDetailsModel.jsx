@@ -140,7 +140,6 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
         ...editedDetailValues,
         ...obj,
       };
-      // console.log("handleDetailAddressChange :", tempEdited);
       setEditedDetailValues(tempEdited);
     },
     [editedDetailValues]
@@ -157,7 +156,6 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
       const resp = modifyCompany(temp_all_saved);
       resp.then(res => {
         if (res.result) {
-          console.log(`Succeeded to modify company`);
           handleClose();
         } else {
           console.error("Failed to modify company : ", res.data);
@@ -175,18 +173,12 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
   ]);
 
   const handleInitialize = () => {
-    console.log('handleInitialize is called');
     setEditedDetailValues(null);
   };
   
   const handleClose = useCallback(() => {
-    console.log('handleClose is called');
-    // setSelectedCategory({category: null, item_code: null});
-    // setEditedDetailValues(null);
-    // setCurrentCompany();
-    // setCurrentCompanyCode("");
     setTimeout(() => {
-      closeModal();
+      closeModal('initialize_company');
     }, 500);
   }, [closeModal]);
 

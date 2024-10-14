@@ -99,11 +99,6 @@ const CompanyPurchaseModel = (props) => {
         }),
     };
 
-
-    useEffect(() => {
-        // console.log('[CompanyPurchaseModel] called!');
-    }, [purchaseByCompany]);
-
     return (
         <div className="row">
             <div className="card mb-2">

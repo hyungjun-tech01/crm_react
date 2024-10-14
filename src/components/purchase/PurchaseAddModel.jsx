@@ -59,7 +59,6 @@ const PurchaseAddModel = (props) => {
 
     //===== Handles to edit 'Purchase Add' =================================================
     const [purchaseChange, setPurchaseChange] = useState({});
-    const [companyData, setCompanyData] = useState({ company_name: '', company_code: '' });
     const [needInit, setNeedInit] = useState(false);
     const selectedCategory = useRecoilValue(atomSelectedCategory);
 
@@ -74,16 +73,11 @@ const PurchaseAddModel = (props) => {
     const handleSelectChange = useCallback((name, selected) => {
         let modifiedData = null;
         if (name === 'company_name') {
-            const tempCompany = {
-                company_code: selected.value.company_code,
-                company_name: selected.value.company_name,
-            };
-            setCompanyData(tempCompany);
-
             modifiedData = {
                 ...purchaseChange,
-                // company_name: selected.value.company_name,
                 company_code: selected.value.company_code,
+                company_name: selected.value.company_name,
+                company_name_en: selected.value.company_name_en,
             };
         }
         else if (name === 'product_name') {
@@ -130,10 +124,8 @@ const PurchaseAddModel = (props) => {
             setPurchaseChange({
                 ...defaultPurchase,
                 company_code: currentCompany.company_code,
-            });
-            setCompanyData({
-                company_code: currentCompany.company_code,
                 company_name: currentCompany.company_name,
+                company_name_en: currentCompany.company_name_en,
             });
         } else {
             setPurchaseChange({...defaultPurchase});
@@ -145,7 +137,7 @@ const PurchaseAddModel = (props) => {
         // Check data if they are available
         let numberOfNoInputItems = 0;
         let noCompanyName = false;
-        if(!companyData.company_name || companyData.company_name === ""){
+        if(!purchaseChange.company_name || purchaseChange.company_name === ""){
             numberOfNoInputItems++;
             noCompanyName = true;
         };
@@ -281,7 +273,6 @@ const PurchaseAddModel = (props) => {
         resp.then(result => {
             if (result) {
                 const updatedContracts = contractLists.concat(result);
-                // console.log(`[ handleSubModalOk ] update contract list : `, updatedContracts);
                 setContractLists(updatedContracts);
 
                 // Update MA Contract end date
@@ -296,7 +287,6 @@ const PurchaseAddModel = (props) => {
                     const res_data = modifyPurchase(modifiedPurchase);
                     res_data.then(res => {
                         if (res.result) {
-                            // console.log('Succeeded to update MA end date');
                             const updateAddChange = {
                                 ...purchaseChange,
                                 ma_finish_date: finalData.ma_finish_date,
@@ -364,7 +354,6 @@ const PurchaseAddModel = (props) => {
     //===== useEffect functions ===========================================================
     useEffect(() => {
         if (init){
-            // console.log('[PurchaseAddModel] initialize!');
             if(handleInit) handleInit(!init);
             setTimeout(()=>{
                 initializePurchaseTemplate();
@@ -409,10 +398,10 @@ const PurchaseAddModel = (props) => {
                                             title={t('company.company_name')}
                                             category='purchase'
                                             name='company_name'
-                                            defaultValue={companyData.company_name}
+                                            defaultValue={purchaseChange.company_name}
                                             required
                                             long
-                                            edited={companyData}
+                                            edited={purchaseChange}
                                             setEdited={setPurchaseChange}
                                             handleOpen={handlePopupOpen}
                                         />

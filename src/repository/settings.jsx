@@ -1,7 +1,22 @@
 import React from 'react';
 import { selector } from "recoil";
 import * as bootstrap from '../assets/js/bootstrap.bundle';
-import { atomModalInfoStack } from '../atoms/atoms';
+import { atomModalInfoStack,
+    atomCurrentCompany,
+    defaultCompany,
+    atomCurrentLead,
+    defaultLead,
+    atomCurrentConsulting,
+    defaultConsulting,
+    atomCurrentPurchase,
+    defaultPurchase,
+    atomCurrentQuotation,
+    defaultQuotation,
+    atomCurrentTaxInvoice,
+    defaultTaxInvoice,
+    atomCurrentTransaction,
+    defaultTransaction
+} from '../atoms/atoms';
 
 
 export const SettingsRepo = selector({
@@ -33,7 +48,7 @@ export const SettingsRepo = selector({
                 set(atomModalInfoStack, updatedModalInfoStack);
             };
         });
-        const closeModal = getCallback(({ set, snapshot }) => async () => {
+        const closeModal = getCallback(({ set, snapshot }) => async (command) => {
             const modalInfoStack = await snapshot.getPromise(atomModalInfoStack);
             if(modalInfoStack.length > 0){
                 const lastModalId = modalInfoStack.at(-1);
@@ -58,6 +73,33 @@ export const SettingsRepo = selector({
                 console.log(' - Modals in Stack :', updatedModalInfoStack);
                 set(atomModalInfoStack, updatedModalInfoStack);
             };
+            if(command){
+                switch(command){
+                    case 'initialize_company':
+                        set(atomCurrentCompany, defaultCompany);
+                        break;
+                    case 'initialize_lead':
+                        set(atomCurrentLead, defaultLead);
+                        break;
+                    case 'initialize_consulting':
+                        set(atomCurrentConsulting, defaultConsulting);
+                        break;
+                    case 'initialize_purchase':
+                        set(atomCurrentPurchase, defaultPurchase);
+                        break;
+                    case 'initialize_quotation':
+                        set(atomCurrentQuotation, defaultQuotation);
+                        break;
+                    case 'initialize_tax_invoice':
+                        set(atomCurrentTaxInvoice, defaultTaxInvoice);
+                        break;
+                    case 'initialize_transaction':
+                        set(atomCurrentTransaction, defaultTransaction);
+                        break;
+                    default:
+                        console.log('Nothing is done');
+                }
+            }
         });
         const _modalEscapeKeyHandler = (event) => {
             if(event.key !== 'Escape') return;

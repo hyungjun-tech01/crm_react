@@ -160,7 +160,6 @@ const LeadAddModel = (props) => {
 
     useEffect(() => {
         if (init && (userState & 1) === 1) {
-            console.log('[LeadAddModel] initialize!');
             if(handleInit) handleInit(!init);
             setTimeout(() => {
                 initializeLeadTemplate();

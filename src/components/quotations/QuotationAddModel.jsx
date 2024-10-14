@@ -95,7 +95,6 @@ const QuotationAddModel = (props) => {
   const selectedCategory = useRecoilValue(atomSelectedCategory);
 
   const handlePopupOpen = (open) => {
-    console.log('QuotationAdd / handlePopupOpen');
     if(open) {
       openModal("antModal");
     } else {
@@ -354,6 +353,11 @@ const QuotationAddModel = (props) => {
     setContentColumns(tempColumns);
   };
 
+  const handleCloseEditHeaders = () => {
+    closeModal();
+    setEditHeaders(false);
+  };
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const ConvertHeaderInfosToString = (data) => {
     let ret = '';
@@ -593,7 +597,7 @@ const QuotationAddModel = (props) => {
   }
 
   // --- Functions used for editing content ------------------------------
-  const handleAddNewContent = useCallback(() => {
+  const handleAddNewContent = () => {
     if (!quotationChange.lead_name) {
       setMessage({ title: '필요 정보 누락', message: '고객 이름이 누락되었습니다.' });
       setIsMessageModalOpen(true);
@@ -622,9 +626,9 @@ const QuotationAddModel = (props) => {
     handlePopupOpen(true);
     setEditedContentModalValues({});
     setIsContentModalOpen(true);
-  }, [quotationChange.lead_name, quotationContents.length, settingForContent, t]);
+  };
 
-  const handleModifyContent = useCallback((data) => {
+  const handleModifyContent = (data) => {
     if (!data) {
       setMessage({ title: '필요 정보 누락', message: '입력 Data가 없습니다.' });
       setIsMessageModalOpen(true);
@@ -650,11 +654,12 @@ const QuotationAddModel = (props) => {
       quotation_amount: data['16'],
     });
 
+    handlePopupOpen(true);
     setEditedContentModalValues({});
     setIsContentModalOpen(true);
-  }, [settingForContent, t]);
+  };
 
-  const handleDeleteSelectedConetents = useCallback(() => {
+  const handleDeleteSelectedConetents = () => {
     if (selectedContentRowKeys.length === 0) {
       setMessage({ title: '선택 항목 누락', message: '선택한 값이 없습니다.' });
       setIsMessageModalOpen(true);
@@ -684,10 +689,14 @@ const QuotationAddModel = (props) => {
     setQuotationContents(finalContents);
     handleCalculateAmounts(finalContents);
     setSelectedContentRowKeys([]);
+  };
 
-  }, [handleCalculateAmounts, quotationChange, quotationContents, selectedContentRowKeys]);
+  const handleEditContentItems = () => {
+    handlePopupOpen(true);
+    setEditHeaders(true);
+  };
 
-  const handleContentModalOk = useCallback(() => {
+  const handleContentModalOk = () => {
     const finalData = {
       ...orgContentModalValues,
       ...editedContentModalValues,
@@ -755,7 +764,7 @@ const QuotationAddModel = (props) => {
     };
 
     handleContentModalCancel();
-  }, [editedContentModalValues, handleCalculateAmounts, orgContentModalValues, quotationContents, settingForContent]);
+  };
 
   const handleContentModalCancel = () => {
     handlePopupOpen(false);
@@ -853,7 +862,6 @@ const QuotationAddModel = (props) => {
   };
 
   const handleClose = () => {
-    console.log('QuotationAdd / handleClose');
     const tempCookies = {
       ...cookies.myQuotationAddColumns,
       [cookies.myLationCrmUserId] : [
@@ -1099,7 +1107,7 @@ const QuotationAddModel = (props) => {
                     />
                     <SettingsOutlined
                       style={{ height: 32, width: 32, color: 'gray' }}
-                      onClick={() => { setEditHeaders(!editHeaders); }}
+                      onClick={handleEditContentItems}
                     />
                   </div>
                 </div>
@@ -1334,10 +1342,10 @@ const QuotationAddModel = (props) => {
       <Modal
         title={t('quotation.header_setting')}
         open={editHeaders}
-        onOk={() => { setEditHeaders(!editHeaders)}}
-        onCancel={() => { setEditHeaders(!editHeaders)}}
+        onOk={handleCloseEditHeaders}
+        onCancel={handleCloseEditHeaders}
         footer={[
-          <Button key="submit" type="primary" onClick={() => { setEditHeaders(!editHeaders)}}>
+          <Button key="submit" type="primary" onClick={handleCloseEditHeaders}>
               Ok
           </Button>,
         ]}

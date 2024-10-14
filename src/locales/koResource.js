@@ -275,11 +275,12 @@ const koResource = {
             end_date:'종료일',
         },
         taxinvoice:{
-            taxinvoice_manage: '(세금)계산서 관리',
             add_taxinvoice :'세금계산서 등록',
+            information: '세금계산서 정보',
+            invoice_contents:'계산서내용',
             memo : '계산서메모',
             summary:'계산서요약',
-            invoice_contents:'계산서내용',
+            taxinvoice_manage: '(세금)계산서 관리',
             taxinvoice_multi_query:'계산서 다중검색',
         },
         common:{

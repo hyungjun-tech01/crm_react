@@ -95,7 +95,6 @@ const TransactionPrint = (props) => {
             setTransactionContents(temp_array);
         };
         if(data) {
-            console.log('[TransactionPrint] :', data);
             if(data.transaction_type ==='매출'){
                 setSupplier({...company_info});
                 setReceiver({

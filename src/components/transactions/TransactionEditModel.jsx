@@ -257,7 +257,6 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
   };
 
   const handleStartAddContent = () => {
-    console.log('add transaction');
     //if(!transactionChange['company_code']) return;
     const tempData = {
       ...dataForTransaction,
@@ -420,6 +419,13 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
     setSelectedContentRowKeys(tempKeys);
   };
 
+  const handlePopupOpen = (open) => {
+    if(open) {
+        openModal('antModal');
+    } else {
+      closeModal();
+    }
+};
 
   //===== Handles to edit 'Receipt' ==============================================
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
@@ -724,11 +730,7 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
   };
 
   const handleClose = () => {
-    if (selectedCategory.category && (selectedCategory.category === 'transaction')) {
-      setSelectedCategory({ category: null, item_code: null });
-    };
-    handleInitialize();
-    closeModal();
+    closeModal('initialize_transaction');
     setTimeout(() => {
       close();
     }, 500);
@@ -741,12 +743,9 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
     if ((companyState & 1) === 0) return;
 
     // if (Object.keys(orgTransaction).length === 0) {
-
-    if (currentTransaction === defaultTransaction) {
-      console.log('[TransactionEditModel] Add New Transaction~');
-      handleInitialize();
-    } else {
-      console.log('[TransactionEditModel] Modify Transaction~', currentTransaction);
+    
+    handleInitialize();
+    if (currentTransaction !== defaultTransaction) {
       setIsAdd(false);
       const currentContents = JSON.parse(currentTransaction.transaction_contents);
       setTransactionContents(currentContents);
@@ -885,6 +884,7 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
                                     defaultValue={orgTransaction.company_name}
                                     edited={transactionChange}
                                     setEdited={handleCompanySelected}
+                                    handleOpen={handlePopupOpen}
                                   />
                                 </Col>
                               </Row>
