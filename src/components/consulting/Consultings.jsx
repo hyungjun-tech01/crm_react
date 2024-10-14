@@ -64,7 +64,7 @@ const Consultings = () => {
 
   //===== Handles to deal 'Consultings' ========================================
   const [ nowLoading, setNowLoading ] = useState(true);
-  const [ openAddConsulting, setOpenAddConsulting ] = useState(false);
+  const [ initAddConsulting, setInitAddConsulting ] = useState(false);
   const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const [searchCondition, setSearchCondition] = useState("");
@@ -165,7 +165,7 @@ const Consultings = () => {
 
   // --- Functions used for Add New Consulting ------------------------------
   const handleAddNewConsultingClicked = useCallback(() => {
-    setOpenAddConsulting(true);
+    setInitAddConsulting(true);
     setCurrentConsulting();
     setTimeout(()=>{
       openModal('add_consulting')
@@ -444,7 +444,7 @@ const Consultings = () => {
         <CompanyDetailsModel />
         <LeadDetailsModel />
         <ConsultingDetailsModel />
-        <ConsultingAddModel open={openAddConsulting} handleOpen={setOpenAddConsulting} />
+        <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} />
         <MultiQueryModal 
           title= {t('consulting.consulting_multi_query')}
           open={multiQueryModal}
