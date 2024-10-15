@@ -68,28 +68,6 @@ const LeadAddModel = (props) => {
         }
     };
 
-    const handleClose = () => {
-        setTimeout(() => {
-          closeModal();
-        }, 500);
-    };
-
-    const initializeLeadTemplate = useCallback(() => {
-        document.querySelector("#add_new_lead_form").reset();
-
-        setLeadChange({...defaultLead});
-        setDisableItems(false);
-        // setDisableItemsChecked({
-        //     company_name_en': false,
-        //     company_address': false,
-        //     company_zip_code': false,
-        //     homepage': false,
-        //     company_fax_number': false,
-        //     site_id': false,
-        //     sales_resource': false,
-        // });
-    }, []);
-
     const handleAddNewLead = () => {
         // Check data if they are available
         let numberOfNoInputItems = 0;
@@ -153,6 +131,28 @@ const LeadAddModel = (props) => {
                 setIsMessageModalOpen(true);
             }
         });
+    };
+
+    const initializeLeadTemplate = useCallback(() => {
+        document.querySelector("#add_new_lead_form").reset();
+
+        setLeadChange({...defaultLead});
+        setDisableItems(false);
+        // setDisableItemsChecked({
+        //     company_name_en': false,
+        //     company_address': false,
+        //     company_zip_code': false,
+        //     homepage': false,
+        //     company_fax_number': false,
+        //     site_id': false,
+        //     sales_resource': false,
+        // });
+    }, []);
+
+    const handleClose = () => {
+        setTimeout(() => {
+          closeModal();
+        }, 500);
     };
 
     useEffect(() => {

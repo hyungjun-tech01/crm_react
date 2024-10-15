@@ -46,11 +46,6 @@ const CompanyAddModel = (props) => {
   //===== Handles to edit 'CompanyAddModel' ===========================================
   const [companyChange, setCompanyChange] = useState({ ...defaultCompany });
 
-  const initializeCompanyTemplate = useCallback(() => {
-    setCompanyChange({ ...defaultCompany });
-    document.querySelector("#add_new_company_form").reset();
-  }, []);
-
   const handleDateChange = (name, date) => {
     const modifiedData = {
       ...companyChange,
@@ -151,8 +146,12 @@ const CompanyAddModel = (props) => {
     });
   };
 
+  const initializeCompanyTemplate = useCallback(() => {
+    setCompanyChange({ ...defaultCompany });
+    document.querySelector("#add_new_company_form").reset();
+  }, []);
+
   const handleClose = () => {
-    initializeCompanyTemplate();
     setTimeout(() => {
       closeModal();
     }, 500);

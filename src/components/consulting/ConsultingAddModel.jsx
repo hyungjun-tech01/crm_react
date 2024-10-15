@@ -402,39 +402,6 @@ const ConsultingAddModel = ({ init, handleInit }) => {
     }
   };
 
-  const initializeConsultingTemplate = useCallback(() => {
-    // document.querySelector("#add_new_consulting_form").reset();
-
-    // set Receipt date -------------
-    const tempDate = new Date();
-    let modified = {
-      ...defaultConsulting,
-      receiver: cookies.myLationCrmUserName,
-      receipt_date: tempDate,
-    };
-
-
-    if ((selectedCategory.category === 'lead')
-      && (currentLead !== defaultLead)
-      && (selectedCategory.item_code === currentLead.lead_code)
-    ) {
-      modified['lead_code'] = currentLead.lead_code;
-      modified['lead_name'] = currentLead.lead_name;
-      modified['department'] = currentLead.department;
-      modified['position'] = currentLead.position;
-      modified['mobile_number'] = currentLead.mobile_number;
-      modified['phone_number'] = currentLead.phone_number;
-      modified['email'] = currentLead.email;
-      modified['company_code'] = currentLead.company_code;
-      modified['company_name'] = currentLead.company_name;
-    };
-    setConsultingChange(modified);
-    setAttachmentsForAction([]);
-    setAttachmentsForRequest([]);
-    
-  }, [cookies.myLationCrmUserName, currentLead, setCurrentCompany, selectedCategory]);
-
-
   const handleAddNewConsulting = () => {
     // Check data if they are available ------------------------------------
     let numberOfNoInputItems = 0;
@@ -482,6 +449,38 @@ const ConsultingAddModel = ({ init, handleInit }) => {
       };
     });
   };
+
+  const initializeConsultingTemplate = useCallback(() => {
+    // document.querySelector("#add_new_consulting_form").reset();
+
+    // set Receipt date -------------
+    const tempDate = new Date();
+    let modified = {
+      ...defaultConsulting,
+      receiver: cookies.myLationCrmUserName,
+      receipt_date: tempDate,
+    };
+
+
+    if ((selectedCategory.category === 'lead')
+      && (currentLead !== defaultLead)
+      && (selectedCategory.item_code === currentLead.lead_code)
+    ) {
+      modified['lead_code'] = currentLead.lead_code;
+      modified['lead_name'] = currentLead.lead_name;
+      modified['department'] = currentLead.department;
+      modified['position'] = currentLead.position;
+      modified['mobile_number'] = currentLead.mobile_number;
+      modified['phone_number'] = currentLead.phone_number;
+      modified['email'] = currentLead.email;
+      modified['company_code'] = currentLead.company_code;
+      modified['company_name'] = currentLead.company_name;
+    };
+    setConsultingChange(modified);
+    setAttachmentsForAction([]);
+    setAttachmentsForRequest([]);
+    
+  }, [cookies.myLationCrmUserName, currentLead, setCurrentCompany, selectedCategory]);
 
   const handleClose = () => {
     setTimeout(() => {

@@ -383,19 +383,6 @@ const ConsultingDetailsModel = () => {
     setEditedDetailValues(null);
   }, [cookies.myLationCrmUserId, modifyConsulting, editedDetailValues, selectedConsulting]);
 
-
-  const handleInitialize = () => {
-    setEditedDetailValues(null);
-    setActionAttachments([]);
-    setRequestAttachments([]);
-  };
-
-  const handleClose = useCallback(() => {
-    setTimeout(() => {
-      closeModal('initialize_consulting');
-    }, 500);
-  }, []);
-
   const consultingItemsInfo = [
     { key: 'department', title: 'lead.department', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
@@ -419,6 +406,17 @@ const ConsultingDetailsModel = () => {
     { key: 'memo', title: 'common.memo', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
   ];
 
+  const handleInitialize = () => {
+    setEditedDetailValues(null);
+    setActionAttachments([]);
+    setRequestAttachments([]);
+  };
+
+  const handleClose = useCallback(() => {
+    setTimeout(() => {
+      closeModal('initialize_consulting');
+    }, 500);
+  }, []);
 
   //===== useEffect functions =============================================== 
   useEffect(() => {

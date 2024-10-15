@@ -370,16 +370,6 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   }, []);
 
   // --- Funtions for Control Windows ---------------------------------
-  const handleInitialize = () => {
-    setEditedDetailValues(null);
-  }; 
-
-  const handleClose = useCallback(() => {
-    setTimeout(() => {
-      closeModal('initialize_quotation');
-    }, 500);
-  }, [setCurrentQuotation, setSelectedCategory]);
-
   const qotation_items_info = [
     { key:'quotation_type', title:'quotation.quotation_type', detail:{ type:'select', options:QuotationTypes, editing:handleDetailSelectChange }},
     { key:'quotation_manager', title:'quotation.quotation_manager', detail:{ type:'select', options:usersForSelection, editing:handleDetailSelectChange }},
@@ -411,6 +401,16 @@ const QuotationDetailsModel = ({init, handleInit}) => {
     { key:'email', title:'lead.email', detail:{ type:'label', editing:handleDetailChange }},
     { key:'company_name', title:'company.company_name', detail:{ type:'label', extra:'long', editing:handleDetailChange }},
   ];
+
+  const handleInitialize = () => {
+    setEditedDetailValues(null);
+  }; 
+
+  const handleClose = useCallback(() => {
+    setTimeout(() => {
+      closeModal('initialize_quotation');
+    }, 500);
+  }, []);
 
   // --- useEffect ------------------------------------------------------
   useEffect(() => {

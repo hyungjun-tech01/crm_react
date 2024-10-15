@@ -112,27 +112,6 @@ const PurchaseAddModel = (props) => {
         }
       };
 
-    const initializePurchaseTemplate = useCallback(() => {
-        document.querySelector("#add_new_purchase_form").reset();
-
-        if((currentCompany !== defaultCompany)
-            && (
-                ((selectedCategory.category === 'company') && (selectedCategory.item_code === currentCompany.company_code))
-                || ((selectedCategory.category === 'lead') && (selectedCategory.item_code === currentLead.lead_code))
-            )
-        ){
-            setPurchaseChange({
-                ...defaultPurchase,
-                company_code: currentCompany.company_code,
-                company_name: currentCompany.company_name,
-                company_name_en: currentCompany.company_name_en,
-            });
-        } else {
-            setPurchaseChange({...defaultPurchase});
-        }
-        setNeedInit(false);
-    }, [currentCompany, selectedCategory]);
-
     const handleAddNewPurchase = () => {
         // Check data if they are available
         let numberOfNoInputItems = 0;
@@ -344,6 +323,27 @@ const PurchaseAddModel = (props) => {
             console.error("Impossible Case~");
         };
     }, [contractLists, cookies.myLationCrmUserId, t]);
+
+    const initializePurchaseTemplate = useCallback(() => {
+        document.querySelector("#add_new_purchase_form").reset();
+
+        if((currentCompany !== defaultCompany)
+            && (
+                ((selectedCategory.category === 'company') && (selectedCategory.item_code === currentCompany.company_code))
+                || ((selectedCategory.category === 'lead') && (selectedCategory.item_code === currentLead.lead_code))
+            )
+        ){
+            setPurchaseChange({
+                ...defaultPurchase,
+                company_code: currentCompany.company_code,
+                company_name: currentCompany.company_name,
+                company_name_en: currentCompany.company_name_en,
+            });
+        } else {
+            setPurchaseChange({...defaultPurchase});
+        }
+        setNeedInit(false);
+    }, [currentCompany, selectedCategory]);
 
     const handleClose = () => {
         setTimeout(() => {

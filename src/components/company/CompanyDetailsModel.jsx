@@ -172,16 +172,6 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     selectedCompany,
   ]);
 
-  const handleInitialize = () => {
-    setEditedDetailValues(null);
-  };
-  
-  const handleClose = useCallback(() => {
-    setTimeout(() => {
-      closeModal('initialize_company');
-    }, 500);
-  }, [closeModal]);
-
   const company_items_info = [
     {
       key: "company_address",
@@ -305,6 +295,16 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
       detail: { type: "textarea", extra:"long",  editing: handleDetailChange },
     },
   ];
+
+  const handleInitialize = () => {
+    setEditedDetailValues(null);
+  };
+  
+  const handleClose = useCallback(() => {
+    setTimeout(() => {
+      closeModal('initialize_company');
+    }, 500);
+  }, [closeModal]);
 
   //===== useEffect for Company ========================================================
   useEffect(() => {
@@ -581,7 +581,8 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
         setTaxInvoiceContents={setTaxInvoiceContents}
       />
       <TaxInvoiceEditModel
-        open={openTaxInvoice}
+        init={openTaxInvoice}
+        handleInit={setOpenTaxInvoice}
         close={() => {
           setOpenTaxInvoice(false);
           setTaxInvoiceData(null);
