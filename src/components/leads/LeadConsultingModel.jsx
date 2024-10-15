@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSetRecoilState, useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
@@ -54,10 +54,7 @@ const LeadConsultingModel = ({ handleInitAddConsulting }) => {
         {
             title: t('consulting.request_type'),
             dataIndex: "request_type",
-            render: (text, record) => <div style={{maxHeight: '520px', overflow: 'auto'}}
-                dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(text || ''),
-                }} />,
+            render: (text, record) => <>{text}</>,
         },
         {
             title: t('consulting.request_content'),
@@ -80,7 +77,10 @@ const LeadConsultingModel = ({ handleInitAddConsulting }) => {
         {
             title: t('consulting.action_content'),
             dataIndex: "action_content",
-            render: (text, record) => <>{text}</>,
+            render: (text, record) => <div style={{maxHeight: '520px', overflow: 'auto'}}
+                dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(text || ''),
+                }} />,
         },
         {
             title: t('consulting.generator'),
