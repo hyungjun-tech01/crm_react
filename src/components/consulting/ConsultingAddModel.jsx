@@ -34,8 +34,7 @@ import MessageModal from "../../constants/MessageModal";
 import QuillEditor from "../../constants/QuillEditor";
 
 
-const ConsultingAddModel = (props) => {
-  const { open, handleOpen } = props;
+const ConsultingAddModel = ({ init, handleInit }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId", "myLationCrmUserName"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -494,14 +493,14 @@ const ConsultingAddModel = (props) => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    if (open && ((userState & 1) === 1)) {
-      if (handleOpen) handleOpen(!open);
+    if (init && ((userState & 1) === 1)) {
+      if (handleInit) handleInit(!init);
       initializeConsultingTemplate();
     };
 
-  }, [open, userState, initializeConsultingTemplate, handleOpen, attachmentsForRequest, attachmentsForAction]);
+  }, [init, userState, initializeConsultingTemplate, handleInit, attachmentsForRequest, attachmentsForAction]);
 
-  if (open)
+  if (init)
     return <div>&nbsp;</div>;
 
   return (
