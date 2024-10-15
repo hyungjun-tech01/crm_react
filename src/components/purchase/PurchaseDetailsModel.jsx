@@ -135,7 +135,6 @@ const PurchaseDetailsModel = () => {
     } else {
       console.log("[ PurchaseDetailModel ] No saved data");
     }
-    setEditedDetailValues(null);
   }, [
     cookies.myLationCrmUserId,
     modifyPurchase,

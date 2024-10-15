@@ -185,9 +185,7 @@ const PurchaseAddModel = (props) => {
         const res_data = modifyPurchase(newPurchaseData);
         res_data.then((res) => {
             if (res.result) {
-                setCurrentPurchase(res.code);
-                setNeedInit(true);
-                closeModal();
+                handleClose();
             } else {
                 console.log('[PurchaseAddModel] fail to add purchase :', res.data);
             }
@@ -348,7 +346,9 @@ const PurchaseAddModel = (props) => {
     }, [contractLists, cookies.myLationCrmUserId, t]);
 
     const handleClose = () => {
-        closeModal();
+        setTimeout(() => {
+            closeModal();
+        }, 500);
     };
 
     //===== useEffect functions ===========================================================

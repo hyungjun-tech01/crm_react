@@ -69,8 +69,6 @@ const LeadAddModel = (props) => {
     };
 
     const handleClose = () => {
-        initializeLeadTemplate();
-        handleInit(false);
         setTimeout(() => {
           closeModal();
         }, 500);
@@ -145,8 +143,7 @@ const LeadAddModel = (props) => {
         const resp = modifyLead(newLeadData);
         resp.then(res => {
             if (res.result) {
-                initializeLeadTemplate();
-                closeModal();
+                handleClose();
             } else {
                 const tempMsg = {
                     title: t('comment.title_check'),

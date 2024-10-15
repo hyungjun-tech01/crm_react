@@ -692,8 +692,6 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
           setTransactionContents(updatedContents);
         };
 
-        closeModal();
-
         if (value === 'Invoice') {
           handleShowInvoice();
           handleInitialize();

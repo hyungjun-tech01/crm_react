@@ -642,7 +642,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
     const resp = modifyTaxInvoice(newTaxInvoice);
     resp.then((res) => {
       if (res.result) {
-        closeModal();
+        handleClose();
       }
       else {
         setMessage({ title: '저장 중 오류', message: `오류가 발생하여 저장하지 못했습니다. - ${res.message}` });

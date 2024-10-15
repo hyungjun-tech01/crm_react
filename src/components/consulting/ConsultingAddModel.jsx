@@ -475,7 +475,6 @@ const ConsultingAddModel = ({ init, handleInit }) => {
     const result = modifyConsulting(newConsultingData);
     result.then((res) => {
       if (res.result) {
-        closeModal();
         handleClose();
       } else {
         setMessage({ title: '저장 실패', message: '정보 저장에 실패하였습니다.' });

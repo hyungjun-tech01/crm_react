@@ -145,7 +145,6 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   }, [cookies.myLationCrmUserId, modifyQuotation, editedDetailValues, selectedQuotation]);
 
   const handleCancelAll = useCallback(() => {
-    setEditedDetailValues({});
     handleClose();
   }, []);
 
