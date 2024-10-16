@@ -152,6 +152,7 @@ const koResource = {
             list_price: '목록 가격',
             list_price_dc: '목록 가격 할인',
             lower_memo: '하단 메모',
+            modify_content: '항목 수정',
             model_name: '모델명',
             note: '비고',
             order: '발주서',
