@@ -380,7 +380,6 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
 
 
   return (
-    <>
       <div
         className="modal right fade"
         id="company-details"
@@ -570,28 +569,27 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
             </div>
           }
         </div>
+        <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} />
+        <PurchaseDetailsModel />
+        <TransactionEditModel
+          open={openTransaction}
+          close={() =>setOpenTransaction(false)}
+          openTaxInvoice={()=>setOpenTaxInvoice(true)} 
+          setTaxInvoiceData={setTaxInvoiceData}
+          setTaxInvoiceContents={setTaxInvoiceContents}
+        />
+        <TaxInvoiceEditModel
+          init={openTaxInvoice}
+          handleInit={setOpenTaxInvoice}
+          close={() => {
+            setOpenTaxInvoice(false);
+            setTaxInvoiceData(null);
+            setTaxInvoiceContents(null);
+          }}
+          data={taxInvoiceData}
+          contents={taxInvoiceContents}
+        />
       </div>
-      <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} />
-      <PurchaseDetailsModel />
-      <TransactionEditModel
-        open={openTransaction}
-        close={() =>setOpenTransaction(false)}
-        openTaxInvoice={()=>setOpenTaxInvoice(true)} 
-        setTaxInvoiceData={setTaxInvoiceData}
-        setTaxInvoiceContents={setTaxInvoiceContents}
-      />
-      <TaxInvoiceEditModel
-        init={openTaxInvoice}
-        handleInit={setOpenTaxInvoice}
-        close={() => {
-          setOpenTaxInvoice(false);
-          setTaxInvoiceData(null);
-          setTaxInvoiceContents(null);
-        }}
-        data={taxInvoiceData}
-        contents={taxInvoiceContents}
-      />
-    </>
   );
 };
 

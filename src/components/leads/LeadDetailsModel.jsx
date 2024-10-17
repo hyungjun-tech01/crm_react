@@ -375,7 +375,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
   
 
   return (
-    <>
       <div
         className="modal right fade"
         id="leads-details"
@@ -601,14 +600,13 @@ const LeadDetailsModel = ({init, handleInit}) => {
             {/* modal-content */}
           </div>
         }
+        <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} />
+        <ConsultingDetailsModel />
+        <QuotationAddModel init={initAddQuotation} handleInit={setInitAddQuotation} />
+        <QuotationDetailsModel  init={initEditQuotation} handleInit={setInitEditQuotation}/>
+        <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} />
+        <PurchaseDetailsModel />
       </div>
-      <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} />
-      <ConsultingDetailsModel />
-      <QuotationAddModel init={initAddQuotation} handleInit={setInitAddQuotation} />
-      <QuotationDetailsModel  init={initEditQuotation} handleInit={setInitEditQuotation}/>
-      <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} />
-      <PurchaseDetailsModel />
-    </>
   );
 };
 
