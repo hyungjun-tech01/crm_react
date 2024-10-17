@@ -356,7 +356,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
           if(res.result) {
             setTransactionByCompany(res.data);
           } else {
-            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
+            console.log('[CompanyDetailsModel] fail to get quotation :', res.message);
             setTransactionByCompany([]);
           };
         });
@@ -368,7 +368,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
           if(res.result) {
             setTaxInvoiceByCompany(res.data);
           } else {
-            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
+            console.log('[CompanyDetailsModel] fail to get tax invoice :', res.message);
             setTaxInvoiceByCompany([]);
           };
         });

@@ -35,7 +35,7 @@ export const quotationColumn = [
     { value: 'quotation_contents', label: '견적 내용'},
 ];
 
-export const quotationExpiry = [
+export const QuotationExpiry = [
     { value: '5일', label: '견적일로부터 5일 이내'},
     { value: '10일', label: '견적일로부터 10일 이내'},
     { value: '15일', label: '견적일로부터 15일 이내'},
@@ -45,7 +45,7 @@ export const quotationExpiry = [
     { value: '60일', label: '견적일로부터 60일 이내'},
 ];
 
-export const quotationDelivery = [
+export const QuotationDelivery = [
     { value: '5일', label: '발주일로부터 5일 이내'},
     { value: '10일', label: '발주일로부터 10일 이내'},
     { value: '15일', label: '발주일로부터 15일 이내'},
@@ -55,12 +55,35 @@ export const quotationDelivery = [
     { value: '60일', label: '발주일로부터 60일 이내'},
 ];
 
-export const quotationPayment = [
+export const QuotationPayment = [
     { value: 'ThisDayCard', label: '당일 카드 결제'},
     { value: 'ThisDayCash', label: '당일 현금 결제'},
     { value: 'ThisMonthLastDayCash', label: '당월말 현금 결제'},
     { value: 'NextMonthLastDayCash', label: '익월말 현금 결제'},
 ];
+
+export const QuotationContentItems = [
+    ['1',   'No'],
+    ['2',   'common.category'],
+    ['3',   'common.maker'],
+    ['4',   'quotation.model_name'],
+    ['5',   'common.product'],
+    ['6',   'common.material'],
+    ['7',   'common.type'],
+    ['8',   'common.color'],
+    ['9',   'common.standard'],
+    ['10',  'quotation.detail_desc'],
+    ['11',  'common.unit'],
+    ['12',  'common.quantity'],
+    ['13',  'quotation.consumer_price'],
+    ['14',  'quotation.discount_rate'],
+    ['15',  'quotation.quotation_unit_price'],
+    ['16',  'quotation.quotation_amount'],
+    ['17',  'quotation.raw_price'],
+    ['18',  'quotation.profit_amount'],
+    ['19',  'quotation.note'],
+    ['998',  'quotation.detail_desc'],
+]
 
 
 export const QuotationRepo = selector({
