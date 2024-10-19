@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useRecoilValue } from 'recoil';
-import { PDFViewer } from '@react-pdf/renderer';
-import { Page, Text, View, Document, StyleSheet, Font } from '@react-pdf/renderer';
+import { PDFViewer, Font, Page, Text, View, Document, StyleSheet, Svg, Rect, Image, Path } from '@react-pdf/renderer';
 import { atomCurrentQuotation, defaultQuotation } from "../../atoms/atoms";
 import { atomAllUsers } from '../../atoms/atomsUser';
 import { quotationExpiry, quotationDelivery, quotationPayment } from '../../repository/quotation';
@@ -9,6 +8,8 @@ import NotoSansRegular from "../../fonts/NotoSansKR-Regular.ttf";
 import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";
 import { ConvertCurrency } from '../../constants/functions';
+import Paths from "../../constants/Paths";
+const BASE_PATH = Paths.BASE_PATH;
 
 const ConvStrNumToKor = (digit) => {
     switch(digit)
@@ -321,71 +322,22 @@ const QuotationView = () => {
                                 <Text style={Styles.text}>납품 기간:  {quotationCondition.delivery}</Text>
                                 <Text style={Styles.text}>유효 기간:  {quotationCondition.expiry}</Text>
                             </View>
-                            <View style={{width:'50%',margin:0,padding:0,border:1,flexDirection: 'row'}}>
-                                <View style={{width:20,margin:0,backgroundColor:'#cccccc',borderRight:1,flexDirection:'column',alignItems:'center',justifyContent:'space-around'}}>
-                                    <Text style={Styles.text}>공</Text>
-                                    <Text style={Styles.text}>급</Text>
-                                    <Text style={Styles.text}>자</Text>
-                                </View>
-                                <View style={{margin:0,border:0,flexDirection:'column'}}>
-                                    <View style={[Styles.supplierRow,{height:20,borderBottom:1}]}>
-                                        <View style={Styles.supplierSubject}>
-                                            <Text style={Styles.supplierText}>등록번호</Text>
-                                        </View>
-                                        <View style={Styles.supplierContent}>
-                                            <Text style={Styles.supplierText}>106-86-26016</Text>
-                                        </View>
-                                    </View>
-                                    <View style={[Styles.supplierRow,{height:20,borderBottom:1}]}>
-                                        <View style={Styles.supplierSubject}>
-                                            <Text style={Styles.supplierText}>상호</Text>
-                                        </View>
-                                        <View style={Styles.supplierContent}>
-                                            <Text style={Styles.supplierText}>노드데이타</Text>
-                                        </View>
-                                    </View>
-                                    <View style={[Styles.supplierRow,{height:20,borderBottom:1}]}>
-                                        <View style={Styles.supplierSubject}>
-                                            <Text style={Styles.supplierText}>대표자명</Text>
-                                        </View>
-                                        <View style={Styles.supplierContent}>
-                                            <Text style={Styles.supplierText}>김신일</Text>
-                                        </View>
-                                    </View>
-                                    <View style={[Styles.supplierRow,{height:36,borderBottom:1}]}>
-                                        <View style={Styles.supplierSubject}>
-                                            <Text style={Styles.supplierText}>주소</Text>
-                                        </View>
-                                        <View style={Styles.supplierContent}>
-                                            <Text style={Styles.supplierText}>서울특별시 금천구 가산디지털 1로 128 1811 (STX V-Tower)</Text>
-                                        </View>
-                                    </View>
-                                    <View style={[Styles.supplierRow,{height:36,borderBottom:1}]}>
-                                        <View style={Styles.supplierSubject}>
-                                            <Text style={Styles.supplierText}>업태/종목</Text>
-                                        </View>
-                                        <View style={Styles.supplierContent}>
-                                            <Text style={Styles.supplierText}>도소매서비스/컴퓨터및주변기기,S/W개발,공급,자문</Text>
-                                        </View>
-                                    </View>
-                                    <View style={[Styles.supplierRow,{height:20,borderBottom:1}]}>
-                                        <View style={Styles.supplierSubject}>
-                                            <Text style={Styles.supplierText}>회사전화</Text>
-                                        </View>
-                                        <View style={Styles.supplierContent}>
-                                            <Text style={Styles.supplierText}>02-595-4450 / 051-517-4450</Text>
-                                        </View>
-                                    </View>
-                                    <View style={[Styles.supplierRow,{height:20,border:0}]}>
-                                        <View style={Styles.supplierSubject}>
-                                            <Text style={Styles.supplierText}>회사팩스</Text>
-                                        </View>
-                                        <View style={Styles.supplierContent}>
-                                            <Text style={Styles.supplierText}>02-595-4454 / 051-518-4452</Text>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
+                            <Svg width="300" height="160" viewBox='0 0 300 160' >
+                                <Image x="130" y="30" style={{width: 40, height: 40}} src={`${BASE_PATH}/files/company_stamp.jpg`} debug={true} />
+                                <Rect x="0" y="0" width="25" height="160" stroke="black" fill="#cccccc" />
+                                <Path d="M25 0 H300 V160 H25 M100 0 V160 M25 20 H300 M25 40 H300 M25 60 H300 M25 90 H300 M25 120 H300 M25 140 H300 " stroke='black' fill='none'/>
+                                <Text x="8" y="50" style={Styles.text}>공</Text>
+                                <Text x="8" y="80" style={Styles.text}>급</Text>
+                                <Text x="8" y="110" style={Styles.text}>자</Text>
+
+                                <Text x="43" y="15" style={Styles.supplierText}>등록번호</Text><Text x="110" y="15" style={Styles.supplierText}>106-86-26016</Text>
+                                <Text x="53" y="35" style={Styles.supplierText}>상호</Text><Text x="110" y="35" style={Styles.supplierText}>노드데이타</Text>
+                                <Text x="43" y="55" style={Styles.supplierText}>대표자명</Text><Text x="110" y="55" style={Styles.supplierText}>김신일</Text>
+                                <Text x="53" y="80" style={Styles.supplierText}>주소</Text><Text x="110" y="73" style={Styles.supplierText}>서울특별시 금천구 가산디지털 1로 128</Text><Text x="110" y="86" style={Styles.supplierText}>1811 (STX V-Tower)</Text>
+                                <Text x="41" y="110" style={Styles.supplierText}>업태/종목</Text><Text x="110" y="103" style={Styles.supplierText}>도소매서비스/컴퓨터및주변기기, S/W개발,</Text><Text x="110" y="116" style={Styles.supplierText}>공급, 자문</Text>
+                                <Text x="45" y="135" style={Styles.supplierText}>회사전화</Text><Text x="110" y="135" style={Styles.supplierText}>02-595-4450 / 051-517-4450</Text>
+                                <Text x="45" y="155" style={Styles.supplierText}>회사팩스</Text><Text x="110" y="155" style={Styles.supplierText}>02-595-4454 / 051-518-4452</Text>
+                            </Svg>
                         </View>
                         <Text style={Styles.text}>{currentQuotation.upper_memo}</Text>
                         <View style={{width:'100%',height:20,margin:0,padding:1,borderTop:1,borderLeft:1,borderRight:1,flexGrow:0}}>
