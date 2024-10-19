@@ -5,33 +5,24 @@ import { Button, Modal } from 'antd';
 import DetailCardItem from '../../constants/DetailCardItem';
 import DetailSelectProduct from '../../constants/DetailSelectProduct';
 
+import { QuotationContentItems } from '../../repository/quotation';
+
 
 const QuotationContentModal = (props) => {
-    const { setting, open, original, edited, handleEdited, handleOk, handleCancel } = props;
+    const { setting, open, items, original, edited, handleEdited, handleOk, handleCancel } = props;
     const [t] = useTranslation();
 
 
     //===== Handles to edit 'Contents' ==================================================
+    const [contentItems, setContentItems] = useState([]);
     const [showDetailDesc, setShowDetailDesc] = useState(false);
     const [tempDetailSpec, setTempDetailSpec] = useState('');
 
-    const detail_spec_desc_select = [{ label: t('common.na'), value: '없음' }, { label: t('common.avail'), value: '있음' }]
-    const content_items = showDetailDesc ?
-        [
-            { name: 'product_name', title: t('purchase.product_name'), detail: {type: 'select', extra: 'long'} },
-            { name: 'detail_desc_on_off', title: t('quotation.detail_desc_on_off'), detail: { type: 'select', options: detail_spec_desc_select, extra: 'long' } },
-            { name: 'detail_desc', title: t('quotation.detail_desc'), detail: { type: 'textarea', row_no: 8, extra: 'long' } },
-            { name: 'quantity', title: t('common.quantity'), detail: { type: 'label', extra: 'long' } },
-            { name: 'list_price', title: t('quotation.list_price'), detail: { type: 'label', extra: 'long', price: true, decimal: setting.show_decimal } },
-            { name: 'quotation_amount', title: t('quotation.quotation_amount'), detail: { type: 'label', extra: 'long', disabled: true, price: true, decimal: setting.show_decimal } },
-        ] :
-        [
-            { name: 'product_name', title: t('purchase.product_name'), detail: {type: 'select', extra: 'long'} },
-            { name: 'detail_desc_on_off', title: t('quotation.detail_desc_on_off'), detail: { type: 'select', options: detail_spec_desc_select, extra: 'long' } },
-            { name: 'quantity', title: t('common.quantity'), detail: { type: 'label', extra: 'long' } },
-            { name: 'list_price', title: t('quotation.list_price'), detail: { type: 'label', extra: 'long', price: true, decimal: setting.show_decimal } },
-            { name: 'quotation_amount', title: t('quotation.quotation_amount'), detail: { type: 'label', extra: 'long', disabled: true, price: true, decimal: setting.show_decimal } },
-        ];
+    const detail_spec_desc_select = [
+        { label: t('common.na'), value: '없음' },
+        { label: t('common.avail'), value: '있음' }
+    ];
+    
 
     const handleTime = (name, time) => {
         const tempData = {
@@ -50,6 +41,7 @@ const QuotationContentModal = (props) => {
                 tempData['cost_price'] = Number(value.cost_price);
                 tempData['reseller_price'] = Number(value.reseller_price);
                 tempData['list_price'] = setting.unit_vat_included ? Number(value.list_price) / 1.1 : Number(value.list_price);
+                tempData['unit_price'] = tempData['list_price'];
                 tempData['org_unit_price'] = Number(value.list_price);
 
                 setTempDetailSpec(value.detail_desc);
@@ -77,44 +69,98 @@ const QuotationContentModal = (props) => {
         handleEdited(tempData);
     };
     const handleValue = (event) => {
-        const target_name = event.target.name;
+        const targetName = event.target.name;
+        const targetValue = event.target.value.replace(/[^\d.-]/g, '');
+        console.log('handleValue : ', targetValue);
+        const tempValue = Number(targetValue);
+
         let tempData = { ...edited };
-        if (target_name === 'quantity') {
-            tempData[target_name] = event.target.value !== '' ? Number(event.target.value) : 0;
-            if (!edited['list_price']
-                || edited.list_price === ''
-                || edited.list_price === 0
-            ) {
-                if (!original.list_price) {
-                    tempData['quotation_amount'] = 0;
-                } else {
-                    tempData['quotation_amount'] = Number(original.list_price) * tempData.quantity;
-                }
-            } else {
-                tempData['quotation_amount'] = tempData['quantity'] * Number(edited.list_price);
-            };
-        } else if (target_name === 'list_price') {
-            tempData[target_name] = event.target.value !== '' ? Number(event.target.value) : 0;
-            if (!edited['quantity'] || edited.quantity === '' || edited.quantity === 0) {
-                if (!original.quantity) {
-                    tempData['quotation_amount'] = 0;
-                } else {
-                    tempData['quotation_amount'] = Number(original.quantity) * tempData.list_price;
-                }
-            } else {
-                tempData['quotation_amount'] = tempData['list_price'] * Number(edited.quantity);
-            };
+        if(isNaN(tempValue)){
+            tempData[targetName] = targetValue;
         } else {
-            tempData[target_name] = event.target.value;
+            tempData[targetName] = tempValue;
+            if(targetName === 'quantity') {
+                if(!edited['unit_price']) {
+                    if(!!original.unit_price && !isNaN(Number(original.unit_price))) {
+                        tempData['quotation_amount'] = Number(original.unit_price) * tempValue;
+                    };
+                } else {
+                    if(!isNaN(Number(edited['unit_price']))) {
+                        tempData['quotation_amount'] = Number(edited.unit_price) * tempValue;
+                    };
+                };
+            } else if (targetName === 'unit_price') {
+                console.log('- unit price is changed :', tempValue);
+                if(!edited['quantity']) {
+                    if(!!original.quantity && !isNaN(Number(original.quantity))) {
+                        tempData['quotation_amount'] = Number(original.quantity) * tempValue;
+                    };
+                } else {
+                    if(!isNaN(Number(edited['quantity']))) {
+                        tempData['quotation_amount'] = Number(edited.quantity) * tempValue;
+                    };
+                };
+            };
         };
+         
         handleEdited(tempData);
     };
 
 
     // ----- useEffect for Production -----------------------------------
     useEffect(() => {
-        const show_detail = !!edited['detail_desc_on_off'] ? edited.detail_desc_on_off : original.detail_desc_on_off;
-        setShowDetailDesc( show_detail === '있음');
+        const detailOnOff = !!edited['detail_desc_on_off'] ? edited.detail_desc_on_off : original.detail_desc_on_off;
+        const showDetail = ( detailOnOff === '있음');
+        setShowDetailDesc(showDetail);
+
+        let tempContentItems = [];
+        let needAddproduct = true;
+        
+        items.forEach(item => {
+            const selectedItem = QuotationContentItems[item.dataIndex];
+            if(!selectedItem.content) return;
+
+            if(item.dataIndex === '1') {
+                tempContentItems.push({
+                    name: QuotationContentItems['1'].name, title: 'No', detail: {type: 'label', extra: 'long'}
+                });
+                tempContentItems.push({
+                    name: 'product_name', title: t('purchase.product_name'), detail: {type: 'select', extra: 'long'} 
+                });
+                needAddproduct = false;
+            } else {
+                if(needAddproduct) {
+                    tempContentItems.push({
+                        name: 'product_name', title: t('purchase.product_name'), detail: {type: 'select', extra: 'long'} 
+                    });
+                    needAddproduct = false;
+                };
+                const tempDetail = selectedItem.type === 'label'
+                    ? {type: 'label', extra: 'long'}
+                    : ( selectedItem.type === 'select'
+                        ? { type: 'select', options: detail_spec_desc_select, extra: 'long' }
+                        : ( selectedItem.type === 'price'
+                            ? { type: 'label', extra: 'long', price: true, decimal: setting.show_decimal }
+                            : { type: 'textarea', row_no: 5, extra: 'long' }
+                        )
+                );
+                tempContentItems.push({
+                    name: QuotationContentItems[item.dataIndex].name,
+                    title: t(QuotationContentItems[item.dataIndex].title),
+                    detail: tempDetail
+                });
+                if(showDetail && selectedItem.name === 'detail_desc_on_off') {
+                    const detailDescItem = QuotationContentItems['998'];
+                    tempContentItems.push({
+                        name: detailDescItem.name,
+                        title: t(detailDescItem.title),
+                        detail: { type: 'textarea', row_no: 8, extra: 'long' }
+                    })
+                }
+            };
+        });
+        setContentItems(tempContentItems);
+
     }, [edited, original.detail_desc_on_off]);
 
     return (
@@ -139,7 +185,7 @@ const QuotationContentModal = (props) => {
             width={820}
             zIndex={2001}
         >
-            {content_items && content_items.map((item, index) => {
+            {contentItems.length > 0 && contentItems.map((item, index) => {
                 let modifiedDetail = { ...item.detail };
                 if (item.detail.type === 'date') {
                     modifiedDetail['editing'] = handleTime;

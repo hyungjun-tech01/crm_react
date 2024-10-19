@@ -123,29 +123,6 @@ const QuotationAddModel = (props) => {
   //===== Handles to edit 'Content Table' ============================================
   const [contentColumns, setContentColumns] = useState([]);
   const [editHeaders, setEditHeaders] = useState(false);
-  
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  // const defaultContentArray = [
-  //   ['1',   'No',                               (text, record) => <>{text}</>],
-  //   ['2',   t('common.category'),               (text, record) => <>{text}</>],
-  //   ['3',   t('common.maker'),                  (text, record) => <>{text}</>],
-  //   ['4',   t('quotation.model_name'),          (text, record) => <>{text}</>],
-  //   ['5',   t('common.product'),                (text, record) => <>{text}</>],
-  //   ['6',   t('common.material'),               (text, record) => <>{text}</>],
-  //   ['7',   t('common.type'),                   (text, record) => <>{text}</>],
-  //   ['8',   t('common.color'),                  (text, record) => <>{text}</>],
-  //   ['9',   t('common.standard'),               (text, record) => <>{text}</>],
-  //   ['10',  t('quotation.detail_desc'),         (text, record) => <>{text}</>],
-  //   ['11',  t('common.unit'),                   (text, record) => <>{text}</>],
-  //   ['12',  t('common.quantity'),               (text, record) => <>{text}</>],
-  //   ['13',  t('quotation.consumer_price'),      (text, record) => <>{handleFormatter(text)}</>],
-  //   ['14',  t('quotation.discount_rate'),       (text, record) => <>{handleFormatter(text)}</>],
-  //   ['15',  t('quotation.quotation_unit_price'),(text, record) => <>{handleFormatter(text)}</>],
-  //   ['16',  t('quotation.quotation_amount'),    (text, record) => <>{handleFormatter(text)}</>],
-  //   ['17',  t('quotation.raw_price'),           (text, record) => <>{handleFormatter(text)}</>],
-  //   ['18',  t('quotation.profit_amount'),       (text, record) => <>{handleFormatter(text)}</>],
-  //   ['19',  t('quotation.note'),                (text, record) => <>{text}</>],
-  // ];
 
   const defaultColumns = [
     {
@@ -236,21 +213,21 @@ const QuotationAddModel = (props) => {
             render: contentColumns.at(-1).render,
           },
           {
-            title: t(QuotationContentItems[targetIndex - 1][1]),
+            title: t(QuotationContentItems[targetName].title),
             dataIndex: targetName,
-            render: (targetIndex > 12 && targetIndex < 19)
+            render: QuotationContentItems[targetName].render
               ? (text, record) => <>{handleFormatter(text)}</>
               : (text, record) => <>{text}</>,
           },  
-        ]
+        ];
       } else {
         tempColumns = [
           ...contentColumns.slice(0, foundIndex),
           {
-            title: t(QuotationContentItems[targetIndex - 1][1]),
+            title: t(QuotationContentItems[targetName].title),
             dataIndex: targetName,
             width: 100,
-            render: (targetIndex > 12 && targetIndex < 19)
+            render: QuotationContentItems[targetName].render
               ? (text, record) => <>{handleFormatter(text)}</>
               : (text, record) => <>{text}</>,
           },
@@ -287,15 +264,15 @@ const QuotationAddModel = (props) => {
   const ConvertHeaderInfosToString = (data) => {
     let ret = '';
 
-    QuotationContentItems.forEach((item, index) => {
+    Object.keys(QuotationContentItems).forEach((item, index) => {
       if (index === 0)
-        ret += item.at(0);
+        ret += item;
       else
-        ret += '|' + item.at(0);
+        ret += '|' + item;
 
-      ret += '|' + item.at(1) + '|';
+      ret += '|' + t(QuotationContentItems[item].title) + '|';
 
-      const foundIdx = data.findIndex(col => col.dataIndex === item.at(0));
+      const foundIdx = data.findIndex(col => col.dataIndex === item);
       if (foundIdx === -1) {
         ret += '0';
       } else {
@@ -703,7 +680,7 @@ const QuotationAddModel = (props) => {
     let ret = value;
     if (typeof value === 'string') {
       ret = Number(value);
-      if (isNaN(ret)) return;
+      if (isNaN(ret)) return value;
     };
 
     return settingForContent.show_decimal
@@ -1349,16 +1326,16 @@ const QuotationAddModel = (props) => {
       >
         <table className="table">
           <tbody>
-            {QuotationContentItems.map((item, index) => {
-              const foundItem = contentColumns.filter(column => column.dataIndex === item.at(0))[0];
+            {Object.keys(QuotationContentItems).map((item, index) => {
+              const foundItem = contentColumns.filter(column => column.dataIndex === item)[0];
               return (
                 <tr key={index}>
                   <td>
-                  {t(item.at(1))}
+                  {t(QuotationContentItems[item].title)}
                   </td>
                   <td>
                     <Checkbox
-                      name={item.at(0)}
+                      name={item}
                       checked={!!foundItem}
                       onChange={handleHeaderCheckChange}
                     />
@@ -1372,6 +1349,7 @@ const QuotationAddModel = (props) => {
       <QuotationContentModal
         setting={settingForContent}
         open={isContentModalOpen}
+        items={contentColumns}
         original={orgContentModalValues}
         edited={editedContentModalValues}
         handleEdited={handleContentItemChange}
