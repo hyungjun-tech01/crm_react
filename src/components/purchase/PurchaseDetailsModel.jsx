@@ -74,7 +74,6 @@ const PurchaseDetailsModel = () => {
 
 
   //===== Handles to edit 'Purchase Details' ==========================================
-  const [ isAllNeededDataLoaded, setIsAllNeededDataLoaded ] = useState(false);
   const [editedDetailValues, setEditedDetailValues] = useState({});
   const [currentPurchaseCode, setCurrentPurchaseCode] = useState("");
 
@@ -350,17 +349,6 @@ const PurchaseDetailsModel = () => {
       setCurrentCompany(currentPurchase.company_code);
     };
   }, [currentPurchase, loadPurchaseMAContracts, currentPurchaseCode]);
-
-  useEffect(() => {
-    if (((productClassState & 1) === 1)
-      && ((productState & 1) === 1)
-    ) {
-      setIsAllNeededDataLoaded(true);
-    };
-  }, [productClassState, productState]);
-
-  if (!isAllNeededDataLoaded)
-    return <div>&nbsp;</div>;
 
   return (
     <>

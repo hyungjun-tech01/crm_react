@@ -72,7 +72,6 @@ const ConsultingDetailsModel = () => {
   }, []);
 
   //===== Handles to edit 'Consulting Details' ========================================
-  const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
   const [editedDetailValues, setEditedDetailValues] = useState(null);
 
   const handleDetailChange = useCallback((e) => {
@@ -438,14 +437,6 @@ const ConsultingDetailsModel = () => {
     };
   }, [cookies.myLationCrmUserId, currentConsultingCode, selectedConsulting]);
 
-  useEffect(() => {
-    if ((userState & 1) === 1) {
-      setIsAllNeededDataLoaded(true);
-    };
-  }, [userState])
-
-  if (!isAllNeededDataLoaded)
-    return <div>&nbsp;</div>;
 
   return (
     <div

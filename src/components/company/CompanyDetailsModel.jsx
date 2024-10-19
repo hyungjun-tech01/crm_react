@@ -392,183 +392,181 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
           className={isFullScreen ? "modal-fullscreen" : "modal-dialog"}
           role="document"
         >
-          {!init &&
-            <div className="modal-content">
-              <div className="modal-header">
-                <div className="row w-100">
-                  <div className="col-md-4 account d-flex">
-                    <div className="company_img">
-                      <img src={C_logo} alt="User" className="user-image" />
-                    </div>
-                    <div>
-                      <p className="mb-0">
-                        <b>{t("company.company")}</b>
-                      </p>
-                      <span className="modal-title">
-                        {selectedCompany.company_name}
-                      </span>
-                    </div>
+          <div className="modal-content">
+            <div className="modal-header">
+              <div className="row w-100">
+                <div className="col-md-4 account d-flex">
+                  <div className="company_img">
+                    <img src={C_logo} alt="User" className="user-image" />
                   </div>
-                  <DetailTitleItem
-                    original={selectedCompany}
-                    name="company_name_en"
-                    title={t("company.company_name_en")}
-                    onEditing={handleDetailChange}
-                  />
-                  <DetailTitleItem
-                    original={selectedCompany}
-                    name="business_registration_code"
-                    title={t("company.business_registration_code")}
-                    onEditing={handleDetailChange}
-                  />
+                  <div>
+                    <p className="mb-0">
+                      <b>{t("company.company")}</b>
+                    </p>
+                    <span className="modal-title">
+                      {selectedCompany.company_name}
+                    </span>
+                  </div>
                 </div>
-                <Switch
-                  checkedChildren="full"
-                  checked={isFullScreen}
-                  onChange={handleWindowWidthChange}
+                <DetailTitleItem
+                  original={selectedCompany}
+                  name="company_name_en"
+                  title={t("company.company_name_en")}
+                  onEditing={handleDetailChange}
                 />
-                <button
-                  type="button"
-                  className="btn-close xs-close"
-                  onClick={handleClose}
+                <DetailTitleItem
+                  original={selectedCompany}
+                  name="business_registration_code"
+                  title={t("company.business_registration_code")}
+                  onEditing={handleDetailChange}
                 />
               </div>
-              <div className="modal-body">
-                <div className="task-infos">
-                  <ul className="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified">
-                    <li className="nav-item">
-                      <Link
-                        className="nav-link active"
-                        to="#company-details-info"
-                        data-bs-toggle="tab"
-                      >
-                        {t("common.details")}
-                      </Link>
-                    </li>
-                    <li className="nav-item">
-                      <Link
-                        className="nav-link"
-                        to="#company-details-product"
-                        data-bs-toggle="tab"
-                      >
-                        {t("purchase.product_info") +
-                          "(" +
-                          validMACount +
-                          "/" +
-                          purchaseByCompany.length +
-                          ")"}
-                      </Link>
-                    </li>
-                    <li className="nav-item">
-                      <Link
-                        className="nav-link"
-                        to="#company-details-transaction"
-                        data-bs-toggle="tab"
-                      >
-                        {t("transaction.statement_of_account") +
-                          "(" +
-                          transactionByCompany.length +
-                          ")"}
-                      </Link>
-                    </li>
-                    <li className="nav-item">
-                      <Link
-                        className="nav-link"
-                        to="#company-details-taxinvoice"
-                        data-bs-toggle="tab"
-                      >
-                        {t("transaction.tax_bill") +
-                          "(" +
-                          taxInvoiceByCompany.length +
-                          ")"}
-                      </Link>
-                    </li>
-                    {/* <li className="nav-item">
-                      <Link
-                        className="nav-link"
-                        to="#task-news"
-                        data-bs-toggle="tab"
-                      >
-                        News
-                      </Link>
-                    </li> */}
-                  </ul>
-                  <div className="tab-content">
-                    <div className="tab-pane show active" id="company-details-info">
-                      <div className="crms-tasks">
-                        <div className="tasks__item crms-task-item">
-                          <div className="row">
-                            <Space
-                              align="start"
-                              direction="horizontal"
-                              size="small"
-                              style={{ display: "flex", marginBottom: "0.5rem" }}
-                              wrap
-                            >
-                              {company_items_info.map((item, index) => (
-                                <DetailCardItem
-                                  key={`${item.title}-${index}`}
-                                  title={t(item.title)}
-                                  defaultValue={selectedCompany[item.key]}
-                                  edited={editedDetailValues}
-                                  name={item.key}
-                                  detail={item.detail}
-                                />
-                              ))}
-                            </Space>
-                          </div>
+              <Switch
+                checkedChildren="full"
+                checked={isFullScreen}
+                onChange={handleWindowWidthChange}
+              />
+              <button
+                type="button"
+                className="btn-close xs-close"
+                onClick={handleClose}
+              />
+            </div>
+            <div className="modal-body">
+              <div className="task-infos">
+                <ul className="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified">
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link active"
+                      to="#company-details-info"
+                      data-bs-toggle="tab"
+                    >
+                      {t("common.details")}
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link"
+                      to="#company-details-product"
+                      data-bs-toggle="tab"
+                    >
+                      {t("purchase.product_info") +
+                        "(" +
+                        validMACount +
+                        "/" +
+                        purchaseByCompany.length +
+                        ")"}
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link"
+                      to="#company-details-transaction"
+                      data-bs-toggle="tab"
+                    >
+                      {t("transaction.statement_of_account") +
+                        "(" +
+                        transactionByCompany.length +
+                        ")"}
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link"
+                      to="#company-details-taxinvoice"
+                      data-bs-toggle="tab"
+                    >
+                      {t("transaction.tax_bill") +
+                        "(" +
+                        taxInvoiceByCompany.length +
+                        ")"}
+                    </Link>
+                  </li>
+                  {/* <li className="nav-item">
+                    <Link
+                      className="nav-link"
+                      to="#task-news"
+                      data-bs-toggle="tab"
+                    >
+                      News
+                    </Link>
+                  </li> */}
+                </ul>
+                <div className="tab-content">
+                  <div className="tab-pane show active" id="company-details-info">
+                    <div className="crms-tasks">
+                      <div className="tasks__item crms-task-item">
+                        <div className="row">
+                          <Space
+                            align="start"
+                            direction="horizontal"
+                            size="small"
+                            style={{ display: "flex", marginBottom: "0.5rem" }}
+                            wrap
+                          >
+                            {company_items_info.map((item, index) => (
+                              <DetailCardItem
+                                key={`${item.title}-${index}`}
+                                title={t(item.title)}
+                                defaultValue={selectedCompany[item.key]}
+                                edited={editedDetailValues}
+                                name={item.key}
+                                detail={item.detail}
+                              />
+                            ))}
+                          </Space>
                         </div>
                       </div>
                     </div>
-                    <div
-                      className="tab-pane company-details-product"
-                      id="company-details-product"
-                    >
-                      <CompanyPurchaseModel
-                        handleInitAddPurchase={setInitAddPurchase}
-                      />
-                    </div>
-                    <div
-                      className="tab-pane company-details-transaction"
-                      id="company-details-transaction"
-                    >
-                      <CompanyTransactionModel
-                        openTransaction={setOpenTransaction}
-                      />
-                    </div>
-                    <div
-                      className="tab-pane company-details-taxinvoice"
-                      id="company-details-taxinvoice"
-                    >
-                      <CompanyTaxInvoiceModel
-                        openTaxInvoice={setOpenTaxInvoice}
-                      />
-                    </div>
                   </div>
-                  {editedDetailValues !== null &&
-                    Object.keys(editedDetailValues).length !== 0 && (
-                      <div className="text-center py-3">
-                        <button
-                          type="button"
-                          className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                          onClick={handleDetailSave}
-                        >
-                          {t("common.save")}
-                        </button>
-                        &nbsp;&nbsp;
-                        <button
-                          type="button"
-                          className="btn btn-secondary btn-rounded"
-                          onClick={handleClose}
-                        >
-                          {t("common.cancel")}
-                        </button>
-                      </div>
-                    )}
+                  <div
+                    className="tab-pane company-details-product"
+                    id="company-details-product"
+                  >
+                    <CompanyPurchaseModel
+                      handleInitAddPurchase={setInitAddPurchase}
+                    />
+                  </div>
+                  <div
+                    className="tab-pane company-details-transaction"
+                    id="company-details-transaction"
+                  >
+                    <CompanyTransactionModel
+                      openTransaction={setOpenTransaction}
+                    />
+                  </div>
+                  <div
+                    className="tab-pane company-details-taxinvoice"
+                    id="company-details-taxinvoice"
+                  >
+                    <CompanyTaxInvoiceModel
+                      openTaxInvoice={setOpenTaxInvoice}
+                    />
+                  </div>
                 </div>
+                {editedDetailValues !== null &&
+                  Object.keys(editedDetailValues).length !== 0 && (
+                    <div className="text-center py-3">
+                      <button
+                        type="button"
+                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                        onClick={handleDetailSave}
+                      >
+                        {t("common.save")}
+                      </button>
+                      &nbsp;&nbsp;
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-rounded"
+                        onClick={handleClose}
+                      >
+                        {t("common.cancel")}
+                      </button>
+                    </div>
+                  )}
               </div>
             </div>
-          }
+          </div>
         </div>
       </div>
       <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} />
