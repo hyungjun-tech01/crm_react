@@ -55,12 +55,13 @@ const default_receipt_data = {
   card_number: '',
 };
 
-const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, setTaxInvoiceContents }) => {
+const TransactionEditModel = ({ open, openTaxInvoice, setTaxInvoiceData, setTaxInvoiceContents }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [message, setMessage] = useState({ title: '', message: '' });
   const [isAdd, setIsAdd] = useState(true);
+  
 
   //===== [RecoilState] Related with Transaction =====================================
   const currentTransaction = useRecoilValue(atomCurrentTransaction);
@@ -694,7 +695,7 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
 
         if (value === 'Invoice') {
           handleShowInvoice();
-          handleInitialize();
+          // handleInitialize();
         } else {
           handleClose();
         };
@@ -728,9 +729,9 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
   };
 
   const handleClose = () => {
-    closeModal('initialize_transaction');
     setTimeout(() => {
-      close();
+      closeModal('initialize_transaction');
+      // close();
     }, 500);
   };
 

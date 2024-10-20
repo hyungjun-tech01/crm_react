@@ -652,9 +652,9 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
   };
 
   const handleClose = () => {
-    closeModal('initialize_tax_invoice');
     setTimeout(() => {
-      close();
+      closeModal('initialize_tax_invoice');
+      // close();
     }, 500);
   };
 
@@ -665,10 +665,11 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
     handleInitialize();
     if ((companyState & 1) === 1) {
       let inputData = null;
-      if (!!data) {
+
+      if (!!data) {   // case : This is opened through TransactionEdit.
         inputData = data;
         setShowSaveButton(true);
-      } else {
+      } else {        // case : This is opened directly by selecting tax invoice data or adding new tax invoice
         if(currentTaxInvoice !== defaultTaxInvoice) {
           inputData = {...currentTaxInvoice};
           setShowSaveButton(false);
@@ -793,9 +794,9 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
     };
   }, [contents, data, companyState, open, currentTaxInvoice, selectedCategory, currentCompany]);
 
-  if (!open) return (
-    <div>&nbsp;</div>
-  );
+  // if (!open) return (
+  //   <div>&nbsp;</div>
+  // );
 
   return (
     <div

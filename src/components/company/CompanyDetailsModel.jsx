@@ -573,19 +573,18 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
       <PurchaseDetailsModel />
       <TransactionEditModel
         open={openTransaction}
-        close={() =>setOpenTransaction(false)}
         openTaxInvoice={()=>setOpenTaxInvoice(true)} 
         setTaxInvoiceData={setTaxInvoiceData}
         setTaxInvoiceContents={setTaxInvoiceContents}
       />
       <TaxInvoiceEditModel
-        init={openTaxInvoice}
-        handleInit={setOpenTaxInvoice}
-        close={() => {
-          setOpenTaxInvoice(false);
-          setTaxInvoiceData(null);
-          setTaxInvoiceContents(null);
-        }}
+        open={openTaxInvoice}
+        // handleInit={setOpenTaxInvoice}
+        // close={() => {
+        //   setOpenTaxInvoice(false);
+        //   setTaxInvoiceData(null);
+        //   setTaxInvoiceContents(null);
+        // }}
         data={taxInvoiceData}
         contents={taxInvoiceContents}
       />

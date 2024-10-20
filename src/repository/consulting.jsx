@@ -12,7 +12,8 @@ import { atomCurrentConsulting
     , atomRequestAttachments
     , atomActionAttachments
     , defaultLead,
-    atomConsultingByLead
+    atomConsultingByLead,
+    atomSelectedCategory
 } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
@@ -206,25 +207,25 @@ export const ConsultingRepo = selector({
                 );
             }else if(itemName === 'company.company_name'){
                 allConsulting = allConsultingList.filter(item => (item.company_name &&item.company_name.includes(filterText))
-                );    
+                );
             }else if(itemName === 'consulting.type'){
                 allConsulting = allConsultingList.filter(item => (item.consulting_type &&item.consulting_type.includes(filterText))
-                );    
+                );
             }else if(itemName === 'lead.full_name'){
                 allConsulting = allConsultingList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))
-                );    
+                );
             }else if(itemName === 'lead.mobile'){
                 allConsulting = allConsultingList.filter(item => (item.mobile_number &&item.mobile_number.includes(filterText))
-                );    
+                );
             }else if(itemName === 'common.phone_no'){
                 allConsulting = allConsultingList.filter(item => (item.phone_number &&item.phone_number.includes(filterText))
-                );    
+                );
             }else if(itemName === 'consulting.request_content'){
                 allConsulting = allConsultingList.filter(item => (item.request_content &&item.request_content.includes(filterText))
-                );    
+                );
             }else if(itemName === 'consulting.action_content'){
                 allConsulting = allConsultingList.filter(item => (item.action_content &&item.action_content.includes(filterText))
-                );    
+                );
             }
             set(atomFilteredConsultingArray, allConsulting);
             return true;
@@ -267,20 +268,19 @@ export const ConsultingRepo = selector({
                         ...filteredAllConsultings
                     ];
                     set(atomFilteredConsultingArray, updatedFiltered);
-                    return {result: true};
 
                     //----- Update ConsultingByLead -----------------------//
-                    //const currentLead = await snapshot.getPromise(atomCurrentLead);
-                    //if((currentLead !== defaultLead)
-                    //    && (currentLead.lead_code === updatedNewConsulting.lead_code))
-                    //{
-                    //    const consultingByCompany = await snapshot.getPromise(atomConsultingByLead);
-                    //    const updated = [
-                    //        updatedNewConsulting,
-                    //        ...consultingByCompany,
-                    //    ];
-                    //    set(atomConsultingByLead, updated);
-                    //};
+                    const currentCategory = await snapshot.getPromise(atomSelectedCategory);
+                    if(currentCategory.category === 'lead'){
+                        const currentConsultingByLead = await snapshot.getPromise(atomConsultingByLead);
+                        const updatedConsultingByLead = [
+                            updatedNewConsulting,
+                            ...currentConsultingByLead
+                        ];
+                        set(atomConsultingByLead, updatedConsultingByLead);
+                    };
+
+                    return {result: true};
 
                 } else if(newConsulting.action_type === 'UPDATE'){
                     const currentConsulting = await snapshot.getPromise(atomCurrentConsulting);
@@ -436,8 +436,8 @@ export const ConsultingRepo = selector({
                     foundData = data.sort((a, b) => {
                         const a_time = new Date(a.modify_date);
                         const b_time = new Date(b.modify_date);
-                        if(a_time > b_time) return 1;
-                        if(a_time < b_time) return -1;
+                        if(a_time > b_time) return -1;
+                        if(a_time < b_time) return 1;
                         return 0;
                     });
                 };

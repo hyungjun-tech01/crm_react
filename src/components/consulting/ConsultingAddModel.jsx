@@ -72,6 +72,7 @@ const ConsultingAddModel = ({ init, handleInit }) => {
   const [ attachmentsForAction, setAttachmentsForAction ] = useState([]);
 
   const handleAddRequestContent = async (data) => {
+    console.log('Check / input data :', data);
     const { content, attachments } = data;
 
     // Check if content has all attachments ------------------------
@@ -113,6 +114,7 @@ const ConsultingAddModel = ({ init, handleInit }) => {
 
     // add attachment info
     let finalAttachments = [];
+    let modifedData = {};
 
     if(foundAttachments.length > 0){
       if(!requestAttachmentCode) {
@@ -167,7 +169,7 @@ const ConsultingAddModel = ({ init, handleInit }) => {
           finalAttachments.push(...tempAttachments);
         }
 
-        const modifedData = {
+        modifedData = {
           ...consultingChange,
           request_content: content,
           request_attachment_code: firstResp.data.attachmentCode,
@@ -200,14 +202,19 @@ const ConsultingAddModel = ({ init, handleInit }) => {
             return { ...item};
           };
         }));
-        const modifedData = {
+        modifedData = {
           ...consultingChange,
           request_content: content,
         };
-        setConsultingChange(modifedData);
       };
       setAttachmentsForRequest(finalAttachments);
+    } else {
+      modifedData = {
+        ...consultingChange,
+        request_content: content,
+      };
     };
+    setConsultingChange(modifedData);
   };
 
   const handleAddActionContent = async (data) => {
@@ -252,6 +259,7 @@ const ConsultingAddModel = ({ init, handleInit }) => {
 
     // add attachment info
     let finalAttachments = [];
+    let modifedData = {};
 
     if(foundAttachments.length > 0){
       if(!actionAttachmentCode) {
@@ -306,12 +314,11 @@ const ConsultingAddModel = ({ init, handleInit }) => {
           finalAttachments.push(...tempAttachments);
         }
 
-        const modifedData = {
+        modifedData = {
           ...consultingChange,
           action_content: content,
           action_attachment_code: firstResp.data.attachmentCode,
         };
-        setConsultingChange(modifedData);
       } else {
         finalAttachments = await Promise.all(foundAttachments.map(async (item) => {
           if(!item.uuid) {
@@ -338,14 +345,19 @@ const ConsultingAddModel = ({ init, handleInit }) => {
             return { ...item};
           };
         }));
-        const modifedData = {
+        modifedData = {
           ...consultingChange,
           action_content: content,
         };
-        setConsultingChange(modifedData);
       }
       setAttachmentsForAction(finalAttachments);
+    } else {
+      modifedData = {
+        ...consultingChange,
+        action_content: content,
+      };
     };
+    setConsultingChange(modifedData);
   };
 
   //===== Handles to This ========================================

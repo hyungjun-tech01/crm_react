@@ -85,6 +85,8 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   const [editedDetailValues, setEditedDetailValues] = useState({});
 
   const handleDetailChange = useCallback((e) => {
+    console.log('Check / original :', selectedQuotation[e.target.name]);
+    console.log('Check / change :', e.target.value);
     if (e.target.value !== selectedQuotation[e.target.name]) {
       const tempEdited = {
         ...editedDetailValues,
