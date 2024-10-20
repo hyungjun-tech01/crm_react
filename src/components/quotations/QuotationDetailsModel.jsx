@@ -79,14 +79,10 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   }, []);
 
   
-
-
   //===== Handles to edit 'Quotation Details' =========================================
   const [editedDetailValues, setEditedDetailValues] = useState({});
 
   const handleDetailChange = useCallback((e) => {
-    console.log('Check / original :', selectedQuotation[e.target.name]);
-    console.log('Check / change :', e.target.value);
     if (e.target.value !== selectedQuotation[e.target.name]) {
       const tempEdited = {
         ...editedDetailValues,
@@ -454,7 +450,7 @@ const QuotationDetailsModel = ({init, handleInit}) => {
 
     handleInitialize();
     setCurrentQuotationCode(selectedQuotation.quotation_code);
-  }, [selectedQuotation, editedDetailValues, currentQuotationCode, quotationState]);
+  }, [selectedQuotation, currentQuotationCode, quotationState]);
 
 
   // ----- useEffect for Production -----------------------------------
