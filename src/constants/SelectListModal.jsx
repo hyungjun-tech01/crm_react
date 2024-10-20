@@ -127,6 +127,7 @@ const SelectListModal = (props) => {
                 if(condition.item === 'company_name') {
                     modifiedData['company_code'] = data.company_code;
                     modifiedData['company_name'] = data.company_name;
+                    modifiedData['company_name_en'] = data.company_name_en;
                 };
                 break;
             case 'tax_invoice':

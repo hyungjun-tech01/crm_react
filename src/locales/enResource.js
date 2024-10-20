@@ -153,6 +153,7 @@ const enResource = {
             list_price_dc: 'List Price DC',
             lower_memo: 'Lower Note',
             model_name: 'Model Name',
+            modify_content: 'Modify Content',
             note: 'Note',
             order: 'Order',
             payment_type: 'Payment Type',
