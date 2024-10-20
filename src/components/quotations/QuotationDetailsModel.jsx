@@ -460,7 +460,7 @@ const QuotationDetailsModel = ({init, handleInit}) => {
     ) {
       handleInit(false);
     };
-}, [allProductClassList, allProducts, productClassState, productState, userState, quotationState, handleInit]);
+}, [userState, quotationState, handleInit]);
 
 if (init)
   return <div>&nbsp;</div>;

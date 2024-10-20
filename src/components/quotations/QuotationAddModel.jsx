@@ -58,7 +58,7 @@ const ResizeableTitle = props => {
 const QuotationAddModel = (props) => {
   const { init, handleInit } = props;
   const [t] = useTranslation();
-  const [cookies, setCookie] = useCookies(["myLationCrmUserId", "myQuotationAddColumns"]);
+  const [cookies, setCookie] = useCookies(["myLationCrmUserId", "myLationCrmUserName", "myQuotationAddColumns"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [message, setMessage] = useState({ title: "", message: "" });
 
@@ -789,7 +789,6 @@ const QuotationAddModel = (props) => {
 
     // load or set setting of column of table ----------------------------------
     if(!cookies.myQuotationAddColumns){
-
       const tempQuotationColumn = [
         ...defaultColumns
       ];

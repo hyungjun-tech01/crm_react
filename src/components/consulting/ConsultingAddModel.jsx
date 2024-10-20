@@ -492,7 +492,7 @@ const ConsultingAddModel = ({ init, handleInit }) => {
     setAttachmentsForAction([]);
     setAttachmentsForRequest([]);
     
-  }, [cookies.myLationCrmUserName, currentLead, setCurrentCompany, selectedCategory]);
+  }, [cookies.myLationCrmUserName, currentLead, selectedCategory]);
 
   const handleClose = () => {
     setTimeout(() => {
@@ -508,10 +508,7 @@ const ConsultingAddModel = ({ init, handleInit }) => {
       initializeConsultingTemplate();
     };
 
-  }, [init, userState, initializeConsultingTemplate, handleInit, attachmentsForRequest, attachmentsForAction]);
-
-  if (init)
-    return <div>&nbsp;</div>;
+  }, [init, userState, initializeConsultingTemplate, handleInit]);
 
   return (
     <div
