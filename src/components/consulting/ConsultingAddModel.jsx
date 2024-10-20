@@ -110,6 +110,7 @@ const ConsultingAddModel = (props) => {
 
     // add attachment info
     let finalAttachments = [];
+    let modifiedData = {};
 
     if(foundAttachments.length > 0){
       if(!requestAttachmentCode) {
@@ -162,14 +163,13 @@ const ConsultingAddModel = (props) => {
             }
           }));
           finalAttachments.push(...tempAttachments);
-        }
+        };
 
-        const modifedData = {
+        modifiedData = {
           ...consultingChange,
           request_content: content,
           request_attachment_code: firstResp.data.attachmentCode,
         };
-        setConsultingChange(modifedData);
       } else {
         finalAttachments = await Promise.all(foundAttachments.map(async (item) => {
           if(!item.uuid) {
@@ -197,14 +197,19 @@ const ConsultingAddModel = (props) => {
             return { ...item};
           };
         }));
-        const modifedData = {
+        modifiedData = {
           ...consultingChange,
           request_content: content,
         };
-        setConsultingChange(modifedData);
       };
       setAttachmentsForRequest(finalAttachments);
+    } else {
+      modifiedData = {
+        ...consultingChange,
+        request_content: content,
+      };
     };
+    setConsultingChange(modifiedData);
   };
 
   const handleAddActionContent = async (data) => {
@@ -249,6 +254,7 @@ const ConsultingAddModel = (props) => {
 
     // add attachment info
     let finalAttachments = [];
+    let modifiedData = {};
 
     if(foundAttachments.length > 0){
       if(!actionAttachmentCode) {
@@ -303,12 +309,11 @@ const ConsultingAddModel = (props) => {
           finalAttachments.push(...tempAttachments);
         }
 
-        const modifedData = {
+        modifiedData = {
           ...consultingChange,
           action_content: content,
           action_attachment_code: firstResp.data.attachmentCode,
         };
-        setConsultingChange(modifedData);
       } else {
         finalAttachments = await Promise.all(foundAttachments.map(async (item) => {
           if(!item.uuid) {
@@ -335,14 +340,19 @@ const ConsultingAddModel = (props) => {
             return { ...item};
           };
         }));
-        const modifedData = {
+        modifiedData = {
           ...consultingChange,
           action_content: content,
         };
-        setConsultingChange(modifedData);
       }
       setAttachmentsForAction(finalAttachments);
+    } else {
+      modifiedData = {
+        ...consultingChange,
+        action_content: content,
+      };
     };
+    setConsultingChange(modifiedData);
   };
 
   //===== Handles to This ========================================
