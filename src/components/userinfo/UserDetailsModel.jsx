@@ -94,7 +94,7 @@ const UserDetailsModel = () => {
     {
       const temp_all_saved = {
         ...editedValues,
-        action_type: "UPDATE",
+        action_type: "UPDATE_USER",
         modify_user: cookies.myLationCrmUserId,
         userId: selectedUser.userId,
       };

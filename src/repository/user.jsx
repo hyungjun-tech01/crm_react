@@ -224,24 +224,82 @@ export const UserRepo = selector({
                         ...currentUser,
                         ...newUser
                     };
-                   //  set(atomCurrentUser, modifiedUser);
+                    set(atomCurrentUser, modifiedUser);
+
+                    if (modifiedUser.isWork === 'N') {
+                        if (modifiedUser.jobType === 'SR') {
+                            //update salespersons selection
+                            const allSalesPersons = await snapshot.getPromise(atomSalespersonsForSelection);
+                            const foundSalesIdx = allSalesPersons.findIndex(user => user.userId === modifiedUser.userId);
+                            if (foundSalesIdx !== -1) {
+                                const updatedSalesPersons = [
+                                    ...allSalesPersons.slice(0, foundSalesIdx),
+                                    ...allSalesPersons.slice(foundSalesIdx + 1,)
+                                ];
+                                set(atomSalespersonsForSelection, updatedSalesPersons);
+                            };
+                        } else if (modifiedUser.jobType === 'AE') {
+                            //update engineers selection
+                            const allEngineers = await snapshot.getPromise(atomEngineersForSelection);
+                            const foundEngIdx = allEngineers.findIndex(user => user.userId === modifiedUser.userId);
+                            if (foundEngIdx !== -1) {
+                                const udpatedEngineers = [
+                                    ...allEngineers.slice(0, foundEngIdx),
+                                    ...allEngineers.slice(foundEngIdx + 1,),
+                                ];
+                                set(atomEngineersForSelection, udpatedEngineers);
+                            };
+                        };
+                    } else {
+                        if (modifiedUser.jobType === 'SR') {
+                            //update salespersons selection
+                            const allSalesPersons = await snapshot.getPromise(atomSalespersonsForSelection);
+                            const foundSalesIdx = allSalesPersons.findIndex(user => user.userId === modifiedUser.userId);
+                            if (foundSalesIdx === -1) {
+                                set(atomSalespersonsForSelection, allSalesPersons.concat({ label: modifiedUser.userName, value: modifiedUser.userName }));
+                            };
+                        } else if (modifiedUser.jobType === 'AE') {
+                            //update engineers selection
+                            const allEngineers = await snapshot.getPromise(atomEngineersForSelection);
+                            const foundEngIdx = allEngineers.findIndex(user => user.userId === modifiedUser.userId);
+                            if (foundEngIdx === -1) {
+                                set(atomEngineersForSelection, allEngineers.concat({ label: modifiedUser.userName, value: modifiedUser.userName }));
+                            };
+                        };
+                    };
+
+                    console.log('modifiedCurrentUser', atomCurrentUser, modifiedUser);
+
+                    return (true);
+                }
+
+                if (newUser.action_type === 'UPDATE_USER') {
+                    const currentUser = await snapshot.getPromise(atomCurrentModifyUser);
+                    delete newUser.action_type;
+                    delete newUser.modify_user;
+                    const modifiedUser = {
+                        ...currentUser,
+                        ...newUser
+                    };
 
                     // update all users
                     const allUsers = await snapshot.getPromise(atomAllUsers);
-                    const foundIdx = allUsers.findIndex(user => user.userId === modifiedUser.userId);
-                    if (foundIdx !== -1) {
-                        const updatedAllUsers = [
-                            ...allUsers.slice(0, foundIdx),
-                            modifiedUser,
-                            ...allUsers.slice(foundIdx + 1,),
-                        ];
-                        set(atomAllUsers, updatedAllUsers);
+                   
+                    const updatedAllObj = {
+                        ...allUsers,
+                        [modifiedUser.userId] : modifiedUser,
                     };
-                    
+
+                    console.log("modifiedUser",modifiedUser );
+
+                    set(atomAllUsers,updatedAllObj );
+
                     //update filtered users 
                     const filteredUser = await snapshot.getPromise(atomFilteredUserArray);
-                    const foundFilteredIdx = filteredUser.findIndex(user => user.userId === modifiedUser.userId);
+
+                    const foundIdx = filteredUser.findIndex(user => user.userId === modifiedUser.userId);
                     if (foundIdx !== -1) {
+                        console.log("foundIdx",modifiedUser );
                         const updatedAllUsers = [
                             ...filteredUser.slice(0, foundIdx),
                             modifiedUser,
@@ -249,6 +307,29 @@ export const UserRepo = selector({
                         ];
                         set(atomFilteredUserArray, updatedAllUsers);
                     };
+
+                  //  const allUsers = await snapshot.getPromise(atomAllUsers);
+                    // const foundIdx = allUsers.findIndex(user => user.userId === modifiedUser.userId);
+                    // if (foundIdx !== -1) {
+                    //     const updatedAllUsers = [
+                    //         ...allUsers.slice(0, foundIdx),
+                    //         modifiedUser,
+                    //         ...allUsers.slice(foundIdx + 1,),
+                    //     ];
+                    //     set(atomAllUsers, updatedAllUsers);
+                    // };
+                    
+                    // //update filtered users 
+                    // const filteredUser = await snapshot.getPromise(atomFilteredUserArray);
+                    // const foundFilteredIdx = filteredUser.findIndex(user => user.userId === modifiedUser.userId);
+                    // if (foundIdx !== -1) {
+                    //     const updatedAllUsers = [
+                    //         ...filteredUser.slice(0, foundIdx),
+                    //         modifiedUser,
+                    //         ...filteredUser.slice(foundIdx + 1,),
+                    //     ];
+                    //     set(atomFilteredUserArray, updatedAllUsers);
+                    // };
 
 
                     if (modifiedUser.isWork === 'N') {
@@ -330,6 +411,9 @@ export const UserRepo = selector({
                 };
                 const allUsers = await snapshot.getPromise(atomAllUsers);
 
+                // allUsers의 값을 로그로 확인
+                console.log('allUsers:', allUsers);
+
                 const selected_array = allUsers.filter(user => user.userId === userId);
                 if(selected_array.length > 0){
                     set(atomCurrentModifyUser, selected_array[0]);
@@ -341,7 +425,7 @@ export const UserRepo = selector({
                 console.log('setCurrentModifyUser',atomCurrentModifyUser, userId );
             }
             catch(err){
-                console.error(`\t[ setCurrentCompany ] Error : ${err}`);
+                console.error(`\t[ setCurrentModifyUser ] Error : ${err}`);
                 set(atomCurrentModifyUser, defaultUser);
             };
         });        
