@@ -326,10 +326,6 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
     if(!!tempContent.transaction_date) delete tempContent.transaction_date;
     if(!!tempContent.product_class_name) delete tempContent.product_class_name;
 
-<<<<<<< HEAD
-    closeModal();
-    const tempContents = transactionContents.concat(tempContent);
-=======
     let tempContents = [];
     if(contentSetting.isNew) {
       tempContents = transactionContents.concat(tempContent);
@@ -340,7 +336,6 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
         ...transactionContents.slice(contentSetting.rowNo + 1, ),
       ]
     };
->>>>>>> 7d43076d92f361280b8518e466bad028295c8b82
     setTransactionContents(tempContents);
     handleAmountCalculation(tempContents);
     setIsContentModalOpen(false);
