@@ -285,14 +285,19 @@ export const UserRepo = selector({
                     // update all users
                     const allUsers = await snapshot.getPromise(atomAllUsers);
                    
-                    const updatedAllObj = {
-                        ...allUsers,
-                        [modifiedUser.userId] : modifiedUser,
-                    };
+                    // const updatedAllObj = {
+                    //     ...allUsers,
+                    //     [modifiedUser.userId] : modifiedUser,
+                    // };
+
+                    const updatedAllArray = allUsers.map(user =>
+                        user.userId === modifiedUser.userId ? modifiedUser : user
+                    );
+                    
 
                     console.log("modifiedUser",modifiedUser );
 
-                    set(atomAllUsers,updatedAllObj );
+                    set(atomAllUsers,updatedAllArray );
 
                     //update filtered users 
                     const filteredUser = await snapshot.getPromise(atomFilteredUserArray);

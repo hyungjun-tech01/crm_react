@@ -306,11 +306,8 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
       return;
     };
 
-<<<<<<< HEAD
-=======
     setIsContentModalOpen(false);
 
->>>>>>> 7d43076d92f361280b8518e466bad028295c8b82
     const tempContent = {
       ...orgContentModalData,
       ...editedContentModalData,
