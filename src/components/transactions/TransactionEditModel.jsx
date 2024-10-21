@@ -212,6 +212,7 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [orgContentModalData, setOrgContentModalData] = useState({});
   const [editedContentModalData, setEditedContentModalData] = useState({});
+  const [contentSetting, setContentSetting] = useState({isNew: false, rowNo: 0});
 
   const handleFormatter = useCallback((value) => {
     if (value === undefined || value === null || value === '') return '';
@@ -257,8 +258,8 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
   };
 
   const handleStartAddContent = () => {
-    console.log('add transaction');
-    //if(!transactionChange['company_code']) return;
+    setContentSetting({isNew: true, rowNo: -1});
+
     const tempData = {
       ...dataForTransaction,
       title: t('quotation.add_content'),
@@ -271,7 +272,9 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
     setIsContentModalOpen(true);
   };
 
-  const handleStartEditContent = (data) => {
+  const handleStartEditContent = (data, index) => {
+    setContentSetting({isNew: false, rowNo: index});
+
     const tempData = {
       ...dataForTransaction,
       title: `${t('common.item')} ${t('common.edit')}`,
@@ -296,30 +299,48 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
   };
 
   const handleContentModalOk = () => {
-    if (!editedContentModalData['transaction_date']) {
+    if (!editedContentModalData['transaction_date'] && !orgContentModalData['transaction_date']) {
       const tempMsg = { title: '확인', message: '거래일 정보가 누락되었습니다.' }
       setMessage(tempMsg);
       setIsMessageModalOpen(true);
       return;
     };
-    const monthDay = `${editedContentModalData.transaction_date.getMonth() - 1}
-      .${editedContentModalData.transaction_date.getDate()}`;
 
+<<<<<<< HEAD
+=======
+    setIsContentModalOpen(false);
+
+>>>>>>> 7d43076d92f361280b8518e466bad028295c8b82
     const tempContent = {
       ...orgContentModalData,
       ...editedContentModalData,
-      month_day: monthDay,
       transaction_sub_index: transactionContents.length + 1,
       company_code: transactionChange.company_code,
       company_name: transactionChange.company_name,
       transaction_sub_type: dataForTransaction.transaction_type,
       modify_date: formatDate(new Date()),
     };
-    delete tempContent.transaction_date;
-    delete tempContent.product_class_name;
+    if(!!editedContentModalData['transaction_date']) {
+      tempContent.month_day = `${editedContentModalData.transaction_date.getMonth() - 1}.${editedContentModalData.transaction_date.getDate()}`
+    };
+    if(!!tempContent.transaction_date) delete tempContent.transaction_date;
+    if(!!tempContent.product_class_name) delete tempContent.product_class_name;
 
+<<<<<<< HEAD
     closeModal();
     const tempContents = transactionContents.concat(tempContent);
+=======
+    let tempContents = [];
+    if(contentSetting.isNew) {
+      tempContents = transactionContents.concat(tempContent);
+    } else {
+      tempContents = [
+        ...transactionContents.slice(0, contentSetting.rowNo),
+        tempContent,
+        ...transactionContents.slice(contentSetting.rowNo + 1, ),
+      ]
+    };
+>>>>>>> 7d43076d92f361280b8518e466bad028295c8b82
     setTransactionContents(tempContents);
     handleAmountCalculation(tempContents);
     setIsContentModalOpen(false);
@@ -1039,7 +1060,7 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
                             onRow={(record, rowIndex) => {
                               return {
                                 onClick: (event) => {
-                                  handleStartEditContent(record);
+                                  handleStartEditContent(record, rowIndex);
                                 }, // click row
                               };
                             }}
