@@ -57,3 +57,17 @@ export const option_industry_type = {
         {value: 'education', label: '교육'},
     ],
 };
+
+export const option_is_yn = {
+    ko: [
+        {value: 'Y', label: 'Y'},
+        {value: 'N', label: 'N'}
+    ],
+};
+
+export const option_job_type = {
+    ko: [
+        {value: 'SR', label: 'SR'},
+        {value: 'AE', label: 'AE'}
+    ],
+};

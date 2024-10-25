@@ -4,6 +4,7 @@ import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import * as bootstrap from "../../assets/js/bootstrap.bundle";
 import { defaultCompany } from "../../atoms/atoms";
+import { defaultUser } from "../../atoms/atomsUser";
 import {
   atomUserState,
   atomEngineersForSelection,
@@ -14,6 +15,8 @@ import {
   option_locations,
   option_deal_type,
   option_industry_type,
+  option_is_yn,
+  option_job_type,
 } from "../../constants/constants";
 
 import AddBasicItem from "../../constants/AddBasicItem";
@@ -40,6 +43,8 @@ const UserAddModal = (props) => {
   //===== Handles to edit 'CompanyAddModel' ===========================================
   const [companyChange, setCompanyChange] = useState({ ...defaultCompany });
 
+  const [userChange, setUserChange] = useState({ ...defaultUser });
+
   const initializeCompanyTemplate = useCallback(() => {
     setCompanyChange({ ...defaultCompany });
     document.querySelector("#add_new_company_form").reset();
@@ -63,10 +68,10 @@ const UserAddModal = (props) => {
 
   const handleSelectChange = (name, selected) => {
     const modifiedData = {
-      ...companyChange,
+      ...userChange,
       [name]: selected.value,
     };
-    setCompanyChange(modifiedData);
+    setUserChange(modifiedData);
   };
 
   const handleAddNewCompany = () => {
@@ -181,7 +186,7 @@ const UserAddModal = (props) => {
         <div className="modal-content">
           <div className="modal-header">
             <h4 className="modal-title text-center">
-              <b>{t("company.new_company")}</b>
+              <b>{t("user.new_user")}</b>
             </h4>
             <button
               type="button"
@@ -195,201 +200,113 @@ const UserAddModal = (props) => {
                 <form id="add_new_company_form">
                   <div className="form-group row">
                     <AddBasicItem
-                      title={t("company.company_name")}
+                      title={t("user.user_id")}
                       type="text"
-                      name="company_name"
-                      defaultValue={companyChange.company_name}
+                      name="userId"
+                      defaultValue={userChange.userId}
                       required
                       onChange={handleItemChange}
                     />
                     <AddBasicItem
-                      title={t("company.company_name_en")}
+                      title={t("user.name")}
                       type="text"
-                      name="company_name_en"
-                      defaultValue={companyChange.company_name_en}
-                      onChange={handleItemChange}
-                    />
-                  </div>
-                  <div className="form-group row">
-                    <AddBasicItem
-                      title={t("company.ceo_name")}
-                      type="text"
-                      name="ceo_name"
-                      defaultValue={companyChange.ceo_name}
-                      onChange={handleItemChange}
-                    />
-                    <AddBasicItem
-                      title={t("company.business_registration_code")}
-                      type="text"
-                      name="business_registration_code"
-                      defaultValue={companyChange.business_registration_code}
-                      onChange={handleItemChange}
-                    />
-                  </div>
-                  <div className="form-group row">
-                    <AddAddressItem
-                      title={t("company.address")}
-                      key_address="company_address"
-                      key_zip="company_zip_code"
-                      required
-                      edited={companyChange}
-                      setEdited={setCompanyChange}
-                    />
-                    <AddBasicItem
-                      title={t("company.phone_number")}
-                      type="text"
-                      name="company_phone_number"
-                      defaultValue={companyChange.company_phone_number}
-                      onChange={handleItemChange}
-                    />
-                  </div>
-                  <div className="form-group row">
-                    <AddBasicItem
-                      title={t("lead.zip_code")}
-                      type="text"
-                      name="company_zip_code"
-                      defaultValue={companyChange.company_zip_code}
-                      required
-                      disabled={true}
-                      onChange={handleItemChange}
-                    />
-                    <AddBasicItem
-                      title={t("company.fax_number")}
-                      type="text"
-                      name="company_fax_number"
-                      defaultValue={companyChange.company_fax_number}
+                      name="userName"
+                      defaultValue={userChange.userName}
                       required
                       onChange={handleItemChange}
                     />
                   </div>
                   <div className="form-group row">
                     <AddBasicItem
-                      title={t("company.homepage")}
+                      title={t("user.password")}
                       type="text"
-                      name="homepage"
-                      required
-                      defaultValue={companyChange.homepage}
-                      onChange={handleItemChange}
-                    />
-                    <AddBasicItem
-                      title={t("company.company_scale")}
-                      type="text"
-                      name="company_scale"
-                      defaultValue={companyChange.company_scale}
-                      onChange={handleItemChange}
-                    />
-                  </div>
-                  <div className="form-group row">
-                    <AddBasicItem
-                      title={t("company.deal_type")}
-                      type="select"
-                      name="deal_type"
-                      defaultValue={companyChange.deal_type}
-                      options={option_deal_type.ko}
-                      onChange={handleSelectChange}
-                    />
-                    <AddBasicItem
-                      title={t("company.industry_type")}
-                      type="select"
-                      name="industry_type"
-                      defaultValue={companyChange.industry_type}
-                      options={option_industry_type.ko}
-                      onChange={handleSelectChange}
-                    />
-                  </div>
-                  <div className="form-group row">
-                    <AddBasicItem
-                      title={t("company.business_type")}
-                      type="text"
-                      name="business_type"
-                      defaultValue={companyChange.business_type}
-                      onChange={handleItemChange}
-                    />
-                    <AddBasicItem
-                      title={t("company.business_item")}
-                      type="text"
-                      name="business_item"
-                      defaultValue={companyChange.business_item}
-                      onChange={handleItemChange}
-                    />
-                  </div>
-                  <div className="form-group row">
-                    <AddBasicItem
-                      title={t("company.establishment_date")}
-                      type="date"
-                      name="establishment_date"
-                      defaultValue={companyChange.establishment_date}
-                      onChange={handleDateChange}
-                    />
-                    <AddBasicItem
-                      title={t("common.site_id")}
-                      type="text"
-                      name="site_id"
-                      defaultValue={companyChange.site_id}
+                      name="password"
+                      defaultValue={userChange.password}
                       required
                       onChange={handleItemChange}
                     />
-                  </div>
-                  <div className="form-group row">
                     <AddBasicItem
-                      title={t("company.account_code")}
+                      title={t("user.mobile")}
                       type="text"
-                      name="account_code"
-                      defaultValue={companyChange.account_code}
-                      onChange={handleItemChange}
-                    />
-                    <AddBasicItem
-                      title={t("company.bank_name")}
-                      type="text"
-                      name="bank_name"
-                      defaultValue={companyChange.bank_name}
+                      name="mobileNumber"
+                      defaultValue={userChange.mobileNumber}
                       onChange={handleItemChange}
                     />
                   </div>
                   <div className="form-group row">
                     <AddBasicItem
-                      title={t("company.account_owner")}
+                      title={t("user.phone")}
                       type="text"
-                      name="account_owner"
-                      defaultValue={companyChange.account_owner}
+                      name="phoneNumber"
+                      defaultValue={userChange.phoneNumber}
                       onChange={handleItemChange}
                     />
                     <AddBasicItem
-                      title={t("company.salesman")}
-                      type="select"
-                      name="sales_resource"
-                      defaultValue={companyChange.sales_resource}
-                      required
-                      options={salespersonsForSelection}
-                      onChange={handleSelectChange}
+                      title={t("user.e_mail")}
+                      type="text"
+                      name="email"
+                      defaultValue={userChange.email}
+                      onChange={handleItemChange}
                     />
                   </div>
                   <div className="form-group row">
                     <AddBasicItem
-                      title={t("company.engineer")}
-                      type="select"
-                      name="application_engineer"
-                      defaultValue={companyChange.application_engineer}
-                      options={engineersForSelection}
-                      onChange={handleSelectChange}
+                      title={t("user.department")}
+                      type="text"
+                      name="department"
+                      defaultValue={userChange.department}
+                      onChange={handleItemChange}
                     />
                     <AddBasicItem
-                      title={t("common.location")}
-                      type="select"
-                      name="region"
-                      options={option_locations.ko}
-                      defaultValue={companyChange.region}
-                      onChange={handleSelectChange}
+                      title={t("user.position")}
+                      type="text"
+                      name="position"
+                      defaultValue={userChange.position}
+                      onChange={handleItemChange}
                     />
                   </div>
                   <div className="form-group row">
                     <AddBasicItem
-                      title={t("common.memo")}
-                      type="textarea"
-                      long
-                      row_no={3}
+                      title={t("user.private_group")}
+                      type="text"
+                      name="private_group"
+                      defaultValue={userChange.private_group}
+                      onChange={handleItemChange}
+                    />
+                    <AddBasicItem
+                      title={t("user.memo")}
+                      type="text"
                       name="memo"
-                      defaultValue={companyChange.memo}
+                      defaultValue={userChange.memo}
+                      onChange={handleItemChange}
+                    />
+                  </div>
+                  <div className="form-group row">
+                    <AddBasicItem
+                      title={t("user.job_type")}
+                      type="select"
+                      name="jobType"
+                      defaultValue={userChange.jobType}
+                      options={option_job_type.ko}
+                      onChange={handleSelectChange}
+                    />
+                    <AddBasicItem
+                      title={t("user.is_work")}
+                      type="select"
+                      name="isWork"
+                      defaultValue={userChange.isWork}
+                      options={option_is_yn.ko}
+                      required
+                      onChange={handleSelectChange}
+                    />
+                  </div>
+                  <div className="form-group row">
+                    <AddBasicItem
+                      title={t("user.user_role")}
+                      type="text"
+                      name="userRole"
+                      defaultValue={userChange.userRole}
+                      required
                       onChange={handleItemChange}
                     />
                   </div>

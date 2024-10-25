@@ -376,6 +376,7 @@ const koResource = {
             user_role:'권한',
             is_work:'현재사원',
             new_user:'사용자등록',
+            password:'비밀번호',
             current_password:'현재 비밀번호',
             change_password:'변경 비밀번호',
             change_password_confirm:'변경 비밀번호 학인',

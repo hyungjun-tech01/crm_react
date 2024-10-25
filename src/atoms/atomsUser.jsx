@@ -71,6 +71,6 @@ export const defaultAccount = {
 }
 
 export const atomAccountInfo = atom({
-    key: "accountInfo",
+    key: "atomAccountInfo",
     default: defaultAccount,
 })
