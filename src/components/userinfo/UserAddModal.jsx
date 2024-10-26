@@ -11,6 +11,7 @@ import {
   atomSalespersonsForSelection,
 } from "../../atoms/atomsUser";
 import { CompanyRepo } from "../../repository/company";
+import { UserRepo } from "../../repository/user";
 import {
   option_locations,
   option_deal_type,
@@ -34,6 +35,8 @@ const UserAddModal = (props) => {
   //===== [RecoilState] Related with Company ==========================================
   const { modifyCompany } = useRecoilValue(CompanyRepo);
 
+  const { modifyUser } = useRecoilValue(UserRepo);
+
 
   //===== [RecoilState] Related with Users ============================================
   const userState = useRecoilValue(atomUserState);
@@ -45,25 +48,17 @@ const UserAddModal = (props) => {
 
   const [userChange, setUserChange] = useState({ ...defaultUser });
 
-  const initializeCompanyTemplate = useCallback(() => {
-    setCompanyChange({ ...defaultCompany });
-    document.querySelector("#add_new_company_form").reset();
+  const initializeUserTemplate = useCallback(() => {
+    setUserChange({ ...defaultUser });
+    document.querySelector("#add_new_user_form").reset();
   }, []);
-
-  const handleDateChange = (name, date) => {
-    const modifiedData = {
-      ...companyChange,
-      [name]: date,
-    };
-    setCompanyChange(modifiedData);
-  };
 
   const handleItemChange = (e) => {
     const modifiedData = {
-      ...companyChange,
+      ...userChange,
       [e.target.name]: e.target.value,
     };
-    setCompanyChange(modifiedData);
+    setUserChange(modifiedData);
   };
 
   const handleSelectChange = (name, selected) => {
@@ -74,50 +69,45 @@ const UserAddModal = (props) => {
     setUserChange(modifiedData);
   };
 
-  const handleAddNewCompany = () => {
+  const handleAddNewUser = () => {
     // Check data if they are available
     let numberOfNoInputItems = 0;
-    let noCompanyName = false;
-    if(!companyChange.company_name || companyChange.company_name === ""){
+    let noUserId = false;
+    if(!userChange.userId || userChange.userId === ""){
       numberOfNoInputItems++;
-      noCompanyName = true;
+      noUserId = true;
     };
-    let noCompanyAddress = false;
-    if(!companyChange.company_address || companyChange.company_address === ""){
+    let noUserName = false;
+    if(!userChange.userName || userChange.userName === ""){
       numberOfNoInputItems++;
-      noCompanyAddress = true;
+      noUserName = true;
     };
-    let noCompanyFaxNumber = false;
-    if(!companyChange.company_fax_number || companyChange.company_fax_number === ""){
+    let noPassword = false;
+    if(!userChange.password || userChange.password === ""){
       numberOfNoInputItems++;
-      noCompanyFaxNumber = true;
+      noPassword = true;
     };
-    let noCompanyHomepage = false;
-    if(!companyChange.homepage || companyChange.homepage === ""){
+    let noIsWork = false;
+    if(!userChange.isWork || userChange.isWork === ""){
       numberOfNoInputItems++;
-      noCompanyHomepage = true;
+      noIsWork = true;
     };
-    let noCompanySiteId = false;
-    if(!companyChange.site_id || companyChange.site_id === ""){
+    let noUserRole = false;
+    if(!userChange.userRole || userChange.userRole === ""){
       numberOfNoInputItems++;
-      noCompanySiteId = true;
+      noUserRole = true;
     };
-    let noSalesResource = false;
-    if(!companyChange.sales_resource || companyChange.sales_resource === ""){
-      numberOfNoInputItems++;
-      noSalesResource = true;
-    };
+   
 
     if(numberOfNoInputItems > 0){
       const contents = (
         <>
           <p>하기 정보는 필수 입력 사항입니다.</p>
-          { noCompanyName && <div> - 회사 이름</div> }
-          { noCompanyAddress && <div> - 회사 주소</div> }
-          { noCompanyFaxNumber && <div> - 회사 팩스 번호</div> }
-          { noCompanyHomepage && <div> - 회사 홈페이지</div> }
-          { noCompanySiteId && <div> - 회사 Site ID</div> }
-          { noSalesResource && <div> - 담당 영업 사원</div> }
+          { noUserId && <div> - 아이디</div> }
+          { noUserName && <div> - 이름</div> }
+          { noPassword && <div> - 비밀번호</div> }
+          { noIsWork && <div> - 현재사원</div> }
+          { noUserRole && <div> - 권한</div> }
         </>
       );
       const tempMsg = {
@@ -129,18 +119,18 @@ const UserAddModal = (props) => {
       return;
     };
 
-    const newComData = {
-      ...companyChange,
+    const newUserData = {
+      ...userChange,
       action_type: "ADD",
       counter: 0,
       modify_user: cookies.myLationCrmUserId,
     };
-    console.log(`[ handleAddNewCompany ]`, newComData);
-    const result = modifyCompany(newComData);
-    result.then((res) => {
-      if (res.result) {
-        initializeCompanyTemplate();
-        let thisModal = bootstrap.Modal.getInstance('#add_company');
+    console.log(`[ handleAddNewUser ]`, newUserData);
+    // const result = modifyUser(newUserData);
+    // result.then((res) => {
+      if (modifyUser(newUserData)) {
+        initializeUserTemplate();
+        let thisModal = bootstrap.Modal.getInstance('#add_user');
         if (thisModal) thisModal.hide();
       } else {
         const tempMsg = {
@@ -150,7 +140,7 @@ const UserAddModal = (props) => {
         setMessage(tempMsg);
         setIsMessageModalOpen(true);
       }
-    });
+  //  });
   };
 
   useEffect(() => {
@@ -158,7 +148,7 @@ const UserAddModal = (props) => {
       console.log("[CompanyAddModel] initialzie!");
       if (handleInit) handleInit(!init);
       setTimeout(() => {
-        initializeCompanyTemplate();
+        initializeUserTemplate();
       }, 500);
     }
   }, [userState, init]);
@@ -197,7 +187,7 @@ const UserAddModal = (props) => {
           <div className="modal-body">
             <div className="row">
               <div className="col-md-12">
-                <form id="add_new_company_form">
+                <form id="add_new_user_form">
                   <div className="form-group row">
                     <AddBasicItem
                       title={t("user.user_id")}
@@ -219,7 +209,7 @@ const UserAddModal = (props) => {
                   <div className="form-group row">
                     <AddBasicItem
                       title={t("user.password")}
-                      type="text"
+                      type="password"
                       name="password"
                       defaultValue={userChange.password}
                       required
@@ -314,7 +304,7 @@ const UserAddModal = (props) => {
                     <button
                       type="button"
                       className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                      onClick={handleAddNewCompany}
+                      onClick={handleAddNewUser}
                     >
                       {t("common.save")}
                     </button>
@@ -323,7 +313,7 @@ const UserAddModal = (props) => {
                       type="button"
                       className="btn btn-secondary btn-rounded"
                       data-bs-dismiss="modal"
-                      onClick={initializeCompanyTemplate}
+                      onClick={initializeUserTemplate}
                     >
                       {t("common.cancel")}
                     </button>

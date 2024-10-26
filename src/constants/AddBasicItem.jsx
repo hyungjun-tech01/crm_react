@@ -102,6 +102,26 @@ const AddBasicItem = (props) => {
                     </div>
                 </div>
             );
+        case 'password':
+            return (
+                <div className={ long ? "col-sm-12" : "col-sm-6"} >
+                    <div className="add-basic-item">
+                        <div className={ long ? "add-long-title" : "add-basic-title"} >
+                            {title}
+                            {required && <span className="text-danger">*</span>}
+                        </div>
+                        <input
+                            className={ long ? "add-long-content" : "add-basic-content"}
+                            name = {name}
+                            type="password"
+                            placeholder={title}
+                            value={defaultValue ? defaultValue : ''}
+                            disabled={disabled ? disabled : false}
+                            onChange={onChange}
+                        />
+                    </div>
+                </div>
+            );    
         default: 
               return null;
     }
