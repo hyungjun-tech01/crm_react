@@ -181,7 +181,7 @@ const UserDetailModel = () => {
         const handlePopState = (event) => {
           if (event.state && event.state.modalInternal) {
             // 뒤로 가기를 방지하기 위해 다시 히스토리를 푸시
-            history.replaceState({ modalInternal: true }, '', location.href);
+            history.pushState({ modalInternal: true }, '', location.href);
           }
         };
       
