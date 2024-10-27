@@ -151,6 +151,17 @@ const UserAddModal = (props) => {
         initializeUserTemplate();
       }, 500);
     }
+    // 모달 내부 페이지의 히스토리 상태 추가
+     history.pushState({ modalInternal: true }, '', location.href);
+
+    // // 뒤로가기를 시도할 때 popstate 이벤트 리스너 추가
+     window.addEventListener('popstate', function(event) {
+       if (event.state && event.state.modalInternal) {
+         // 뒤로가기를 방지하기 위해 다시 히스토리를 푸시
+         history.pushState({ modalInternal: true }, '', location.href);
+       }
+     });
+
   }, [userState, init]);
 
   if (init)

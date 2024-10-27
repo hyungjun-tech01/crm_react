@@ -66,11 +66,11 @@ const handleClickUser = useCallback((id) => {
   //setSelectedCategory({category: 'company', item_code: id});
   setTimeout(()=>{
     const modalElement = document.getElementById('user-details-modal');
-    console.log('modalElement',modalElement);
+   // console.log('modalElement',modalElement);
     let myModal = new bootstrap.Modal(document.getElementById('user-details-model'), {
       keyboard: false
     });
-    myModal.show();
+      myModal.show();
   }, 500);
   
 }, [setCurrentModifyUser]);
