@@ -356,7 +356,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
       setCurrentCompany(selectedLead.company_code);
       loadCompanyMAContracts(selectedLead.company_code);
       setCurrentLeadCode(selectedLead.lead_code);
-      setCheckState({purchase:false, consulting:false, quotation:false});
+      setCheckState({purchase:false, consulting:false, quotation:false});    
     };
   }, [selectedLead, currentLeadCode, setCurrentCompany, loadCompanyMAContracts]);
 

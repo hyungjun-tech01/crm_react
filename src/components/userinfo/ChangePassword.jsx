@@ -263,9 +263,20 @@ const ChangePassword = (props) => {
 
 
 useEffect(() => {
-    // 모달이 열릴 때 editedValues와 savedValues를 초기화
-    setEditedValues(null);
-    setSavedValues(null);
+     // 모달 내부 페이지의 히스토리 상태 추가
+     history.pushState({ modalInternal: true }, '', location.href);
+
+     const handlePopState = (event) => {
+       if (event.state && event.state.modalInternal) {
+         // 뒤로 가기를 방지하기 위해 다시 히스토리를 푸시
+         history.pushState({ modalInternal: true }, '', location.href);
+         console.log('모달 뒤로가기 ');
+       }
+     };
+   
+     // popstate 이벤트 리스너 추가 (중복 추가 방지)
+     window.addEventListener('popstate', handlePopState);
+   
 }, []);
 
   // useEffect(() => {
