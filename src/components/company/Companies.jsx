@@ -253,6 +253,9 @@ const Companies = () => {
       setNowLoading(false);
     };
 
+    //BlockBackNavi;
+    //return cleanup;
+
     // 모달 내부 페이지의 히스토리 상태 추가
     history.pushState({ modalInternal: true }, '', location.href);
 

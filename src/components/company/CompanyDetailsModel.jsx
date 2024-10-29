@@ -355,11 +355,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
   
     // popstate 이벤트 리스너 추가 (중복 추가 방지)
     window.addEventListener('popstate', handlePopState);
-  
-    // 컴포넌트가 언마운트될 때 이벤트 리스너 제거
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };  
+
 
   }, [init, selectedCompany, currentCompanyCode, loadCompanyMAContracts]);
 
