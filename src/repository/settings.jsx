@@ -1,28 +1,12 @@
 import React from 'react';
 import { selector } from "recoil";
 import * as bootstrap from '../assets/js/bootstrap.bundle';
-import { atomModalInfoStack,
-    atomCurrentCompany,
-    defaultCompany,
-    atomCurrentLead,
-    defaultLead,
-    atomCurrentConsulting,
-    defaultConsulting,
-    atomCurrentPurchase,
-    defaultPurchase,
-    atomCurrentQuotation,
-    defaultQuotation,
-    atomCurrentTaxInvoice,
-    defaultTaxInvoice,
-    atomCurrentTransaction,
-    defaultTransaction
- } from '../atoms/atoms';
+import { atomModalInfoStack } from '../atoms/atoms';
 
 export const SettingsRepo = selector({
     key: "SettingsRepository",
     get: ({getCallback}) => {
         const openModal = getCallback(({ set, snapshot }) => async (modalId) => {
-            console.log(' - Check input :', modalId);
             const modalInfoStack = await snapshot.getPromise(atomModalInfoStack);
             if(modalInfoStack.length > 0){
                 const lastModalId = modalInfoStack.at(-1);
@@ -47,16 +31,16 @@ export const SettingsRepo = selector({
                     };
                 };
                 const updatedModalInfoStack = modalInfoStack.concat(modalId);
-                console.log(' - Modals in Stack :', updatedModalInfoStack);
+                // console.log(' - Modals in Stack :', updatedModalInfoStack);
                 set(atomModalInfoStack, updatedModalInfoStack);
             };
         });
-        const closeModal = getCallback(({ set, snapshot }) => async (command) => {
+        const closeModal = getCallback(({ set, snapshot }) => async () => {
             const modalInfoStack = await snapshot.getPromise(atomModalInfoStack);
             if(modalInfoStack.length > 0){
                 const lastModalId = modalInfoStack.at(-1);
                 const lastModal = bootstrap.Modal.getInstance('#'+lastModalId);
-                console.log('closeModal / last modal : ', lastModal);
+                // console.log('closeModal / last modal : ', lastModal);
                 
                 if(lastModal){
                     // const modalElement = document.getElementById(lastModalId);
@@ -73,36 +57,9 @@ export const SettingsRepo = selector({
                         nextLastModal._focustrap.activate();
                     };
                 };
-                console.log(' - Modals in Stack :', updatedModalInfoStack);
+                // console.log(' - Modals in Stack :', updatedModalInfoStack);
                 set(atomModalInfoStack, updatedModalInfoStack);
             };
-            if(command){
-                switch(command){
-                    case 'initialize_company':
-                        set(atomCurrentCompany, defaultCompany);
-                        break;
-                    case 'initialize_lead':
-                        set(atomCurrentLead, defaultLead);
-                        break;
-                    case 'initialize_consulting':
-                        set(atomCurrentConsulting, defaultConsulting);
-                        break;
-                    case 'initialize_purchase':
-                        set(atomCurrentPurchase, defaultPurchase);
-                        break;
-                    case 'initialize_quotation':
-                        set(atomCurrentQuotation, defaultQuotation);
-                        break;
-                    case 'initialize_tax_invoice':
-                        set(atomCurrentTaxInvoice, defaultTaxInvoice);
-                        break;
-                    case 'initialize_transaction':
-                        set(atomCurrentTransaction, defaultTransaction);
-                        break;
-                    default:
-                        console.log('Nothing is done');
-                }
-            }
         });
         return {
             openModal,

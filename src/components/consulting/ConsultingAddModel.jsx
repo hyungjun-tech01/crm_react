@@ -415,6 +415,8 @@ const ConsultingAddModel = (props) => {
   };
 
   const initializeConsultingTemplate = useCallback(() => {
+    // document.querySelector("#add_new_consulting_form").reset();
+
     // set Receipt date -------------
     const tempDate = new Date();
     let modified = {
@@ -422,6 +424,7 @@ const ConsultingAddModel = (props) => {
       receiver: cookies.myLationCrmUserName,
       receipt_date: tempDate,
     };
+
 
     if ((selectedCategory.category === 'lead')
       && (currentLead !== defaultLead)
@@ -494,9 +497,10 @@ const ConsultingAddModel = (props) => {
   };
 
   const handleClose = () => {
+    setNeedInit(true);
     setTimeout(() => {
       closeModal();
-    }, 250);
+    }, 500);
   };
 
 

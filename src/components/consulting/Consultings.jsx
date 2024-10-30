@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
@@ -164,36 +164,36 @@ const Consultings = () => {
   };
 
   // --- Functions used for Add New Consulting ------------------------------
-  const handleAddNewConsultingClicked = () => {
+  const handleAddNewConsultingClicked = useCallback(() => {
     setInitAddConsulting(true);
     setCurrentConsulting();
     setTimeout(()=>{
       openModal('add_consulting')
-    }, 250);
-  };
+    }, 500);
+  }, []);
 
-  const handleClickConsulting = (code) => {
+  const handleClickConsulting = useCallback((code) => {
     setCurrentConsulting(code);
     setTimeout(()=>{
       openModal('consulting-details')
-    }, 250);
-  };
+    }, 500);
+  }, []);
 
-  const handleClickCompany = (code) => {
+  const handleClickCompany = useCallback((code) => {
     setCurrentCompany(code);
     setSelectedCategory({category: 'company', item_code: code});
     setTimeout(()=>{
       openModal('company-details')
-    }, 250);
-  };
+    }, 500);
+  }, []);
 
-  const handleClickLead = (code) => {
+  const handleClickLead = useCallback((code) => {
     setCurrentLead(code);
     setSelectedCategory({category: 'lead', item_code: code});
     setTimeout(()=>{
       openModal('leads-details')
-    }, 250);
-  };
+    }, 500);
+  }, []);
 
   // --- Section for Table ------------------------------
   const columns = [
