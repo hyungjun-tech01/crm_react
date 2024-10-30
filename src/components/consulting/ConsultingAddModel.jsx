@@ -35,7 +35,7 @@ import QuillEditor from "../../constants/QuillEditor";
 
 
 const ConsultingAddModel = (props) => {
-  const { open, handleOpen } = props;
+  const { init, handleInit } = props;
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId", "myLationCrmUserName"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -507,12 +507,12 @@ const ConsultingAddModel = (props) => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    if (open && needInit && ((userState & 1) === 1)) {
-      if (handleOpen) handleOpen(!open);
+    if (init && needInit && ((userState & 1) === 1)) {
+      if (handleInit) handleInit(!init);
       initializeConsultingTemplate();
     };
 
-  }, [open, userState, initializeConsultingTemplate, handleOpen, needInit, attachmentsForRequest, attachmentsForAction]);
+  }, [init, userState, initializeConsultingTemplate, handleInit, needInit, attachmentsForRequest, attachmentsForAction]);
 
   if (needInit)
     return <div>&nbsp;</div>;

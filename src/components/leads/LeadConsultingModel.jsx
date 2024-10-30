@@ -28,7 +28,7 @@ const LeadConsultingModel = ({ handleInitAddConsulting }) => {
 
     const handleAddNewConsulting = () => {
         handleInitAddConsulting(true);
-        setCurrentConsulting();
+        setCurrentConsulting(defaultConsulting);
         setTimeout(() => {
             openModal('add_consulting');
         }, 500);
