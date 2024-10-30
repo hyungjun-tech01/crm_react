@@ -413,7 +413,7 @@ const ConsultingDetailsModel = () => {
 
   const handleClose = () => {
     setTimeout(() => {
-      closeModal('initialize_consulting');
+      closeModal();
     }, 250);
   };
 

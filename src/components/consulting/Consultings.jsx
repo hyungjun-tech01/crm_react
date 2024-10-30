@@ -175,7 +175,7 @@ const Consultings = () => {
   const handleClickConsulting = (code) => {
     setCurrentConsulting(code);
     setTimeout(()=>{
-      openModal('consulting-details')
+      openModal('consulting-details', 'initialize_consulting')
     }, 250);
   };
 

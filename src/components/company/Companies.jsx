@@ -206,12 +206,11 @@ const Companies = () => {
   ];
 
   const handleEditCompany = useCallback((id) => {
-    // console.log('[Company] set current company : ', id);
     setInitToEditCompany(true);
     setCurrentCompany(id);
     setSelectedCategory({category: 'company', item_code: id});
     setTimeout(()=>{
-      openModal('company-details');
+      openModal('company-details','initialize_company');
     }, 250);
   }, [setCurrentCompany]);
 

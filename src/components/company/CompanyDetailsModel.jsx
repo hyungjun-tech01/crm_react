@@ -306,7 +306,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
 
   const handleClose = () => {
     setTimeout(() => {
-      closeModal('initialize_company');
+      closeModal();
     }, 250);
   };
 

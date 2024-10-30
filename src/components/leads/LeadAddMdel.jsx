@@ -68,30 +68,6 @@ const LeadAddModel = (props) => {
         }
     };
 
-    const handleClose = () => {
-        initializeLeadTemplate();
-        handleInit(false);
-        setTimeout(() => {
-          closeModal();
-        }, 500);
-    };
-
-    const initializeLeadTemplate = useCallback(() => {
-        document.querySelector("#add_new_lead_form").reset();
-
-        setLeadChange({...defaultLead});
-        setDisableItems(false);
-        // setDisableItemsChecked({
-        //     company_name_en': false,
-        //     company_address': false,
-        //     company_zip_code': false,
-        //     homepage': false,
-        //     company_fax_number': false,
-        //     site_id': false,
-        //     sales_resource': false,
-        // });
-    }, []);
-
     const handleAddNewLead = () => {
         // Check data if they are available
         let numberOfNoInputItems = 0;
@@ -145,7 +121,6 @@ const LeadAddModel = (props) => {
         const resp = modifyLead(newLeadData);
         resp.then(res => {
             if (res.result) {
-                initializeLeadTemplate();
                 closeModal();
             } else {
                 const tempMsg = {
@@ -158,13 +133,23 @@ const LeadAddModel = (props) => {
         });
     };
 
+    const handleClose = () => {
+        setTimeout(() => {
+          closeModal();
+        }, 250);
+    };
+
+    const initializeLeadTemplate = () => {
+        setLeadChange({...defaultLead});
+        setDisableItems(false);
+    };
+
     useEffect(() => {
         if (init && (userState & 1) === 1) {
-            console.log('[LeadAddModel] initialize!');
             if(handleInit) handleInit(!init);
             setTimeout(() => {
                 initializeLeadTemplate();
-            }, 500);
+            }, 250);
         }
     }, [userState, init]);
 

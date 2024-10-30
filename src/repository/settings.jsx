@@ -21,11 +21,11 @@ import { atomModalInfoStack,
 export const SettingsRepo = selector({
     key: "SettingsRepository",
     get: ({getCallback}) => {
-        const openModal = getCallback(({ set, snapshot }) => async (modalId) => {
+        const openModal = getCallback(({ set, snapshot }) => async (modalId, command) => {
             console.log(' - Check input :', modalId);
             const modalInfoStack = await snapshot.getPromise(atomModalInfoStack);
             if(modalInfoStack.length > 0){
-                const lastModalId = modalInfoStack.at(-1);
+                const lastModalId = modalInfoStack.at(-1).id;
                 const lastModal = bootstrap.Modal.getInstance('#' + lastModalId);
                 if(lastModal){
                     lastModal._focustrap.deactivate();
@@ -46,28 +46,33 @@ export const SettingsRepo = selector({
                         myModal.show();  
                     };
                 };
-                const updatedModalInfoStack = modalInfoStack.concat(modalId);
+                const updatedModalInfoStack = modalInfoStack.concat({id:modalId,command:command});
                 console.log(' - Modals in Stack :', updatedModalInfoStack);
                 set(atomModalInfoStack, updatedModalInfoStack);
             };
         });
         const closeModal = getCallback(({ set, snapshot }) => async (command) => {
+            let gottenCommand = null;
             const modalInfoStack = await snapshot.getPromise(atomModalInfoStack);
             if(modalInfoStack.length > 0){
-                const lastModalId = modalInfoStack.at(-1);
+                const lastModalId = modalInfoStack.at(-1).id;
                 const lastModal = bootstrap.Modal.getInstance('#'+lastModalId);
                 console.log('closeModal / last modal : ', lastModal);
                 
-                if(lastModal){
+                if(!!lastModal){
                     // const modalElement = document.getElementById(lastModalId);
                     // if(modalElement) {
                     //     modalElement.removeEventListener('keydown')
                     // }
                     lastModal.hide();
                 };
+                const lastModalCommand = modalInfoStack.at(-1).command;
+                if(!!lastModalCommand){
+                    gottenCommand = lastModalCommand;
+                };
                 const updatedModalInfoStack = [ ...modalInfoStack.slice(0, -1)];
                 if(updatedModalInfoStack.length > 0){
-                    const nextLastModalId = updatedModalInfoStack.at(-1);
+                    const nextLastModalId = updatedModalInfoStack.at(-1).id;
                     const nextLastModal = bootstrap.Modal.getInstance('#'+nextLastModalId);
                     if(nextLastModal){
                         nextLastModal._focustrap.activate();
@@ -76,8 +81,9 @@ export const SettingsRepo = selector({
                 console.log(' - Modals in Stack :', updatedModalInfoStack);
                 set(atomModalInfoStack, updatedModalInfoStack);
             };
-            if(command){
-                switch(command){
+            if(command || gottenCommand){
+                gottenCommand = command || gottenCommand;
+                switch(gottenCommand){
                     case 'initialize_company':
                         set(atomCurrentCompany, defaultCompany);
                         break;

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Avatar, Space, Switch } from "antd";
@@ -10,9 +10,8 @@ import {
   atomPurchaseByCompany,
   atomConsultingByLead,
   atomQuotationByLead,
-  atomSelectedCategory,
 } from "../../atoms/atoms";
-import { atomUserState, atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
+import { atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo } from "../../repository/company";
 import { KeyManForSelection, LeadRepo } from "../../repository/lead";
 import { ConsultingRepo } from "../../repository/consulting";
@@ -39,9 +38,6 @@ import PurchaseAddModel from "../purchase/PurchaseAddModel";
 const LeadDetailsModel = ({init, handleInit}) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
-  const [checkState,  setCheckState] = useState({
-    purchase: false, consulting: false, quotation: false,
-  });
 
 
   //===== [RecoilState] Related with Lead ==========================================
@@ -71,7 +67,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
 
 
   //===== [RecoilState] Related with Users ==========================================
-  const userState = useRecoilValue(atomUserState);
   const engineersForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
@@ -84,7 +79,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentLeadCode, setCurrentLeadCode] = useState('');
   const [validMACount, setValidMACount] = useState(0);
-  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -157,7 +151,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
         ...editedDetailValues,
         ...obj,
       };
-      // console.log("handleDetailAddressChange :", tempEdited);
       setEditedDetailValues(tempEdited);
     },
     [editedDetailValues]
@@ -175,23 +168,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
         delete editedDetailValues['status'];
       };
     };
-
-    // const tempEdited = {
-    //   status: newStatus,
-    //   action_type: "UPDATE",
-    //   modify_user: cookies.myLationCrmUserId,
-    //   lead_code: selectedLead.lead_code,
-    // };
-
-    // console.log('tempEdited', tempEdited);
-    // const resp = modifyLead(tempEdited);
-    // resp.then(res => {
-    //   if (res.result) {
-    //     console.log(`Succeeded to lead change status`);
-    //   } else {
-    //     console.error('Failed to modify lead : ', res.data);
-    //   };
-    // })
   };
 
   const handlePopupOpen = (open) => {
@@ -201,17 +177,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
       closeModal();
     }
   };
-
-  const handleClose = useCallback(() => {
-    closeModal();
-    setSelectedCategory({category: null, item_code: null});
-    setEditedDetailValues(null);
-    setCurrentLead();
-    setCurrentLeadCode('');
-    setTimeout(() => {
-      closeModal();
-    }, 500);
-  }, [setCurrentLead]);
 
   const handleSaveAll = useCallback(() => {
     if (editedDetailValues !== null
@@ -247,27 +212,29 @@ const LeadDetailsModel = ({init, handleInit}) => {
           const resp = modifyCompany(temp_update_company);
           resp.then(res => {
             if (res.result) {
-              console.log(`Succeeded to modify company`);
               handleClose();
             } else {
               console.error('Failed to modify company : ', res.data);
             };
           });
         };
-        closeModal();
       } else {
         console.error('Failed to modify lead')
       };
     } else {
       console.log("[ LeadDetailModel ] No saved data");
     };
-    setEditedDetailValues(null);
   }, [cookies.myLationCrmUserId, currentCompany.company_code, editedDetailValues, modifyCompany, modifyLead, selectedLead]);
 
-  const handleCancelAll = useCallback(() => {
+  const handleInitialize = () => {
     setEditedDetailValues(null);
-    handleClose();
-  }, []);
+  };
+
+  const handleClose = () => {
+    setTimeout(() => {
+      closeModal();
+    }, 250);
+  };
 
   const lead_items_info = [
     { key: 'lead_name', title: 'lead.lead_name', detail: { type: 'label', editing: handleDetailChange } },
@@ -314,7 +281,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
 
   const handleSearchQuotationCondition = (newValue) => {
     setSearchQuotationCondition(newValue);
-    // console.log("handleSearchCondition", searchQuotationCondition)
     filterCompanyQuotation(newValue);
   };
 
@@ -335,40 +301,33 @@ const LeadDetailsModel = ({init, handleInit}) => {
   };
 
 
-  //===== useEffect functions ===============================================  
   useEffect(() => {
-    if (init
-      && (selectedLead !== defaultLead)
-      && (selectedLead.lead_code !== currentLeadCode)
-    ) {
-      // console.log('[LeadDetailsModel] new lead is loaded');
-
+    if (init) {
+      console.log('LeadDetailsModel / init : start');
+      handleInit(false);
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {
-        localStorage.setItem("isFullScreen", '0');
+        localStorage.setItem("isFullScreen", "0");
         setIsFullScreen(false);
-      } else if (detailViewStatus === '0') {
+      } else if (detailViewStatus === "0") {
         setIsFullScreen(false);
       } else {
         setIsFullScreen(true);
       };
-      
+
+      if ((selectedLead === defaultLead)
+        || (selectedLead.lead_code === currentLeadCode)
+      ) {
+        return;
+      }
+      console.log('LeadDetailsModel / init : different lead');
       setCurrentCompany(selectedLead.company_code);
       loadCompanyMAContracts(selectedLead.company_code);
       setCurrentLeadCode(selectedLead.lead_code);
-      setCheckState({purchase:false, consulting:false, quotation:false});    
-    };
-  }, [selectedLead, currentLeadCode, setCurrentCompany, loadCompanyMAContracts]);
 
-  //===== useEffect for Purchase =======================================================
-  useEffect(() => {
-    if(!!selectedLead.company_code  && !checkState.purchase) {
-      setCheckState({
-        ...checkState,
-        purchase: true,
-      });
-      const queryPromise = searchPurchases('company_code', selectedLead.company_code, true);
-      queryPromise
+      // load company of selected lead -----------
+      const queryCompany = searchPurchases('company_code', selectedLead.company_code, true);
+      queryCompany
         .then(res => {
           if(res.result) {
             setPurchasesByCompany(res.data);
@@ -385,18 +344,10 @@ const LeadDetailsModel = ({init, handleInit}) => {
             setValidMACount(0);
           };
         });
-    }
-  }, [selectedLead.company_code, searchPurchases, checkState]);
 
-  //===== useEffect for Consulting =======================================================
-  useEffect(() => {
-    if(!!selectedLead.lead_code  && !checkState.consulting) {
-      setCheckState({
-        ...checkState,
-        consulting: true,
-      });
-      const queryPromise = searchConsultings('lead_code', selectedLead.lead_code, true);
-      queryPromise
+      // load consulting of selected lead -----------
+      const queryConsulting = searchConsultings('lead_code', selectedLead.lead_code, true);
+      queryConsulting
         .then(res => {
           if(res.result) {
             setConsultingsByLead(res.data);
@@ -405,18 +356,10 @@ const LeadDetailsModel = ({init, handleInit}) => {
             setConsultingsByLead([]);
           };
         });
-    };
-  }, [checkState, searchConsultings, selectedLead.lead_code]);
 
-  //===== useEffect for Quotation =======================================================
-  useEffect(() => {
-    if(!!selectedLead.lead_code  && !checkState.quotation) {
-      setCheckState({
-        ...checkState,
-        quotation: true,
-      });
-      const queryPromise = searchQuotations('lead_code', selectedLead.lead_code, true);
-      queryPromise
+      // load quotation of selected lead -----------
+      const queryQuotation = searchQuotations('lead_code', selectedLead.lead_code, true);
+      queryQuotation
         .then(res => {
           if(res.result) {
             setQuotationsByLead(res.data);
@@ -425,17 +368,10 @@ const LeadDetailsModel = ({init, handleInit}) => {
             setQuotationsByLead([]);
           };
         });
-    };
-  }, [checkState, searchQuotations, selectedLead.lead_code]);
 
-  useEffect(() => {
-    if (init && checkState.purchase && checkState.consulting && checkState.quotation
-      && ((userState & 1) === 1)
-    ) {
-      // console.log('[LeadDetailModel] all needed data is loaded');
-      handleInit(false);
+      handleInitialize();
     };
-  }, [init, userState, checkState, handleInit]);
+  }, [selectedLead, currentLeadCode, setCurrentCompany, loadCompanyMAContracts]);
 
   if (init)
     return <div>&nbsp;</div>;
@@ -655,7 +591,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
                   <button
                     type="button"
                     className="btn btn-secondary btn-rounded"
-                    onClick={handleCancelAll}
+                    onClick={handleClose}
                   >
                     {t('common.cancel')}
                   </button>

@@ -165,8 +165,8 @@ const Leads = () => {
     setCurrentCompany(companyCode);   // 현재 company 세팅 
     
     setTimeout(() => {
-      openModal('leads-details');
-    }, 500);
+      openModal('leads-details', 'initialize_lead');
+    }, 250);
   }, [setCurrentCompany, setCurrentLead, setSelectedCategory]);
 
 
