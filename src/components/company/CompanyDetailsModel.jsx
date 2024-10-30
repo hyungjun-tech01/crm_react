@@ -153,7 +153,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     [editedDetailValues]
   );
 
-  const handleDetailSave = useCallback(() => {
+  const handleDetailSave = () => {
     if (editedDetailValues !== null && selectedCompany !== defaultCompany) {
       const temp_all_saved = {
         ...editedDetailValues,
@@ -174,27 +174,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
       console.log("[ CompanyDetailModel ] No saved data");
     }
     setEditedDetailValues(null);
-  }, [
-    cookies.myLationCrmUserId,
-    modifyCompany,
-    editedDetailValues,
-    selectedCompany,
-  ]);
-
-  const handleDetailCancel = useCallback(() => {
-    setEditedDetailValues(null);
-    handleClose();
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setSelectedCategory({category: null, item_code: null});
-    setEditedDetailValues(null);
-    setCurrentCompany();
-    setCurrentCompanyCode("");
-    setTimeout(() => {
-      closeModal();
-    }, 500);
-  }, [setCurrentCompany]);
+  };
 
   const company_items_info = [
     {
@@ -320,14 +300,18 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     },
   ];
 
-  //===== useEffect for Company ========================================================
-  useEffect(() => {
-    if (init
-      && (selectedCompany !== defaultCompany)
-      && (selectedCompany.company_code !== currentCompanyCode)
-    ) {
-      // console.log("[CompanyDetailsModel] new company is loading!");
+  const handleInitialize = () => {
+    setEditedDetailValues(null);
+  };
 
+  const handleClose = () => {
+    setTimeout(() => {
+      closeModal('initialize_company');
+    }, 250);
+  };
+
+  useEffect(() => {
+    if (init) {
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {
         localStorage.setItem("isFullScreen", "0");
@@ -338,11 +322,63 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
         setIsFullScreen(true);
       };
 
+      if((selectedCompany === defaultCompany)
+        || (selectedCompany.company_code === currentCompanyCode)
+      ){
+        handleInit(false);
+        return;
+      };
+
       loadCompanyMAContracts(selectedCompany.company_code);
       setCurrentCompanyCode(selectedCompany.company_code);
-      setCheckState({purchase:false, transaction:false, taxInvoice:false});
-    }
 
+      // load purchase of selected company -----------
+      const queryPurchase = searchPurchases('company_code', selectedCompany.company_code, true);
+      queryPurchase
+        .then(res => {
+          if(res.result) {
+            setPurchasesByCompany(res.data);
+
+            let valid_count = 0;
+            res.data.forEach((item) => {
+              if (!!item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now()))
+                valid_count++;
+            });
+            setValidMACount(valid_count);
+          } else {
+            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
+            setPurchasesByCompany([]);
+            setValidMACount(0);
+          };
+        });
+
+      // load transaction of selected company -----------
+      const queryTransaction = searchTransactions('company_code', selectedCompany.company_code, true);
+      queryTransaction
+        .then(res => {
+          if(res.result) {
+            setTransactionByCompany(res.data);
+          } else {
+            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
+            setTransactionByCompany([]);
+          };
+        });
+
+      // load tax invoice of selected company -----------
+      const queryTaxInvoice = searchTaxInvoices('company_code', selectedCompany.company_code, true);
+      queryTaxInvoice
+        .then(res => {
+          if(res.result) {
+            setTaxInvoiceByCompany(res.data);
+          } else {
+            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
+            setTaxInvoiceByCompany([]);
+          };
+        });
+
+      handleInitialize();
+      handleInit(false);
+    }
     // 모달 내부 페이지의 히스토리 상태 추가
     history.pushState({ modalInternal: true }, '', location.href);
 
@@ -355,89 +391,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
   
     // popstate 이벤트 리스너 추가 (중복 추가 방지)
     window.addEventListener('popstate', handlePopState);
-
-
-  }, [init, selectedCompany, currentCompanyCode, loadCompanyMAContracts]);
-
-  //===== useEffect for Purchase =======================================================
-  useEffect(() => {
-    if(!!selectedCompany.company_code && !checkState.purchase) {
-      setCheckState({
-        ...checkState,
-        purchase: true,
-      });
-      const queryPromise = searchPurchases('company_code', selectedCompany.company_code, true);
-      queryPromise
-        .then(res => {
-          if(res.result) {
-            setPurchasesByCompany(res.data);
-          } else {
-            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
-            setPurchasesByCompany([]);
-          };
-        });
-    }
-  }, [checkState, searchPurchases, selectedCompany.company_code]);
-
-  //===== useEffect for Purchase =======================================================
-  useEffect(() => {
-    let valid_count = 0;
-    purchaseByCompany.forEach((item) => {
-      if (!!item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now()))
-        valid_count++;
-    });
-    setValidMACount(valid_count);
-  }, [purchaseByCompany]);
-
-  //===== useEffect for Transaction ====================================================
-  useEffect(() => {
-    if(!!selectedCompany.company_code && !checkState.transaction) {
-      setCheckState({
-        ...checkState,
-        transaction: true,
-      });
-      const queryPromise = searchTransactions('company_code', selectedCompany.company_code, true);
-      queryPromise
-        .then(res => {
-          if(res.result) {
-            setTransactionByCompany(res.data);
-          } else {
-            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
-            setTransactionByCompany([]);
-          };
-        });
-    }
-  }, [checkState, searchTransactions, selectedCompany.company_code]);
-
-  //===== useEffect for Tax Invoice ====================================================
-  useEffect(() => {
-    if(!!selectedCompany.company_code && !checkState.taxInvoice) {
-      setCheckState({
-        ...checkState,
-        taxInvoice: true,
-      });
-      const queryPromise = searchTaxInvoices('company_code', selectedCompany.company_code, true);
-      queryPromise
-        .then(res => {
-          if(res.result) {
-            setTaxInvoiceByCompany(res.data);
-          } else {
-            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
-            setTaxInvoiceByCompany([]);
-          };
-        });
-    }
-  }, [checkState, searchTransactions, selectedCompany.company_code]);
-
-  //===== useEffect for User ==========================================================
-  useEffect(() => {
-    if (init && checkState.purchase && checkState.transaction && checkState.taxInvoice
-      && ((userState & 1) === 1)
-     ){
-      // console.log('[CompanyDetailModel] all needed data is loaded');
-      handleInit(false);
-    };
-  }, [checkState, userState, handleInit]);
+  }, [init, selectedCompany, currentCompanyCode, loadCompanyMAContracts, searchPurchases, searchTransactions, searchTaxInvoices, handleInit, setPurchasesByCompany, setTransactionByCompany, setTaxInvoiceByCompany]);
 
   if (init)
     return <div>&nbsp;</div>;

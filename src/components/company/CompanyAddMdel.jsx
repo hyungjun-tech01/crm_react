@@ -48,7 +48,6 @@ const CompanyAddModel = (props) => {
 
   const initializeCompanyTemplate = useCallback(() => {
     setCompanyChange({ ...defaultCompany });
-    document.querySelector("#add_new_company_form").reset();
   }, []);
 
   const handleDateChange = (name, date) => {
@@ -136,7 +135,7 @@ const CompanyAddModel = (props) => {
       counter: 0,
       modify_user: cookies.myLationCrmUserId,
     };
-    // console.log(`[ handleAddNewCompany ]`, newComData);
+    
     const result = modifyCompany(newComData);
     result.then((res) => {
       if (res.result) {
@@ -153,7 +152,6 @@ const CompanyAddModel = (props) => {
   };
 
   const handleClose = () => {
-    initializeCompanyTemplate();
     setTimeout(() => {
       closeModal();
     }, 500);
@@ -161,11 +159,10 @@ const CompanyAddModel = (props) => {
 
   useEffect(() => {
     if (init && (userState & 1) === 1) {
-      // console.log("[CompanyAddModel] initialzie!");
       if (handleInit) handleInit(!init);
       setTimeout(() => {
         initializeCompanyTemplate();
-      }, 500);
+      }, 250);
     }
     // 모달 내부 페이지의 히스토리 상태 추가
     history.pushState({ modalInternal: true }, '', location.href);

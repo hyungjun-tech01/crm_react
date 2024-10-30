@@ -151,17 +151,6 @@ const Companies = () => {
   };
 
   // --- Functions used for Table ------------------------------
-  const handleClickCompanyName = useCallback((id) => {
-    // console.log('[Company] set current company : ', id);
-    setInitToEditCompany(true);
-    setCurrentCompany(id);
-    setSelectedCategory({category: 'company', item_code: id});
-    setTimeout(()=>{
-      openModal('company-details');
-    }, 500);
-    
-  }, [setCurrentCompany]);
-
   const columns = [
     {
       title: t('company.company_name'),
@@ -216,11 +205,21 @@ const Companies = () => {
     },
   ];
 
-  const handleAddNewCompanyClicked = useCallback(() => {
+  const handleEditCompany = useCallback((id) => {
+    // console.log('[Company] set current company : ', id);
+    setInitToEditCompany(true);
+    setCurrentCompany(id);
+    setSelectedCategory({category: 'company', item_code: id});
+    setTimeout(()=>{
+      openModal('company-details');
+    }, 250);
+  }, [setCurrentCompany]);
+
+  const handleAddCompany = useCallback(() => {
     setInitToAddCompany(true);
     setTimeout(() => {
       openModal('add_company');
-    }, 500);
+    }, 250);
   }, [setInitToAddCompany]);
 
   useEffect(() => {
@@ -351,7 +350,7 @@ const Companies = () => {
                     <button
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                       id="add-task"
-                      onClick={handleAddNewCompanyClicked}
+                      onClick={handleAddCompany}
                     >
                       {t('company.new_company')}
                     </button>
@@ -384,7 +383,7 @@ const Companies = () => {
                       onRow={(record, rowIndex) => {
                         return {
                           onClick: () => {
-                            handleClickCompanyName(record.company_code);
+                            handleEditCompany(record.company_code);
                           },
                         };
                       }}
