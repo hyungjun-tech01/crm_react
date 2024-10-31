@@ -226,16 +226,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
     };
   }, [cookies.myLationCrmUserId, currentCompany.company_code, editedDetailValues, modifyCompany, modifyLead, selectedLead]);
 
-  const handleInitialize = () => {
-    setEditedDetailValues(null);
-  };
-
-  const handleClose = () => {
-    setTimeout(() => {
-      closeModal();
-    }, 250);
-  };
-
   const lead_items_info = [
     { key: 'lead_name', title: 'lead.lead_name', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
@@ -300,10 +290,18 @@ const LeadDetailsModel = ({init, handleInit}) => {
     }
   };
 
+  const handleInitialize = () => {
+    setEditedDetailValues(null);
+  };
+
+  const handleClose = () => {
+    setTimeout(() => {
+      closeModal();
+    }, 250);
+  };
 
   useEffect(() => {
     if (init) {
-      console.log('LeadDetailsModel / init : start');
       handleInit(false);
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {
@@ -320,7 +318,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
       ) {
         return;
       }
-      console.log('LeadDetailsModel / init : different lead');
       setCurrentCompany(selectedLead.company_code);
       loadCompanyMAContracts(selectedLead.company_code);
       setCurrentLeadCode(selectedLead.lead_code);

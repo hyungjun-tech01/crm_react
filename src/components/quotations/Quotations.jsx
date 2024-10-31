@@ -170,11 +170,11 @@ const Quotations = () => {
   //   openModal('leads-details');
   // }, []);
 
-  const handleClickQuotation = useCallback((code) => {
+  const handleClickQuotation = (code) => {
     setCurrentQuotation(code);
     setSelectedCategory({category: 'quotation', item_code: code});
-    openModal('quotation-details');
-  }, []);
+    openModal('quotation-details','initialize_quotation');
+  };
 
   // --- Section for Table ------------------------------
   const columns = [

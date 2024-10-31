@@ -65,22 +65,6 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   const { closeModal } = useRecoilValue(SettingsRepo);
 
 
-  //===== Handles to deal this component ==============================================
-  const [ isFullScreen, setIsFullScreen ] = useState(false);
-  const [ currentQuotationCode, setCurrentQuotationCode ] = useState('');
-  const [ selectedCategory, setSelectedCategory ] = useRecoilState(atomSelectedCategory);
-
-  const handleWidthChange = useCallback((checked) => {
-    setIsFullScreen(checked);
-    if(checked)
-      localStorage.setItem('isFullScreen', '1');
-    else
-      localStorage.setItem('isFullScreen', '0');
-  }, []);
-
-  
-
-
   //===== Handles to edit 'Quotation Details' =========================================
   const [editedDetailValues, setEditedDetailValues] = useState({});
 
@@ -117,37 +101,6 @@ const QuotationDetailsModel = ({init, handleInit}) => {
       setEditedDetailValues(tempEdited);
     }
   }, [editedDetailValues, selectedQuotation]);
-
-  const handleSaveAll = useCallback(() => {
-    if (editedDetailValues !== null &&
-      selectedQuotation &&
-      selectedQuotation !== defaultQuotation
-    ) {
-      const temp_all_saved = {
-        ...editedDetailValues,
-        action_type: "UPDATE",
-        modify_user: cookies.myLationCrmUserId,
-        quotation_code: selectedQuotation.quotation_code,
-      };
-      const resp = modifyQuotation(temp_all_saved);
-      resp.then(res => {
-        if (res.result) {
-          console.log(`Succeeded to modify Quotation`);
-          handleClose();
-        } else {
-          console.error("Failed to modify Quotation :", res.data);
-        };
-      });
-    } else {
-      console.log("[ QuotationDetailModel ] No saved data");
-    }
-    setEditedDetailValues({});
-  }, [cookies.myLationCrmUserId, modifyQuotation, editedDetailValues, selectedQuotation]);
-
-  const handleCancelAll = useCallback(() => {
-    setEditedDetailValues({});
-    handleClose();
-  }, []);
 
 
   //===== Handles to edit 'Content' ===================================================
@@ -370,20 +323,6 @@ const QuotationDetailsModel = ({init, handleInit}) => {
     setQuotationContents(tempContents);
   }, []);
 
-  // --- Funtions for Control Windows ---------------------------------
-  
-
-  const handleClose = useCallback(() => {
-    if(selectedCategory.category === 'quotation') {
-      setSelectedCategory({category: null, item_code: null});
-    }
-    setEditedDetailValues(null);
-    setCurrentQuotation();
-    setTimeout(() => {
-      closeModal();
-    }, 500);
-  }, [setCurrentQuotation, setSelectedCategory]);
-
   const qotation_items_info = [
     { key:'quotation_type', title:'quotation.quotation_type', detail:{ type:'select', options:QuotationTypes, editing:handleDetailSelectChange }},
     { key:'quotation_manager', title:'quotation.quotation_manager', detail:{ type:'select', options:usersForSelection, editing:handleDetailSelectChange }},
@@ -416,7 +355,54 @@ const QuotationDetailsModel = ({init, handleInit}) => {
     { key:'company_name', title:'company.company_name', detail:{ type:'label', extra:'long', editing:handleDetailChange }},
   ];
 
-  // --- useEffect ------------------------------------------------------
+  //===== Handles to handle this =================================================
+  const [ isFullScreen, setIsFullScreen ] = useState(false);
+  const [ currentQuotationCode, setCurrentQuotationCode ] = useState('');
+
+  const handleWidthChange = useCallback((checked) => {
+    setIsFullScreen(checked);
+    if(checked)
+      localStorage.setItem('isFullScreen', '1');
+    else
+      localStorage.setItem('isFullScreen', '0');
+  }, []);
+  
+  const handleSaveAll = useCallback(() => {
+    if (editedDetailValues !== null &&
+      selectedQuotation &&
+      selectedQuotation !== defaultQuotation
+    ) {
+      const temp_all_saved = {
+        ...editedDetailValues,
+        action_type: "UPDATE",
+        modify_user: cookies.myLationCrmUserId,
+        quotation_code: selectedQuotation.quotation_code,
+      };
+      const resp = modifyQuotation(temp_all_saved);
+      resp.then(res => {
+        if (res.result) {
+          console.log(`Succeeded to modify Quotation`);
+          handleClose();
+        } else {
+          console.error("Failed to modify Quotation :", res.data);
+        };
+      });
+    } else {
+      console.log("[ QuotationDetailModel ] No saved data");
+    }
+  }, [cookies.myLationCrmUserId, modifyQuotation, editedDetailValues, selectedQuotation]);
+
+  const handleInitialize = () => {
+    setEditedDetailValues(null);
+  };
+
+  const handleClose = () => {
+    setTimeout(() => {
+      closeModal();
+    }, 250);
+  };
+
+  //===== useEffect functions =============================================== 
   useEffect(() => {
     if((selectedQuotation !== defaultQuotation)
       && (selectedQuotation.quotation_code !== currentQuotationCode)
@@ -454,6 +440,7 @@ const QuotationDetailsModel = ({init, handleInit}) => {
       };
     };
 
+    handleInitialize();
     setCurrentQuotationCode(selectedQuotation.quotation_code);
   }, [selectedQuotation, editedDetailValues, currentQuotationCode, quotationState]);
 
@@ -586,7 +573,7 @@ if (init)
                                 <button
                                   type="button"
                                   className="btn btn-secondary btn-rounded"
-                                  onClick={handleCancelAll}
+                                  onClick={handleClose}
                                 >
                                   {t('common.cancel')}
                                 </button>

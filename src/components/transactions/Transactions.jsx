@@ -53,8 +53,8 @@ const Transactions = () => {
 
   //===== Handles to edit this ========================================================
   const [nowLoading, setNowLoading] = useState(true);
-  const [openTransaction, setOpenTransaction] = useState(false);
-  const [openTaxInvoice, setOpenTaxInvoice] = useState(false);
+  const [initTransaction, setInitTransaction] = useState(false);
+  const [initTaxInvoice, setInitTaxInvoice] = useState(false);
   const [taxInvoiceData, setTaxInvoiceData] = useState(null);
   const [taxInvoiceContents, setTaxInvoiceContents] = useState(null);
   const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
@@ -119,7 +119,7 @@ const Transactions = () => {
     setMultiQueryModal(false);
 
     // query condition 세팅 후 query
-    console.log("handleMultiQueryModalOk", queryConditions);
+    // console.log("handleMultiQueryModalOk", queryConditions);
 
     const multiQueryCondi = {
       queryConditions: queryConditions,
@@ -213,7 +213,7 @@ const Transactions = () => {
 
   const handleAddNewTransaction = () => {
     setCurrentTransaction()
-    setOpenTransaction(true);
+    setInitTransaction(true);
 
     setTimeout(() => {
       openModal('edit_transaction');
@@ -221,13 +221,12 @@ const Transactions = () => {
   };
 
   const handleOpenTransactoin = (code) => {
-    console.log('handleOpenTransactoin');
     setCurrentTransaction(code)
-    setOpenTransaction(true);
+    setInitTransaction(true);
     setSelectedCategory({category: 'transaction', item_code: code});
 
     setTimeout(() => {
-      openModal('edit_transaction');
+      openModal('edit_transaction','initialize_transaction');
     }, 500);
   };
 
@@ -349,19 +348,20 @@ const Transactions = () => {
         {/* modal */}
         <SystemUserModel />
         <TransactionEditModel
-          open={openTransaction}
-          close={() => setOpenTransaction(false)}
-          openTaxInvoice={() => setOpenTaxInvoice(true)}
+          init={initTransaction}
+          handleInit={setInitTransaction}
+          openTaxInvoice={() => {
+            setInitTaxInvoice(true);
+            setTimeout(()=>{
+              openModal('edit_tax_invoice');
+            })
+          }}
           setTaxInvoiceData={setTaxInvoiceData}
           setTaxInvoiceContents={setTaxInvoiceContents}
         />
         <TaxInvoiceEditModel
-          open={openTaxInvoice}
-          close={() => {
-            setOpenTaxInvoice(false);
-            setTaxInvoiceData(null);
-            setTaxInvoiceContents(null);
-          }}
+          init={initTaxInvoice}
+          handleInit={setInitTaxInvoice}
           data={taxInvoiceData}
           contents={taxInvoiceContents}
         />

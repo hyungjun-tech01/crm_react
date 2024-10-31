@@ -68,23 +68,21 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
 
 
   //===== [RecoilState] Related with Users ============================================
-  const userState = useRecoilValue(atomUserState);
   const engineerForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
 
   //===== [RecoilState] Related with Users ============================================
-  const { closeModal } = useRecoilValue(SettingsRepo);
+  const { openModal, closeModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to deal this component ==============================================
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentCompanyCode, setCurrentCompanyCode] = useState("");
-  const [ openTransaction, setOpenTransaction ] = useState(false);
-  const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
+  const [ initTransaction, setInitTransaction ] = useState(false);
+  const [ initTaxInvoice, setInitTaxInvoice ] = useState(false);
   const [ taxInvoiceData, setTaxInvoiceData ] = useState(null);
   const [ taxInvoiceContents, setTaxInvoiceContents ] = useState(null);
-  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const handleWindowWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -549,7 +547,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
                     id="company-details-transaction"
                   >
                     <CompanyTransactionModel
-                      openTransaction={setOpenTransaction}
+                      openTransaction={setInitTransaction}
                     />
                   </div>
                   <div
@@ -557,7 +555,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
                     id="company-details-taxinvoice"
                   >
                     <CompanyTaxInvoiceModel
-                      openTaxInvoice={setOpenTaxInvoice}
+                      openTaxInvoice={setInitTaxInvoice}
                     />
                   </div>
                 </div>
@@ -575,7 +573,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
                       <button
                         type="button"
                         className="btn btn-secondary btn-rounded"
-                        onClick={handleDetailCancel}
+                        onClick={handleClose}
                       >
                         {t("common.cancel")}
                       </button>
@@ -590,19 +588,20 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
       <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} />
       <PurchaseDetailsModel />
       <TransactionEditModel
-        open={openTransaction}
-        close={() =>setOpenTransaction(false)}
-        openTaxInvoice={()=>setOpenTaxInvoice(true)} 
+        init={initTransaction}
+        handleInit={setInitTransaction}
+        openTaxInvoice={()=>{
+          setInitTaxInvoice(true);
+          setTimeout(()=>{
+            openModal('edit_tax_invoice');
+          })
+        }} 
         setTaxInvoiceData={setTaxInvoiceData}
         setTaxInvoiceContents={setTaxInvoiceContents}
       />
       <TaxInvoiceEditModel
-        open={openTaxInvoice}
-        close={() => {
-          setOpenTaxInvoice(false);
-          setTaxInvoiceData(null);
-          setTaxInvoiceContents(null);
-        }}
+        init={initTaxInvoice}
+        handleInit={setInitTaxInvoice}
         data={taxInvoiceData}
         contents={taxInvoiceContents}
       />

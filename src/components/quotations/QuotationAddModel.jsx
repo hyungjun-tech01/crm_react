@@ -92,96 +92,6 @@ const QuotationAddModel = (props) => {
   const [quotationChange, setQuotationChange] = useState({ ...defaultQuotation });
   const [quotationContents, setQuotationContents] = useState([]);
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
-  const selectedCategory = useRecoilValue(atomSelectedCategory);
-
-  const handlePopupOpen = (open) => {
-    console.log('QuotationAdd / handlePopupOpen');
-    if(open) {
-      openModal("antModal");
-    } else {
-      closeModal();
-    }
-  };
-
-  const initializeQuotationTemplate = useCallback(() => {
-    setQuotationContents([]);
-
-    let modifiedData = {
-      ...defaultQuotation,
-      receiver: cookies.myLationCrmUserName,
-    };
-
-    if ((selectedCategory.category === 'lead')
-      && (currentLead !== defaultLead)
-      && (selectedCategory.item_code === currentLead.lead_code)
-    ) {
-        modifiedData['lead_code'] = currentLead.lead_code;
-        modifiedData['lead_name'] = currentLead.lead_name;
-        modifiedData['department'] = currentLead.department;
-        modifiedData['position'] = currentLead.position;
-        modifiedData['mobile_number'] = currentLead.mobile_number;
-        modifiedData['phone_number'] = currentLead.phone_number;
-        modifiedData['email'] = currentLead.email;
-    };
-
-    setAmountsForContent({
-      sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
-    });
-
-    setIsContentModalOpen(false);
-    setEditedContentModalValues({});
-    setOrgContentModalValues({});
-    setSelectedContentRowKeys([]);
-
-    // load or set setting of column of table ----------------------------------
-    if(!cookies.myQuotationAddColumns){
-
-      const tempQuotationColumn = [
-        ...defaultColumns
-      ];
-      const tempCookieValue = {
-        [cookies.myLationCrmUserId] : tempQuotationColumn 
-      }
-      setContentColumns(tempQuotationColumn);
-      setCookie('myQuotationAddColumns', tempCookieValue);
-    } else {
-      const columnSettings = cookies.myQuotationAddColumns[cookies.myLationCrmUserId];
-      if(!columnSettings){
-        const tempQuotationColumn = [
-          ...defaultColumns
-        ];
-        const tempCookieValue = {
-          ...cookies.myQuotationAddColumns,
-          [cookies.myLationCrmUserId]: tempQuotationColumn
-        };
-        setContentColumns(tempQuotationColumn);
-        setCookie('myQuotationAddColumns', tempCookieValue);
-      } else {
-        const tempQuotationColumn = columnSettings.map(col => ({
-          ...col,
-          render: defaultContentArray[col.dataIndex - 1][2]
-        }));
-        setContentColumns(tempQuotationColumn);
-      };
-    };
-
-    let newDocNo = "";
-    const response = getQuotationDocNo({modify_user: cookies.myLationCrmUserId});
-    response
-      .then((res) => {
-        if(res.result){
-          newDocNo = res.docNo;
-        };
-        modifiedData['quotation_number'] = newDocNo;
-        setQuotationChange(modifiedData);
-      })
-      .catch(err => {
-        console.log('initializeQuotationTemplate / getQuotationDocNo :', err);
-        modifiedData['quotation_number'] = newDocNo;
-        setQuotationChange(modifiedData);
-      })
-
-  }, [cookies.myLationCrmUserId, cookies.myLationCrmUserName, currentLead, getQuotationDocNo]);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
@@ -303,6 +213,15 @@ const QuotationAddModel = (props) => {
       width: size.width,
     };
     setContentColumns(nextColumns);
+
+    // update cookie for content columns ----------------
+    const tempCookies = {
+      ...cookies.myQuotationAddColumns,
+      [cookies.myLationCrmUserId] : [
+        ...nextColumns
+      ]
+    };
+    setCookie("myQuotationAddColumns", tempCookies);
   };
 
   const handleHeaderCheckChange = (event) => {
@@ -352,6 +271,15 @@ const QuotationAddModel = (props) => {
     };
     
     setContentColumns(tempColumns);
+
+    // update cookie for content columns ----------------
+    const tempCookies = {
+      ...cookies.myQuotationAddColumns,
+      [cookies.myLationCrmUserId] : [
+        ...tempColumns
+      ]
+    };
+    setCookie("myQuotationAddColumns", tempCookies);
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -378,7 +306,7 @@ const QuotationAddModel = (props) => {
   };
 
 
-  //===== Handles to edit 'Contents' =================================================
+  //===== Handles to edit 'Content' =================================================
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [orgContentModalValues, setOrgContentModalValues] = useState({});
   const [editedContentModalValues, setEditedContentModalValues] = useState({});
@@ -592,7 +520,7 @@ const QuotationAddModel = (props) => {
     setAmountsForContent(updatedSetting);
   }
 
-  // --- Functions used for editing content ------------------------------
+  //===== Handles to edit contents ========================================
   const handleAddNewContent = useCallback(() => {
     if (!quotationChange.lead_name) {
       setMessage({ title: '필요 정보 누락', message: '고객 이름이 누락되었습니다.' });
@@ -783,7 +711,98 @@ const QuotationAddModel = (props) => {
   }, [settingForContent.show_decimal]);
 
 
-  //===== Function for Final Actions  ==========================================
+  //===== Handles to handle this =================================================
+  const selectedCategory = useRecoilValue(atomSelectedCategory);
+
+  const handlePopupOpen = (open) => {
+    console.log('QuotationAdd / handlePopupOpen');
+    if(open) {
+      openModal("antModal");
+    } else {
+      closeModal();
+    }
+  };
+
+  const handleInitialize = useCallback(() => {
+    setQuotationContents([]);
+
+    let modifiedData = {
+      ...defaultQuotation,
+      receiver: cookies.myLationCrmUserName,
+    };
+
+    if ((selectedCategory.category === 'lead')
+      && (currentLead !== defaultLead)
+      && (selectedCategory.item_code === currentLead.lead_code)
+    ) {
+        modifiedData['lead_code'] = currentLead.lead_code;
+        modifiedData['lead_name'] = currentLead.lead_name;
+        modifiedData['department'] = currentLead.department;
+        modifiedData['position'] = currentLead.position;
+        modifiedData['mobile_number'] = currentLead.mobile_number;
+        modifiedData['phone_number'] = currentLead.phone_number;
+        modifiedData['email'] = currentLead.email;
+    };
+
+    setAmountsForContent({
+      sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
+    });
+
+    setIsContentModalOpen(false);
+    setEditedContentModalValues({});
+    setOrgContentModalValues({});
+    setSelectedContentRowKeys([]);
+
+    // load or set setting of column of table ----------------------------------
+    if(!cookies.myQuotationAddColumns){
+
+      const tempQuotationColumn = [
+        ...defaultColumns
+      ];
+      const tempCookieValue = {
+        [cookies.myLationCrmUserId] : tempQuotationColumn 
+      }
+      setContentColumns(tempQuotationColumn);
+      setCookie('myQuotationAddColumns', tempCookieValue);
+    } else {
+      const columnSettings = cookies.myQuotationAddColumns[cookies.myLationCrmUserId];
+      if(!columnSettings){
+        const tempQuotationColumn = [
+          ...defaultColumns
+        ];
+        const tempCookieValue = {
+          ...cookies.myQuotationAddColumns,
+          [cookies.myLationCrmUserId]: tempQuotationColumn
+        };
+        setContentColumns(tempQuotationColumn);
+        setCookie('myQuotationAddColumns', tempCookieValue);
+      } else {
+        const tempQuotationColumn = columnSettings.map(col => ({
+          ...col,
+          render: defaultContentArray[col.dataIndex - 1][2]
+        }));
+        setContentColumns(tempQuotationColumn);
+      };
+    };
+
+    let newDocNo = "";
+    const response = getQuotationDocNo({modify_user: cookies.myLationCrmUserId});
+    response
+      .then((res) => {
+        if(res.result){
+          newDocNo = res.docNo;
+        };
+        modifiedData['quotation_number'] = newDocNo;
+        setQuotationChange(modifiedData);
+      })
+      .catch(err => {
+        console.log('handleInitialize / getQuotationDocNo :', err);
+        modifiedData['quotation_number'] = newDocNo;
+        setQuotationChange(modifiedData);
+      })
+
+  }, [cookies.myLationCrmUserId, cookies.myLationCrmUserName, currentLead, getQuotationDocNo]);
+
   const handleAddNewQuotation = () => {
     // Check data if they are available
     let numberOfNoInputItems = 0;
@@ -862,7 +881,7 @@ const QuotationAddModel = (props) => {
     setCookie("myQuotationAddColumns", tempCookies);
     setTimeout(() => {
       closeModal();
-    }, 500);
+    }, 250);
   };
 
 
@@ -871,10 +890,10 @@ const QuotationAddModel = (props) => {
     if (init && ((userState & 1) === 1)) {
       if (handleInit) handleInit(!init);
       setTimeout(() => {
-        initializeQuotationTemplate();
+        handleInitialize();
       }, 500);
     };
-  }, [userState, init, handleInit, initializeQuotationTemplate]);
+  }, [userState, init, handleInit, handleInitialize]);
 
   if (init)
     return <div>&nbsp;</div>;

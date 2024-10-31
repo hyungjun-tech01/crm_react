@@ -64,6 +64,37 @@ const ConsultingAddModel = (props) => {
   //===== [RecoilState] Related with Users ============================================
   const { openModal, closeModal } = useRecoilValue(SettingsRepo);
 
+  const handleItemChange = (e) => {
+    const modifiedData = {
+      ...consultingChange,
+      [e.target.name]: e.target.value,
+    };
+    setConsultingChange(modifiedData);
+  };
+
+  const handleSelectChange = (name, selected) => {
+    const modifiedData = {
+      ...consultingChange,
+      [name]: selected.value,
+    };
+    setConsultingChange(modifiedData);
+  };
+
+  const handleDataChange = (name, data) => {
+    const modifiedData = {
+      ...consultingChange,
+      [name]: data
+    };
+    setConsultingChange(modifiedData);
+  };
+
+  const handleLeadSelected = (data) => {
+    setConsultingChange(data);
+  };
+
+
+  //===== Handles to edit 'Add Consulting' ========================================
+  const [ consultingChange, setConsultingChange] = useState({});
 
   //===== Handles to attachment ========================================
   const { deleteFile, modifyAttachmentInfo } = useRecoilValue(AttachmentRepo);
@@ -359,9 +390,9 @@ const ConsultingAddModel = (props) => {
     setConsultingChange(modifiedData);
   };
 
-  //===== Handles to This ========================================
+
+  //===== Handles to handle this ================================================= 
   const [ needInit, setNeedInit ] = useState(true);
-  const [ consultingChange, setConsultingChange] = useState({});
   const [ showEditor, setShowEditor ] = useState(0);
 
   const selectedCategory = useRecoilValue(atomSelectedCategory);
@@ -370,33 +401,7 @@ const ConsultingAddModel = (props) => {
   const EDIT_REQUEST_CONTENT = 1;
   const EDIT_ACTION_CONTENT = 2;
 
-  const handleItemChange = (e) => {
-    const modifiedData = {
-      ...consultingChange,
-      [e.target.name]: e.target.value,
-    };
-    setConsultingChange(modifiedData);
-  };
-
-  const handleSelectChange = (name, selected) => {
-    const modifiedData = {
-      ...consultingChange,
-      [name]: selected.value,
-    };
-    setConsultingChange(modifiedData);
-  };
-
-  const handleDataChange = (name, data) => {
-    const modifiedData = {
-      ...consultingChange,
-      [name]: data
-    };
-    setConsultingChange(modifiedData);
-  };
-
-  const handleLeadSelected = (data) => {
-    setConsultingChange(data);
-  };
+  
 
   const handleClickRequestContent = () => {
     setShowEditor(EDIT_REQUEST_CONTENT);
@@ -413,37 +418,6 @@ const ConsultingAddModel = (props) => {
       closeModal();
     }
   };
-
-  const initializeConsultingTemplate = useCallback(() => {
-    // set Receipt date -------------
-    const tempDate = new Date();
-    let modified = {
-      ...defaultConsulting,
-      receiver: cookies.myLationCrmUserName,
-      receipt_date: tempDate,
-    };
-
-    if ((selectedCategory.category === 'lead')
-      && (currentLead !== defaultLead)
-      && (selectedCategory.item_code === currentLead.lead_code)
-    ) {
-      modified['lead_code'] = currentLead.lead_code;
-      modified['lead_name'] = currentLead.lead_name;
-      modified['department'] = currentLead.department;
-      modified['position'] = currentLead.position;
-      modified['mobile_number'] = currentLead.mobile_number;
-      modified['phone_number'] = currentLead.phone_number;
-      modified['email'] = currentLead.email;
-      modified['company_code'] = currentLead.company_code;
-      modified['company_name'] = currentLead.company_name;
-    };
-    setConsultingChange(modified);
-    setAttachmentsForAction([]);
-    setAttachmentsForRequest([]);
-    setNeedInit(false);
-    
-  }, [cookies.myLationCrmUserName, currentLead, setCurrentCompany, selectedCategory]);
-
 
   const handleAddNewConsulting = () => {
     // Check data if they are available ------------------------------------
@@ -493,6 +467,36 @@ const ConsultingAddModel = (props) => {
     });
   };
 
+  const handleInitialize = useCallback(() => {
+    // set Receipt date -------------
+    const tempDate = new Date();
+    let modified = {
+      ...defaultConsulting,
+      receiver: cookies.myLationCrmUserName,
+      receipt_date: tempDate,
+    };
+
+    if ((selectedCategory.category === 'lead')
+      && (currentLead !== defaultLead)
+      && (selectedCategory.item_code === currentLead.lead_code)
+    ) {
+      modified['lead_code'] = currentLead.lead_code;
+      modified['lead_name'] = currentLead.lead_name;
+      modified['department'] = currentLead.department;
+      modified['position'] = currentLead.position;
+      modified['mobile_number'] = currentLead.mobile_number;
+      modified['phone_number'] = currentLead.phone_number;
+      modified['email'] = currentLead.email;
+      modified['company_code'] = currentLead.company_code;
+      modified['company_name'] = currentLead.company_name;
+    };
+    setConsultingChange(modified);
+    setAttachmentsForAction([]);
+    setAttachmentsForRequest([]);
+    setNeedInit(false);
+    
+  }, [cookies.myLationCrmUserName, currentLead, selectedCategory]);
+
   const handleClose = () => {
     setTimeout(() => {
       closeModal();
@@ -504,10 +508,10 @@ const ConsultingAddModel = (props) => {
   useEffect(() => {
     if (init && needInit && ((userState & 1) === 1)) {
       if (handleInit) handleInit(!init);
-      initializeConsultingTemplate();
+      handleInitialize();
     };
 
-  }, [init, userState, initializeConsultingTemplate, handleInit, needInit, attachmentsForRequest, attachmentsForAction]);
+  }, [init, userState, handleInitialize, handleInit, needInit, attachmentsForRequest, attachmentsForAction]);
 
   if (needInit)
     return <div>&nbsp;</div>;

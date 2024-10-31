@@ -6,14 +6,12 @@ import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
 
 import {
-  atomUserState,
   atomUsersForSelection,
   atomEngineersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
 import {
   atomCurrentConsulting,
-  atomSelectedCategory,
   atomRequestAttachments,
   atomActionAttachments,
   defaultConsulting, 
@@ -36,43 +34,26 @@ import DetailTitleItem from "../../constants/DetailTitleItem";
 const ConsultingDetailsModel = () => {
   const [t] = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
+  const EDIT_REQUEST_CONTENT = 1;
+  const EDIT_ACTION_CONTENT = 2;
 
 
   //===== [RecoilState] Related with Consulting =======================================
   const selectedConsulting = useRecoilValue(atomCurrentConsulting);
-  const { modifyConsulting, setCurrentConsulting } = useRecoilValue(ConsultingRepo);
+  const { modifyConsulting } = useRecoilValue(ConsultingRepo);
 
 
   //===== [RecoilState] Related with Users ==========================================
-  const userState = useRecoilValue(atomUserState);
   const usersForSelection = useRecoilValue(atomUsersForSelection);
   const engineersForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
 
   //===== [RecoilState] Related with Users ============================================
-  const { openModal, closeModal } = useRecoilValue(SettingsRepo);
+  const { closeModal } = useRecoilValue(SettingsRepo);
 
-
-  //===== Handles to deal this component ==============================================
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  const [currentConsultingCode, setCurrentConsultingCode] = useState('');
-  const [ selectedCategory, setSelectedCategory] = useRecoilState(atomSelectedCategory);
-  const [ showEditor, setShowEditor ] = useState(0);
-
-  const EDIT_REQUEST_CONTENT = 1;
-  const EDIT_ACTION_CONTENT = 2;
-
-  const handleWidthChange = useCallback((checked) => {
-    setIsFullScreen(checked);
-    if (checked)
-      localStorage.setItem('isFullScreen', '1');
-    else
-      localStorage.setItem('isFullScreen', '0');
-  }, []);
 
   //===== Handles to edit 'Consulting Details' ========================================
-  const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
   const [editedDetailValues, setEditedDetailValues] = useState(null);
 
   const handleDetailChange = useCallback((e) => {
@@ -109,7 +90,8 @@ const ConsultingDetailsModel = () => {
     };
   }, [editedDetailValues, selectedConsulting]);
 
-  //===== Handles to attachment ========================================
+
+  //===== Handles to edit attachment ========================================
   const orgRequestAttachments = useRecoilValue(atomRequestAttachments);
   const orgActionAttachments = useRecoilValue(atomActionAttachments);
   const [ requestAttachmentCode, setRequestAttachmentCode ] = useRecoilState(atomRequestAttachmentCode);
@@ -117,6 +99,7 @@ const ConsultingDetailsModel = () => {
   const { deleteFile, modifyAttachmentInfo } = useRecoilValue(AttachmentRepo);
   const [ requestAttachments, setRequestAttachments ] = useState([]);
   const [ actionAttachments, setActionAttachments ] = useState([]);
+  const [ showEditor, setShowEditor ] = useState(0);
 
   const handleAddRequestContent = async (data) => {
     const {content, attachments} = data;
@@ -158,7 +141,6 @@ const ConsultingDetailsModel = () => {
       removedAttachments.forEach(async item => {
         const deleteResp = await deleteFile(item.dirName, item.fileName, item.fileExt);
         if(!deleteResp.result){
-          console.log('Failed to remove uploaded file :', item);
           // ToDo: Then, what should we do to deal this condition!
           return;
         };
@@ -278,7 +260,6 @@ const ConsultingDetailsModel = () => {
       removedAttachments.forEach(async item => {
         const deleteResp = await deleteFile(item.dirName, item.fileName, item.fileExt);
         if(!deleteResp.result){
-          console.log('Failed to remove uploaded file :', item);
           // ToDo: Then, what should we do to deal this condition!
           return;
         };
@@ -358,6 +339,42 @@ const ConsultingDetailsModel = () => {
     };
   };
 
+  const consultingItemsInfo = [
+    { key: 'department', title: 'lead.department', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'mobile_number', title: 'lead.mobile', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'phone_number', title: 'common.phone_no', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'email', title: 'lead.email', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'status', title: 'common.status', detail: { type: 'select', options: ConsultingStatusTypes, editing: handleDetailSelectChange } },
+    { key: 'receipt_date', title: 'consulting.receipt_date', detail: { type: 'date', editing: handleDetailDataChange } },
+    { key: 'consulting_type', title: 'consulting.type', detail: { type: 'select', options: ConsultingTypes, editing: handleDetailSelectChange } },
+    { key: 'lead_time', title: 'consulting.lead_time', detail: { type: 'select', options: ConsultingTimeTypes, editing: handleDetailSelectChange } },
+    { key: 'product_type', title: 'consulting.product_type', detail: { type: 'select', options: ProductTypes, editing: handleDetailSelectChange } },
+    { key: 'request_type', title: 'consulting.request_type', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'lead_sales', title: 'lead.lead_sales', detail: { type: 'select', options: salespersonsForSelection, editing: handleDetailSelectChange } },
+    { key: 'application_engineer', title: 'company.engineer', detail: { type: 'select', options: engineersForSelection, editing: handleDetailSelectChange } },
+    { key: 'receiver', title: 'consulting.receiver', detail: { type: 'select', options: usersForSelection, editing: handleDetailSelectChange } },
+  ];
+
+  const consultingItemsInfo2 = [
+    { key: 'request_content', title: 'consulting.request_content', detail: { type: 'content', editable: (showEditor & EDIT_REQUEST_CONTENT), editableKey: EDIT_REQUEST_CONTENT, handleEditable: setShowEditor, editing: handleAddRequestContent } },
+    { key: 'action_content', title: 'consulting.action_content', detail: { type: 'content', editable: (showEditor & EDIT_ACTION_CONTENT), editableKey: EDIT_ACTION_CONTENT, handleEditable: setShowEditor, editing: handleAddActionContent } },
+    { key: 'memo', title: 'common.memo', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
+  ];
+
+
+  //===== Handles to handle this =================================================
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [currentConsultingCode, setCurrentConsultingCode] = useState('');
+
+  const handleWidthChange = useCallback((checked) => {
+    setIsFullScreen(checked);
+    if (checked)
+      localStorage.setItem('isFullScreen', '1');
+    else
+      localStorage.setItem('isFullScreen', '0');
+  }, []);
+
   const handleSaveAll = () => {
     if (editedDetailValues !== null
       && selectedConsulting
@@ -381,29 +398,6 @@ const ConsultingDetailsModel = () => {
       console.log("[ ConsultingDetailModel ] No saved data");
     };
   };
-
-  const consultingItemsInfo = [
-    { key: 'department', title: 'lead.department', detail: { type: 'label', editing: handleDetailChange } },
-    { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
-    { key: 'mobile_number', title: 'lead.mobile', detail: { type: 'label', editing: handleDetailChange } },
-    { key: 'phone_number', title: 'common.phone_no', detail: { type: 'label', editing: handleDetailChange } },
-    { key: 'email', title: 'lead.email', detail: { type: 'label', editing: handleDetailChange } },
-    { key: 'status', title: 'common.status', detail: { type: 'select', options: ConsultingStatusTypes, editing: handleDetailSelectChange } },
-    { key: 'receipt_date', title: 'consulting.receipt_date', detail: { type: 'date', editing: handleDetailDataChange } },
-    { key: 'consulting_type', title: 'consulting.type', detail: { type: 'select', options: ConsultingTypes, editing: handleDetailSelectChange } },
-    { key: 'lead_time', title: 'consulting.lead_time', detail: { type: 'select', options: ConsultingTimeTypes, editing: handleDetailSelectChange } },
-    { key: 'product_type', title: 'consulting.product_type', detail: { type: 'select', options: ProductTypes, editing: handleDetailSelectChange } },
-    { key: 'request_type', title: 'consulting.request_type', detail: { type: 'label', editing: handleDetailChange } },
-    { key: 'lead_sales', title: 'lead.lead_sales', detail: { type: 'select', options: salespersonsForSelection, editing: handleDetailSelectChange } },
-    { key: 'application_engineer', title: 'company.engineer', detail: { type: 'select', options: engineersForSelection, editing: handleDetailSelectChange } },
-    { key: 'receiver', title: 'consulting.receiver', detail: { type: 'select', options: usersForSelection, editing: handleDetailSelectChange } },
-  ];
-
-  const consultingItemsInfo2 = [
-    { key: 'request_content', title: 'consulting.request_content', detail: { type: 'content', editable: (showEditor & EDIT_REQUEST_CONTENT), editableKey: EDIT_REQUEST_CONTENT, handleEditable: setShowEditor, editing: handleAddRequestContent } },
-    { key: 'action_content', title: 'consulting.action_content', detail: { type: 'content', editable: (showEditor & EDIT_ACTION_CONTENT), editableKey: EDIT_ACTION_CONTENT, handleEditable: setShowEditor, editing: handleAddActionContent } },
-    { key: 'memo', title: 'common.memo', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
-  ];
 
   const handleInitialize = () => {
     setEditedDetailValues(null);

@@ -60,7 +60,7 @@ const default_invoice_data = {
   vacant_count: 0,
 };
 
-const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
+const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
   const { t } = useTranslation();
   const [ cookies ] = useCookies(["myLationCrmUserId"]);
   const [ isMessageModalOpen, setIsMessageModalOpen ] = useState(false);
@@ -547,8 +547,9 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
     };
   };
 
+  //===== Handles to handle this =================================================
   const handleInitialize = useCallback(() => {
-    document.querySelector("#add_new_tax_invoice_form").reset();
+    // document.querySelector("#add_new_tax_invoice_form").reset();
     setInvoiceData({...default_invoice_data});
     setInvoiceChange({});
     setInvoiceContents([]);
@@ -561,6 +562,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
     setOrgContentModalData({});
     setEditedContentModalData({});
   }, []);
+
 
   const handleSaveTaxInvoice = () => {
     const finalData = {
@@ -635,8 +637,7 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
     const resp = modifyTaxInvoice(newTaxInvoice);
     resp.then((res) => {
       if (res.result) {
-        handleInitialize();
-        closeModal();
+        handleClose();
       }
       else {
         setMessage({ title: '저장 중 오류', message: `오류가 발생하여 저장하지 못했습니다. - ${res.message}` });
@@ -646,19 +647,17 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
   };
 
   const handleClose = () => {
-    if(selectedCategory.category && (selectedCategory.category === 'tax_invoice')){
-      setSelectedCategory({category: null, item_code: null});
-    };
-    handleInitialize();
-    closeModal();
     setTimeout(() => {
-      close();
-    }, 500);
+      closeModal();
+    }, 250);
   };
 
-  //===== useEffect ==============================================================
+  //===== useEffect functions =============================================== 
   useEffect(() => {
-    if (!open) return;
+    if (!init) return;
+
+    if(handleInit) handleInit(false);
+    handleInitialize();
 
     if ((companyState & 1) === 1) {
       let inputData = null;
@@ -788,12 +787,8 @@ const TaxInvoiceEditModel = ({ open, close, data, contents }) => {
       }
       setInvoiceChange({});
     };
+  }, [contents, data, companyState, init, currentTaxInvoice, selectedCategory, currentCompany]);
 
-  }, [contents, data, companyState, open, currentTaxInvoice, selectedCategory, currentCompany]);
-
-  if (!open) return (
-    <div>&nbsp;</div>
-  );
 
   return (
     <div

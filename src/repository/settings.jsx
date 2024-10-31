@@ -22,7 +22,6 @@ export const SettingsRepo = selector({
     key: "SettingsRepository",
     get: ({getCallback}) => {
         const openModal = getCallback(({ set, snapshot }) => async (modalId, command) => {
-            console.log(' - Check input :', modalId);
             const modalInfoStack = await snapshot.getPromise(atomModalInfoStack);
             if(modalInfoStack.length > 0){
                 const lastModalId = modalInfoStack.at(-1).id;

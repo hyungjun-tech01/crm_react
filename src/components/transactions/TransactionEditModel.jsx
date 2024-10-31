@@ -55,7 +55,7 @@ const default_receipt_data = {
   card_number: '',
 };
 
-const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, setTaxInvoiceContents }) => {
+const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceData, setTaxInvoiceContents }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -529,40 +529,6 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
   const [transactionForPrint, setTransactionForPrint] = useState(null);
   const [contentsForPrint, setContentsForPrint] = useState(null);
 
-  const handleInitialize = useCallback(() => {
-    setIsAdd(true);
-    setIsSale(true);
-    setIsVatIncluded(true);
-    setShowDecimal(0);
-    setDataForTransaction({ ...default_transaction_data });
-    setDisableItems(false);
-
-    if ((selectedCategory.category === 'company')
-      && (currentCompany !== defaultCompany)
-      && (selectedCategory.item_code === currentCompany.company_code)) {
-      setTransactionChange({
-        company_code: currentCompany.company_code,
-        company_name: currentCompany.company_name,
-        ceo_name: currentCompany.ceo_name,
-        company_address: currentCompany.company_address,
-        business_type: currentCompany.business_type,
-        business_item: currentCompany.business_item,
-        business_registration_code: currentCompany.business_registration_code,
-      });
-    } else {
-      setTransactionChange({});
-    };
-    setTransactionContents([]);
-    setOrgReceiptModalData({ ...default_receipt_data });
-    setEditedReceiptModalData({});
-    // setCurrentTransaction(defaultTransaction);
-    setSelectData({ trans_type: trans_types[0], tax_type: 'vat_included', company_selection: null });
-    setOrgTransaction({});
-    setTransactionForPrint(null);
-    setContentsForPrint(null);
-    document.querySelector("#add_new_transaction_form").reset();
-  }, [selectedCategory, currentCompany]);
-
   const handleShowPrint = () => {
     const tempTransactionData = {
       ...orgTransaction,
@@ -632,10 +598,6 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
 
     setTaxInvoiceContents(tempInvoiceContents);
     openTaxInvoice();
-
-    setTimeout(() => {
-      openModal('edit_tax_invoice');
-    }, 500);
   };
 
   const handleSaveTransaction = (value) => {
@@ -736,30 +698,58 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
     };
   };
 
-  const handleClose = () => {
-    if (selectedCategory.category && (selectedCategory.category === 'transaction')) {
-      setSelectedCategory({ category: null, item_code: null });
+
+  //===== Handles to handle this =================================================
+  const handleInitialize = useCallback(() => {
+    setIsAdd(true);
+    setIsSale(true);
+    setIsVatIncluded(true);
+    setShowDecimal(0);
+    setDataForTransaction({ ...default_transaction_data });
+    setDisableItems(false);
+
+    if ((selectedCategory.category === 'company')
+      && (currentCompany !== defaultCompany)
+      && (selectedCategory.item_code === currentCompany.company_code)) {
+      setTransactionChange({
+        company_code: currentCompany.company_code,
+        company_name: currentCompany.company_name,
+        ceo_name: currentCompany.ceo_name,
+        company_address: currentCompany.company_address,
+        business_type: currentCompany.business_type,
+        business_item: currentCompany.business_item,
+        business_registration_code: currentCompany.business_registration_code,
+      });
+    } else {
+      setTransactionChange({});
     };
-    handleInitialize();
-    closeModal();
+    setTransactionContents([]);
+    setOrgReceiptModalData({ ...default_receipt_data });
+    setEditedReceiptModalData({});
+    
+    setSelectData({ trans_type: trans_types[0], tax_type: 'vat_included', company_selection: null });
+    setOrgTransaction({});
+    setTransactionForPrint(null);
+    setContentsForPrint(null);
+    // document.querySelector("#add_new_transaction_form").reset();
+  }, [selectedCategory, currentCompany]);
+
+  const handleClose = () => {
     setTimeout(() => {
-      close();
-    }, 500);
+      closeModal();
+    }, 250);
   };
 
-  //===== useEffect ==============================================================
+  //===== useEffect functions =============================================== 
   useEffect(() => {
-    if (!open) return;
-
+    if (!init) return;
+    
     if ((companyState & 1) === 0) return;
 
-    // if (Object.keys(orgTransaction).length === 0) {
+    if(handleInit) handleInit(false);
+    handleInitialize();
 
-    if (currentTransaction === defaultTransaction) {
-      console.log('[TransactionEditModel] Add New Transaction~');
-      handleInitialize();
-    } else {
-      console.log('[TransactionEditModel] Modify Transaction~', currentTransaction);
+    if (currentTransaction !== defaultTransaction) {
       setIsAdd(false);
       const currentContents = JSON.parse(currentTransaction.transaction_contents);
       setTransactionContents(currentContents);
@@ -803,11 +793,8 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
     }
     setOrgReceiptModalData(tempReceiptData);
     // };
-  }, [open, companyState, currentTransaction]);
+  }, [init, companyState, currentTransaction]);
 
-  if (!open) return (
-    <div>&nbsp;</div>
-  );
 
   return (
     <div
