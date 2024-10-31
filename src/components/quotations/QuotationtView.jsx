@@ -46,7 +46,7 @@ const ConvertKoreanAmount = (amount) => {
         temp_number = amount;
     };
     if(isNaN(temp_number)) {
-        console.log('\t[ ConvertKoreanAmount ] Wrong input');
+        // console.log('\t[ ConvertKoreanAmount ] Wrong input');
         return "";
     };
 
@@ -85,7 +85,7 @@ const ConvertKoreanAmount = (amount) => {
 const ConvCurrencyMark = (currency) => {
     if(typeof currency !== 'string')
     {
-        console.log('\t[ ConvCurrencyMark ] Wrong Type : ', typeof currency);
+        // console.log('\t[ ConvCurrencyMark ] Wrong Type : ', typeof currency);
         return;
     } 
 
@@ -222,7 +222,6 @@ const QuotationView = () => {
     const [ quotationCondition, setQuotationCondition ] = useState({});
 
     useEffect(() => {
-        console.log('[QuotationView] called');
         if(currentQuotation && currentQuotation !== defaultQuotation){
             const tempContents = JSON.parse(currentQuotation.quotation_contents);
             if(tempContents && Array.isArray(tempContents)){
@@ -283,7 +282,7 @@ const QuotationView = () => {
             }
 
             // get info of quotation condition -----------
-            console.log('Check data :', currentQuotation);
+            // console.log('Check data :', currentQuotation);
             const foundExpiryArray = quotationExpiry.filter(item => item.value === currentQuotation.quotation_expiration_date);
             const tempExpiry = (foundExpiryArray.length > 0) ? foundExpiryArray[0].label : currentQuotation.quotation_expiration_date;
             const foundDeliveryArray = quotationDelivery.filter(item => item.value === currentQuotation.delivery_period);

@@ -79,7 +79,6 @@ export const UserRepo = selector({
         const tryLoadAllUsers = getCallback(({ set, snapshot }) => async () => {
             const loadStates = await snapshot.getPromise(atomUserState);
             if((loadStates & 3) === 0){
-                console.log('[tryLoadAllUsers] Try to load all users');
                 set(atomUserState, (loadStates | 2));   // state : loading
                 const ret = await loadAllUsers();
                 if(ret){
@@ -94,7 +93,6 @@ export const UserRepo = selector({
         /////////////////////load all Users /////////////////////////////
         const loadAllUsers = getCallback(({ set }) => async () => {
             try {
-                console.log('[UserRepository] Try loading all');
                 const response = await fetch(`${BASE_PATH}/getallusers`);
                 const data = await response.json();
                 if (data.message) {

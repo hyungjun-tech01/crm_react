@@ -111,10 +111,6 @@ const LeadConsultingModel = ({ handleInitAddConsulting }) => {
         }),
     };
 
-    useEffect(()=>{
-        console.log('[LeadConsultingModel] Maybe consultings are updated');
-    }, [consultingsByLead])
-
     return (
         <div className="row">
             <div className="card mb-0">

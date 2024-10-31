@@ -23,7 +23,6 @@ export const MAContractRepo = selector({
         
         const loadCompanyMAContracts = getCallback(({set, snapshot}) => async (code) => {
             const input_json = JSON.stringify({company_code: code});
-            console.log(`[ loadCompanyMAContracts ] input : `, input_json);
             try{
                 const response = await fetch(`${BASE_PATH}/companyMaContract`, {
                     method: "POST",
@@ -32,7 +31,7 @@ export const MAContractRepo = selector({
                 });
                 const data = await response.json();
                 if(data.message){
-                    console.log('[loadCompanyMAContracts] message:', data.message);
+                    // console.log('[loadCompanyMAContracts] message:', data.message);
                     set(atomMAContractSet, []);
                     set(atomMAContractState, 0);
                     return;
@@ -50,7 +49,6 @@ export const MAContractRepo = selector({
         });
         const loadPurchaseMAContracts = getCallback(({set, snapshot}) => async (code) => {
             const input_json = JSON.stringify({purchase_code: code});
-            console.log(`[ loadPurchaseMAContracts ] input : `, input_json);
             try{
                 const response = await fetch(`${BASE_PATH}/purchaseMaContract`, {
                     method: "POST",
@@ -59,7 +57,7 @@ export const MAContractRepo = selector({
                 });
                 const data = await response.json();
                 if(data.message){
-                    console.log('[loadPurchaseMAContracts] message:', data.message);
+                    // console.log('[loadPurchaseMAContracts] message:', data.message);
                     set(atomMAContractSet, []);
                     return;
                 }

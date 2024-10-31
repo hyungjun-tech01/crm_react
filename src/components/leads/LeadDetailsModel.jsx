@@ -163,6 +163,14 @@ const LeadDetailsModel = ({ init, handleInit }) => {
     };
   };
 
+  const handlePopupOpen = (open) => {
+    if (open) {
+      openModal('antModal');
+    } else {
+      closeModal();
+    }
+  };
+
   const lead_items_info = [
     { key: 'lead_name', title: 'lead.lead_name', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
@@ -238,14 +246,6 @@ const LeadDetailsModel = ({ init, handleInit }) => {
     else
       localStorage.setItem('isFullScreen', '0');
   }, []);
-
-  const handlePopupOpen = (open) => {
-    if (open) {
-      openModal('antModal');
-    } else {
-      closeModal();
-    }
-  };
 
   const handleOpenMessage = (msg) => {
     openModal('antModal');
