@@ -333,6 +333,7 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
         ...transactionContents.slice(contentSetting.rowNo + 1, ),
       ]
     };
+    closeModal();
     setTransactionContents(tempContents);
     handleAmountCalculation(tempContents);
     setIsContentModalOpen(false);
@@ -700,6 +701,14 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
 
 
   //===== Handles to handle this =================================================
+  const handlePopupOpen = (open) => {
+    if(open) {
+      openModal('antModal');
+    } else {
+      closeModal();
+    }
+};
+
   const handleInitialize = useCallback(() => {
     setIsAdd(true);
     setIsSale(true);
@@ -885,6 +894,7 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
                                     defaultValue={orgTransaction.company_name}
                                     edited={transactionChange}
                                     setEdited={handleCompanySelected}
+                                    handleOpen={handlePopupOpen}
                                   />
                                 </Col>
                               </Row>

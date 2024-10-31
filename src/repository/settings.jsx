@@ -16,66 +16,80 @@ import { atomModalInfoStack,
     defaultTaxInvoice,
     atomCurrentTransaction,
     defaultTransaction
- } from '../atoms/atoms';
+} from '../atoms/atoms';
+
+const ANTD_MODAL = 'antModal';
 
 export const SettingsRepo = selector({
     key: "SettingsRepository",
     get: ({getCallback}) => {
-        const openModal = getCallback(({ set, snapshot }) => async (modalId, command) => {
+        const escapeKeyDownEvent = (event) => {
+            if(event.key !== 'Escape') return;
+            closeModal();
+        };
+        const openModal = getCallback(({ set, snapshot }) => async (modalId, command=null) => {
+            if(!modalId) return;
+            // console.log(' - Check input :', modalId);
             const modalInfoStack = await snapshot.getPromise(atomModalInfoStack);
             if(modalInfoStack.length > 0){
                 const lastModalId = modalInfoStack.at(-1).id;
                 const lastModal = bootstrap.Modal.getInstance('#' + lastModalId);
                 if(lastModal){
                     lastModal._focustrap.deactivate();
-                };
-            };
-            if(modalId){
-                if(modalId !== 'antModal'){
-                    const modalElement = document.getElementById(modalId);
-                    const myModal = new bootstrap.Modal(modalElement, {
-                        keyboard: false,
-                        focus: true,
-                    });
-                    if(myModal){
-                        modalElement.addEventListener('keydown', (event) => {
-                            if(event.key !== 'Escape') return;
-                            closeModal();
-                        });
-                        myModal.show();  
+                    const modalElement = document.getElementById(lastModalId);
+                    if(modalElement) {
+                        modalElement.removeEventListener('keydown', escapeKeyDownEvent);
                     };
                 };
-                const updatedModalInfoStack = modalInfoStack.concat({id:modalId,command:command});
-                console.log(' - Modals in Stack :', updatedModalInfoStack);
-                set(atomModalInfoStack, updatedModalInfoStack);
             };
+            if(modalId !== ANTD_MODAL){
+                const modalElement = document.getElementById(modalId);
+                const myModal = new bootstrap.Modal(modalElement, {
+                    keyboard: false,
+                    focus: true,
+                });
+                if(myModal){
+                    modalElement.addEventListener('keydown', escapeKeyDownEvent);
+                    myModal.show();  
+                };
+            };
+            const updatedModalInfoStack = modalInfoStack.concat({id:modalId, command:command});
+            console.log(' - Modals in Stack :', updatedModalInfoStack);
+            set(atomModalInfoStack, updatedModalInfoStack);
         });
         const closeModal = getCallback(({ set, snapshot }) => async (command) => {
             let gottenCommand = null;
             const modalInfoStack = await snapshot.getPromise(atomModalInfoStack);
             if(modalInfoStack.length > 0){
                 const lastModalId = modalInfoStack.at(-1).id;
-                const lastModal = bootstrap.Modal.getInstance('#'+lastModalId);
-                console.log('closeModal / last modal : ', lastModal);
+                if(lastModalId !== ANTD_MODAL){
+                    const lastModal = bootstrap.Modal.getInstance('#'+lastModalId);
+                    if(!!lastModal){
+                        const modalElement = document.getElementById(lastModalId);
+                        if(modalElement) {
+                            modalElement.removeEventListener('keydown', escapeKeyDownEvent);
+                        };
+                        lastModal.hide();
+                    };
+                    const lastModalCommand = modalInfoStack.at(-1).command;
+                    if(!!lastModalCommand){
+                        gottenCommand = lastModalCommand;
+                    };
+                }
                 
-                if(!!lastModal){
-                    // const modalElement = document.getElementById(lastModalId);
-                    // if(modalElement) {
-                    //     modalElement.removeEventListener('keydown')
-                    // }
-                    lastModal.hide();
-                };
-                const lastModalCommand = modalInfoStack.at(-1).command;
-                if(!!lastModalCommand){
-                    gottenCommand = lastModalCommand;
-                };
                 const updatedModalInfoStack = [ ...modalInfoStack.slice(0, -1)];
                 if(updatedModalInfoStack.length > 0){
                     const nextLastModalId = updatedModalInfoStack.at(-1).id;
-                    const nextLastModal = bootstrap.Modal.getInstance('#'+nextLastModalId);
-                    if(nextLastModal){
-                        nextLastModal._focustrap.activate();
-                    };
+                    if(nextLastModalId !== ANTD_MODAL){
+                        const nextLastModal = bootstrap.Modal.getInstance('#'+nextLastModalId);
+                        if(nextLastModal){
+                            nextLastModal._focustrap.activate();
+                            const modalElement = document.getElementById(nextLastModalId);
+                            if(modalElement) {
+                                modalElement.addEventListener('keydown', escapeKeyDownEvent);
+                            };
+                        };
+                    }
                 };
                 console.log(' - Modals in Stack :', updatedModalInfoStack);
                 set(atomModalInfoStack, updatedModalInfoStack);

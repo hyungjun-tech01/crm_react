@@ -265,7 +265,7 @@ const PurchaseAddModel = ({ init, handleInit }) => {
         } else {
           closeModal();
         }
-      };
+    };
 
     const handleAddNewPurchase = () => {
         // Check data if they are available

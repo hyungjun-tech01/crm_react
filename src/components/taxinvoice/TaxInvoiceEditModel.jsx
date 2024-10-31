@@ -956,7 +956,9 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
                                   :
                                   <div className={styles.searchWarpper}>
                                     <label className={styles.textStart}>{supplier.company_name}</label>
-                                    <div className={styles.searchIcon} onClick={() => setIsPopupOpen(!isPopupOpen)}>
+                                    <div className={styles.searchIcon}
+                                      onClick={() => {setIsPopupOpen(!isPopupOpen); openModal('antModal');}}
+                                    >
                                         <FiSearch />
                                     </div>
                                   </div>
@@ -1060,7 +1062,9 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
                                 {isSale ?
                                   <div className={styles.searchWarpper}>
                                     <label className={styles.textStart}>{receiver.company_name}</label>
-                                    <div className={styles.searchIcon} onClick={() => setIsPopupOpen(!isPopupOpen)}>
+                                    <div className={styles.searchIcon}
+                                      onClick={() => {setIsPopupOpen(!isPopupOpen);openModal('antModal')}}
+                                    >
                                         <FiSearch />
                                     </div>
                                   </div>
@@ -1525,7 +1529,7 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
             delete data.component;
             handleSelectCompany(data);
         }}
-        handleClose={()=>setIsPopupOpen(false)}
+        handleClose={()=>{setIsPopupOpen(false);closeModal();}}
     />
     </div>
   );

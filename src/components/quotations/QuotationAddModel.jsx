@@ -578,6 +578,7 @@ const QuotationAddModel = (props) => {
       quotation_amount: data['16'],
     });
 
+    handlePopupOpen(true);
     setEditedContentModalValues({});
     setIsContentModalOpen(true);
   }, [settingForContent, t]);
@@ -709,6 +710,16 @@ const QuotationAddModel = (props) => {
       ? ret?.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,')
       : ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }, [settingForContent.show_decimal]);
+
+  const handleOpenEditHeaders = () => {
+    handlePopupOpen(true);
+    setEditHeaders(true);
+  };
+
+  const handleCloseEditHeaders = () => {
+    handlePopupOpen(false);
+    setEditHeaders(false);
+  };
 
 
   //===== Handles to handle this =================================================
@@ -1117,7 +1128,7 @@ const QuotationAddModel = (props) => {
                     />
                     <SettingsOutlined
                       style={{ height: 32, width: 32, color: 'gray' }}
-                      onClick={() => { setEditHeaders(!editHeaders); }}
+                      onClick={handleOpenEditHeaders}
                     />
                   </div>
                 </div>
@@ -1352,10 +1363,10 @@ const QuotationAddModel = (props) => {
       <Modal
         title={t('quotation.header_setting')}
         open={editHeaders}
-        onOk={() => { setEditHeaders(!editHeaders)}}
-        onCancel={() => { setEditHeaders(!editHeaders)}}
+        onOk={handleCloseEditHeaders}
+        onCancel={handleCloseEditHeaders}
         footer={[
-          <Button key="submit" type="primary" onClick={() => { setEditHeaders(!editHeaders)}}>
+          <Button key="submit" type="primary" onClick={handleCloseEditHeaders}>
               Ok
           </Button>,
         ]}
