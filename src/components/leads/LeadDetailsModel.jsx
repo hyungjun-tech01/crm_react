@@ -34,10 +34,14 @@ import QuotationDetailsModel from "../quotations/QuotationDetailsModel";
 import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
 import PurchaseAddModel from "../purchase/PurchaseAddModel";
 
+import MessageModal from "../../constants/MessageModal";
 
-const LeadDetailsModel = ({init, handleInit}) => {
+
+const LeadDetailsModel = ({ init, handleInit }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [message, setMessage] = useState({ title: "", message: "" });
 
 
   //===== [RecoilState] Related with Lead ==========================================
@@ -51,18 +55,18 @@ const LeadDetailsModel = ({init, handleInit}) => {
 
 
   //===== [RecoilState] Related with Purchase =======================================
-  const [ purchaseByCompany, setPurchasesByCompany ] = useRecoilState(atomPurchaseByCompany);
+  const [purchaseByCompany, setPurchasesByCompany] = useRecoilState(atomPurchaseByCompany);
   const { searchPurchases } = useRecoilValue(PurchaseRepo)
   const { loadCompanyMAContracts } = useRecoilValue(MAContractRepo);
 
 
   //===== [RecoilState] Related with Consulting =======================================
-  const [ consultingByLead, setConsultingsByLead ] = useRecoilState(atomConsultingByLead);
+  const [consultingByLead, setConsultingsByLead] = useRecoilState(atomConsultingByLead);
   const { searchConsultings } = useRecoilValue(ConsultingRepo);
 
 
   //===== [RecoilState] Related with Quotation ========================================
-  const [ quotationByLead, setQuotationsByLead ] = useRecoilState(atomQuotationByLead);
+  const [quotationByLead, setQuotationsByLead] = useRecoilState(atomQuotationByLead);
   const { searchQuotations } = useRecoilValue(QuotationRepo);
 
 
@@ -76,21 +80,10 @@ const LeadDetailsModel = ({init, handleInit}) => {
 
 
   //===== Handles to deal this component ============================================
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  const [currentLeadCode, setCurrentLeadCode] = useState('');
   const [validMACount, setValidMACount] = useState(0);
-
-  const handleWidthChange = useCallback((checked) => {
-    setIsFullScreen(checked);
-    if (checked)
-      localStorage.setItem('isFullScreen', '1');
-    else
-      localStorage.setItem('isFullScreen', '0');
-  }, []);
 
 
   //===== Handles to edit 'Lead Details' ===============================================
-  // const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
   const [editedDetailValues, setEditedDetailValues] = useState({});
 
   const handleDetailChange = useCallback((e) => {
@@ -147,12 +140,12 @@ const LeadDetailsModel = ({init, handleInit}) => {
   }, [editedDetailValues, selectedLead]);
 
   const handleDetailObjectChange = useCallback((obj) => {
-      const tempEdited = {
-        ...editedDetailValues,
-        ...obj,
-      };
-      setEditedDetailValues(tempEdited);
-    },
+    const tempEdited = {
+      ...editedDetailValues,
+      ...obj,
+    };
+    setEditedDetailValues(tempEdited);
+  },
     [editedDetailValues]
   );
 
@@ -169,62 +162,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
       };
     };
   };
-
-  const handlePopupOpen = (open) => {
-    if(open) {
-      openModal('antModal');
-    } else {
-      closeModal();
-    }
-  };
-
-  const handleSaveAll = useCallback(() => {
-    if (editedDetailValues !== null
-      && selectedLead !== defaultLead) {
-      const temp_all_saved = {
-        ...editedDetailValues,
-        action_type: "UPDATE",
-        modify_user: cookies.myLationCrmUserId,
-        lead_code: selectedLead.lead_code,
-      };
-      
-      if (modifyLead(temp_all_saved)) {
-        let temp_update_company = {};
-        if (editedDetailValues['company_name'])
-          temp_update_company['company_name'] = editedDetailValues['company_name'];
-        if (editedDetailValues['company_name_en'])
-          temp_update_company['company_name_en'] = editedDetailValues['company_name_en'];
-        if (editedDetailValues['company_phone_number'])
-          temp_update_company['company_phone_number'] = editedDetailValues['company_phone_number'];
-        if (editedDetailValues['company_fax_number'])
-          temp_update_company['company_fax_number'] = editedDetailValues['company_fax_number'];
-        if (editedDetailValues['company_address'])
-          temp_update_company['company_address'] = editedDetailValues['company_address'];
-        if (editedDetailValues['company_zip_code'])
-          temp_update_company['company_zip_code'] = editedDetailValues['company_zip_code'];
-        if (editedDetailValues['region'])
-          temp_update_company['region'] = editedDetailValues['region'];
-
-        if (temp_update_company !== null) {
-          temp_update_company['action_type'] = 'UPDATE';
-          temp_update_company['modify_user'] = cookies.myLationCrmUserId;
-          temp_update_company['company_code'] = currentCompany.company_code;
-          const resp = modifyCompany(temp_update_company);
-          resp.then(res => {
-            if (res.result) {
-              handleClose();
-            } else {
-              console.error('Failed to modify company : ', res.data);
-            };
-          });
-        };
-      } else {
-        console.error('Failed to modify lead')
-      };
-    } else {
-      console.log("[ LeadDetailModel ] No saved data");
-    };
-  }, [cookies.myLationCrmUserId, currentCompany.company_code, editedDetailValues, modifyCompany, modifyLead, selectedLead]);
 
   const lead_items_info = [
     { key: 'lead_name', title: 'lead.lead_name', detail: { type: 'label', editing: handleDetailChange } },
@@ -274,7 +211,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
     filterCompanyQuotation(newValue);
   };
 
-
   // 상태(state) 정의
   const [selectedRow, setSelectedRow] = useState(null);
 
@@ -290,6 +226,99 @@ const LeadDetailsModel = ({init, handleInit}) => {
     }
   };
 
+
+  //===== Handles to handle this =================================================
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [currentLeadCode, setCurrentLeadCode] = useState('');
+
+  const handleWidthChange = useCallback((checked) => {
+    setIsFullScreen(checked);
+    if (checked)
+      localStorage.setItem('isFullScreen', '1');
+    else
+      localStorage.setItem('isFullScreen', '0');
+  }, []);
+
+  const handlePopupOpen = (open) => {
+    if (open) {
+      openModal('antModal');
+    } else {
+      closeModal();
+    }
+  };
+
+  const handleOpenMessage = (msg) => {
+    openModal('antModal');
+    setMessage(msg);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleCloseMessage = () => {
+    closeModal();
+    setIsMessageModalOpen(false);
+  };
+
+  const handleSaveAll = useCallback(() => {
+    if (editedDetailValues !== null
+      && selectedLead !== defaultLead
+    ) {
+      const temp_all_saved = {
+        ...editedDetailValues,
+        action_type: "UPDATE",
+        modify_user: cookies.myLationCrmUserId,
+        lead_code: selectedLead.lead_code,
+      };
+
+      const respLead = modifyLead(temp_all_saved);
+      respLead.then(resLead => {
+        if (resLead.result) {
+          let temp_update_company = {};
+          if (editedDetailValues['company_name'])
+            temp_update_company['company_name'] = editedDetailValues['company_name'];
+          if (editedDetailValues['company_name_en'])
+            temp_update_company['company_name_en'] = editedDetailValues['company_name_en'];
+          if (editedDetailValues['company_phone_number'])
+            temp_update_company['company_phone_number'] = editedDetailValues['company_phone_number'];
+          if (editedDetailValues['company_fax_number'])
+            temp_update_company['company_fax_number'] = editedDetailValues['company_fax_number'];
+          if (editedDetailValues['company_address'])
+            temp_update_company['company_address'] = editedDetailValues['company_address'];
+          if (editedDetailValues['company_zip_code'])
+            temp_update_company['company_zip_code'] = editedDetailValues['company_zip_code'];
+          if (editedDetailValues['region'])
+            temp_update_company['region'] = editedDetailValues['region'];
+
+          if (temp_update_company !== null) {
+            temp_update_company['action_type'] = 'UPDATE';
+            temp_update_company['modify_user'] = cookies.myLationCrmUserId;
+            temp_update_company['company_code'] = currentCompany.company_code;
+
+            const respComp = modifyCompany(temp_update_company);
+            respComp.then(resComp => {
+              if (resComp.result) {
+                handleClose();
+              } else {
+                const tempMsg = {
+                  title: t('comment.title_error'),
+                  message: `${t('comment.msg_fail_save')} - ${resComp.data}`,
+                };
+                handleOpenMessage(tempMsg);
+              };
+            });
+          };
+        } else {
+          const tempMsg = {
+            title: t('comment.title_error'),
+            message: `${t('comment.msg_fail_save')} - ${resLead.data}`,
+          };
+          handleOpenMessage(tempMsg);
+        };
+      });
+    } else {
+      console.log("[ LeadDetailModel ] No saved data");
+    };
+  }, [cookies.myLationCrmUserId, currentCompany.company_code, editedDetailValues, modifyCompany, modifyLead, selectedLead]);
+
   const handleInitialize = () => {
     setEditedDetailValues(null);
   };
@@ -300,6 +329,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
     }, 250);
   };
 
+  //===== useEffect functions ====================================================
   useEffect(() => {
     if (init) {
       handleInit(false);
@@ -326,9 +356,9 @@ const LeadDetailsModel = ({init, handleInit}) => {
       const queryCompany = searchPurchases('company_code', selectedLead.company_code, true);
       queryCompany
         .then(res => {
-          if(res.result) {
+          if (res.result) {
             setPurchasesByCompany(res.data);
-  
+
             let valid_count = 0;
             res.data.forEach((item) => {
               if (item.ma_finish_date && new Date(item.ma_finish_date) > Date.now())
@@ -346,7 +376,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
       const queryConsulting = searchConsultings('lead_code', selectedLead.lead_code, true);
       queryConsulting
         .then(res => {
-          if(res.result) {
+          if (res.result) {
             setConsultingsByLead(res.data);
           } else {
             console.log('[LeadDetailsModel] fail to get consulting :', res.message);
@@ -358,7 +388,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
       const queryQuotation = searchQuotations('lead_code', selectedLead.lead_code, true);
       queryQuotation
         .then(res => {
-          if(res.result) {
+          if (res.result) {
             setQuotationsByLead(res.data);
           } else {
             console.log('[LeadDetailsModel] fail to get quotation :', res.message);
@@ -370,8 +400,6 @@ const LeadDetailsModel = ({init, handleInit}) => {
     };
   }, [selectedLead, currentLeadCode, setCurrentCompany, loadCompanyMAContracts]);
 
-  if (init)
-    return <div>&nbsp;</div>;
 
   return (
     <>
@@ -418,11 +446,11 @@ const LeadDetailsModel = ({init, handleInit}) => {
                     className="cd-breadcrumb triangle nav nav-tabs w-100 crms-steps"
                     role="tablist"
                   >
-                    <li role="presentation"  style={{ flex: 1, textAlign: "center" }}>
+                    <li role="presentation" style={{ flex: 1, textAlign: "center" }}>
                       <Link
                         to="#on-time"
                         className={selectedLead.status === "Not On Time" || selectedLead.status === null ? "active" : "inactive"}
-                        style={{ width: "400px" }} 
+                        style={{ width: "400px" }}
                         aria-controls="not-contacted"
                         role="tab"
                         data-bs-toggle="tab"
@@ -437,7 +465,7 @@ const LeadDetailsModel = ({init, handleInit}) => {
                       <Link
                         to="#on-time"
                         className={selectedLead.status === "On Time" ? "active" : "inactive"}
-                        style={{ width: "400px" }} 
+                        style={{ width: "400px" }}
                         aria-controls="not-contacted"
                         role="tab"
                         data-bs-toggle="tab"
@@ -603,9 +631,15 @@ const LeadDetailsModel = ({init, handleInit}) => {
       <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} />
       <ConsultingDetailsModel />
       <QuotationAddModel init={initAddQuotation} handleInit={setInitAddQuotation} />
-      <QuotationDetailsModel  init={initEditQuotation} handleInit={setInitEditQuotation}/>
+      <QuotationDetailsModel init={initEditQuotation} handleInit={setInitEditQuotation} />
       <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} />
       <PurchaseDetailsModel />
+      <MessageModal
+        title={message.title}
+        message={message.message}
+        open={isMessageModalOpen}
+        handleOk={handleCloseMessage}
+      />
     </>
   );
 };

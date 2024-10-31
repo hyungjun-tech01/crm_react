@@ -212,7 +212,7 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [orgContentModalData, setOrgContentModalData] = useState({});
   const [editedContentModalData, setEditedContentModalData] = useState({});
-  const [contentSetting, setContentSetting] = useState({isNew: false, rowNo: 0});
+  const [contentSetting, setContentSetting] = useState({ isNew: false, rowNo: 0 });
 
   const handleFormatter = useCallback((value) => {
     if (value === undefined || value === null || value === '') return '';
@@ -258,7 +258,7 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
   };
 
   const handleStartAddContent = () => {
-    setContentSetting({isNew: true, rowNo: -1});
+    setContentSetting({ isNew: true, rowNo: -1 });
 
     const tempData = {
       ...dataForTransaction,
@@ -273,7 +273,7 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
   };
 
   const handleStartEditContent = (data, index) => {
-    setContentSetting({isNew: false, rowNo: index});
+    setContentSetting({ isNew: false, rowNo: index });
 
     const tempData = {
       ...dataForTransaction,
@@ -300,9 +300,17 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
 
   const handleContentModalOk = () => {
     if (!editedContentModalData['transaction_date'] && !orgContentModalData['transaction_date']) {
-      const tempMsg = { title: '확인', message: '거래일 정보가 누락되었습니다.' }
-      setMessage(tempMsg);
-      setIsMessageModalOpen(true);
+      const contents = (
+        <>
+          <p>{t('comment.msg_no_necessary_data')}</p>
+          <div> - 거래일</div>
+        </>
+      );
+      const tempMsg = {
+        title: t('comment.title_check'),
+        message: contents,
+      };
+      handleOpenMessage(tempMsg);
       return;
     };
 
@@ -317,20 +325,20 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
       transaction_sub_type: dataForTransaction.transaction_type,
       modify_date: formatDate(new Date()),
     };
-    if(!!editedContentModalData['transaction_date']) {
+    if (!!editedContentModalData['transaction_date']) {
       tempContent.month_day = `${editedContentModalData.transaction_date.getMonth() - 1}.${editedContentModalData.transaction_date.getDate()}`
     };
-    if(!!tempContent.transaction_date) delete tempContent.transaction_date;
-    if(!!tempContent.product_class_name) delete tempContent.product_class_name;
+    if (!!tempContent.transaction_date) delete tempContent.transaction_date;
+    if (!!tempContent.product_class_name) delete tempContent.product_class_name;
 
     let tempContents = [];
-    if(contentSetting.isNew) {
+    if (contentSetting.isNew) {
       tempContents = transactionContents.concat(tempContent);
     } else {
       tempContents = [
         ...transactionContents.slice(0, contentSetting.rowNo),
         tempContent,
-        ...transactionContents.slice(contentSetting.rowNo + 1, ),
+        ...transactionContents.slice(contentSetting.rowNo + 1,),
       ]
     };
     closeModal();
@@ -624,21 +632,20 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
       noTransactionContents = true;
     }
 
-    if(numberOfNoInputItems > 0){
+    if (numberOfNoInputItems > 0) {
       const contents = (
         <>
-          <p>하기 정보는 필수 입력 사항입니다.</p>
-          { noCompanyCode && <div> - 회사 이름</div> }
-          { noPublishDate && <div> - 발행일</div> }
-          { noTransactionContents && <div> - 거래 항목</div> }
+          <p>{t('comment.msg_no_necessary_data')}</p>
+          {noCompanyCode && <div> - 회사 이름</div>}
+          {noPublishDate && <div> - 발행일</div>}
+          {noTransactionContents && <div> - 거래 항목</div>}
         </>
       );
       const tempMsg = {
         title: t('comment.title_check'),
         message: contents,
       };
-      setMessage(tempMsg);
-      setIsMessageModalOpen(true);
+      handleOpenMessage(tempMsg);
       return;
     };
 
@@ -670,10 +677,12 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
         } else {
           handleClose();
         };
-      }
-      else {
-        setMessage({ title: '저장 중 오류', message: `오류가 발생하여 저장하지 못했습니다.` });
-        setIsMessageModalOpen(true);
+      } else {
+        const tempMsg = {
+          title: t('comment.title_error'),
+          message: `${t('comment.msg_fail_save')} - ${t('comment.reason')} : ${res.data}`,
+        };
+        handleOpenMessage(tempMsg);
       };
     });
   };
@@ -702,12 +711,23 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
 
   //===== Handles to handle this =================================================
   const handlePopupOpen = (open) => {
-    if(open) {
+    if (open) {
       openModal('antModal');
     } else {
       closeModal();
     }
-};
+  };
+
+  const handleOpenMessage = (msg) => {
+    openModal('antModal');
+    setMessage(msg);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleCloseMessage = () => {
+    closeModal();
+    setIsMessageModalOpen(false);
+  };
 
   const handleInitialize = useCallback(() => {
     setIsAdd(true);
@@ -735,7 +755,7 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
     setTransactionContents([]);
     setOrgReceiptModalData({ ...default_receipt_data });
     setEditedReceiptModalData({});
-    
+
     setSelectData({ trans_type: trans_types[0], tax_type: 'vat_included', company_selection: null });
     setOrgTransaction({});
     setTransactionForPrint(null);
@@ -752,10 +772,10 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
   //===== useEffect functions =============================================== 
   useEffect(() => {
     if (!init) return;
-    
+
     if ((companyState & 1) === 0) return;
 
-    if(handleInit) handleInit(false);
+    if (handleInit) handleInit(false);
     handleInitialize();
 
     if (currentTransaction !== defaultTransaction) {
@@ -1225,7 +1245,7 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
         title={message.title}
         message={message.message}
         open={isMessageModalOpen}
-        handleOk={() => setIsMessageModalOpen(false)}
+        handleOk={handleCloseMessage}
       />
     </div>
   );

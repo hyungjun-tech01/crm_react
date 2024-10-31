@@ -13,8 +13,8 @@ import AddAddressItem from '../../constants/AddAddressItem';
 import AddSearchItem from '../../constants/AddSearchItem';
 import MessageModal from "../../constants/MessageModal";
 
-const LeadAddModel = (props) => {
-    const { init, handleInit } = props;
+
+const LeadAddModel = ({ init, handleInit }) => {
     const { t } = useTranslation();
     const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
     const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -36,8 +36,8 @@ const LeadAddModel = (props) => {
 
 
     //===== Handles to edit 'Lead Add' =====================================================
-    const [ disableItems, setDisableItems ] = useState(false);
-    const [ leadChange, setLeadChange ] = useState({...defaultLead});
+    const [disableItems, setDisableItems] = useState(false);
+    const [leadChange, setLeadChange] = useState({ ...defaultLead });
 
     const handleLeadChange = useCallback((e) => {
         const modifiedData = {
@@ -60,54 +60,66 @@ const LeadAddModel = (props) => {
         setDisableItems(true);
     };
 
+
+    //===== Handles to handle this =================================================
     const handlePopupOpen = (open) => {
-        if(open) {
+        if (open) {
             openModal('antModal');
         } else {
-          closeModal();
+            closeModal();
         }
+    };
+
+    const handleOpenMessage = (msg) => {
+        openModal('antModal');
+        setMessage(msg);
+        setIsMessageModalOpen(true);
+    };
+
+    const handleCloseMessage = () => {
+        closeModal();
+        setIsMessageModalOpen(false);
     };
 
     const handleAddNewLead = () => {
         // Check data if they are available
         let numberOfNoInputItems = 0;
         let noLeadName = false;
-        if(!leadChange.lead_name || leadChange.lead_name === ""){
+        if (!leadChange.lead_name || leadChange.lead_name === "") {
             numberOfNoInputItems++;
             noLeadName = true;
         };
         let noCompanyCode = false;
-        if(!leadChange.company_code || leadChange.company_code === ""){
+        if (!leadChange.company_code || leadChange.company_code === "") {
             numberOfNoInputItems++;
             noCompanyCode = true;
         };
         let noLeadMobile = false;
-        if(!leadChange.mobile_number || leadChange.mobile_number === ""){
+        if (!leadChange.mobile_number || leadChange.mobile_number === "") {
             numberOfNoInputItems++;
             noLeadMobile = true;
         };
         let noLeadEmail = false;
-        if(!leadChange.email || leadChange.email === ""){
+        if (!leadChange.email || leadChange.email === "") {
             numberOfNoInputItems++;
             noLeadEmail = true;
         };
 
-        if(numberOfNoInputItems > 0){
+        if (numberOfNoInputItems > 0) {
             const contents = (
-              <>
-                <p>하기 정보는 필수 입력 사항입니다.</p>
-                { noLeadName && <div> - 고객 이름</div> }
-                { noCompanyCode && <div> - 회사 이름</div> }
-                { noLeadMobile && <div> - 고객 휴대전화</div> }
-                { noLeadEmail && <div> - 고객 Email(1)</div> }
-              </>
+                <>
+                    <p>하기 정보는 필수 입력 사항입니다.</p>
+                    {noLeadName && <div> - 고객 이름</div>}
+                    {noCompanyCode && <div> - 회사 이름</div>}
+                    {noLeadMobile && <div> - 고객 휴대전화</div>}
+                    {noLeadEmail && <div> - 고객 Email(1)</div>}
+                </>
             );
             const tempMsg = {
                 title: t('comment.title_check'),
                 message: contents,
             };
-            setMessage(tempMsg);
-            setIsMessageModalOpen(true);
+            handleOpenMessage(tempMsg);
             return;
         };
 
@@ -124,37 +136,35 @@ const LeadAddModel = (props) => {
                 closeModal();
             } else {
                 const tempMsg = {
-                    title: t('comment.title_check'),
-                    message: `${t('comment.msg_fail_save')} - 오류 이유 : ${res.data}`,
+                    title: t('comment.title_error'),
+                    message: `${t('comment.msg_fail_save')} - ${t('comment.reason')} : ${res.data}`,
                 };
-                setMessage(tempMsg);
-                setIsMessageModalOpen(true);
+                handleOpenMessage(tempMsg);
             }
         });
     };
 
     const handleClose = () => {
         setTimeout(() => {
-          closeModal();
+            closeModal();
         }, 250);
     };
 
-    const initializeLeadTemplate = () => {
-        setLeadChange({...defaultLead});
+    const handleInitialize = () => {
+        setLeadChange({ ...defaultLead });
         setDisableItems(false);
     };
 
+    //===== useEffect functions ====================================================
     useEffect(() => {
         if (init && (userState & 1) === 1) {
-            if(handleInit) handleInit(!init);
+            if (handleInit) handleInit(!init);
             setTimeout(() => {
-                initializeLeadTemplate();
+                handleInitialize();
             }, 250);
         }
     }, [userState, init]);
 
-    if (init)
-        return <div>&nbsp;</div>;
 
     return (
         <div
@@ -387,7 +397,7 @@ const LeadAddModel = (props) => {
                 title={message.title}
                 message={message.message}
                 open={isMessageModalOpen}
-                handleOk={() => setIsMessageModalOpen(false)}
+                handleOk={handleCloseMessage}
             />
             {/* modal-dialog */}
         </div>

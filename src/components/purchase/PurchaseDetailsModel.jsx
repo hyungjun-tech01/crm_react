@@ -25,6 +25,7 @@ import { SettingsRepo } from "../../repository/settings";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import DetailSubModal from "../../constants/DetailSubModal";
+import MessageModal from "../../constants/MessageModal";
 
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
@@ -34,6 +35,8 @@ import { CompanyRepo } from "../../repository/company";
 const PurchaseDetailsModel = () => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [message, setMessage] = useState({ title: "", message: "" });
 
 
   //===== [RecoilState] Related with Purchase =========================================
@@ -284,7 +287,6 @@ const PurchaseDetailsModel = () => {
 
   //===== Handles to handle this =================================================
   const [isFullScreen, setIsFullScreen] = useState(false);
-  // const [ selectedCategory, setSelectedCategory ] = useRecoilState(atomSelectedCategory);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -293,6 +295,17 @@ const PurchaseDetailsModel = () => {
     else
       localStorage.setItem('isFullScreen', '0');
   }, []);
+
+  const handleOpenMessage = (msg) => {
+    openModal('antModal');
+    setMessage(msg);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleCloseMessage = () => {
+    closeModal();
+    setIsMessageModalOpen(false);
+  };
 
   const handleSaveAll = () => {
     if (Object.keys(editedDetailValues).length !== 0 && currentPurchase) {
@@ -305,10 +318,13 @@ const PurchaseDetailsModel = () => {
       const res_data = modifyPurchase(temp_all_saved);
       res_data.then(res => {
         if (res.result) {
-          console.log(`Succeeded to modify purchase`);
           handleClose();
         } else {
-          console.error("Failed to modify purchase");
+          const tempMsg = {
+            title: t('comment.title_error'),
+            message: `${t('comment.msg_fail_save')} - ${t('comment.reason')} : ${res.data}`,
+          };
+          handleOpenMessage(tempMsg);
         }  
       })
     } else {
@@ -571,6 +587,12 @@ const PurchaseDetailsModel = () => {
           handleOk={handleSubModalOk}
           handleCancel={handleSubModalCancel}
         />
+        <MessageModal
+        title={message.title}
+        message={message.message}
+        open={isMessageModalOpen}
+        handleOk={handleCloseMessage}
+      />
       </div>
     </>
   );

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
@@ -10,13 +10,11 @@ import { option_locations, option_deal_type } from "../../constants/constants";
 import {
   atomCurrentCompany,
   atomPurchaseByCompany,
-  atomSelectedCategory,
   atomTaxInvoiceByCompany,
   atomTransactionByCompany,
   defaultCompany,
 } from "../../atoms/atoms";
 import {
-  atomUserState,
   atomEngineersForSelection,
   atomSalespersonsForSelection,
 } from "../../atoms/atomsUser";
@@ -37,13 +35,14 @@ import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
 import TransactionEditModel from "../transactions/TransactionEditModel";
 import TaxInvoiceEditModel from "../taxinvoice/TaxInvoiceEditModel";
 
+import MessageModal from "../../constants/MessageModal";
+
 
 const CompanyDetailsModel = ({ init, handleInit }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
-  const [checkState,  setCheckState] = useState({
-    purchase: false, transaction: false, taxInvoice: false,
-  });
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [message, setMessage] = useState({ title: "", message: "" });
 
 
   //===== [RecoilState] Related with Company ==========================================
@@ -77,18 +76,10 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
 
 
   //===== Handles to deal this component ==============================================
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  const [currentCompanyCode, setCurrentCompanyCode] = useState("");
   const [ initTransaction, setInitTransaction ] = useState(false);
   const [ initTaxInvoice, setInitTaxInvoice ] = useState(false);
   const [ taxInvoiceData, setTaxInvoiceData ] = useState(null);
   const [ taxInvoiceContents, setTaxInvoiceContents ] = useState(null);
-
-  const handleWindowWidthChange = useCallback((checked) => {
-    setIsFullScreen(checked);
-    if (checked) localStorage.setItem("isFullScreen", "1");
-    else localStorage.setItem("isFullScreen", "0");
-  }, []);
 
 
   //===== Handles to edit 'Company Details' ============================================
@@ -150,29 +141,6 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     },
     [editedDetailValues]
   );
-
-  const handleDetailSave = () => {
-    if (editedDetailValues !== null && selectedCompany !== defaultCompany) {
-      const temp_all_saved = {
-        ...editedDetailValues,
-        action_type: "UPDATE",
-        modify_user: cookies.myLationCrmUserId,
-        company_code: selectedCompany.company_code,
-      };
-      const resp = modifyCompany(temp_all_saved);
-      resp.then(res => {
-        if (res.result) {
-          console.log(`Succeeded to modify company`);
-          handleClose();
-        } else {
-          console.error("Failed to modify company : ", res.data);
-        };
-      });
-    } else {
-      console.log("[ CompanyDetailModel ] No saved data");
-    }
-    setEditedDetailValues(null);
-  };
 
   const company_items_info = [
     {
@@ -298,6 +266,53 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     },
   ];
 
+  //===== Handles to handle this =================================================
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [currentCompanyCode, setCurrentCompanyCode] = useState("");
+
+  const handleOpenMessage = (msg) => {
+    openModal('antModal');
+    setMessage(msg);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleCloseMessage = () => {
+    closeModal();
+    setIsMessageModalOpen(false);
+  };
+
+  const handleWindowWidthChange = useCallback((checked) => {
+    setIsFullScreen(checked);
+    if (checked) localStorage.setItem("isFullScreen", "1");
+    else localStorage.setItem("isFullScreen", "0");
+  }, []);
+
+  const handleDetailSave = () => {
+    if (editedDetailValues !== null && selectedCompany !== defaultCompany) {
+      const temp_all_saved = {
+        ...editedDetailValues,
+        action_type: "UPDATE",
+        modify_user: cookies.myLationCrmUserId,
+        company_code: selectedCompany.company_code,
+      };
+      const resp = modifyCompany(temp_all_saved);
+      resp.then(res => {
+        if (res.result) {
+          handleClose();
+        } else {
+          // console.error("Failed to modify company : ", res.data);
+          const tempMsg = {
+            title: t('comment.title_error'),
+            message: `${t('comment.msg_fail_save')} - ${res.data}`,
+          };
+          handleOpenMessage(tempMsg);
+        };
+      });
+    } else {
+      console.log("[ CompanyDetailModel ] No saved data");
+    }
+  };
+
   const handleInitialize = () => {
     setEditedDetailValues(null);
   };
@@ -308,6 +323,8 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     }, 250);
   };
 
+
+  //===== useEffect functions ====================================================
   useEffect(() => {
     if (init) {
       const detailViewStatus = localStorage.getItem("isFullScreen");
@@ -391,8 +408,6 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     window.addEventListener('popstate', handlePopState);
   }, [init, selectedCompany, currentCompanyCode, loadCompanyMAContracts, searchPurchases, searchTransactions, searchTaxInvoices, handleInit, setPurchasesByCompany, setTransactionByCompany, setTaxInvoiceByCompany]);
 
-  if (init)
-    return <div>&nbsp;</div>;
 
   return (
     <>
@@ -604,6 +619,12 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
         handleInit={setInitTaxInvoice}
         data={taxInvoiceData}
         contents={taxInvoiceContents}
+      />
+      <MessageModal
+        title={message.title}
+        message={message.message}
+        open={isMessageModalOpen}
+        handleOk={handleCloseMessage}
       />
     </>
   );

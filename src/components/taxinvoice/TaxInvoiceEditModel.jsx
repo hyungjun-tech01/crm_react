@@ -62,9 +62,9 @@ const default_invoice_data = {
 
 const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
   const { t } = useTranslation();
-  const [ cookies ] = useCookies(["myLationCrmUserId"]);
-  const [ isMessageModalOpen, setIsMessageModalOpen ] = useState(false);
-  const [ message, setMessage ] = useState({ title: '', message: '' });
+  const [cookies] = useCookies(["myLationCrmUserId"]);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [message, setMessage] = useState({ title: '', message: '' });
 
 
   //===== [RecoilState] Related with Tax Invoice =====================================
@@ -76,24 +76,24 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
   const companyState = useRecoilValue(atomCompanyState);
   const currentCompany = useRecoilValue(atomCurrentCompany);
 
-  
+
   //===== [RecoilState] Related with Company =========================================
   const { openModal, closeModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to edit 'TaxInvoiceEditModel' ======================================
-  const [ receiver, setReceiver ] = useState({});
-  const [ supplier, setSupplier ] = useState({});
-  const [ invoiceData, setInvoiceData ] = useState({ ...default_invoice_data });
-  const [ invoiceChange, setInvoiceChange ] = useState({});
-  const [ invoiceContents, setInvoiceContents ] = useState([]);
-  const [ printData, setPrintData ] = useState({})
-  const [ isSale, setIsSale ] = useState(true);
-  const [ isTaxInvoice, setIsTaxInvoice ] = useState(true);
-  const [ selectValues, setSelectValue ] = useState({})
-  const [ selectedContentRowKeys, setSelectedContentRowKeys ] = useState([]);
-  const [ selectedCategory, setSelectedCategory ] = useRecoilState(atomSelectedCategory);
-  const [ showSaveButton, setShowSaveButton ] = useState(false);
+  const [receiver, setReceiver] = useState({});
+  const [supplier, setSupplier] = useState({});
+  const [invoiceData, setInvoiceData] = useState({ ...default_invoice_data });
+  const [invoiceChange, setInvoiceChange] = useState({});
+  const [invoiceContents, setInvoiceContents] = useState([]);
+  const [printData, setPrintData] = useState({})
+  const [isSale, setIsSale] = useState(true);
+  const [isTaxInvoice, setIsTaxInvoice] = useState(true);
+  const [selectValues, setSelectValue] = useState({})
+  const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useRecoilState(atomSelectedCategory);
+  const [showSaveButton, setShowSaveButton] = useState(false);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
@@ -335,9 +335,17 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
 
   const handleContentModalOk = () => {
     if (!orgContentModalData['invoice_date'] && !editedContentModalData['invoice_date']) {
-      const tempMsg = { title: '확인', message: '날짜 정보가 없습니다.' };
-      setMessage(tempMsg);
-      setIsMessageModalOpen(true);
+      const contents = (
+        <>
+          <p>{t('comment.msg_no_necessary_data')}</p>
+          <div> - 날짜</div>
+        </>
+      );
+      const tempMsg = {
+        title: t('comment.title_check'),
+        message: contents,
+      };
+      handleOpenMessage(tempMsg);
       return;
     };
     let tempMonthDay = null;
@@ -548,9 +556,20 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
   };
 
   //===== Handles to handle this =================================================
+  const handleOpenMessage = (msg) => {
+    openModal('antModal');
+    setMessage(msg);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleCloseMessage = () => {
+    closeModal();
+    setIsMessageModalOpen(false);
+  };
+
   const handleInitialize = useCallback(() => {
     // document.querySelector("#add_new_tax_invoice_form").reset();
-    setInvoiceData({...default_invoice_data});
+    setInvoiceData({ ...default_invoice_data });
     setInvoiceChange({});
     setInvoiceContents([]);
     setPrintData({});
@@ -587,36 +606,35 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
     // Check data if they are available -----------------------------------
     let numberOfNoInputItems = 0;
     let noCompanyCode = false;
-    if(!newTaxInvoice.company_code || newTaxInvoice.company_code === ""){
+    if (!newTaxInvoice.company_code || newTaxInvoice.company_code === "") {
       numberOfNoInputItems++;
       noCompanyCode = true;
     };
     let noCreateDate = false;
-    if(!newTaxInvoice.create_date || newTaxInvoice.create_date === ""){
+    if (!newTaxInvoice.create_date || newTaxInvoice.create_date === "") {
       numberOfNoInputItems++;
       noCreateDate = true;
     };
     let noInvoiceContents = false;
-    if(invoiceContents.length === 0){
+    if (invoiceContents.length === 0) {
       numberOfNoInputItems++;
       noInvoiceContents = true;
     };
 
-    if(numberOfNoInputItems > 0){
+    if (numberOfNoInputItems > 0) {
       const contents = (
         <>
-          <p>하기 정보는 필수 입력 사항입니다.</p>
-          { noCompanyCode && <div> - 회사 이름</div> }
-          { noCreateDate && <div> - 작성일</div> }
-          { noInvoiceContents && <div> - 세금계산서 항목</div> }
+          <p>{t('comment.msg_no_necessary_data')}</p>
+          {noCompanyCode && <div> - 회사 이름</div>}
+          {noCreateDate && <div> - 작성일</div>}
+          {noInvoiceContents && <div> - 세금계산서 항목</div>}
         </>
       );
       const tempMsg = {
         title: t('comment.title_check'),
         message: contents,
       };
-      setMessage(tempMsg);
-      setIsMessageModalOpen(true);
+      handleOpenMessage(tempMsg);
       return;
     };
 
@@ -638,10 +656,12 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
     resp.then((res) => {
       if (res.result) {
         handleClose();
-      }
-      else {
-        setMessage({ title: '저장 중 오류', message: `오류가 발생하여 저장하지 못했습니다. - ${res.message}` });
-        setIsMessageModalOpen(true);
+      } else {
+        const tempMsg = {
+          title: t('comment.title_error'),
+          message: `${t('comment.msg_fail_save')} - ${t('comment.reason')} : ${res.data}`,
+        };
+        handleOpenMessage(tempMsg);
       };
     });
   };
@@ -656,7 +676,7 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
   useEffect(() => {
     if (!init) return;
 
-    if(handleInit) handleInit(false);
+    if (handleInit) handleInit(false);
     handleInitialize();
 
     if ((companyState & 1) === 1) {
@@ -665,39 +685,39 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
         inputData = data;
         setShowSaveButton(true);
       } else {
-        if(currentTaxInvoice !== defaultTaxInvoice) {
-          inputData = {...currentTaxInvoice};
+        if (currentTaxInvoice !== defaultTaxInvoice) {
+          inputData = { ...currentTaxInvoice };
           setShowSaveButton(false);
         } else {
-          if((selectedCategory.category === 'company')
+          if ((selectedCategory.category === 'company')
             && (currentCompany !== defaultCompany)
             && (selectedCategory.item_code === currentCompany.company_code)
-          ){
+          ) {
             setShowSaveButton(true);
             inputData = {
               ...default_invoice_data,
               ...defaultTaxInvoice,
               create_date: new Date(),
-              transaction_type : '매출',  // default
+              transaction_type: '매출',  // default
               invoice_type: '세금계산서', // default
               payment_type: '현금', //default
               supply_price: 0,
               tax_price: 0,
-              company_code : currentCompany.company_code,
-              business_registration_code : currentCompany.business_registration_code,
-              company_name : currentCompany.company_name,
-              ceo_name : currentCompany.ceo_name,
-              company_address : currentCompany.company_address,
-              business_type : currentCompany.business_type,
-              business_item : currentCompany.business_item,
+              company_code: currentCompany.company_code,
+              business_registration_code: currentCompany.business_registration_code,
+              company_name: currentCompany.company_name,
+              ceo_name: currentCompany.ceo_name,
+              company_address: currentCompany.company_address,
+              business_type: currentCompany.business_type,
+              business_item: currentCompany.business_item,
             }
           } else {
             setShowSaveButton(false);
           };
         }
       };
-      
-      if(!!inputData && Object.keys(inputData).length > 0) {
+
+      if (!!inputData && Object.keys(inputData).length > 0) {
         // invoiceData ------------------------------
         const tempSelectValues = {
           transaction_type: inputData.transaction_type === '매출' ? trans_types[0] : trans_types[1],
@@ -767,18 +787,18 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
       if (!!contents && contents.length > 0) {
         setInvoiceContents(contents);
       } else {
-        if(currentTaxInvoice !== defaultTaxInvoice) {
+        if (currentTaxInvoice !== defaultTaxInvoice) {
           const dataContents = JSON.parse(currentTaxInvoice.invoice_contents);
           const tempContents = dataContents.map((item, index) => {
-              const tempDate = new Date();
-              const splitted = item.month_day.split('.');
-              tempDate.setMonth(splitted.at(0) - 1);
-              tempDate.setDate(splitted.at(1));
-              return {
-                  ...item,
-                  invoice_date: tempDate,
-                  sub_index: index,
-              }
+            const tempDate = new Date();
+            const splitted = item.month_day.split('.');
+            tempDate.setMonth(splitted.at(0) - 1);
+            tempDate.setDate(splitted.at(1));
+            return {
+              ...item,
+              invoice_date: tempDate,
+              sub_index: index,
+            }
           });
           setInvoiceContents(tempContents);
         } else {
@@ -835,7 +855,7 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
                     className="nav-link"
                     to="#tax-bill-print"
                     data-bs-toggle="tab"
-                    onClick={()=> setPrintData({...invoiceData, ...invoiceChange})}
+                    onClick={() => setPrintData({ ...invoiceData, ...invoiceChange })}
                   >
                     {t('common.preview')}
                   </Link>
@@ -957,9 +977,9 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
                                   <div className={styles.searchWarpper}>
                                     <label className={styles.textStart}>{supplier.company_name}</label>
                                     <div className={styles.searchIcon}
-                                      onClick={() => {setIsPopupOpen(!isPopupOpen); openModal('antModal');}}
+                                      onClick={() => { setIsPopupOpen(!isPopupOpen); openModal('antModal'); }}
                                     >
-                                        <FiSearch />
+                                      <FiSearch />
                                     </div>
                                   </div>
                                 }
@@ -1063,9 +1083,9 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
                                   <div className={styles.searchWarpper}>
                                     <label className={styles.textStart}>{receiver.company_name}</label>
                                     <div className={styles.searchIcon}
-                                      onClick={() => {setIsPopupOpen(!isPopupOpen);openModal('antModal')}}
+                                      onClick={() => { setIsPopupOpen(!isPopupOpen); openModal('antModal') }}
                                     >
-                                        <FiSearch />
+                                      <FiSearch />
                                     </div>
                                   </div>
                                   :
@@ -1471,7 +1491,7 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
                         </div>
                       </div>
                     </div>
-                    { (Object.keys(invoiceChange).length > 0 || showSaveButton) &&
+                    {(Object.keys(invoiceChange).length > 0 || showSaveButton) &&
                       <div className="text-center">
                         <button
                           type="button"
@@ -1518,19 +1538,19 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
         title={message.title}
         message={message.message}
         open={isMessageModalOpen}
-        handleOk={() => setIsMessageModalOpen(false)}
+        handleOk={handleCloseMessage}
       />
       <SelectListModal
         title={`${t('company.company')} ${t('common.search')}`}
-        condition={{category: 'tax_invoice', item: 'company_name'}}
+        condition={{ category: 'tax_invoice', item: 'company_name' }}
         open={isPopupOpen}
         handleChange={(data) => {
-            delete data.index;
-            delete data.component;
-            handleSelectCompany(data);
+          delete data.index;
+          delete data.component;
+          handleSelectCompany(data);
         }}
-        handleClose={()=>{setIsPopupOpen(false);closeModal();}}
-    />
+        handleClose={() => { setIsPopupOpen(false); closeModal(); }}
+      />
     </div>
   );
 };

@@ -1,23 +1,25 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Collapse, Space, Switch } from "antd";
-import { atomCurrentQuotation,
+import {
+  atomCurrentQuotation,
   defaultQuotation,
   atomQuotationState,
   atomProductClassList,
   atomProductClassListState,
   atomProductsState,
   atomAllProducts,
-  atomSelectedCategory,
 } from "../../atoms/atoms";
-import { atomUserState,
+import {
+  atomUserState,
   atomUsersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
-import { QuotationRepo,
+import {
+  QuotationRepo,
   QuotationSendTypes,
   QuotationTypes,
   quotationExpiry,
@@ -30,24 +32,26 @@ import DetailLabelItem from "../../constants/DetailLabelItem";
 import DetailTextareaItem from "../../constants/DetailTextareaItem";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
+import MessageModal from "../../constants/MessageModal";
 import QuotationView from "./QuotationtView";
 import { Add, Remove } from '@mui/icons-material';
 
-const content_indices = ['3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18'];
+const content_indices = ['3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18'];
 
 
-const QuotationDetailsModel = ({init, handleInit}) => {
-  const [ t ] = useTranslation();
-  const [ cookies ] = useCookies(["myLationCrmUserId"]);
+const QuotationDetailsModel = ({ init, handleInit }) => {
+  const [t] = useTranslation();
+  const [cookies] = useCookies(["myLationCrmUserId"]);
   const { Panel } = Collapse;
-
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [message, setMessage] = useState({ title: "", message: "" });
 
   //===== [RecoilState] Related with Quotation ========================================
   const quotationState = useRecoilValue(atomQuotationState);
   const selectedQuotation = useRecoilValue(atomCurrentQuotation);
   const { modifyQuotation, setCurrentQuotation } = useRecoilValue(QuotationRepo);
 
-  
+
   //===== [RecoilState] Related with Product ==========================================
   const productClassState = useRecoilValue(atomProductClassListState);
   const allProductClassList = useRecoilValue(atomProductClassList);
@@ -62,7 +66,7 @@ const QuotationDetailsModel = ({init, handleInit}) => {
 
 
   //===== [RecoilState] Related with Settings ============================================
-  const { closeModal } = useRecoilValue(SettingsRepo);
+  const { openModal, closeModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to edit 'Quotation Details' =========================================
@@ -76,7 +80,7 @@ const QuotationDetailsModel = ({init, handleInit}) => {
       };
       setEditedDetailValues(tempEdited);
     } else {
-      if(editedDetailValues[e.target.name]){
+      if (editedDetailValues[e.target.name]) {
         delete editedDetailValues[e.target.name];
       };
     };
@@ -93,7 +97,7 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   }, [editedDetailValues, selectedQuotation]);
 
   const handleDetailSelectChange = useCallback((name, selected) => {
-    if(selected.value !== selectedQuotation[name]){
+    if (selected.value !== selectedQuotation[name]) {
       const tempEdited = {
         ...editedDetailValues,
         [name]: selected.value,
@@ -104,15 +108,15 @@ const QuotationDetailsModel = ({init, handleInit}) => {
 
 
   //===== Handles to edit 'Content' ===================================================
-  const [ orgQuotationContents, setOrgQuotationContents ] = useState([]);
-  const [ quotationContents, setQuotationContents ] = useState([]);
-  const [ quotationHeaders, setQuotationHeaders ] = useState([]);
+  const [orgQuotationContents, setOrgQuotationContents] = useState([]);
+  const [quotationContents, setQuotationContents] = useState([]);
+  const [quotationHeaders, setQuotationHeaders] = useState([]);
 
-  const [ editedContentValues, setEditedContentValues ] = useState(null);
-  const [ savedContentValues, setSavedContentValues ] = useState(null);
+  const [editedContentValues, setEditedContentValues] = useState(null);
+  const [savedContentValues, setSavedContentValues] = useState(null);
 
-  const [ checkContentState, setCheckContentState ] = useState(null);
-  const [ isNewlyAdded, setIsNewlyAdded ] = useState(false);
+  const [checkContentState, setCheckContentState] = useState(null);
+  const [isNewlyAdded, setIsNewlyAdded] = useState(false);
 
   const handleCheckContentEditState = useCallback((key) => {
     return editedContentValues !== null && key in editedContentValues;
@@ -139,8 +143,7 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   const handleEndContentEdit = useCallback((input) => {
     const splitted = input.split('.');
     const [index, key] = splitted;
-    if (editedContentValues[input] === quotationContents[index][key])
-    {
+    if (editedContentValues[input] === quotationContents[index][key]) {
       const tempEdited = {
         ...editedContentValues,
       };
@@ -188,13 +191,13 @@ const QuotationDetailsModel = ({init, handleInit}) => {
     ];
     setQuotationContents(tempContents);
 
-    const tempCheck=[
+    const tempCheck = [
       ...checkContentState,
       true,
     ];
     setCheckContentState(tempCheck);
 
-    if(!isNewlyAdded){
+    if (!isNewlyAdded) {
       setIsNewlyAdded(true);
     };
   }, [checkContentState, isNewlyAdded, quotationContents, quotationHeaders]);
@@ -204,10 +207,10 @@ const QuotationDetailsModel = ({init, handleInit}) => {
     let tempEditedContent = {
       ...editedContentValues
     };
-    if(editedContentValues){
+    if (editedContentValues) {
       Object.keys(editedContentValues).forEach(key => {
         const [no, idx] = key.split('.');
-        if(no === index){
+        if (no === index) {
           delete tempEditedContent[key];
         };
       });
@@ -218,10 +221,10 @@ const QuotationDetailsModel = ({init, handleInit}) => {
     let tempSavedContent = {
       ...savedContentValues
     };
-    if(savedContentValues){
+    if (savedContentValues) {
       Object.keys(savedContentValues).forEach(key => {
         const [no, idx] = key.split('.');
-        if(no === index){
+        if (no === index) {
           delete tempSavedContent[key];
         };
       });
@@ -231,7 +234,7 @@ const QuotationDetailsModel = ({init, handleInit}) => {
     // Finally, ---------------------------------------------
     const tempContents = [
       ...quotationContents.slice(0, index),
-      ...quotationContents.slice(index + 1, ),
+      ...quotationContents.slice(index + 1,),
     ];
     setQuotationContents(tempContents);
 
@@ -242,8 +245,8 @@ const QuotationDetailsModel = ({init, handleInit}) => {
     setCheckContentState(tempCheck);
 
     let isThereNewlyAdded = false;
-    for(let i=0; i<tempCheck.length; i++){
-      if(tempCheck[i]){
+    for (let i = 0; i < tempCheck.length; i++) {
+      if (tempCheck[i]) {
         isThereNewlyAdded = true;
         break;
       };
@@ -266,14 +269,14 @@ const QuotationDetailsModel = ({init, handleInit}) => {
       Object.keys(savedContentValues).forEach(item => {
         const [no, index] = item.split('.');
         tempContents[no][index] = savedContentValues[item];
-        if(!contents_in_saved[no]){
+        if (!contents_in_saved[no]) {
           contents_in_saved[no] = true;
         };
       });
 
       // Check if there is a newly added content having no date in it
-      for(let i=checkContentState.length - 1; i >= 0; i--){
-        if(checkContentState[i] && !contents_in_saved[i]){
+      for (let i = checkContentState.length - 1; i >= 0; i--) {
+        if (checkContentState[i] && !contents_in_saved[i]) {
           tempContents.splice(i, 1);
         };
       };
@@ -297,7 +300,11 @@ const QuotationDetailsModel = ({init, handleInit}) => {
           setCheckContentState(tempCheck);
           setIsNewlyAdded(false);
         } else {
-          console.error("Failed to modify Quotation : ", res.data);
+          const tempMsg = {
+            title: t('comment.title_error'),
+            message: `${t('comment.msg_fail_save')} - ${t('comment.reason')} : ${res.data}`,
+          };
+          handleOpenMessage(tempMsg);
         };
       });
     } else {
@@ -324,49 +331,60 @@ const QuotationDetailsModel = ({init, handleInit}) => {
   }, []);
 
   const qotation_items_info = [
-    { key:'quotation_type', title:'quotation.quotation_type', detail:{ type:'select', options:QuotationTypes, editing:handleDetailSelectChange }},
-    { key:'quotation_manager', title:'quotation.quotation_manager', detail:{ type:'select', options:usersForSelection, editing:handleDetailSelectChange }},
-    { key:'quotation_send_type', title:'quotation.send_type', detail:{ type:'select', options:QuotationSendTypes, editing:handleDetailSelectChange }},
-    { key:'quotation_date', title:'quotation.quotation_date', detail:{ type:'date', editing:handleDetailDateChange}},
-    { key:'quotation_expiration_date', title:'quotation.expiry_date', detail:{ type:'select', options:quotationExpiry, editing:handleDetailSelectChange }},
-    { key:'comfirm_date', title:'quotation.confirm_date', detail:{ type:'date', editing:handleDetailDateChange}},
-    { key:'delivery_location', title:'quotation.delivery_location', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'delivery_period', title:'quotation.delivery_period', detail:{ type:'select', options:quotationDelivery, editing:handleDetailSelectChange }},
-    { key:'warranty_period', title:'quotation.warranty', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'sales_representative', title:'quotation.sales_rep', detail:{ type:'select', options:salespersonsForSelection, editing:handleDetailSelectChange }},
-    { key:'payment_type', title:'quotation.payment_type', detail:{ type:'select', options:quotationPayment, editing:handleDetailSelectChange }},
-    { key:'list_price', title:'quotation.list_price', detail:{ type:'label', price: true, editing:handleDetailChange }},
-    { key:'list_price_dc', title:'quotation.list_price_dc', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'sub_total_amount', title:'quotation.sub_total_amount', detail:{ type:'label', price: true, editing:handleDetailChange }},
-    { key:'dc_rate', title:'quotation.dc_rate', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'cutoff_amount', title:'quotation.cutoff_amount', detail:{ type:'label', price: true, editing:handleDetailChange }},
-    { key:'total_quotation_amount', title:'quotation.total_quotation_amount', detail:{ type:'label', price: true, editing:handleDetailChange }},
-    { key:'profit', title:'quotation.profit_amount', detail:{ type:'label', price: true, editing:handleDetailChange }},
-    { key:'profit_rate', title:'quotation.profit_rate', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'upper_memo', title:'quotation.upper_memo', detail:{ type:'textarea', extra:'long', editing:handleDetailChange }},
-    { key:'lower_memo', title:'quotation.lower_memo', detail:{ type:'textarea', extra:'long', editing:handleDetailChange }},
-    { key:'lead_name', title:'lead.lead_name', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'department', title:'lead.department', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'position', title:'lead.position', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'mobile_number', title:'lead.mobile', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'phone_number', title:'common.phone_no', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'fax_number', title:'lead.fax_number', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'email', title:'lead.email', detail:{ type:'label', editing:handleDetailChange }},
-    { key:'company_name', title:'company.company_name', detail:{ type:'label', extra:'long', editing:handleDetailChange }},
+    { key: 'quotation_type', title: 'quotation.quotation_type', detail: { type: 'select', options: QuotationTypes, editing: handleDetailSelectChange } },
+    { key: 'quotation_manager', title: 'quotation.quotation_manager', detail: { type: 'select', options: usersForSelection, editing: handleDetailSelectChange } },
+    { key: 'quotation_send_type', title: 'quotation.send_type', detail: { type: 'select', options: QuotationSendTypes, editing: handleDetailSelectChange } },
+    { key: 'quotation_date', title: 'quotation.quotation_date', detail: { type: 'date', editing: handleDetailDateChange } },
+    { key: 'quotation_expiration_date', title: 'quotation.expiry_date', detail: { type: 'select', options: quotationExpiry, editing: handleDetailSelectChange } },
+    { key: 'comfirm_date', title: 'quotation.confirm_date', detail: { type: 'date', editing: handleDetailDateChange } },
+    { key: 'delivery_location', title: 'quotation.delivery_location', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'delivery_period', title: 'quotation.delivery_period', detail: { type: 'select', options: quotationDelivery, editing: handleDetailSelectChange } },
+    { key: 'warranty_period', title: 'quotation.warranty', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'sales_representative', title: 'quotation.sales_rep', detail: { type: 'select', options: salespersonsForSelection, editing: handleDetailSelectChange } },
+    { key: 'payment_type', title: 'quotation.payment_type', detail: { type: 'select', options: quotationPayment, editing: handleDetailSelectChange } },
+    { key: 'list_price', title: 'quotation.list_price', detail: { type: 'label', price: true, editing: handleDetailChange } },
+    { key: 'list_price_dc', title: 'quotation.list_price_dc', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'sub_total_amount', title: 'quotation.sub_total_amount', detail: { type: 'label', price: true, editing: handleDetailChange } },
+    { key: 'dc_rate', title: 'quotation.dc_rate', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'cutoff_amount', title: 'quotation.cutoff_amount', detail: { type: 'label', price: true, editing: handleDetailChange } },
+    { key: 'total_quotation_amount', title: 'quotation.total_quotation_amount', detail: { type: 'label', price: true, editing: handleDetailChange } },
+    { key: 'profit', title: 'quotation.profit_amount', detail: { type: 'label', price: true, editing: handleDetailChange } },
+    { key: 'profit_rate', title: 'quotation.profit_rate', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'upper_memo', title: 'quotation.upper_memo', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
+    { key: 'lower_memo', title: 'quotation.lower_memo', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
+    { key: 'lead_name', title: 'lead.lead_name', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'department', title: 'lead.department', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'mobile_number', title: 'lead.mobile', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'phone_number', title: 'common.phone_no', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'fax_number', title: 'lead.fax_number', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'email', title: 'lead.email', detail: { type: 'label', editing: handleDetailChange } },
+    { key: 'company_name', title: 'company.company_name', detail: { type: 'label', extra: 'long', editing: handleDetailChange } },
   ];
 
   //===== Handles to handle this =================================================
-  const [ isFullScreen, setIsFullScreen ] = useState(false);
-  const [ currentQuotationCode, setCurrentQuotationCode ] = useState('');
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [currentQuotationCode, setCurrentQuotationCode] = useState('');
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
-    if(checked)
+    if (checked)
       localStorage.setItem('isFullScreen', '1');
     else
       localStorage.setItem('isFullScreen', '0');
   }, []);
-  
+
+  const handleOpenMessage = (msg) => {
+    openModal('antModal');
+    setMessage(msg);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleCloseMessage = () => {
+    closeModal();
+    setIsMessageModalOpen(false);
+  };
+
   const handleSaveAll = useCallback(() => {
     if (editedDetailValues !== null &&
       selectedQuotation &&
@@ -381,10 +399,13 @@ const QuotationDetailsModel = ({init, handleInit}) => {
       const resp = modifyQuotation(temp_all_saved);
       resp.then(res => {
         if (res.result) {
-          console.log(`Succeeded to modify Quotation`);
           handleClose();
         } else {
-          console.error("Failed to modify Quotation :", res.data);
+          const tempMsg = {
+            title: t('comment.title_error'),
+            message: `${t('comment.msg_fail_save')} - ${t('comment.reason')} : ${res.data}`,
+          };
+          handleOpenMessage(tempMsg);
         };
       });
     } else {
@@ -404,36 +425,36 @@ const QuotationDetailsModel = ({init, handleInit}) => {
 
   //===== useEffect functions =============================================== 
   useEffect(() => {
-    if((selectedQuotation !== defaultQuotation)
+    if ((selectedQuotation !== defaultQuotation)
       && (selectedQuotation.quotation_code !== currentQuotationCode)
-    ){
+    ) {
       const headerValues = selectedQuotation.quotation_table.split('|');
-      if(headerValues && Array.isArray(headerValues)){
+      if (headerValues && Array.isArray(headerValues)) {
         let tableHeaders = [];
         const headerCount = headerValues.length / 3;
-        for(let i=0; i < headerCount; i++){
-          tableHeaders.push([ headerValues.at(3*i), headerValues.at(3*i + 1),headerValues.at(3*i + 2)]);
+        for (let i = 0; i < headerCount; i++) {
+          tableHeaders.push([headerValues.at(3 * i), headerValues.at(3 * i + 1), headerValues.at(3 * i + 2)]);
         };
         setQuotationHeaders(tableHeaders);
       };
 
       const contentsData = JSON.parse(selectedQuotation.quotation_contents);
-      if(contentsData && Array.isArray(contentsData)){
+      if (contentsData && Array.isArray(contentsData)) {
         setOrgQuotationContents([...contentsData]);
         setQuotationContents([...contentsData]);
 
         let tempCheck = [];
-        for(let i=0; i<contentsData.length; i++){
+        for (let i = 0; i < contentsData.length; i++) {
           tempCheck.push(false);
         };
         setCheckContentState(tempCheck);
       };
 
       const detailViewStatus = localStorage.getItem("isFullScreen");
-      if(detailViewStatus === null){
+      if (detailViewStatus === null) {
         localStorage.setItem("isFullScreen", '0');
         setIsFullScreen(false);
-      } else if(detailViewStatus === '0'){
+      } else if (detailViewStatus === '0') {
         setIsFullScreen(false);
       } else {
         setIsFullScreen(true);
@@ -452,10 +473,10 @@ const QuotationDetailsModel = ({init, handleInit}) => {
     ) {
       handleInit(false);
     };
-}, [allProductClassList, allProducts, productClassState, productState, userState, quotationState, handleInit]);
+  }, [allProductClassList, allProducts, productClassState, productState, userState, quotationState, handleInit]);
 
-if (init)
-  return <div>&nbsp;</div>;
+  if (init)
+    return <div>&nbsp;</div>;
 
   return (
     <>
@@ -489,11 +510,11 @@ if (init)
                   onEditing={handleDetailChange}
                 />
               </div>
-              <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange}/>
+              <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange} />
               <button
                 type="button"
                 className="btn-close xs-close"
-                onClick={ handleClose }
+                onClick={handleClose}
               />
             </div>
             <div className="modal-body">
@@ -535,7 +556,7 @@ if (init)
                         </li>
                       </ul>
                       <div className="tab-content">
-{/*---- Start -- Tab : Detail Quotation-------------------------------------------------------------*/}
+                        {/*---- Start -- Tab : Detail Quotation-------------------------------------------------------------*/}
                         <div className="tab-pane show active p-0" id="sub-quotation-details">
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item">
@@ -546,7 +567,7 @@ if (init)
                                 style={{ display: 'flex', marginBottom: '0.5rem' }}
                                 wrap
                               >
-                                { qotation_items_info.map((item, index) => 
+                                {qotation_items_info.map((item, index) =>
                                   <DetailCardItem
                                     key={index}
                                     title={t(item.title)}
@@ -559,7 +580,7 @@ if (init)
                               </Space>
                             </div>
                           </div>
-                          { editedDetailValues !== null &&
+                          {editedDetailValues !== null &&
                             Object.keys(editedDetailValues).length !== 0 && (
                               <div className="text-center py-3">
                                 <button
@@ -578,23 +599,23 @@ if (init)
                                   {t('common.cancel')}
                                 </button>
                               </div>
-                          )}
+                            )}
                         </div>
-{/*---- End   -- Tab : Detail Quotation ------------------------------------------------------------*/}
-{/*---- Start -- Tab : Product Lists - Quotation ---------------------------------------------------*/}
+                        {/*---- End   -- Tab : Detail Quotation ------------------------------------------------------------*/}
+                        {/*---- Start -- Tab : Product Lists - Quotation ---------------------------------------------------*/}
                         <div className="tab-pane task-related p-0" id="sub-quotation-products">
                           <div className="crms-tasks">
                             <div className="tasks__item crms-task-item active">
-                            { quotationContents && quotationContents.length > 0 && 
+                              {quotationContents && quotationContents.length > 0 &&
                                 quotationContents.map((content, index1) => {
-                                  if(content['1'] === null || content['1'] === 'null') return;
+                                  if (content['1'] === null || content['1'] === 'null') return;
                                   return (
-                                    <Collapse key={index1}  defaultActiveKey={[index1]} accordion expandIconPosition="start">
+                                    <Collapse key={index1} defaultActiveKey={[index1]} accordion expandIconPosition="start">
                                       <Panel header={"No." + content["1"]} key={index1}
-                                        extra={ <Remove
-                                                  style={{ color: 'gray' }}
-                                                  onClick={()=>{ handleDeleteConetent(index1);}}
-                                                /> } >
+                                        extra={<Remove
+                                          style={{ color: 'gray' }}
+                                          onClick={() => { handleDeleteConetent(index1); }}
+                                        />} >
                                         <table className="table">
                                           <tbody>
                                             <DetailLabelItem
@@ -611,20 +632,20 @@ if (init)
                                               checkSaved={handleCheckContentSaved}
                                               cancelSaved={handleCancelContentSaved}
                                             />
-                                            { content_indices.map((value, index2) =>
-                                                <DetailLabelItem
-                                                  key={index2}
-                                                  defaultText={content[value]}
-                                                  saved={savedContentValues}
-                                                  name={index1 + '.' + value}
-                                                  title={quotationHeaders[value - 1][1]}
-                                                  checkEdit={handleCheckContentEditState}
-                                                  startEdit={handleStartContentEdit}
-                                                  endEdit={handleEndContentEdit}
-                                                  editing={handleContentEditing}
-                                                  checkSaved={handleCheckContentSaved}
-                                                  cancelSaved={handleCancelContentSaved}
-                                                />
+                                            {content_indices.map((value, index2) =>
+                                              <DetailLabelItem
+                                                key={index2}
+                                                defaultText={content[value]}
+                                                saved={savedContentValues}
+                                                name={index1 + '.' + value}
+                                                title={quotationHeaders[value - 1][1]}
+                                                checkEdit={handleCheckContentEditState}
+                                                startEdit={handleStartContentEdit}
+                                                endEdit={handleEndContentEdit}
+                                                editing={handleContentEditing}
+                                                checkSaved={handleCheckContentSaved}
+                                                cancelSaved={handleCancelContentSaved}
+                                              />
                                             )}
                                             <DetailTextareaItem
                                               key={22}
@@ -633,7 +654,7 @@ if (init)
                                               name={index1 + '.19'}
                                               title={t('quotation.note')}
                                               row_no={3}
-                                              no_border={ content['998'] ? false : true}
+                                              no_border={content['998'] ? false : true}
                                               checkEdit={handleCheckContentEditState}
                                               startEdit={handleStartContentEdit}
                                               endEdit={handleEndContentEdit}
@@ -641,7 +662,7 @@ if (init)
                                               checkSaved={handleCheckContentSaved}
                                               cancelSaved={handleCancelContentSaved}
                                             />
-                                            { content['998'] && 
+                                            {content['998'] &&
                                               <DetailTextareaItem
                                                 key={23}
                                                 defaultText={content['998']}
@@ -662,17 +683,18 @@ if (init)
                                         </table>
                                       </Panel>
                                     </Collapse>
-                                )})}
+                                  )
+                                })}
                             </div>
                             <div className="detail-add-content">
                               <Add
                                 style={{ height: 32, width: 32, color: '#d9c9c9' }}
-                                onClick={ handleAddContent }
+                                onClick={handleAddContent}
                               />
                             </div>
                           </div>
-                          { ((savedContentValues && Object.keys(savedContentValues).length !== 0)
-                              || isNewlyAdded)
+                          {((savedContentValues && Object.keys(savedContentValues).length !== 0)
+                            || isNewlyAdded)
                             && (
                               <div className="text-center py-3">
                                 <button
@@ -691,16 +713,16 @@ if (init)
                                   {t('common.cancel')}
                                 </button>
                               </div>
-                          )}
+                            )}
                         </div>
-{/*---- End   -- Tab : Product Lists - Quotation ---------------------------------------------------*/}
-{/*---- Start -- Tab : PDF View - Quotation --------------------------------------------------------*/}
+                        {/*---- End   -- Tab : Product Lists - Quotation ---------------------------------------------------*/}
+                        {/*---- Start -- Tab : PDF View - Quotation --------------------------------------------------------*/}
                         <div className="tab-pane task-related p-0" id="sub-quotation-pdf-view">
-                          { selectedQuotation && (selectedQuotation.quotation_contents.length > 0) &&
-                            <QuotationView/>
+                          {selectedQuotation && (selectedQuotation.quotation_contents.length > 0) &&
+                            <QuotationView />
                           }
                         </div>
-{/*---- End   -- Tab : PDF View - Quotation---------------------------------------------------------*/}
+                        {/*---- End   -- Tab : PDF View - Quotation---------------------------------------------------------*/}
                       </div>
                     </div>
                   </div>
@@ -710,6 +732,12 @@ if (init)
           </div>
           {/* modal-content */}
         </div>
+        <MessageModal
+          title={message.title}
+          message={message.message}
+          open={isMessageModalOpen}
+          handleOk={handleCloseMessage}
+        />
         {/* modal-dialog */}
       </div>
     </>

@@ -33,7 +33,7 @@ const PurchaseAddModel = ({ init, handleInit }) => {
     const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
     const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
     const [message, setMessage] = useState({ title: "", message: "" });
-    
+
 
     //===== [RecoilState] Related with Company =============================================
     const currentCompany = useRecoilValue(atomCurrentCompany);
@@ -260,53 +260,63 @@ const PurchaseAddModel = ({ init, handleInit }) => {
     const selectedCategory = useRecoilValue(atomSelectedCategory);
 
     const handlePopupOpen = (open) => {
-        if(open) {
-          openModal('antModal');
+        if (open) {
+            openModal('antModal');
         } else {
-          closeModal();
+            closeModal();
         }
+    };
+
+    const handleOpenMessage = (msg) => {
+        openModal('antModal');
+        setMessage(msg);
+        setIsMessageModalOpen(true);
+    };
+
+    const handleCloseMessage = () => {
+        closeModal();
+        setIsMessageModalOpen(false);
     };
 
     const handleAddNewPurchase = () => {
         // Check data if they are available
         let numberOfNoInputItems = 0;
         let noCompanyName = false;
-        if(!purchaseChange.company_name || purchaseChange.company_name === ""){
+        if (!purchaseChange.company_name || purchaseChange.company_name === "") {
             numberOfNoInputItems++;
             noCompanyName = true;
         };
         let noProductName = false;
-        if(!purchaseChange.product_name || purchaseChange.product_name === ""){
+        if (!purchaseChange.product_name || purchaseChange.product_name === "") {
             numberOfNoInputItems++;
             noProductName = true;
         };
         let noQuantity = false;
-        if(!purchaseChange.quantity || purchaseChange.quantity === ""){
+        if (!purchaseChange.quantity || purchaseChange.quantity === "") {
             numberOfNoInputItems++;
             noQuantity = true;
         };
         let noPrice = false;
-        if(!purchaseChange.price || purchaseChange.price === ""){
+        if (!purchaseChange.price || purchaseChange.price === "") {
             numberOfNoInputItems++;
             noPrice = true;
         };
 
-        if(numberOfNoInputItems > 0){
+        if (numberOfNoInputItems > 0) {
             const contents = (
                 <>
                     <p>하기 정보는 필수 입력 사항입니다.</p>
-                    { noCompanyName && <div> - 회사 이름</div> }
-                    { noProductName && <div> - 제품 이름</div> }
-                    { noQuantity && <div> - 제품 수량</div> }
-                    { noPrice && <div> - 제품 가격</div> }
+                    {noCompanyName && <div> - 회사 이름</div>}
+                    {noProductName && <div> - 제품 이름</div>}
+                    {noQuantity && <div> - 제품 수량</div>}
+                    {noPrice && <div> - 제품 가격</div>}
                 </>
             );
             const tempMsg = {
                 title: t('comment.title_check'),
                 message: contents,
             };
-            setMessage(tempMsg);
-            setIsMessageModalOpen(true);
+            handleOpenMessage(tempMsg);
             return;
         };
 
@@ -321,7 +331,11 @@ const PurchaseAddModel = ({ init, handleInit }) => {
             if (res.result) {
                 handleClose();
             } else {
-                console.log('[PurchaseAddModel] fail to add purchase :', res.data);
+                const tempMsg = {
+                    title: t('comment.title_error'),
+                    message: `${t('comment.msg_fail_save')} - ${t('comment.reason')} : ${res.data}`,
+                };
+                handleOpenMessage(tempMsg);
             }
         });
     };
@@ -329,12 +343,12 @@ const PurchaseAddModel = ({ init, handleInit }) => {
     const handleInitialize = useCallback(() => {
         // document.querySelector("#add_new_purchase_form").reset();
 
-        if((currentCompany !== defaultCompany)
+        if ((currentCompany !== defaultCompany)
             && (
                 ((selectedCategory.category === 'company') && (selectedCategory.item_code === currentCompany.company_code))
                 || ((selectedCategory.category === 'lead') && (selectedCategory.item_code === currentLead.lead_code))
             )
-        ){
+        ) {
             setPurchaseChange({
                 ...defaultPurchase,
                 company_code: currentCompany.company_code,
@@ -342,7 +356,7 @@ const PurchaseAddModel = ({ init, handleInit }) => {
                 company_name_en: currentCompany.company_name_en,
             });
         } else {
-            setPurchaseChange({...defaultPurchase});
+            setPurchaseChange({ ...defaultPurchase });
         }
         setNeedInit(false);
     }, [currentCompany, selectedCategory]);
@@ -355,9 +369,9 @@ const PurchaseAddModel = ({ init, handleInit }) => {
 
     //===== useEffect functions ===========================================================
     useEffect(() => {
-        if (init){
-            if(handleInit) handleInit(!init);
-            setTimeout(()=>{
+        if (init) {
+            if (handleInit) handleInit(!init);
+            setTimeout(() => {
                 handleInitialize();
             }, 250);
         };
@@ -629,7 +643,7 @@ const PurchaseAddModel = ({ init, handleInit }) => {
                 title={message.title}
                 message={message.message}
                 open={isMessageModalOpen}
-                handleOk={() => setIsMessageModalOpen(false)}
+                handleOk={handleCloseMessage}
             />
         </div>
     );

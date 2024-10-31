@@ -355,12 +355,17 @@ const enResource = {
             modify_date:'Modify Date'
         },
         comment: {
+            click_below_to_edit: '👉 Click the below to edit',
+            click_drag_file_upload: 'Click or drag file to this area to upload',
             input_search_text: 'Input search text',
+            msg_fail_save: 'Failed to save.',
+            msg_no_data: 'No input data',
+            msg_no_necessary_data: 'The following data must be provided.',
+            msg_select_nothing: 'Nothing is chosen.',
+            reason: 'Reason',
             search_address_first: 'Please search address...',
             title_check: 'Check',
-            msg_fail_save: 'Failed to save.',
-            click_drag_file_upload: 'Click or drag file to this area to upload',
-            click_below_to_edit: '👉 Click the below to edit',
+            title_error: 'Error',
         },
         user :{
             user_id:'Id',

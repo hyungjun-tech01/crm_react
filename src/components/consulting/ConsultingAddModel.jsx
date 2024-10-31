@@ -419,6 +419,17 @@ const ConsultingAddModel = (props) => {
     }
   };
 
+  const handleOpenMessage = (msg) => {
+    openModal('antModal');
+    setMessage(msg);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleCloseMessage = () => {
+    closeModal();
+    setIsMessageModalOpen(false);
+  };
+
   const handleAddNewConsulting = () => {
     // Check data if they are available ------------------------------------
     let numberOfNoInputItems = 0;
@@ -444,8 +455,7 @@ const ConsultingAddModel = (props) => {
         title: t('comment.title_check'),
         message: contents,
       };
-      setMessage(tempMsg);
-      setIsMessageModalOpen(true);
+      handleOpenMessage(tempMsg);
       return;
     };
 
@@ -461,8 +471,11 @@ const ConsultingAddModel = (props) => {
       if (res.result) {
         handleClose();
       } else {
-        setMessage({ title: '저장 실패', message: '정보 저장에 실패하였습니다.' });
-        setIsMessageModalOpen(true);
+        const tempMsg = {
+          title: t('comment.title_error'),
+          message: `${t('comment.msg_fail_save')} - ${t('comment.reason')} : ${res.data}`,
+        };
+        handleOpenMessage(tempMsg);;
       };
     });
   };
@@ -741,7 +754,7 @@ const ConsultingAddModel = (props) => {
         title={message.title}
         message={message.message}
         open={isMessageModalOpen}
-        handleOk={() => setIsMessageModalOpen(false)}
+        handleOk={handleCloseMessage}
       />
     </div>
   );

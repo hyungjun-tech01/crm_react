@@ -62,8 +62,7 @@ const ResizeableTitle = props => {
   );
 };
 
-const QuotationAddModel = (props) => {
-  const { init, handleInit } = props;
+const QuotationAddModel = ({ init, handleInit }) => {
   const [t] = useTranslation();
   const [cookies, setCookie] = useCookies(["myLationCrmUserId", "myQuotationAddColumns"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -523,8 +522,17 @@ const QuotationAddModel = (props) => {
   //===== Handles to edit contents ========================================
   const handleAddNewContent = useCallback(() => {
     if (!quotationChange.lead_name) {
-      setMessage({ title: '필요 정보 누락', message: '고객 이름이 누락되었습니다.' });
-      setIsMessageModalOpen(true);
+      const contents = (
+        <>
+          <p>{t('comment.msg_no_necessary_data')}</p>
+          <div> - 고객 이름</div>
+        </>
+      );
+      const tempMsg = {
+        title: t('comment.title_check'),
+        message: contents,
+      };
+      handleOpenMessage(tempMsg);
       return;
     };
 
@@ -554,8 +562,11 @@ const QuotationAddModel = (props) => {
 
   const handleModifyContent = useCallback((data) => {
     if (!data) {
-      setMessage({ title: '필요 정보 누락', message: '입력 Data가 없습니다.' });
-      setIsMessageModalOpen(true);
+      const tempMsg = {
+        title: t('comment.title_check'),
+        message: t('comment.msg_no_data'),
+      };
+      handleOpenMessage(tempMsg);
       return;
     };
 
@@ -585,8 +596,11 @@ const QuotationAddModel = (props) => {
 
   const handleDeleteSelectedConetents = useCallback(() => {
     if (selectedContentRowKeys.length === 0) {
-      setMessage({ title: '선택 항목 누락', message: '선택한 값이 없습니다.' });
-      setIsMessageModalOpen(true);
+      const tempMsg = {
+        title: t('comment.title_check'),
+        message: t('comment.msg_select_nothing'),
+      };
+      handleOpenMessage(tempMsg);
       return;
     };
 
@@ -623,7 +637,18 @@ const QuotationAddModel = (props) => {
     };
     if (!finalData.product_name || !finalData.quotation_amount) {
       setMessage({ title: '필요 항목 누락', message: '필요 값 - 제품명 또는 견적 가격 - 이 없습니다.' });
-      setIsMessageModalOpen(true);
+      const contents = (
+        <>
+          <p>하기 정보는 필수 입력 사항입니다.</p>
+          { !finalData.product_name && <div> - 제품명</div> }
+          { !finalData.quotation_amount && <div> - 견적 가격</div> }
+        </>
+      );
+      const tempMsg = {
+        title: t('comment.title_check'),
+        message: contents,
+      };
+      handleOpenMessage(tempMsg);
       return;
     };
 
@@ -732,6 +757,17 @@ const QuotationAddModel = (props) => {
     } else {
       closeModal();
     }
+  };
+
+  const handleOpenMessage = (msg) => {
+    openModal('antModal');
+    setMessage(msg);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleCloseMessage = () => {
+    closeModal();
+    setIsMessageModalOpen(false);
   };
 
   const handleInitialize = useCallback(() => {
@@ -846,8 +882,7 @@ const QuotationAddModel = (props) => {
         title: t('comment.title_check'),
         message: contents,
       };
-      setMessage(tempMsg);
-      setIsMessageModalOpen(true);
+      handleOpenMessage(tempMsg);
       return;
     };
 
@@ -875,21 +910,16 @@ const QuotationAddModel = (props) => {
       if (res.result) {
         handleClose();
       } else {
-        setMessage({ title: '저장 실패', message: '정보 저장에 실패하였습니다.' });
-        setIsMessageModalOpen(true);
+        const tempMsg = {
+          title: t('comment.title_error'),
+          message: `${t('comment.msg_fail_save')} - ${t('comment.reason')} : ${res.data}`,
+        };
+        handleOpenMessage(tempMsg);
       };
     });
   };
 
   const handleClose = () => {
-    console.log('QuotationAdd / handleClose');
-    const tempCookies = {
-      ...cookies.myQuotationAddColumns,
-      [cookies.myLationCrmUserId] : [
-        ...contentColumns
-      ]
-    };
-    setCookie("myQuotationAddColumns", tempCookies);
     setTimeout(() => {
       closeModal();
     }, 250);
@@ -1409,7 +1439,7 @@ const QuotationAddModel = (props) => {
         title={message.title}
         message={message.message}
         open={isMessageModalOpen}
-        handleOk={() => setIsMessageModalOpen(false)}
+        handleOk={handleCloseMessage}
       />
     </div>
   );

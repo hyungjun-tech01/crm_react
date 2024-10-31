@@ -29,11 +29,15 @@ import { SettingsRepo } from "../../repository/settings";
 
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
+import MessageModal from "../../constants/MessageModal";
 
 
 const ConsultingDetailsModel = () => {
   const [t] = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [message, setMessage] = useState({ title: "", message: "" });
+
   const EDIT_REQUEST_CONTENT = 1;
   const EDIT_ACTION_CONTENT = 2;
 
@@ -49,8 +53,8 @@ const ConsultingDetailsModel = () => {
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
 
-  //===== [RecoilState] Related with Users ============================================
-  const { closeModal } = useRecoilValue(SettingsRepo);
+  //===== [RecoilState] Related with Settings =========================================
+  const { openModal, closeModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to edit 'Consulting Details' ========================================
@@ -175,7 +179,11 @@ const ConsultingDetailsModel = () => {
           creator : cookies.myLationCrmUserId,
         });
         if(!firstResp.result){
-          console.log('handleAddRequestContent / after modifyAttachmentInfo ', firstResp.message);
+          const tempMsg = {
+            title: t('comment.title_error'),
+            message: `${t('comment.msg_fail_save')} - ${firstResp.message}`,
+          };
+          handleOpenMessage(tempMsg);
           return;
         };
         finalAttachments.push({
@@ -294,7 +302,11 @@ const ConsultingDetailsModel = () => {
           creator : cookies.myLationCrmUserId,
         });
         if(!firstResp.result){
-          console.log('handleAddRequestContent / after modifyAttachmentInfo ', firstResp.message);
+          const tempMsg = {
+            title: t('comment.title_error'),
+            message: `${t('comment.msg_fail_save')} - ${firstResp.message}`,
+          };
+          handleOpenMessage(tempMsg);
           return;
         };
         finalAttachments.push({
@@ -375,6 +387,17 @@ const ConsultingDetailsModel = () => {
       localStorage.setItem('isFullScreen', '0');
   }, []);
 
+  const handleOpenMessage = (msg) => {
+    openModal('antModal');
+    setMessage(msg);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleCloseMessage = () => {
+    closeModal();
+    setIsMessageModalOpen(false);
+  };
+
   const handleSaveAll = () => {
     if (editedDetailValues !== null
       && selectedConsulting
@@ -392,6 +415,8 @@ const ConsultingDetailsModel = () => {
           handleClose();
         } else {
           console.error('Failed to modify company : ', res.data);
+          openModal('antModal');
+          setMessage(`저장에 실패했습니다 - ${res.data}`);
         };
       });
     } else {
@@ -411,7 +436,7 @@ const ConsultingDetailsModel = () => {
     }, 250);
   };
 
-  //===== useEffect functions =============================================== 
+  //===== useEffect functions ====================================================
   useEffect(() => {
     if ((selectedConsulting !== defaultConsulting)
       && (selectedConsulting.consulting_code !== currentConsultingCode)
@@ -574,6 +599,12 @@ const ConsultingDetailsModel = () => {
         {/* modal-content */}
       </div>
       {/* modal-dialog */}
+      <MessageModal
+        title={message.title}
+        message={message.message}
+        open={isMessageModalOpen}
+        handleOk={handleCloseMessage}
+      />
     </div>
   );
 };
