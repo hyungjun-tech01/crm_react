@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSetRecoilState, useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
@@ -99,7 +99,21 @@ const LeadQuotationModel = ({ handleInitAddQuotation }) => {
             className: "checkbox-red",
         }),
     };
+    useEffect(()=>{
+        console.log('[LeadConsultingModel] Maybe consultings are updated');
+        // 모달 내부 페이지의 히스토리 상태 추가
+        history.pushState({ modalInternal: true }, '', location.href);
 
+        const handlePopState = (event) => {
+        if (event.state && event.state.modalInternal) {
+            // 뒤로 가기를 방지하기 위해 다시 히스토리를 푸시
+            history.pushState({ modalInternal: true }, '', location.href);
+        }
+        };
+
+        // popstate 이벤트 리스너 추가 (중복 추가 방지)
+        window.addEventListener('popstate', handlePopState);        
+    }, [])
     return (
         <div className="row">
             <div className="card mb-0">
