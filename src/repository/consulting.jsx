@@ -269,20 +269,20 @@ export const ConsultingRepo = selector({
                         ...filteredAllConsultings
                     ];
                     set(atomFilteredConsultingArray, updatedFiltered);
-                    return {result: true};
 
                     //----- Update ConsultingByLead -----------------------//
-                    //const currentLead = await snapshot.getPromise(atomCurrentLead);
-                    //if((currentLead !== defaultLead)
-                    //    && (currentLead.lead_code === updatedNewConsulting.lead_code))
-                    //{
-                    //    const consultingByCompany = await snapshot.getPromise(atomConsultingByLead);
-                    //    const updated = [
-                    //        updatedNewConsulting,
-                    //        ...consultingByCompany,
-                    //    ];
-                    //    set(atomConsultingByLead, updated);
-                    //};
+                    const currentLead = await snapshot.getPromise(atomCurrentLead);
+                    if((currentLead !== defaultLead)
+                       && (currentLead.lead_code === updatedNewConsulting.lead_code))
+                    {
+                       const consultingByLead = await snapshot.getPromise(atomConsultingByLead);
+                       const updated = [
+                           updatedNewConsulting,
+                           ...consultingByLead,
+                       ];
+                       set(atomConsultingByLead, updated);
+                    };
+                    return {result: true};
 
                 } else if(newConsulting.action_type === 'UPDATE'){
                     const currentConsulting = await snapshot.getPromise(atomCurrentConsulting);
