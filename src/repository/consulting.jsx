@@ -438,8 +438,8 @@ export const ConsultingRepo = selector({
                     foundData = data.sort((a, b) => {
                         const a_time = new Date(a.modify_date);
                         const b_time = new Date(b.modify_date);
-                        if(a_time > b_time) return 1;
-                        if(a_time < b_time) return -1;
+                        if(a_time > b_time) return -1;
+                        if(a_time < b_time) return 1;
                         return 0;
                     });
                 };
