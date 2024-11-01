@@ -8,8 +8,7 @@ import NotoSansRegular from "../../fonts/NotoSansKR-Regular.ttf";
 import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";
 import { ConvertCurrency } from '../../constants/functions';
-import Paths from "../../constants/Paths";
-const BASE_PATH = Paths.BASE_PATH;
+import Stamp from '../../files/company_stamp.jpg';
 
 const ConvStrNumToKor = (digit) => {
     switch(digit)
@@ -46,7 +45,7 @@ const ConvertKoreanAmount = (amount) => {
         temp_number = amount;
     };
     if(isNaN(temp_number)) {
-        console.log('\t[ ConvertKoreanAmount ] Wrong input');
+        // console.log('\t[ ConvertKoreanAmount ] Wrong input');
         return "";
     };
 
@@ -85,7 +84,7 @@ const ConvertKoreanAmount = (amount) => {
 const ConvCurrencyMark = (currency) => {
     if(typeof currency !== 'string')
     {
-        console.log('\t[ ConvCurrencyMark ] Wrong Type : ', typeof currency);
+        // console.log('\t[ ConvCurrencyMark ] Wrong Type : ', typeof currency);
         return;
     } 
 
@@ -222,7 +221,6 @@ const QuotationView = () => {
     const [ quotationCondition, setQuotationCondition ] = useState({});
 
     useEffect(() => {
-        console.log('[QuotationView] called');
         if(currentQuotation && currentQuotation !== defaultQuotation){
             const tempContents = JSON.parse(currentQuotation.quotation_contents);
             if(tempContents && Array.isArray(tempContents)){
@@ -283,7 +281,7 @@ const QuotationView = () => {
             }
 
             // get info of quotation condition -----------
-            console.log('Check data :', currentQuotation);
+            // console.log('Check data :', currentQuotation);
             const foundExpiryArray = quotationExpiry.filter(item => item.value === currentQuotation.quotation_expiration_date);
             const tempExpiry = (foundExpiryArray.length > 0) ? foundExpiryArray[0].label : currentQuotation.quotation_expiration_date;
             const foundDeliveryArray = quotationDelivery.filter(item => item.value === currentQuotation.delivery_period);
@@ -323,7 +321,7 @@ const QuotationView = () => {
                                 <Text style={Styles.text}>유효 기간:  {quotationCondition.expiry}</Text>
                             </View>
                             <Svg width="300" height="160" viewBox='0 0 300 160' >
-                                <Image x="130" y="30" style={{width: 40, height: 40}} src={`${BASE_PATH}/files/company_stamp.jpg`} debug={true} />
+                                <Image x="130" y="30" style={{width: 40, height: 40}} src={Stamp} debug={true} />
                                 <Rect x="0" y="0" width="25" height="160" stroke="black" fill="#cccccc" />
                                 <Path d="M25 0 H300 V160 H25 M100 0 V160 M25 20 H300 M25 40 H300 M25 60 H300 M25 90 H300 M25 120 H300 M25 140 H300 " stroke='black' fill='none'/>
                                 <Text x="8" y="50" style={Styles.text}>공</Text>
