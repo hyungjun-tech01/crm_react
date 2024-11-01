@@ -54,7 +54,7 @@ export const SettingsRepo = selector({
                 };
             };
             const updatedModalInfoStack = modalInfoStack.concat({id:modalId, command:command});
-            // console.log(' - Modals in Stack :', updatedModalInfoStack);
+            console.log(' - Modals in Stack :', updatedModalInfoStack);
             set(atomModalInfoStack, updatedModalInfoStack);
         });
         const closeModal = getCallback(({ set, snapshot }) => async (command) => {
@@ -91,7 +91,7 @@ export const SettingsRepo = selector({
                         };
                     }
                 };
-                // console.log(' - Modals in Stack :', updatedModalInfoStack);
+                console.log(' - Modals in Stack :', updatedModalInfoStack);
                 set(atomModalInfoStack, updatedModalInfoStack);
             };
             if(command || gottenCommand){

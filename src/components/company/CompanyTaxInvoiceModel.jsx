@@ -30,20 +30,18 @@ const CompanyTaxInvoiceModel = (props) => {
 
     const handleSelectTaxInvoice = (code) => {
         setCurrentTaxInvoice(code);
-        openTaxInvoice(true);
-
         setTimeout(()=>{
+            openTaxInvoice(true);
             openModal('edit_tax_invoice');
-        }, 500);
+        }, 250);
     };
 
     const handleAddNewTaxInvoice = () => {
         setCurrentTaxInvoice();
-        openTaxInvoice(true);
-
         setTimeout(()=>{
+            openTaxInvoice(true);
             openModal('edit_tax_invoice');
-        }, 500);
+        }, 250);
     };
 
     const taxInvoiceRowSelection = {
@@ -161,7 +159,7 @@ const CompanyTaxInvoiceModel = (props) => {
                                     borderRadius: '5px',
                                 }}
                                 >
-                                    <div>{t('purchase.information')}</div>
+                                    <div>{t('taxinvoice.information')}</div>
                                     <Add  onClick={() => handleAddNewTaxInvoice()}/>
                                 </div>
                             }

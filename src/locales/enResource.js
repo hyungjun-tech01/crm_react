@@ -279,11 +279,12 @@ const enResource = {
             end_date:'End Date',
         },
         taxinvoice:{
-            taxinvoice_manage: 'Manage (Tax) Invoice',
             add_taxinvoice :'Add Invoice',
             memo : 'Invoice Memo',
-            summary:'Summary',
+            information: 'Tax Inovice Information',
             invoice_contents:'Invoice Contents',
+            summary:'Summary',
+            taxinvoice_manage: 'Manage (Tax) Invoice',
             taxinvoice_multi_query:'Invoice Multi Query',
         },
         common:{

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
@@ -16,7 +16,6 @@ import {
   atomCompanyState,
   atomCurrentCompany,
   atomCurrentTransaction,
-  atomSelectedCategory,
   defaultCompany,
   defaultTransaction,
 } from "../../atoms/atoms";
@@ -86,7 +85,6 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
   const [showDecimal, setShowDecimal] = useState(0);
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
   const [selectData, setSelectData] = useState({});
-  const [selectedCategory, setSelectedCategory] = useRecoilState(atomSelectedCategory);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
@@ -669,13 +667,10 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
           setTransactionContents(updatedContents);
         };
 
-        closeModal();
+        handleClose();
 
         if (value === 'Invoice') {
           handleShowInvoice();
-          handleInitialize();
-        } else {
-          handleClose();
         };
       } else {
         const tempMsg = {
@@ -736,32 +731,16 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
     setShowDecimal(0);
     setDataForTransaction({ ...default_transaction_data });
     setDisableItems(false);
-
-    if ((selectedCategory.category === 'company')
-      && (currentCompany !== defaultCompany)
-      && (selectedCategory.item_code === currentCompany.company_code)) {
-      setTransactionChange({
-        company_code: currentCompany.company_code,
-        company_name: currentCompany.company_name,
-        ceo_name: currentCompany.ceo_name,
-        company_address: currentCompany.company_address,
-        business_type: currentCompany.business_type,
-        business_item: currentCompany.business_item,
-        business_registration_code: currentCompany.business_registration_code,
-      });
-    } else {
-      setTransactionChange({});
-    };
+    setTransactionChange({});
     setTransactionContents([]);
     setOrgReceiptModalData({ ...default_receipt_data });
     setEditedReceiptModalData({});
-
     setSelectData({ trans_type: trans_types[0], tax_type: 'vat_included', company_selection: null });
     setOrgTransaction({});
     setTransactionForPrint(null);
     setContentsForPrint(null);
     // document.querySelector("#add_new_transaction_form").reset();
-  }, [selectedCategory, currentCompany]);
+  }, []);
 
   const handleClose = () => {
     setTimeout(() => {
@@ -802,27 +781,37 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
         };
         setDataForTransaction(tempData);
       };
-    };
 
-    const tempTransaction = {
-      ...currentTransaction,
-      transaction_type: currentTransaction.transaction_type ? currentTransaction.transaction_type : '매출',
-      publish_date: currentTransaction.publish_date ? new Date(currentTransaction.publish_date) : null,
+      if (currentCompany !== defaultCompany){
+        setTransactionChange({
+          company_code: currentCompany.company_code,
+          company_name: currentCompany.company_name,
+          ceo_name: currentCompany.ceo_name,
+          company_address: currentCompany.company_address,
+          business_type: currentCompany.business_type,
+          business_item: currentCompany.business_item,
+          business_registration_code: currentCompany.business_registration_code,
+        });
+      };
+      const tempTransaction = {
+        ...currentTransaction,
+        transaction_type: currentTransaction.transaction_type || '매출',
+        publish_date: currentTransaction.publish_date ? new Date(currentTransaction.publish_date) : null,
+      };
+      setOrgTransaction(tempTransaction);
+  
+      const tempReceiptData = {
+        paid_money: currentTransaction.paid_money,
+        payment_type: currentTransaction.payment_type,
+        bank_name: currentTransaction.bank_name,
+        account_owner: currentTransaction.account_owner,
+        account_number: currentTransaction.account_number,
+        card_no: currentTransaction.card_no,
+        card_number: currentTransaction.card_number,
+      }
+      setOrgReceiptModalData(tempReceiptData);
     };
-    setOrgTransaction(tempTransaction);
-
-    const tempReceiptData = {
-      paid_money: currentTransaction.paid_money,
-      payment_type: currentTransaction.payment_type,
-      bank_name: currentTransaction.bank_name,
-      account_owner: currentTransaction.account_owner,
-      account_number: currentTransaction.account_number,
-      card_no: currentTransaction.card_no,
-      card_number: currentTransaction.card_number,
-    }
-    setOrgReceiptModalData(tempReceiptData);
-    // };
-  }, [init, companyState, currentTransaction]);
+  }, [init, companyState, currentTransaction, handleInit, handleInitialize, trans_types, currentCompany, dataForTransaction]);
 
 
   return (
