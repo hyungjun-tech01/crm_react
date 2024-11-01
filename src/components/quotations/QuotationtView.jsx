@@ -8,8 +8,7 @@ import NotoSansRegular from "../../fonts/NotoSansKR-Regular.ttf";
 import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";
 import { ConvertCurrency } from '../../constants/functions';
-import Paths from "../../constants/Paths";
-const BASE_PATH = Paths.BASE_PATH;
+import Stamp from "../../files/company_stamp.jpg";
 
 const ConvStrNumToKor = (digit) => {
     switch(digit)
@@ -322,7 +321,7 @@ const QuotationView = () => {
                                 <Text style={Styles.text}>유효 기간:  {quotationCondition.expiry}</Text>
                             </View>
                             <Svg width="300" height="160" viewBox='0 0 300 160' >
-                                <Image x="130" y="30" style={{width: 40, height: 40}} src={`${BASE_PATH}/files/company_stamp.jpg`} debug={true} />
+                                <Image x="130" y="30" style={{width: 40, height: 40}} src={Stamp} debug={true} />
                                 <Rect x="0" y="0" width="25" height="160" stroke="black" fill="#cccccc" />
                                 <Path d="M25 0 H300 V160 H25 M100 0 V160 M25 20 H300 M25 40 H300 M25 60 H300 M25 90 H300 M25 120 H300 M25 140 H300 " stroke='black' fill='none'/>
                                 <Text x="8" y="50" style={Styles.text}>공</Text>
