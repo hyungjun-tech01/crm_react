@@ -351,6 +351,50 @@ const ConsultingDetailsModel = () => {
     };
   };
 
+<<<<<<< HEAD
+=======
+  const handleSaveAll = useCallback(() => {
+    if (editedDetailValues !== null
+      && selectedConsulting
+      && selectedConsulting !== defaultConsulting) {
+      let temp_all_saved = {
+        ...editedDetailValues
+      };
+      temp_all_saved['action_type'] = "UPDATE";
+      temp_all_saved['modify_user'] = cookies.myLationCrmUserId;
+      temp_all_saved['consulting_code'] = selectedConsulting.consulting_code;
+
+      const resp = modifyConsulting(temp_all_saved);
+      resp.then(res => {
+        if (res.result) {
+          console.log(`Succeeded to modify company`);
+          handleClose();
+        } else {
+          console.error('Failed to modify company : ', res.data);
+        };
+      });
+    } else {
+      console.log("[ ConsultingDetailModel ] No saved data");
+    };
+    setEditedDetailValues(null);
+  }, [cookies.myLationCrmUserId, modifyConsulting, editedDetailValues, selectedConsulting]);
+
+  const handleCancelAll = useCallback(() => {
+    setEditedDetailValues(null);
+    handleClose();
+  }, []);
+
+  const handleClose = useCallback(() => {
+    if(selectedCategory.category === 'consulting'){
+      setSelectedCategory({category: null, item_code: null});
+    };
+    setEditedDetailValues(null);
+    setActionAttachments([]);
+    setRequestAttachments([]);
+    setCurrentConsulting();
+  }, [setCurrentConsulting]);
+
+>>>>>>> c5a7b4da54db9ae0e9a55e38f8fe9737f9e77db7
   const consultingItemsInfo = [
     { key: 'department', title: 'lead.department', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
@@ -374,6 +418,7 @@ const ConsultingDetailsModel = () => {
     { key: 'memo', title: 'common.memo', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
   ];
 
+<<<<<<< HEAD
 
   //===== Handles to handle this =================================================
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -435,6 +480,8 @@ const ConsultingDetailsModel = () => {
       closeModal();
     }, 250);
   };
+=======
+>>>>>>> c5a7b4da54db9ae0e9a55e38f8fe9737f9e77db7
 
   //===== useEffect functions ====================================================
   useEffect(() => {
@@ -451,10 +498,18 @@ const ConsultingDetailsModel = () => {
         setIsFullScreen(true);
       };
 
-      handleInitialize();
       setCurrentConsultingCode(selectedConsulting.consulting_code);
     };
   }, [cookies.myLationCrmUserId, currentConsultingCode, selectedConsulting]);
+
+  useEffect(() => {
+    if ((userState & 1) === 1) {
+      setIsAllNeededDataLoaded(true);
+    };
+  }, [userState])
+
+  if (!isAllNeededDataLoaded)
+    return <div>&nbsp;</div>;
 
   return (
     <div
@@ -584,7 +639,7 @@ const ConsultingDetailsModel = () => {
                         <button
                           type="button"
                           className="btn btn-secondary btn-rounded"
-                          onClick={handleClose}
+                          onClick={handleCancelAll}
                         >
                           {t('common.cancel')}
                         </button>

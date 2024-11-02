@@ -419,6 +419,7 @@ const ConsultingAddModel = (props) => {
     }
   };
 
+<<<<<<< HEAD
   const handleOpenMessage = (msg) => {
     openModal('antModal');
     setMessage(msg);
@@ -481,6 +482,11 @@ const ConsultingAddModel = (props) => {
   };
 
   const handleInitialize = useCallback(() => {
+=======
+  const initializeConsultingTemplate = useCallback(() => {
+    // document.querySelector("#add_new_consulting_form").reset();
+
+>>>>>>> c5a7b4da54db9ae0e9a55e38f8fe9737f9e77db7
     // set Receipt date -------------
     const tempDate = new Date();
     let modified = {
@@ -488,6 +494,7 @@ const ConsultingAddModel = (props) => {
       receiver: cookies.myLationCrmUserName,
       receipt_date: tempDate,
     };
+
 
     if ((selectedCategory.category === 'lead')
       && (currentLead !== defaultLead)
@@ -511,9 +518,10 @@ const ConsultingAddModel = (props) => {
   }, [cookies.myLationCrmUserName, currentLead, selectedCategory]);
 
   const handleClose = () => {
+    setNeedInit(true);
     setTimeout(() => {
       closeModal();
-    }, 250);
+    }, 500);
   };
 
 

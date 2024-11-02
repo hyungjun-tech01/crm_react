@@ -8,7 +8,11 @@ import NotoSansRegular from "../../fonts/NotoSansKR-Regular.ttf";
 import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";
 import { ConvertCurrency } from '../../constants/functions';
+<<<<<<< HEAD
 import Stamp from "../../files/company_stamp.jpg";
+=======
+import Stamp from '../../files/company_stamp.jpg';
+>>>>>>> c5a7b4da54db9ae0e9a55e38f8fe9737f9e77db7
 
 const ConvStrNumToKor = (digit) => {
     switch(digit)
