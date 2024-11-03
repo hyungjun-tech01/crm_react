@@ -45,14 +45,6 @@ const CompanyAddModel = ({ init, handleInit }) => {
   //===== Handles to edit 'CompanyAddModel' ===========================================
   const [companyChange, setCompanyChange] = useState({ ...defaultCompany });
 
-<<<<<<< HEAD
-=======
-  const initializeCompanyTemplate = useCallback(() => {
-    setCompanyChange({ ...defaultCompany });
-    document.querySelector("#add_new_company_form").reset();
-  }, []);
-
->>>>>>> c5a7b4da54db9ae0e9a55e38f8fe9737f9e77db7
   const handleDateChange = (name, date) => {
     const modifiedData = {
       ...companyChange,
@@ -150,7 +142,7 @@ const CompanyAddModel = ({ init, handleInit }) => {
       counter: 0,
       modify_user: cookies.myLationCrmUserId,
     };
-    // console.log(`[ handleAddNewCompany ]`, newComData);
+    
     const result = modifyCompany(newComData);
     result.then((res) => {
       if (res.result) {
@@ -170,7 +162,6 @@ const CompanyAddModel = ({ init, handleInit }) => {
   };
 
   const handleClose = () => {
-    initializeCompanyTemplate();
     setTimeout(() => {
       closeModal();
     }, 250);
@@ -180,16 +171,10 @@ const CompanyAddModel = ({ init, handleInit }) => {
   //===== useEffect functions ====================================================
   useEffect(() => {
     if (init && (userState & 1) === 1) {
-      // console.log("[CompanyAddModel] initialzie!");
       if (handleInit) handleInit(!init);
       setTimeout(() => {
-<<<<<<< HEAD
         handleInitialize();
       }, 250);
-=======
-        initializeCompanyTemplate();
-      }, 500);
->>>>>>> c5a7b4da54db9ae0e9a55e38f8fe9737f9e77db7
     }
     // 모달 내부 페이지의 히스토리 상태 추가
     history.pushState({ modalInternal: true }, '', location.href);

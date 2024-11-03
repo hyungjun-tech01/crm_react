@@ -1,7 +1,6 @@
 import React from 'react';
 import { selector } from "recoil";
 import * as bootstrap from '../assets/js/bootstrap.bundle';
-<<<<<<< HEAD
 import { atomModalInfoStack,
     atomCurrentCompany,
     defaultCompany,
@@ -20,14 +19,10 @@ import { atomModalInfoStack,
 } from '../atoms/atoms';
 
 const ANTD_MODAL = 'antModal';
-=======
-import { atomModalInfoStack } from '../atoms/atoms';
->>>>>>> c5a7b4da54db9ae0e9a55e38f8fe9737f9e77db7
 
 export const SettingsRepo = selector({
     key: "SettingsRepository",
     get: ({getCallback}) => {
-<<<<<<< HEAD
         const escapeKeyDownEvent = (event) => {
             if(event.key !== 'Escape') return;
             closeModal();
@@ -35,9 +30,6 @@ export const SettingsRepo = selector({
         const openModal = getCallback(({ set, snapshot }) => async (modalId, command=null) => {
             if(!modalId) return;
             // console.log(' - Check input :', modalId);
-=======
-        const openModal = getCallback(({ set, snapshot }) => async (modalId) => {
->>>>>>> c5a7b4da54db9ae0e9a55e38f8fe9737f9e77db7
             const modalInfoStack = await snapshot.getPromise(atomModalInfoStack);
             if(modalInfoStack.length > 0){
                 const lastModalId = modalInfoStack.at(-1).id;
@@ -49,12 +41,6 @@ export const SettingsRepo = selector({
                         modalElement.removeEventListener('keydown', escapeKeyDownEvent);
                     };
                 };
-<<<<<<< HEAD
-=======
-                const updatedModalInfoStack = modalInfoStack.concat(modalId);
-                // console.log(' - Modals in Stack :', updatedModalInfoStack);
-                set(atomModalInfoStack, updatedModalInfoStack);
->>>>>>> c5a7b4da54db9ae0e9a55e38f8fe9737f9e77db7
             };
             if(modalId !== ANTD_MODAL){
                 const modalElement = document.getElementById(modalId);
@@ -71,7 +57,6 @@ export const SettingsRepo = selector({
             console.log(' - Modals in Stack :', updatedModalInfoStack);
             set(atomModalInfoStack, updatedModalInfoStack);
         });
-<<<<<<< HEAD
         const closeModal = getCallback(({ set, snapshot }) => async (command) => {
             let gottenCommand = null;
             const modalInfoStack = await snapshot.getPromise(atomModalInfoStack);
@@ -91,14 +76,6 @@ export const SettingsRepo = selector({
                         gottenCommand = lastModalCommand;
                     };
                 }
-=======
-        const closeModal = getCallback(({ set, snapshot }) => async () => {
-            const modalInfoStack = await snapshot.getPromise(atomModalInfoStack);
-            if(modalInfoStack.length > 0){
-                const lastModalId = modalInfoStack.at(-1);
-                const lastModal = bootstrap.Modal.getInstance('#'+lastModalId);
-                // console.log('closeModal / last modal : ', lastModal);
->>>>>>> c5a7b4da54db9ae0e9a55e38f8fe9737f9e77db7
                 
                 const updatedModalInfoStack = [ ...modalInfoStack.slice(0, -1)];
                 if(updatedModalInfoStack.length > 0){
@@ -114,10 +91,9 @@ export const SettingsRepo = selector({
                         };
                     }
                 };
-                // console.log(' - Modals in Stack :', updatedModalInfoStack);
+                console.log(' - Modals in Stack :', updatedModalInfoStack);
                 set(atomModalInfoStack, updatedModalInfoStack);
             };
-<<<<<<< HEAD
             if(command || gottenCommand){
                 gottenCommand = command || gottenCommand;
                 switch(gottenCommand){
@@ -146,8 +122,6 @@ export const SettingsRepo = selector({
                         console.log('Nothing is done');
                 }
             }
-=======
->>>>>>> c5a7b4da54db9ae0e9a55e38f8fe9737f9e77db7
         });
         return {
             openModal,

@@ -151,17 +151,6 @@ const Companies = () => {
   };
 
   // --- Functions used for Table ------------------------------
-  const handleClickCompanyName = useCallback((id) => {
-    // console.log('[Company] set current company : ', id);
-    setInitToEditCompany(true);
-    setCurrentCompany(id);
-    setSelectedCategory({category: 'company', item_code: id});
-    setTimeout(()=>{
-      openModal('company-details');
-    }, 500);
-    
-  }, [setCurrentCompany]);
-
   const columns = [
     {
       title: t('company.company_name'),
@@ -216,7 +205,6 @@ const Companies = () => {
     },
   ];
 
-<<<<<<< HEAD
   const handleEditCompany = useCallback((id) => {
     setInitToEditCompany(true);
     setCurrentCompany(id);
@@ -227,13 +215,10 @@ const Companies = () => {
   }, [setCurrentCompany]);
 
   const handleAddCompany = useCallback(() => {
-=======
-  const handleAddNewCompanyClicked = useCallback(() => {
->>>>>>> c5a7b4da54db9ae0e9a55e38f8fe9737f9e77db7
     setInitToAddCompany(true);
     setTimeout(() => {
       openModal('add_company');
-    }, 500);
+    }, 250);
   }, [setInitToAddCompany]);
 
   useEffect(() => {
@@ -364,7 +349,7 @@ const Companies = () => {
                     <button
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                       id="add-task"
-                      onClick={handleAddNewCompanyClicked}
+                      onClick={handleAddCompany}
                     >
                       {t('company.new_company')}
                     </button>
@@ -397,7 +382,7 @@ const Companies = () => {
                       onRow={(record, rowIndex) => {
                         return {
                           onClick: () => {
-                            handleClickCompanyName(record.company_code);
+                            handleEditCompany(record.company_code);
                           },
                         };
                       }}
