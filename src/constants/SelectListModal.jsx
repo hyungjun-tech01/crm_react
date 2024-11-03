@@ -64,6 +64,13 @@ const SelectListModal = (props) => {
                     index: idx,
                     component: <div>{item.lead_name} / {item.company_name}</div>,
                 }));
+            }
+            else if(condition.item === 'company_name') {
+                    tempItems = res.data.map((item, idx) => ({
+                        ...item,
+                        index: idx,
+                        component: <div>{item.company_name} / {item.ceo_name} / {item.business_registration_code}</div>,
+                    }));                 
             } else {
                 tempItems = res.data.map((item, idx) => ({
                     ...item,
