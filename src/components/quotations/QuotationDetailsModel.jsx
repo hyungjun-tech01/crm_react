@@ -463,7 +463,7 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
 
     handleInitialize();
     setCurrentQuotationCode(selectedQuotation.quotation_code);
-  }, [selectedQuotation, editedDetailValues, currentQuotationCode, quotationState]);
+  }, [selectedQuotation, currentQuotationCode, quotationState]);
 
 
   // ----- useEffect for Production -----------------------------------
