@@ -397,6 +397,11 @@ const ConsultingDetailsModel = () => {
     setActionAttachments([]);
     setRequestAttachments([]);
     setCurrentConsulting();
+    
+    setTimeout(() => {
+      closeModal();
+    }, 500);
+    
   }, [setCurrentConsulting]);
 
   const consultingItemsInfo = [
