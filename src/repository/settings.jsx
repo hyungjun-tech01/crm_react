@@ -40,7 +40,7 @@ export const SettingsRepo = selector({
             if(modalInfoStack.length > 0){
                 const lastModalId = modalInfoStack.at(-1);
                 const lastModal = bootstrap.Modal.getInstance('#'+lastModalId);
-                console.log('closeModal / last modal : ', lastModal);
+                //console.log('closeModal / last modal : ', lastModal);
                 
                 if(lastModal){
                     // const modalElement = document.getElementById(lastModalId);

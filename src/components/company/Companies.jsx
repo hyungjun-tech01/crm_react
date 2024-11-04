@@ -162,6 +162,11 @@ const Companies = () => {
     
   }, [setCurrentCompany]);
 
+  //delete company
+  const handleDeleteCompany = useCallback((comapny_code) =>{
+    console.log('delete company',comapny_code);
+  },[]) ;
+
   const columns = [
     {
       title: t('company.company_name'),
@@ -214,6 +219,19 @@ const Companies = () => {
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.sales_resource, b.sales_resource),
     },
+    {
+      title: t('common.actions'),
+      dataIndex: "",
+      render: (text, record) => (
+        <div className="table_company" style={{color:'#0d6efd'}}
+          onClick={() => {
+            handleDeleteCompany(record.company_code);
+          }}
+        >
+          <button>삭제</button>
+        </div>
+      ),
+    },    
   ];
 
   const handleAddNewCompanyClicked = useCallback(() => {

@@ -287,7 +287,7 @@ const koResource = {
             taxinvoice_multi_query:'계산서 다중검색',
         },
         common:{
-            actions: '',
+            actions: 'Action',
             activity: '활동',
             add: '추가',
             additional_information:'추가 정보',

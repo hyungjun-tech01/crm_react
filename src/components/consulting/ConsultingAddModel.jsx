@@ -4,6 +4,7 @@ import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import "react-datepicker/dist/react-datepicker.css";
 import * as DOMPurify from "dompurify";
+import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import {
   atomCurrentLead,
@@ -498,6 +499,14 @@ const ConsultingAddModel = (props) => {
 
   const handleClose = () => {
     setNeedInit(true);
+
+    //closeModal 이 안되서 해당 Modal에서 바로 close 함.
+    const currentModal = bootstrap.Modal.getInstance('#'+'add_consulting');
+    
+    if(currentModal){
+      currentModal.hide();
+    };
+    
     setTimeout(() => {
       closeModal();
     }, 500);
