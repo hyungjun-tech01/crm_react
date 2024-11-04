@@ -57,7 +57,7 @@ const ResizeableTitle = props => {
 
 const QuotationAddModel = ({ init, handleInit }) => {
   const [t] = useTranslation();
-  const [cookies, setCookie] = useCookies(["myLationCrmUserId", "myQuotationAddColumns"]);
+  const [cookies, setCookie] = useCookies(["myLationCrmUserId", "myLationCrmUserName", "myQuotationAddColumns"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [message, setMessage] = useState({ title: "", message: "" });
 
@@ -764,6 +764,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
   };
 
   const handleInitialize = useCallback(() => {
+    console.log('QuotationAdd / handleInitialize : start');
     setQuotationContents([]);
 
     let modifiedData = {
@@ -926,7 +927,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
       if (handleInit) handleInit(!init);
       setTimeout(() => {
         handleInitialize();
-      }, 500);
+      }, 250);
     };
   }, [userState, init, handleInit, handleInitialize]);
 

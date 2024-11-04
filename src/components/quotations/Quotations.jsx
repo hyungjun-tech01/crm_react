@@ -258,7 +258,7 @@ const Quotations = () => {
     setInitAddNewQuotation(true);
     setTimeout(() => {
       openModal('add_quotation');
-    }, 500);
+    }, 250);
   }, []);
 
   useEffect(() => {
