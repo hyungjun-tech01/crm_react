@@ -24,7 +24,7 @@ export const QuotationSendTypes = [
     { value: 'E-Mail', label: 'Email'},
 ];
 
-export const quotationColumn = [
+export const QuotationColumn = [
     { value: 'company_name', label: '회사명'},
     { value: 'quotation_type', label: '견적구분'},
     { value: 'lead_name', label: '고객명'},
@@ -35,7 +35,7 @@ export const quotationColumn = [
     { value: 'quotation_contents', label: '견적 내용'},
 ];
 
-export const quotationExpiry = [
+export const QuotationExpiry = [
     { value: '5일', label: '견적일로부터 5일 이내'},
     { value: '10일', label: '견적일로부터 10일 이내'},
     { value: '15일', label: '견적일로부터 15일 이내'},
@@ -45,7 +45,7 @@ export const quotationExpiry = [
     { value: '60일', label: '견적일로부터 60일 이내'},
 ];
 
-export const quotationDelivery = [
+export const QuotationDelivery = [
     { value: '5일', label: '발주일로부터 5일 이내'},
     { value: '10일', label: '발주일로부터 10일 이내'},
     { value: '15일', label: '발주일로부터 15일 이내'},
@@ -55,13 +55,36 @@ export const quotationDelivery = [
     { value: '60일', label: '발주일로부터 60일 이내'},
 ];
 
-export const quotationPayment = [
+export const QuotationPayment = [
     { value: 'ThisDayCard', label: '당일 카드 결제'},
     { value: 'ThisDayCash', label: '당일 현금 결제'},
     { value: 'ThisMonthLastDayCash', label: '당월말 현금 결제'},
     { value: 'NextMonthLastDayCash', label: '익월말 현금 결제'},
 ];
 
+//---- 1: index, 2: title, 3: render type, 4: content name
+export const QuotationContentItems = {
+    '1': { name: 'no', title: 'common.no', render: false, content : true, type:'label'},
+    '2': { name: 'product_class_name', title: 'common.category', render: false, content: false,},
+    '3': { name: 'manufacturer', title: 'common.maker', render: false, content: false},
+    '4': { name: 'model_name', title: 'quotation.model_name', render: false, content: false},
+    '5': { name: 'product_name', title: 'common.product', render: false, content: false},
+    '6': { name: 'material', title: 'common.material', render: false, content: true, type:'label'},
+    '7': { name: 'type', title: 'common.type', render: false, content: true, type:'label'},
+    '8': { name: 'color', title: 'common.color', render: false, content: true, type:'label'},
+    '9': { name: 'standard', title: 'common.standard', render: false, content: true, type:'label'},
+    '10': { name: 'detail_desc_on_off', title: 'quotation.detail_desc', render: false, content: true, type:'select'},
+    '11': { name: 'unit', title: 'common.unit', render: false, content: true, type:'label' },
+    '12': { name: 'quantity', title: 'common.quantity', render: false, content: true, type:'label'},
+    '13': { name: 'list_price', title: 'quotation.list_price', render: true, content: true, type:'price'},
+    '14': { name: 'dc_rate', title: 'quotation.discount_rate', render: true, content: true, type:'price'},
+    '15': { name: 'unit_price', title: 'quotation.quotation_unit_price', render: true, content: true, type:'price'},
+    '16': { name: 'quotation_amount', title: 'quotation.quotation_amount', render: true, content: true, type:'price'},
+    '17': { name: 'raw_price', title: 'quotation.raw_price', render: true, content: true, type:'price'},
+    '18': { name: 'profit', title: 'quotation.profit_amount', render: true, content: true, type:'price'},
+    '19': { name: 'note', title: 'quotation.note', render: false, content: true, type:'textarea'},
+    '998': { name: 'detail_desc', title: 'quotation.detail_desc', render: false, content: true, type:'textarea'},
+}
 
 export const QuotationRepo = selector({
     key: "QuotationRepository",

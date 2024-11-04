@@ -7,8 +7,6 @@ import { Button, Checkbox, InputNumber, Modal, Space, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { AddBoxOutlined, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
 import { option_locations } from '../../constants/constants';
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
-import "../antdstyle.css";
 
 import {
   defaultQuotation,
@@ -25,9 +23,10 @@ import {
   QuotationRepo,
   QuotationTypes,
   QuotationSendTypes,
-  quotationDelivery,
-  quotationExpiry,
-  quotationPayment
+  QuotationDelivery,
+  QuotationExpiry,
+  QuotationPayment,
+  QuotationContentItems,
 } from "../../repository/quotation";
 import { SettingsRepo } from '../../repository/settings'
 
@@ -36,12 +35,6 @@ import AddSearchItem from "../../constants/AddSearchItem";
 import QuotationContentModal from "./QuotationContentModal";
 import MessageModal from "../../constants/MessageModal";
 
-const defaultQuotationContent = {
-  '1': null, '2': null, '3': null, '4': null, '5': null,
-  '6': null, '7': null, '8': null, '9': null, '10': null,
-  '11': null, '12': null, '13': null, '14': null, '15': null,
-  '16': null, '17': null, '18': null, '19': null, '998': null,
-};
 
 const ResizeableTitle = props => {
   const { onResize, width, ...restProps } = props;
@@ -122,27 +115,27 @@ const QuotationAddModel = ({ init, handleInit }) => {
   const [editHeaders, setEditHeaders] = useState(false);
   
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const defaultContentArray = [
-    ['1',   'No',                               (text, record) => <>{text}</>],
-    ['2',   t('common.category'),               (text, record) => <>{text}</>],
-    ['3',   t('common.maker'),                  (text, record) => <>{text}</>],
-    ['4',   t('quotation.model_name'),          (text, record) => <>{text}</>],
-    ['5',   t('common.product'),                (text, record) => <>{text}</>],
-    ['6',   t('common.material'),               (text, record) => <>{text}</>],
-    ['7',   t('common.type'),                   (text, record) => <>{text}</>],
-    ['8',   t('common.color'),                  (text, record) => <>{text}</>],
-    ['9',   t('common.standard'),               (text, record) => <>{text}</>],
-    ['10',  t('quotation.detail_desc'),         (text, record) => <>{text}</>],
-    ['11',  t('common.unit'),                   (text, record) => <>{text}</>],
-    ['12',  t('common.quantity'),               (text, record) => <>{handleFormatter(text)}</>],
-    ['13',  t('quotation.consumer_price'),      (text, record) => <>{handleFormatter(text)}</>],
-    ['14',  t('quotation.discount_rate'),       (text, record) => <>{handleFormatter(text)}</>],
-    ['15',  t('quotation.quotation_unit_price'),(text, record) => <>{handleFormatter(text)}</>],
-    ['16',  t('quotation.quotation_amount'),    (text, record) => <>{handleFormatter(text)}</>],
-    ['17',  t('quotation.raw_price'),           (text, record) => <>{handleFormatter(text)}</>],
-    ['18',  t('quotation.profit_amount'),       (text, record) => <>{handleFormatter(text)}</>],
-    ['19',  t('quotation.note'),                (text, record) => <>{text}</>],
-  ];
+  // const defaultContentArray = [
+  //   ['1',   'No',                               (text, record) => <>{text}</>],
+  //   ['2',   t('common.category'),               (text, record) => <>{text}</>],
+  //   ['3',   t('common.maker'),                  (text, record) => <>{text}</>],
+  //   ['4',   t('quotation.model_name'),          (text, record) => <>{text}</>],
+  //   ['5',   t('common.product'),                (text, record) => <>{text}</>],
+  //   ['6',   t('common.material'),               (text, record) => <>{text}</>],
+  //   ['7',   t('common.type'),                   (text, record) => <>{text}</>],
+  //   ['8',   t('common.color'),                  (text, record) => <>{text}</>],
+  //   ['9',   t('common.standard'),               (text, record) => <>{text}</>],
+  //   ['10',  t('quotation.detail_desc'),         (text, record) => <>{text}</>],
+  //   ['11',  t('common.unit'),                   (text, record) => <>{text}</>],
+  //   ['12',  t('common.quantity'),               (text, record) => <>{handleFormatter(text)}</>],
+  //   ['13',  t('quotation.consumer_price'),      (text, record) => <>{handleFormatter(text)}</>],
+  //   ['14',  t('quotation.discount_rate'),       (text, record) => <>{handleFormatter(text)}</>],
+  //   ['15',  t('quotation.quotation_unit_price'),(text, record) => <>{handleFormatter(text)}</>],
+  //   ['16',  t('quotation.quotation_amount'),    (text, record) => <>{handleFormatter(text)}</>],
+  //   ['17',  t('quotation.raw_price'),           (text, record) => <>{handleFormatter(text)}</>],
+  //   ['18',  t('quotation.profit_amount'),       (text, record) => <>{handleFormatter(text)}</>],
+  //   ['19',  t('quotation.note'),                (text, record) => <>{text}</>],
+  // ];
 
   const defaultColumns = [
     {
@@ -242,19 +235,23 @@ const QuotationAddModel = ({ init, handleInit }) => {
             render: contentColumns.at(-1).render,
           },
           {
-            title: defaultContentArray[targetIndex - 1][1],
+            title: t(QuotationContentItems[targetName].title),
             dataIndex: targetName,
-            render: defaultContentArray[targetIndex -1][2],
-          },  
-        ]
+            render: QuotationContentItems[targetName].type === 'price'
+              ? (text, record) => <>{handleFormatter(text)}</>
+              : (text, record) => <>{text}</>,
+          }, 
+        ];
       } else {
         tempColumns = [
           ...contentColumns.slice(0, foundIndex),
           {
-            title: defaultContentArray[targetIndex - 1][1],
+            title: t(QuotationContentItems[targetName].title),
             dataIndex: targetName,
             width: 100,
-            render: defaultContentArray[targetIndex -1][2],
+            render: QuotationContentItems[targetName].type === 'price'
+              ? (text, record) => <>{handleFormatter(text)}</>
+              : (text, record) => <>{text}</>,
           },
           ...contentColumns.slice(foundIndex,),
         ];
@@ -285,15 +282,15 @@ const QuotationAddModel = ({ init, handleInit }) => {
   const ConvertHeaderInfosToString = (data) => {
     let ret = '';
 
-    defaultContentArray.forEach((item, index) => {
-      if (index === 0)
-        ret += item.at(0);
+    Object.keys(QuotationContentItems).forEach((item, index) => {
+      if (item === '1')
+        ret += item;
       else
-        ret += '|' + item.at(0);
+        ret += '|' + item;
 
-      ret += '|' + item.at(1) + '|';
+      ret += '|' + t(QuotationContentItems[item].title) + '|';
 
-      const foundIdx = data.findIndex(col => col.dataIndex === item.at(0));
+      const foundIdx = data.findIndex(col => col.dataIndex === item);
       if (foundIdx === -1) {
         ret += '0';
       } else {
@@ -653,22 +650,32 @@ const QuotationAddModel = ({ init, handleInit }) => {
     };
 
     // update Contents -------------------------------------------------
+    const updatedContent = {
+      '1': 1,
+      '2': finalData.product_class_name,
+      '3': finalData.manufacturer || '',
+      '4': finalData.model_name || '',
+      '5': finalData.product_name || '',
+      '6': finalData.material || '',
+      '7': finalData.type || '',
+      '8': finalData.color || '',
+      '9': finalData.standard || '',
+      '10': finalData.detail_desc_on_off || '',
+      '11': finalData.unit || '',
+      '12': finalData.quantity || '',
+      '13': finalData.reseller_price || '',
+      '14': settingForContent.dc_rate || '',
+      '15': finalData.list_price || '',
+      '16': finalData.quotation_amount || '',
+      '17': finalData.cost_price || '',
+      '18': finalData.profit_amount || '',
+      '19': finalData.memo || '',
+      '998': finalData.detail_desc || '',
+      'org_unit_price': finalData.org_unit_price,
+    };
+
     if (settingForContent.action === "ADD") {
-      const updatedContent = {
-        ...defaultQuotationContent,
-        '1': quotationContents.length + 1,
-        '2': finalData.product_class_name,
-        '5': finalData.product_name,
-        '10': finalData.detail_desc_on_off,
-        '12': finalData.quantity,
-        '13': finalData.reseller_price,
-        '14': settingForContent.dc_rate,
-        '15': finalData.list_price,
-        '16': finalData.quotation_amount,
-        '17': finalData.cost_price,
-        '998': finalData.detail_desc ? finalData.detail_desc : '',
-        'org_unit_price': finalData.org_unit_price,
-      };
+      updatedContent['1'] = quotationContents.length + 1;
       const updatedContents = quotationContents.concat(updatedContent);
       setQuotationContents(updatedContents);
 
@@ -676,21 +683,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
         handleCalculateAmounts(updatedContents);
       };
     } else {  //Update
-      const updatedContent = {
-        ...defaultQuotationContent,
-        '1': settingForContent.index,
-        '2': finalData.product_class_name,
-        '5': finalData.product_name,
-        '10': finalData.detail_desc_on_off,
-        '12': finalData.quantity,
-        '13': finalData.reseller_price,
-        '14': settingForContent.dc_rate,
-        '15': finalData.list_price,
-        '16': finalData.quotation_amount,
-        '17': finalData.cost_price,
-        '998': finalData.detail_desc ? finalData.detail_desc : '',
-        'org_unit_price': finalData.org_unit_price,
-      };
+      updatedContent['1'] = settingForContent.index;
       const foundIdx = quotationContents.findIndex(item => item['1'] === settingForContent.index);
       if (foundIdx === -1) {
         console.log('Something Wrong when modifying content');
@@ -728,7 +721,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
     let ret = value;
     if (typeof value === 'string') {
       ret = Number(value);
-      if (isNaN(ret)) return;
+      if (isNaN(ret)) return value;
     };
 
     return settingForContent.show_decimal
@@ -778,17 +771,15 @@ const QuotationAddModel = ({ init, handleInit }) => {
       receiver: cookies.myLationCrmUserName,
     };
 
-    if ((selectedCategory.category === 'lead')
-      && (currentLead !== defaultLead)
-      && (selectedCategory.item_code === currentLead.lead_code)
-    ) {
-        modifiedData['lead_code'] = currentLead.lead_code;
-        modifiedData['lead_name'] = currentLead.lead_name;
-        modifiedData['department'] = currentLead.department;
-        modifiedData['position'] = currentLead.position;
-        modifiedData['mobile_number'] = currentLead.mobile_number;
-        modifiedData['phone_number'] = currentLead.phone_number;
-        modifiedData['email'] = currentLead.email;
+    if (currentLead !== defaultLead)
+    {
+      modifiedData['lead_code'] = currentLead.lead_code;
+      modifiedData['lead_name'] = currentLead.lead_name;
+      modifiedData['department'] = currentLead.department;
+      modifiedData['position'] = currentLead.position;
+      modifiedData['mobile_number'] = currentLead.mobile_number;
+      modifiedData['phone_number'] = currentLead.phone_number;
+      modifiedData['email'] = currentLead.email;
     };
 
     setAmountsForContent({
@@ -814,6 +805,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
     } else {
       const columnSettings = cookies.myQuotationAddColumns[cookies.myLationCrmUserId];
       if(!columnSettings){
+        console.log('Initialize : get column setting from cookies -', columnSettings);
         const tempQuotationColumn = [
           ...defaultColumns
         ];
@@ -826,7 +818,9 @@ const QuotationAddModel = ({ init, handleInit }) => {
       } else {
         const tempQuotationColumn = columnSettings.map(col => ({
           ...col,
-          render: defaultContentArray[col.dataIndex - 1][2]
+          render: QuotationContentItems[col.dataIndex].type === 'price'
+              ? (text, record) => <>{handleFormatter(text)}</>
+              : (text, record) => <>{text}</>,
         }));
         setContentColumns(tempQuotationColumn);
       };
@@ -1062,7 +1056,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
                   title={t('quotation.expiry_date')}
                   type='select'
                   name='quotation_expiration_date'
-                  options={quotationExpiry}
+                  options={QuotationExpiry}
                   defaultValue={quotationChange.quotation_expiration_date}
                   onChange={handleSelectChange}
                 />
@@ -1086,7 +1080,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
                   title={t('quotation.delivery_period')}
                   type='select'
                   name='delivery_period'
-                  options={quotationDelivery}
+                  options={QuotationDelivery}
                   defaultValue={quotationChange.delivery_period}
                   onChange={handleSelectChange}
                 />
@@ -1113,7 +1107,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
                   title={t('quotation.payment_type')}
                   type='select'
                   name='payment_type'
-                  options={quotationPayment}
+                  options={QuotationPayment}
                   defaultValue={quotationChange.payment_type}
                   onChange={handleSelectChange}
                 />
@@ -1406,16 +1400,16 @@ const QuotationAddModel = ({ init, handleInit }) => {
       >
         <table className="table">
           <tbody>
-            {defaultContentArray.map((item, index) => {
-              const foundItem = contentColumns.filter(column => column.dataIndex === item.at(0))[0];
+          {Object.keys(QuotationContentItems).map((item, index) => {
+              const foundItem = contentColumns.filter(column => column.dataIndex === item)[0];
               return (
                 <tr key={index}>
                   <td>
-                  {item.at(1)}
+                  {t(QuotationContentItems[item].title)}
                   </td>
                   <td>
                     <Checkbox
-                      name={item.at(0)}
+                      name={item}
                       checked={!!foundItem}
                       onChange={handleHeaderCheckChange}
                     />
@@ -1429,6 +1423,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
       <QuotationContentModal
         setting={settingForContent}
         open={isContentModalOpen}
+        items={contentColumns}
         original={orgContentModalValues}
         edited={editedContentModalValues}
         handleEdited={handleContentItemChange}

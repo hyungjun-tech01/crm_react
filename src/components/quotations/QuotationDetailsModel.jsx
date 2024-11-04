@@ -22,9 +22,9 @@ import {
   QuotationRepo,
   QuotationSendTypes,
   QuotationTypes,
-  quotationExpiry,
-  quotationDelivery,
-  quotationPayment
+  QuotationExpiry,
+  QuotationDelivery,
+  QuotationPayment
 } from "../../repository/quotation";
 import { SettingsRepo } from "../../repository/settings";
 
@@ -335,13 +335,13 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
     { key: 'quotation_manager', title: 'quotation.quotation_manager', detail: { type: 'select', options: usersForSelection, editing: handleDetailSelectChange } },
     { key: 'quotation_send_type', title: 'quotation.send_type', detail: { type: 'select', options: QuotationSendTypes, editing: handleDetailSelectChange } },
     { key: 'quotation_date', title: 'quotation.quotation_date', detail: { type: 'date', editing: handleDetailDateChange } },
-    { key: 'quotation_expiration_date', title: 'quotation.expiry_date', detail: { type: 'select', options: quotationExpiry, editing: handleDetailSelectChange } },
+    { key: 'quotation_expiration_date', title: 'quotation.expiry_date', detail: { type: 'select', options: QuotationExpiry, editing: handleDetailSelectChange } },
     { key: 'comfirm_date', title: 'quotation.confirm_date', detail: { type: 'date', editing: handleDetailDateChange } },
     { key: 'delivery_location', title: 'quotation.delivery_location', detail: { type: 'label', editing: handleDetailChange } },
-    { key: 'delivery_period', title: 'quotation.delivery_period', detail: { type: 'select', options: quotationDelivery, editing: handleDetailSelectChange } },
+    { key: 'delivery_period', title: 'quotation.delivery_period', detail: { type: 'select', options: QuotationDelivery, editing: handleDetailSelectChange } },
     { key: 'warranty_period', title: 'quotation.warranty', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'sales_representative', title: 'quotation.sales_rep', detail: { type: 'select', options: salespersonsForSelection, editing: handleDetailSelectChange } },
-    { key: 'payment_type', title: 'quotation.payment_type', detail: { type: 'select', options: quotationPayment, editing: handleDetailSelectChange } },
+    { key: 'payment_type', title: 'quotation.payment_type', detail: { type: 'select', options: QuotationPayment, editing: handleDetailSelectChange } },
     { key: 'list_price', title: 'quotation.list_price', detail: { type: 'label', price: true, editing: handleDetailChange } },
     { key: 'list_price_dc', title: 'quotation.list_price_dc', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'sub_total_amount', title: 'quotation.sub_total_amount', detail: { type: 'label', price: true, editing: handleDetailChange } },
