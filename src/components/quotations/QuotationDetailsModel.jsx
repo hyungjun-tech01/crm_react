@@ -390,13 +390,13 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
       selectedQuotation &&
       selectedQuotation !== defaultQuotation
     ) {
-      const temp_all_saved = {
+      const tempAllSaved = {
         ...editedDetailValues,
         action_type: "UPDATE",
         modify_user: cookies.myLationCrmUserId,
         quotation_code: selectedQuotation.quotation_code,
       };
-      const resp = modifyQuotation(temp_all_saved);
+      const resp = modifyQuotation(tempAllSaved);
       resp.then(res => {
         if (res.result) {
           handleClose();
@@ -425,9 +425,7 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
 
   //===== useEffect functions =============================================== 
   useEffect(() => {
-    if ((selectedQuotation !== defaultQuotation)
-      && (selectedQuotation.quotation_code !== currentQuotationCode)
-    ) {
+    if (selectedQuotation !== defaultQuotation) {
       const headerValues = selectedQuotation.quotation_table.split('|');
       if (headerValues && Array.isArray(headerValues)) {
         let tableHeaders = [];

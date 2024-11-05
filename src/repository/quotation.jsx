@@ -271,12 +271,24 @@ export const QuotationRepo = selector({
                     //----- Update AllQuotationObj --------------------------//
                     const updatedAllObj = {
                         ...allQuotations,
-                        [modifiedQuotation.consulting_code]: modifiedQuotation,
+                        [modifiedQuotation.quotation_code]: modifiedQuotation,
                     };
                     set(atomAllQuotationObj, updatedAllObj);
 
                     //----- Update FilteredQuotationArry -----------------------//
-                    set(atomFilteredQuotationArray, Object.values(updatedAllObj));
+                    //set(atomFilteredQuotationArray, Object.values(updatedAllObj));
+                    const quotationArray = await snapshot.getPromise(atomFilteredQuotationArray);
+                    const idxInfiltered = quotationArray.findIndex(item => item.quotation_code === modifiedQuotation.quotation_code);
+                    if(idxInfiltered !== -1){
+                        const updatedFiltered = [
+                            modifiedQuotation,
+                            ...quotationArray.slice(0, idxInfiltered),
+                            ...quotationArray.slice(idxInfiltered + 1,)
+                        ];
+                        set(atomFilteredQuotationArray, updatedFiltered);
+                    } else {
+                        console.log("[quotation repo / update item] Impossible : this item is chosen in the list, but can't find it now");
+                    };
 
                     //----- Update QuotationByLead -----------------------//
                     const currentLead = await snapshot.getPromise(atomCurrentLead);

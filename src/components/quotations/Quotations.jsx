@@ -172,8 +172,10 @@ const Quotations = () => {
 
   const handleClickQuotation = (code) => {
     setCurrentQuotation(code);
-    setSelectedCategory({category: 'quotation', item_code: code});
-    openModal('quotation-details','initialize_quotation');
+    // setSelectedCategory({category: 'quotation', item_code: code});
+    setTimeout(() => {
+      openModal('quotation-details','initialize_quotation');
+    }, 250);
   };
 
   // --- Section for Table ------------------------------

@@ -117,7 +117,6 @@ const QuotationContentModal = (props) => {
 
         items.forEach(item => {
             const selectedItem = QuotationContentItems[item.dataIndex];
-            console.log('QuotationContentModal /set content items :', selectedItem);
             if(!selectedItem.content) return;
 
             if(item.dataIndex === '1') {
