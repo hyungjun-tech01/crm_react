@@ -324,7 +324,7 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
       modify_date: formatDate(new Date()),
     };
     if (!!editedContentModalData['transaction_date']) {
-      tempContent.month_day = `${editedContentModalData.transaction_date.getMonth() - 1}.${editedContentModalData.transaction_date.getDate()}`
+      tempContent.month_day = `${editedContentModalData.transaction_date.getMonth() + 1}.${editedContentModalData.transaction_date.getDate()}`
     };
     if (!!tempContent.transaction_date) delete tempContent.transaction_date;
     if (!!tempContent.product_class_name) delete tempContent.product_class_name;
