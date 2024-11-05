@@ -380,6 +380,7 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
     setIsContentModalOpen(false);
     setOrgContentModalData({});
     setEditedContentModalData({});
+    setSelectedContentRowKeys([]);
   };
 
   const handleContentModalCancel = () => {
@@ -394,6 +395,7 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
     if (selectedContentRowKeys.length === 0) return;
     const tempContents = invoiceContents.filter(item => selectedContentRowKeys.indexOf(item.sub_index) === -1);
     setInvoiceContents(tempContents);
+    handleAmountCalculation(tempContents);
     setSelectedContentRowKeys([]);
   };
 
@@ -434,6 +436,7 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
       tempKeys.push(startIdx);
     }
     setSelectedContentRowKeys(tempKeys);
+    setShowSaveButton(true);
   };
 
   const handleContentMoveDown = () => {
@@ -473,6 +476,7 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
       tempKeys.push(startIdx--);
     }
     setSelectedContentRowKeys(tempKeys);
+    setShowSaveButton(true);
   };
 
 
