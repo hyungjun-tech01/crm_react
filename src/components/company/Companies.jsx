@@ -223,12 +223,27 @@ const Companies = () => {
       title: t('common.actions'),
       dataIndex: "",
       render: (text, record) => (
-        <div className="table_company" style={{color:'#0d6efd'}}
+        <div className="delete_button"
           onClick={() => {
             handleDeleteCompany(record.company_code);
           }}
+          style={{ color: '#0d6efd', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
         >
-          <button>삭제</button>
+        <button
+            className="delete_button"
+            style={{
+              backgroundColor: '#0d6efd', // 붉은 계열의 배경색
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px', // 둥근 모서리
+              padding: '4px 8px', // 여백 추가
+              cursor: 'pointer',
+              fontSize: '12px',
+              marginLeft: '4px'
+            }}
+          >
+            -
+          </button>
         </div>
       ),
     },    
@@ -401,7 +416,9 @@ const Companies = () => {
                       rowKey={(record) => record.company_code}
                       onRow={(record, rowIndex) => {
                         return {
-                          onClick: () => {
+                          onClick: (event) => {
+                            console.log('event.target.className', event.target.className);
+                            if(event.target.className === 'delete_button' ) return;
                             handleClickCompanyName(record.company_code);
                           },
                         };

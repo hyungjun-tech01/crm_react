@@ -372,7 +372,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
           if(res.result) {
             setPurchasesByCompany(res.data);
           } else {
-            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
+            //console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
             setPurchasesByCompany([]);
           };
         });
