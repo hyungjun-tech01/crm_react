@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { Button } from "antd";
 import "react-datepicker/dist/react-datepicker.css";
 import * as DOMPurify from "dompurify";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import {
   atomUsersForSelection,
