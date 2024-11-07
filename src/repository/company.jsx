@@ -195,6 +195,47 @@ export const CompanyRepo = selector({
                     } else {
                         return { result: false, data: "No Data" };  // 해당 lead_code를 찾지 못했을 때
                     }
+                }else if(newCompany.action_type === 'DELETE'){
+                  
+                    delete newCompany.action_type;
+                    delete newCompany.company_code;
+                    delete newCompany.modify_user;
+
+                    const alldeletedCompanies = await snapshot.getPromise(atomAllCompanyObj);
+
+                    console.log("Before update ", Object.keys(alldeletedCompanies).length);
+
+
+                    //----- Update AllCompanyObj --------------------------//
+                    const updatedAllCompanies = {
+                        ...alldeletedCompanies
+                    };
+
+                    Object.keys(newCompany).forEach(key => {
+                        if (key in updatedAllCompanies) {
+                            delete updatedAllCompanies[key];
+                        }
+                    });
+
+                    set(atomAllCompanyObj, updatedAllCompanies);  
+
+                    console.log("After update ", Object.keys(atomAllCompanyObj).length);
+
+
+                     //----- Update FilteredCompanies -----------------------//
+                    const filteredAllCompanies = await snapshot.getPromise(atomFilteredCompanyArray);
+
+                    const modifiedFilteredCompany = { ...filteredAllCompanies };
+
+                    Object.keys(newCompany).forEach(key => {
+                        if (key in modifiedFilteredCompany) {
+                            delete modifiedFilteredCompany[key];
+                        }
+                    });
+
+                    set(atomFilteredCompanyArray, modifiedFilteredCompany);
+                    return { result: true };
+
                 }
             }
             catch(err){

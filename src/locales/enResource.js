@@ -366,6 +366,7 @@ const enResource = {
             search_address_first: 'Please search address...',
             title_check: 'Check',
             title_error: 'Error',
+            msg_not_reg_user: 'Only create user can delete data.',
         },
         user :{
             user_id:'Id',

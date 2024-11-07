@@ -367,6 +367,7 @@ const koResource = {
             search_address_first: '먼저 주소 검색하시기 바랍니다.',
             title_check: '확인',
             title_error: '오류',
+            msg_not_reg_user: '등록한 사용자만 삭제 가능합니다.',
         },
         user :{
             user_id:'아이디',
