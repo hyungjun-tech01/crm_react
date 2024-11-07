@@ -10,6 +10,7 @@ import {
   atomPurchaseByCompany,
   atomConsultingByLead,
   atomQuotationByLead,
+  defaultConsulting,
 } from "../../atoms/atoms";
 import { atomEngineersForSelection, atomSalespersonsForSelection } from '../../atoms/atomsUser';
 import { CompanyRepo } from "../../repository/company";
@@ -21,7 +22,7 @@ import { MAContractRepo } from "../../repository/ma_contract";
 import { SettingsRepo } from "../../repository/settings";
 
 import CompanyPurchaseModel from "../company/CompanyPurchaseModel";
-import ConsultingAddModel from "../consulting/ConsultingAddModel";
+import LeadAddConsultingModel from "./LeadAddConsultingModel";
 import ConsultingDetailsModel from "../consulting/ConsultingDetailsModel";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
@@ -200,7 +201,7 @@ const LeadDetailsModel = ({ init, handleInit }) => {
 
 
   //===== Handles to edit 'Consulting Add/Details' ===============================================
-  const [initAddConsulting, setInitAddConsulting] = useState(false);
+  const [initDataAddConsulting, setInitDataAddConsulting] = useState(defaultConsulting);
 
 
   //===== Handles to edit 'Quotation Add/Details' ===============================================
@@ -589,7 +590,7 @@ const LeadDetailsModel = ({ init, handleInit }) => {
                         <div className="tab-pane task-related p-0"
                           id="sub-lead-consultings" >
                           <LeadConsultingModel
-                            handleInitAddConsulting={setInitAddConsulting}
+                            handleInitDataAddConsulting={setInitDataAddConsulting}
                           />
                         </div>
                         <div className="tab-pane task-related p-0"
@@ -628,7 +629,7 @@ const LeadDetailsModel = ({ init, handleInit }) => {
         </div>
         {/* modal-dialog */}
       </div>
-      <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} />
+      <LeadAddConsultingModel initData={initDataAddConsulting} />
       <ConsultingDetailsModel />
       <QuotationAddModel init={initAddQuotation} handleInit={setInitAddQuotation} />
       <QuotationDetailsModel init={initEditQuotation} handleInit={setInitEditQuotation} />

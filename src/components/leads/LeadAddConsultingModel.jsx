@@ -27,7 +27,7 @@ import QuillEditor from "../../constants/QuillEditor";
 import { defaultConsulting } from "../../atoms/atoms";
 
 
-const ConsultingAddModel = ({ initData }) => {
+const LeadAddConsultingModel = ({ initData }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId", "myLationCrmUserName"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -478,7 +478,7 @@ const ConsultingAddModel = ({ initData }) => {
   return (
     <div
       className="modal right fade"
-      id="add_consulting"
+      id="add_lead_consulting"
       tabIndex={-1}
       role="dialog"
       aria-modal="true"
@@ -706,4 +706,4 @@ const ConsultingAddModel = ({ initData }) => {
   );
 };
 
-export default ConsultingAddModel;
+export default LeadAddConsultingModel;
