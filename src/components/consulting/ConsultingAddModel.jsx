@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
+import { Button } from "antd";
 import "react-datepicker/dist/react-datepicker.css";
 import * as DOMPurify from "dompurify";
 
@@ -624,15 +625,13 @@ const ConsultingAddModel = ({ initData }) => {
                       <div className="add-upload-title" >
                         {t('consulting.request_content')}
                       </div>
-                      { !(showEditor & EDIT_REQUEST_CONTENT) && <div style={{fontSize:'13px', fontWeight: 'bold', color: '#999999'}}>
-                          {t('comment.click_below_to_edit')}
-                        </div>
+                      { !(showEditor & EDIT_REQUEST_CONTENT) &&
+                        <Button type='dashed' onClick={handleClickRequestContent}>Click here to edit the below</Button>
                       }
                     </div>
                     { !(showEditor & EDIT_REQUEST_CONTENT) ?
                       <div
                         className="add-upload-button"
-                        onClick={handleClickRequestContent}
                         dangerouslySetInnerHTML={{
                           __html: DOMPurify.sanitize(consultingChange.request_content || ''),
                         }}
@@ -652,15 +651,13 @@ const ConsultingAddModel = ({ initData }) => {
                       <div className="add-upload-title" >
                         {t('consulting.action_content')}
                       </div>
-                      { !(showEditor & EDIT_ACTION_CONTENT) && <div style={{fontSize:'13px', fontWeight: 'bold', color: '#999999'}}>
-                          {t('comment.click_below_to_edit')}
-                        </div>
+                      { !(showEditor & EDIT_ACTION_CONTENT) &&
+                        <Button type='dashed' onClick={handleClickActionContent}>Click here to edit the below</Button>
                       }
                     </div>
                     { !(showEditor & EDIT_ACTION_CONTENT) ?
                       <div
                         className="add-upload-button"
-                        onClick={handleClickActionContent}
                         dangerouslySetInnerHTML={{
                           __html: DOMPurify.sanitize(consultingChange.action_content || ''),
                         }}
