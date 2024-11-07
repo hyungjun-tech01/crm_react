@@ -45,6 +45,7 @@ export const SettingsRepo = selector({
             if(modalId !== ANTD_MODAL){
                 const modalElement = document.getElementById(modalId);
                 const myModal = new bootstrap.Modal(modalElement, {
+                    backdrop: 'static',
                     keyboard: false,
                     focus: true,
                 });
