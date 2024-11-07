@@ -9,6 +9,7 @@ import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";
 import { ConvertCurrency } from '../../constants/functions';
 import Stamp from "../../files/company_stamp.jpg";
+import Logo from "../../files/company_logo.jpg";
 
 const ConvStrNumToKor = (digit) => {
     switch(digit)
@@ -298,17 +299,22 @@ const QuotationView = () => {
                 <Page wrap size="A4" style={Styles.body}>
                     {currentQuotation.sales_representative &&
                         <Text style={{fontSize: 10, marginBottom: 20, textAlign: 'start', color: 'grey', fontFamily: 'Noto Sans',}} fixed>
-                            담당자: 노드데이타 {salesRespInfo.userName} {salesRespInfo.mobileNumber} {salesRespInfo.userID}
+                            담당자: 노드데이타 {salesRespInfo.userName} ({salesRespInfo.mobileNumber}) {salesRespInfo.userID}
                         </Text>
                     }
                     {/*----- Header ---------------------------------------------*/}
                     <View style={{width: '100%', flexGrow: 0}} >
-                        <Text style={{fontSize:10,textAlign:'right',marginBottom:20,fontFamily:'Noto Sans'}}>
-                            견적번호: {currentQuotation.quotation_number}
-                        </Text>
-                        <Text style={{fontSize: 24,fontWeight: 'bold',marginBottom: 30,textAlign: 'center',textDecoration: 'underline',fontFamily: 'Noto Sans'}}>
-                            {currentQuotation.quotation_type}
-                        </Text>
+                        <View style={{width: '100%',height: '20',flexDirection: 'column',flexGrow:0}}>
+                            <Text style={{fontSize:10,textAlign:'right',fontFamily:'Noto Sans'}}>
+                                견적번호: {currentQuotation.quotation_number}
+                            </Text>
+                        </View>
+                        <Svg width="100%" height="60" viewBox='0 0 555 80' >
+                            <Text x="225" y="30" style={{fontSize: 26,fontWeight: 'bold',fontFamily: 'Noto Sans'}}>
+                                {currentQuotation.quotation_type}
+                            </Text>
+                            <Image x="500" y="0" style={{width: 125, height: 66}} src={Logo}/>
+                        </Svg>
                         <Text style={{fontSize: 16,textAlign: 'left',textDecoration: 'underline',marginLeft: 20,marginBottom: 10,fontFamily: 'Noto Sans'}}>
                             {currentQuotation.company_name} 귀중
                         </Text>
@@ -321,7 +327,7 @@ const QuotationView = () => {
                                 <Text style={Styles.text}>유효 기간:  {quotationCondition.expiry}</Text>
                             </View>
                             <Svg width="300" height="160" viewBox='0 0 300 160' >
-                                <Image x="130" y="30" style={{width: 40, height: 40}} src={Stamp} debug={true} />
+                                <Image x="130" y="30" style={{width: 40, height: 40}} src={Stamp} />
                                 <Rect x="0" y="0" width="25" height="160" stroke="black" fill="#cccccc" />
                                 <Path d="M25 0 H300 V160 H25 M100 0 V160 M25 20 H300 M25 40 H300 M25 60 H300 M25 90 H300 M25 120 H300 M25 140 H300 " stroke='black' fill='none'/>
                                 <Text x="8" y="50" style={Styles.text}>공</Text>
