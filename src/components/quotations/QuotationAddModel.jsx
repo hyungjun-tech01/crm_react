@@ -7,8 +7,6 @@ import { Button, Checkbox, InputNumber, Modal, Space, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { AddBoxOutlined, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
 import { option_locations } from '../../constants/constants';
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
-import "../antdstyle.css";
 
 import {
   defaultQuotation,
@@ -25,9 +23,10 @@ import {
   QuotationRepo,
   QuotationTypes,
   QuotationSendTypes,
-  quotationDelivery,
-  quotationExpiry,
-  quotationPayment
+  QuotationDelivery,
+  QuotationExpiry,
+  QuotationPayment,
+  QuotationContentItems,
 } from "../../repository/quotation";
 import { SettingsRepo } from '../../repository/settings'
 
@@ -36,12 +35,6 @@ import AddSearchItem from "../../constants/AddSearchItem";
 import QuotationContentModal from "./QuotationContentModal";
 import MessageModal from "../../constants/MessageModal";
 
-const defaultQuotationContent = {
-  '1': null, '2': null, '3': null, '4': null, '5': null,
-  '6': null, '7': null, '8': null, '9': null, '10': null,
-  '11': null, '12': null, '13': null, '14': null, '15': null,
-  '16': null, '17': null, '18': null, '19': null, '998': null,
-};
 
 const ResizeableTitle = props => {
   const { onResize, width, ...restProps } = props;
@@ -62,10 +55,9 @@ const ResizeableTitle = props => {
   );
 };
 
-const QuotationAddModel = (props) => {
-  const { init, handleInit } = props;
+const QuotationAddModel = ({ init, handleInit }) => {
   const [t] = useTranslation();
-  const [cookies, setCookie] = useCookies(["myLationCrmUserId", "myQuotationAddColumns"]);
+  const [cookies, setCookie] = useCookies(["myLationCrmUserId", "myLationCrmUserName", "myQuotationAddColumns"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [message, setMessage] = useState({ title: "", message: "" });
 
@@ -92,96 +84,6 @@ const QuotationAddModel = (props) => {
   const [quotationChange, setQuotationChange] = useState({ ...defaultQuotation });
   const [quotationContents, setQuotationContents] = useState([]);
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
-  const selectedCategory = useRecoilValue(atomSelectedCategory);
-
-  const handlePopupOpen = (open) => {
-    console.log('QuotationAdd / handlePopupOpen');
-    if(open) {
-      openModal("antModal");
-    } else {
-      closeModal();
-    }
-  };
-
-  const initializeQuotationTemplate = useCallback(() => {
-    setQuotationContents([]);
-
-    let modifiedData = {
-      ...defaultQuotation,
-      receiver: cookies.myLationCrmUserName,
-    };
-
-    if ((selectedCategory.category === 'lead')
-      && (currentLead !== defaultLead)
-      && (selectedCategory.item_code === currentLead.lead_code)
-    ) {
-        modifiedData['lead_code'] = currentLead.lead_code;
-        modifiedData['lead_name'] = currentLead.lead_name;
-        modifiedData['department'] = currentLead.department;
-        modifiedData['position'] = currentLead.position;
-        modifiedData['mobile_number'] = currentLead.mobile_number;
-        modifiedData['phone_number'] = currentLead.phone_number;
-        modifiedData['email'] = currentLead.email;
-    };
-
-    setAmountsForContent({
-      sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
-    });
-
-    setIsContentModalOpen(false);
-    setEditedContentModalValues({});
-    setOrgContentModalValues({});
-    setSelectedContentRowKeys([]);
-
-    // load or set setting of column of table ----------------------------------
-    if(!cookies.myQuotationAddColumns){
-
-      const tempQuotationColumn = [
-        ...defaultColumns
-      ];
-      const tempCookieValue = {
-        [cookies.myLationCrmUserId] : tempQuotationColumn 
-      }
-      setContentColumns(tempQuotationColumn);
-      setCookie('myQuotationAddColumns', tempCookieValue);
-    } else {
-      const columnSettings = cookies.myQuotationAddColumns[cookies.myLationCrmUserId];
-      if(!columnSettings){
-        const tempQuotationColumn = [
-          ...defaultColumns
-        ];
-        const tempCookieValue = {
-          ...cookies.myQuotationAddColumns,
-          [cookies.myLationCrmUserId]: tempQuotationColumn
-        };
-        setContentColumns(tempQuotationColumn);
-        setCookie('myQuotationAddColumns', tempCookieValue);
-      } else {
-        const tempQuotationColumn = columnSettings.map(col => ({
-          ...col,
-          render: defaultContentArray[col.dataIndex - 1][2]
-        }));
-        setContentColumns(tempQuotationColumn);
-      };
-    };
-
-    let newDocNo = "";
-    const response = getQuotationDocNo({modify_user: cookies.myLationCrmUserId});
-    response
-      .then((res) => {
-        if(res.result){
-          newDocNo = res.docNo;
-        };
-        modifiedData['quotation_number'] = newDocNo;
-        setQuotationChange(modifiedData);
-      })
-      .catch(err => {
-        console.log('initializeQuotationTemplate / getQuotationDocNo :', err);
-        modifiedData['quotation_number'] = newDocNo;
-        setQuotationChange(modifiedData);
-      })
-
-  }, [cookies.myLationCrmUserId, cookies.myLationCrmUserName, currentLead, getQuotationDocNo]);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
@@ -213,27 +115,27 @@ const QuotationAddModel = (props) => {
   const [editHeaders, setEditHeaders] = useState(false);
   
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const defaultContentArray = [
-    ['1',   'No',                               (text, record) => <>{text}</>],
-    ['2',   t('common.category'),               (text, record) => <>{text}</>],
-    ['3',   t('common.maker'),                  (text, record) => <>{text}</>],
-    ['4',   t('quotation.model_name'),          (text, record) => <>{text}</>],
-    ['5',   t('common.product'),                (text, record) => <>{text}</>],
-    ['6',   t('common.material'),               (text, record) => <>{text}</>],
-    ['7',   t('common.type'),                   (text, record) => <>{text}</>],
-    ['8',   t('common.color'),                  (text, record) => <>{text}</>],
-    ['9',   t('common.standard'),               (text, record) => <>{text}</>],
-    ['10',  t('quotation.detail_desc'),         (text, record) => <>{text}</>],
-    ['11',  t('common.unit'),                   (text, record) => <>{text}</>],
-    ['12',  t('common.quantity'),               (text, record) => <>{handleFormatter(text)}</>],
-    ['13',  t('quotation.consumer_price'),      (text, record) => <>{handleFormatter(text)}</>],
-    ['14',  t('quotation.discount_rate'),       (text, record) => <>{handleFormatter(text)}</>],
-    ['15',  t('quotation.quotation_unit_price'),(text, record) => <>{handleFormatter(text)}</>],
-    ['16',  t('quotation.quotation_amount'),    (text, record) => <>{handleFormatter(text)}</>],
-    ['17',  t('quotation.raw_price'),           (text, record) => <>{handleFormatter(text)}</>],
-    ['18',  t('quotation.profit_amount'),       (text, record) => <>{handleFormatter(text)}</>],
-    ['19',  t('quotation.note'),                (text, record) => <>{text}</>],
-  ];
+  // const defaultContentArray = [
+  //   ['1',   'No',                               (text, record) => <>{text}</>],
+  //   ['2',   t('common.category'),               (text, record) => <>{text}</>],
+  //   ['3',   t('common.maker'),                  (text, record) => <>{text}</>],
+  //   ['4',   t('quotation.model_name'),          (text, record) => <>{text}</>],
+  //   ['5',   t('common.product'),                (text, record) => <>{text}</>],
+  //   ['6',   t('common.material'),               (text, record) => <>{text}</>],
+  //   ['7',   t('common.type'),                   (text, record) => <>{text}</>],
+  //   ['8',   t('common.color'),                  (text, record) => <>{text}</>],
+  //   ['9',   t('common.standard'),               (text, record) => <>{text}</>],
+  //   ['10',  t('quotation.detail_desc'),         (text, record) => <>{text}</>],
+  //   ['11',  t('common.unit'),                   (text, record) => <>{text}</>],
+  //   ['12',  t('common.quantity'),               (text, record) => <>{handleFormatter(text)}</>],
+  //   ['13',  t('quotation.consumer_price'),      (text, record) => <>{handleFormatter(text)}</>],
+  //   ['14',  t('quotation.discount_rate'),       (text, record) => <>{handleFormatter(text)}</>],
+  //   ['15',  t('quotation.quotation_unit_price'),(text, record) => <>{handleFormatter(text)}</>],
+  //   ['16',  t('quotation.quotation_amount'),    (text, record) => <>{handleFormatter(text)}</>],
+  //   ['17',  t('quotation.raw_price'),           (text, record) => <>{handleFormatter(text)}</>],
+  //   ['18',  t('quotation.profit_amount'),       (text, record) => <>{handleFormatter(text)}</>],
+  //   ['19',  t('quotation.note'),                (text, record) => <>{text}</>],
+  // ];
 
   const defaultColumns = [
     {
@@ -303,6 +205,15 @@ const QuotationAddModel = (props) => {
       width: size.width,
     };
     setContentColumns(nextColumns);
+
+    // update cookie for content columns ----------------
+    const tempCookies = {
+      ...cookies.myQuotationAddColumns,
+      [cookies.myLationCrmUserId] : [
+        ...nextColumns
+      ]
+    };
+    setCookie("myQuotationAddColumns", tempCookies);
   };
 
   const handleHeaderCheckChange = (event) => {
@@ -324,19 +235,23 @@ const QuotationAddModel = (props) => {
             render: contentColumns.at(-1).render,
           },
           {
-            title: defaultContentArray[targetIndex - 1][1],
+            title: t(QuotationContentItems[targetName].title),
             dataIndex: targetName,
-            render: defaultContentArray[targetIndex -1][2],
-          },  
-        ]
+            render: QuotationContentItems[targetName].type === 'price'
+              ? (text, record) => <>{handleFormatter(text)}</>
+              : (text, record) => <>{text}</>,
+          }, 
+        ];
       } else {
         tempColumns = [
           ...contentColumns.slice(0, foundIndex),
           {
-            title: defaultContentArray[targetIndex - 1][1],
+            title: t(QuotationContentItems[targetName].title),
             dataIndex: targetName,
             width: 100,
-            render: defaultContentArray[targetIndex -1][2],
+            render: QuotationContentItems[targetName].type === 'price'
+              ? (text, record) => <>{handleFormatter(text)}</>
+              : (text, record) => <>{text}</>,
           },
           ...contentColumns.slice(foundIndex,),
         ];
@@ -352,21 +267,30 @@ const QuotationAddModel = (props) => {
     };
     
     setContentColumns(tempColumns);
+
+    // update cookie for content columns ----------------
+    const tempCookies = {
+      ...cookies.myQuotationAddColumns,
+      [cookies.myLationCrmUserId] : [
+        ...tempColumns
+      ]
+    };
+    setCookie("myQuotationAddColumns", tempCookies);
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const ConvertHeaderInfosToString = (data) => {
     let ret = '';
 
-    defaultContentArray.forEach((item, index) => {
-      if (index === 0)
-        ret += item.at(0);
+    Object.keys(QuotationContentItems).forEach((item, index) => {
+      if (item === '1')
+        ret += item;
       else
-        ret += '|' + item.at(0);
+        ret += '|' + item;
 
-      ret += '|' + item.at(1) + '|';
+      ret += '|' + t(QuotationContentItems[item].title) + '|';
 
-      const foundIdx = data.findIndex(col => col.dataIndex === item.at(0));
+      const foundIdx = data.findIndex(col => col.dataIndex === item);
       if (foundIdx === -1) {
         ret += '0';
       } else {
@@ -378,7 +302,7 @@ const QuotationAddModel = (props) => {
   };
 
 
-  //===== Handles to edit 'Contents' =================================================
+  //===== Handles to edit 'Content' =================================================
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [orgContentModalValues, setOrgContentModalValues] = useState({});
   const [editedContentModalValues, setEditedContentModalValues] = useState({});
@@ -592,11 +516,20 @@ const QuotationAddModel = (props) => {
     setAmountsForContent(updatedSetting);
   }
 
-  // --- Functions used for editing content ------------------------------
+  //===== Handles to edit contents ========================================
   const handleAddNewContent = useCallback(() => {
     if (!quotationChange.lead_name) {
-      setMessage({ title: '필요 정보 누락', message: '고객 이름이 누락되었습니다.' });
-      setIsMessageModalOpen(true);
+      const contents = (
+        <>
+          <p>{t('comment.msg_no_necessary_data')}</p>
+          <div> - 고객 이름</div>
+        </>
+      );
+      const tempMsg = {
+        title: t('comment.title_check'),
+        message: contents,
+      };
+      handleOpenMessage(tempMsg);
       return;
     };
 
@@ -626,8 +559,11 @@ const QuotationAddModel = (props) => {
 
   const handleModifyContent = useCallback((data) => {
     if (!data) {
-      setMessage({ title: '필요 정보 누락', message: '입력 Data가 없습니다.' });
-      setIsMessageModalOpen(true);
+      const tempMsg = {
+        title: t('comment.title_check'),
+        message: t('comment.msg_no_data'),
+      };
+      handleOpenMessage(tempMsg);
       return;
     };
 
@@ -650,14 +586,18 @@ const QuotationAddModel = (props) => {
       quotation_amount: data['16'],
     });
 
+    handlePopupOpen(true);
     setEditedContentModalValues({});
     setIsContentModalOpen(true);
   }, [settingForContent, t]);
 
   const handleDeleteSelectedConetents = useCallback(() => {
     if (selectedContentRowKeys.length === 0) {
-      setMessage({ title: '선택 항목 누락', message: '선택한 값이 없습니다.' });
-      setIsMessageModalOpen(true);
+      const tempMsg = {
+        title: t('comment.title_check'),
+        message: t('comment.msg_select_nothing'),
+      };
+      handleOpenMessage(tempMsg);
       return;
     };
 
@@ -694,27 +634,48 @@ const QuotationAddModel = (props) => {
     };
     if (!finalData.product_name || !finalData.quotation_amount) {
       setMessage({ title: '필요 항목 누락', message: '필요 값 - 제품명 또는 견적 가격 - 이 없습니다.' });
-      setIsMessageModalOpen(true);
+      const contents = (
+        <>
+          <p>하기 정보는 필수 입력 사항입니다.</p>
+          { !finalData.product_name && <div> - 제품명</div> }
+          { !finalData.quotation_amount && <div> - 견적 가격</div> }
+        </>
+      );
+      const tempMsg = {
+        title: t('comment.title_check'),
+        message: contents,
+      };
+      handleOpenMessage(tempMsg);
       return;
     };
 
     // update Contents -------------------------------------------------
+    const updatedContent = {
+      '1': 1,
+      '2': finalData.product_class_name,
+      '3': finalData.manufacturer || '',
+      '4': finalData.model_name || '',
+      '5': finalData.product_name || '',
+      '6': finalData.material || '',
+      '7': finalData.type || '',
+      '8': finalData.color || '',
+      '9': finalData.standard || '',
+      '10': finalData.detail_desc_on_off || '',
+      '11': finalData.unit || '',
+      '12': finalData.quantity || '',
+      '13': finalData.reseller_price || '',
+      '14': settingForContent.dc_rate || '',
+      '15': finalData.list_price || '',
+      '16': finalData.quotation_amount || '',
+      '17': finalData.cost_price || '',
+      '18': finalData.profit_amount || '',
+      '19': finalData.memo || '',
+      '998': finalData.detail_desc || '',
+      'org_unit_price': finalData.org_unit_price,
+    };
+
     if (settingForContent.action === "ADD") {
-      const updatedContent = {
-        ...defaultQuotationContent,
-        '1': quotationContents.length + 1,
-        '2': finalData.product_class_name,
-        '5': finalData.product_name,
-        '10': finalData.detail_desc_on_off,
-        '12': finalData.quantity,
-        '13': finalData.reseller_price,
-        '14': settingForContent.dc_rate,
-        '15': finalData.list_price,
-        '16': finalData.quotation_amount,
-        '17': finalData.cost_price,
-        '998': finalData.detail_desc ? finalData.detail_desc : '',
-        'org_unit_price': finalData.org_unit_price,
-      };
+      updatedContent['1'] = quotationContents.length + 1;
       const updatedContents = quotationContents.concat(updatedContent);
       setQuotationContents(updatedContents);
 
@@ -722,21 +683,7 @@ const QuotationAddModel = (props) => {
         handleCalculateAmounts(updatedContents);
       };
     } else {  //Update
-      const updatedContent = {
-        ...defaultQuotationContent,
-        '1': settingForContent.index,
-        '2': finalData.product_class_name,
-        '5': finalData.product_name,
-        '10': finalData.detail_desc_on_off,
-        '12': finalData.quantity,
-        '13': finalData.reseller_price,
-        '14': settingForContent.dc_rate,
-        '15': finalData.list_price,
-        '16': finalData.quotation_amount,
-        '17': finalData.cost_price,
-        '998': finalData.detail_desc ? finalData.detail_desc : '',
-        'org_unit_price': finalData.org_unit_price,
-      };
+      updatedContent['1'] = settingForContent.index;
       const foundIdx = quotationContents.findIndex(item => item['1'] === settingForContent.index);
       if (foundIdx === -1) {
         console.log('Something Wrong when modifying content');
@@ -774,7 +721,7 @@ const QuotationAddModel = (props) => {
     let ret = value;
     if (typeof value === 'string') {
       ret = Number(value);
-      if (isNaN(ret)) return;
+      if (isNaN(ret)) return value;
     };
 
     return settingForContent.show_decimal
@@ -782,8 +729,122 @@ const QuotationAddModel = (props) => {
       : ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }, [settingForContent.show_decimal]);
 
+  const handleOpenEditHeaders = () => {
+    handlePopupOpen(true);
+    setEditHeaders(true);
+  };
 
-  //===== Function for Final Actions  ==========================================
+  const handleCloseEditHeaders = () => {
+    handlePopupOpen(false);
+    setEditHeaders(false);
+  };
+
+
+  //===== Handles to handle this =================================================
+  const selectedCategory = useRecoilValue(atomSelectedCategory);
+
+  const handlePopupOpen = (open) => {
+    console.log('QuotationAdd / handlePopupOpen');
+    if(open) {
+      openModal("antModal");
+    } else {
+      closeModal();
+    }
+  };
+
+  const handleOpenMessage = (msg) => {
+    openModal('antModal');
+    setMessage(msg);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleCloseMessage = () => {
+    closeModal();
+    setIsMessageModalOpen(false);
+  };
+
+  const handleInitialize = useCallback(() => {
+    console.log('QuotationAdd / handleInitialize : start');
+    setQuotationContents([]);
+
+    let modifiedData = {
+      ...defaultQuotation,
+      receiver: cookies.myLationCrmUserName,
+    };
+
+    if (currentLead !== defaultLead)
+    {
+      modifiedData['lead_code'] = currentLead.lead_code;
+      modifiedData['lead_name'] = currentLead.lead_name;
+      modifiedData['department'] = currentLead.department;
+      modifiedData['position'] = currentLead.position;
+      modifiedData['mobile_number'] = currentLead.mobile_number;
+      modifiedData['phone_number'] = currentLead.phone_number;
+      modifiedData['email'] = currentLead.email;
+    };
+
+    setAmountsForContent({
+      sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
+    });
+
+    setIsContentModalOpen(false);
+    setEditedContentModalValues({});
+    setOrgContentModalValues({});
+    setSelectedContentRowKeys([]);
+
+    // load or set setting of column of table ----------------------------------
+    if(!cookies.myQuotationAddColumns){
+
+      const tempQuotationColumn = [
+        ...defaultColumns
+      ];
+      const tempCookieValue = {
+        [cookies.myLationCrmUserId] : tempQuotationColumn 
+      }
+      setContentColumns(tempQuotationColumn);
+      setCookie('myQuotationAddColumns', tempCookieValue);
+    } else {
+      const columnSettings = cookies.myQuotationAddColumns[cookies.myLationCrmUserId];
+      if(!columnSettings){
+        console.log('Initialize : get column setting from cookies -', columnSettings);
+        const tempQuotationColumn = [
+          ...defaultColumns
+        ];
+        const tempCookieValue = {
+          ...cookies.myQuotationAddColumns,
+          [cookies.myLationCrmUserId]: tempQuotationColumn
+        };
+        setContentColumns(tempQuotationColumn);
+        setCookie('myQuotationAddColumns', tempCookieValue);
+      } else {
+        const tempQuotationColumn = columnSettings.map(col => ({
+          ...col,
+          render: QuotationContentItems[col.dataIndex].type === 'price'
+              ? (text, record) => <>{handleFormatter(text)}</>
+              : (text, record) => <>{text}</>,
+        }));
+        setContentColumns(tempQuotationColumn);
+      };
+    };
+
+    let newDocNo = "";
+    const response = getQuotationDocNo({modify_user: cookies.myLationCrmUserId});
+    response
+      .then((res) => {
+        if(res.result){
+          newDocNo = res.docNo;
+        };
+        modifiedData['quotation_number'] = newDocNo;
+        setQuotationChange(modifiedData);
+      })
+      .catch(err => {
+        console.log('handleInitialize / getQuotationDocNo :', err);
+        modifiedData['quotation_number'] = newDocNo;
+        setQuotationChange(modifiedData);
+      })
+
+  }, [cookies.myLationCrmUserId, cookies.myLationCrmUserName, currentLead, getQuotationDocNo]);
+
   const handleAddNewQuotation = () => {
     // Check data if they are available
     let numberOfNoInputItems = 0;
@@ -816,8 +877,7 @@ const QuotationAddModel = (props) => {
         title: t('comment.title_check'),
         message: contents,
       };
-      setMessage(tempMsg);
-      setIsMessageModalOpen(true);
+      handleOpenMessage(tempMsg);
       return;
     };
 
@@ -845,36 +905,24 @@ const QuotationAddModel = (props) => {
       if (res.result) {
         handleClose();
       } else {
-        setMessage({ title: '저장 실패', message: '정보 저장에 실패하였습니다.' });
-        setIsMessageModalOpen(true);
+        const tempMsg = {
+          title: t('comment.title_error'),
+          message: `${t('comment.msg_fail_save')} - ${t('comment.reason')} : ${res.data}`,
+        };
+        handleOpenMessage(tempMsg);
       };
     });
   };
 
   const handleClose = () => {
-    console.log('QuotationAdd / handleClose');
-    const tempCookies = {
-      ...cookies.myQuotationAddColumns,
-      [cookies.myLationCrmUserId] : [
-        ...contentColumns
-      ]
-    };
-    setCookie("myQuotationAddColumns", tempCookies);
     setTimeout(() => {
       closeModal();
-    }, 500);
+    }, 250);
   };
 
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    if (init && ((userState & 1) === 1)) {
-      if (handleInit) handleInit(!init);
-      setTimeout(() => {
-        initializeQuotationTemplate();
-      }, 500);
-    };
-
     // 모달 내부 페이지의 히스토리 상태 추가
     history.pushState({ modalInternal: true }, '', location.href);
 
@@ -886,9 +934,15 @@ const QuotationAddModel = (props) => {
     };
 
     // popstate 이벤트 리스너 추가 (중복 추가 방지)
-    window.addEventListener('popstate', handlePopState);  
-
-  }, [userState, init, handleInit, initializeQuotationTemplate]);
+    window.addEventListener('popstate', handlePopState);
+    
+    if (init && ((userState & 1) === 1)) {
+      if (handleInit) handleInit(!init);
+      setTimeout(() => {
+        handleInitialize();
+      }, 250);
+    };
+  }, [userState, init, handleInit, handleInitialize]);
 
   if (init)
     return <div>&nbsp;</div>;
@@ -1016,7 +1070,7 @@ const QuotationAddModel = (props) => {
                   title={t('quotation.expiry_date')}
                   type='select'
                   name='quotation_expiration_date'
-                  options={quotationExpiry}
+                  options={QuotationExpiry}
                   defaultValue={quotationChange.quotation_expiration_date}
                   onChange={handleSelectChange}
                 />
@@ -1040,7 +1094,7 @@ const QuotationAddModel = (props) => {
                   title={t('quotation.delivery_period')}
                   type='select'
                   name='delivery_period'
-                  options={quotationDelivery}
+                  options={QuotationDelivery}
                   defaultValue={quotationChange.delivery_period}
                   onChange={handleSelectChange}
                 />
@@ -1067,7 +1121,7 @@ const QuotationAddModel = (props) => {
                   title={t('quotation.payment_type')}
                   type='select'
                   name='payment_type'
-                  options={quotationPayment}
+                  options={QuotationPayment}
                   defaultValue={quotationChange.payment_type}
                   onChange={handleSelectChange}
                 />
@@ -1112,7 +1166,7 @@ const QuotationAddModel = (props) => {
                     />
                     <SettingsOutlined
                       style={{ height: 32, width: 32, color: 'gray' }}
-                      onClick={() => { setEditHeaders(!editHeaders); }}
+                      onClick={handleOpenEditHeaders}
                     />
                   </div>
                 </div>
@@ -1347,10 +1401,10 @@ const QuotationAddModel = (props) => {
       <Modal
         title={t('quotation.header_setting')}
         open={editHeaders}
-        onOk={() => { setEditHeaders(!editHeaders)}}
-        onCancel={() => { setEditHeaders(!editHeaders)}}
+        onOk={handleCloseEditHeaders}
+        onCancel={handleCloseEditHeaders}
         footer={[
-          <Button key="submit" type="primary" onClick={() => { setEditHeaders(!editHeaders)}}>
+          <Button key="submit" type="primary" onClick={handleCloseEditHeaders}>
               Ok
           </Button>,
         ]}
@@ -1360,16 +1414,16 @@ const QuotationAddModel = (props) => {
       >
         <table className="table">
           <tbody>
-            {defaultContentArray.map((item, index) => {
-              const foundItem = contentColumns.filter(column => column.dataIndex === item.at(0))[0];
+          {Object.keys(QuotationContentItems).map((item, index) => {
+              const foundItem = contentColumns.filter(column => column.dataIndex === item)[0];
               return (
                 <tr key={index}>
                   <td>
-                  {item.at(1)}
+                  {t(QuotationContentItems[item].title)}
                   </td>
                   <td>
                     <Checkbox
-                      name={item.at(0)}
+                      name={item}
                       checked={!!foundItem}
                       onChange={handleHeaderCheckChange}
                     />
@@ -1383,6 +1437,7 @@ const QuotationAddModel = (props) => {
       <QuotationContentModal
         setting={settingForContent}
         open={isContentModalOpen}
+        items={contentColumns}
         original={orgContentModalValues}
         edited={editedContentModalValues}
         handleEdited={handleContentItemChange}
@@ -1393,7 +1448,7 @@ const QuotationAddModel = (props) => {
         title={message.title}
         message={message.message}
         open={isMessageModalOpen}
-        handleOk={() => setIsMessageModalOpen(false)}
+        handleOk={handleCloseMessage}
       />
     </div>
   );

@@ -154,7 +154,7 @@ const Purchase = () => {
   const handleClickPurchase = useCallback((code)=>{
     setCurrentPurchase(code);
     setSelectedCategory({category: 'purchase', item_code: code});
-    openModal('purchase-details');
+    openModal('purchase-details', 'initialize_purchase');
   },[setCurrentPurchase, setSelectedCategory]);
 
   const handleAddNewPurchaseClicked = useCallback(() => {

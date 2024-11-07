@@ -6,14 +6,12 @@ import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
 
 import {
-  atomUserState,
   atomUsersForSelection,
   atomEngineersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
 import {
   atomCurrentConsulting,
-  atomSelectedCategory,
   atomRequestAttachments,
   atomActionAttachments,
   defaultConsulting, 
@@ -31,48 +29,35 @@ import { SettingsRepo } from "../../repository/settings";
 
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
+import MessageModal from "../../constants/MessageModal";
 
 
 const ConsultingDetailsModel = () => {
   const [t] = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [message, setMessage] = useState({ title: "", message: "" });
+
+  const EDIT_REQUEST_CONTENT = 1;
+  const EDIT_ACTION_CONTENT = 2;
 
 
   //===== [RecoilState] Related with Consulting =======================================
   const selectedConsulting = useRecoilValue(atomCurrentConsulting);
-  const { modifyConsulting, setCurrentConsulting } = useRecoilValue(ConsultingRepo);
+  const { modifyConsulting } = useRecoilValue(ConsultingRepo);
 
 
   //===== [RecoilState] Related with Users ==========================================
-  const userState = useRecoilValue(atomUserState);
   const usersForSelection = useRecoilValue(atomUsersForSelection);
   const engineersForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
 
-  //===== [RecoilState] Related with Users ============================================
+  //===== [RecoilState] Related with Settings =========================================
   const { openModal, closeModal } = useRecoilValue(SettingsRepo);
 
 
-  //===== Handles to deal this component ==============================================
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  const [currentConsultingCode, setCurrentConsultingCode] = useState('');
-  const [ selectedCategory, setSelectedCategory] = useRecoilState(atomSelectedCategory);
-  const [ showEditor, setShowEditor ] = useState(0);
-
-  const EDIT_REQUEST_CONTENT = 1;
-  const EDIT_ACTION_CONTENT = 2;
-
-  const handleWidthChange = useCallback((checked) => {
-    setIsFullScreen(checked);
-    if (checked)
-      localStorage.setItem('isFullScreen', '1');
-    else
-      localStorage.setItem('isFullScreen', '0');
-  }, []);
-
   //===== Handles to edit 'Consulting Details' ========================================
-  const [isAllNeededDataLoaded, setIsAllNeededDataLoaded] = useState(false);
   const [editedDetailValues, setEditedDetailValues] = useState(null);
 
   const handleDetailChange = useCallback((e) => {
@@ -109,7 +94,8 @@ const ConsultingDetailsModel = () => {
     };
   }, [editedDetailValues, selectedConsulting]);
 
-  //===== Handles to attachment ========================================
+
+  //===== Handles to edit attachment ========================================
   const orgRequestAttachments = useRecoilValue(atomRequestAttachments);
   const orgActionAttachments = useRecoilValue(atomActionAttachments);
   const [ requestAttachmentCode, setRequestAttachmentCode ] = useRecoilState(atomRequestAttachmentCode);
@@ -117,6 +103,7 @@ const ConsultingDetailsModel = () => {
   const { deleteFile, modifyAttachmentInfo } = useRecoilValue(AttachmentRepo);
   const [ requestAttachments, setRequestAttachments ] = useState([]);
   const [ actionAttachments, setActionAttachments ] = useState([]);
+  const [ showEditor, setShowEditor ] = useState(0);
 
   const handleAddRequestContent = async (data) => {
     const {content, attachments} = data;
@@ -158,7 +145,6 @@ const ConsultingDetailsModel = () => {
       removedAttachments.forEach(async item => {
         const deleteResp = await deleteFile(item.dirName, item.fileName, item.fileExt);
         if(!deleteResp.result){
-          console.log('Failed to remove uploaded file :', item);
           // ToDo: Then, what should we do to deal this condition!
           return;
         };
@@ -193,7 +179,11 @@ const ConsultingDetailsModel = () => {
           creator : cookies.myLationCrmUserId,
         });
         if(!firstResp.result){
-          console.log('handleAddRequestContent / after modifyAttachmentInfo ', firstResp.message);
+          const tempMsg = {
+            title: t('comment.title_error'),
+            message: `${t('comment.msg_fail_save')} - ${firstResp.message}`,
+          };
+          handleOpenMessage(tempMsg);
           return;
         };
         finalAttachments.push({
@@ -278,7 +268,6 @@ const ConsultingDetailsModel = () => {
       removedAttachments.forEach(async item => {
         const deleteResp = await deleteFile(item.dirName, item.fileName, item.fileExt);
         if(!deleteResp.result){
-          console.log('Failed to remove uploaded file :', item);
           // ToDo: Then, what should we do to deal this condition!
           return;
         };
@@ -313,7 +302,11 @@ const ConsultingDetailsModel = () => {
           creator : cookies.myLationCrmUserId,
         });
         if(!firstResp.result){
-          console.log('handleAddRequestContent / after modifyAttachmentInfo ', firstResp.message);
+          const tempMsg = {
+            title: t('comment.title_error'),
+            message: `${t('comment.msg_fail_save')} - ${firstResp.message}`,
+          };
+          handleOpenMessage(tempMsg);
           return;
         };
         finalAttachments.push({
@@ -358,52 +351,6 @@ const ConsultingDetailsModel = () => {
     };
   };
 
-  const handleSaveAll = useCallback(() => {
-    if (editedDetailValues !== null
-      && selectedConsulting
-      && selectedConsulting !== defaultConsulting) {
-      let temp_all_saved = {
-        ...editedDetailValues
-      };
-      temp_all_saved['action_type'] = "UPDATE";
-      temp_all_saved['modify_user'] = cookies.myLationCrmUserId;
-      temp_all_saved['consulting_code'] = selectedConsulting.consulting_code;
-
-      const resp = modifyConsulting(temp_all_saved);
-      resp.then(res => {
-        if (res.result) {
-          console.log(`Succeeded to modify company`);
-          handleClose();
-        } else {
-          console.error('Failed to modify company : ', res.data);
-        };
-      });
-    } else {
-      console.log("[ ConsultingDetailModel ] No saved data");
-    };
-    setEditedDetailValues(null);
-  }, [cookies.myLationCrmUserId, modifyConsulting, editedDetailValues, selectedConsulting]);
-
-  const handleCancelAll = useCallback(() => {
-    setEditedDetailValues(null);
-    handleClose();
-  }, []);
-
-  const handleClose = useCallback(() => {
-    if(selectedCategory.category === 'consulting'){
-      setSelectedCategory({category: null, item_code: null});
-    };
-    setEditedDetailValues(null);
-    setActionAttachments([]);
-    setRequestAttachments([]);
-    setCurrentConsulting();
-    
-    setTimeout(() => {
-      closeModal();
-    }, 500);
-    
-  }, [setCurrentConsulting]);
-
   const consultingItemsInfo = [
     { key: 'department', title: 'lead.department', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'position', title: 'lead.position', detail: { type: 'label', editing: handleDetailChange } },
@@ -428,7 +375,68 @@ const ConsultingDetailsModel = () => {
   ];
 
 
-  //===== useEffect functions =============================================== 
+  //===== Handles to handle this =================================================
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [currentConsultingCode, setCurrentConsultingCode] = useState('');
+
+  const handleWidthChange = useCallback((checked) => {
+    setIsFullScreen(checked);
+    if (checked)
+      localStorage.setItem('isFullScreen', '1');
+    else
+      localStorage.setItem('isFullScreen', '0');
+  }, []);
+
+  const handleOpenMessage = (msg) => {
+    openModal('antModal');
+    setMessage(msg);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleCloseMessage = () => {
+    closeModal();
+    setIsMessageModalOpen(false);
+  };
+
+  const handleSaveAll = () => {
+    if (editedDetailValues !== null
+      && selectedConsulting
+      && selectedConsulting !== defaultConsulting) {
+      let temp_all_saved = {
+        ...editedDetailValues
+      };
+      temp_all_saved['action_type'] = "UPDATE";
+      temp_all_saved['modify_user'] = cookies.myLationCrmUserId;
+      temp_all_saved['consulting_code'] = selectedConsulting.consulting_code;
+
+      const resp = modifyConsulting(temp_all_saved);
+      resp.then(res => {
+        if (res.result) {
+          handleClose();
+        } else {
+          console.error('Failed to modify company : ', res.data);
+          openModal('antModal');
+          setMessage(`저장에 실패했습니다 - ${res.data}`);
+        };
+      });
+    } else {
+      console.log("[ ConsultingDetailModel ] No saved data");
+    };
+  };
+
+  const handleInitialize = () => {
+    setEditedDetailValues(null);
+    setActionAttachments([]);
+    setRequestAttachments([]);
+  };
+
+  const handleClose = () => {
+    setTimeout(() => {
+      closeModal();
+    }, 250);
+  };
+
+  //===== useEffect functions ====================================================
   useEffect(() => {
     if ((selectedConsulting !== defaultConsulting)
       && (selectedConsulting.consulting_code !== currentConsultingCode)
@@ -443,31 +451,23 @@ const ConsultingDetailsModel = () => {
         setIsFullScreen(true);
       };
 
+      // 모달 내부 페이지의 히스토리 상태 추가
+      history.pushState({ modalInternal: true }, '', location.href);
+
+      const handlePopState = (event) => {
+        if (event.state && event.state.modalInternal) {
+          // 뒤로 가기를 방지하기 위해 다시 히스토리를 푸시
+          history.pushState({ modalInternal: true }, '', location.href);
+        }
+      };
+
+      // popstate 이벤트 리스너 추가 (중복 추가 방지)
+      window.addEventListener('popstate', handlePopState);
+
+      handleInitialize();
       setCurrentConsultingCode(selectedConsulting.consulting_code);
     };
   }, [cookies.myLationCrmUserId, currentConsultingCode, selectedConsulting]);
-
-  useEffect(() => {
-    if ((userState & 1) === 1) {
-      setIsAllNeededDataLoaded(true);
-    };
-    // 모달 내부 페이지의 히스토리 상태 추가
-    history.pushState({ modalInternal: true }, '', location.href);
-
-    const handlePopState = (event) => {
-      if (event.state && event.state.modalInternal) {
-        // 뒤로 가기를 방지하기 위해 다시 히스토리를 푸시
-        history.pushState({ modalInternal: true }, '', location.href);
-      }
-    };
-
-    // popstate 이벤트 리스너 추가 (중복 추가 방지)
-    window.addEventListener('popstate', handlePopState);
-    
-  }, [userState])
-
-  if (!isAllNeededDataLoaded)
-    return <div>&nbsp;</div>;
 
   return (
     <div
@@ -597,7 +597,7 @@ const ConsultingDetailsModel = () => {
                         <button
                           type="button"
                           className="btn btn-secondary btn-rounded"
-                          onClick={handleCancelAll}
+                          onClick={handleClose}
                         >
                           {t('common.cancel')}
                         </button>
@@ -612,6 +612,12 @@ const ConsultingDetailsModel = () => {
         {/* modal-content */}
       </div>
       {/* modal-dialog */}
+      <MessageModal
+        title={message.title}
+        message={message.message}
+        open={isMessageModalOpen}
+        handleOk={handleCloseMessage}
+      />
     </div>
   );
 };

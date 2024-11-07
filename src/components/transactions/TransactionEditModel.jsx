@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import Select from "react-select";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
@@ -16,7 +16,6 @@ import {
   atomCompanyState,
   atomCurrentCompany,
   atomCurrentTransaction,
-  atomSelectedCategory,
   defaultCompany,
   defaultTransaction,
 } from "../../atoms/atoms";
@@ -55,7 +54,7 @@ const default_receipt_data = {
   card_number: '',
 };
 
-const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, setTaxInvoiceContents }) => {
+const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceData, setTaxInvoiceContents }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -86,7 +85,6 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
   const [showDecimal, setShowDecimal] = useState(0);
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
   const [selectData, setSelectData] = useState({});
-  const [selectedCategory, setSelectedCategory] = useRecoilState(atomSelectedCategory);
 
   const handleItemChange = useCallback((e) => {
     const modifiedData = {
@@ -212,7 +210,7 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [orgContentModalData, setOrgContentModalData] = useState({});
   const [editedContentModalData, setEditedContentModalData] = useState({});
-  const [contentSetting, setContentSetting] = useState({isNew: false, rowNo: 0});
+  const [contentSetting, setContentSetting] = useState({ isNew: false, rowNo: 0 });
 
   const handleFormatter = useCallback((value) => {
     if (value === undefined || value === null || value === '') return '';
@@ -258,7 +256,7 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
   };
 
   const handleStartAddContent = () => {
-    setContentSetting({isNew: true, rowNo: -1});
+    setContentSetting({ isNew: true, rowNo: -1 });
 
     const tempData = {
       ...dataForTransaction,
@@ -273,7 +271,7 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
   };
 
   const handleStartEditContent = (data, index) => {
-    setContentSetting({isNew: false, rowNo: index});
+    setContentSetting({ isNew: false, rowNo: index });
 
     const tempData = {
       ...dataForTransaction,
@@ -300,9 +298,17 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
 
   const handleContentModalOk = () => {
     if (!editedContentModalData['transaction_date'] && !orgContentModalData['transaction_date']) {
-      const tempMsg = { title: '확인', message: '거래일 정보가 누락되었습니다.' }
-      setMessage(tempMsg);
-      setIsMessageModalOpen(true);
+      const contents = (
+        <>
+          <p>{t('comment.msg_no_necessary_data')}</p>
+          <div> - 거래일</div>
+        </>
+      );
+      const tempMsg = {
+        title: t('comment.title_check'),
+        message: contents,
+      };
+      handleOpenMessage(tempMsg);
       return;
     };
 
@@ -317,22 +323,23 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
       transaction_sub_type: dataForTransaction.transaction_type,
       modify_date: formatDate(new Date()),
     };
-    if(!!editedContentModalData['transaction_date']) {
-      tempContent.month_day = `${editedContentModalData.transaction_date.getMonth() - 1}.${editedContentModalData.transaction_date.getDate()}`
+    if (!!editedContentModalData['transaction_date']) {
+      tempContent.month_day = `${editedContentModalData.transaction_date.getMonth() + 1}.${editedContentModalData.transaction_date.getDate()}`
     };
-    if(!!tempContent.transaction_date) delete tempContent.transaction_date;
-    if(!!tempContent.product_class_name) delete tempContent.product_class_name;
+    if (!!tempContent.transaction_date) delete tempContent.transaction_date;
+    if (!!tempContent.product_class_name) delete tempContent.product_class_name;
 
     let tempContents = [];
-    if(contentSetting.isNew) {
+    if (contentSetting.isNew) {
       tempContents = transactionContents.concat(tempContent);
     } else {
       tempContents = [
         ...transactionContents.slice(0, contentSetting.rowNo),
         tempContent,
-        ...transactionContents.slice(contentSetting.rowNo + 1, ),
+        ...transactionContents.slice(contentSetting.rowNo + 1,),
       ]
     };
+    closeModal();
     setTransactionContents(tempContents);
     handleAmountCalculation(tempContents);
     setIsContentModalOpen(false);
@@ -529,40 +536,6 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
   const [transactionForPrint, setTransactionForPrint] = useState(null);
   const [contentsForPrint, setContentsForPrint] = useState(null);
 
-  const handleInitialize = useCallback(() => {
-    setIsAdd(true);
-    setIsSale(true);
-    setIsVatIncluded(true);
-    setShowDecimal(0);
-    setDataForTransaction({ ...default_transaction_data });
-    setDisableItems(false);
-
-    if ((selectedCategory.category === 'company')
-      && (currentCompany !== defaultCompany)
-      && (selectedCategory.item_code === currentCompany.company_code)) {
-      setTransactionChange({
-        company_code: currentCompany.company_code,
-        company_name: currentCompany.company_name,
-        ceo_name: currentCompany.ceo_name,
-        company_address: currentCompany.company_address,
-        business_type: currentCompany.business_type,
-        business_item: currentCompany.business_item,
-        business_registration_code: currentCompany.business_registration_code,
-      });
-    } else {
-      setTransactionChange({});
-    };
-    setTransactionContents([]);
-    setOrgReceiptModalData({ ...default_receipt_data });
-    setEditedReceiptModalData({});
-    // setCurrentTransaction(defaultTransaction);
-    setSelectData({ trans_type: trans_types[0], tax_type: 'vat_included', company_selection: null });
-    setOrgTransaction({});
-    setTransactionForPrint(null);
-    setContentsForPrint(null);
-    document.querySelector("#add_new_transaction_form").reset();
-  }, [selectedCategory, currentCompany]);
-
   const handleShowPrint = () => {
     const tempTransactionData = {
       ...orgTransaction,
@@ -632,10 +605,6 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
 
     setTaxInvoiceContents(tempInvoiceContents);
     openTaxInvoice();
-
-    setTimeout(() => {
-      openModal('edit_tax_invoice');
-    }, 500);
   };
 
   const handleSaveTransaction = (value) => {
@@ -661,21 +630,20 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
       noTransactionContents = true;
     }
 
-    if(numberOfNoInputItems > 0){
+    if (numberOfNoInputItems > 0) {
       const contents = (
         <>
-          <p>하기 정보는 필수 입력 사항입니다.</p>
-          { noCompanyCode && <div> - 회사 이름</div> }
-          { noPublishDate && <div> - 발행일</div> }
-          { noTransactionContents && <div> - 거래 항목</div> }
+          <p>{t('comment.msg_no_necessary_data')}</p>
+          {noCompanyCode && <div> - 회사 이름</div>}
+          {noPublishDate && <div> - 발행일</div>}
+          {noTransactionContents && <div> - 거래 항목</div>}
         </>
       );
       const tempMsg = {
         title: t('comment.title_check'),
         message: contents,
       };
-      setMessage(tempMsg);
-      setIsMessageModalOpen(true);
+      handleOpenMessage(tempMsg);
       return;
     };
 
@@ -699,18 +667,17 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
           setTransactionContents(updatedContents);
         };
 
-        closeModal();
+        handleClose();
 
         if (value === 'Invoice') {
           handleShowInvoice();
-          handleInitialize();
-        } else {
-          handleClose();
         };
-      }
-      else {
-        setMessage({ title: '저장 중 오류', message: `오류가 발생하여 저장하지 못했습니다.` });
-        setIsMessageModalOpen(true);
+      } else {
+        const tempMsg = {
+          title: t('comment.title_error'),
+          message: `${t('comment.msg_fail_save')} - ${t('comment.reason')} : ${res.data}`,
+        };
+        handleOpenMessage(tempMsg);
       };
     });
   };
@@ -736,30 +703,61 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
     };
   };
 
-  const handleClose = () => {
-    if (selectedCategory.category && (selectedCategory.category === 'transaction')) {
-      setSelectedCategory({ category: null, item_code: null });
-    };
-    handleInitialize();
-    closeModal();
-    setTimeout(() => {
-      close();
-    }, 500);
+
+  //===== Handles to handle this =================================================
+  const handlePopupOpen = (open) => {
+    if (open) {
+      openModal('antModal');
+    } else {
+      closeModal();
+    }
   };
 
-  //===== useEffect ==============================================================
+  const handleOpenMessage = (msg) => {
+    openModal('antModal');
+    setMessage(msg);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleCloseMessage = () => {
+    closeModal();
+    setIsMessageModalOpen(false);
+  };
+
+  const handleInitialize = useCallback(() => {
+    setIsAdd(true);
+    setIsSale(true);
+    setIsVatIncluded(true);
+    setShowDecimal(0);
+    setDataForTransaction({ ...default_transaction_data });
+    setDisableItems(false);
+    setTransactionChange({});
+    setTransactionContents([]);
+    setOrgReceiptModalData({ ...default_receipt_data });
+    setEditedReceiptModalData({});
+    setSelectData({ trans_type: trans_types[0], tax_type: 'vat_included', company_selection: null });
+    setOrgTransaction({});
+    setTransactionForPrint(null);
+    setContentsForPrint(null);
+    // document.querySelector("#add_new_transaction_form").reset();
+  }, []);
+
+  const handleClose = () => {
+    setTimeout(() => {
+      closeModal();
+    }, 250);
+  };
+
+  //===== useEffect functions =============================================== 
   useEffect(() => {
-    if (!open) return;
+    if (!init) return;
 
     if ((companyState & 1) === 0) return;
 
-    // if (Object.keys(orgTransaction).length === 0) {
+    if (handleInit) handleInit(false);
+    handleInitialize();
 
-    if (currentTransaction === defaultTransaction) {
-      console.log('[TransactionEditModel] Add New Transaction~');
-      handleInitialize();
-    } else {
-      console.log('[TransactionEditModel] Modify Transaction~', currentTransaction);
+    if (currentTransaction !== defaultTransaction) {
       setIsAdd(false);
       const currentContents = JSON.parse(currentTransaction.transaction_contents);
       setTransactionContents(currentContents);
@@ -783,45 +781,52 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
         };
         setDataForTransaction(tempData);
       };
+
+      if (currentCompany !== defaultCompany){
+        setTransactionChange({
+          company_code: currentCompany.company_code,
+          company_name: currentCompany.company_name,
+          ceo_name: currentCompany.ceo_name,
+          company_address: currentCompany.company_address,
+          business_type: currentCompany.business_type,
+          business_item: currentCompany.business_item,
+          business_registration_code: currentCompany.business_registration_code,
+        });
+      };
+
+      const tempTransaction = {
+        ...currentTransaction,
+        transaction_type: currentTransaction.transaction_type || '매출',
+        publish_date: currentTransaction.publish_date ? new Date(currentTransaction.publish_date) : null,
+      };
+      setOrgTransaction(tempTransaction);
+  
+      const tempReceiptData = {
+        paid_money: currentTransaction.paid_money,
+        payment_type: currentTransaction.payment_type,
+        bank_name: currentTransaction.bank_name,
+        account_owner: currentTransaction.account_owner,
+        account_number: currentTransaction.account_number,
+        card_no: currentTransaction.card_no,
+        card_number: currentTransaction.card_number,
+      }
+      setOrgReceiptModalData(tempReceiptData);
+
+      // 모달 내부 페이지의 히스토리 상태 추가
+      history.pushState({ modalInternal: true }, '', location.href);
+
+      const handlePopState = (event) => {
+          if (event.state && event.state.modalInternal) {
+          // 뒤로 가기를 방지하기 위해 다시 히스토리를 푸시
+          history.pushState({ modalInternal: true }, '', location.href);
+          }
+      };
+
+      // popstate 이벤트 리스너 추가 (중복 추가 방지)
+      window.addEventListener('popstate', handlePopState);
     };
+  }, [init, companyState, currentTransaction, handleInit, handleInitialize, trans_types, currentCompany, dataForTransaction]);
 
-    const tempTransaction = {
-      ...currentTransaction,
-      transaction_type: currentTransaction.transaction_type ? currentTransaction.transaction_type : '매출',
-      publish_date: currentTransaction.publish_date ? new Date(currentTransaction.publish_date) : null,
-    };
-    setOrgTransaction(tempTransaction);
-
-    const tempReceiptData = {
-      paid_money: currentTransaction.paid_money,
-      payment_type: currentTransaction.payment_type,
-      bank_name: currentTransaction.bank_name,
-      account_owner: currentTransaction.account_owner,
-      account_number: currentTransaction.account_number,
-      card_no: currentTransaction.card_no,
-      card_number: currentTransaction.card_number,
-    }
-    setOrgReceiptModalData(tempReceiptData);
-    // };
-
-    // 모달 내부 페이지의 히스토리 상태 추가
-    history.pushState({ modalInternal: true }, '', location.href);
-
-    const handlePopState = (event) => {
-        if (event.state && event.state.modalInternal) {
-        // 뒤로 가기를 방지하기 위해 다시 히스토리를 푸시
-        history.pushState({ modalInternal: true }, '', location.href);
-        }
-    };
-
-    // popstate 이벤트 리스너 추가 (중복 추가 방지)
-    window.addEventListener('popstate', handlePopState);
-    
-  }, [open, companyState, currentTransaction]);
-
-  if (!open) return (
-    <div>&nbsp;</div>
-  );
 
   return (
     <div
@@ -912,6 +917,7 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
                                     defaultValue={orgTransaction.company_name}
                                     edited={transactionChange}
                                     setEdited={handleCompanySelected}
+                                    handleOpen={handlePopupOpen}
                                   />
                                 </Col>
                               </Row>
@@ -1242,7 +1248,7 @@ const TransactionEditModel = ({ open, close, openTaxInvoice, setTaxInvoiceData, 
         title={message.title}
         message={message.message}
         open={isMessageModalOpen}
-        handleOk={() => setIsMessageModalOpen(false)}
+        handleOk={handleCloseMessage}
       />
     </div>
   );

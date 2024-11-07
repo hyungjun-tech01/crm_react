@@ -3,12 +3,12 @@ import { useRecoilValue } from 'recoil';
 import { PDFViewer, Font, Page, Text, View, Document, StyleSheet, Svg, Rect, Image, Path } from '@react-pdf/renderer';
 import { atomCurrentQuotation, defaultQuotation } from "../../atoms/atoms";
 import { atomAllUsers } from '../../atoms/atomsUser';
-import { quotationExpiry, quotationDelivery, quotationPayment } from '../../repository/quotation';
+import { QuotationExpiry, QuotationDelivery, QuotationPayment } from '../../repository/quotation';
 import NotoSansRegular from "../../fonts/NotoSansKR-Regular.ttf";
 import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";
 import { ConvertCurrency } from '../../constants/functions';
-import Stamp from '../../files/company_stamp.jpg';
+import Stamp from "../../files/company_stamp.jpg";
 
 const ConvStrNumToKor = (digit) => {
     switch(digit)
@@ -282,11 +282,11 @@ const QuotationView = () => {
 
             // get info of quotation condition -----------
             // console.log('Check data :', currentQuotation);
-            const foundExpiryArray = quotationExpiry.filter(item => item.value === currentQuotation.quotation_expiration_date);
+            const foundExpiryArray = QuotationExpiry.filter(item => item.value === currentQuotation.quotation_expiration_date);
             const tempExpiry = (foundExpiryArray.length > 0) ? foundExpiryArray[0].label : currentQuotation.quotation_expiration_date;
-            const foundDeliveryArray = quotationDelivery.filter(item => item.value === currentQuotation.delivery_period);
+            const foundDeliveryArray = QuotationDelivery.filter(item => item.value === currentQuotation.delivery_period);
             const tempDelivery = (foundDeliveryArray.length > 0) ? foundDeliveryArray[0].label : currentQuotation.delivery_period;
-            const foundPaymentArray = quotationPayment.filter(item => item.value === currentQuotation.payment_type);
+            const foundPaymentArray = QuotationPayment.filter(item => item.value === currentQuotation.payment_type);
             const tempPayment = (foundPaymentArray.length > 0) ? foundPaymentArray[0].label : currentQuotation.payment_type;
             setQuotationCondition({expiry: tempExpiry, delivery: tempDelivery, payment: tempPayment});
         }

@@ -78,7 +78,6 @@ const TaxInvoicePrint = (props) => {
     const [ receiver, setReceiver ] = useState({});
 
     useEffect(() => {
-        console.log('TaxInvoicePrint: ', invoiceData);
         if(contents && Array.isArray(contents) && contents.length > 0){
             const num_5 = Math.ceil(contents.length / 5) * 5;
             let temp_array = new Array(num_5);

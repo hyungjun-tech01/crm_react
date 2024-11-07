@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { Button } from "antd";
 import "react-datepicker/dist/react-datepicker.css";
 import * as DOMPurify from "dompurify";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
 
 import {
   atomUsersForSelection,
@@ -29,7 +28,7 @@ import QuillEditor from "../../constants/QuillEditor";
 import { defaultConsulting } from "../../atoms/atoms";
 
 
-const ConsultingAddModel = ({ initData }) => {
+const LeadAddConsultingModel = ({ initData }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId", "myLationCrmUserName"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -470,19 +469,6 @@ const ConsultingAddModel = ({ initData }) => {
 
   //===== useEffect functions ==========================================
   useEffect(() => {
-    // 모달 내부 페이지의 히스토리 상태 추가
-    history.pushState({ modalInternal: true }, '', location.href);
-
-    const handlePopState = (event) => {
-      if (event.state && event.state.modalInternal) {
-        // 뒤로 가기를 방지하기 위해 다시 히스토리를 푸시
-        history.pushState({ modalInternal: true }, '', location.href);
-      }
-    };
-
-    // popstate 이벤트 리스너 추가 (중복 추가 방지)
-    window.addEventListener('popstate', handlePopState); 
-
     setConsultingChange({...initData});
     setActionAttachmentCode(null);
     setRequestAttachmentCode(null);
@@ -493,7 +479,7 @@ const ConsultingAddModel = ({ initData }) => {
   return (
     <div
       className="modal right fade"
-      id="add_consulting"
+      id="add_lead_consulting"
       tabIndex={-1}
       role="dialog"
       aria-modal="true"
@@ -665,7 +651,7 @@ const ConsultingAddModel = ({ initData }) => {
                       <div className="add-upload-title" >
                         {t('consulting.action_content')}
                       </div>
-                      { !(showEditor & EDIT_ACTION_CONTENT) &&
+                      { !(showEditor & EDIT_ACTION_CONTENT) && 
                         <Button type='dashed' onClick={handleClickActionContent}>Click here to edit the below</Button>
                       }
                     </div>
@@ -717,4 +703,4 @@ const ConsultingAddModel = ({ initData }) => {
   );
 };
 
-export default ConsultingAddModel;
+export default LeadAddConsultingModel;

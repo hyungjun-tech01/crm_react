@@ -30,7 +30,6 @@ export const PurchaseRepo = selector({
         const tryLoadAllPurchases = getCallback(({ set, snapshot }) => async (multiQueryCondi) => {
             const loadStates = await snapshot.getPromise(atomPurchaseState);
             if((loadStates & 3) === 0){
-                console.log('[tryLoadAllPurchases] Try to load all Purchases');
                 set(atomPurchaseState, (loadStates | 2));   // state : loading
                 const ret = await loadAllPurchases(multiQueryCondi);
                 if(ret){
@@ -314,18 +313,6 @@ export const PurchaseRepo = selector({
                 console.log('\t[ searchPurchases ] error occurs on searching');
                 return { result: false, message: 'fail to query'};
             };
-
-            // //----- Update AllPurchaseObj --------------------------//
-            // const allPurchaseData = await snapshot.getPromise(atomAllPurchaseObj);
-            // const updatedAllPurchaseData = {
-            //     ...allPurchaseData,
-            //     ...foundInServer,
-            // };
-            // set(atomAllPurchaseObj, updatedAllPurchaseData);
-
-            // //----- Update FilteredPurchases -----------------------//
-            // const updatedList = Object.values(updatedAllPurchaseData);
-            // set(atomFilteredPurchaseArray, updatedList);
             
             return { result: true, data: foundData};
         });

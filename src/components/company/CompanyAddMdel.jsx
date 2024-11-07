@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
@@ -21,8 +21,7 @@ import AddAddressItem from "../../constants/AddAddressItem";
 import MessageModal from "../../constants/MessageModal";
 
 
-const CompanyAddModel = (props) => {
-  const { init, handleInit } = props;
+const CompanyAddModel = ({ init, handleInit }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -39,17 +38,12 @@ const CompanyAddModel = (props) => {
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
 
-  //===== [RecoilState] Related with Users ============================================
-  const { closeModal } = useRecoilValue(SettingsRepo);
+  //===== [RecoilState] Related with Settings =========================================
+  const { openModal, closeModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to edit 'CompanyAddModel' ===========================================
   const [companyChange, setCompanyChange] = useState({ ...defaultCompany });
-
-  const initializeCompanyTemplate = useCallback(() => {
-    setCompanyChange({ ...defaultCompany });
-    document.querySelector("#add_new_company_form").reset();
-  }, []);
 
   const handleDateChange = (name, date) => {
     const modifiedData = {
@@ -73,6 +67,19 @@ const CompanyAddModel = (props) => {
       [name]: selected.value,
     };
     setCompanyChange(modifiedData);
+  };
+
+
+  //===== Handles to handle this =================================================
+  const handleOpenMessage = (msg) => {
+    openModal('antModal');
+    setMessage(msg);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleCloseMessage = () => {
+    closeModal();
+    setIsMessageModalOpen(false);
   };
 
   const handleAddNewCompany = () => {
@@ -112,7 +119,7 @@ const CompanyAddModel = (props) => {
     if(numberOfNoInputItems > 0){
       const contents = (
         <>
-          <p>하기 정보는 필수 입력 사항입니다.</p>
+          <p>{t('comment.msg_no_necessary_data')}</p>
           { noCompanyName && <div> - 회사 이름</div> }
           { noCompanyAddress && <div> - 회사 주소</div> }
           { noCompanyFaxNumber && <div> - 회사 팩스 번호</div> }
@@ -125,8 +132,7 @@ const CompanyAddModel = (props) => {
         title: t('comment.title_check'),
         message: contents,
       };
-      setMessage(tempMsg);
-      setIsMessageModalOpen(true);
+      handleOpenMessage(tempMsg);
       return;
     };
 
@@ -136,36 +142,39 @@ const CompanyAddModel = (props) => {
       counter: 0,
       modify_user: cookies.myLationCrmUserId,
     };
-    // console.log(`[ handleAddNewCompany ]`, newComData);
+    
     const result = modifyCompany(newComData);
     result.then((res) => {
       if (res.result) {
         handleClose();
       } else {
         const tempMsg = {
-          title: t('comment.title_check'),
-          message: `${t('comment.msg_fail_save')} - 오류 이유 : ${res.data}`,
+          title: t('comment.title_error'),
+          message: `${t('comment.msg_fail_save')} - ${t('comment.reason')} : ${res.data}`,
         };
-        setMessage(tempMsg);
-        setIsMessageModalOpen(true);
+        handleOpenMessage(tempMsg);
       }
     });
   };
 
-  const handleClose = () => {
-    initializeCompanyTemplate();
-    setTimeout(() => {
-      closeModal();
-    }, 500);
+  const handleInitialize = () => {
+    setCompanyChange({ ...defaultCompany });
   };
 
+  const handleClose = () => {
+    setTimeout(() => {
+      closeModal();
+    }, 250);
+  };
+
+
+  //===== useEffect functions ====================================================
   useEffect(() => {
     if (init && (userState & 1) === 1) {
-      // console.log("[CompanyAddModel] initialzie!");
       if (handleInit) handleInit(!init);
       setTimeout(() => {
-        initializeCompanyTemplate();
-      }, 500);
+        handleInitialize();
+      }, 250);
     }
     // 모달 내부 페이지의 히스토리 상태 추가
     history.pushState({ modalInternal: true }, '', location.href);
@@ -181,8 +190,6 @@ const CompanyAddModel = (props) => {
     window.addEventListener('popstate', handlePopState);    
   }, [userState, init]);
 
-  if (init)
-    return <div>&nbsp;</div>;
 
   return (
     <div
@@ -443,7 +450,7 @@ const CompanyAddModel = (props) => {
         title={message.title}
         message={message.message}
         open={isMessageModalOpen}
-        handleOk={() => setIsMessageModalOpen(false)}
+        handleOk={handleCloseMessage}
       />
       {/* modal-dialog */}
     </div>

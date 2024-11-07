@@ -149,24 +149,7 @@ const Companies = () => {
     setExpaned(false);
     setSearchCondition("");
   };
-
-  // --- Functions used for Table ------------------------------
-  const handleClickCompanyName = useCallback((id) => {
-    // console.log('[Company] set current company : ', id);
-    setInitToEditCompany(true);
-    setCurrentCompany(id);
-    setSelectedCategory({category: 'company', item_code: id});
-    setTimeout(()=>{
-      openModal('company-details');
-    }, 500);
-    
-  }, [setCurrentCompany]);
-
-  //delete company
-  const handleDeleteCompany = useCallback((comapny_code) =>{
-    console.log('delete company',comapny_code);
-  },[]) ;
-
+  
   const columns = [
     {
       title: t('company.company_name'),
@@ -249,12 +232,26 @@ const Companies = () => {
     },    
   ];
 
-  const handleAddNewCompanyClicked = useCallback(() => {
+  const handleEditCompany = useCallback((id) => {
+    setInitToEditCompany(true);
+    setCurrentCompany(id);
+    setSelectedCategory({category: 'company', item_code: id});
+    setTimeout(()=>{
+      openModal('company-details','initialize_company');
+    }, 250);
+  }, [setCurrentCompany]);
+
+  const handleAddCompany = useCallback(() => {
     setInitToAddCompany(true);
     setTimeout(() => {
       openModal('add_company');
-    }, 500);
+    }, 250);
   }, [setInitToAddCompany]);
+
+  //delete company
+  const handleDeleteCompany = useCallback((comapny_code) =>{
+    console.log('delete company',comapny_code);
+  },[]) ;
 
   useEffect(() => {
 
@@ -384,7 +381,7 @@ const Companies = () => {
                     <button
                       className="add btn btn-gradient-primary font-weight-bold text-white todo-list-add-btn btn-rounded"
                       id="add-task"
-                      onClick={handleAddNewCompanyClicked}
+                      onClick={handleAddCompany}
                     >
                       {t('company.new_company')}
                     </button>
@@ -419,7 +416,7 @@ const Companies = () => {
                           onClick: (event) => {
                             console.log('event.target.className', event.target.className);
                             if(event.target.className === 'delete_button' ) return;
-                            handleClickCompanyName(record.company_code);
+                            handleEditCompany(record.company_code);
                           },
                         };
                       }}

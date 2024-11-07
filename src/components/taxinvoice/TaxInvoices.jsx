@@ -52,7 +52,7 @@ const TaxInovices = () => {
 
   //===== Handles to edit this ========================================================
   const [ nowLoading, setNowLoading ] = useState(true);
-  const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
+  const [ initTaxInvoice, setInitTaxInvoice ] = useState(false);
   const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const [searchCondition, setSearchCondition] = useState("");
@@ -214,21 +214,21 @@ const TaxInovices = () => {
 
   const handleAddNewTaxInvoice = useCallback(() => {
     setCurrentTaxInvoice();
-    setOpenTaxInvoice(true);
+    setInitTaxInvoice(true);
 
     setTimeout(()=>{
       openModal('edit_tax_invoice');
-    }, 500);
-  }, [setCurrentTaxInvoice]);
+    }, 250);
+  }, []);
 
   const handleOpenTaxInvoice = (code) => {
     setCurrentTaxInvoice(code);
-    setOpenTaxInvoice(true);
+    setInitTaxInvoice(true);
     setSelectedCategory({category: 'tax_invoice', item_code: code});
 
     setTimeout(()=>{
-      openModal('edit_tax_invoice');
-    }, 500);
+      openModal('edit_tax_invoice','initialize_tax_invoice');
+    }, 250);
   }
 
   useEffect(() => {
@@ -368,8 +368,8 @@ const TaxInovices = () => {
         {/* modal */}
         <SystemUserModel />
         <TaxInvoiceEditModel
-          open={openTaxInvoice}
-          close={()=>setOpenTaxInvoice(false)}
+          init={initTaxInvoice}
+          hanldeInit={setInitTaxInvoice}
         />
         <MultiQueryModal 
           title= {t('quotation.quotation_multi_query')}

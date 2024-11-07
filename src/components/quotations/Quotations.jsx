@@ -23,7 +23,7 @@ import {
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { compareCompanyName, compareText, ConvertCurrency, formatDate } from "../../constants/functions";
-import { quotationColumn } from "../../repository/quotation";
+import { QuotationColumn } from "../../repository/quotation";
 
 
 const Quotations = () => {
@@ -170,11 +170,13 @@ const Quotations = () => {
   //   openModal('leads-details');
   // }, []);
 
-  const handleClickQuotation = useCallback((code) => {
+  const handleClickQuotation = (code) => {
     setCurrentQuotation(code);
-    setSelectedCategory({category: 'quotation', item_code: code});
-    openModal('quotation-details');
-  }, []);
+    // setSelectedCategory({category: 'quotation', item_code: code});
+    setTimeout(() => {
+      openModal('quotation-details','initialize_quotation');
+    }, 250);
+  };
 
   // --- Section for Table ------------------------------
   const columns = [
@@ -258,7 +260,7 @@ const Quotations = () => {
     setInitAddNewQuotation(true);
     setTimeout(() => {
       openModal('add_quotation');
-    }, 500);
+    }, 250);
   }, []);
 
   useEffect(() => {
@@ -449,7 +451,7 @@ const Quotations = () => {
           open={multiQueryModal}
           handleOk={handleMultiQueryModalOk}
           handleCancel={handleMultiQueryModalCancel}
-          companyColumn={quotationColumn}
+          companyColumn={QuotationColumn}
           queryConditions={queryConditions}
           setQueryConditions={setQueryConditions}
           dates={dates}

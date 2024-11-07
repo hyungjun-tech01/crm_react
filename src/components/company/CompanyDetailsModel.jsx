@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Space, Switch } from "antd";
@@ -10,13 +10,11 @@ import { option_locations, option_deal_type } from "../../constants/constants";
 import {
   atomCurrentCompany,
   atomPurchaseByCompany,
-  atomSelectedCategory,
   atomTaxInvoiceByCompany,
   atomTransactionByCompany,
   defaultCompany,
 } from "../../atoms/atoms";
 import {
-  atomUserState,
   atomEngineersForSelection,
   atomSalespersonsForSelection,
 } from "../../atoms/atomsUser";
@@ -37,13 +35,14 @@ import PurchaseDetailsModel from "../purchase/PurchaseDetailsModel";
 import TransactionEditModel from "../transactions/TransactionEditModel";
 import TaxInvoiceEditModel from "../taxinvoice/TaxInvoiceEditModel";
 
+import MessageModal from "../../constants/MessageModal";
+
 
 const CompanyDetailsModel = ({ init, handleInit }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
-  const [checkState,  setCheckState] = useState({
-    purchase: false, transaction: false, taxInvoice: false,
-  });
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [message, setMessage] = useState({ title: "", message: "" });
 
 
   //===== [RecoilState] Related with Company ==========================================
@@ -68,29 +67,19 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
 
 
   //===== [RecoilState] Related with Users ============================================
-  const userState = useRecoilValue(atomUserState);
   const engineerForSelection = useRecoilValue(atomEngineersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
 
   //===== [RecoilState] Related with Users ============================================
-  const { closeModal } = useRecoilValue(SettingsRepo);
+  const { openModal, closeModal } = useRecoilValue(SettingsRepo);
 
 
   //===== Handles to deal this component ==============================================
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  const [currentCompanyCode, setCurrentCompanyCode] = useState("");
-  const [ openTransaction, setOpenTransaction ] = useState(false);
-  const [ openTaxInvoice, setOpenTaxInvoice ] = useState(false);
+  const [ initTransaction, setInitTransaction ] = useState(false);
+  const [ initTaxInvoice, setInitTaxInvoice ] = useState(false);
   const [ taxInvoiceData, setTaxInvoiceData ] = useState(null);
   const [ taxInvoiceContents, setTaxInvoiceContents ] = useState(null);
-  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
-
-  const handleWindowWidthChange = useCallback((checked) => {
-    setIsFullScreen(checked);
-    if (checked) localStorage.setItem("isFullScreen", "1");
-    else localStorage.setItem("isFullScreen", "0");
-  }, []);
 
 
   //===== Handles to edit 'Company Details' ============================================
@@ -152,49 +141,6 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     },
     [editedDetailValues]
   );
-
-  const handleDetailSave = useCallback(() => {
-    if (editedDetailValues !== null && selectedCompany !== defaultCompany) {
-      const temp_all_saved = {
-        ...editedDetailValues,
-        action_type: "UPDATE",
-        modify_user: cookies.myLationCrmUserId,
-        company_code: selectedCompany.company_code,
-      };
-      const resp = modifyCompany(temp_all_saved);
-      resp.then(res => {
-        if (res.result) {
-          console.log(`Succeeded to modify company`);
-          handleClose();
-        } else {
-          console.error("Failed to modify company : ", res.data);
-        };
-      });
-    } else {
-      console.log("[ CompanyDetailModel ] No saved data");
-    }
-    setEditedDetailValues(null);
-  }, [
-    cookies.myLationCrmUserId,
-    modifyCompany,
-    editedDetailValues,
-    selectedCompany,
-  ]);
-
-  const handleDetailCancel = useCallback(() => {
-    setEditedDetailValues(null);
-    handleClose();
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setSelectedCategory({category: null, item_code: null});
-    setEditedDetailValues(null);
-    setCurrentCompany();
-    setCurrentCompanyCode("");
-    setTimeout(() => {
-      closeModal();
-    }, 500);
-  }, [setCurrentCompany]);
 
   const company_items_info = [
     {
@@ -320,14 +266,67 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     },
   ];
 
-  //===== useEffect for Company ========================================================
-  useEffect(() => {
-    if (init
-      && (selectedCompany !== defaultCompany)
-      && (selectedCompany.company_code !== currentCompanyCode)
-    ) {
-      // console.log("[CompanyDetailsModel] new company is loading!");
+  //===== Handles to handle this =================================================
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [currentCompanyCode, setCurrentCompanyCode] = useState("");
 
+  const handleOpenMessage = (msg) => {
+    openModal('antModal');
+    setMessage(msg);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleCloseMessage = () => {
+    closeModal();
+    setIsMessageModalOpen(false);
+  };
+
+  const handleWindowWidthChange = useCallback((checked) => {
+    setIsFullScreen(checked);
+    if (checked) localStorage.setItem("isFullScreen", "1");
+    else localStorage.setItem("isFullScreen", "0");
+  }, []);
+
+  const handleDetailSave = () => {
+    if (editedDetailValues !== null && selectedCompany !== defaultCompany) {
+      const temp_all_saved = {
+        ...editedDetailValues,
+        action_type: "UPDATE",
+        modify_user: cookies.myLationCrmUserId,
+        company_code: selectedCompany.company_code,
+      };
+      const resp = modifyCompany(temp_all_saved);
+      resp.then(res => {
+        if (res.result) {
+          handleClose();
+        } else {
+          // console.error("Failed to modify company : ", res.data);
+          const tempMsg = {
+            title: t('comment.title_error'),
+            message: `${t('comment.msg_fail_save')} - ${res.data}`,
+          };
+          handleOpenMessage(tempMsg);
+        };
+      });
+    } else {
+      console.log("[ CompanyDetailModel ] No saved data");
+    }
+  };
+
+  const handleInitialize = () => {
+    setEditedDetailValues(null);
+  };
+
+  const handleClose = () => {
+    setTimeout(() => {
+      closeModal();
+    }, 250);
+  };
+
+
+  //===== useEffect functions ====================================================
+  useEffect(() => {
+    if (init) {
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {
         localStorage.setItem("isFullScreen", "0");
@@ -338,11 +337,63 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
         setIsFullScreen(true);
       };
 
+      if((selectedCompany === defaultCompany)
+        || (selectedCompany.company_code === currentCompanyCode)
+      ){
+        handleInit(false);
+        return;
+      };
+
       loadCompanyMAContracts(selectedCompany.company_code);
       setCurrentCompanyCode(selectedCompany.company_code);
-      setCheckState({purchase:false, transaction:false, taxInvoice:false});
-    }
 
+      // load purchase of selected company -----------
+      const queryPurchase = searchPurchases('company_code', selectedCompany.company_code, true);
+      queryPurchase
+        .then(res => {
+          if(res.result) {
+            setPurchasesByCompany(res.data);
+
+            let valid_count = 0;
+            res.data.forEach((item) => {
+              if (!!item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now()))
+                valid_count++;
+            });
+            setValidMACount(valid_count);
+          } else {
+            //console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
+            setPurchasesByCompany([]);
+            setValidMACount(0);
+          };
+        });
+
+      // load transaction of selected company -----------
+      const queryTransaction = searchTransactions('company_code', selectedCompany.company_code, true);
+      queryTransaction
+        .then(res => {
+          if(res.result) {
+            setTransactionByCompany(res.data);
+          } else {
+            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
+            setTransactionByCompany([]);
+          };
+        });
+
+      // load tax invoice of selected company -----------
+      const queryTaxInvoice = searchTaxInvoices('company_code', selectedCompany.company_code, true);
+      queryTaxInvoice
+        .then(res => {
+          if(res.result) {
+            setTaxInvoiceByCompany(res.data);
+          } else {
+            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
+            setTaxInvoiceByCompany([]);
+          };
+        });
+
+      handleInitialize();
+      handleInit(false);
+    }
     // 모달 내부 페이지의 히스토리 상태 추가
     history.pushState({ modalInternal: true }, '', location.href);
 
@@ -355,92 +406,8 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
   
     // popstate 이벤트 리스너 추가 (중복 추가 방지)
     window.addEventListener('popstate', handlePopState);
+  }, [init, selectedCompany, currentCompanyCode, loadCompanyMAContracts, searchPurchases, searchTransactions, searchTaxInvoices, handleInit, setPurchasesByCompany, setTransactionByCompany, setTaxInvoiceByCompany]);
 
-
-  }, [init, selectedCompany, currentCompanyCode, loadCompanyMAContracts]);
-
-  //===== useEffect for Purchase =======================================================
-  useEffect(() => {
-    if(!!selectedCompany.company_code && !checkState.purchase) {
-      setCheckState({
-        ...checkState,
-        purchase: true,
-      });
-      const queryPromise = searchPurchases('company_code', selectedCompany.company_code, true);
-      queryPromise
-        .then(res => {
-          if(res.result) {
-            setPurchasesByCompany(res.data);
-          } else {
-            //console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
-            setPurchasesByCompany([]);
-          };
-        });
-    }
-  }, [checkState, searchPurchases, selectedCompany.company_code]);
-
-  //===== useEffect for Purchase =======================================================
-  useEffect(() => {
-    let valid_count = 0;
-    purchaseByCompany.forEach((item) => {
-      if (!!item.ma_finish_date && (new Date(item.ma_finish_date) > Date.now()))
-        valid_count++;
-    });
-    setValidMACount(valid_count);
-  }, [purchaseByCompany]);
-
-  //===== useEffect for Transaction ====================================================
-  useEffect(() => {
-    if(!!selectedCompany.company_code && !checkState.transaction) {
-      setCheckState({
-        ...checkState,
-        transaction: true,
-      });
-      const queryPromise = searchTransactions('company_code', selectedCompany.company_code, true);
-      queryPromise
-        .then(res => {
-          if(res.result) {
-            setTransactionByCompany(res.data);
-          } else {
-            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
-            setTransactionByCompany([]);
-          };
-        });
-    }
-  }, [checkState, searchTransactions, selectedCompany.company_code]);
-
-  //===== useEffect for Tax Invoice ====================================================
-  useEffect(() => {
-    if(!!selectedCompany.company_code && !checkState.taxInvoice) {
-      setCheckState({
-        ...checkState,
-        taxInvoice: true,
-      });
-      const queryPromise = searchTaxInvoices('company_code', selectedCompany.company_code, true);
-      queryPromise
-        .then(res => {
-          if(res.result) {
-            setTaxInvoiceByCompany(res.data);
-          } else {
-            console.log('[CompanyDetailsModel] fail to get purchase :', res.message);
-            setTaxInvoiceByCompany([]);
-          };
-        });
-    }
-  }, [checkState, searchTransactions, selectedCompany.company_code]);
-
-  //===== useEffect for User ==========================================================
-  useEffect(() => {
-    if (init && checkState.purchase && checkState.transaction && checkState.taxInvoice
-      && ((userState & 1) === 1)
-     ){
-      // console.log('[CompanyDetailModel] all needed data is loaded');
-      handleInit(false);
-    };
-  }, [checkState, userState, handleInit]);
-
-  if (init)
-    return <div>&nbsp;</div>;
 
   return (
     <>
@@ -595,7 +562,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
                     id="company-details-transaction"
                   >
                     <CompanyTransactionModel
-                      openTransaction={setOpenTransaction}
+                      openTransaction={setInitTransaction}
                     />
                   </div>
                   <div
@@ -603,7 +570,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
                     id="company-details-taxinvoice"
                   >
                     <CompanyTaxInvoiceModel
-                      openTaxInvoice={setOpenTaxInvoice}
+                      openTaxInvoice={setInitTaxInvoice}
                     />
                   </div>
                 </div>
@@ -621,7 +588,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
                       <button
                         type="button"
                         className="btn btn-secondary btn-rounded"
-                        onClick={handleDetailCancel}
+                        onClick={handleClose}
                       >
                         {t("common.cancel")}
                       </button>
@@ -636,21 +603,28 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
       <PurchaseAddModel init={initAddPurchase} handleInit={setInitAddPurchase} />
       <PurchaseDetailsModel />
       <TransactionEditModel
-        open={openTransaction}
-        close={() =>setOpenTransaction(false)}
-        openTaxInvoice={()=>setOpenTaxInvoice(true)} 
+        init={initTransaction}
+        handleInit={setInitTransaction}
+        openTaxInvoice={()=>{
+          setInitTaxInvoice(true);
+          setTimeout(()=>{
+            openModal('edit_tax_invoice');
+          })
+        }} 
         setTaxInvoiceData={setTaxInvoiceData}
         setTaxInvoiceContents={setTaxInvoiceContents}
       />
       <TaxInvoiceEditModel
-        open={openTaxInvoice}
-        close={() => {
-          setOpenTaxInvoice(false);
-          setTaxInvoiceData(null);
-          setTaxInvoiceContents(null);
-        }}
+        init={initTaxInvoice}
+        handleInit={setInitTaxInvoice}
         data={taxInvoiceData}
         contents={taxInvoiceContents}
+      />
+      <MessageModal
+        title={message.title}
+        message={message.message}
+        open={isMessageModalOpen}
+        handleOk={handleCloseMessage}
       />
     </>
   );

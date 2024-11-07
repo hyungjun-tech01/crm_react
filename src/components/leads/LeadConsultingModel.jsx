@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSetRecoilState, useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
+import { useCookies } from "react-cookie";
 import { Table } from "antd";
 import * as DOMPurify from "dompurify";
 
@@ -8,14 +9,19 @@ import { SettingsRepo } from "../../repository/settings";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { Add } from "@mui/icons-material";
 
-import { atomConsultingByLead, atomCurrentConsulting, defaultConsulting } from "../../atoms/atoms";
+import { atomConsultingByLead, atomCurrentConsulting, atomCurrentLead, defaultConsulting } from "../../atoms/atoms";
 
-const LeadConsultingModel = ({ handleInitAddConsulting }) => {
+const LeadConsultingModel = ({ handleInitDataAddConsulting }) => {
     const { t } = useTranslation();
+    const [ cookies ] = useCookies([ "myLationCrmUserName" ]);
 
 
     //===== [RecoilState] Related with Users ==========================================
     const { openModal } = useRecoilValue(SettingsRepo);
+
+
+    //===== [RecoilState] Related with Consulting ==========================================
+    const currentLead = useRecoilValue(atomCurrentLead);
 
 
     //===== [RecoilState] Related with Consulting ==========================================
@@ -27,11 +33,22 @@ const LeadConsultingModel = ({ handleInitAddConsulting }) => {
     const [selectedKeys, setSelectedRowKeys] = useState([]);
 
     const handleAddNewConsulting = () => {
-        handleInitAddConsulting(true);
         setCurrentConsulting(defaultConsulting);
-        setTimeout(() => {
-            openModal('add_consulting');
-        }, 500);
+        handleInitDataAddConsulting({
+            ...defaultConsulting,
+            lead_code: currentLead.lead_code,
+            lead_name: currentLead.lead_name,
+            department: currentLead.department,
+            position: currentLead.position,
+            mobile_number: currentLead.mobile_number,
+            phone_number: currentLead.phone_number,
+            email: currentLead.email,
+            company_code: currentLead.company_code,
+            company_name: currentLead.company_name,
+            receiver: cookies.myLationCrmUserName,
+            receipt_date: new Date(),
+        });
+        openModal('add_lead_consulting');
     };
     
     const columns_consulting = [
@@ -110,22 +127,6 @@ const LeadConsultingModel = ({ handleInitAddConsulting }) => {
             className: "checkbox-red",
         }),
     };
-
-    useEffect(()=>{
-        console.log('[LeadConsultingModel] Maybe consultings are updated');
-        // 모달 내부 페이지의 히스토리 상태 추가
-        history.pushState({ modalInternal: true }, '', location.href);
-
-        const handlePopState = (event) => {
-        if (event.state && event.state.modalInternal) {
-            // 뒤로 가기를 방지하기 위해 다시 히스토리를 푸시
-            history.pushState({ modalInternal: true }, '', location.href);
-        }
-        };
-
-        // popstate 이벤트 리스너 추가 (중복 추가 방지)
-        window.addEventListener('popstate', handlePopState);        
-    }, [consultingsByLead])
 
     return (
         <div className="row">

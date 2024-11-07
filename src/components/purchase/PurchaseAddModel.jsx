@@ -28,13 +28,12 @@ import DetailSubModal from '../../constants/DetailSubModal';
 import MessageModal from "../../constants/MessageModal";
 
 
-const PurchaseAddModel = (props) => {
-    const { init, handleInit } = props;
+const PurchaseAddModel = ({ init, handleInit }) => {
     const { t } = useTranslation();
     const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
     const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
     const [message, setMessage] = useState({ title: "", message: "" });
-    
+
 
     //===== [RecoilState] Related with Company =============================================
     const currentCompany = useRecoilValue(atomCurrentCompany);
@@ -59,8 +58,6 @@ const PurchaseAddModel = (props) => {
 
     //===== Handles to edit 'Purchase Add' =================================================
     const [purchaseChange, setPurchaseChange] = useState({});
-    const [needInit, setNeedInit] = useState(false);
-    const selectedCategory = useRecoilValue(atomSelectedCategory);
 
     const handleItemChange = useCallback((e) => {
         const modifiedData = {
@@ -103,94 +100,6 @@ const PurchaseAddModel = (props) => {
         };
         setPurchaseChange(modifiedData);
     }, [purchaseChange]);
-
-    const handlePopupOpen = (open) => {
-        if(open) {
-          openModal('antModal');
-        } else {
-          closeModal();
-        }
-      };
-
-    const initializePurchaseTemplate = useCallback(() => {
-        document.querySelector("#add_new_purchase_form").reset();
-
-        if((currentCompany !== defaultCompany)
-            && (
-                ((selectedCategory.category === 'company') && (selectedCategory.item_code === currentCompany.company_code))
-                || ((selectedCategory.category === 'lead') && (selectedCategory.item_code === currentLead.lead_code))
-            )
-        ){
-            setPurchaseChange({
-                ...defaultPurchase,
-                company_code: currentCompany.company_code,
-                company_name: currentCompany.company_name,
-                company_name_en: currentCompany.company_name_en,
-            });
-        } else {
-            setPurchaseChange({...defaultPurchase});
-        }
-        setNeedInit(false);
-    }, [currentCompany, selectedCategory]);
-
-    const handleAddNewPurchase = () => {
-        // Check data if they are available
-        let numberOfNoInputItems = 0;
-        let noCompanyName = false;
-        if(!purchaseChange.company_name || purchaseChange.company_name === ""){
-            numberOfNoInputItems++;
-            noCompanyName = true;
-        };
-        let noProductName = false;
-        if(!purchaseChange.product_name || purchaseChange.product_name === ""){
-            numberOfNoInputItems++;
-            noProductName = true;
-        };
-        let noQuantity = false;
-        if(!purchaseChange.quantity || purchaseChange.quantity === ""){
-            numberOfNoInputItems++;
-            noQuantity = true;
-        };
-        let noPrice = false;
-        if(!purchaseChange.price || purchaseChange.price === ""){
-            numberOfNoInputItems++;
-            noPrice = true;
-        };
-
-        if(numberOfNoInputItems > 0){
-            const contents = (
-                <>
-                    <p>하기 정보는 필수 입력 사항입니다.</p>
-                    { noCompanyName && <div> - 회사 이름</div> }
-                    { noProductName && <div> - 제품 이름</div> }
-                    { noQuantity && <div> - 제품 수량</div> }
-                    { noPrice && <div> - 제품 가격</div> }
-                </>
-            );
-            const tempMsg = {
-                title: t('comment.title_check'),
-                message: contents,
-            };
-            setMessage(tempMsg);
-            setIsMessageModalOpen(true);
-            return;
-        };
-
-        const newPurchaseData = {
-            ...purchaseChange,
-            action_type: 'ADD',
-            modify_user: cookies.myLationCrmUserId,
-        };
-
-        const res_data = modifyPurchase(newPurchaseData);
-        res_data.then((res) => {
-            if (res.result) {
-                handleClose();
-            } else {
-                console.log('[PurchaseAddModel] fail to add purchase :', res.data);
-            }
-        });
-    };
 
 
     //===== Handles to edit 'MA contract' =================================================
@@ -271,7 +180,6 @@ const PurchaseAddModel = (props) => {
         resp.then(result => {
             if (result) {
                 const updatedContracts = contractLists.concat(result);
-                // console.log(`[ handleSubModalOk ] update contract list : `, updatedContracts);
                 setContractLists(updatedContracts);
 
                 // Update MA Contract end date
@@ -286,7 +194,6 @@ const PurchaseAddModel = (props) => {
                     const res_data = modifyPurchase(modifiedPurchase);
                     res_data.then(res => {
                         if (res.result) {
-                            // console.log('Succeeded to update MA end date');
                             const updateAddChange = {
                                 ...purchaseChange,
                                 ma_finish_date: finalData.ma_finish_date,
@@ -347,6 +254,113 @@ const PurchaseAddModel = (props) => {
         };
     }, [contractLists, cookies.myLationCrmUserId, t]);
 
+
+    //===== Handles to handle this ================================================= 
+    const [needInit, setNeedInit] = useState(false);
+    const selectedCategory = useRecoilValue(atomSelectedCategory);
+
+    const handlePopupOpen = (open) => {
+        if (open) {
+            openModal('antModal');
+        } else {
+            closeModal();
+        }
+    };
+
+    const handleOpenMessage = (msg) => {
+        openModal('antModal');
+        setMessage(msg);
+        setIsMessageModalOpen(true);
+    };
+
+    const handleCloseMessage = () => {
+        closeModal();
+        setIsMessageModalOpen(false);
+    };
+
+    const handleAddNewPurchase = () => {
+        // Check data if they are available
+        let numberOfNoInputItems = 0;
+        let noCompanyName = false;
+        if (!purchaseChange.company_name || purchaseChange.company_name === "") {
+            numberOfNoInputItems++;
+            noCompanyName = true;
+        };
+        let noProductName = false;
+        if (!purchaseChange.product_name || purchaseChange.product_name === "") {
+            numberOfNoInputItems++;
+            noProductName = true;
+        };
+        let noQuantity = false;
+        if (!purchaseChange.quantity || purchaseChange.quantity === "") {
+            numberOfNoInputItems++;
+            noQuantity = true;
+        };
+        let noPrice = false;
+        if (!purchaseChange.price || purchaseChange.price === "") {
+            numberOfNoInputItems++;
+            noPrice = true;
+        };
+
+        if (numberOfNoInputItems > 0) {
+            const contents = (
+                <>
+                    <p>하기 정보는 필수 입력 사항입니다.</p>
+                    {noCompanyName && <div> - 회사 이름</div>}
+                    {noProductName && <div> - 제품 이름</div>}
+                    {noQuantity && <div> - 제품 수량</div>}
+                    {noPrice && <div> - 제품 가격</div>}
+                </>
+            );
+            const tempMsg = {
+                title: t('comment.title_check'),
+                message: contents,
+            };
+            handleOpenMessage(tempMsg);
+            return;
+        };
+
+        const newPurchaseData = {
+            ...purchaseChange,
+            action_type: 'ADD',
+            modify_user: cookies.myLationCrmUserId,
+        };
+
+        const res_data = modifyPurchase(newPurchaseData);
+        res_data.then((res) => {
+            if (res.result) {
+                handleClose();
+            } else {
+                const tempMsg = {
+                    title: t('comment.title_error'),
+                    message: `${t('comment.msg_fail_save')} - ${t('comment.reason')} : ${res.data}`,
+                };
+                handleOpenMessage(tempMsg);
+            }
+        });
+    };
+
+    const handleInitialize = useCallback(() => {
+        // document.querySelector("#add_new_purchase_form").reset();
+
+        if ((currentCompany !== defaultCompany)
+            && (
+                ((selectedCategory.category === 'company') && (selectedCategory.item_code === currentCompany.company_code))
+                || ((selectedCategory.category === 'lead') && (selectedCategory.item_code === currentLead.lead_code))
+            )
+        ) {
+            setPurchaseChange({
+                ...defaultPurchase,
+                company_code: currentCompany.company_code,
+                company_name: currentCompany.company_name,
+                company_name_en: currentCompany.company_name_en,
+            });
+        } else {
+            setPurchaseChange({ ...defaultPurchase });
+        }
+        setNeedInit(false);
+    }, [currentCompany, selectedCategory]);
+
     const handleClose = () => {
         setTimeout(() => {
             closeModal();
@@ -355,14 +369,6 @@ const PurchaseAddModel = (props) => {
 
     //===== useEffect functions ===========================================================
     useEffect(() => {
-        if (init){
-            // console.log('[PurchaseAddModel] initialize!');
-            if(handleInit) handleInit(!init);
-            setTimeout(()=>{
-                initializePurchaseTemplate();
-            }, 500);
-        };
-
         // 모달 내부 페이지의 히스토리 상태 추가
         history.pushState({ modalInternal: true }, '', location.href);
 
@@ -374,9 +380,15 @@ const PurchaseAddModel = (props) => {
         };
 
         // popstate 이벤트 리스너 추가 (중복 추가 방지)
-        window.addEventListener('popstate', handlePopState);        
-
-    }, [init, handleInit, initializePurchaseTemplate]);
+        window.addEventListener('popstate', handlePopState); 
+        
+        if (init) {
+            if (handleInit) handleInit(!init);
+            setTimeout(() => {
+                handleInitialize();
+            }, 250);
+        };
+    }, [init, handleInit, handleInitialize]);
 
     if (init)
         return <div>&nbsp;</div>;
@@ -554,7 +566,7 @@ const PurchaseAddModel = (props) => {
                                             <button
                                                 type="button"
                                                 className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                                                onClick={initializePurchaseTemplate}
+                                                onClick={handleInitialize}
                                             >
                                                 {t('common.initialize')}
                                             </button>
@@ -644,7 +656,7 @@ const PurchaseAddModel = (props) => {
                 title={message.title}
                 message={message.message}
                 open={isMessageModalOpen}
-                handleOk={() => setIsMessageModalOpen(false)}
+                handleOk={handleCloseMessage}
             />
         </div>
     );

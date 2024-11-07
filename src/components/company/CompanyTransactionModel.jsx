@@ -10,8 +10,7 @@ import { atomTransactionByCompany, defaultTransaction } from '../../atoms/atoms'
 import { TransactionRepo } from '../../repository/transaction';
 import { SettingsRepo } from '../../repository/settings';
 
-const CompanyTransactionModel = (props) => {
-    const { openTransaction } = props;
+const CompanyTransactionModel = ({ openTransaction }) => {
     const { t } = useTranslation();
 
 
@@ -29,20 +28,18 @@ const CompanyTransactionModel = (props) => {
 
     const handleSelectTransaction = (value) => {
         setCurrentTransaction(value.transaction_code);
-        openTransaction(true);
-        
         setTimeout(()=>{
+            openTransaction(true);
             openModal('edit_transaction');
-        }, 500);
+        }, 250);
     };
 
     const handleAddNewTransaction = () => {
         setCurrentTransaction();
-        openTransaction(true);
-
         setTimeout(()=>{
+            openTransaction(true);
             openModal('edit_transaction');
-        }, 500);
+        }, 250);
     };
 
     const transactionRowSelection = {
@@ -160,7 +157,7 @@ const CompanyTransactionModel = (props) => {
                                     borderRadius: '5px',
                                 }}
                                 >
-                                    <div>{t('purchase.information')}</div>
+                                    <div>{t('transaction.information')}</div>
                                     <Add  onClick={() => handleAddNewTransaction()}/>
                                 </div>
                             }

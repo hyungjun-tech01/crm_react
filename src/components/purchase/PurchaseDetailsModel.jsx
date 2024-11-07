@@ -25,6 +25,7 @@ import { SettingsRepo } from "../../repository/settings";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import DetailSubModal from "../../constants/DetailSubModal";
+import MessageModal from "../../constants/MessageModal";
 
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
@@ -34,6 +35,8 @@ import { CompanyRepo } from "../../repository/company";
 const PurchaseDetailsModel = () => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [message, setMessage] = useState({ title: "", message: "" });
 
 
   //===== [RecoilState] Related with Purchase =========================================
@@ -58,19 +61,6 @@ const PurchaseDetailsModel = () => {
 
   //===== [RecoilState] Related with MA Contract ======================================
   const { openModal, closeModal } = useRecoilValue(SettingsRepo);
-
-  
-  //===== Handles to deal this component ==============================================
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  const [ selectedCategory, setSelectedCategory ] = useRecoilState(atomSelectedCategory);
-
-  const handleWidthChange = useCallback((checked) => {
-    setIsFullScreen(checked);
-    if (checked)
-      localStorage.setItem('isFullScreen', '1');
-    else
-      localStorage.setItem('isFullScreen', '0');
-  }, []);
 
 
   //===== Handles to edit 'Purchase Details' ==========================================
@@ -115,50 +105,6 @@ const PurchaseDetailsModel = () => {
       };
     };
   }, [editedDetailValues]);
-
-  const handleSaveAll = useCallback(() => {
-    if (Object.keys(editedDetailValues).length !== 0 && currentPurchase) {
-      const temp_all_saved = {
-        ...editedDetailValues,
-        action_type: "UPDATE",
-        modify_user: cookies.myLationCrmUserId,
-        purchase_code: currentPurchase.purchase_code,
-      };
-      const res_data = modifyPurchase(temp_all_saved);
-      res_data.then(res => {
-        if (res.result) {
-          console.log(`Succeeded to modify purchase`);
-          handleClose();
-        } else {
-          console.error("Failed to modify purchase");
-        }  
-      })
-    } else {
-      console.log("[ PurchaseDetailModel ] No saved data");
-    }
-    setEditedDetailValues(null);
-  }, [
-    cookies.myLationCrmUserId,
-    modifyPurchase,
-    editedDetailValues,
-    currentPurchase,
-  ]);
-
-  const handleCancelAll = useCallback(() => {
-    setEditedDetailValues(null);
-    handleClose();
-  }, []);
-
-  const handleClose = useCallback(() => {
-    if(selectedCategory.category === 'purchase') {
-      setSelectedCategory({category: null, item_code: null});
-    };
-    setEditedDetailValues(null);
-    setCurrentPurchase(defaultPurchase);
-    setTimeout(() => {
-      closeModal();
-    }, 500);
-  }, []);
 
   const purchase_items_info = [
     { key: 'product_type', title: 'purchase.product_type', detail: { type: 'select', options: ProductTypeOptions, editing: handleDetailSelectChange } },
@@ -338,6 +284,65 @@ const PurchaseDetailsModel = () => {
     { name: 'ma_memo', title: t('common.memo'), detail: { type: 'textarea', row_no: 4 } },
   ];
 
+
+  //===== Handles to handle this =================================================
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
+  const handleWidthChange = useCallback((checked) => {
+    setIsFullScreen(checked);
+    if (checked)
+      localStorage.setItem('isFullScreen', '1');
+    else
+      localStorage.setItem('isFullScreen', '0');
+  }, []);
+
+  const handleOpenMessage = (msg) => {
+    openModal('antModal');
+    setMessage(msg);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleCloseMessage = () => {
+    closeModal();
+    setIsMessageModalOpen(false);
+  };
+
+  const handleSaveAll = () => {
+    if (Object.keys(editedDetailValues).length !== 0 && currentPurchase) {
+      const temp_all_saved = {
+        ...editedDetailValues,
+        action_type: "UPDATE",
+        modify_user: cookies.myLationCrmUserId,
+        purchase_code: currentPurchase.purchase_code,
+      };
+      const res_data = modifyPurchase(temp_all_saved);
+      res_data.then(res => {
+        if (res.result) {
+          handleClose();
+        } else {
+          const tempMsg = {
+            title: t('comment.title_error'),
+            message: `${t('comment.msg_fail_save')} - ${t('comment.reason')} : ${res.data}`,
+          };
+          handleOpenMessage(tempMsg);
+        }  
+      })
+    } else {
+      console.log("[ PurchaseDetailModel ] No saved data");
+    }
+  };
+
+  const handleInitialize = () => {
+    setEditedDetailValues(null);
+  };
+
+  const handleClose = () => {
+    setTimeout(() => {
+      closeModal();
+    }, 250);
+  };
+
+  //===== useEffect functions =============================================== 
   useEffect(() => {
     if ((currentPurchase !== defaultPurchase)
       && (currentPurchase.purchase_code !== currentPurchaseCode)
@@ -355,6 +360,7 @@ const PurchaseDetailsModel = () => {
       loadPurchaseMAContracts(currentPurchase.purchase_code);
       setCurrentPurchaseCode(currentPurchase.purchase_code);
 
+      handleInitialize();
       if(currentCompany === defaultCompany) {
         setCurrentCompany(currentPurchase.company_code);
       };
@@ -573,7 +579,7 @@ const PurchaseDetailsModel = () => {
                       <button
                         type="button"
                         className="btn btn-secondary btn-rounded"
-                        onClick={handleCancelAll}
+                        onClick={handleClose}
                       >
                         {t('common.cancel')}
                       </button>
@@ -595,6 +601,12 @@ const PurchaseDetailsModel = () => {
           handleOk={handleSubModalOk}
           handleCancel={handleSubModalCancel}
         />
+        <MessageModal
+        title={message.title}
+        message={message.message}
+        open={isMessageModalOpen}
+        handleOk={handleCloseMessage}
+      />
       </div>
     </>
   );

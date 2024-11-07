@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
+import { useCookies } from "react-cookie";
 import { Table } from "antd";
 
 import "antd/dist/reset.css";
@@ -26,6 +27,7 @@ import {
   atomLeadState,
   atomConsultingState,
   atomSelectedCategory,
+  defaultConsulting,
 } from "../../atoms/atoms"; 
 import { compareCompanyName, compareText } from "../../constants/functions";
 import MultiQueryModal from "../../constants/MultiQueryModal";
@@ -34,6 +36,7 @@ import { consultingColumn } from "../../repository/consulting";
 
 const Consultings = () => {
   const { t } = useTranslation();
+  const [ cookies ] = useCookies([ "myLationCrmUserName" ]);
 
 
   //===== [RecoilState] Related with Consulting =======================================
@@ -64,7 +67,7 @@ const Consultings = () => {
 
   //===== Handles to deal 'Consultings' ========================================
   const [ nowLoading, setNowLoading ] = useState(true);
-  const [ initAddConsulting, setInitAddConsulting ] = useState(false);
+  const [ initDataAddConsulting, setInitDataAddConsulting ] = useState(defaultConsulting);
   const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const [searchCondition, setSearchCondition] = useState("");
@@ -164,36 +167,38 @@ const Consultings = () => {
   };
 
   // --- Functions used for Add New Consulting ------------------------------
-  const handleAddNewConsultingClicked = useCallback(() => {
-    setInitAddConsulting(true);
+  const handleAddNewConsultingClicked = () => {
     setCurrentConsulting();
-    setTimeout(()=>{
-      openModal('add_consulting')
-    }, 500);
-  }, []);
+    setInitDataAddConsulting({
+      ...defaultConsulting,
+      receiver: cookies.myLationCrmUserName,
+      receipt_date: new Date(),
+    });
+    openModal('add_consulting');
+  };
 
-  const handleClickConsulting = useCallback((code) => {
+  const handleClickConsulting = (code) => {
     setCurrentConsulting(code);
     setTimeout(()=>{
-      openModal('consulting-details')
-    }, 500);
-  }, []);
+      openModal('consulting-details', 'initialize_consulting')
+    }, 250);
+  };
 
-  const handleClickCompany = useCallback((code) => {
+  const handleClickCompany = (code) => {
     setCurrentCompany(code);
     setSelectedCategory({category: 'company', item_code: code});
     setTimeout(()=>{
       openModal('company-details')
-    }, 500);
-  }, []);
+    }, 250);
+  };
 
-  const handleClickLead = useCallback((code) => {
+  const handleClickLead = (code) => {
     setCurrentLead(code);
     setSelectedCategory({category: 'lead', item_code: code});
     setTimeout(()=>{
       openModal('leads-details')
-    }, 500);
-  }, []);
+    }, 250);
+  };
 
   // --- Section for Table ------------------------------
   const columns = [
@@ -458,7 +463,7 @@ const Consultings = () => {
         <CompanyDetailsModel />
         <LeadDetailsModel />
         <ConsultingDetailsModel />
-        <ConsultingAddModel init={initAddConsulting} handleInit={setInitAddConsulting} />
+        <ConsultingAddModel initData={initDataAddConsulting} />
         <MultiQueryModal 
           title= {t('consulting.consulting_multi_query')}
           open={multiQueryModal}
