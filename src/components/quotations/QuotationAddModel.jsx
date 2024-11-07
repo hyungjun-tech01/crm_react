@@ -76,7 +76,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
 
-  //===== [RecoilState] Related with Users ===========================================
+  //===== [RecoilState] Related with Settings ===========================================
   const { openModal, closeModal } = useRecoilValue(SettingsRepo);
 
 
@@ -114,28 +114,6 @@ const QuotationAddModel = ({ init, handleInit }) => {
   const [contentColumns, setContentColumns] = useState([]);
   const [editHeaders, setEditHeaders] = useState(false);
   
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  // const defaultContentArray = [
-  //   ['1',   'No',                               (text, record) => <>{text}</>],
-  //   ['2',   t('common.category'),               (text, record) => <>{text}</>],
-  //   ['3',   t('common.maker'),                  (text, record) => <>{text}</>],
-  //   ['4',   t('quotation.model_name'),          (text, record) => <>{text}</>],
-  //   ['5',   t('common.product'),                (text, record) => <>{text}</>],
-  //   ['6',   t('common.material'),               (text, record) => <>{text}</>],
-  //   ['7',   t('common.type'),                   (text, record) => <>{text}</>],
-  //   ['8',   t('common.color'),                  (text, record) => <>{text}</>],
-  //   ['9',   t('common.standard'),               (text, record) => <>{text}</>],
-  //   ['10',  t('quotation.detail_desc'),         (text, record) => <>{text}</>],
-  //   ['11',  t('common.unit'),                   (text, record) => <>{text}</>],
-  //   ['12',  t('common.quantity'),               (text, record) => <>{handleFormatter(text)}</>],
-  //   ['13',  t('quotation.consumer_price'),      (text, record) => <>{handleFormatter(text)}</>],
-  //   ['14',  t('quotation.discount_rate'),       (text, record) => <>{handleFormatter(text)}</>],
-  //   ['15',  t('quotation.quotation_unit_price'),(text, record) => <>{handleFormatter(text)}</>],
-  //   ['16',  t('quotation.quotation_amount'),    (text, record) => <>{handleFormatter(text)}</>],
-  //   ['17',  t('quotation.raw_price'),           (text, record) => <>{handleFormatter(text)}</>],
-  //   ['18',  t('quotation.profit_amount'),       (text, record) => <>{handleFormatter(text)}</>],
-  //   ['19',  t('quotation.note'),                (text, record) => <>{text}</>],
-  // ];
 
   const defaultColumns = [
     {
@@ -173,16 +151,6 @@ const QuotationAddModel = ({ init, handleInit }) => {
       dataIndex: '16',
       render: (text, record) => <>{handleFormatter(record['16'])}</>,
     },
-    // {
-    //   title: "Edit",
-    //   render: (text, record) => (
-    //     <div className="dropdown dropdown-action text-center">
-    //       <ModeEdit onClick={() => {
-    //         handleLoadSelectedContent(record);
-    //       }} />
-    //     </div>
-    //   ),
-    // },
   ];
 
   const tableComponents = {
@@ -741,10 +709,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
 
 
   //===== Handles to handle this =================================================
-  const selectedCategory = useRecoilValue(atomSelectedCategory);
-
   const handlePopupOpen = (open) => {
-    console.log('QuotationAdd / handlePopupOpen');
     if(open) {
       openModal("antModal");
     } else {
@@ -764,7 +729,6 @@ const QuotationAddModel = ({ init, handleInit }) => {
   };
 
   const handleInitialize = useCallback(() => {
-    console.log('QuotationAdd / handleInitialize : start');
     setQuotationContents([]);
 
     let modifiedData = {
@@ -806,7 +770,6 @@ const QuotationAddModel = ({ init, handleInit }) => {
     } else {
       const columnSettings = cookies.myQuotationAddColumns[cookies.myLationCrmUserId];
       if(!columnSettings){
-        console.log('Initialize : get column setting from cookies -', columnSettings);
         const tempQuotationColumn = [
           ...defaultColumns
         ];

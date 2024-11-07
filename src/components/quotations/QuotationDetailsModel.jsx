@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Collapse, Space, Switch } from "antd";
+import { Space, Switch } from "antd";
 import {
   atomCurrentQuotation,
   defaultQuotation,
@@ -28,21 +28,16 @@ import {
 } from "../../repository/quotation";
 import { SettingsRepo } from "../../repository/settings";
 
-import DetailLabelItem from "../../constants/DetailLabelItem";
-import DetailTextareaItem from "../../constants/DetailTextareaItem";
 import DetailCardItem from "../../constants/DetailCardItem";
 import DetailTitleItem from "../../constants/DetailTitleItem";
 import MessageModal from "../../constants/MessageModal";
 import QuotationView from "./QuotationtView";
-import { Add, Remove } from '@mui/icons-material';
-
-const content_indices = ['3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18'];
+import QuotationContents from "./QuotationContents";
 
 
 const QuotationDetailsModel = ({ init, handleInit }) => {
   const [t] = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
-  const { Panel } = Collapse;
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [message, setMessage] = useState({ title: "", message: "" });
 
@@ -106,229 +101,6 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
     }
   }, [editedDetailValues, selectedQuotation]);
 
-
-  //===== Handles to edit 'Content' ===================================================
-  const [orgQuotationContents, setOrgQuotationContents] = useState([]);
-  const [quotationContents, setQuotationContents] = useState([]);
-  const [quotationHeaders, setQuotationHeaders] = useState([]);
-
-  const [editedContentValues, setEditedContentValues] = useState(null);
-  const [savedContentValues, setSavedContentValues] = useState(null);
-
-  const [checkContentState, setCheckContentState] = useState(null);
-  const [isNewlyAdded, setIsNewlyAdded] = useState(false);
-
-  const handleCheckContentEditState = useCallback((key) => {
-    return editedContentValues !== null && key in editedContentValues;
-  }, [editedContentValues]);
-
-  const handleStartContentEdit = useCallback((input) => {
-    const splitted = input.split('.');
-    const [index, key] = splitted;
-    const tempEdited = {
-      ...editedContentValues,
-      [input]: quotationContents[index][key],
-    };
-    setEditedContentValues(tempEdited);
-  }, [editedContentValues, quotationContents]);
-
-  const handleContentEditing = useCallback((e) => {
-    const tempEdited = {
-      ...editedContentValues,
-      [e.target.name]: e.target.value,
-    };
-    setEditedContentValues(tempEdited);
-  }, [editedContentValues]);
-
-  const handleEndContentEdit = useCallback((input) => {
-    const splitted = input.split('.');
-    const [index, key] = splitted;
-    if (editedContentValues[input] === quotationContents[index][key]) {
-      const tempEdited = {
-        ...editedContentValues,
-      };
-      delete tempEdited[input];
-      setEditedContentValues(tempEdited);
-      return;
-    }
-
-    const tempSaved = {
-      ...savedContentValues,
-      [input]: editedContentValues[input],
-    };
-    setSavedContentValues(tempSaved);
-
-    const tempEdited = {
-      ...editedContentValues,
-    };
-    delete tempEdited[input];
-    setEditedContentValues(tempEdited);
-  }, [editedContentValues, savedContentValues, quotationContents]);
-
-  // --- Funtions for Content Saving ----------------------------------------------------
-  const handleCheckContentSaved = useCallback((input) => {
-    return savedContentValues !== null && input in savedContentValues;
-  }, [savedContentValues]);
-
-  const handleCancelContentSaved = useCallback((input) => {
-    const tempSaved = {
-      ...savedContentValues,
-    };
-    delete tempSaved[input];
-    setSavedContentValues(tempSaved);
-  }, [savedContentValues]);
-
-  // --- Funtions for Dealing Content ------------------------------------------------------
-  const handleAddContent = useCallback(() => {
-    let tempContent = {};
-    quotationHeaders.forEach((header) => {
-      tempContent[header[0]] = null;
-    });
-    tempContent['1'] = quotationContents.length + 1;
-    const tempContents = [
-      ...quotationContents,
-      tempContent
-    ];
-    setQuotationContents(tempContents);
-
-    const tempCheck = [
-      ...checkContentState,
-      true,
-    ];
-    setCheckContentState(tempCheck);
-
-    if (!isNewlyAdded) {
-      setIsNewlyAdded(true);
-    };
-  }, [checkContentState, isNewlyAdded, quotationContents, quotationHeaders]);
-
-  const handleDeleteConetent = useCallback((index) => {
-    // Check 'editedContentValues' and clear data related content
-    let tempEditedContent = {
-      ...editedContentValues
-    };
-    if (editedContentValues) {
-      Object.keys(editedContentValues).forEach(key => {
-        const [no, idx] = key.split('.');
-        if (no === index) {
-          delete tempEditedContent[key];
-        };
-      });
-      setEditedContentValues(tempEditedContent);
-    }
-
-    // Check 'savedContentValues' and clear data related content
-    let tempSavedContent = {
-      ...savedContentValues
-    };
-    if (savedContentValues) {
-      Object.keys(savedContentValues).forEach(key => {
-        const [no, idx] = key.split('.');
-        if (no === index) {
-          delete tempSavedContent[key];
-        };
-      });
-      setSavedContentValues(tempSavedContent);
-    }
-
-    // Finally, ---------------------------------------------
-    const tempContents = [
-      ...quotationContents.slice(0, index),
-      ...quotationContents.slice(index + 1,),
-    ];
-    setQuotationContents(tempContents);
-
-    const tempCheck = [
-      ...checkContentState
-    ];
-    tempCheck.splice(index, 1);
-    setCheckContentState(tempCheck);
-
-    let isThereNewlyAdded = false;
-    for (let i = 0; i < tempCheck.length; i++) {
-      if (tempCheck[i]) {
-        isThereNewlyAdded = true;
-        break;
-      };
-    };
-    setIsNewlyAdded(isThereNewlyAdded);
-  }, [checkContentState, editedContentValues, quotationContents, savedContentValues]);
-
-  const handleSaveContentAll = useCallback(() => {
-    if (
-      savedContentValues !== null &&
-      selectedQuotation &&
-      selectedQuotation !== defaultQuotation
-    ) {
-      // Transfer data in temporary variable into content data.
-      let contents_in_saved = {};
-      let tempContents = [
-        ...quotationContents,
-      ];
-
-      Object.keys(savedContentValues).forEach(item => {
-        const [no, index] = item.split('.');
-        tempContents[no][index] = savedContentValues[item];
-        if (!contents_in_saved[no]) {
-          contents_in_saved[no] = true;
-        };
-      });
-
-      // Check if there is a newly added content having no date in it
-      for (let i = checkContentState.length - 1; i >= 0; i--) {
-        if (checkContentState[i] && !contents_in_saved[i]) {
-          tempContents.splice(i, 1);
-        };
-      };
-
-      const temp_all_saved = {
-        ...selectedQuotation,
-        quotation_contents: JSON.stringify(tempContents),
-        action_type: "UPDATE",
-        modify_user: cookies.myLationCrmUserId,
-        quotation_code: selectedQuotation.quotation_code,
-      };
-      const resp = modifyQuotation(temp_all_saved);
-      resp.then(res => {
-        if (res.result) {
-          setQuotationContents(tempContents);
-          setOrgQuotationContents(tempContents);
-          let tempCheck = [];
-          tempContents.forEach(content => {
-            tempCheck.push(true);
-          });
-          setCheckContentState(tempCheck);
-          setIsNewlyAdded(false);
-        } else {
-          const tempMsg = {
-            title: t('comment.title_error'),
-            message: `${t('comment.msg_fail_save')} - ${t('comment.reason')} : ${res.data}`,
-          };
-          handleOpenMessage(tempMsg);
-        };
-      });
-    } else {
-      console.log("[ QuotationDetailModel ] No saved data");
-    }
-    setEditedContentValues(null);
-    setSavedContentValues(null);
-  }, [
-    checkContentState,
-    cookies.myLationCrmUserId,
-    modifyQuotation,
-    savedContentValues,
-    selectedQuotation,
-    quotationContents,
-  ]);
-
-  const handleCancelContentAll = useCallback(() => {
-    setEditedContentValues(null);
-    setSavedContentValues(null);
-    const tempContents = [
-      ...orgQuotationContents
-    ];
-    setQuotationContents(tempContents);
-  }, []);
 
   const qotation_items_info = [
     { key: 'quotation_type', title: 'quotation.quotation_type', detail: { type: 'select', options: QuotationTypes, editing: handleDetailSelectChange } },
@@ -426,28 +198,6 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
   //===== useEffect functions =============================================== 
   useEffect(() => {
     if (selectedQuotation !== defaultQuotation) {
-      const headerValues = selectedQuotation.quotation_table.split('|');
-      if (headerValues && Array.isArray(headerValues)) {
-        let tableHeaders = [];
-        const headerCount = headerValues.length / 3;
-        for (let i = 0; i < headerCount; i++) {
-          tableHeaders.push([headerValues.at(3 * i), headerValues.at(3 * i + 1), headerValues.at(3 * i + 2)]);
-        };
-        setQuotationHeaders(tableHeaders);
-      };
-
-      const contentsData = JSON.parse(selectedQuotation.quotation_contents);
-      if (contentsData && Array.isArray(contentsData)) {
-        setOrgQuotationContents([...contentsData]);
-        setQuotationContents([...contentsData]);
-
-        let tempCheck = [];
-        for (let i = 0; i < contentsData.length; i++) {
-          tempCheck.push(false);
-        };
-        setCheckContentState(tempCheck);
-      };
-
       const detailViewStatus = localStorage.getItem("isFullScreen");
       if (detailViewStatus === null) {
         localStorage.setItem("isFullScreen", '0');
@@ -550,15 +300,6 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
                         <li className="nav-item">
                           <Link
                             className="nav-link"
-                            to="#sub-quotation-products"
-                            data-bs-toggle="tab"
-                          >
-                            {t('quotation.product_lists')}
-                          </Link>
-                        </li>
-                        <li className="nav-item">
-                          <Link
-                            className="nav-link"
                             to="#sub-quotation-pdf-view"
                             data-bs-toggle="tab"
                           >
@@ -590,6 +331,7 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
                                 )}
                               </Space>
                             </div>
+                            <QuotationContents checkData={{name: selectedQuotation.lead_name}}/>
                           </div>
                           {editedDetailValues !== null &&
                             Object.keys(editedDetailValues).length !== 0 && (
@@ -613,120 +355,6 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
                             )}
                         </div>
                         {/*---- End   -- Tab : Detail Quotation ------------------------------------------------------------*/}
-                        {/*---- Start -- Tab : Product Lists - Quotation ---------------------------------------------------*/}
-                        <div className="tab-pane task-related p-0" id="sub-quotation-products">
-                          <div className="crms-tasks">
-                            <div className="tasks__item crms-task-item active">
-                              {quotationContents && quotationContents.length > 0 &&
-                                quotationContents.map((content, index1) => {
-                                  if (content['1'] === null || content['1'] === 'null') return;
-                                  return (
-                                    <Collapse key={index1} defaultActiveKey={[index1]} accordion expandIconPosition="start">
-                                      <Panel header={"No." + content["1"]} key={index1}
-                                        extra={<Remove
-                                          style={{ color: 'gray' }}
-                                          onClick={() => { handleDeleteConetent(index1); }}
-                                        />} >
-                                        <table className="table">
-                                          <tbody>
-                                            <DetailLabelItem
-                                              key={21}
-                                              defaultText={content['2']}
-                                              saved={savedContentValues}
-                                              name={index1 + '.2'}
-                                              no_border={true}
-                                              title={t('common.category')}
-                                              checkEdit={handleCheckContentEditState}
-                                              startEdit={handleStartContentEdit}
-                                              endEdit={handleEndContentEdit}
-                                              editing={handleContentEditing}
-                                              checkSaved={handleCheckContentSaved}
-                                              cancelSaved={handleCancelContentSaved}
-                                            />
-                                            {content_indices.map((value, index2) =>
-                                              <DetailLabelItem
-                                                key={index2}
-                                                defaultText={content[value]}
-                                                saved={savedContentValues}
-                                                name={index1 + '.' + value}
-                                                title={quotationHeaders[value - 1][1]}
-                                                checkEdit={handleCheckContentEditState}
-                                                startEdit={handleStartContentEdit}
-                                                endEdit={handleEndContentEdit}
-                                                editing={handleContentEditing}
-                                                checkSaved={handleCheckContentSaved}
-                                                cancelSaved={handleCancelContentSaved}
-                                              />
-                                            )}
-                                            <DetailTextareaItem
-                                              key={22}
-                                              defaultText={content['19']}
-                                              saved={savedContentValues}
-                                              name={index1 + '.19'}
-                                              title={t('quotation.note')}
-                                              row_no={3}
-                                              no_border={content['998'] ? false : true}
-                                              checkEdit={handleCheckContentEditState}
-                                              startEdit={handleStartContentEdit}
-                                              endEdit={handleEndContentEdit}
-                                              editing={handleContentEditing}
-                                              checkSaved={handleCheckContentSaved}
-                                              cancelSaved={handleCancelContentSaved}
-                                            />
-                                            {content['998'] &&
-                                              <DetailTextareaItem
-                                                key={23}
-                                                defaultText={content['998']}
-                                                saved={savedContentValues}
-                                                name={index1 + '.998'}
-                                                title='Comment'
-                                                row_no={5}
-                                                no_border={true}
-                                                checkEdit={handleCheckContentEditState}
-                                                startEdit={handleStartContentEdit}
-                                                endEdit={handleEndContentEdit}
-                                                editing={handleContentEditing}
-                                                checkSaved={handleCheckContentSaved}
-                                                cancelSaved={handleCancelContentSaved}
-                                              />
-                                            }
-                                          </tbody>
-                                        </table>
-                                      </Panel>
-                                    </Collapse>
-                                  )
-                                })}
-                            </div>
-                            <div className="detail-add-content">
-                              <Add
-                                style={{ height: 32, width: 32, color: '#d9c9c9' }}
-                                onClick={handleAddContent}
-                              />
-                            </div>
-                          </div>
-                          {((savedContentValues && Object.keys(savedContentValues).length !== 0)
-                            || isNewlyAdded)
-                            && (
-                              <div className="text-center py-3">
-                                <button
-                                  type="button"
-                                  className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                                  onClick={handleSaveContentAll}
-                                >
-                                  {t('common.save')}
-                                </button>
-                                &nbsp;&nbsp;
-                                <button
-                                  type="button"
-                                  className="btn btn-secondary btn-rounded"
-                                  onClick={handleCancelContentAll}
-                                >
-                                  {t('common.cancel')}
-                                </button>
-                              </div>
-                            )}
-                        </div>
-                        {/*---- End   -- Tab : Product Lists - Quotation ---------------------------------------------------*/}
                         {/*---- Start -- Tab : PDF View - Quotation --------------------------------------------------------*/}
                         <div className="tab-pane task-related p-0" id="sub-quotation-pdf-view">
                           {selectedQuotation && (selectedQuotation.quotation_contents.length > 0) &&
