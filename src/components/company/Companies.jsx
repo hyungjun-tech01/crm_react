@@ -262,6 +262,7 @@ const Companies = () => {
         modify_user: cookies.myLationCrmUserId,
       };
       
+      console.log('delete company',newComData, comapny.create_user);
       const result = modifyCompany(newComData);
       result.then((res) => {
         if (res.result) {
