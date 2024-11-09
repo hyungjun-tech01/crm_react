@@ -353,7 +353,8 @@ const koResource = {
             view: '보기',
             visible: '보기',
             zip_code: '우편번호',
-            modify_date:'최종수정일'
+            modify_date:'최종수정일',
+            create_user:'생성자',
         },
         comment: {
             click_below_to_edit: '👉 편집하려면 하기 창을 클릭하세요',

@@ -352,7 +352,8 @@ const enResource = {
             view: 'View',
             visible: 'Visible',
             zip_code: 'Postal Code',
-            modify_date:'Modify Date'
+            modify_date:'Modify Date',
+            create_user:'Created by',
         },
         comment: {
             click_below_to_edit: '👉 Click the below to edit',
