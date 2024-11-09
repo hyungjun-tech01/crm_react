@@ -368,6 +368,7 @@ const koResource = {
             title_check: '확인',
             title_error: '오류',
             msg_not_reg_user: '등록한 사용자만 삭제 가능합니다.',
+            msg_delete_confirm:'삭제하시겠습니까?',
         },
         user :{
             user_id:'아이디',

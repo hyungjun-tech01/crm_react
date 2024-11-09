@@ -23,10 +23,12 @@ import MultiQueryModal from "../../constants/MultiQueryModal";
 import { leadColumn } from "../../repository/lead";
 import { useTranslation } from "react-i18next";
 import LeadAddModel from "./LeadAddMdel";
+import { useCookies } from "react-cookie";
 
 
 const Leads = () => {
   const { t } = useTranslation();
+  const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
   //===== [RecoilState] Related with Company ==========================================
   const companyState = useRecoilValue(atomCompanyState);
@@ -37,7 +39,7 @@ const Leads = () => {
   //===== [RecoilState] Related with Lead =============================================
   const leadState = useRecoilValue(atomLeadState);
   const filteredLead = useRecoilValue(atomFilteredLeadArray);
-  const { tryLoadAllLeads, loadAllLeads, setCurrentLead, filterLeads } = useRecoilValue(LeadRepo);
+  const { tryLoadAllLeads, loadAllLeads, setCurrentLead, filterLeads, modifyLead } = useRecoilValue(LeadRepo);
 
 
   //===== [RecoilState] Related with User ================================================
@@ -236,6 +238,34 @@ const Leads = () => {
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.sales_resource, b.sales_resource),
     },
+    {
+      title: t('common.actions'),
+      dataIndex: "",
+      render: (text, record) => (
+        <div className="delete_button"
+          onClick={() => {
+            handleDeleteLead(record);
+          }}
+          style={{ color: '#0d6efd', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
+        >
+        <button
+            className="delete_button"
+            style={{
+              backgroundColor: '#0d6efd', // 붉은 계열의 배경색
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px', // 둥근 모서리
+              padding: '4px 8px', // 여백 추가
+              cursor: 'pointer',
+              fontSize: '12px',
+              marginLeft: '4px'
+            }}
+          >
+            -
+          </button>
+        </div>
+      ),
+    },    
     // {
     //   title: "",
     //   dataIndex: "star",
@@ -305,6 +335,33 @@ const Leads = () => {
     //   ),
     // },
   ];
+
+   //delete company
+   const handleDeleteLead = useCallback((lead) =>{
+
+    if(lead.create_user === cookies.myLationCrmUserId){
+      const newLeadData = {
+        ...lead,
+        action_type: "DELETE",
+        modify_user: cookies.myLationCrmUserId,
+      };
+      
+      if (confirm(`${t('comment.msg_delete_confirm')}`)) {
+        const result = modifyLead(newLeadData);
+        result.then((res) => {
+          if (res.result) {
+          } else {
+            alert(`${res.data}`);
+          }
+        });
+      } else {
+        console.log("delete cancel");
+      }
+      
+    }else{
+      alert(`${t('comment.msg_not_reg_user')}`);
+    }
+  },[]) ;
 
   useEffect(() => {
     tryLoadAllCompanies();
@@ -493,7 +550,8 @@ const Leads = () => {
                       rowKey={(record) => record.lead_code}
                       onRow={(record, rowIndex) => {
                         return {
-                          onClick: () => {
+                          onClick: (event) => {
+                            if(event.target.className === 'delete_button' ) return;
                             handleClickLeadName(record.lead_code, record.company_code);
                           },
                         };

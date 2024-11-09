@@ -209,6 +209,40 @@ export const LeadRepo = selector({
                         return { result: false, data: "No Data" };  // 해당 lead_code를 찾지 못했을 때
                     }
 
+                } else if(newLead.action_type === 'DELETE'){
+
+                    delete newLead.action_type;
+                    delete newLead.modify_user;
+
+                    const alldeletedLeads = await snapshot.getPromise(atomAllLeadObj);
+
+                    const targetLeadCode = newLead.lead_code;
+                    
+                    //----- Update AllCompanyObj --------------------------//
+                    const updatedAllLeads = {  ...alldeletedLeads };
+                    
+                    if (targetLeadCode in updatedAllLeads) {
+                        delete updatedAllLeads[targetLeadCode];
+                    } 
+                    
+                    // 상태 업데이트
+                    set(atomAllLeadObj, updatedAllLeads);
+
+                    //----- Update FilteredCompanies -----------------------//
+                    const filteredAllLeads = await snapshot.getPromise(atomFilteredLeadArray);
+                                        
+                    const foundIdx = filteredAllLeads.findIndex(item => item.lead_code === targetLeadCode);
+                    if(foundIdx !== -1){
+                        const updatedFiltered = [
+                            ...filteredAllLeads.slice(0, foundIdx),
+                            ...filteredAllLeads.slice(foundIdx + 1),
+                        ];
+                        
+                        set(atomFilteredLeadArray, updatedFiltered);
+                        return { result: true };
+                    } else {
+                        return { result: false, data: "No Data" };  // 해당 company_code를 찾지 못했을 때
+                    }
                 }
             }
             catch(err){

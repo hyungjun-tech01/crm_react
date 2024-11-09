@@ -253,7 +253,6 @@ const Companies = () => {
 
   //delete company
   const handleDeleteCompany = useCallback((comapny) =>{
-    console.log('delete company',comapny, comapny.create_user);
 
     if(comapny.create_user === cookies.myLationCrmUserId){
       const newComData = {
@@ -261,21 +260,26 @@ const Companies = () => {
         action_type: "DELETE",
         modify_user: cookies.myLationCrmUserId,
       };
+       
       
-      console.log('delete company',newComData, comapny.create_user);
-      const result = modifyCompany(newComData);
-      result.then((res) => {
-        if (res.result) {
-         
-        } else {
-         
-          alert(`${res.data}`);
-        }
-      });
+      if (confirm(`${t('comment.msg_delete_confirm')}`)) {
+        const result = modifyCompany(newComData);
+        result.then((res) => {
+          if (res.result) {
+          
+          } else {
+          
+            alert(`${res.data}`);
+          }
+        });
+      } else {
+        console.log("delete cancel");
+      }
       
     }else{
       alert(`${t('comment.msg_not_reg_user')}`);
     }
+    
   },[]) ;
 
   useEffect(() => {
@@ -439,7 +443,6 @@ const Companies = () => {
                       onRow={(record, rowIndex) => {
                         return {
                           onClick: (event) => {
-                            console.log('event.target.className', event.target.className);
                             if(event.target.className === 'delete_button' ) return;
                             handleEditCompany(record.company_code);
                           },

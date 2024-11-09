@@ -367,6 +367,7 @@ const enResource = {
             title_check: 'Check',
             title_error: 'Error',
             msg_not_reg_user: 'Only create user can delete data.',
+            msg_delete_confirm:'Delete data?',
         },
         user :{
             user_id:'Id',

@@ -228,7 +228,7 @@ export const CompanyRepo = selector({
                         set(atomFilteredCompanyArray, updatedFiltered);
                         return { result: true };
                     } else {
-                        return { result: false, data: "No Data" };  // 해당 lead_code를 찾지 못했을 때
+                        return { result: false, data: "No Data" };  // 해당 company_code를 찾지 못했을 때
                     }
 
                 }
