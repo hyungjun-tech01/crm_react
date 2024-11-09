@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState , useCallback} from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
@@ -36,13 +36,13 @@ import { consultingColumn } from "../../repository/consulting";
 
 const Consultings = () => {
   const { t } = useTranslation();
-  const [ cookies ] = useCookies([ "myLationCrmUserName" ]);
+  const [ cookies ] = useCookies([ "myLationCrmUserName", "myLationCrmUserId" ]);
 
 
   //===== [RecoilState] Related with Consulting =======================================
   const consultingState = useRecoilValue(atomConsultingState);
   const filteredConsulting = useRecoilValue(atomFilteredConsultingArray);
-  const { tryLoadAllConsultings, loadAllConsultings, setCurrentConsulting, filterConsultingOri } = useRecoilValue(ConsultingRepo);
+  const { tryLoadAllConsultings, loadAllConsultings, setCurrentConsulting, filterConsultingOri, modifyConsulting } = useRecoilValue(ConsultingRepo);
 
 
   //===== [RecoilState] Related with Company ==========================================
@@ -296,8 +296,67 @@ const Consultings = () => {
       render: (text, record) => <>{text}</>,
       sorter: (a, b) => compareText(a.phone_number, b.phone_number),
     },
+    {
+      title: t('common.actions'),
+      dataIndex: "",
+      render: (text, record) => (
+        <div className="delete_button"
+          onClick={() => {
+            handleDeleteConsulting(record);
+          }}
+          style={{ color: '#0d6efd', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
+        >
+        <button
+            className="delete_button"
+            style={{
+              backgroundColor: '#0d6efd', // 붉은 계열의 배경색
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px', // 둥근 모서리
+              padding: '4px 8px', // 여백 추가
+              cursor: 'pointer',
+              fontSize: '12px',
+              marginLeft: '4px'
+            }}
+          >
+            -
+          </button>
+        </div>
+      ),
+    },  
   ];
 
+//delete consulting
+const handleDeleteConsulting = useCallback((consulting) =>{
+
+  if(consulting.creator === cookies.myLationCrmUserId){
+    const newConsultingData = {
+      ...consulting,
+      action_type: "DELETE",
+      modify_user: cookies.myLationCrmUserId,
+    };
+     
+    
+    if (confirm(`${t('comment.msg_delete_confirm')}`)) {
+      const result = modifyConsulting(newConsultingData);
+      result.then((res) => {
+        if (res.result) {
+        
+        } else {
+        
+          alert(`${res.data}`);
+        }
+      });
+    } else {
+      console.log("delete cancel");
+    }
+    
+  }else{
+    console.log('consulting.creator', consulting.creator);
+    alert(`${t('comment.msg_not_reg_user')}`);
+  }
+  
+},[]) ;  
   //===== useEffect functions ==========================================
   useEffect(() => {
     //tryLoadAllCompanies();
@@ -444,6 +503,7 @@ const Consultings = () => {
                         return {
                           onClick: (event) => {
                             if(event.target.className === 'table_company' || event.target.className === 'table_lead') return;
+                            if(event.target.className === 'delete_button' ) return;
                             handleClickConsulting(record.consulting_code);
                           },
                         };

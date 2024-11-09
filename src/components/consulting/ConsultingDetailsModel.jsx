@@ -499,6 +499,16 @@ const ConsultingDetailsModel = () => {
                 title={t('lead.position')}
                 onEditing={handleDetailChange}
               />
+              <div className="col-md-1 account d-flex">
+                <div>
+                  <p className="mb-0">
+                    <b>{t("common.create_user")}</b>
+                  </p>
+                  <span className="modal-title">
+                    {selectedConsulting.creator}
+                  </span>
+                </div>
+              </div>
             </div>
             <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange} />
             <button

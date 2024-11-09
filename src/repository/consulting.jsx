@@ -323,7 +323,40 @@ export const ConsultingRepo = selector({
                         };
                     };
                     return {result: true};
-                };
+                }else if(newConsulting.action_type === 'DELETE'){
+                    delete newConsulting.action_type;
+                    delete newConsulting.modify_user;
+
+                    const alldeletedConsultings = await snapshot.getPromise(atomAllConsultingObj);
+
+                    const targetConsultingCode = newConsulting.consulting_code;
+                    
+                    //----- Update AllCompanyObj --------------------------//
+                    const updatedAllConsultings = {  ...alldeletedConsultings };
+                    
+                    if (targetConsultingCode in updatedAllConsultings) {
+                        delete updatedAllConsultings[targetConsultingCode];
+                    } 
+                    
+                    // 상태 업데이트
+                    set(atomAllConsultingObj, updatedAllConsultings);
+
+                    //----- Update FilteredCompanies -----------------------//
+                    const filteredAllConsultings = await snapshot.getPromise(atomFilteredConsultingArray);
+                                        
+                    const foundIdx = filteredAllConsultings.findIndex(item => item.consulting_code === targetConsultingCode);
+                    if(foundIdx !== -1){
+                        const updatedFiltered = [
+                            ...filteredAllConsultings.slice(0, foundIdx),
+                            ...filteredAllConsultings.slice(foundIdx + 1),
+                        ];
+                        
+                        set(atomFilteredConsultingArray, updatedFiltered);
+                        return { result: true };
+                    } else {
+                        return { result: false, data: "No Data" };  // 해당 company_code를 찾지 못했을 때
+                    }
+                }
             }
             catch(err){
                 return {result:false, data: err};
