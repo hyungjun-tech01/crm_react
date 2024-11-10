@@ -123,6 +123,7 @@ const koResource = {
             information: '상담 정보',
             lead_time: '소요 시간',
             product_type: '물품 유형',
+            sales_representative:'',
             request_content: '상담 내역',
             receipt_date:'접수 일자',
             receiver: '상담 진행자',

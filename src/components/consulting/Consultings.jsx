@@ -435,9 +435,12 @@ const handleDeleteConsulting = useCallback((consulting) =>{
                     <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('common.all')}>{t('common.all')}</button>
                     <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('company.company_name')}>{t('company.company_name')}</button>
                     <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('consulting.type')}>{t('consulting.type')}</button>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('consulting.product_type')}>{t('consulting.product_type')}</button>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('consulting.receiver')}>{t('consulting.receiver')}</button>
                     <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('lead.full_name')}>{t('lead.full_name')}</button>
                     <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('lead.mobile')}>{t('lead.mobile')}</button>
                     <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('common.phone_no')}>{t('common.phone_no')}</button>
+                    <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('lead.lead_sales')}>{t('lead.lead_sales')}</button>
                     <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('consulting.request_content')}>{t('consulting.request_content')}</button>
                     <button className="dropdown-item" type="button" onClick={() => handleStatusSearch('consulting.action_content')}>{t('consulting.action_content')}</button>
                   </div>
