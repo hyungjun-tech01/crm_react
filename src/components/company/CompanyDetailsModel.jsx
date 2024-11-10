@@ -142,6 +142,8 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     [editedDetailValues]
   );
 
+  const numRowMemo = selectedCompany.memo ? (selectedCompany.memo.match(/\n/g) || []).length : 2;
+
   const company_items_info = [
     {
       key: "company_address",
@@ -262,7 +264,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     {
       key: "memo",
       title: "common.memo",
-      detail: { type: "textarea", extra:"long",  editing: handleDetailChange },
+      detail: { type: "textarea", extra:"long", row_no:numRowMemo,  editing: handleDetailChange },
     },
   ];
 
