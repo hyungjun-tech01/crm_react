@@ -13,6 +13,38 @@ import { SettingsRepo } from '../../repository/settings';
 import QuotationContentModal from "./QuotationContentModal";
 import MessageModal from "../../constants/MessageModal";
 
+const defaultColumns = [
+    {
+        title: "No",
+        dataIndex: '1',
+        width: 50,
+    },
+    {
+        title: 'common.product',
+        dataIndex: '5',
+        width: 300,
+    },
+    {
+        title: 'quotation.detail_desc',
+        dataIndex: '10',
+        width: 100,
+    },
+    {
+        title: 'common.quantity',
+        dataIndex: '12',
+        width: 100,
+    },
+    {
+        title: 'quotation.quotation_unit_price',
+        dataIndex: '15',
+        width: 150,
+    },
+    {
+        title: 'quotation.quotation_amount',
+        dataIndex: '16',
+    },
+];
+
 const ResizeableTitle = props => {
     const { onResize, width, ...restProps } = props;
 
@@ -31,7 +63,6 @@ const ResizeableTitle = props => {
         </Resizable>
     );
 };
-
 
 const QuotationContents = ({ checkData, contents, handleContents }) => {
     const [t] = useTranslation();
@@ -85,44 +116,6 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
             ? ret?.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,')
             : ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }, [settingForContent.show_decimal]);
-
-    const defaultColumns = [
-        {
-            title: "No",
-            dataIndex: '1',
-            width: 50,
-            render: (text, record) => <>{text}</>,
-        },
-        {
-            title: t('common.product'),
-            dataIndex: '5',
-            width: 300,
-            render: (text, record) => <>{text}</>,
-        },
-        {
-            title: t('quotation.detail_desc'),
-            dataIndex: '10',
-            width: 100,
-            render: (text, record) => <>{text}</>,
-        },
-        {
-            title: t('common.quantity'),
-            dataIndex: '12',
-            width: 100,
-            render: (text, record) => <>{text}</>,
-        },
-        {
-            title: t('quotation.quotation_unit_price'),
-            dataIndex: '15',
-            width: 150,
-            render: (text, record) => <>{handleFormatter(record['15'])}</>,
-        },
-        {
-            title: t('quotation.quotation_amount'),
-            dataIndex: '16',
-            render: (text, record) => <>{handleFormatter(record['16'])}</>,
-        },
-    ];
 
     const tableComponents = {
         header: {
@@ -661,9 +654,19 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
     //===== useEffect functions =============================================== 
     useEffect(() => {
         if (!cookies.myQuotationAddColumns) {
-            const tempQuotationColumn = [
-                ...defaultColumns
-            ];
+            const tempQuotationColumn = defaultColumns.forEach(item => {
+                const ret = {
+                    title: t(item.title),
+                    dataIndex: item.dataIndex,
+                    render: QuotationContentItems[item.dataIndex].type === 'price'
+                        ? (text, record) => <>{handleFormatter(text)}</>
+                        : (text, record) => <>{text}</>,
+                };
+                if(!!item.width) {
+                    ret['width'] = item.width;
+                }
+                return ret;
+            });
             const tempCookieValue = {
                 [cookies.myLationCrmUserId]: tempQuotationColumn
             }
@@ -672,9 +675,19 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
         } else {
             const columnSettings = cookies.myQuotationAddColumns[cookies.myLationCrmUserId];
             if (!columnSettings) {
-                const tempQuotationColumn = [
-                    ...defaultColumns
-                ];
+                const tempQuotationColumn = defaultColumns.forEach(item => {
+                    const ret = {
+                        title: t(item.title),
+                        dataIndex: item.dataIndex,
+                        render: QuotationContentItems[item.dataIndex].type === 'price'
+                        ? (text, record) => <>{handleFormatter(text)}</>
+                        : (text, record) => <>{text}</>,
+                    };
+                    if(!!item.width) {
+                        ret['width'] = item.width;
+                    }
+                    return ret;
+                });
                 const tempCookieValue = {
                     ...cookies.myQuotationAddColumns,
                     [cookies.myLationCrmUserId]: tempQuotationColumn
