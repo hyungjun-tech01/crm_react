@@ -597,7 +597,7 @@ const ConsultingAddModel = ({ initData }) => {
               }
               <div className="form-group row">
                 <AddBasicItem
-                  title={t('company.salesman')}
+                  title={t('lead.lead_sales')}
                   type='select'
                   name='sales_representative'
                   defaultValue={consultingChange.sales_representative}

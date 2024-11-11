@@ -432,6 +432,16 @@ const LeadDetailsModel = ({ init, handleInit }) => {
                   title={t('company.company_name')}
                   onEditing={handleDetailChange}
                 />
+                <div className="col-md-1 account d-flex">
+                  <div>
+                    <p className="mb-0">
+                      <b>{t("common.create_user")}</b>
+                    </p>
+                    <span className="modal-title">
+                      {selectedLead.create_user}
+                    </span>
+                  </div>
+                </div>
               </div>
               <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange} />
               <button

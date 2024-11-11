@@ -363,7 +363,7 @@ const ConsultingDetailsModel = () => {
     { key: 'lead_time', title: 'consulting.lead_time', detail: { type: 'select', options: ConsultingTimeTypes, editing: handleDetailSelectChange } },
     { key: 'product_type', title: 'consulting.product_type', detail: { type: 'select', options: ProductTypes, editing: handleDetailSelectChange } },
     { key: 'request_type', title: 'consulting.request_type', detail: { type: 'label', editing: handleDetailChange } },
-    { key: 'lead_sales', title: 'lead.lead_sales', detail: { type: 'select', options: salespersonsForSelection, editing: handleDetailSelectChange } },
+    { key: 'sales_representative', title: 'lead.lead_sales', detail: { type: 'select', options: salespersonsForSelection, editing: handleDetailSelectChange } },
     { key: 'application_engineer', title: 'company.engineer', detail: { type: 'select', options: engineersForSelection, editing: handleDetailSelectChange } },
     { key: 'receiver', title: 'consulting.receiver', detail: { type: 'select', options: usersForSelection, editing: handleDetailSelectChange } },
   ];
@@ -499,6 +499,16 @@ const ConsultingDetailsModel = () => {
                 title={t('lead.position')}
                 onEditing={handleDetailChange}
               />
+              <div className="col-md-1 account d-flex">
+                <div>
+                  <p className="mb-0">
+                    <b>{t("common.create_user")}</b>
+                  </p>
+                  <span className="modal-title">
+                    {selectedConsulting.creator}
+                  </span>
+                </div>
+              </div>
             </div>
             <Switch checkedChildren="full" checked={isFullScreen} onChange={handleWidthChange} />
             <button

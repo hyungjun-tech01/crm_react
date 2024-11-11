@@ -201,17 +201,25 @@ export const ConsultingRepo = selector({
                                             (item.receiver && item.receiver.includes(filterText)) ||
                                             (item.company_name && item.company_name.includes(filterText)) ||
                                             (item.consulting_type && item.consulting_type.includes(filterText)) ||
+                                            (item.product_type && item.product_type.includes(filterText)) ||
                                             (item.mobile_number && item.mobile_number.includes(filterText)) || 
                                             (item.phone_number && item.phone_number.includes(filterText)) || 
+                                            (item.sales_representative && item.sales_representative.includes(filterText)) || 
                                             (item.request_content && item.request_content.includes(filterText)) || 
                                             (item.action_content && item.action_content.includes(filterText)) 
                 );
             }else if(itemName === 'company.company_name'){
                 allConsulting = allConsultingList.filter(item => (item.company_name &&item.company_name.includes(filterText))
                 );    
+            }else if(itemName === 'consulting.receiver'){
+                allConsulting = allConsultingList.filter(item => (item.receiver &&item.receiver.includes(filterText))
+                );    
             }else if(itemName === 'consulting.type'){
                 allConsulting = allConsultingList.filter(item => (item.consulting_type &&item.consulting_type.includes(filterText))
                 );    
+            }else if(itemName === 'consulting.product_type'){
+                allConsulting = allConsultingList.filter(item => (item.product_type &&item.product_type.includes(filterText))
+                );                  
             }else if(itemName === 'lead.full_name'){
                 allConsulting = allConsultingList.filter(item => (item.lead_name &&item.lead_name.includes(filterText))
                 );    
@@ -220,6 +228,9 @@ export const ConsultingRepo = selector({
                 );    
             }else if(itemName === 'common.phone_no'){
                 allConsulting = allConsultingList.filter(item => (item.phone_number &&item.phone_number.includes(filterText))
+                );    
+            }else if(itemName === 'lead.lead_sales'){
+                allConsulting = allConsultingList.filter(item => (item.sales_representative &&item.sales_representative.includes(filterText))
                 );    
             }else if(itemName === 'consulting.request_content'){
                 allConsulting = allConsultingList.filter(item => (item.request_content &&item.request_content.includes(filterText))
@@ -323,7 +334,40 @@ export const ConsultingRepo = selector({
                         };
                     };
                     return {result: true};
-                };
+                }else if(newConsulting.action_type === 'DELETE'){
+                    delete newConsulting.action_type;
+                    delete newConsulting.modify_user;
+
+                    const alldeletedConsultings = await snapshot.getPromise(atomAllConsultingObj);
+
+                    const targetConsultingCode = newConsulting.consulting_code;
+                    
+                    //----- Update AllCompanyObj --------------------------//
+                    const updatedAllConsultings = {  ...alldeletedConsultings };
+                    
+                    if (targetConsultingCode in updatedAllConsultings) {
+                        delete updatedAllConsultings[targetConsultingCode];
+                    } 
+                    
+                    // 상태 업데이트
+                    set(atomAllConsultingObj, updatedAllConsultings);
+
+                    //----- Update FilteredCompanies -----------------------//
+                    const filteredAllConsultings = await snapshot.getPromise(atomFilteredConsultingArray);
+                                        
+                    const foundIdx = filteredAllConsultings.findIndex(item => item.consulting_code === targetConsultingCode);
+                    if(foundIdx !== -1){
+                        const updatedFiltered = [
+                            ...filteredAllConsultings.slice(0, foundIdx),
+                            ...filteredAllConsultings.slice(foundIdx + 1),
+                        ];
+                        
+                        set(atomFilteredConsultingArray, updatedFiltered);
+                        return { result: true };
+                    } else {
+                        return { result: false, data: "No Data" };  // 해당 company_code를 찾지 못했을 때
+                    }
+                }
             }
             catch(err){
                 return {result:false, data: err};

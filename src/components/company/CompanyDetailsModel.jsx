@@ -142,6 +142,8 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     [editedDetailValues]
   );
 
+  const numRowMemo = selectedCompany.memo ? (selectedCompany.memo.match(/\n/g) || []).length : 2;
+
   const company_items_info = [
     {
       key: "company_address",
@@ -262,7 +264,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
     {
       key: "memo",
       title: "common.memo",
-      detail: { type: "textarea", extra:"long",  editing: handleDetailChange },
+      detail: { type: "textarea", extra:"long", row_no:numRowMemo,  editing: handleDetailChange },
     },
   ];
 
@@ -450,6 +452,16 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
                   title={t("company.business_registration_code")}
                   onEditing={handleDetailChange}
                 />
+                <div className="col-md-1 account d-flex">
+                  <div>
+                    <p className="mb-0">
+                      <b>{t("common.create_user")}</b>
+                    </p>
+                    <span className="modal-title">
+                      {selectedCompany.create_user}
+                    </span>
+                  </div>
+                </div>
               </div>
               <Switch
                 checkedChildren="full"

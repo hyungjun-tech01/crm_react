@@ -3,6 +3,7 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
 import { useTranslation } from "react-i18next";
+import { useCookies } from "react-cookie";
 
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { CompanyRepo } from "../../repository/company";
@@ -22,10 +23,11 @@ import { atomUserState } from "../../atoms/atomsUser";
 
 const Companies = () => {
   const { t } = useTranslation();
+  const [cookies] = useCookies(["myLationCrmUserName", "myLationCrmUserId"]);
 
   //===== [RecoilState] Related with Company ==========================================
   const [ companyState, setCompanyState] = useRecoilState(atomCompanyState);
-  const { tryLoadAllCompanies, filterCompanies, setCurrentCompany , loadAllCompanies } = useRecoilValue(CompanyRepo);
+  const { tryLoadAllCompanies, filterCompanies, setCurrentCompany , loadAllCompanies, modifyCompany } = useRecoilValue(CompanyRepo);
   const filteredCompany = useRecoilValue(atomFilteredCompanyArray);
 
 
@@ -95,6 +97,7 @@ const Companies = () => {
   const singleDateSettings = [
     { label: t('company.ma_non_extended'), stateKey: 'ma_finish_date', checked: false },
   ];
+
 
   const handleMultiQueryModal = () => {
     setMultiQueryModal(true);
@@ -208,7 +211,7 @@ const Companies = () => {
       render: (text, record) => (
         <div className="delete_button"
           onClick={() => {
-            handleDeleteCompany(record.company_code);
+            handleDeleteCompany(record);
           }}
           style={{ color: '#0d6efd', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
         >
@@ -249,8 +252,34 @@ const Companies = () => {
   }, [setInitToAddCompany]);
 
   //delete company
-  const handleDeleteCompany = useCallback((comapny_code) =>{
-    console.log('delete company',comapny_code);
+  const handleDeleteCompany = useCallback((comapny) =>{
+
+    if(comapny.create_user === cookies.myLationCrmUserId){
+      const newComData = {
+        ...comapny,
+        action_type: "DELETE",
+        modify_user: cookies.myLationCrmUserId,
+      };
+       
+      
+      if (confirm(`${t('comment.msg_delete_confirm')}`)) {
+        const result = modifyCompany(newComData);
+        result.then((res) => {
+          if (res.result) {
+          
+          } else {
+          
+            alert(`${res.data}`);
+          }
+        });
+      } else {
+        console.log("delete cancel");
+      }
+      
+    }else{
+      alert(`${t('comment.msg_not_reg_user')}`);
+    }
+    
   },[]) ;
 
   useEffect(() => {
@@ -414,7 +443,6 @@ const Companies = () => {
                       onRow={(record, rowIndex) => {
                         return {
                           onClick: (event) => {
-                            console.log('event.target.className', event.target.className);
                             if(event.target.className === 'delete_button' ) return;
                             handleEditCompany(record.company_code);
                           },

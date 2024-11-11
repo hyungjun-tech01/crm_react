@@ -123,6 +123,7 @@ const koResource = {
             information: '상담 정보',
             lead_time: '소요 시간',
             product_type: '물품 유형',
+            sales_representative:'',
             request_content: '상담 내역',
             receipt_date:'접수 일자',
             receiver: '상담 진행자',
@@ -353,7 +354,8 @@ const koResource = {
             view: '보기',
             visible: '보기',
             zip_code: '우편번호',
-            modify_date:'최종수정일'
+            modify_date:'최종수정일',
+            create_user:'생성자',
         },
         comment: {
             click_below_to_edit: '👉 편집하려면 하기 창을 클릭하세요',
@@ -367,6 +369,8 @@ const koResource = {
             search_address_first: '먼저 주소 검색하시기 바랍니다.',
             title_check: '확인',
             title_error: '오류',
+            msg_not_reg_user: '등록한 사용자만 삭제 가능합니다.',
+            msg_delete_confirm:'삭제하시겠습니까?',
         },
         user :{
             user_id:'아이디',

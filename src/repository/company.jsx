@@ -122,6 +122,7 @@ export const CompanyRepo = selector({
             return true;
         });
         const modifyCompany = getCallback(({set, snapshot}) => async (newCompany) => {
+            console.log('modifyCompany company', newCompany);
             const input_json = JSON.stringify(newCompany);
             try{
                 const response = await fetch(`${BASE_PATH}/modifyCompany`, {
@@ -195,6 +196,41 @@ export const CompanyRepo = selector({
                     } else {
                         return { result: false, data: "No Data" };  // 해당 lead_code를 찾지 못했을 때
                     }
+                }else if(newCompany.action_type === 'DELETE'){
+                  
+                    delete newCompany.action_type;
+                    delete newCompany.modify_user;
+
+                    const alldeletedCompanies = await snapshot.getPromise(atomAllCompanyObj);
+
+                    const targetCompanyCode = newCompany.company_code;
+                    
+                    //----- Update AllCompanyObj --------------------------//
+                    const updatedAllCompanies = {  ...alldeletedCompanies };
+                    
+                    if (targetCompanyCode in updatedAllCompanies) {
+                        delete updatedAllCompanies[targetCompanyCode];
+                    } 
+                    
+                    // 상태 업데이트
+                    set(atomAllCompanyObj, updatedAllCompanies);
+
+                    //----- Update FilteredCompanies -----------------------//
+                    const filteredAllCompanies = await snapshot.getPromise(atomFilteredCompanyArray);
+                                        
+                    const foundIdx = filteredAllCompanies.findIndex(item => item.company_code === targetCompanyCode);
+                    if(foundIdx !== -1){
+                        const updatedFiltered = [
+                            ...filteredAllCompanies.slice(0, foundIdx),
+                            ...filteredAllCompanies.slice(foundIdx + 1),
+                        ];
+                        
+                        set(atomFilteredCompanyArray, updatedFiltered);
+                        return { result: true };
+                    } else {
+                        return { result: false, data: "No Data" };  // 해당 company_code를 찾지 못했을 때
+                    }
+
                 }
             }
             catch(err){
