@@ -120,7 +120,9 @@ const QuotationContentModal = (props) => {
 
         // popstate 이벤트 리스너 추가 (중복 추가 방지)
         window.addEventListener('popstate', handlePopState);
+    }, []);
 
+    useEffect(() => {
         const detailOnOff = !!edited['detail_desc_on_off'] ? edited.detail_desc_on_off : original.detail_desc_on_off;
         const showDetail = ( detailOnOff === '있음');
         setShowDetailDesc(showDetail);

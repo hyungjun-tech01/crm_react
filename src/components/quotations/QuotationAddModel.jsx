@@ -10,7 +10,6 @@ import { option_locations } from '../../constants/constants';
 
 import {
   defaultQuotation,
-  atomSelectedCategory,
   atomCurrentLead,
   defaultLead,
 } from "../../atoms/atoms";

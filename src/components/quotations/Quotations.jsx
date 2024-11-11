@@ -263,8 +263,9 @@ const Quotations = () => {
     }, 250);
   }, []);
 
+
+  //===== useEffect functions =============================================== 
   useEffect(() => {
-    
     const multiQueryCondi = {
       queryConditions:queryConditions,
       checkedDates:checkedDates,

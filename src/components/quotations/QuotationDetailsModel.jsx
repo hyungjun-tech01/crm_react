@@ -137,6 +137,9 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
   //===== Handles to handle this =================================================
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentQuotationCode, setCurrentQuotationCode] = useState('');
+  const [contentColumns, setContentColumns] = useState([]);
+  const [quotationContents, setQuotationContents] = useState([]);
+
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -186,6 +189,9 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
   }, [cookies.myLationCrmUserId, modifyQuotation, editedDetailValues, selectedQuotation]);
 
   const handleInitialize = () => {
+    console.log('QuotationDetails / handleInitialize: ', selectedQuotation);
+    const selectedContents = JSON.parse(selectedQuotation.quotation_contents);
+    setQuotationContents(selectedContents);
     setEditedDetailValues(null);
   };
 
@@ -195,27 +201,26 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
     }, 250);
   };
 
+
   //===== useEffect functions =============================================== 
   useEffect(() => {
     if (selectedQuotation !== defaultQuotation) {
-      const detailViewStatus = localStorage.getItem("isFullScreen");
-      if (detailViewStatus === null) {
-        localStorage.setItem("isFullScreen", '0');
-        setIsFullScreen(false);
-      } else if (detailViewStatus === '0') {
-        setIsFullScreen(false);
-      } else {
-        setIsFullScreen(true);
-      };
+      handleInitialize();
+    };
+    setCurrentQuotationCode(selectedQuotation.quotation_code);
+  }, [ selectedQuotation, currentQuotationCode, quotationState ]);
+
+  useEffect(() => {
+    const detailViewStatus = localStorage.getItem("isFullScreen");
+    if (detailViewStatus === null) {
+      localStorage.setItem("isFullScreen", '0');
+      setIsFullScreen(false);
+    } else if (detailViewStatus === '0') {
+      setIsFullScreen(false);
+    } else {
+      setIsFullScreen(true);
     };
 
-    handleInitialize();
-    setCurrentQuotationCode(selectedQuotation.quotation_code);
-  }, [selectedQuotation, currentQuotationCode, quotationState]);
-
-
-  // ----- useEffect for Production -----------------------------------
-  useEffect(() => {
     // 모달 내부 페이지의 히스토리 상태 추가
     history.pushState({ modalInternal: true }, '', location.href);
 
@@ -227,8 +232,10 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
     };
 
     // popstate 이벤트 리스너 추가 (중복 추가 방지)
-    window.addEventListener('popstate', handlePopState); 
-    
+    window.addEventListener('popstate', handlePopState);
+  }, []);
+
+  useEffect(() => {
     if (((userState & 1) === 1)
       && ((quotationState & 1) === 1)
     ) {
@@ -331,7 +338,13 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
                                 )}
                               </Space>
                             </div>
-                            <QuotationContents checkData={{name: selectedQuotation.lead_name}}/>
+                            <QuotationContents
+                              checkData={{ name: selectedQuotation.lead_name }}
+                              columns={contentColumns}
+                              handleColumns={setContentColumns}
+                              contents={quotationContents}
+                              handleContents={setQuotationContents}
+                            />
                           </div>
                           {editedDetailValues !== null &&
                             Object.keys(editedDetailValues).length !== 0 && (

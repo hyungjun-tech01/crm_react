@@ -1,13 +1,14 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Resizable } from 'react-resizable';
-import { Checkbox, InputNumber, Space, Table } from 'antd';
+import { Button, Checkbox, InputNumber, Modal, Space, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { AddBoxOutlined, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
 
-import { SettingsRepo } from '../../repository/settings'
+import { QuotationContentItems } from '../../repository/quotation';
+import { SettingsRepo } from '../../repository/settings';
 
 import QuotationContentModal from "./QuotationContentModal";
 import MessageModal from "../../constants/MessageModal";
@@ -32,7 +33,7 @@ const ResizeableTitle = props => {
 };
 
 
-const QuotationContents = ({ checkData }) => {
+const QuotationContents = ({ checkData, contents, handleContents }) => {
     const [t] = useTranslation();
     const [cookies, setCookie] = useCookies(["myLationCrmUserId", "myLationCrmUserName", "myQuotationAddColumns"]);
     const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -51,12 +52,12 @@ const QuotationContents = ({ checkData }) => {
 
     const handlePopupOpen = (open) => {
         console.log('QuotationAdd / handlePopupOpen');
-        if(open) {
-          openModal("antModal");
+        if (open) {
+            openModal("antModal");
         } else {
-          closeModal();
+            closeModal();
         }
-      };
+    };
 
     //===== [RecoilState] Related with Settings ===========================================
     const { openModal, closeModal } = useRecoilValue(SettingsRepo);
@@ -76,14 +77,14 @@ const QuotationContents = ({ checkData }) => {
         if (value === undefined || value === null || value === '') return '';
         let ret = value;
         if (typeof value === 'string') {
-          ret = Number(value);
-          if (isNaN(ret)) return value;
+            ret = Number(value);
+            if (isNaN(ret)) return value;
         };
-    
+
         return settingForContent.show_decimal
-          ? ret?.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,')
-          : ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-      }, [settingForContent.show_decimal]);
+            ? ret?.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+            : ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }, [settingForContent.show_decimal]);
 
     const defaultColumns = [
         {
@@ -107,7 +108,7 @@ const QuotationContents = ({ checkData }) => {
         {
             title: t('common.quantity'),
             dataIndex: '12',
-            width: 50,
+            width: 100,
             render: (text, record) => <>{text}</>,
         },
         {
@@ -209,9 +210,7 @@ const QuotationContents = ({ checkData }) => {
         // update cookie for content columns ----------------
         const tempCookies = {
             ...cookies.myQuotationAddColumns,
-            [cookies.myLationCrmUserId]: [
-                ...tempColumns
-            ]
+            [ cookies.myLationCrmUserId ]: [ ...tempColumns ]
         };
         setCookie("myQuotationAddColumns", tempCookies);
     };
@@ -241,20 +240,19 @@ const QuotationContents = ({ checkData }) => {
     const handleOpenEditHeaders = () => {
         handlePopupOpen(true);
         setEditHeaders(true);
-      };
-    
-      const handleCloseEditHeaders = () => {
+    };
+
+    const handleCloseEditHeaders = () => {
         handlePopupOpen(false);
         setEditHeaders(false);
-      };
+    };
 
 
     //===== Handles to edit 'Content' =================================================
-    const [quotationContents, setQuotationContents] = useState([]);
     const [isContentModalOpen, setIsContentModalOpen] = useState(false);
     const [orgContentModalValues, setOrgContentModalValues] = useState({});
     const [editedContentModalValues, setEditedContentModalValues] = useState({});
-    
+
     const [amountsForContent, setAmountsForContent] = useState({
         sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
     });
@@ -572,92 +570,128 @@ const QuotationContents = ({ checkData }) => {
 
     const handleContentModalOk = () => {
         const finalData = {
-          ...orgContentModalValues,
-          ...editedContentModalValues,
+            ...orgContentModalValues,
+            ...editedContentModalValues,
         };
         if (!finalData.product_name || !finalData.quotation_amount) {
-          setMessage({ title: '필요 항목 누락', message: '필요 값 - 제품명 또는 견적 가격 - 이 없습니다.' });
-          const contents = (
-            <>
-              <p>하기 정보는 필수 입력 사항입니다.</p>
-              { !finalData.product_name && <div> - 제품명</div> }
-              { !finalData.quotation_amount && <div> - 견적 가격</div> }
-            </>
-          );
-          const tempMsg = {
-            title: t('comment.title_check'),
-            message: contents,
-          };
-          handleOpenMessage(tempMsg);
-          return;
+            setMessage({ title: '필요 항목 누락', message: '필요 값 - 제품명 또는 견적 가격 - 이 없습니다.' });
+            const contents = (
+                <>
+                    <p>하기 정보는 필수 입력 사항입니다.</p>
+                    {!finalData.product_name && <div> - 제품명</div>}
+                    {!finalData.quotation_amount && <div> - 견적 가격</div>}
+                </>
+            );
+            const tempMsg = {
+                title: t('comment.title_check'),
+                message: contents,
+            };
+            handleOpenMessage(tempMsg);
+            return;
         };
-    
+
         // update Contents -------------------------------------------------
         const updatedContent = {
-          '1': 1,
-          '2': finalData.product_class_name,
-          '3': finalData.manufacturer || '',
-          '4': finalData.model_name || '',
-          '5': finalData.product_name || '',
-          '6': finalData.material || '',
-          '7': finalData.type || '',
-          '8': finalData.color || '',
-          '9': finalData.standard || '',
-          '10': finalData.detail_desc_on_off || '',
-          '11': finalData.unit || '',
-          '12': finalData.quantity || '',
-          '13': finalData.reseller_price || '',
-          '14': settingForContent.dc_rate || '',
-          '15': finalData.list_price || '',
-          '16': finalData.quotation_amount || '',
-          '17': finalData.cost_price || '',
-          '18': finalData.profit_amount || '',
-          '19': finalData.memo || '',
-          '998': finalData.detail_desc || '',
-          'org_unit_price': finalData.org_unit_price,
+            '1': 1,
+            '2': finalData.product_class_name,
+            '3': finalData.manufacturer || '',
+            '4': finalData.model_name || '',
+            '5': finalData.product_name || '',
+            '6': finalData.material || '',
+            '7': finalData.type || '',
+            '8': finalData.color || '',
+            '9': finalData.standard || '',
+            '10': finalData.detail_desc_on_off || '',
+            '11': finalData.unit || '',
+            '12': finalData.quantity || '',
+            '13': finalData.reseller_price || '',
+            '14': settingForContent.dc_rate || '',
+            '15': finalData.list_price || '',
+            '16': finalData.quotation_amount || '',
+            '17': finalData.cost_price || '',
+            '18': finalData.profit_amount || '',
+            '19': finalData.memo || '',
+            '998': finalData.detail_desc || '',
+            'org_unit_price': finalData.org_unit_price,
         };
-    
+
         if (settingForContent.action === "ADD") {
-          updatedContent['1'] = quotationContents.length + 1;
-          const updatedContents = quotationContents.concat(updatedContent);
-          setQuotationContents(updatedContents);
-    
-          if (settingForContent.auto_calc) {
-            handleCalculateAmounts(updatedContents);
-          };
+            updatedContent['1'] = contents.length + 1;
+            const updatedContents = contents.concat(updatedContent);
+            handleContents(updatedContents);
+
+            if (settingForContent.auto_calc) {
+                handleCalculateAmounts(updatedContents);
+            };
         } else {  //Update
-          updatedContent['1'] = settingForContent.index;
-          const foundIdx = quotationContents.findIndex(item => item['1'] === settingForContent.index);
-          if (foundIdx === -1) {
-            console.log('Something Wrong when modifying content');
-            return;
-          };
-          const updatedContents = [
-            ...quotationContents.slice(0, foundIdx),
-            updatedContent,
-            ...quotationContents.slice(foundIdx + 1,),
-          ];
-          setQuotationContents(updatedContents);
-    
-          if (settingForContent.auto_calc) {
-            handleCalculateAmounts(updatedContents);
-          };
+            updatedContent['1'] = settingForContent.index;
+            const foundIdx = contents.findIndex(item => item['1'] === settingForContent.index);
+            if (foundIdx === -1) {
+                console.log('Something Wrong when modifying content');
+                return;
+            };
+            const updatedContents = [
+                ...contents.slice(0, foundIdx),
+                updatedContent,
+                ...contents.slice(foundIdx + 1,),
+            ];
+            handleContents(updatedContents);
+
+            if (settingForContent.auto_calc) {
+                handleCalculateAmounts(updatedContents);
+            };
         };
-    
+
         handleContentModalCancel();
-      };
-    
-      const handleContentModalCancel = () => {
+    };
+
+    const handleContentModalCancel = () => {
         handlePopupOpen(false);
         setIsContentModalOpen(false);
         setEditedContentModalValues({});
         setOrgContentModalValues({});
         setSelectedContentRowKeys([]);
-      };
-    
-      const handleContentItemChange = useCallback(data => {
+    };
+
+    const handleContentItemChange = useCallback(data => {
         setEditedContentModalValues(data);
-      }, []);
+    }, []);
+
+
+    //===== useEffect functions =============================================== 
+    useEffect(() => {
+        if (!cookies.myQuotationAddColumns) {
+            const tempQuotationColumn = [
+                ...defaultColumns
+            ];
+            const tempCookieValue = {
+                [cookies.myLationCrmUserId]: tempQuotationColumn
+            }
+            setContentColumns(tempQuotationColumn);
+            setCookie('myQuotationAddColumns', tempCookieValue);
+        } else {
+            const columnSettings = cookies.myQuotationAddColumns[cookies.myLationCrmUserId];
+            if (!columnSettings) {
+                const tempQuotationColumn = [
+                    ...defaultColumns
+                ];
+                const tempCookieValue = {
+                    ...cookies.myQuotationAddColumns,
+                    [cookies.myLationCrmUserId]: tempQuotationColumn
+                };
+                setContentColumns(tempQuotationColumn);
+                setCookie('myQuotationAddColumns', tempCookieValue);
+            } else {
+                const tempQuotationColumn = columnSettings.map(col => ({
+                    ...col,
+                    render: QuotationContentItems[col.dataIndex].type === 'price'
+                        ? (text, record) => <>{handleFormatter(text)}</>
+                        : (text, record) => <>{text}</>,
+                }));
+                setContentColumns(tempQuotationColumn);
+            };
+        };
+    }, [cookies.myLationCrmUserId, cookies.myQuotationAddColumns, defaultColumns, handleFormatter, setCookie]);
 
     return (
         <>
@@ -740,9 +774,9 @@ const QuotationContents = ({ checkData }) => {
                             onResize: handleColumnResize(index),
                         }),
                     }))}
-                    dataSource={quotationContents}
+                    dataSource={contents}
                     pagination={{
-                        total: quotationContents.length,
+                        total: contents.length,
                         showTotal: ShowTotal,
                         showSizeChanger: true,
                         onShowSizeChange: onShowSizeChange,
@@ -887,6 +921,42 @@ const QuotationContents = ({ checkData }) => {
                     </Space.Compact>
                 </Space>
             </div>
+            <Modal
+                title={t('quotation.header_setting')}
+                open={editHeaders}
+                onOk={handleCloseEditHeaders}
+                onCancel={handleCloseEditHeaders}
+                footer={[
+                <Button key="submit" type="primary" onClick={handleCloseEditHeaders}>
+                    Ok
+                </Button>,
+                ]}
+                style={{ top: 120 }}
+                width={360}
+                zIndex={2001}
+            >
+                <table className="table">
+                <tbody>
+                {Object.keys(QuotationContentItems).map((item, index) => {
+                    const foundItem = contentColumns.filter(column => column.dataIndex === item)[0];
+                    return (
+                        <tr key={index}>
+                        <td>
+                        {t(QuotationContentItems[item].title)}
+                        </td>
+                        <td>
+                            <Checkbox
+                            name={item}
+                            checked={!!foundItem}
+                            onChange={handleHeaderCheckChange}
+                            />
+                        </td>
+                        </tr>
+                    )
+                    })}
+                </tbody>
+                </table>
+            </Modal>
             <QuotationContentModal
                 setting={settingForContent}
                 open={isContentModalOpen}
