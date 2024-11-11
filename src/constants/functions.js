@@ -66,12 +66,12 @@ export const formatTime = (date_value) => {
 export const ConvertCurrency = (amount, fixed = 0) => {
     if(amount === undefined || amount === null || amount === '') return "";
 
-    let ret = null;
+    let ret = amount;
     if(typeof amount === 'string') {
         ret = Number(amount);
         if(isNaN(ret)) return amount;
-    } else if(typeof amount === 'number'){
-        ret = amount;
+    } else if(typeof amount !== 'number'){
+        return NaN;
     };
     
     return fixed === 0 

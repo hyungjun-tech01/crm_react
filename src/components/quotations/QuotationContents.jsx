@@ -7,43 +7,13 @@ import { Button, Checkbox, InputNumber, Modal, Space, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { AddBoxOutlined, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
 
-import { QuotationContentItems } from '../../repository/quotation';
+import { QuotationContentItems, QuotationDefaultColumns } from '../../repository/quotation';
 import { SettingsRepo } from '../../repository/settings';
 
 import QuotationContentModal from "./QuotationContentModal";
 import MessageModal from "../../constants/MessageModal";
+import { ConvertCurrency } from "../../constants/functions";
 
-const defaultColumns = [
-    {
-        title: "No",
-        dataIndex: '1',
-        width: 50,
-    },
-    {
-        title: 'common.product',
-        dataIndex: '5',
-        width: 300,
-    },
-    {
-        title: 'quotation.detail_desc',
-        dataIndex: '10',
-        width: 100,
-    },
-    {
-        title: 'common.quantity',
-        dataIndex: '12',
-        width: 100,
-    },
-    {
-        title: 'quotation.quotation_unit_price',
-        dataIndex: '15',
-        width: 150,
-    },
-    {
-        title: 'quotation.quotation_amount',
-        dataIndex: '16',
-    },
-];
 
 const ResizeableTitle = props => {
     const { onResize, width, ...restProps } = props;
@@ -64,7 +34,7 @@ const ResizeableTitle = props => {
     );
 };
 
-const QuotationContents = ({ checkData, contents, handleContents }) => {
+const QuotationContents = ({ checkData, columns, handleColumns, contents, handleContents }) => {
     const [t] = useTranslation();
     const [cookies, setCookie] = useCookies(["myLationCrmUserId", "myLationCrmUserName", "myQuotationAddColumns"]);
     const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -90,6 +60,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
         }
     };
 
+
     //===== [RecoilState] Related with Settings ===========================================
     const { openModal, closeModal } = useRecoilValue(SettingsRepo);
 
@@ -103,19 +74,6 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
         vat_included: false, unit_vat_included: false, total_only: false, auto_calc: true, show_decimal: false,
         vat_included_disabled: false, unit_vat_included_disabled: true, total_only_disabled: true, dc_rate: 0,
     });
-
-    const handleFormatter = useCallback((value) => {
-        if (value === undefined || value === null || value === '') return '';
-        let ret = value;
-        if (typeof value === 'string') {
-            ret = Number(value);
-            if (isNaN(ret)) return value;
-        };
-
-        return settingForContent.show_decimal
-            ? ret?.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,')
-            : ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    }, [settingForContent.show_decimal]);
 
     const tableComponents = {
         header: {
@@ -170,7 +128,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
                         title: t(QuotationContentItems[targetName].title),
                         dataIndex: targetName,
                         render: QuotationContentItems[targetName].type === 'price'
-                            ? (text, record) => <>{handleFormatter(text)}</>
+                            ? (text, record) => <>{ConvertCurrency(text)}</>
                             : (text, record) => <>{text}</>,
                     },
                 ];
@@ -182,7 +140,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
                         dataIndex: targetName,
                         width: 100,
                         render: QuotationContentItems[targetName].type === 'price'
-                            ? (text, record) => <>{handleFormatter(text)}</>
+                            ? (text, record) => <>{ConvertCurrency(text)}</>
                             : (text, record) => <>{text}</>,
                     },
                     ...contentColumns.slice(foundIndex,),
@@ -245,7 +203,6 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
     const [isContentModalOpen, setIsContentModalOpen] = useState(false);
     const [orgContentModalValues, setOrgContentModalValues] = useState({});
     const [editedContentModalValues, setEditedContentModalValues] = useState({});
-
     const [amountsForContent, setAmountsForContent] = useState({
         sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
     });
@@ -275,7 +232,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
                     tempSetting.unit_vat_included = target_value;
                     tempSetting.total_only_disabled = !target_value;
                     let updatedEachSums = 0;
-                    const updatedContents = quotationContents.map(item => {
+                    const updatedContents = contents.map(item => {
                         const newPrice = (target_value && !settingForContent.total_only) ? item['org_unit_price'] / 1.1 : item['org_unit_price'];
                         const updatedAmount = newPrice * item['12'];
                         updatedEachSums += updatedAmount;
@@ -285,7 +242,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
                             '16': updatedAmount,
                         };
                     });
-                    setQuotationContents(updatedContents);
+                    handleContents(updatedContents);
                     handleChangeEachSum(updatedEachSums);
                     break;
                 }
@@ -294,7 +251,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
                     tempSetting.unit_vat_included_disabled = target_value;
                     tempSetting.total_only = target_value;
                     let updatedEachSums = 0;
-                    const updatedContents = quotationContents.map(item => {
+                    const updatedContents = contents.map(item => {
                         const newPrice = (!target_value && settingForContent.unit_vat_included) ? item['org_unit_price'] / 1.1 : item['org_unit_price'];
                         const updatedAmount = newPrice * item['12'];
                         updatedEachSums += updatedAmount;
@@ -304,7 +261,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
                             '16': updatedAmount,
                         };
                     });
-                    setQuotationContents(updatedContents);
+                    handleContents(updatedContents);
                     handleChangeEachSum(target_value ? updatedEachSums / 1.1 : updatedEachSums);
                     break;
                 }
@@ -453,7 +410,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
 
     const handleAddNewContent = () => {
         if (!checkData.lead_name) {
-            const contents = (
+            const tempContents = (
                 <>
                     <p>{t('comment.msg_no_necessary_data')}</p>
                     <div> - 고객 이름</div>
@@ -461,7 +418,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
             );
             const tempMsg = {
                 title: t('comment.title_check'),
-                message: contents,
+                message: tempContents,
             };
             handleOpenMessage(tempMsg);
             return;
@@ -470,7 +427,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
         setSettingForContent({
             ...settingForContent,
             action: 'ADD',
-            index: quotationContents.length + 1,
+            index: contents.length + 1,
             title: t('quotation.add_content'),
         });
 
@@ -536,7 +493,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
         };
 
         let tempContents = [
-            ...quotationContents
+            ...contents
         ];
 
         selectedContentRowKeys.forEach(row => {
@@ -550,12 +507,12 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
             return { ...item, '1': index + 1 };
         });
 
-        const tempQuotation = {
-            ...quotationChange,
-            total_quotation_amount: temp_total_amount,
-        };
-        setQuotationChange(tempQuotation);
-        setQuotationContents(finalContents);
+        // const tempQuotation = {
+        //     ...quotationChange,
+        //     total_quotation_amount: temp_total_amount,
+        // };
+        // setQuotationChange(tempQuotation);
+        handleContents(finalContents);
         handleCalculateAmounts(finalContents);
         setSelectedContentRowKeys([]);
 
@@ -568,7 +525,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
         };
         if (!finalData.product_name || !finalData.quotation_amount) {
             setMessage({ title: '필요 항목 누락', message: '필요 값 - 제품명 또는 견적 가격 - 이 없습니다.' });
-            const contents = (
+            const tempContents = (
                 <>
                     <p>하기 정보는 필수 입력 사항입니다.</p>
                     {!finalData.product_name && <div> - 제품명</div>}
@@ -577,7 +534,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
             );
             const tempMsg = {
                 title: t('comment.title_check'),
-                message: contents,
+                message: tempContents,
             };
             handleOpenMessage(tempMsg);
             return;
@@ -653,35 +610,18 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
 
     //===== useEffect functions =============================================== 
     useEffect(() => {
-        if (!cookies.myQuotationAddColumns) {
-            const tempQuotationColumn = defaultColumns.forEach(item => {
-                const ret = {
-                    title: t(item.title),
-                    dataIndex: item.dataIndex,
-                    render: QuotationContentItems[item.dataIndex].type === 'price'
-                        ? (text, record) => <>{handleFormatter(text)}</>
-                        : (text, record) => <>{text}</>,
-                };
-                if(!!item.width) {
-                    ret['width'] = item.width;
-                }
-                return ret;
-            });
-            const tempCookieValue = {
-                [cookies.myLationCrmUserId]: tempQuotationColumn
-            }
-            setContentColumns(tempQuotationColumn);
-            setCookie('myQuotationAddColumns', tempCookieValue);
+        if(!!columns && columns.length > 0) {
+            console.log('QuotationContents / useEffect :', columns);
+            setContentColumns([...columns]);
         } else {
-            const columnSettings = cookies.myQuotationAddColumns[cookies.myLationCrmUserId];
-            if (!columnSettings) {
-                const tempQuotationColumn = defaultColumns.forEach(item => {
+            if (!cookies.myQuotationAddColumns) {
+                const tempQuotationColumn = QuotationDefaultColumns.forEach(item => {
                     const ret = {
                         title: t(item.title),
                         dataIndex: item.dataIndex,
                         render: QuotationContentItems[item.dataIndex].type === 'price'
-                        ? (text, record) => <>{handleFormatter(text)}</>
-                        : (text, record) => <>{text}</>,
+                            ? (text, record) => <>{ConvertCurrency(text)}</>
+                            : (text, record) => <>{text}</>,
                     };
                     if(!!item.width) {
                         ret['width'] = item.width;
@@ -689,22 +629,44 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
                     return ret;
                 });
                 const tempCookieValue = {
-                    ...cookies.myQuotationAddColumns,
                     [cookies.myLationCrmUserId]: tempQuotationColumn
-                };
+                }
                 setContentColumns(tempQuotationColumn);
                 setCookie('myQuotationAddColumns', tempCookieValue);
             } else {
-                const tempQuotationColumn = columnSettings.map(col => ({
-                    ...col,
-                    render: QuotationContentItems[col.dataIndex].type === 'price'
-                        ? (text, record) => <>{handleFormatter(text)}</>
-                        : (text, record) => <>{text}</>,
-                }));
-                setContentColumns(tempQuotationColumn);
+                const columnSettings = cookies.myQuotationAddColumns[cookies.myLationCrmUserId];
+                if (!columnSettings) {
+                    const tempQuotationColumn = QuotationDefaultColumns.forEach(item => {
+                        const ret = {
+                            title: t(item.title),
+                            dataIndex: item.dataIndex,
+                            render: QuotationContentItems[item.dataIndex].type === 'price'
+                            ? (text, record) => <>{ConvertCurrency(text)}</>
+                            : (text, record) => <>{text}</>,
+                        };
+                        if(!!item.width) {
+                            ret['width'] = item.width;
+                        }
+                        return ret;
+                    });
+                    const tempCookieValue = {
+                        ...cookies.myQuotationAddColumns,
+                        [cookies.myLationCrmUserId]: tempQuotationColumn
+                    };
+                    setContentColumns(tempQuotationColumn);
+                    setCookie('myQuotationAddColumns', tempCookieValue);
+                } else {
+                    const tempQuotationColumn = columnSettings.map(col => ({
+                        ...col,
+                        render: QuotationContentItems[col.dataIndex].type === 'price'
+                            ? (text, record) => <>{ConvertCurrency(text)}</>
+                            : (text, record) => <>{text}</>,
+                    }));
+                    setContentColumns(tempQuotationColumn);
+                };
             };
         };
-    }, [cookies.myLationCrmUserId, cookies.myQuotationAddColumns, defaultColumns, handleFormatter, setCookie]);
+    }, [cookies.myLationCrmUserId, cookies.myQuotationAddColumns, setCookie, columns, t]);
 
     return (
         <>
@@ -819,7 +781,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
                             name='sub_total_amount'
                             defaultValue={0}
                             value={amountsForContent.sub_total_amount}
-                            formatter={handleFormatter}
+                            formatter={ConvertCurrency}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             disabled={settingForContent.auto_calc}
                             onChange={handleChangeEachSum}
@@ -849,7 +811,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
                             name='dc_amount'
                             defaultValue={0}
                             value={amountsForContent.dc_amount}
-                            formatter={handleFormatter}
+                            formatter={ConvertCurrency}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             disabled={settingForContent.auto_calc}
                             onChange={handleChangeDCAmount}
@@ -865,7 +827,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
                             defaultValue={0}
                             value={amountsForContent.sum_dc_applied}
                             disabled={settingForContent.auto_calc}
-                            formatter={handleFormatter}
+                            formatter={ConvertCurrency}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             onChange={handleChangeDCAppliedSum}
                             style={{
@@ -880,7 +842,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
                             defaultValue={0}
                             value={amountsForContent.vat_amount}
                             disabled={settingForContent.auto_calc}
-                            formatter={handleFormatter}
+                            formatter={ConvertCurrency}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             onChange={handleChangeVAT}
                             style={{
@@ -894,7 +856,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
                             name='cut_off_amount'
                             defaultValue={0}
                             value={amountsForContent.cut_off_amount}
-                            formatter={handleFormatter}
+                            formatter={ConvertCurrency}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             onChange={handleChangeCutOffAmount}
                             style={{
@@ -909,7 +871,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
                             defaultValue={0}
                             value={amountsForContent.sum_final}
                             disabled={settingForContent.auto_calc}
-                            formatter={handleFormatter}
+                            formatter={ConvertCurrency}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             onChange={handleChangeFinalAmount}
                             style={{
@@ -924,7 +886,7 @@ const QuotationContents = ({ checkData, contents, handleContents }) => {
                             defaultValue={0}
                             value={amountsForContent.total_cost_price}
                             disabled={settingForContent.auto_calc}
-                            formatter={handleFormatter}
+                            formatter={ConvertCurrency}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             onChange={handleChangeTotalCostPrice}
                             style={{

@@ -23,7 +23,7 @@ import {
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { compareCompanyName, compareText, ConvertCurrency, formatDate } from "../../constants/functions";
-import { QuotationColumn } from "../../repository/quotation";
+import { QuotationCompanyColumns } from "../../repository/quotation";
 
 
 const Quotations = () => {
@@ -452,7 +452,7 @@ const Quotations = () => {
           open={multiQueryModal}
           handleOk={handleMultiQueryModalOk}
           handleCancel={handleMultiQueryModalCancel}
-          companyColumn={QuotationColumn}
+          companyColumn={QuotationCompanyColumns}
           queryConditions={queryConditions}
           setQueryConditions={setQueryConditions}
           dates={dates}

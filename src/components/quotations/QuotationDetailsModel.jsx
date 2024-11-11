@@ -8,13 +8,8 @@ import {
   atomCurrentQuotation,
   defaultQuotation,
   atomQuotationState,
-  atomProductClassList,
-  atomProductClassListState,
-  atomProductsState,
-  atomAllProducts,
 } from "../../atoms/atoms";
 import {
-  atomUserState,
   atomUsersForSelection,
   atomSalespersonsForSelection,
 } from '../../atoms/atomsUser';
@@ -24,7 +19,8 @@ import {
   QuotationTypes,
   QuotationExpiry,
   QuotationDelivery,
-  QuotationPayment
+  QuotationPayment,
+  QuotationContentItems,
 } from "../../repository/quotation";
 import { SettingsRepo } from "../../repository/settings";
 
@@ -33,13 +29,15 @@ import DetailTitleItem from "../../constants/DetailTitleItem";
 import MessageModal from "../../constants/MessageModal";
 import QuotationView from "./QuotationtView";
 import QuotationContents from "./QuotationContents";
+import { ConvertCurrency } from "../../constants/functions";
 
 
-const QuotationDetailsModel = ({ init, handleInit }) => {
+const QuotationDetailsModel = () => {
   const [t] = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [message, setMessage] = useState({ title: "", message: "" });
+
 
   //===== [RecoilState] Related with Quotation ========================================
   const quotationState = useRecoilValue(atomQuotationState);
@@ -47,15 +45,7 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
   const { modifyQuotation, setCurrentQuotation } = useRecoilValue(QuotationRepo);
 
 
-  //===== [RecoilState] Related with Product ==========================================
-  const productClassState = useRecoilValue(atomProductClassListState);
-  const allProductClassList = useRecoilValue(atomProductClassList);
-  const productState = useRecoilValue(atomProductsState);
-  const allProducts = useRecoilValue(atomAllProducts);
-
-
   //===== [RecoilState] Related with Users ============================================
-  const userState = useRecoilValue(atomUserState);
   const usersForSelection = useRecoilValue(atomUsersForSelection);
   const salespersonsForSelection = useRecoilValue(atomSalespersonsForSelection);
 
@@ -190,7 +180,35 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
 
   const handleInitialize = () => {
     console.log('QuotationDetails / handleInitialize: ', selectedQuotation);
+    const tempColumnValues = selectedQuotation.quotation_table.split('|');
+    let tempColumns = [];
+    let temp_i = 0;
+
+    while(true) {
+      const num_i = 3*temp_i + 2;
+      if(!tempColumnValues[num_i]) break;
+
+      const numWidth = Number(tempColumnValues[num_i]);
+      if(!isNaN(numWidth) && numWidth > 0) {
+        const tempIndex = tempColumnValues[num_i - 2];
+        const tempTitle = tempColumnValues[num_i - 1];
+        tempColumns.push({
+          title: tempTitle,
+          dataIndex: tempIndex,
+          width: numWidth,
+          render: QuotationContentItems[tempIndex].type === 'price'
+            ? (text, record) => <>{ConvertCurrency(text)}</>
+            : (text, record) => <>{text}</>,
+        })
+      };
+      temp_i++;
+    };
+
+    console.log('QuotationDetails / handleInitialize / columns : ', tempColumns);
+    setContentColumns(tempColumns);
+
     const selectedContents = JSON.parse(selectedQuotation.quotation_contents);
+    console.log('QuotationDetails / handleInitialize / contents : ', selectedContents);
     setQuotationContents(selectedContents);
     setEditedDetailValues(null);
   };
@@ -206,8 +224,8 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
   useEffect(() => {
     if (selectedQuotation !== defaultQuotation) {
       handleInitialize();
+      setCurrentQuotationCode(selectedQuotation.quotation_code);
     };
-    setCurrentQuotationCode(selectedQuotation.quotation_code);
   }, [ selectedQuotation, currentQuotationCode, quotationState ]);
 
   useEffect(() => {
@@ -234,17 +252,6 @@ const QuotationDetailsModel = ({ init, handleInit }) => {
     // popstate 이벤트 리스너 추가 (중복 추가 방지)
     window.addEventListener('popstate', handlePopState);
   }, []);
-
-  useEffect(() => {
-    if (((userState & 1) === 1)
-      && ((quotationState & 1) === 1)
-    ) {
-      handleInit(false);
-    };
-  }, [allProductClassList, allProducts, productClassState, productState, userState, quotationState, handleInit]);
-
-  if (init)
-    return <div>&nbsp;</div>;
 
   return (
     <>

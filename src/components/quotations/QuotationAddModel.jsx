@@ -26,6 +26,7 @@ import {
   QuotationExpiry,
   QuotationPayment,
   QuotationContentItems,
+  QuotationDefaultColumns,
 } from "../../repository/quotation";
 import { SettingsRepo } from '../../repository/settings'
 
@@ -33,6 +34,7 @@ import AddBasicItem from "../../constants/AddBasicItem";
 import AddSearchItem from "../../constants/AddSearchItem";
 import QuotationContentModal from "./QuotationContentModal";
 import MessageModal from "../../constants/MessageModal";
+import { ConvertCurrency } from "../../constants/functions";
 
 
 const ResizeableTitle = props => {
@@ -112,45 +114,6 @@ const QuotationAddModel = ({ init, handleInit }) => {
   //===== Handles to edit 'Content Table' ============================================
   const [contentColumns, setContentColumns] = useState([]);
   const [editHeaders, setEditHeaders] = useState(false);
-  
-
-  const defaultColumns = [
-    {
-      title: "No",
-      dataIndex: '1',
-      width: 50,
-      render: (text, record) => <>{text}</>,
-    },
-    {
-      title: t('common.product'),
-      dataIndex: '5',
-      width: 300,
-      render: (text, record) => <>{text}</>,
-    },
-    {
-      title: t('quotation.detail_desc'),
-      dataIndex: '10',
-      width: 100,
-      render: (text, record) => <>{text}</>,
-    },
-    {
-      title: t('common.quantity'),
-      dataIndex: '12',
-      width: 50,
-      render: (text, record) => <>{text}</>,
-    },
-    {
-      title: t('quotation.quotation_unit_price'),
-      dataIndex: '15',
-      width: 150,
-      render: (text, record) => <>{handleFormatter(record['15'])}</>,
-    },
-    {
-      title: t('quotation.quotation_amount'),
-      dataIndex: '16',
-      render: (text, record) => <>{handleFormatter(record['16'])}</>,
-    },
-  ];
 
   const tableComponents = {
     header: {
@@ -205,7 +168,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
             title: t(QuotationContentItems[targetName].title),
             dataIndex: targetName,
             render: QuotationContentItems[targetName].type === 'price'
-              ? (text, record) => <>{handleFormatter(text)}</>
+              ? (text, record) => <>{ConvertCurrency(text)}</>
               : (text, record) => <>{text}</>,
           }, 
         ];
@@ -217,7 +180,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
             dataIndex: targetName,
             width: 100,
             render: QuotationContentItems[targetName].type === 'price'
-              ? (text, record) => <>{handleFormatter(text)}</>
+              ? (text, record) => <>{ConvertCurrency(text)}</>
               : (text, record) => <>{text}</>,
           },
           ...contentColumns.slice(foundIndex,),
@@ -683,19 +646,6 @@ const QuotationAddModel = ({ init, handleInit }) => {
     setEditedContentModalValues(data);
   }, []);
 
-  const handleFormatter = useCallback((value) => {
-    if (value === undefined || value === null || value === '') return '';
-    let ret = value;
-    if (typeof value === 'string') {
-      ret = Number(value);
-      if (isNaN(ret)) return value;
-    };
-
-    return settingForContent.show_decimal
-      ? ret?.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,')
-      : ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  }, [settingForContent.show_decimal]);
-
   const handleOpenEditHeaders = () => {
     handlePopupOpen(true);
     setEditHeaders(true);
@@ -756,11 +706,28 @@ const QuotationAddModel = ({ init, handleInit }) => {
     setSelectedContentRowKeys([]);
 
     // load or set setting of column of table ----------------------------------
-    if(!cookies.myQuotationAddColumns){
-
-      const tempQuotationColumn = [
-        ...defaultColumns
-      ];
+    if(!cookies.myQuotationAddColumns) {
+      const tempQuotationColumn = QuotationDefaultColumns.map(item => {
+        const selectedItem = QuotationContentItems[item.dataIndex];
+        if(!!item.width) {
+          return {
+            title: t(selectedItem.title),
+            dataIndex: item.dataIndex,
+            width: item.width,
+            render: selectedItem.type === 'price'
+              ? (text, record) => <>{ConvertCurrency(text)}</>
+              : (text, record) => <>{text}</>,
+          }
+        } else {
+          return {
+            title: t(selectedItem.title),
+            dataIndex: item.dataIndex,
+            render: selectedItem.type === 'price'
+              ? (text, record) => <>{ConvertCurrency(text)}</>
+              : (text, record) => <>{text}</>,
+          }
+        };
+      });
       const tempCookieValue = {
         [cookies.myLationCrmUserId] : tempQuotationColumn 
       }
@@ -769,9 +736,27 @@ const QuotationAddModel = ({ init, handleInit }) => {
     } else {
       const columnSettings = cookies.myQuotationAddColumns[cookies.myLationCrmUserId];
       if(!columnSettings){
-        const tempQuotationColumn = [
-          ...defaultColumns
-        ];
+        const tempQuotationColumn = QuotationDefaultColumns.map(item => {
+          const selectedItem = QuotationContentItems[item.dataIndex];
+          if(!!item.width) {
+            return {
+              title: t(selectedItem.title),
+              dataIndex: item.dataIndex,
+              width: item.width,
+              render: selectedItem.type === 'price'
+                ? (text, record) => <>{ConvertCurrency(text)}</>
+                : (text, record) => <>{text}</>,
+            }
+          } else {
+            return {
+              title: t(selectedItem.title),
+              dataIndex: item.dataIndex,
+              render: selectedItem.type === 'price'
+                ? (text, record) => <>{ConvertCurrency(text)}</>
+                : (text, record) => <>{text}</>,
+            }
+          };
+        });
         const tempCookieValue = {
           ...cookies.myQuotationAddColumns,
           [cookies.myLationCrmUserId]: tempQuotationColumn
@@ -782,7 +767,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
         const tempQuotationColumn = columnSettings.map(col => ({
           ...col,
           render: QuotationContentItems[col.dataIndex].type === 'price'
-              ? (text, record) => <>{handleFormatter(text)}</>
+              ? (text, record) => <>{ConvertCurrency(text)}</>
               : (text, record) => <>{text}</>,
         }));
         setContentColumns(tempQuotationColumn);
@@ -1224,7 +1209,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
                       name='sub_total_amount'
                       defaultValue={0}
                       value={amountsForContent.sub_total_amount}
-                      formatter={handleFormatter}
+                      formatter={ConvertCurrency}
                       parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                       disabled={settingForContent.auto_calc}
                       onChange={handleChangeEachSum}
@@ -1254,7 +1239,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
                       name='dc_amount'
                       defaultValue={0}
                       value={amountsForContent.dc_amount}
-                      formatter={handleFormatter}
+                      formatter={ConvertCurrency}
                       parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                       disabled={settingForContent.auto_calc}
                       onChange={handleChangeDCAmount}
@@ -1270,7 +1255,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
                       defaultValue={0}
                       value={amountsForContent.sum_dc_applied}
                       disabled={settingForContent.auto_calc}
-                      formatter={handleFormatter}
+                      formatter={ConvertCurrency}
                       parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                       onChange={handleChangeDCAppliedSum}
                       style={{
@@ -1285,7 +1270,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
                       defaultValue={0}
                       value={amountsForContent.vat_amount}
                       disabled={settingForContent.auto_calc}
-                      formatter={handleFormatter}
+                      formatter={ConvertCurrency}
                       parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                       onChange={handleChangeVAT}
                       style={{
@@ -1299,7 +1284,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
                       name='cut_off_amount'
                       defaultValue={0}
                       value={amountsForContent.cut_off_amount}
-                      formatter={handleFormatter}
+                      formatter={ConvertCurrency}
                       parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                       onChange={handleChangeCutOffAmount}
                       style={{
@@ -1314,7 +1299,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
                       defaultValue={0}
                       value={amountsForContent.sum_final}
                       disabled={settingForContent.auto_calc}
-                      formatter={handleFormatter}
+                      formatter={ConvertCurrency}
                       parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                       onChange={handleChangeFinalAmount}
                       style={{
@@ -1329,7 +1314,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
                       defaultValue={0}
                       value={amountsForContent.total_cost_price}
                       disabled={settingForContent.auto_calc}
-                      formatter={handleFormatter}
+                      formatter={ConvertCurrency}
                       parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                       onChange={handleChangeTotalCostPrice}
                       style={{
