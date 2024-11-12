@@ -40,7 +40,6 @@ const QuotationDetailsModel = () => {
 
 
   //===== [RecoilState] Related with Quotation ========================================
-  const quotationState = useRecoilValue(atomQuotationState);
   const selectedQuotation = useRecoilValue(atomCurrentQuotation);
   const { modifyQuotation, setCurrentQuotation } = useRecoilValue(QuotationRepo);
 
@@ -91,7 +90,6 @@ const QuotationDetailsModel = () => {
     }
   }, [editedDetailValues, selectedQuotation]);
 
-
   const qotation_items_info = [
     { key: 'quotation_type', title: 'quotation.quotation_type', detail: { type: 'select', options: QuotationTypes, editing: handleDetailSelectChange } },
     { key: 'quotation_manager', title: 'quotation.quotation_manager', detail: { type: 'select', options: usersForSelection, editing: handleDetailSelectChange } },
@@ -124,12 +122,35 @@ const QuotationDetailsModel = () => {
     { key: 'company_name', title: 'company.company_name', detail: { type: 'label', extra: 'long', editing: handleDetailChange } },
   ];
 
-  //===== Handles to handle this =================================================
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  const [currentQuotationCode, setCurrentQuotationCode] = useState('');
+
+  //===== Handles to handle 'Contents' =================================================
   const [contentColumns, setContentColumns] = useState([]);
   const [quotationContents, setQuotationContents] = useState([]);
 
+  const ConvertHeaderInfosToString = (data) => {
+    let ret = '';
+
+    Object.keys(QuotationContentItems).forEach((item, index) => {
+      if (item === '1')
+        ret += item;
+      else
+        ret += '|' + item;
+
+      ret += '|' + t(QuotationContentItems[item].title) + '|';
+
+      const foundIdx = data.findIndex(col => col.dataIndex === item);
+      if (foundIdx === -1) {
+        ret += '0';
+      } else {
+        ret += data[foundIdx]['width'] || '100';
+      }
+    });
+
+    return ret;
+  };
+
+  //===== Handles to handle this =================================================
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   const handleWidthChange = useCallback((checked) => {
     setIsFullScreen(checked);
@@ -184,12 +205,12 @@ const QuotationDetailsModel = () => {
     let tempColumns = [];
     let temp_i = 0;
 
-    while(true) {
-      const num_i = 3*temp_i + 2;
-      if(!tempColumnValues[num_i]) break;
+    while (true) {
+      const num_i = 3 * temp_i + 2;
+      if (!tempColumnValues[num_i]) break;
 
       const numWidth = Number(tempColumnValues[num_i]);
-      if(!isNaN(numWidth) && numWidth > 0) {
+      if (!isNaN(numWidth) && numWidth > 0) {
         const tempIndex = tempColumnValues[num_i - 2];
         const tempTitle = tempColumnValues[num_i - 1];
         tempColumns.push({
@@ -224,9 +245,8 @@ const QuotationDetailsModel = () => {
   useEffect(() => {
     if (selectedQuotation !== defaultQuotation) {
       handleInitialize();
-      setCurrentQuotationCode(selectedQuotation.quotation_code);
     };
-  }, [ selectedQuotation, currentQuotationCode, quotationState ]);
+  }, [selectedQuotation]);
 
   useEffect(() => {
     const detailViewStatus = localStorage.getItem("isFullScreen");

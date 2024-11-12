@@ -66,7 +66,6 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
 
 
     //===== Handles to edit 'Content Table' ============================================
-    const [contentColumns, setContentColumns] = useState([]);
     const [editHeaders, setEditHeaders] = useState(false);
     const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
     const [settingForContent, setSettingForContent] = useState({
@@ -89,12 +88,12 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
     };
 
     const handleColumnResize = index => (e, { size }) => {
-        const nextColumns = [...contentColumns];
+        const nextColumns = [...columns];
         nextColumns[index] = {
             ...nextColumns[index],
             width: size.width,
         };
-        setContentColumns(nextColumns);
+        handleColumns(nextColumns);
 
         // update cookie for content columns ----------------
         const tempCookies = {
@@ -109,20 +108,23 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
     const handleHeaderCheckChange = (event) => {
         const targetName = event.target.name;
         const targetIndex = Number(targetName);
+        console.log('handleHeaderCheckChange / trageIndex:', targetIndex);
 
         let tempColumns = null;
         if (event.target.checked) {
-            const foundIndex = contentColumns.findIndex(
+            console.log('handleHeaderCheckChange / checked');
+            const foundIndex = columns.findIndex(
                 item => Number(item.dataIndex) > targetIndex);
+            console.log('handleHeaderCheckChange / foundIndex:', foundIndex);
 
             if (foundIndex === -1) {
                 tempColumns = [
-                    ...contentColumns.slice(0, -1),
+                    ...columns.slice(0, -1),
                     {
-                        title: contentColumns.at(-1).title,
-                        dataIndex: contentColumns.at(-1).dataIndex,
+                        title: columns.at(-1).title,
+                        dataIndex: columns.at(-1).dataIndex,
                         width: 100,
-                        render: contentColumns.at(-1).render,
+                        render: columns.at(-1).render,
                     },
                     {
                         title: t(QuotationContentItems[targetName].title),
@@ -134,7 +136,7 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
                 ];
             } else {
                 tempColumns = [
-                    ...contentColumns.slice(0, foundIndex),
+                    ...columns.slice(0, foundIndex),
                     {
                         title: t(QuotationContentItems[targetName].title),
                         dataIndex: targetName,
@@ -143,20 +145,21 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
                             ? (text, record) => <>{ConvertCurrency(text)}</>
                             : (text, record) => <>{text}</>,
                     },
-                    ...contentColumns.slice(foundIndex,),
+                    ...columns.slice(foundIndex,),
                 ];
             };
         } else {
-            const foundIndex = contentColumns.findIndex(
+            console.log('handleHeaderCheckChange / unchecked');
+            const foundIndex = columns.findIndex(
                 item => Number(item.dataIndex) === targetIndex);
 
             tempColumns = [
-                ...contentColumns.slice(0, foundIndex),
-                ...contentColumns.slice(foundIndex + 1,),
+                ...columns.slice(0, foundIndex),
+                ...columns.slice(foundIndex + 1,),
             ];
         };
 
-        setContentColumns(tempColumns);
+        handleColumns(tempColumns);
 
         // update cookie for content columns ----------------
         const tempCookies = {
@@ -164,28 +167,6 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
             [ cookies.myLationCrmUserId ]: [ ...tempColumns ]
         };
         setCookie("myQuotationAddColumns", tempCookies);
-    };
-
-    const ConvertHeaderInfosToString = (data) => {
-        let ret = '';
-
-        Object.keys(QuotationContentItems).forEach((item, index) => {
-            if (item === '1')
-                ret += item;
-            else
-                ret += '|' + item;
-
-            ret += '|' + t(QuotationContentItems[item].title) + '|';
-
-            const foundIdx = data.findIndex(col => col.dataIndex === item);
-            if (foundIdx === -1) {
-                ret += '0';
-            } else {
-                ret += data[foundIdx]['width'] || '100';
-            }
-        });
-
-        return ret;
     };
 
     const handleOpenEditHeaders = () => {
@@ -199,7 +180,7 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
     };
 
 
-    //===== Handles to edit 'Content' =================================================
+    //===== Handles to edit 'Content Modal' =================================================
     const [isContentModalOpen, setIsContentModalOpen] = useState(false);
     const [orgContentModalValues, setOrgContentModalValues] = useState({});
     const [editedContentModalValues, setEditedContentModalValues] = useState({});
@@ -610,10 +591,7 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
 
     //===== useEffect functions =============================================== 
     useEffect(() => {
-        if(!!columns && columns.length > 0) {
-            console.log('QuotationContents / useEffect :', columns);
-            setContentColumns([...columns]);
-        } else {
+        if(!columns || columns.length === 0) {
             if (!cookies.myQuotationAddColumns) {
                 const tempQuotationColumn = QuotationDefaultColumns.forEach(item => {
                     const ret = {
@@ -631,7 +609,7 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
                 const tempCookieValue = {
                     [cookies.myLationCrmUserId]: tempQuotationColumn
                 }
-                setContentColumns(tempQuotationColumn);
+                handleColumns(tempQuotationColumn);
                 setCookie('myQuotationAddColumns', tempCookieValue);
             } else {
                 const columnSettings = cookies.myQuotationAddColumns[cookies.myLationCrmUserId];
@@ -653,7 +631,7 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
                         ...cookies.myQuotationAddColumns,
                         [cookies.myLationCrmUserId]: tempQuotationColumn
                     };
-                    setContentColumns(tempQuotationColumn);
+                    handleColumns(tempQuotationColumn);
                     setCookie('myQuotationAddColumns', tempCookieValue);
                 } else {
                     const tempQuotationColumn = columnSettings.map(col => ({
@@ -662,7 +640,7 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
                             ? (text, record) => <>{ConvertCurrency(text)}</>
                             : (text, record) => <>{text}</>,
                     }));
-                    setContentColumns(tempQuotationColumn);
+                    handleColumns(tempQuotationColumn);
                 };
             };
         };
@@ -742,7 +720,7 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
                     bordered
                     className="resizable-antd-table"
                     components={tableComponents}
-                    columns={contentColumns.map((col, index) => ({
+                    columns={columns.map((col, index) => ({
                         ...col,
                         onHeaderCell: column => ({
                             width: column.width,
@@ -913,7 +891,7 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
                 <table className="table">
                 <tbody>
                 {Object.keys(QuotationContentItems).map((item, index) => {
-                    const foundItem = contentColumns.filter(column => column.dataIndex === item)[0];
+                    const foundItem = columns.filter(column => column.dataIndex === item)[0];
                     return (
                         <tr key={index}>
                         <td>
@@ -935,7 +913,7 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
             <QuotationContentModal
                 setting={settingForContent}
                 open={isContentModalOpen}
-                items={contentColumns}
+                items={columns}
                 original={orgContentModalValues}
                 edited={editedContentModalValues}
                 handleEdited={handleContentItemChange}
