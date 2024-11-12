@@ -126,6 +126,10 @@ const QuotationDetailsModel = () => {
   //===== Handles to handle 'Contents' =================================================
   const [contentColumns, setContentColumns] = useState([]);
   const [quotationContents, setQuotationContents] = useState([]);
+  const [contentData, setContentData] = useState({
+    name: '',
+    sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
+  })
 
   const ConvertHeaderInfosToString = (data) => {
     let ret = '';
@@ -201,6 +205,7 @@ const QuotationDetailsModel = () => {
 
   const handleInitialize = () => {
     console.log('QuotationDetails / handleInitialize: ', selectedQuotation);
+    // initialize columns of content table --------------------------------------------
     const tempColumnValues = selectedQuotation.quotation_table.split('|');
     let tempColumns = [];
     let temp_i = 0;
@@ -228,9 +233,24 @@ const QuotationDetailsModel = () => {
     console.log('QuotationDetails / handleInitialize / columns : ', tempColumns);
     setContentColumns(tempColumns);
 
+    // initialize contents of content table --------------------------------------------
     const selectedContents = JSON.parse(selectedQuotation.quotation_contents);
     console.log('QuotationDetails / handleInitialize / contents : ', selectedContents);
     setQuotationContents(selectedContents);
+
+
+    // initialize values related to price --------------------------------------------
+    const tempData = {
+      total_cost_price: selectedQuotation.total_cost_price,
+      sub_total_amount: selectedQuotation.sub_total_amount, 
+      dc_amount: selectedQuotation.dc_amount, 
+      sum_dc_applied: selectedQuotation.quotation_amount, 
+      vat_amount: selectedQuotation.tax_amount, 
+      cut_off_amount: selectedQuotation.cutoff_amount,
+      sum_final: selectedQuotation.total_quotation_amount,
+    };
+    setContentData(tempData);
+    
     setEditedDetailValues(null);
   };
 
@@ -366,7 +386,8 @@ const QuotationDetailsModel = () => {
                               </Space>
                             </div>
                             <QuotationContents
-                              checkData={{ name: selectedQuotation.lead_name }}
+                              data={contentData}
+                              handleData={setContentData}
                               columns={contentColumns}
                               handleColumns={setContentColumns}
                               contents={quotationContents}

@@ -34,7 +34,7 @@ const ResizeableTitle = props => {
     );
 };
 
-const QuotationContents = ({ checkData, columns, handleColumns, contents, handleContents }) => {
+const QuotationContents = ({ data, handleData, columns = [], handleColumns, contents, handleContents }) => {
     const [t] = useTranslation();
     const [cookies, setCookie] = useCookies(["myLationCrmUserId", "myLationCrmUserName", "myQuotationAddColumns"]);
     const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -68,11 +68,6 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
     //===== Handles to edit 'Content Table' ============================================
     const [editHeaders, setEditHeaders] = useState(false);
     const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
-    const [settingForContent, setSettingForContent] = useState({
-        title: '',
-        vat_included: false, unit_vat_included: false, total_only: false, auto_calc: true, show_decimal: false,
-        vat_included_disabled: false, unit_vat_included_disabled: true, total_only_disabled: true, dc_rate: 0,
-    });
 
     const tableComponents = {
         header: {
@@ -108,14 +103,10 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
     const handleHeaderCheckChange = (event) => {
         const targetName = event.target.name;
         const targetIndex = Number(targetName);
-        console.log('handleHeaderCheckChange / trageIndex:', targetIndex);
 
         let tempColumns = null;
         if (event.target.checked) {
-            console.log('handleHeaderCheckChange / checked');
-            const foundIndex = columns.findIndex(
-                item => Number(item.dataIndex) > targetIndex);
-            console.log('handleHeaderCheckChange / foundIndex:', foundIndex);
+            const foundIndex = columns.findIndex(item => Number(item.dataIndex) > targetIndex);
 
             if (foundIndex === -1) {
                 tempColumns = [
@@ -149,9 +140,7 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
                 ];
             };
         } else {
-            console.log('handleHeaderCheckChange / unchecked');
-            const foundIndex = columns.findIndex(
-                item => Number(item.dataIndex) === targetIndex);
+            const foundIndex = columns.findIndex(item => Number(item.dataIndex) === targetIndex);
 
             tempColumns = [
                 ...columns.slice(0, foundIndex),
@@ -184,9 +173,12 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
     const [isContentModalOpen, setIsContentModalOpen] = useState(false);
     const [orgContentModalValues, setOrgContentModalValues] = useState({});
     const [editedContentModalValues, setEditedContentModalValues] = useState({});
-    const [amountsForContent, setAmountsForContent] = useState({
-        sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
+    const [settingForContent, setSettingForContent] = useState({
+        title: '',
+        vat_included: false, unit_vat_included: false, total_only: false, auto_calc: true, show_decimal: false,
+        vat_included_disabled: false, unit_vat_included_disabled: true, total_only_disabled: true, dc_rate: 0,
     });
+
 
     const handleChangeContentSetting = (event) => {
         const target_name = event.target.name;
@@ -198,13 +190,13 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
                 tempSetting.vat_included = target_value;
                 tempSetting.unit_vat_included_disabled = !target_value;
                 if (settingForContent.auto_calc) {
-                    const vat_amount = target_value ? amountsForContent.sum_dc_applied * 0.1 : 0;
+                    const vat_amount = target_value ? data.sum_dc_applied * 0.1 : 0;
                     const updatedAmount = {
-                        ...amountsForContent,
+                        ...data,
                         vat_amount: vat_amount,
-                        sum_final: amountsForContent.sum_dc_applied + vat_amount - amountsForContent.cut_off_amount,
+                        sum_final: data.sum_dc_applied + vat_amount - data.cut_off_amount,
                     };
-                    setAmountsForContent(updatedAmount);
+                    handleData(updatedAmount);
                 };
                 break;
             case 'unit_vat_included':
@@ -270,9 +262,9 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
         const dc_amount = sub_total_amount * settingForContent.dc_rate * 0.01;
         const sum_dc_applied = sub_total_amount - dc_amount;
         const vat_amount = settingForContent.vat_included ? sum_dc_applied * 0.1 : 0;
-        const sum_final = sum_dc_applied + vat_amount - amountsForContent.cut_off_amount;
+        const sum_final = sum_dc_applied + vat_amount - data.cut_off_amount;
         const tempAmount = {
-            ...amountsForContent,
+            ...data,
             sub_total_amount: sub_total_amount,
             dc_amount: dc_amount,
             sum_dc_applied: sum_dc_applied,
@@ -280,13 +272,13 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
             sum_final: sum_final,
             total_cost_price: sum_cost_items,
         };
-        setAmountsForContent(tempAmount);
+        handleData(tempAmount);
 
     };
 
     const handleChangeEachSum = (value) => {
         let updatedAmount = {
-            ...amountsForContent,
+            ...data,
             sub_total_amount: value,
         };
         if (settingForContent.auto_calc) {
@@ -296,9 +288,9 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
             updatedAmount.dc_amount = dc_amount;
             updatedAmount.sum_dc_applied = sum_dc_applied;
             updatedAmount.vat_amount = vat_amount;
-            updatedAmount.sum_final = sum_dc_applied + vat_amount - amountsForContent.cut_off_amount;
+            updatedAmount.sum_final = sum_dc_applied + vat_amount - data.cut_off_amount;
         };
-        setAmountsForContent(updatedAmount);
+        handleData(updatedAmount);
     };
 
     const handleChangeDCRate = (value) => {
@@ -308,89 +300,89 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
         };
         setSettingForContent(updatedSetting);
 
-        if (settingForContent.auto_calc && amountsForContent.sub_total_amount !== 0) {
-            const dc_amount = amountsForContent.sub_total_amount * value * 0.01;
-            const sum_dc_applied = amountsForContent.sub_total_amount - dc_amount;
+        if (settingForContent.auto_calc && data.sub_total_amount !== 0) {
+            const dc_amount = data.sub_total_amount * value * 0.01;
+            const sum_dc_applied = data.sub_total_amount - dc_amount;
             const vat_amount = settingForContent.vat_included ? sum_dc_applied * 0.1 : 0;
             const tempAmount = {
-                ...amountsForContent,
+                ...data,
                 dc_amount: dc_amount,
                 sum_dc_applied: sum_dc_applied,
                 vat_amount: vat_amount,
-                sum_final: sum_dc_applied + vat_amount - amountsForContent.cut_off_amount,
+                sum_final: sum_dc_applied + vat_amount - data.cut_off_amount,
             };
-            setAmountsForContent(tempAmount);
+            handleData(tempAmount);
         };
     };
 
     const handleChangeDCAmount = (value) => {
         let updatedAmount = {
-            ...amountsForContent,
+            ...data,
             dc_amount: value
         };
         if (settingForContent.auto_calc) {
-            const sum_dc_applied = amountsForContent.sub_total_amount - value;
+            const sum_dc_applied = data.sub_total_amount - value;
             const vat_amount = settingForContent.vat_included ? sum_dc_applied * 0.1 : 0;
             updatedAmount.sum_dc_applied = sum_dc_applied;
             updatedAmount.vat_amount = vat_amount;
-            updatedAmount.sum_final = sum_dc_applied + vat_amount - amountsForContent.cut_off_amount;
+            updatedAmount.sum_final = sum_dc_applied + vat_amount - data.cut_off_amount;
         };
-        setAmountsForContent(updatedAmount);
+        handleData(updatedAmount);
     };
 
     const handleChangeDCAppliedSum = (value) => {
         let updatedAmount = {
-            ...amountsForContent,
+            ...data,
             sum_dc_applied: value
         };
         if (settingForContent.auto_calc) {
             const vat_amount = settingForContent.vat_included ? value * 0.1 : 0;
             updatedAmount.vat_amount = vat_amount;
-            updatedAmount.sum_final = value + vat_amount - amountsForContent.cut_off_amount;
+            updatedAmount.sum_final = value + vat_amount - data.cut_off_amount;
         };
-        setAmountsForContent(updatedAmount);
+        handleData(updatedAmount);
     };
 
     const handleChangeVAT = (value) => {
         let updatedAmount = {
-            ...amountsForContent,
+            ...data,
             vat_amount: value,
         };
         if (settingForContent.auto_calc) {
-            updatedAmount.sum_final = amountsForContent.sum_dc_applied + value - amountsForContent.cut_off_amount;
+            updatedAmount.sum_final = data.sum_dc_applied + value - data.cut_off_amount;
         };
-        setAmountsForContent(updatedAmount);
+        handleData(updatedAmount);
     };
 
     const handleChangeCutOffAmount = (value) => {
         let updatedAmount = {
-            ...amountsForContent,
+            ...data,
             cut_off_amount: value
         };
         if (settingForContent.auto_calc) {
-            updatedAmount.sum_final = amountsForContent.sum_dc_applied + amountsForContent.vat_amount - value;
+            updatedAmount.sum_final = data.sum_dc_applied + data.vat_amount - value;
         }
-        setAmountsForContent(updatedAmount);
+        handleData(updatedAmount);
     };
 
     const handleChangeFinalAmount = (value) => {
         const updatedSetting = {
-            ...amountsForContent,
+            ...data,
             sum_final: value,
         };
-        setAmountsForContent(updatedSetting);
+        handleData(updatedSetting);
     };
 
     const handleChangeTotalCostPrice = (value) => {
         const updatedSetting = {
-            ...amountsForContent,
+            ...data,
             total_cost_price: value,
         };
-        setAmountsForContent(updatedSetting);
+        handleData(updatedSetting);
     }
 
     const handleAddNewContent = () => {
-        if (!checkData.lead_name) {
+        if (!data.name) {
             const tempContents = (
                 <>
                     <p>{t('comment.msg_no_necessary_data')}</p>
@@ -446,17 +438,15 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
             title: t('quotation.modify_content'),
         });
 
-        setOrgContentModalValues({
-            product_name: data['5'],
-            product_class_name: data['2'],
-            detail_desc_on_off: data['10'],
-            detail_desc: data['998'],
-            quantity: data['12'],
-            reseller_price: data['13'],
-            list_price: data['15'],
-            cost_price: data['17'],
-            quotation_amount: data['16'],
+        console.log('handleModifyContent:', data);
+        const tempOrgContentValues = {};
+        Object.keys(data).forEach(keyVal => {
+            if(!!data[keyVal] && !!QuotationContentItems[keyVal]) {
+                tempOrgContentValues[QuotationContentItems[keyVal].name] = data[keyVal]
+            };
         });
+        console.log('handleModifyContent:', tempOrgContentValues);
+        setOrgContentModalValues(tempOrgContentValues);
 
         handlePopupOpen(true);
         setEditedContentModalValues({});
@@ -721,12 +711,13 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
                     className="resizable-antd-table"
                     components={tableComponents}
                     columns={columns.map((col, index) => ({
-                        ...col,
-                        onHeaderCell: column => ({
-                            width: column.width,
-                            onResize: handleColumnResize(index),
-                        }),
-                    }))}
+                            ...col,
+                            onHeaderCell: column => ({
+                                width: column.width,
+                                onResize: handleColumnResize(index),
+                            }),
+                        }))
+                    }
                     dataSource={contents}
                     pagination={{
                         total: contents.length,
@@ -754,11 +745,26 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
                     style={{ display: 'flex', marginBottom: '0.25rem', marginTop: '0.25rem' }}
                 >
                     <Space.Compact direction="vertical">
+                        <label >{t('quotation.total_cost_price')}</label>
+                        <InputNumber
+                            name='total_cost_price'
+                            defaultValue={0}
+                            value={data.total_cost_price}
+                            disabled={settingForContent.auto_calc}
+                            formatter={ConvertCurrency}
+                            parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                            onChange={handleChangeTotalCostPrice}
+                            style={{
+                                width: 180,
+                            }}
+                        />
+                    </Space.Compact>
+                    <Space.Compact direction="vertical">
                         <label>{t('transaction.total_price')}</label>
                         <InputNumber
                             name='sub_total_amount'
                             defaultValue={0}
-                            value={amountsForContent.sub_total_amount}
+                            value={data.sub_total_amount}
                             formatter={ConvertCurrency}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             disabled={settingForContent.auto_calc}
@@ -788,7 +794,7 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
                         <InputNumber
                             name='dc_amount'
                             defaultValue={0}
-                            value={amountsForContent.dc_amount}
+                            value={data.dc_amount}
                             formatter={ConvertCurrency}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             disabled={settingForContent.auto_calc}
@@ -803,7 +809,7 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
                         <InputNumber
                             name='sum_dc_applied'
                             defaultValue={0}
-                            value={amountsForContent.sum_dc_applied}
+                            value={data.sum_dc_applied}
                             disabled={settingForContent.auto_calc}
                             formatter={ConvertCurrency}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
@@ -818,7 +824,7 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
                         <InputNumber
                             name='vat_amount'
                             defaultValue={0}
-                            value={amountsForContent.vat_amount}
+                            value={data.vat_amount}
                             disabled={settingForContent.auto_calc}
                             formatter={ConvertCurrency}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
@@ -833,7 +839,7 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
                         <InputNumber
                             name='cut_off_amount'
                             defaultValue={0}
-                            value={amountsForContent.cut_off_amount}
+                            value={data.cut_off_amount}
                             formatter={ConvertCurrency}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             onChange={handleChangeCutOffAmount}
@@ -847,26 +853,11 @@ const QuotationContents = ({ checkData, columns, handleColumns, contents, handle
                         <InputNumber
                             name='sum_final'
                             defaultValue={0}
-                            value={amountsForContent.sum_final}
+                            value={data.sum_final}
                             disabled={settingForContent.auto_calc}
                             formatter={ConvertCurrency}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             onChange={handleChangeFinalAmount}
-                            style={{
-                                width: 180,
-                            }}
-                        />
-                    </Space.Compact>
-                    <Space.Compact direction="vertical">
-                        <label >{t('quotation.total_cost_price')}</label>
-                        <InputNumber
-                            name='total_cost_price'
-                            defaultValue={0}
-                            value={amountsForContent.total_cost_price}
-                            disabled={settingForContent.auto_calc}
-                            formatter={ConvertCurrency}
-                            parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            onChange={handleChangeTotalCostPrice}
                             style={{
                                 width: 180,
                             }}
