@@ -66,24 +66,23 @@ export const ConsultingTimeTypes = [
 
 export const consultingColumn = [
     { value: 'company_name', label: '회사명'},
-    { value: 'receiver', label: '상담진행자'},
     { value: 'consulting_type', label: '상담 유형'},
     { value: 'product_type', label: '물품 유형'},
+    { value: 'receiver', label: '상담진행자'},
     { value: 'lead_name', label: '고객명'},
     { value: 'mobile_number', label: '고객휴대전화'},
     { value: 'phone_number', label: '전화번호'},
     { value: 'department', label: '부서'},
     { value: 'position', label: '직위'},
     { value: 'email', label: '전자우편'},
-    { value: 'request_type', label: '요청유형'},
     { value: 'status', label: '상태'},
     { value: 'lead_time', label: '소요시간'},
     { value: 'sales_representative', label: '고객영업담당'},
     { value: 'application_engineer', label: '기술담당'},
     { value: 'request_content', label: '상담내역'},
     { value: 'action_content', label: '상담 결과'},
+    { value: 'memo', label: '메모'},
 ];
-
 
 export const ConsultingRepo = selector({
     key: "ConsultingRepository",
@@ -204,9 +203,14 @@ export const ConsultingRepo = selector({
                                             (item.product_type && item.product_type.includes(filterText)) ||
                                             (item.mobile_number && item.mobile_number.includes(filterText)) || 
                                             (item.phone_number && item.phone_number.includes(filterText)) || 
+                                            (item.email && item.email.includes(filterText)) || 
+                                            (item.status && item.status.includes(filterText)) || 
+                                            (item.lead_time && item.lead_time.includes(filterText)) || 
                                             (item.sales_representative && item.sales_representative.includes(filterText)) || 
+                                            (item.application_engineer && item.application_engineer.includes(filterText)) || 
                                             (item.request_content && item.request_content.includes(filterText)) || 
-                                            (item.action_content && item.action_content.includes(filterText)) 
+                                            (item.action_content && item.action_content.includes(filterText)) ||
+                                            (item.memo && item.memo.includes(filterText)) 
                 );
             }else if(itemName === 'company.company_name'){
                 allConsulting = allConsultingList.filter(item => (item.company_name &&item.company_name.includes(filterText))
@@ -232,11 +236,26 @@ export const ConsultingRepo = selector({
             }else if(itemName === 'lead.lead_sales'){
                 allConsulting = allConsultingList.filter(item => (item.sales_representative &&item.sales_representative.includes(filterText))
                 );    
-            }else if(itemName === 'consulting.request_content'){
+            } else if(itemName === 'lead.email'){
+                allConsulting = allConsultingList.filter(item => (item.email &&item.email.includes(filterText))
+                );    
+            }else if(itemName === 'consulting.status'){
+                allConsulting = allConsultingList.filter(item => (item.status &&item.status.includes(filterText))
+                );    
+            }else if(itemName === 'consulting.lead_time'){
+                allConsulting = allConsultingList.filter(item => (item.lead_time &&item.lead_time.includes(filterText))
+                );    
+            }else if(itemName === 'company.engineer'){
+                allConsulting = allConsultingList.filter(item => (item.application_engineer &&item.application_engineer.includes(filterText))
+                );    
+            } else if(itemName === 'consulting.request_content'){
                 allConsulting = allConsultingList.filter(item => (item.request_content &&item.request_content.includes(filterText))
                 );    
             }else if(itemName === 'consulting.action_content'){
                 allConsulting = allConsultingList.filter(item => (item.action_content &&item.action_content.includes(filterText))
+                );    
+            }else if(itemName === 'common.memo'){
+                allConsulting = allConsultingList.filter(item => (item.memo &&item.memo.includes(filterText))
                 );    
             }
             set(atomFilteredConsultingArray, allConsulting);
