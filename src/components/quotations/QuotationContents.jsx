@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Resizable } from 'react-resizable';
-import { Button, Checkbox, InputNumber, Modal, Space, Table } from 'antd';
+import { Button, Checkbox, Flex, InputNumber, Modal, Space, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { AddBoxOutlined, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
 
-import { QuotationContentItems, QuotationDefaultColumns } from '../../repository/quotation';
+import { QuotationContentItems } from '../../repository/quotation';
 import { SettingsRepo } from '../../repository/settings';
 
 import QuotationContentModal from "./QuotationContentModal";
@@ -34,7 +34,7 @@ const ResizeableTitle = props => {
     );
 };
 
-const QuotationContents = ({ data, handleData, columns = [], handleColumns, contents, handleContents }) => {
+const QuotationContents = ({ data, handleData, columns, handleColumns, contents, handleContents }) => {
     const [t] = useTranslation();
     const [cookies, setCookie] = useCookies(["myLationCrmUserId", "myLationCrmUserName", "myQuotationAddColumns"]);
     const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -153,7 +153,7 @@ const QuotationContents = ({ data, handleData, columns = [], handleColumns, cont
         // update cookie for content columns ----------------
         const tempCookies = {
             ...cookies.myQuotationAddColumns,
-            [ cookies.myLationCrmUserId ]: [ ...tempColumns ]
+            [cookies.myLationCrmUserId]: [...tempColumns]
         };
         setCookie("myQuotationAddColumns", tempCookies);
     };
@@ -373,12 +373,40 @@ const QuotationContents = ({ data, handleData, columns = [], handleColumns, cont
         handleData(updatedSetting);
     };
 
-    const handleChangeTotalCostPrice = (value) => {
+    const handleChangeTotalListPrice = (value) => {
         const updatedSetting = {
             ...data,
-            total_cost_price: value,
+            list_price: value,
         };
         handleData(updatedSetting);
+    };
+
+    const handleChangeTotalListPriceDCRate = (value) => {
+        if(data.list_price_dc !== value) {
+            const tempSubTotalAmount = data.list_price*(1 - value*0.01);
+
+            const updatedSetting = {
+                ...data,
+                list_price_dc: value,
+                sub_total_amount: tempSubTotalAmount,
+            };
+            handleData(updatedSetting);
+        };
+    }
+
+    const handleChangeCostPrice = (value) => {
+        if(data.total_cost_price !== value) {
+            const tempProfit = data.total_quotation_amount - value;
+            const tempProfitRate = tempProfit/data.total_quotation_amount*100;
+
+            const updatedSetting = {
+                ...data,
+                total_cost_price: value,
+                profit: tempProfit,
+                profit_rate: tempProfitRate,
+            };
+            handleData(updatedSetting);
+        }
     }
 
     const handleAddNewContent = () => {
@@ -441,7 +469,7 @@ const QuotationContents = ({ data, handleData, columns = [], handleColumns, cont
         console.log('handleModifyContent:', data);
         const tempOrgContentValues = {};
         Object.keys(data).forEach(keyVal => {
-            if(!!data[keyVal] && !!QuotationContentItems[keyVal]) {
+            if (!!data[keyVal] && !!QuotationContentItems[keyVal]) {
                 tempOrgContentValues[QuotationContentItems[keyVal].name] = data[keyVal]
             };
         });
@@ -530,7 +558,7 @@ const QuotationContents = ({ data, handleData, columns = [], handleColumns, cont
             '15': finalData.list_price || '',
             '16': finalData.quotation_amount || '',
             '17': finalData.cost_price || '',
-            '18': finalData.profit_amount || '',
+            '18': finalData.profit || '',
             '19': finalData.memo || '',
             '998': finalData.detail_desc || '',
             'org_unit_price': finalData.org_unit_price,
@@ -580,61 +608,63 @@ const QuotationContents = ({ data, handleData, columns = [], handleColumns, cont
 
 
     //===== useEffect functions =============================================== 
-    useEffect(() => {
-        if(!columns || columns.length === 0) {
-            if (!cookies.myQuotationAddColumns) {
-                const tempQuotationColumn = QuotationDefaultColumns.forEach(item => {
-                    const ret = {
-                        title: t(item.title),
-                        dataIndex: item.dataIndex,
-                        render: QuotationContentItems[item.dataIndex].type === 'price'
-                            ? (text, record) => <>{ConvertCurrency(text)}</>
-                            : (text, record) => <>{text}</>,
-                    };
-                    if(!!item.width) {
-                        ret['width'] = item.width;
-                    }
-                    return ret;
-                });
-                const tempCookieValue = {
-                    [cookies.myLationCrmUserId]: tempQuotationColumn
-                }
-                handleColumns(tempQuotationColumn);
-                setCookie('myQuotationAddColumns', tempCookieValue);
-            } else {
-                const columnSettings = cookies.myQuotationAddColumns[cookies.myLationCrmUserId];
-                if (!columnSettings) {
-                    const tempQuotationColumn = QuotationDefaultColumns.forEach(item => {
-                        const ret = {
-                            title: t(item.title),
-                            dataIndex: item.dataIndex,
-                            render: QuotationContentItems[item.dataIndex].type === 'price'
-                            ? (text, record) => <>{ConvertCurrency(text)}</>
-                            : (text, record) => <>{text}</>,
-                        };
-                        if(!!item.width) {
-                            ret['width'] = item.width;
-                        }
-                        return ret;
-                    });
-                    const tempCookieValue = {
-                        ...cookies.myQuotationAddColumns,
-                        [cookies.myLationCrmUserId]: tempQuotationColumn
-                    };
-                    handleColumns(tempQuotationColumn);
-                    setCookie('myQuotationAddColumns', tempCookieValue);
-                } else {
-                    const tempQuotationColumn = columnSettings.map(col => ({
-                        ...col,
-                        render: QuotationContentItems[col.dataIndex].type === 'price'
-                            ? (text, record) => <>{ConvertCurrency(text)}</>
-                            : (text, record) => <>{text}</>,
-                    }));
-                    handleColumns(tempQuotationColumn);
-                };
-            };
-        };
-    }, [cookies.myLationCrmUserId, cookies.myQuotationAddColumns, setCookie, columns, t]);
+    // useEffect(() => {
+    //     console.log('QuotationContents / useEffect');
+    //     if (!columns || columns.length === 0) {
+    //         if (!cookies.myQuotationAddColumns) {
+    //             const tempQuotationColumn = QuotationDefaultColumns.forEach(item => {
+    //                 const ret = {
+    //                     title: t(item.title),
+    //                     dataIndex: item.dataIndex,
+    //                     render: QuotationContentItems[item.dataIndex].type === 'price'
+    //                         ? (text, record) => <>{ConvertCurrency(text)}</>
+    //                         : (text, record) => <>{text}</>,
+    //                 };
+    //                 if (!!item.width) {
+    //                     ret['width'] = item.width;
+    //                 }
+    //                 return ret;
+    //             });
+    //             const tempCookieValue = {
+    //                 [cookies.myLationCrmUserId]: tempQuotationColumn
+    //             }
+    //             handleColumns(tempQuotationColumn);
+    //             setCookie('myQuotationAddColumns', tempCookieValue);
+    //         } else {
+    //             const columnSettings = cookies.myQuotationAddColumns[cookies.myLationCrmUserId];
+    //             if (!columnSettings) {
+    //                 const tempQuotationColumn = QuotationDefaultColumns.forEach(item => {
+    //                     const ret = {
+    //                         title: t(item.title),
+    //                         dataIndex: item.dataIndex,
+    //                         render: QuotationContentItems[item.dataIndex].type === 'price'
+    //                             ? (text, record) => <>{ConvertCurrency(text)}</>
+    //                             : (text, record) => <>{text}</>,
+    //                     };
+    //                     if (!!item.width) {
+    //                         ret['width'] = item.width;
+    //                     }
+    //                     return ret;
+    //                 });
+    //                 const tempCookieValue = {
+    //                     ...cookies.myQuotationAddColumns,
+    //                     [cookies.myLationCrmUserId]: tempQuotationColumn
+    //                 };
+    //                 handleColumns(tempQuotationColumn);
+    //                 setCookie('myQuotationAddColumns', tempCookieValue);
+    //             } else {
+    //                 const tempQuotationColumn = columnSettings.map(col => ({
+    //                     ...col,
+    //                     render: QuotationContentItems[col.dataIndex].type === 'price'
+    //                         ? (text, record) => <>{ConvertCurrency(text)}</>
+    //                         : (text, record) => <>{text}</>,
+    //                 }));
+    //                 handleColumns(tempQuotationColumn);
+    //             };
+    //         };
+    //     };
+    // }, [cookies.myQuotationAddColumns, columns]);
+    
 
     return (
         <>
@@ -711,12 +741,12 @@ const QuotationContents = ({ data, handleData, columns = [], handleColumns, cont
                     className="resizable-antd-table"
                     components={tableComponents}
                     columns={columns.map((col, index) => ({
-                            ...col,
-                            onHeaderCell: column => ({
-                                width: column.width,
-                                onResize: handleColumnResize(index),
-                            }),
-                        }))
+                        ...col,
+                        onHeaderCell: column => ({
+                            width: column.width,
+                            onResize: handleColumnResize(index),
+                        }),
+                    }))
                     }
                     dataSource={contents}
                     pagination={{
@@ -738,29 +768,40 @@ const QuotationContents = ({ data, handleData, columns = [], handleColumns, cont
                 />
             </div>
             <div className="form-group row">
-                <Space
-                    align="center"
-                    direction="horizontal"
-                    size="middle"
-                    style={{ display: 'flex', marginBottom: '0.25rem', marginTop: '0.25rem' }}
-                >
+                <Flex wrap gap="small">
                     <Space.Compact direction="vertical">
-                        <label >{t('quotation.total_cost_price')}</label>
+                        <label >{t('quotation.total_list_price')}</label>
                         <InputNumber
-                            name='total_cost_price'
+                            name='list_price'
                             defaultValue={0}
-                            value={data.total_cost_price}
+                            value={data.list_price}
                             disabled={settingForContent.auto_calc}
                             formatter={ConvertCurrency}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            onChange={handleChangeTotalCostPrice}
+                            onChange={handleChangeTotalListPrice}
                             style={{
                                 width: 180,
                             }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
-                        <label>{t('transaction.total_price')}</label>
+                        <label >{t('quotation.total_list_price_dc_rate')}</label>
+                        <InputNumber
+                            name='list_price_dc'
+                            defaultValue={0}
+                            value={data.list_price_dc}
+                            formatter={(value) => `${value}%`}
+                            parser={(value) => typeof value === 'string'
+                                ? Number(value).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+                                : value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                            onChange={handleChangeTotalListPriceDCRate}
+                            style={{
+                                width: 180,
+                            }}
+                        />
+                    </Space.Compact>
+                    <Space.Compact direction="vertical">
+                        <label>{t('quotation.sub_total_amount')}</label>
                         <InputNumber
                             name='sub_total_amount'
                             defaultValue={0}
@@ -781,7 +822,9 @@ const QuotationContents = ({ data, handleData, columns = [], handleColumns, cont
                             min={0}
                             max={100}
                             formatter={(value) => `${value}%`}
-                            parser={(value) => value?.replace('%', '')}
+                            parser={(value) => typeof value === 'string'
+                                ? Number(value).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+                                : value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
                             value={settingForContent.dc_rate}
                             onChange={handleChangeDCRate}
                             style={{
@@ -807,9 +850,9 @@ const QuotationContents = ({ data, handleData, columns = [], handleColumns, cont
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.quotation_amount')}</label>
                         <InputNumber
-                            name='sum_dc_applied'
+                            name='quotation_amount'
                             defaultValue={0}
-                            value={data.sum_dc_applied}
+                            value={data.quotation_amount}
                             disabled={settingForContent.auto_calc}
                             formatter={ConvertCurrency}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
@@ -822,9 +865,9 @@ const QuotationContents = ({ data, handleData, columns = [], handleColumns, cont
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.tax_amount')}</label>
                         <InputNumber
-                            name='vat_amount'
+                            name='tax_amount'
                             defaultValue={0}
-                            value={data.vat_amount}
+                            value={data.tax_amount}
                             disabled={settingForContent.auto_calc}
                             formatter={ConvertCurrency}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
@@ -851,9 +894,9 @@ const QuotationContents = ({ data, handleData, columns = [], handleColumns, cont
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.total_quotation_amount')}</label>
                         <InputNumber
-                            name='sum_final'
+                            name='total_quotation_amount'
                             defaultValue={0}
-                            value={data.sum_final}
+                            value={data.total_quotation_amount}
                             disabled={settingForContent.auto_calc}
                             formatter={ConvertCurrency}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
@@ -863,7 +906,51 @@ const QuotationContents = ({ data, handleData, columns = [], handleColumns, cont
                             }}
                         />
                     </Space.Compact>
-                </Space>
+                    <Space.Compact direction="vertical">
+                        <label >{t('quotation.total_cost_price')}</label>
+                        <InputNumber
+                            name='total_cost_price'
+                            defaultValue={0}
+                            value={data.total_cost_price}
+                            formatter={ConvertCurrency}
+                            parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                            onChange={handleChangeCostPrice}
+                            style={{
+                                width: 180,
+                            }}
+                        />
+                    </Space.Compact>
+                    <Space.Compact direction="vertical">
+                        <label >{t('quotation.profit')}</label>
+                        <InputNumber
+                            name='profit'
+                            defaultValue={0}
+                            value={data.profit}
+                            disabled={settingForContent.auto_calc}
+                            formatter={ConvertCurrency}
+                            parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                            onChange={handleChangeFinalAmount}
+                            style={{
+                                width: 180,
+                            }}
+                        />
+                    </Space.Compact>
+                    <Space.Compact direction="vertical">
+                        <label >{t('quotation.profit_rate')}</label>
+                        <InputNumber
+                            name='profit_rate'
+                            defaultValue={0}
+                            value={data.profit_rate}
+                            disabled={settingForContent.auto_calc}
+                            formatter={ConvertCurrency}
+                            parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                            onChange={handleChangeFinalAmount}
+                            style={{
+                                width: 180,
+                            }}
+                        />
+                    </Space.Compact>
+                </Flex>
             </div>
             <Modal
                 title={t('quotation.header_setting')}
@@ -871,34 +958,32 @@ const QuotationContents = ({ data, handleData, columns = [], handleColumns, cont
                 onOk={handleCloseEditHeaders}
                 onCancel={handleCloseEditHeaders}
                 footer={[
-                <Button key="submit" type="primary" onClick={handleCloseEditHeaders}>
-                    Ok
-                </Button>,
+                    <Button key="submit" type="primary" onClick={handleCloseEditHeaders}>
+                        Ok
+                    </Button>,
                 ]}
                 style={{ top: 120 }}
                 width={360}
                 zIndex={2001}
             >
                 <table className="table">
-                <tbody>
-                {Object.keys(QuotationContentItems).map((item, index) => {
-                    const foundItem = columns.filter(column => column.dataIndex === item)[0];
-                    return (
-                        <tr key={index}>
-                        <td>
-                        {t(QuotationContentItems[item].title)}
-                        </td>
-                        <td>
-                            <Checkbox
-                            name={item}
-                            checked={!!foundItem}
-                            onChange={handleHeaderCheckChange}
-                            />
-                        </td>
-                        </tr>
-                    )
-                    })}
-                </tbody>
+                    <tbody>
+                        {Object.keys(QuotationContentItems).map((item, index) => {
+                            const foundItem = columns.filter(column => column.dataIndex === item)[0];
+                            return (
+                                <tr key={index}>
+                                    <td>{t(QuotationContentItems[item].title)}</td>
+                                    <td>
+                                        <Checkbox
+                                            name={item}
+                                            checked={!!foundItem}
+                                            onChange={handleHeaderCheckChange}
+                                        />
+                                    </td>
+                                </tr>
+                            )
+                        })}
+                    </tbody>
                 </table>
             </Modal>
             <QuotationContentModal

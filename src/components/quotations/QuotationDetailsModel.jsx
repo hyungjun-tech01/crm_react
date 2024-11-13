@@ -102,14 +102,6 @@ const QuotationDetailsModel = () => {
     { key: 'warranty_period', title: 'quotation.warranty', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'sales_representative', title: 'quotation.sales_rep', detail: { type: 'select', options: salespersonsForSelection, editing: handleDetailSelectChange } },
     { key: 'payment_type', title: 'quotation.payment_type', detail: { type: 'select', options: QuotationPayment, editing: handleDetailSelectChange } },
-    { key: 'list_price', title: 'quotation.list_price', detail: { type: 'label', price: true, editing: handleDetailChange } },
-    { key: 'list_price_dc', title: 'quotation.list_price_dc', detail: { type: 'label', editing: handleDetailChange } },
-    { key: 'sub_total_amount', title: 'quotation.sub_total_amount', detail: { type: 'label', price: true, editing: handleDetailChange } },
-    { key: 'dc_rate', title: 'quotation.dc_rate', detail: { type: 'label', editing: handleDetailChange } },
-    { key: 'cutoff_amount', title: 'quotation.cutoff_amount', detail: { type: 'label', price: true, editing: handleDetailChange } },
-    { key: 'total_quotation_amount', title: 'quotation.total_quotation_amount', detail: { type: 'label', price: true, editing: handleDetailChange } },
-    { key: 'profit', title: 'quotation.profit_amount', detail: { type: 'label', price: true, editing: handleDetailChange } },
-    { key: 'profit_rate', title: 'quotation.profit_rate', detail: { type: 'label', editing: handleDetailChange } },
     { key: 'upper_memo', title: 'quotation.upper_memo', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
     { key: 'lower_memo', title: 'quotation.lower_memo', detail: { type: 'textarea', extra: 'long', editing: handleDetailChange } },
     { key: 'lead_name', title: 'lead.lead_name', detail: { type: 'label', editing: handleDetailChange } },
@@ -128,8 +120,19 @@ const QuotationDetailsModel = () => {
   const [quotationContents, setQuotationContents] = useState([]);
   const [contentData, setContentData] = useState({
     name: '',
-    sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
-  })
+    list_price: 0,
+    list_price_dc: 0,
+    sub_total_amount: 0,
+    dc_rate: 0,
+    dc_amount: 0,
+    quotation_amount: 0,
+    tax_amount: 0,
+    cut_off_amount: 0,
+    total_quotation_amount: 0,
+    total_cost_price: 0,
+    profit: 0,
+    profit_rate: 0,
+  });
 
   const ConvertHeaderInfosToString = (data) => {
     let ret = '';
@@ -203,7 +206,7 @@ const QuotationDetailsModel = () => {
     }
   }, [cookies.myLationCrmUserId, modifyQuotation, editedDetailValues, selectedQuotation]);
 
-  const handleInitialize = () => {
+  const handleInitialize = useCallback(() => {
     console.log('QuotationDetails / handleInitialize: ', selectedQuotation);
     // initialize columns of content table --------------------------------------------
     const tempColumnValues = selectedQuotation.quotation_table.split('|');
@@ -241,18 +244,24 @@ const QuotationDetailsModel = () => {
 
     // initialize values related to price --------------------------------------------
     const tempData = {
-      total_cost_price: selectedQuotation.total_cost_price,
-      sub_total_amount: selectedQuotation.sub_total_amount, 
-      dc_amount: selectedQuotation.dc_amount, 
-      sum_dc_applied: selectedQuotation.quotation_amount, 
-      vat_amount: selectedQuotation.tax_amount, 
+      name : selectedQuotation.lead_name,
+      list_price: selectedQuotation.list_price,
+      list_price_dc: selectedQuotation.list_price_dc,
+      sub_total_amount: selectedQuotation.sub_total_amount,
+      dc_rate: selectedQuotation.dc_rate,
+      dc_amount: selectedQuotation.dc_amount,
+      quotation_amount: selectedQuotation.quotation_amount,
+      tax_amount: selectedQuotation.tax_amount,
       cut_off_amount: selectedQuotation.cutoff_amount,
-      sum_final: selectedQuotation.total_quotation_amount,
+      total_quotation_amount: selectedQuotation.total_quotation_amount,
+      total_cost_price: selectedQuotation.total_cost_price,
+      profit: selectedQuotation.profit,
+      profit_rate: selectedQuotation.profit_rate,
     };
     setContentData(tempData);
     
     setEditedDetailValues(null);
-  };
+  }, [selectedQuotation]);
 
   const handleClose = () => {
     setTimeout(() => {
@@ -263,6 +272,7 @@ const QuotationDetailsModel = () => {
 
   //===== useEffect functions =============================================== 
   useEffect(() => {
+    console.log('QuotationDetailsModel / useEffect');
     if (selectedQuotation !== defaultQuotation) {
       handleInitialize();
     };
@@ -292,6 +302,7 @@ const QuotationDetailsModel = () => {
     // popstate 이벤트 리스너 추가 (중복 추가 방지)
     window.addEventListener('popstate', handlePopState);
   }, []);
+  
 
   return (
     <>
