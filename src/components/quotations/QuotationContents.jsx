@@ -12,7 +12,7 @@ import { SettingsRepo } from '../../repository/settings';
 
 import QuotationContentModal from "./QuotationContentModal";
 import MessageModal from "../../constants/MessageModal";
-import { ConvertCurrency } from "../../constants/functions";
+import { ConvertCurrency, ConvertRate } from "../../constants/functions";
 
 
 const ResizeableTitle = props => {
@@ -252,25 +252,29 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
     };
 
     const handleCalculateAmounts = (items) => {
-        let SumEachItems = 0, SumEachCosts = 0;
+        let SumEachListPrice = 0, SumEachItems = 0;
         items.forEach(item => {
+            SumEachListPrice += item['13'];
             SumEachItems += item['16'];
-            SumEachCosts += item['13'];
         });
-        const sum_cost_items = SumEachCosts;
-        const sub_total_amount = settingForContent.total_only ? SumEachItems / 1.1 : SumEachItems;
-        const dc_amount = sub_total_amount * settingForContent.dc_rate * 0.01;
-        const sum_dc_applied = sub_total_amount - dc_amount;
-        const vat_amount = settingForContent.vat_included ? sum_dc_applied * 0.1 : 0;
-        const sum_final = sum_dc_applied + vat_amount - data.cut_off_amount;
+
+        const dc_amount_new = SumEachItems*data.dc_rate*0.01;
+        const quotation_amount_new = SumEachItems - dc_amount_new;
+        const tax_amount_new = settingForContent.vat_included ? quotation_amount_new*0.1 : 0;
+        const total_amount_new = quotation_amount_new + tax_amount_new - data.cut_off_amount;
+        const profit_new = total_amount_new - data.total_cost_price;
+
         const tempAmount = {
             ...data,
-            sub_total_amount: sub_total_amount,
-            dc_amount: dc_amount,
-            sum_dc_applied: sum_dc_applied,
-            vat_amount: vat_amount,
-            sum_final: sum_final,
-            total_cost_price: sum_cost_items,
+            list_price: SumEachListPrice,
+            list_price_dc: (SumEachListPrice - SumEachItems) * 100 / SumEachListPrice,
+            sub_total_amount: SumEachItems,
+            dc_amount: dc_amount_new,
+            quotation_amount: quotation_amount_new,
+            tax_amount: tax_amount_new,
+            total_quotation_amount: total_amount_new,
+            profit: profit_new,
+            profit_rate: profit_new * 100 / data.total_cost_price,
         };
         handleData(tempAmount);
 
@@ -776,7 +780,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             defaultValue={0}
                             value={data.list_price}
                             disabled={settingForContent.auto_calc}
-                            formatter={ConvertCurrency}
+                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             onChange={handleChangeTotalListPrice}
                             style={{
@@ -790,10 +794,8 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             name='list_price_dc'
                             defaultValue={0}
                             value={data.list_price_dc}
-                            formatter={(value) => `${value}%`}
-                            parser={(value) => typeof value === 'string'
-                                ? Number(value).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
-                                : value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                            formatter={ConvertRate}
+                            parser={(value) => value?.replace('%', '')}
                             onChange={handleChangeTotalListPriceDCRate}
                             style={{
                                 width: 180,
@@ -806,7 +808,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             name='sub_total_amount'
                             defaultValue={0}
                             value={data.sub_total_amount}
-                            formatter={ConvertCurrency}
+                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             disabled={settingForContent.auto_calc}
                             onChange={handleChangeEachSum}
@@ -821,10 +823,8 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             name='dc_rate'
                             min={0}
                             max={100}
-                            formatter={(value) => `${value}%`}
-                            parser={(value) => typeof value === 'string'
-                                ? Number(value).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
-                                : value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                            formatter={ConvertRate}
+                            parser={(value) => value?.replace('%', '')}
                             value={settingForContent.dc_rate}
                             onChange={handleChangeDCRate}
                             style={{
@@ -838,7 +838,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             name='dc_amount'
                             defaultValue={0}
                             value={data.dc_amount}
-                            formatter={ConvertCurrency}
+                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             disabled={settingForContent.auto_calc}
                             onChange={handleChangeDCAmount}
@@ -854,7 +854,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             defaultValue={0}
                             value={data.quotation_amount}
                             disabled={settingForContent.auto_calc}
-                            formatter={ConvertCurrency}
+                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             onChange={handleChangeDCAppliedSum}
                             style={{
@@ -869,7 +869,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             defaultValue={0}
                             value={data.tax_amount}
                             disabled={settingForContent.auto_calc}
-                            formatter={ConvertCurrency}
+                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             onChange={handleChangeVAT}
                             style={{
@@ -883,7 +883,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             name='cut_off_amount'
                             defaultValue={0}
                             value={data.cut_off_amount}
-                            formatter={ConvertCurrency}
+                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             onChange={handleChangeCutOffAmount}
                             style={{
@@ -898,7 +898,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             defaultValue={0}
                             value={data.total_quotation_amount}
                             disabled={settingForContent.auto_calc}
-                            formatter={ConvertCurrency}
+                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             onChange={handleChangeFinalAmount}
                             style={{
@@ -912,7 +912,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             name='total_cost_price'
                             defaultValue={0}
                             value={data.total_cost_price}
-                            formatter={ConvertCurrency}
+                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             onChange={handleChangeCostPrice}
                             style={{
@@ -927,7 +927,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             defaultValue={0}
                             value={data.profit}
                             disabled={settingForContent.auto_calc}
-                            formatter={ConvertCurrency}
+                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             onChange={handleChangeFinalAmount}
                             style={{
@@ -942,8 +942,8 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             defaultValue={0}
                             value={data.profit_rate}
                             disabled={settingForContent.auto_calc}
-                            formatter={ConvertCurrency}
-                            parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                            formatter={ConvertRate}
+                            parser={(value) => value?.replace('%', '')}
                             onChange={handleChangeFinalAmount}
                             style={{
                                 width: 180,

@@ -73,8 +73,24 @@ export const ConvertCurrency = (amount, fixed = 0) => {
     } else if(typeof amount !== 'number'){
         return NaN;
     };
-    
+
     return fixed === 0 
-        ? ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-        : ret?.toFixed(fixed).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        ? ret.toLocaleString('ko-KR', { style: 'currency', currency: 'KRW' })
+        : `&#8361;${ret?.toFixed(fixed)}`.replace(/\d(?=(\d{3})+\.)/g, '$&,');
+};
+
+export const ConvertRate = (amount) => {
+    if(amount === undefined || amount === null || amount === '') return "";
+
+    let ret = amount;
+    if(typeof amount === 'string') {
+        ret = Number(amount);
+        if(isNaN(ret)) return amount;
+    } else if(typeof amount !== 'number'){
+        return NaN;
+    };
+    
+    return (ret - Math.floor(ret) > 0)
+        ? `${ret.toFixed(2)}%`.replace(/\d(?=(\d{3})+\.)/g, '$&,')
+        : `${ret}%`.replace(/\d(?=(\d{3})+\.)/g, '$&,');
 };
