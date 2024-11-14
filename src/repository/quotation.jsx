@@ -106,7 +106,7 @@ export const QuotationContentItems = {
     '14': { name: 'dc_rate', title: 'quotation.discount_rate', content: true, type:'price'},
     '15': { name: 'unit_price', title: 'quotation.quotation_unit_price', content: true, type:'price'},
     '16': { name: 'quotation_amount', title: 'quotation.quotation_amount', content: true, type:'price'},
-    '17': { name: 'raw_price', title: 'quotation.raw_price', content: true, type:'price'},
+    '17': { name: 'cost_price', title: 'quotation.cost_price', content: true, type:'price'},
     '18': { name: 'profit', title: 'quotation.profit', content: true, type:'price'},
     '19': { name: 'note', title: 'quotation.note', content: true, type:'textarea'},
     '998': { name: 'detail_desc', title: 'quotation.detail_desc', content: true, type:'textarea'},

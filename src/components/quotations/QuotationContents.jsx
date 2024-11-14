@@ -378,11 +378,14 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
     };
 
     const handleChangeTotalListPrice = (value) => {
-        const updatedSetting = {
-            ...data,
-            list_price: value,
-        };
-        handleData(updatedSetting);
+        if(data.list_price !== value) {
+            const updatedSetting = {
+                ...data,
+                list_price: value,
+                list_price_dc: (value - data.sub_total_amount)*100/value,
+            };
+            handleData(updatedSetting);
+        }
     };
 
     const handleChangeTotalListPriceDCRate = (value) => {
@@ -545,7 +548,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
 
         // update Contents -------------------------------------------------
         const updatedContent = {
-            '1': 1,
+            '1': finalData.no || '1',
             '2': finalData.product_class_name,
             '3': finalData.manufacturer || '',
             '4': finalData.model_name || '',
@@ -557,19 +560,18 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
             '10': finalData.detail_desc_on_off || '',
             '11': finalData.unit || '',
             '12': finalData.quantity || '',
-            '13': finalData.reseller_price || '',
-            '14': settingForContent.dc_rate || '',
-            '15': finalData.list_price || '',
+            '13': finalData.list_price || '',
+            '14': finalData.dc_rate || '',
+            '15': finalData.unit_price || '',
             '16': finalData.quotation_amount || '',
             '17': finalData.cost_price || '',
             '18': finalData.profit || '',
-            '19': finalData.memo || '',
+            '19': finalData.note || '',
             '998': finalData.detail_desc || '',
             'org_unit_price': finalData.org_unit_price,
         };
 
         if (settingForContent.action === "ADD") {
-            updatedContent['1'] = contents.length + 1;
             const updatedContents = contents.concat(updatedContent);
             handleContents(updatedContents);
 
@@ -577,7 +579,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                 handleCalculateAmounts(updatedContents);
             };
         } else {  //Update
-            updatedContent['1'] = settingForContent.index;
+            // updatedContent['1'] = settingForContent.index;
             const foundIdx = contents.findIndex(item => item['1'] === settingForContent.index);
             if (foundIdx === -1) {
                 console.log('Something Wrong when modifying content');
@@ -794,6 +796,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             name='list_price_dc'
                             defaultValue={0}
                             value={data.list_price_dc}
+                            disabled={settingForContent.auto_calc}
                             formatter={ConvertRate}
                             parser={(value) => value?.replace('%', '')}
                             onChange={handleChangeTotalListPriceDCRate}

@@ -177,7 +177,7 @@ const QuotationContentModal = (props) => {
             };
         });
         setContentItems(tempContentItems);
-    }, [open]);
+    }, [open, edited, original, items]);
 
     return (
         <Modal
