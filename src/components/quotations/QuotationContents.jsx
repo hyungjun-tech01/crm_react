@@ -280,141 +280,220 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
 
     };
 
-    const handleChangeEachSum = (value) => {
-        let updatedAmount = {
-            ...data,
-            sub_total_amount: value,
-        };
-        if (settingForContent.auto_calc) {
-            const dc_amount = value * settingForContent.dc_rate * 0.01;
-            const sum_dc_applied = value - dc_amount;
-            const vat_amount = settingForContent.vat_included ? sum_dc_applied * 0.1 : 0;
-            updatedAmount.dc_amount = dc_amount;
-            updatedAmount.sum_dc_applied = sum_dc_applied;
-            updatedAmount.vat_amount = vat_amount;
-            updatedAmount.sum_final = sum_dc_applied + vat_amount - data.cut_off_amount;
-        };
-        handleData(updatedAmount);
-    };
-
-    const handleChangeDCRate = (value) => {
-        const updatedSetting = {
-            ...settingForContent,
-            dc_rate: value
-        };
-        setSettingForContent(updatedSetting);
-
-        if (settingForContent.auto_calc && data.sub_total_amount !== 0) {
-            const dc_amount = data.sub_total_amount * value * 0.01;
-            const sum_dc_applied = data.sub_total_amount - dc_amount;
-            const vat_amount = settingForContent.vat_included ? sum_dc_applied * 0.1 : 0;
-            const tempAmount = {
-                ...data,
-                dc_amount: dc_amount,
-                sum_dc_applied: sum_dc_applied,
-                vat_amount: vat_amount,
-                sum_final: sum_dc_applied + vat_amount - data.cut_off_amount,
-            };
-            handleData(tempAmount);
-        };
-    };
-
-    const handleChangeDCAmount = (value) => {
-        let updatedAmount = {
-            ...data,
-            dc_amount: value
-        };
-        if (settingForContent.auto_calc) {
-            const sum_dc_applied = data.sub_total_amount - value;
-            const vat_amount = settingForContent.vat_included ? sum_dc_applied * 0.1 : 0;
-            updatedAmount.sum_dc_applied = sum_dc_applied;
-            updatedAmount.vat_amount = vat_amount;
-            updatedAmount.sum_final = sum_dc_applied + vat_amount - data.cut_off_amount;
-        };
-        handleData(updatedAmount);
-    };
-
-    const handleChangeDCAppliedSum = (value) => {
-        let updatedAmount = {
-            ...data,
-            sum_dc_applied: value
-        };
-        if (settingForContent.auto_calc) {
-            const vat_amount = settingForContent.vat_included ? value * 0.1 : 0;
-            updatedAmount.vat_amount = vat_amount;
-            updatedAmount.sum_final = value + vat_amount - data.cut_off_amount;
-        };
-        handleData(updatedAmount);
-    };
-
-    const handleChangeVAT = (value) => {
-        let updatedAmount = {
-            ...data,
-            vat_amount: value,
-        };
-        if (settingForContent.auto_calc) {
-            updatedAmount.sum_final = data.sum_dc_applied + value - data.cut_off_amount;
-        };
-        handleData(updatedAmount);
-    };
-
-    const handleChangeCutOffAmount = (value) => {
-        let updatedAmount = {
-            ...data,
-            cut_off_amount: value
-        };
-        if (settingForContent.auto_calc) {
-            updatedAmount.sum_final = data.sum_dc_applied + data.vat_amount - value;
-        }
-        handleData(updatedAmount);
-    };
-
-    const handleChangeFinalAmount = (value) => {
-        const updatedSetting = {
-            ...data,
-            sum_final: value,
-        };
-        handleData(updatedSetting);
-    };
-
+    //===== Handles to change each values related to prices =======================================
     const handleChangeTotalListPrice = (value) => {
         if(data.list_price !== value) {
-            const updatedSetting = {
+            const updatedAmounts = {
                 ...data,
                 list_price: value,
-                list_price_dc: (value - data.sub_total_amount)*100/value,
             };
-            handleData(updatedSetting);
+            if (settingForContent.auto_calc) {
+                updatedAmounts.list_price_dc = (value - data.sub_total_amount) * 100 / value;
+            };
+            handleData(updatedAmounts);
         }
     };
 
     const handleChangeTotalListPriceDCRate = (value) => {
         if(data.list_price_dc !== value) {
-            const tempSubTotalAmount = data.list_price*(1 - value*0.01);
-
-            const updatedSetting = {
+            const updatedAmounts = {
                 ...data,
                 list_price_dc: value,
-                sub_total_amount: tempSubTotalAmount,
             };
-            handleData(updatedSetting);
+            if (settingForContent.auto_calc) {
+                updatedAmounts.sub_total_amount = data.list_price * (1 - value * 0.01);
+            };
+            handleData(updatedAmounts);
         };
-    }
+    };
 
-    const handleChangeCostPrice = (value) => {
-        if(data.total_cost_price !== value) {
-            const tempProfit = data.total_quotation_amount - value;
-            const tempProfitRate = tempProfit/data.total_quotation_amount*100;
+    const handleChangeSubTotalAmount = (value) => {
+        if(data.sub_total_amount !== value) {
+            const updatedAmounts = {
+                ...data,
+                sub_total_amount: value,
+            };
+            if (settingForContent.auto_calc) {
+                const tempListDc = (data.list_price - value) * 100 / data.list_price;
+                const tempDcAmount = value * settingForContent.dc_rate * 0.01;
+                const tempQuotationAmount = value - tempDcAmount;
+                const tempTaxAmount = settingForContent.vat_included ? tempQuotationAmount * 0.1 : 0;
+                const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cut_off_amount;
+                const tempProfit = tempTotalAmount - data.total_cost_price;
+                updatedAmounts.list_dc = tempListDc;
+                updatedAmounts.dc_amount = tempDcAmount;
+                updatedAmounts.quotation_amount = tempQuotationAmount;
+                updatedAmounts.tax_amount = tempTaxAmount;
+                updatedAmounts.total_quotation_amount = tempTotalAmount;
+                updatedAmounts.profit = tempProfit;
+                updatedAmounts.profit_rate = tempProfit * 100 / tempTotalAmount;
+            };
+            handleData(updatedAmounts);
+        };
+    };
 
+    const handleChangeDCRate = (value) => {
+        if(data.dc_rate !== value) {
             const updatedSetting = {
+                ...settingForContent,
+                dc_rate: value
+            };
+            setSettingForContent(updatedSetting);
+
+            const updatedAmounts = {
+                ...data,
+                dc_rate: value
+            };
+
+            if (settingForContent.auto_calc) {
+                const tempDcAmount = data.sub_total_amount * value * 0.01;
+                const tempQuotationAmount = data.sub_total_amount - tempDcAmount;
+                const tempTaxAmount = settingForContent.vat_included ? tempQuotationAmount * 0.1 : 0;
+                const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cut_off_amount;
+                const tempProfit = tempTotalAmount - data.total_cost_price;
+                updatedAmounts.dc_amount = tempDcAmount;
+                updatedAmounts.quotation_amount = tempQuotationAmount;
+                updatedAmounts.tax_amount = tempTaxAmount;
+                updatedAmounts.total_quotation_amount = tempTotalAmount;
+                updatedAmounts.profit = tempProfit;
+                updatedAmounts.profit_rate = tempProfit * 100 / tempTotalAmount;
+            };
+            handleData(updatedAmounts);
+        };
+    };
+
+    const handleChangeDCAmount = (value) => {
+        if(data.dc_amount !== value) {
+            const updatedAmounts = {
+                ...data,
+                dc_amount: value
+            };
+
+            if (settingForContent.auto_calc) {
+                const tempQuotationAmount = data.sub_total_amount - value;
+                const tempTaxAmount = settingForContent.vat_included ? tempQuotationAmount * 0.1 : 0;
+                const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cut_off_amount;
+                const tempProfit = tempTotalAmount - data.total_cost_price;
+                updatedAmounts.quotation_amount = tempQuotationAmount;
+                updatedAmounts.tax_amount = tempTaxAmount;
+                updatedAmounts.total_quotation_amount = tempTotalAmount;
+                updatedAmounts.profit = tempProfit;
+                updatedAmounts.profit_rate = tempProfit * 100 / tempTotalAmount;
+            };
+            handleData(updatedAmounts);
+        };
+    };
+
+    const handleChangeQuotationAmount = (value) => {
+        if(data.quotation_amount !== value) {
+            const updatedAmounts = {
+                ...data,
+                quotation_amount: value
+            };
+            if (settingForContent.auto_calc) {
+                const tempTaxAmount = settingForContent.vat_included ? value * 0.1 : 0;
+                const tempTotalAmount = value + tempTaxAmount - data.cut_off_amount;
+                const tempProfit = tempTotalAmount - data.total_cost_price;
+                updatedAmounts.tax_amount = tempTaxAmount;
+                updatedAmounts.total_quotation_amount = tempTotalAmount;
+                updatedAmounts.profit = tempProfit;
+                updatedAmounts.profit_rate = tempProfit * 100 / tempTotalAmount;
+            };
+            handleData(updatedAmounts);
+        };
+    };
+
+    const handleChangeTaxAmount = (value) => {
+        if(data.tax_amount !== value) {
+            const updatedAmounts = {
+                ...data,
+                tax_amount: value,
+            };
+            if (settingForContent.auto_calc) {
+                const tempTotalAmount = data.quotation_amount + value - data.cut_off_amount;
+                const tempProfit = tempTotalAmount - data.total_cost_price;
+                updatedAmounts.total_quotation_amount = tempTotalAmount;
+                updatedAmounts.profit = tempProfit;
+                updatedAmounts.profit_rate = tempProfit * 100 / tempTotalAmount;
+            };
+            handleData(updatedAmounts);
+        };
+    };
+
+    const handleChangeCutOffAmount = (value) => {
+        if(data.cutoff_amount !== value) {
+            const updatedAmounts = {
+                ...data,
+                cutoff_amount: value
+            };
+            if (settingForContent.auto_calc) {
+                const tempTotalAmount = data.quotation_amount + data.tax_amount - value;
+                const tempProfit = tempTotalAmount - data.total_cost_price;
+                updatedAmounts.total_quotation_amount = tempTotalAmount;
+                updatedAmounts.profit = tempProfit;
+                updatedAmounts.profit_rate = tempProfit * 100 / tempTotalAmount;
+            };
+            handleData(updatedAmounts);
+        };
+    };
+
+    const handleChangeTotalQuotationAmount = (value) => {
+        if(data.total_quotation_amount !== value) {
+            const updatedAmounts = {
+                ...data,
+                total_quotation_amount: value,
+            };
+            if (settingForContent.auto_calc) {
+                const tempProfit = value - data.total_cost_price;
+                updatedAmounts.profit = tempProfit;
+                updatedAmounts.profit_rate = tempProfit * 100 / value;
+            };
+            handleData(updatedAmounts);
+        };
+    };
+
+    const handleChangeTotalCostPrice = (value) => {
+        if(data.total_cost_price !== value) {
+            const updatedAmounts = {
                 ...data,
                 total_cost_price: value,
-                profit: tempProfit,
-                profit_rate: tempProfitRate,
             };
-            handleData(updatedSetting);
-        }
-    }
+            if (settingForContent.auto_calc) {
+                const tempProfit = data.total_quotation_amount - value;
+                updatedAmounts.profit = tempProfit;
+                updatedAmounts.profit_rate = tempProfit * 100 /data.total_quotation_amount;
+            };
+            handleData(updatedAmounts);
+        };
+    };
+
+    const handleChangeProfit = (value) => {
+        if(data.profit !== value) {
+            const updatedAmounts = {
+                ...data,
+                profit : value,
+            };
+            if (settingForContent.auto_calc) {
+                const tempProfitRate = value * 100 / data.total_quotation_amount;
+                updatedAmounts.profit_rate = tempProfitRate;
+            };
+            handleData(updatedAmounts);
+        };
+    };
+
+    const handleChangeProfitRate = (value) => {
+        if(data.profit_rate !== value) {
+            const updatedAmounts = {
+                ...data,
+                profit_rate : value,
+            };
+            if (settingForContent.auto_calc) {
+                updatedAmounts.profit = data.total_quotation_amount * value * 0.01;
+            };
+            handleData(updatedAmounts);
+        };
+    };
+
 
     const handleAddNewContent = () => {
         if (!data.name) {
@@ -814,7 +893,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             disabled={settingForContent.auto_calc}
-                            onChange={handleChangeEachSum}
+                            onChange={handleChangeSubTotalAmount}
                             style={{
                                 width: 180,
                             }}
@@ -859,7 +938,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             disabled={settingForContent.auto_calc}
                             formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            onChange={handleChangeDCAppliedSum}
+                            onChange={handleChangeQuotationAmount}
                             style={{
                                 width: 180,
                             }}
@@ -874,7 +953,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             disabled={settingForContent.auto_calc}
                             formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            onChange={handleChangeVAT}
+                            onChange={handleChangeTaxAmount}
                             style={{
                                 width: 180,
                             }}
@@ -903,7 +982,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             disabled={settingForContent.auto_calc}
                             formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            onChange={handleChangeFinalAmount}
+                            onChange={handleChangeTotalQuotationAmount}
                             style={{
                                 width: 180,
                             }}
@@ -917,7 +996,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             value={data.total_cost_price}
                             formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            onChange={handleChangeCostPrice}
+                            onChange={handleChangeTotalCostPrice}
                             style={{
                                 width: 180,
                             }}
@@ -932,7 +1011,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             disabled={settingForContent.auto_calc}
                             formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            onChange={handleChangeFinalAmount}
+                            onChange={handleChangeProfit}
                             style={{
                                 width: 180,
                             }}
@@ -947,7 +1026,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             disabled={settingForContent.auto_calc}
                             formatter={ConvertRate}
                             parser={(value) => value?.replace('%', '')}
-                            onChange={handleChangeFinalAmount}
+                            onChange={handleChangeProfitRate}
                             style={{
                                 width: 180,
                             }}
