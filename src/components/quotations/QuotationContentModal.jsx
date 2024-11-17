@@ -39,8 +39,8 @@ const QuotationContentModal = (props) => {
                 tempData['product_name'] = value.product_name;
                 tempData['cost_price'] = Number(value.cost_price);
                 tempData['reseller_price'] = Number(value.reseller_price);
-                tempData['list_price'] = setting.unit_vat_included ? Number(value.list_price) / 1.1 : Number(value.list_price);
-                tempData['unit_price'] = tempData['list_price'];
+                tempData['list_price'] = Number(value.list_price);
+                tempData['unit_price'] = setting.unit_vat_included ? Number(value.list_price) / 1.1 : Number(value.list_price);
                 tempData['org_unit_price'] = Number(value.list_price);
 
                 setTempDetailSpec(value.detail_desc);
@@ -70,7 +70,6 @@ const QuotationContentModal = (props) => {
     const handleValue = (event) => {
         const targetName = event.target.name;
         const targetValue = event.target.value.replace(/[^\d.-]/g, '');
-        console.log('handleValue : ', targetValue);
         const tempValue = Number(targetValue);
 
         let tempData = { ...edited };
@@ -89,7 +88,6 @@ const QuotationContentModal = (props) => {
                     };
                 };
             } else if (targetName === 'unit_price') {
-                console.log('- unit price is changed :', tempValue);
                 if(!edited['quantity']) {
                     if(!!original.quantity && !isNaN(Number(original.quantity))) {
                         tempData['quotation_amount'] = Number(original.quantity) * tempValue;
@@ -99,6 +97,7 @@ const QuotationContentModal = (props) => {
                         tempData['quotation_amount'] = Number(edited.quantity) * tempValue;
                     };
                 };
+                tempData['org_unit_price'] = tempValue;
             };
         };
          

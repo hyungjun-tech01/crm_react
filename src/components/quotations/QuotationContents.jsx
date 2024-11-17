@@ -52,7 +52,6 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
     };
 
     const handlePopupOpen = (open) => {
-        console.log('QuotationAdd / handlePopupOpen');
         if (open) {
             openModal("antModal");
         } else {
@@ -184,19 +183,26 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
         const target_name = event.target.name;
         const target_value = event.target.checked;
 
-        let tempSetting = { ...settingForContent };
+        const tempSetting = { ...settingForContent };
         switch (target_name) {
             case 'vat_included':
                 tempSetting.vat_included = target_value;
                 tempSetting.unit_vat_included_disabled = !target_value;
                 if (settingForContent.auto_calc) {
-                    const vat_amount = target_value ? data.sum_dc_applied * 0.1 : 0;
-                    const updatedAmount = {
+                    const tempTaxAmount = target_value ? data.quotation_amount * 0.1 : 0;
+                    const tempTotalAmount = data.quotation_amount + tempTaxAmount - data.cutoff_amount;
+                    const tempProfit = tempTotalAmount - data.total_cost_price;
+                    const tempProfitRate = data.total_cost_price !== 0
+                        ? tempProfit * 100 / tempTotalAmount
+                        : 0;
+                    const updatedAmounts = {
                         ...data,
-                        vat_amount: vat_amount,
-                        sum_final: data.sum_dc_applied + vat_amount - data.cut_off_amount,
+                        tax_amount: tempTaxAmount,
+                        total_quotation_amount: tempTotalAmount,
+                        profit: tempProfit,
+                        profit_rate: tempProfitRate,
                     };
-                    handleData(updatedAmount);
+                    handleData(updatedAmounts);
                 };
                 break;
             case 'unit_vat_included':
@@ -216,7 +222,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                         };
                     });
                     handleContents(updatedContents);
-                    handleChangeEachSum(updatedEachSums);
+                    handleChangeSubTotalAmount(updatedEachSums);
                     break;
                 }
             case 'total_only':
@@ -235,7 +241,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                         };
                     });
                     handleContents(updatedContents);
-                    handleChangeEachSum(target_value ? updatedEachSums / 1.1 : updatedEachSums);
+                    handleChangeSubTotalAmount(target_value ? updatedEachSums / 1.1 : updatedEachSums);
                     break;
                 }
             case 'auto_calc':
@@ -254,28 +260,31 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
     const handleCalculateAmounts = (items) => {
         let SumEachListPrice = 0, SumEachItems = 0;
         items.forEach(item => {
-            SumEachListPrice += item['13'];
+            SumEachListPrice += item['13']*item['12'];
             SumEachItems += item['16'];
         });
 
-        const dc_amount_new = SumEachItems*data.dc_rate*0.01;
-        const quotation_amount_new = SumEachItems - dc_amount_new;
-        const tax_amount_new = settingForContent.vat_included ? quotation_amount_new*0.1 : 0;
-        const total_amount_new = quotation_amount_new + tax_amount_new - data.cut_off_amount;
-        const profit_new = total_amount_new - data.total_cost_price;
+        const tempDcAmount = SumEachItems * data.dc_rate * 0.01;
+        const tempQuotationAmount = SumEachItems - tempDcAmount;
+        const tempTaxAmount = settingForContent.vat_included ? tempQuotationAmount*0.1 : 0;
+        const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cutoff_amount;
+        const tempProfit = tempTotalAmount - data.total_cost_price;
 
         const tempAmount = {
             ...data,
             list_price: SumEachListPrice,
-            list_price_dc: (SumEachListPrice - SumEachItems) * 100 / SumEachListPrice,
+            list_price_dc: SumEachListPrice !== 0 ? (SumEachListPrice - SumEachItems) * 100 / SumEachListPrice : 0,
             sub_total_amount: SumEachItems,
-            dc_amount: dc_amount_new,
-            quotation_amount: quotation_amount_new,
-            tax_amount: tax_amount_new,
-            total_quotation_amount: total_amount_new,
-            profit: profit_new,
-            profit_rate: profit_new * 100 / data.total_cost_price,
+            dc_amount: tempDcAmount,
+            quotation_amount: tempQuotationAmount,
+            tax_amount: tempTaxAmount,
+            total_quotation_amount: tempTotalAmount,
+            profit: tempProfit,
+            profit_rate: (!!data.total_cost_price && data.total_cost_price !== 0)
+                ? tempProfit * 100 / data.total_cost_price
+                : 0,
         };
+        console.log('handleCalculateAmounts : ', tempAmount);
         handleData(tempAmount);
 
     };
@@ -318,7 +327,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                 const tempDcAmount = value * settingForContent.dc_rate * 0.01;
                 const tempQuotationAmount = value - tempDcAmount;
                 const tempTaxAmount = settingForContent.vat_included ? tempQuotationAmount * 0.1 : 0;
-                const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cut_off_amount;
+                const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cutoff_amount;
                 const tempProfit = tempTotalAmount - data.total_cost_price;
                 updatedAmounts.list_dc = tempListDc;
                 updatedAmounts.dc_amount = tempDcAmount;
@@ -326,7 +335,9 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                 updatedAmounts.tax_amount = tempTaxAmount;
                 updatedAmounts.total_quotation_amount = tempTotalAmount;
                 updatedAmounts.profit = tempProfit;
-                updatedAmounts.profit_rate = tempProfit * 100 / tempTotalAmount;
+                updatedAmounts.profit_rate = data.total_cost_price !== 0
+                    ? tempProfit * 100 / data.total_cost_price
+                    : 0;
             };
             handleData(updatedAmounts);
         };
@@ -349,14 +360,16 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                 const tempDcAmount = data.sub_total_amount * value * 0.01;
                 const tempQuotationAmount = data.sub_total_amount - tempDcAmount;
                 const tempTaxAmount = settingForContent.vat_included ? tempQuotationAmount * 0.1 : 0;
-                const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cut_off_amount;
+                const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cutoff_amount;
                 const tempProfit = tempTotalAmount - data.total_cost_price;
                 updatedAmounts.dc_amount = tempDcAmount;
                 updatedAmounts.quotation_amount = tempQuotationAmount;
                 updatedAmounts.tax_amount = tempTaxAmount;
                 updatedAmounts.total_quotation_amount = tempTotalAmount;
                 updatedAmounts.profit = tempProfit;
-                updatedAmounts.profit_rate = tempProfit * 100 / tempTotalAmount;
+                updatedAmounts.profit_rate = data.total_cost_price !== 0
+                    ? tempProfit * 100 / data.total_cost_price
+                    : 0;
             };
             handleData(updatedAmounts);
         };
@@ -372,13 +385,15 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
             if (settingForContent.auto_calc) {
                 const tempQuotationAmount = data.sub_total_amount - value;
                 const tempTaxAmount = settingForContent.vat_included ? tempQuotationAmount * 0.1 : 0;
-                const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cut_off_amount;
+                const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cutoff_amount;
                 const tempProfit = tempTotalAmount - data.total_cost_price;
                 updatedAmounts.quotation_amount = tempQuotationAmount;
                 updatedAmounts.tax_amount = tempTaxAmount;
                 updatedAmounts.total_quotation_amount = tempTotalAmount;
                 updatedAmounts.profit = tempProfit;
-                updatedAmounts.profit_rate = tempProfit * 100 / tempTotalAmount;
+                updatedAmounts.profit_rate = data.total_cost_price !== 0
+                    ? tempProfit * 100 / data.total_cost_price
+                    : 0;
             };
             handleData(updatedAmounts);
         };
@@ -392,12 +407,14 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
             };
             if (settingForContent.auto_calc) {
                 const tempTaxAmount = settingForContent.vat_included ? value * 0.1 : 0;
-                const tempTotalAmount = value + tempTaxAmount - data.cut_off_amount;
+                const tempTotalAmount = value + tempTaxAmount - data.cutoff_amount;
                 const tempProfit = tempTotalAmount - data.total_cost_price;
                 updatedAmounts.tax_amount = tempTaxAmount;
                 updatedAmounts.total_quotation_amount = tempTotalAmount;
                 updatedAmounts.profit = tempProfit;
-                updatedAmounts.profit_rate = tempProfit * 100 / tempTotalAmount;
+                updatedAmounts.profit_rate = data.total_cost_price !== 0
+                    ? tempProfit * 100 / data.total_cost_price
+                    : 0;
             };
             handleData(updatedAmounts);
         };
@@ -410,11 +427,13 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                 tax_amount: value,
             };
             if (settingForContent.auto_calc) {
-                const tempTotalAmount = data.quotation_amount + value - data.cut_off_amount;
+                const tempTotalAmount = data.quotation_amount + value - data.cutoff_amount;
                 const tempProfit = tempTotalAmount - data.total_cost_price;
                 updatedAmounts.total_quotation_amount = tempTotalAmount;
                 updatedAmounts.profit = tempProfit;
-                updatedAmounts.profit_rate = tempProfit * 100 / tempTotalAmount;
+                updatedAmounts.profit_rate = data.total_cost_price !== 0
+                    ? tempProfit * 100 / data.total_cost_price
+                    : 0;
             };
             handleData(updatedAmounts);
         };
@@ -431,8 +450,11 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                 const tempProfit = tempTotalAmount - data.total_cost_price;
                 updatedAmounts.total_quotation_amount = tempTotalAmount;
                 updatedAmounts.profit = tempProfit;
-                updatedAmounts.profit_rate = tempProfit * 100 / tempTotalAmount;
+                updatedAmounts.profit_rate = data.total_cost_price !== 0
+                    ? tempProfit * 100 / data.total_cost_price
+                    : 0;
             };
+            console.log('handleChangeCutOffAmount : ', updatedAmounts);
             handleData(updatedAmounts);
         };
     };
@@ -446,7 +468,9 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
             if (settingForContent.auto_calc) {
                 const tempProfit = value - data.total_cost_price;
                 updatedAmounts.profit = tempProfit;
-                updatedAmounts.profit_rate = tempProfit * 100 / value;
+                updatedAmounts.profit_rate = data.total_cost_price !== 0
+                    ? tempProfit * 100 / data.total_cost_price
+                    : 0;
             };
             handleData(updatedAmounts);
         };
@@ -461,7 +485,9 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
             if (settingForContent.auto_calc) {
                 const tempProfit = data.total_quotation_amount - value;
                 updatedAmounts.profit = tempProfit;
-                updatedAmounts.profit_rate = tempProfit * 100 /data.total_quotation_amount;
+                updatedAmounts.profit_rate = value !== 0
+                    ? tempProfit * 100 / value
+                    : 0;
             };
             handleData(updatedAmounts);
         };
@@ -474,7 +500,9 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                 profit : value,
             };
             if (settingForContent.auto_calc) {
-                const tempProfitRate = value * 100 / data.total_quotation_amount;
+                const tempProfitRate =  data.total_cost_price !== 0
+                    ? value * 100 / data.total_cost_price
+                    : 0;
                 updatedAmounts.profit_rate = tempProfitRate;
             };
             handleData(updatedAmounts);
@@ -519,15 +547,27 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
         });
 
         setOrgContentModalValues({
-            product_name: null,
+            no: "",
             product_class_name: null,
-            detail_desc_on_off: '없음',
+            manufacturer: null,
+            model_name: null,
+            product_name: null,
+            material: null,
+            type: null,
+            color: null,
+            standard: null,
+            detail_desc_on_off: "없음",
+            unit: null,
+            quantity: 0,
+            list_price: 0,
+            dc_rate: 0,
+            unit_price: 0,
+            quotation_amount: 0,
+            cost_price: 0,
+            profit: 0,
+            note: null,
             detail_desc: null,
-            quantity: null,
-            cost_price: null,
-            reseller_price: null,
-            list_price: null,
-            quotation_amount: null,
+            org_unit_price: 0,
         });
 
         handlePopupOpen(true);
@@ -552,14 +592,12 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
             title: t('quotation.modify_content'),
         });
 
-        console.log('handleModifyContent:', data);
         const tempOrgContentValues = {};
         Object.keys(data).forEach(keyVal => {
             if (!!data[keyVal] && !!QuotationContentItems[keyVal]) {
                 tempOrgContentValues[QuotationContentItems[keyVal].name] = data[keyVal]
             };
         });
-        console.log('handleModifyContent:', tempOrgContentValues);
         setOrgContentModalValues(tempOrgContentValues);
 
         handlePopupOpen(true);
@@ -586,21 +624,9 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
             tempContents = filteredContents;
         });
 
-        let temp_total_amount = 0;
-        const finalContents = tempContents.map((item, index) => {
-            temp_total_amount += item['16'];
-            return { ...item, '1': index + 1 };
-        });
-
-        // const tempQuotation = {
-        //     ...quotationChange,
-        //     total_quotation_amount: temp_total_amount,
-        // };
-        // setQuotationChange(tempQuotation);
-        handleContents(finalContents);
-        handleCalculateAmounts(finalContents);
+        handleContents(tempContents);
+        handleCalculateAmounts(tempContents);
         setSelectedContentRowKeys([]);
-
     };
 
     const handleContentModalOk = () => {
@@ -858,7 +884,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                         <label >{t('quotation.total_list_price')}</label>
                         <InputNumber
                             name='list_price'
-                            defaultValue={0}
+                            defaultValue={data.list_price}
                             value={data.list_price}
                             disabled={settingForContent.auto_calc}
                             formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
@@ -890,9 +916,9 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             name='sub_total_amount'
                             defaultValue={0}
                             value={data.sub_total_amount}
+                            disabled={settingForContent.auto_calc}
                             formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            disabled={settingForContent.auto_calc}
                             onChange={handleChangeSubTotalAmount}
                             style={{
                                 width: 180,
@@ -903,11 +929,12 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                         <label >{t('quotation.dc_rate')}</label>
                         <InputNumber
                             name='dc_rate'
+                            defaultValue={0}
+                            value={data.dc_rate}
                             min={0}
                             max={100}
                             formatter={ConvertRate}
                             parser={(value) => value?.replace('%', '')}
-                            value={settingForContent.dc_rate}
                             onChange={handleChangeDCRate}
                             style={{
                                 width: 180,
@@ -920,9 +947,9 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             name='dc_amount'
                             defaultValue={0}
                             value={data.dc_amount}
+                            disabled={settingForContent.auto_calc}
                             formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            disabled={settingForContent.auto_calc}
                             onChange={handleChangeDCAmount}
                             style={{
                                 width: 180,
@@ -962,9 +989,9 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.cutoff_amount')}</label>
                         <InputNumber
-                            name='cut_off_amount'
+                            name='cutoff_amount'
                             defaultValue={0}
-                            value={data.cut_off_amount}
+                            value={data.cutoff_amount}
                             formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                             onChange={handleChangeCutOffAmount}
