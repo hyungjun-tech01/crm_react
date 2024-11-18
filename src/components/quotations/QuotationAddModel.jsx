@@ -242,7 +242,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
     vat_included_disabled: false, unit_vat_included_disabled: true, total_only_disabled: true, dc_rate: 0,
   });
   const [amountsForContent, setAmountsForContent] = useState({
-    sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
+    sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cutoff_amount: 0, sum_final: 0, total_cost_price: 0
   });
 
   const handleChangeContentSetting = (event) => {
@@ -259,7 +259,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
           const updatedAmount = {
             ...amountsForContent,
             vat_amount: vat_amount,
-            sum_final: amountsForContent.sum_dc_applied + vat_amount - amountsForContent.cut_off_amount,
+            sum_final: amountsForContent.sum_dc_applied + vat_amount - amountsForContent.cutoff_amount,
           };
           setAmountsForContent(updatedAmount);
         };
@@ -327,7 +327,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
     const dc_amount = sub_total_amount * settingForContent.dc_rate * 0.01;
     const sum_dc_applied = sub_total_amount - dc_amount;
     const vat_amount = settingForContent.vat_included ? sum_dc_applied * 0.1 : 0;
-    const sum_final = sum_dc_applied + vat_amount - amountsForContent.cut_off_amount;
+    const sum_final = sum_dc_applied + vat_amount - amountsForContent.cutoff_amount;
     const tempAmount = {
       ...amountsForContent,
       sub_total_amount: sub_total_amount,
@@ -353,7 +353,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
       updatedAmount.dc_amount = dc_amount;
       updatedAmount.sum_dc_applied = sum_dc_applied;
       updatedAmount.vat_amount = vat_amount;
-      updatedAmount.sum_final = sum_dc_applied + vat_amount - amountsForContent.cut_off_amount;
+      updatedAmount.sum_final = sum_dc_applied + vat_amount - amountsForContent.cutoff_amount;
     };
     setAmountsForContent(updatedAmount);
   };
@@ -374,7 +374,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
         dc_amount: dc_amount,
         sum_dc_applied: sum_dc_applied,
         vat_amount: vat_amount,
-        sum_final: sum_dc_applied + vat_amount - amountsForContent.cut_off_amount,
+        sum_final: sum_dc_applied + vat_amount - amountsForContent.cutoff_amount,
       };
       setAmountsForContent(tempAmount);
     };
@@ -390,7 +390,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
       const vat_amount = settingForContent.vat_included ? sum_dc_applied * 0.1 : 0;
       updatedAmount.sum_dc_applied = sum_dc_applied;
       updatedAmount.vat_amount = vat_amount;
-      updatedAmount.sum_final = sum_dc_applied + vat_amount - amountsForContent.cut_off_amount;
+      updatedAmount.sum_final = sum_dc_applied + vat_amount - amountsForContent.cutoff_amount;
     };
     setAmountsForContent(updatedAmount);
   };
@@ -403,7 +403,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
     if (settingForContent.auto_calc) {
       const vat_amount = settingForContent.vat_included ? value * 0.1 : 0;
       updatedAmount.vat_amount = vat_amount;
-      updatedAmount.sum_final = value + vat_amount - amountsForContent.cut_off_amount;
+      updatedAmount.sum_final = value + vat_amount - amountsForContent.cutoff_amount;
     };
     setAmountsForContent(updatedAmount);
   };
@@ -414,7 +414,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
       vat_amount: value,
     };
     if (settingForContent.auto_calc) {
-      updatedAmount.sum_final = amountsForContent.sum_dc_applied + value - amountsForContent.cut_off_amount;
+      updatedAmount.sum_final = amountsForContent.sum_dc_applied + value - amountsForContent.cutoff_amount;
     };
     setAmountsForContent(updatedAmount);
   };
@@ -422,7 +422,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
   const handleChangeCutOffAmount = (value) => {
     let updatedAmount = {
       ...amountsForContent,
-      cut_off_amount: value
+      cutoff_amount: value
     };
     if (settingForContent.auto_calc) {
       updatedAmount.sum_final = amountsForContent.sum_dc_applied + amountsForContent.vat_amount - value;
@@ -697,7 +697,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
     };
 
     setAmountsForContent({
-      sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cut_off_amount: 0, sum_final: 0, total_cost_price: 0
+      sub_total_amount: 0, dc_amount: 0, sum_dc_applied: 0, vat_amount: 0, cutoff_amount: 0, sum_final: 0, total_cost_price: 0
     });
 
     setIsContentModalOpen(false);
@@ -835,7 +835,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
       dc_amount: amountsForContent.dc_amount,
       quotation_amount: amountsForContent.sum_dc_applied,
       tax_amount: amountsForContent.vat_amount,
-      cutoff_amount: amountsForContent.cut_off_amount,
+      cutoff_amount: amountsForContent.cutoff_amount,
       total_quotation_amount: amountsForContent.sum_final,
       total_cost_price: amountsForContent.total_cost_price,
       quotation_table: ConvertHeaderInfosToString(contentColumns),
@@ -1281,9 +1281,9 @@ const QuotationAddModel = ({ init, handleInit }) => {
                   <Space.Compact direction="vertical">
                     <label >{t('quotation.cutoff_amount')}</label>
                     <InputNumber
-                      name='cut_off_amount'
+                      name='cutoff_amount'
                       defaultValue={0}
-                      value={amountsForContent.cut_off_amount}
+                      value={amountsForContent.cutoff_amount}
                       formatter={ConvertCurrency}
                       parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                       onChange={handleChangeCutOffAmount}

@@ -127,7 +127,7 @@ const QuotationDetailsModel = () => {
     dc_amount: 0,
     quotation_amount: 0,
     tax_amount: 0,
-    cut_off_amount: 0,
+    cutoff_amount: 0,
     total_quotation_amount: 0,
     total_cost_price: 0,
     profit: 0,
@@ -194,7 +194,7 @@ const QuotationDetailsModel = () => {
     if(contentData.dc_amount !== data.dc_amount) updatedValues['dc_amount'] = data.dc_amount;
     if(contentData.quotation_amount !== data.quotation_amount) updatedValues['quotation_amount'] = data.quotation_amount;
     if(contentData.tax_amount !== data.tax_amount) updatedValues['tax_amount'] = data.tax_amount;
-    if(contentData.cut_off_amount !== data.cut_off_amount) updatedValues['cut_off_amount'] = data.cut_off_amount;
+    if(contentData.cutoff_amount !== data.cutoff_amount) updatedValues['cutoff_amount'] = data.cutoff_amount;
     if(contentData.total_quotation_amount !== data.total_quotation_amount) updatedValues['total_quotation_amount'] = data.total_quotation_amount;
     if(contentData.total_cost_price !== data.total_cost_price) updatedValues['total_cost_price'] = data.total_cost_price;
     if(contentData.profit !== data.profit) updatedValues['profit'] = data.profit;
@@ -298,7 +298,7 @@ const QuotationDetailsModel = () => {
     const dcAmount = Number(selectedQuotation.dc_amount);
     const quotationAmount = Number(selectedQuotation.quotation_amount);
     const taxAmount = Number(selectedQuotation.tax_amount);
-    const cutOffAmount = Number(selectedQuotation.cut_off_amount);
+    const cutOffAmount = Number(selectedQuotation.cutoff_amount);
     const totalQuotationAmount = Number(selectedQuotation.total_quotation_amount);
     const totalCostPrice = Number(selectedQuotation.total_cost_price);
     const profit = Number(selectedQuotation.profit);
@@ -313,7 +313,7 @@ const QuotationDetailsModel = () => {
       dc_amount: isNaN(dcAmount) ? 0 : dcAmount,
       quotation_amount: isNaN(quotationAmount) ? 0 : quotationAmount,
       tax_amount: isNaN(taxAmount) ? 0 : taxAmount,
-      cut_off_amount: isNaN(cutOffAmount) ? 0 : cutOffAmount,
+      cutoff_amount: isNaN(cutOffAmount) ? 0 : cutOffAmount,
       total_quotation_amount: isNaN(totalQuotationAmount) ? 0 : totalQuotationAmount,
       total_cost_price: isNaN(totalCostPrice) ? 0 : totalCostPrice,
       profit: isNaN(profit) ? 0 : profit,
