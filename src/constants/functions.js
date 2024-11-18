@@ -79,6 +79,22 @@ export const ConvertCurrency = (amount, fixed = 0) => {
         : `&#8361;${ret?.toFixed(fixed)}`.replace(/\d(?=(\d{3})+\.)/g, '$&,');
 };
 
+export const ConvertCurrency0 = (amount, fixed = 0) => {
+    if(amount === undefined || amount === null || amount === '') return "";
+
+    let ret = amount;
+    if(typeof amount === 'string') {
+        ret = Number(amount);
+        if(isNaN(ret)) return amount;
+    } else if(typeof amount !== 'number'){
+        return NaN;
+    };
+
+    return fixed === 0 
+        ? ret.toLocaleString({ style: 'currency'})
+        : `&#8361;${ret?.toFixed(fixed)}`.replace(/\d(?=(\d{3})+\.)/g, '$&,');
+};
+
 export const ConvertRate = (amount) => {
     if(amount === undefined || amount === null || amount === '') return "";
 

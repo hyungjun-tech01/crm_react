@@ -28,7 +28,7 @@ const DateInput = (props) => {
                     </span>
                     {showTime ?
                         <DatePicker
-                            className="ant-input css-dev-only-do-not-override-5wsri9 ant-input-outlined"
+                            className="ant-input-custom css-dev-only-do-not-override-5wsri9 ant-input-outlined"
                             name={name}
                             selected={value}
                             onChange={onChange}
@@ -37,7 +37,7 @@ const DateInput = (props) => {
                             disabled={disabled}
                         /> :
                         <DatePicker
-                            className="ant-input css-dev-only-do-not-override-5wsri9 ant-input-outlined"
+                            className="ant-input-custom css-dev-only-do-not-override-5wsri9 ant-input-outlined"
                             name={name}
                             selected={value}
                             onChange={onChange}
@@ -65,7 +65,6 @@ const TextareaInput = (props) => {
                         {addonBefore}
                     </span>
                     <Input.TextArea
-                        // className="ant-input detail-input-extra"
                         name={name}
                         rows={row_no}
                         placeholder={title}
@@ -161,7 +160,7 @@ const AddressInput = (props) => {
                         {addonBefore}
                     </span>
                     <input
-                        className="ant-input detail-input-extra"
+                        className="ant-input-custom detail-input-extra"
                         name={name}
                         placeholder={title}
                         onChange={handleChange}
@@ -210,7 +209,7 @@ const SearchInput = (props) => {
                         {addonBefore}
                     </span>
                     <input
-                        className="ant-input detail-input-extra"
+                        className="ant-input-custom detail-input-extra"
                         name={name}
                         placeholder={title}
                         style={{ backgroundColor: 'white', borderTopRightRadius: '5px', borderBottomRightRadius: '5px' }}

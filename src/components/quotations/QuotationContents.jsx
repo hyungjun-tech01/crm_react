@@ -3,7 +3,7 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Resizable } from 'react-resizable';
-import { Button, Checkbox, Flex, InputNumber, Modal, Space, Table } from 'antd';
+import { Button, Checkbox, Flex, Input, InputNumber, Modal, Space, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { AddBoxOutlined, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
 
@@ -12,7 +12,7 @@ import { SettingsRepo } from '../../repository/settings';
 
 import QuotationContentModal from "./QuotationContentModal";
 import MessageModal from "../../constants/MessageModal";
-import { ConvertCurrency, ConvertRate } from "../../constants/functions";
+import { ConvertCurrency, ConvertCurrency0, ConvertRate } from "../../constants/functions";
 
 
 const ResizeableTitle = props => {
@@ -176,6 +176,10 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
         title: '',
         vat_included: false, unit_vat_included: false, total_only: false, auto_calc: true, show_decimal: false,
         vat_included_disabled: false, unit_vat_included_disabled: true, total_only_disabled: true, dc_rate: 0,
+    });
+    const [stringsForAmount, setStringsForAmount] = useState({
+        list_price: "0", list_price_dc: "0", sub_total_amount: "0", dc_rate: "0", dc_amount: "0", quotation_amount: "0",
+        tax_amount: "0", cutoff_amount: "0", total_quotation_amount: "0", total_cost_price: "0", profit: "0", profit_rate: "0"
     });
 
 
@@ -718,65 +722,6 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
     }, []);
 
 
-    //===== useEffect functions =============================================== 
-    // useEffect(() => {
-    //     console.log('QuotationContents / useEffect');
-    //     if (!columns || columns.length === 0) {
-    //         if (!cookies.myQuotationAddColumns) {
-    //             const tempQuotationColumn = QuotationDefaultColumns.forEach(item => {
-    //                 const ret = {
-    //                     title: t(item.title),
-    //                     dataIndex: item.dataIndex,
-    //                     render: QuotationContentItems[item.dataIndex].type === 'price'
-    //                         ? (text, record) => <>{ConvertCurrency(text)}</>
-    //                         : (text, record) => <>{text}</>,
-    //                 };
-    //                 if (!!item.width) {
-    //                     ret['width'] = item.width;
-    //                 }
-    //                 return ret;
-    //             });
-    //             const tempCookieValue = {
-    //                 [cookies.myLationCrmUserId]: tempQuotationColumn
-    //             }
-    //             handleColumns(tempQuotationColumn);
-    //             setCookie('myQuotationAddColumns', tempCookieValue);
-    //         } else {
-    //             const columnSettings = cookies.myQuotationAddColumns[cookies.myLationCrmUserId];
-    //             if (!columnSettings) {
-    //                 const tempQuotationColumn = QuotationDefaultColumns.forEach(item => {
-    //                     const ret = {
-    //                         title: t(item.title),
-    //                         dataIndex: item.dataIndex,
-    //                         render: QuotationContentItems[item.dataIndex].type === 'price'
-    //                             ? (text, record) => <>{ConvertCurrency(text)}</>
-    //                             : (text, record) => <>{text}</>,
-    //                     };
-    //                     if (!!item.width) {
-    //                         ret['width'] = item.width;
-    //                     }
-    //                     return ret;
-    //                 });
-    //                 const tempCookieValue = {
-    //                     ...cookies.myQuotationAddColumns,
-    //                     [cookies.myLationCrmUserId]: tempQuotationColumn
-    //                 };
-    //                 handleColumns(tempQuotationColumn);
-    //                 setCookie('myQuotationAddColumns', tempCookieValue);
-    //             } else {
-    //                 const tempQuotationColumn = columnSettings.map(col => ({
-    //                     ...col,
-    //                     render: QuotationContentItems[col.dataIndex].type === 'price'
-    //                         ? (text, record) => <>{ConvertCurrency(text)}</>
-    //                         : (text, record) => <>{text}</>,
-    //                 }));
-    //                 handleColumns(tempQuotationColumn);
-    //             };
-    //         };
-    //     };
-    // }, [cookies.myQuotationAddColumns, columns]);
-    
-
     return (
         <>
             <h4 className="h4-price">
@@ -882,7 +827,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                 <Flex wrap gap="small">
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.total_list_price')}</label>
-                        <InputNumber
+                        {/* <InputNumber
                             name='list_price'
                             defaultValue={data.list_price}
                             value={data.list_price}
@@ -893,11 +838,20 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             style={{
                                 width: 180,
                             }}
+                        /> */}
+                        <Input
+                            name='list_price'
+                            prefix='&#8361;'
+                            defaultValue={data.list_price}
+                            value={ConvertCurrency0(data.list_price, settingForContent.show_decimal ? 4 : 0)}
+                            disabled={settingForContent.auto_calc}
+                            onChange={handleChangeTotalListPrice}
+                            style={{ width: 180, height: 32 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.total_list_price_dc_rate')}</label>
-                        <InputNumber
+                        {/* <InputNumber
                             name='list_price_dc'
                             defaultValue={0}
                             value={data.list_price_dc}
@@ -908,11 +862,20 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             style={{
                                 width: 180,
                             }}
+                        /> */}
+                        <Input
+                            name='list_price_dc'
+                            suffix='%'
+                            defaultValue={data.list_price_dc}
+                            value={data.list_price_dc}
+                            disabled={settingForContent.auto_calc}
+                            onChange={handleChangeTotalListPriceDCRate}
+                            style={{ width: 180, height: 32 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label>{t('quotation.sub_total_amount')}</label>
-                        <InputNumber
+                        {/* <InputNumber
                             name='sub_total_amount'
                             defaultValue={0}
                             value={data.sub_total_amount}
@@ -923,11 +886,20 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             style={{
                                 width: 180,
                             }}
+                        /> */}
+                        <Input
+                            name='sub_total_amount'
+                            prefix='&#8361;'
+                            defaultValue={data.sub_total_amount}
+                            value={ConvertCurrency0(data.sub_total_amount, settingForContent.show_decimal ? 4 : 0)}
+                            disabled={settingForContent.auto_calc}
+                            onChange={handleChangeSubTotalAmount}
+                            style={{ width: 180, height: 32 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.dc_rate')}</label>
-                        <InputNumber
+                        {/* <InputNumber
                             name='dc_rate'
                             defaultValue={0}
                             value={data.dc_rate}
@@ -939,11 +911,20 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             style={{
                                 width: 180,
                             }}
+                        /> */}
+                        <Input
+                            name='dc_rate'
+                            suffix='%'
+                            defaultValue={data.dc_rate}
+                            value={data.dc_rate}
+                            disabled={settingForContent.auto_calc}
+                            onChange={handleChangeDCRate}
+                            style={{ width: 180, height: 32 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.dc_amount')}</label>
-                        <InputNumber
+                        {/* <InputNumber
                             name='dc_amount'
                             defaultValue={0}
                             value={data.dc_amount}
@@ -954,11 +935,20 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             style={{
                                 width: 180,
                             }}
+                        /> */}
+                        <Input
+                            name='dc_amount'
+                            prefix='&#8361;'
+                            defaultValue={data.dc_amount}
+                            value={ConvertCurrency0(data.dc_amount, settingForContent.show_decimal ? 4 : 0)}
+                            disabled={settingForContent.auto_calc}
+                            onChange={handleChangeDCAmount}
+                            style={{ width: 180, height: 32 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.quotation_amount')}</label>
-                        <InputNumber
+                        {/* <InputNumber
                             name='quotation_amount'
                             defaultValue={0}
                             value={data.quotation_amount}
@@ -969,11 +959,20 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             style={{
                                 width: 180,
                             }}
+                        /> */}
+                        <Input
+                            name='quotation_amount'
+                            prefix='&#8361;'
+                            defaultValue={data.quotation_amount}
+                            value={ConvertCurrency0(data.quotation_amount, settingForContent.show_decimal ? 4 : 0)}
+                            disabled={settingForContent.auto_calc}
+                            onChange={handleChangeQuotationAmount}
+                            style={{ width: 180, height: 32 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.tax_amount')}</label>
-                        <InputNumber
+                        {/* <InputNumber
                             name='tax_amount'
                             defaultValue={0}
                             value={data.tax_amount}
@@ -984,11 +983,20 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             style={{
                                 width: 180,
                             }}
+                        /> */}
+                        <Input
+                            name='tax_amount'
+                            prefix='&#8361;'
+                            defaultValue={data.tax_amount}
+                            value={ConvertCurrency0(data.tax_amount, settingForContent.show_decimal ? 4 : 0)}
+                            disabled={settingForContent.auto_calc}
+                            onChange={handleChangeTaxAmount}
+                            style={{ width: 180, height: 32 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.cutoff_amount')}</label>
-                        <InputNumber
+                        {/* <InputNumber
                             name='cutoff_amount'
                             defaultValue={0}
                             value={data.cutoff_amount}
@@ -998,11 +1006,19 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             style={{
                                 width: 180,
                             }}
+                        /> */}
+                        <Input
+                            name='cutoff_amount'
+                            prefix='&#8361;'
+                            defaultValue={data.cutoff_amount}
+                            value={ConvertCurrency0(data.cutoff_amount, settingForContent.show_decimal ? 4 : 0)}
+                            onChange={handleChangeCutOffAmount}
+                            style={{ width: 180, height: 32 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.total_quotation_amount')}</label>
-                        <InputNumber
+                        {/* <InputNumber
                             name='total_quotation_amount'
                             defaultValue={0}
                             value={data.total_quotation_amount}
@@ -1013,11 +1029,20 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             style={{
                                 width: 180,
                             }}
+                        /> */}
+                        <Input
+                            name='total_quotation_amount'
+                            prefix='&#8361;'
+                            defaultValue={data.total_quotation_amount}
+                            value={ConvertCurrency0(data.total_quotation_amount, settingForContent.show_decimal ? 4 : 0)}
+                            disabled={settingForContent.auto_calc}
+                            onChange={handleChangeTotalQuotationAmount}
+                            style={{ width: 180, height: 32 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.total_cost_price')}</label>
-                        <InputNumber
+                        {/* <InputNumber
                             name='total_cost_price'
                             defaultValue={0}
                             value={data.total_cost_price}
@@ -1027,11 +1052,19 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             style={{
                                 width: 180,
                             }}
+                        /> */}
+                        <Input
+                            name='total_cost_price'
+                            prefix='&#8361;'
+                            defaultValue={data.total_cost_price}
+                            value={ConvertCurrency0(data.total_cost_price, settingForContent.show_decimal ? 4 : 0)}
+                            onChange={handleChangeTotalCostPrice}
+                            style={{ width: 180, height: 32 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.profit')}</label>
-                        <InputNumber
+                        {/* <InputNumber
                             name='profit'
                             defaultValue={0}
                             value={data.profit}
@@ -1042,11 +1075,20 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             style={{
                                 width: 180,
                             }}
+                        /> */}
+                        <Input
+                            name='profit'
+                            prefix='&#8361;'
+                            defaultValue={data.profit}
+                            value={ConvertCurrency0(data.profit, settingForContent.show_decimal ? 4 : 0)}
+                            disabled={settingForContent.auto_calc}
+                            onChange={handleChangeProfit}
+                            style={{ width: 180, height: 32 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.profit_rate')}</label>
-                        <InputNumber
+                        {/* <InputNumber
                             name='profit_rate'
                             defaultValue={0}
                             value={data.profit_rate}
@@ -1057,6 +1099,15 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                             style={{
                                 width: 180,
                             }}
+                        /> */}
+                        <Input
+                            name='profit_rate'
+                            suffix='%'
+                            defaultValue={data.profit_rate}
+                            value={data.profit_rate}
+                            disabled={settingForContent.auto_calc}
+                            onChange={handleChangeProfitRate}
+                            style={{ width: 180, height: 32 }}
                         />
                     </Space.Compact>
                 </Flex>
