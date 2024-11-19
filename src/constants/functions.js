@@ -76,7 +76,7 @@ export const ConvertCurrency = (amount, fixed = 0) => {
 
     return fixed === 0 
         ? ret.toLocaleString('ko-KR', { style: 'currency', currency: 'KRW' })
-        : `₩${ret?.toFixed(fixed)}`.replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        : `₩ ${ret?.toFixed(fixed)}`.replace(/\d(?=(\d{3})+\.)/g, '$&,');
 };
 
 export const ConvertCurrency0 = (amount, fixed = 0) => {
@@ -92,7 +92,7 @@ export const ConvertCurrency0 = (amount, fixed = 0) => {
 
     return fixed === 0 
         ? ret.toLocaleString({ style: 'currency'})
-        : `₩${ret?.toFixed(fixed)}`.replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        : `₩ ${ret?.toFixed(fixed)}`.replace(/\d(?=(\d{3})+\.)/g, '$&,');
 };
 
 export const ConvertRate = (amount) => {
