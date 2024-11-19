@@ -69,38 +69,83 @@ const QuotationContentModal = (props) => {
     };
     const handleValue = (event) => {
         const targetName = event.target.name;
-        const targetValue = event.target.value.replace(/[^\d.-]/g, '');
-        const tempValue = Number(targetValue);
+        const targetValue = event.target.value;
 
         let tempData = { ...edited };
-        if(isNaN(tempValue)){
-            tempData[targetName] = targetValue;
-        } else {
+        if(targetName === 'quantity'
+            || targetName === 'list_price'
+            || targetName === 'unit_price'
+            || targetName === 'quotation_amount'
+            || targetName === 'cost_price'
+            || targetName === 'profit'
+        ) {
+            const tempValue = Number(targetValue.replace(/\$\s?|(,*)/g, ''));
+            if(isNaN(tempValue)) return;
+
             tempData[targetName] = tempValue;
             if(targetName === 'quantity') {
-                if(!edited['unit_price']) {
-                    if(!!original.unit_price && !isNaN(Number(original.unit_price))) {
-                        tempData['quotation_amount'] = Number(original.unit_price) * tempValue;
-                    };
+                const tempUnitPrice = edited['unit_price'] || original['unit_price'];
+                if(!tempUnitPrice) {
+                    tempData['quotation_amount'] = 0;
                 } else {
-                    if(!isNaN(Number(edited['unit_price']))) {
-                        tempData['quotation_amount'] = Number(edited.unit_price) * tempValue;
-                    };
+                    tempData['quotation_amount'] = tempUnitPrice * tempValue;
                 };
-            } else if (targetName === 'unit_price') {
-                if(!edited['quantity']) {
-                    if(!!original.quantity && !isNaN(Number(original.quantity))) {
-                        tempData['quotation_amount'] = Number(original.quantity) * tempValue;
-                    };
+
+                const tempCostPrice = edited['cost_price'] || original['cost_price'];
+                if(!tempCostPrice) {
+                    tempData['profit'] = tempData['quotation_amount'];
                 } else {
-                    if(!isNaN(Number(edited['quantity']))) {
-                        tempData['quotation_amount'] = Number(edited.quantity) * tempValue;
-                    };
+                    tempData['profit'] = tempData['quotation_amount'] - tempCostPrice;
                 };
+            }
+            else if(targetName === 'list_price') {
+                const tempUnitPrice = edited['unit_price'] || original['unit_price'];
+                if(!tempUnitPrice) {
+                    tempData['dc_rate'] = 0;
+                } else {
+                    tempData['dc_rate'] = (tempValue - tempUnitPrice) * 100 / tempValue;
+                };
+            } else if(targetName === 'unit_price') {
+                const tempListPrice = edited['list_price'] || original['list_price'];
+                if(!tempListPrice) {
+                    tempData['dc_rate'] = 0;
+                } else {
+                    tempData['dc_rate'] = (tempListPrice - tempValue) * 100 / tempListPrice;
+                };
+
+                const tempQuantity =  edited['quantity'] || original['quantity'];
+                if(!tempQuantity) {
+                    tempData['quotation_amount'] = 0;
+                } else {
+                    tempData['quotation_amount'] = tempQuantity * tempValue;
+                };
+
+                const tempCostPrice = edited['cost_price'] || original['cost_price'];
+                if(!tempCostPrice) {
+                    tempData['profit'] = tempData['quotation_amount'];
+                } else {
+                    tempData['profit'] = tempData['quotation_amount'] - tempCostPrice;
+                };
+
                 tempData['org_unit_price'] = tempValue;
-            };
-        };
-         
+            } else if(targetName === 'cost_price') {
+                const tempQuotationPrice = edited['quotation_amount'] || original['quotation_amount'];
+                if(!tempQuotationPrice) {
+                    tempData['profit'] = 0;
+                } else {
+                    tempData['profit'] = tempQuotationPrice - tempValue;
+                };
+            } else if(targetName === 'profit') {
+                const tempQuotationPrice = edited['quotation_amount'] || original['quotation_amount'];
+                if(!tempQuotationPrice) {
+                    tempData['cost_price'] = 0;
+                } else {
+                    tempData['cost_price'] = tempQuotationPrice - tempValue;
+                };
+            }
+        } else {
+            tempData[targetName]= targetValue;
+        }
         handleEdited(tempData);
     };
 
@@ -122,7 +167,6 @@ const QuotationContentModal = (props) => {
     }, []);
 
     useEffect(() => {
-        console.log('QuotationContentModal / useEffect');
         if(!open) return;
 
         const detailOnOff = !!edited['detail_desc_on_off'] ? edited.detail_desc_on_off : original.detail_desc_on_off;
@@ -151,15 +195,27 @@ const QuotationContentModal = (props) => {
                     });
                     needAddproduct = false;
                 };
-                const tempDetail = selectedItem.type === 'label'
-                    ? {type: 'label', extra: 'long'}
-                    : ( selectedItem.type === 'select'
-                        ? { type: 'select', options: detail_spec_desc_select, extra: 'long' }
-                        : ( selectedItem.type === 'price'
-                            ? { type: 'label', extra: 'long', price: true, decimal: setting.show_decimal }
-                            : { type: 'textarea', row_no: 5, extra: 'long' }
-                        )
-                );
+                let tempDetail = {}
+                switch(selectedItem.type){
+                    case 'label':
+                        tempDetail = {type: 'label', extra: 'long'};
+                        break;
+                    case 'select':
+                        tempDetail = { type: 'select', options: detail_spec_desc_select, extra: 'long' };
+                        break;
+                    case 'price':
+                        tempDetail = { type: 'label', extra: 'long', price: true, decimal: setting.show_decimal };
+                        break;
+                    case 'price0':
+                        tempDetail = { type: 'label', extra: 'long', price0: true, decimal: setting.show_decimal };
+                        break;
+                    case 'value':
+                        tempDetail = { type: 'label', extra: 'long', value: true, decimal: setting.show_decimal };
+                        break;
+                    default:
+                        tempDetail = { type: 'textarea', row_no: 5, extra: 'long' };
+                        break;
+                };
                 tempContentItems.push({
                     name: QuotationContentItems[item.dataIndex].name,
                     title: t(QuotationContentItems[item.dataIndex].title),

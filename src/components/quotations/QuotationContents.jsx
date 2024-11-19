@@ -3,7 +3,7 @@ import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Resizable } from 'react-resizable';
-import { Button, Checkbox, Flex, Input, InputNumber, Modal, Space, Table } from 'antd';
+import { Button, Checkbox, Flex, Input, Modal, Space, Table } from 'antd';
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { AddBoxOutlined, IndeterminateCheckBoxOutlined, SettingsOutlined } from '@mui/icons-material';
 
@@ -12,7 +12,7 @@ import { SettingsRepo } from '../../repository/settings';
 
 import QuotationContentModal from "./QuotationContentModal";
 import MessageModal from "../../constants/MessageModal";
-import { ConvertCurrency, ConvertCurrency0, ConvertRate } from "../../constants/functions";
+import { ConvertCurrency, ConvertCurrency0 } from "../../constants/functions";
 
 
 const ResizeableTitle = props => {
@@ -177,11 +177,6 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
         vat_included: false, unit_vat_included: false, total_only: false, auto_calc: true, show_decimal: false,
         vat_included_disabled: false, unit_vat_included_disabled: true, total_only_disabled: true, dc_rate: 0,
     });
-    const [stringsForAmount, setStringsForAmount] = useState({
-        list_price: "0", list_price_dc: "0", sub_total_amount: "0", dc_rate: "0", dc_amount: "0", quotation_amount: "0",
-        tax_amount: "0", cutoff_amount: "0", total_quotation_amount: "0", total_cost_price: "0", profit: "0", profit_rate: "0"
-    });
-
 
     const handleChangeContentSetting = (event) => {
         const target_name = event.target.name;
@@ -214,9 +209,15 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                     tempSetting.vat_included_disabled = target_value;
                     tempSetting.unit_vat_included = target_value;
                     tempSetting.total_only_disabled = !target_value;
+
                     let updatedEachSums = 0;
                     const updatedContents = contents.map(item => {
-                        const newPrice = (target_value && !settingForContent.total_only) ? item['org_unit_price'] / 1.1 : item['org_unit_price'];
+                        let newPrice = 0;
+                        if(!!item['org_unit_price']) {
+                            newPrice = (target_value && !settingForContent.total_only) ? item['org_unit_price'] / 1.1 : item['org_unit_price'];
+                        } else {
+                            newPrice = (target_value && !settingForContent.total_only) ? item['unit_price'] / 1.1 : item['unit_price'] * 1.1;
+                        };
                         const updatedAmount = newPrice * item['12'];
                         updatedEachSums += updatedAmount;
                         return {
@@ -226,7 +227,22 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                         };
                     });
                     handleContents(updatedContents);
-                    handleChangeSubTotalAmount(updatedEachSums);
+
+                    const tempQuotationAmount = updatedEachSums;
+                    const tempTaxAmount = settingForContent.vat_included ? tempQuotationAmount * 0.1 : 0;
+                    const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cutoff_amount;
+                    const tempProfit = tempTotalAmount - data.total_cost_price;
+                    const updatedAmounts = {
+                        ...data,
+                        quotation_amount: tempQuotationAmount,
+                        tax_amount: tempTaxAmount,
+                        total_quotation_amount: tempTotalAmount,
+                        profit: tempProfit,
+                        profit_rate: data.total_cost_price !== 0
+                            ? tempProfit * 100 / data.total_cost_price
+                            : 0
+                    };
+                    handleData(updatedAmounts);
                     break;
                 }
             case 'total_only':
@@ -245,7 +261,23 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                         };
                     });
                     handleContents(updatedContents);
-                    handleChangeSubTotalAmount(target_value ? updatedEachSums / 1.1 : updatedEachSums);
+                    
+                    const tempQuotationAmount = target_value ? updatedEachSums / 1.1 : updatedEachSums;
+                    const tempTaxAmount = settingForContent.vat_included ? tempQuotationAmount * 0.1 : 0;
+                    const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cutoff_amount;
+                    const tempProfit = tempTotalAmount - data.total_cost_price;
+                    const updatedAmounts = {
+                        ...data,
+                        quotation_amount: tempQuotationAmount,
+                        tax_amount: tempTaxAmount,
+                        total_quotation_amount: tempTotalAmount,
+                        profit: tempProfit,
+                        profit_rate: data.total_cost_price !== 0
+                            ? tempProfit * 100 / data.total_cost_price
+                            : 0
+                    };
+                    handleData(updatedAmounts);
+                    
                     break;
                 }
             case 'auto_calc':
@@ -270,263 +302,208 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
 
         const tempDcAmount = SumEachItems * data.dc_rate * 0.01;
         const tempQuotationAmount = SumEachItems - tempDcAmount;
-        const tempTaxAmount = settingForContent.vat_included ? tempQuotationAmount*0.1 : 0;
+        const tempTaxAmount = settingForContent.vat_included ? tempQuotationAmount * 0.1 : 0;
         const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cutoff_amount;
         const tempProfit = tempTotalAmount - data.total_cost_price;
+        const tempPriceDCRate = SumEachListPrice !== 0 ? (SumEachListPrice - SumEachItems) * 100 / SumEachListPrice : 0;
+        const tempProfitRate = (!!data.total_cost_price && data.total_cost_price !== 0)
+            ? tempProfit * 100 / data.total_cost_price
+            : 0;
 
         const tempAmount = {
             ...data,
             list_price: SumEachListPrice,
-            list_price_dc: SumEachListPrice !== 0 ? (SumEachListPrice - SumEachItems) * 100 / SumEachListPrice : 0,
+            list_price_dc: tempPriceDCRate - Math.floor(tempPriceDCRate) > 0 ?  tempPriceDCRate.toFixed(2) : tempPriceDCRate,
             sub_total_amount: SumEachItems,
             dc_amount: tempDcAmount,
             quotation_amount: tempQuotationAmount,
             tax_amount: tempTaxAmount,
             total_quotation_amount: tempTotalAmount,
             profit: tempProfit,
-            profit_rate: (!!data.total_cost_price && data.total_cost_price !== 0)
-                ? tempProfit * 100 / data.total_cost_price
-                : 0,
+            profit_rate: tempProfitRate - Math.floor(tempProfitRate) > 0 ? tempProfitRate.toFixed(2) : tempProfitRate,
         };
-        console.log('handleCalculateAmounts : ', tempAmount);
         handleData(tempAmount);
 
     };
 
-    //===== Handles to change each values related to prices =======================================
-    const handleChangeTotalListPrice = (value) => {
-        if(data.list_price !== value) {
-            const updatedAmounts = {
-                ...data,
-                list_price: value,
-            };
-            if (settingForContent.auto_calc) {
-                updatedAmounts.list_price_dc = (value - data.sub_total_amount) * 100 / value;
-            };
-            handleData(updatedAmounts);
-        }
-    };
+    //===== Handles to change each values related to amounts =======================================
+    const handleChangeAmounts = (e) => {
+        const targetName = e.target.name;
+        const targetValue = e.target.value;
 
-    const handleChangeTotalListPriceDCRate = (value) => {
-        if(data.list_price_dc !== value) {
+        const value = Number(targetValue.replace(/\$\s?|(,*)/g, ''));
+        if(isNaN(value)) {
+            console.log('handleChangeAmounts / value is NaN :', targetValue);
+            return;
+        };
+        if(data[targetName] === undefined || data[targetName] === null) {
+            console.log('handleChangeAmounts / name is not in content :', targetName);
+            return;
+        };
+        if(data[targetName] !== value) {
             const updatedAmounts = {
                 ...data,
-                list_price_dc: value,
+                [targetName]: value
             };
             if (settingForContent.auto_calc) {
-                updatedAmounts.sub_total_amount = data.list_price * (1 - value * 0.01);
+                switch(targetName){
+                    case 'list_price':
+                        updatedAmounts.list_price_dc = (value - data.sub_total_amount) * 100 / value;
+                        break;
+                    case 'sub_total_amount':
+                    {
+                        const tempListDc = (data.list_price - value) * 100 / data.list_price;
+                        const tempDcAmount = value * settingForContent.dc_rate * 0.01;
+                        const tempQuotationAmount = value - tempDcAmount;
+                        const tempTaxAmount = settingForContent.vat_included ? tempQuotationAmount * 0.1 : 0;
+                        const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cutoff_amount;
+                        const tempProfit = tempTotalAmount - data.total_cost_price;
+                        updatedAmounts.list_dc = tempListDc;
+                        updatedAmounts.dc_amount = tempDcAmount;
+                        updatedAmounts.quotation_amount = tempQuotationAmount;
+                        updatedAmounts.tax_amount = tempTaxAmount;
+                        updatedAmounts.total_quotation_amount = tempTotalAmount;
+                        updatedAmounts.profit = tempProfit;
+                        updatedAmounts.profit_rate = data.total_cost_price !== 0
+                            ? tempProfit * 100 / data.total_cost_price
+                            : 0;
+                        break;
+                    }
+                    case 'dc_amount':
+                    {
+                        const tempQuotationAmount = data.sub_total_amount - value;
+                        const tempTaxAmount = settingForContent.vat_included ? tempQuotationAmount * 0.1 : 0;
+                        const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cutoff_amount;
+                        const tempProfit = tempTotalAmount - data.total_cost_price;
+                        updatedAmounts.quotation_amount = tempQuotationAmount;
+                        updatedAmounts.tax_amount = tempTaxAmount;
+                        updatedAmounts.total_quotation_amount = tempTotalAmount;
+                        updatedAmounts.profit = tempProfit;
+                        updatedAmounts.profit_rate = data.total_cost_price !== 0
+                            ? tempProfit * 100 / data.total_cost_price
+                            : 0;
+                            break;
+                    }
+                    case 'quotation_amount':
+                    {
+                        const tempTaxAmount = settingForContent.vat_included ? value * 0.1 : 0;
+                        const tempTotalAmount = value + tempTaxAmount - data.cutoff_amount;
+                        const tempProfit = tempTotalAmount - data.total_cost_price;
+                        updatedAmounts.tax_amount = tempTaxAmount;
+                        updatedAmounts.total_quotation_amount = tempTotalAmount;
+                        updatedAmounts.profit = tempProfit;
+                        updatedAmounts.profit_rate = data.total_cost_price !== 0
+                            ? tempProfit * 100 / data.total_cost_price
+                            : 0;
+                        break;
+                    }
+                    case 'tax_amount':
+                    {
+                        const tempTotalAmount = data.quotation_amount + value - data.cutoff_amount;
+                        const tempProfit = tempTotalAmount - data.total_cost_price;
+                        updatedAmounts.total_quotation_amount = tempTotalAmount;
+                        updatedAmounts.profit = tempProfit;
+                        updatedAmounts.profit_rate = data.total_cost_price !== 0
+                            ? tempProfit * 100 / data.total_cost_price
+                            : 0;
+                        break;
+                    }
+                    case 'cutoff_amount':
+                    {
+                        const tempTotalAmount = data.quotation_amount + data.tax_amount - value;
+                        const tempProfit = tempTotalAmount - data.total_cost_price;
+                        updatedAmounts.total_quotation_amount = tempTotalAmount;
+                        updatedAmounts.profit = tempProfit;
+                        updatedAmounts.profit_rate = data.total_cost_price !== 0
+                            ? tempProfit * 100 / data.total_cost_price
+                            : 0;
+                        break;
+                    }
+                    case 'total_quotation_amount':
+                    {
+                        const tempProfit = value - data.total_cost_price;
+                        updatedAmounts.profit = tempProfit;
+                        updatedAmounts.profit_rate = data.total_cost_price !== 0
+                            ? tempProfit * 100 / data.total_cost_price
+                            : 0;
+                        break;
+                    }
+                    case 'total_cost_price':
+                    {
+                        const tempProfit = data.total_quotation_amount - value;
+                        updatedAmounts.profit = tempProfit;
+                        updatedAmounts.profit_rate = value !== 0
+                            ? tempProfit * 100 / value
+                            : 0;
+                        break;
+                    }
+                    case 'profit':
+                        const tempProfitRate =  data.total_cost_price !== 0
+                            ? value * 100 / data.total_cost_price
+                            : 0;
+                        updatedAmounts.profit_rate = tempProfitRate;
+                        break;
+                    default:
+                        console.log('handleChangeAmounts / name is not available :', targetName);
+                        break;
+                };
             };
             handleData(updatedAmounts);
         };
     };
 
-    const handleChangeSubTotalAmount = (value) => {
-        if(data.sub_total_amount !== value) {
+    const handleChangeRates = (e) => {
+        const targetName = e.target.name;
+        const targetValue = e.target.value;
+
+        const value = Number(targetValue);
+        if(isNaN(value)) {
+            console.log('handleChangeRate / value is NaN :', targetValue);
+            return;
+        };
+        if(data[targetName] === undefined || data[targetName] === null) {
+            console.log('handleChangeRate / name is not in content :', targetName);
+            return;
+        };
+        if(data[targetName] !== value) {
             const updatedAmounts = {
                 ...data,
-                sub_total_amount: value,
+                [targetName]: value
             };
             if (settingForContent.auto_calc) {
-                const tempListDc = (data.list_price - value) * 100 / data.list_price;
-                const tempDcAmount = value * settingForContent.dc_rate * 0.01;
-                const tempQuotationAmount = value - tempDcAmount;
-                const tempTaxAmount = settingForContent.vat_included ? tempQuotationAmount * 0.1 : 0;
-                const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cutoff_amount;
-                const tempProfit = tempTotalAmount - data.total_cost_price;
-                updatedAmounts.list_dc = tempListDc;
-                updatedAmounts.dc_amount = tempDcAmount;
-                updatedAmounts.quotation_amount = tempQuotationAmount;
-                updatedAmounts.tax_amount = tempTaxAmount;
-                updatedAmounts.total_quotation_amount = tempTotalAmount;
-                updatedAmounts.profit = tempProfit;
-                updatedAmounts.profit_rate = data.total_cost_price !== 0
-                    ? tempProfit * 100 / data.total_cost_price
-                    : 0;
-            };
+                switch(targetName){
+                    case 'list_price_dc':
+                        updatedAmounts.sub_total_amount = data.list_price * (1 - value * 0.01);
+                        break;
+                    case 'dc_rate':
+                        const tempDcAmount = data.sub_total_amount * value * 0.01;
+                        const tempQuotationAmount = data.sub_total_amount - tempDcAmount;
+                        const tempTaxAmount = settingForContent.vat_included ? tempQuotationAmount * 0.1 : 0;
+                        const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cutoff_amount;
+                        const tempProfit = tempTotalAmount - data.total_cost_price;
+                        updatedAmounts.dc_amount = tempDcAmount;
+                        updatedAmounts.quotation_amount = tempQuotationAmount;
+                        updatedAmounts.tax_amount = tempTaxAmount;
+                        updatedAmounts.total_quotation_amount = tempTotalAmount;
+                        updatedAmounts.profit = tempProfit;
+                        updatedAmounts.profit_rate = data.total_cost_price !== 0
+                            ? tempProfit * 100 / data.total_cost_price
+                            : 0;
+                        break;
+                    case 'profit_rate':
+                        updatedAmounts.profit = data.total_quotation_amount * value * 0.01;
+                        break;
+                    default:
+                        console.log('handleChangeAmounts / name is not available :', targetName);
+                        break;
+                }
+            }
             handleData(updatedAmounts);
         };
-    };
-
-    const handleChangeDCRate = (value) => {
-        if(data.dc_rate !== value) {
-            const updatedSetting = {
-                ...settingForContent,
-                dc_rate: value
-            };
-            setSettingForContent(updatedSetting);
-
-            const updatedAmounts = {
-                ...data,
-                dc_rate: value
-            };
-
-            if (settingForContent.auto_calc) {
-                const tempDcAmount = data.sub_total_amount * value * 0.01;
-                const tempQuotationAmount = data.sub_total_amount - tempDcAmount;
-                const tempTaxAmount = settingForContent.vat_included ? tempQuotationAmount * 0.1 : 0;
-                const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cutoff_amount;
-                const tempProfit = tempTotalAmount - data.total_cost_price;
-                updatedAmounts.dc_amount = tempDcAmount;
-                updatedAmounts.quotation_amount = tempQuotationAmount;
-                updatedAmounts.tax_amount = tempTaxAmount;
-                updatedAmounts.total_quotation_amount = tempTotalAmount;
-                updatedAmounts.profit = tempProfit;
-                updatedAmounts.profit_rate = data.total_cost_price !== 0
-                    ? tempProfit * 100 / data.total_cost_price
-                    : 0;
-            };
-            handleData(updatedAmounts);
-        };
-    };
-
-    const handleChangeDCAmount = (value) => {
-        if(data.dc_amount !== value) {
-            const updatedAmounts = {
-                ...data,
-                dc_amount: value
-            };
-
-            if (settingForContent.auto_calc) {
-                const tempQuotationAmount = data.sub_total_amount - value;
-                const tempTaxAmount = settingForContent.vat_included ? tempQuotationAmount * 0.1 : 0;
-                const tempTotalAmount = tempQuotationAmount + tempTaxAmount - data.cutoff_amount;
-                const tempProfit = tempTotalAmount - data.total_cost_price;
-                updatedAmounts.quotation_amount = tempQuotationAmount;
-                updatedAmounts.tax_amount = tempTaxAmount;
-                updatedAmounts.total_quotation_amount = tempTotalAmount;
-                updatedAmounts.profit = tempProfit;
-                updatedAmounts.profit_rate = data.total_cost_price !== 0
-                    ? tempProfit * 100 / data.total_cost_price
-                    : 0;
-            };
-            handleData(updatedAmounts);
-        };
-    };
-
-    const handleChangeQuotationAmount = (value) => {
-        if(data.quotation_amount !== value) {
-            const updatedAmounts = {
-                ...data,
-                quotation_amount: value
-            };
-            if (settingForContent.auto_calc) {
-                const tempTaxAmount = settingForContent.vat_included ? value * 0.1 : 0;
-                const tempTotalAmount = value + tempTaxAmount - data.cutoff_amount;
-                const tempProfit = tempTotalAmount - data.total_cost_price;
-                updatedAmounts.tax_amount = tempTaxAmount;
-                updatedAmounts.total_quotation_amount = tempTotalAmount;
-                updatedAmounts.profit = tempProfit;
-                updatedAmounts.profit_rate = data.total_cost_price !== 0
-                    ? tempProfit * 100 / data.total_cost_price
-                    : 0;
-            };
-            handleData(updatedAmounts);
-        };
-    };
-
-    const handleChangeTaxAmount = (value) => {
-        if(data.tax_amount !== value) {
-            const updatedAmounts = {
-                ...data,
-                tax_amount: value,
-            };
-            if (settingForContent.auto_calc) {
-                const tempTotalAmount = data.quotation_amount + value - data.cutoff_amount;
-                const tempProfit = tempTotalAmount - data.total_cost_price;
-                updatedAmounts.total_quotation_amount = tempTotalAmount;
-                updatedAmounts.profit = tempProfit;
-                updatedAmounts.profit_rate = data.total_cost_price !== 0
-                    ? tempProfit * 100 / data.total_cost_price
-                    : 0;
-            };
-            handleData(updatedAmounts);
-        };
-    };
-
-    const handleChangeCutOffAmount = (value) => {
-        if(data.cutoff_amount !== value) {
-            const updatedAmounts = {
-                ...data,
-                cutoff_amount: value
-            };
-            if (settingForContent.auto_calc) {
-                const tempTotalAmount = data.quotation_amount + data.tax_amount - value;
-                const tempProfit = tempTotalAmount - data.total_cost_price;
-                updatedAmounts.total_quotation_amount = tempTotalAmount;
-                updatedAmounts.profit = tempProfit;
-                updatedAmounts.profit_rate = data.total_cost_price !== 0
-                    ? tempProfit * 100 / data.total_cost_price
-                    : 0;
-            };
-            console.log('handleChangeCutOffAmount : ', updatedAmounts);
-            handleData(updatedAmounts);
-        };
-    };
-
-    const handleChangeTotalQuotationAmount = (value) => {
-        if(data.total_quotation_amount !== value) {
-            const updatedAmounts = {
-                ...data,
-                total_quotation_amount: value,
-            };
-            if (settingForContent.auto_calc) {
-                const tempProfit = value - data.total_cost_price;
-                updatedAmounts.profit = tempProfit;
-                updatedAmounts.profit_rate = data.total_cost_price !== 0
-                    ? tempProfit * 100 / data.total_cost_price
-                    : 0;
-            };
-            handleData(updatedAmounts);
-        };
-    };
-
-    const handleChangeTotalCostPrice = (value) => {
-        if(data.total_cost_price !== value) {
-            const updatedAmounts = {
-                ...data,
-                total_cost_price: value,
-            };
-            if (settingForContent.auto_calc) {
-                const tempProfit = data.total_quotation_amount - value;
-                updatedAmounts.profit = tempProfit;
-                updatedAmounts.profit_rate = value !== 0
-                    ? tempProfit * 100 / value
-                    : 0;
-            };
-            handleData(updatedAmounts);
-        };
-    };
-
-    const handleChangeProfit = (value) => {
-        if(data.profit !== value) {
-            const updatedAmounts = {
-                ...data,
-                profit : value,
-            };
-            if (settingForContent.auto_calc) {
-                const tempProfitRate =  data.total_cost_price !== 0
-                    ? value * 100 / data.total_cost_price
-                    : 0;
-                updatedAmounts.profit_rate = tempProfitRate;
-            };
-            handleData(updatedAmounts);
-        };
-    };
-
-    const handleChangeProfitRate = (value) => {
-        if(data.profit_rate !== value) {
-            const updatedAmounts = {
-                ...data,
-                profit_rate : value,
-            };
-            if (settingForContent.auto_calc) {
-                updatedAmounts.profit = data.total_quotation_amount * value * 0.01;
-            };
-            handleData(updatedAmounts);
-        };
-    };
+    }
 
 
+    //===== Handles to add, edit and remove content =======================================
     const handleAddNewContent = () => {
         if (!data.name) {
             const tempContents = (
@@ -592,14 +569,16 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
         setSettingForContent({
             ...settingForContent,
             action: 'UPDATE',
-            index: data['1'],
+            index: data.index,
             title: t('quotation.modify_content'),
         });
 
         const tempOrgContentValues = {};
         Object.keys(data).forEach(keyVal => {
             if (!!data[keyVal] && !!QuotationContentItems[keyVal]) {
-                tempOrgContentValues[QuotationContentItems[keyVal].name] = data[keyVal]
+                tempOrgContentValues[ QuotationContentItems[keyVal].name ]
+                    = QuotationContentItems[keyVal].type === 'price' || QuotationContentItems[keyVal].type === 'value'
+                        ? Number(data[keyVal]) : data[keyVal]
             };
         });
         setOrgContentModalValues(tempOrgContentValues);
@@ -657,7 +636,7 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
 
         // update Contents -------------------------------------------------
         const updatedContent = {
-            '1': finalData.no || '1',
+            '1': finalData.no || '',
             '2': finalData.product_class_name,
             '3': finalData.manufacturer || '',
             '4': finalData.model_name || '',
@@ -677,7 +656,8 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
             '18': finalData.profit || '',
             '19': finalData.note || '',
             '998': finalData.detail_desc || '',
-            'org_unit_price': finalData.org_unit_price,
+            index: settingForContent.index,
+            org_unit_price: finalData.org_unit_price,
         };
 
         if (settingForContent.action === "ADD") {
@@ -688,16 +668,14 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                 handleCalculateAmounts(updatedContents);
             };
         } else {  //Update
-            // updatedContent['1'] = settingForContent.index;
-            const foundIdx = contents.findIndex(item => item['1'] === settingForContent.index);
-            if (foundIdx === -1) {
+            if (updatedContent.index >= contents.length) {
                 console.log('Something Wrong when modifying content');
                 return;
             };
             const updatedContents = [
-                ...contents.slice(0, foundIdx),
+                ...contents.slice(0, updatedContent.index),
                 updatedContent,
-                ...contents.slice(foundIdx + 1,),
+                ...contents.slice(updatedContent.index + 1,),
             ];
             handleContents(updatedContents);
 
@@ -827,287 +805,142 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
                 <Flex wrap gap="small">
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.total_list_price')}</label>
-                        {/* <InputNumber
-                            name='list_price'
-                            defaultValue={data.list_price}
-                            value={data.list_price}
-                            disabled={settingForContent.auto_calc}
-                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
-                            parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            onChange={handleChangeTotalListPrice}
-                            style={{
-                                width: 180,
-                            }}
-                        /> */}
                         <Input
                             name='list_price'
                             prefix='&#8361;'
                             defaultValue={data.list_price}
                             value={ConvertCurrency0(data.list_price, settingForContent.show_decimal ? 4 : 0)}
                             disabled={settingForContent.auto_calc}
-                            onChange={handleChangeTotalListPrice}
-                            style={{ width: 180, height: 32 }}
+                            onChange={handleChangeAmounts}
+                            style={{ width: 180, height: 45 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.total_list_price_dc_rate')}</label>
-                        {/* <InputNumber
-                            name='list_price_dc'
-                            defaultValue={0}
-                            value={data.list_price_dc}
-                            disabled={settingForContent.auto_calc}
-                            formatter={ConvertRate}
-                            parser={(value) => value?.replace('%', '')}
-                            onChange={handleChangeTotalListPriceDCRate}
-                            style={{
-                                width: 180,
-                            }}
-                        /> */}
                         <Input
                             name='list_price_dc'
                             suffix='%'
                             defaultValue={data.list_price_dc}
                             value={data.list_price_dc}
                             disabled={settingForContent.auto_calc}
-                            onChange={handleChangeTotalListPriceDCRate}
-                            style={{ width: 180, height: 32 }}
+                            onChange={handleChangeRates}
+                            style={{ width: 180, height: 45 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label>{t('quotation.sub_total_amount')}</label>
-                        {/* <InputNumber
-                            name='sub_total_amount'
-                            defaultValue={0}
-                            value={data.sub_total_amount}
-                            disabled={settingForContent.auto_calc}
-                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
-                            parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            onChange={handleChangeSubTotalAmount}
-                            style={{
-                                width: 180,
-                            }}
-                        /> */}
                         <Input
                             name='sub_total_amount'
                             prefix='&#8361;'
                             defaultValue={data.sub_total_amount}
                             value={ConvertCurrency0(data.sub_total_amount, settingForContent.show_decimal ? 4 : 0)}
                             disabled={settingForContent.auto_calc}
-                            onChange={handleChangeSubTotalAmount}
-                            style={{ width: 180, height: 32 }}
+                            onChange={handleChangeAmounts}
+                            style={{ width: 180, height: 45 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.dc_rate')}</label>
-                        {/* <InputNumber
-                            name='dc_rate'
-                            defaultValue={0}
-                            value={data.dc_rate}
-                            min={0}
-                            max={100}
-                            formatter={ConvertRate}
-                            parser={(value) => value?.replace('%', '')}
-                            onChange={handleChangeDCRate}
-                            style={{
-                                width: 180,
-                            }}
-                        /> */}
                         <Input
                             name='dc_rate'
                             suffix='%'
                             defaultValue={data.dc_rate}
                             value={data.dc_rate}
-                            disabled={settingForContent.auto_calc}
-                            onChange={handleChangeDCRate}
-                            style={{ width: 180, height: 32 }}
+                            onChange={handleChangeRates}
+                            style={{ width: 180, height: 45 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.dc_amount')}</label>
-                        {/* <InputNumber
-                            name='dc_amount'
-                            defaultValue={0}
-                            value={data.dc_amount}
-                            disabled={settingForContent.auto_calc}
-                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
-                            parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            onChange={handleChangeDCAmount}
-                            style={{
-                                width: 180,
-                            }}
-                        /> */}
                         <Input
                             name='dc_amount'
                             prefix='&#8361;'
                             defaultValue={data.dc_amount}
                             value={ConvertCurrency0(data.dc_amount, settingForContent.show_decimal ? 4 : 0)}
-                            disabled={settingForContent.auto_calc}
-                            onChange={handleChangeDCAmount}
-                            style={{ width: 180, height: 32 }}
+                            onChange={handleChangeAmounts}
+                            style={{ width: 180, height: 45 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.quotation_amount')}</label>
-                        {/* <InputNumber
-                            name='quotation_amount'
-                            defaultValue={0}
-                            value={data.quotation_amount}
-                            disabled={settingForContent.auto_calc}
-                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
-                            parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            onChange={handleChangeQuotationAmount}
-                            style={{
-                                width: 180,
-                            }}
-                        /> */}
                         <Input
                             name='quotation_amount'
                             prefix='&#8361;'
                             defaultValue={data.quotation_amount}
                             value={ConvertCurrency0(data.quotation_amount, settingForContent.show_decimal ? 4 : 0)}
                             disabled={settingForContent.auto_calc}
-                            onChange={handleChangeQuotationAmount}
-                            style={{ width: 180, height: 32 }}
+                            onChange={handleChangeAmounts}
+                            style={{ width: 180, height: 45 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.tax_amount')}</label>
-                        {/* <InputNumber
-                            name='tax_amount'
-                            defaultValue={0}
-                            value={data.tax_amount}
-                            disabled={settingForContent.auto_calc}
-                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
-                            parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            onChange={handleChangeTaxAmount}
-                            style={{
-                                width: 180,
-                            }}
-                        /> */}
                         <Input
                             name='tax_amount'
                             prefix='&#8361;'
                             defaultValue={data.tax_amount}
                             value={ConvertCurrency0(data.tax_amount, settingForContent.show_decimal ? 4 : 0)}
                             disabled={settingForContent.auto_calc}
-                            onChange={handleChangeTaxAmount}
-                            style={{ width: 180, height: 32 }}
+                            onChange={handleChangeAmounts}
+                            style={{ width: 180, height: 45 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.cutoff_amount')}</label>
-                        {/* <InputNumber
-                            name='cutoff_amount'
-                            defaultValue={0}
-                            value={data.cutoff_amount}
-                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
-                            parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            onChange={handleChangeCutOffAmount}
-                            style={{
-                                width: 180,
-                            }}
-                        /> */}
                         <Input
                             name='cutoff_amount'
                             prefix='&#8361;'
                             defaultValue={data.cutoff_amount}
                             value={ConvertCurrency0(data.cutoff_amount, settingForContent.show_decimal ? 4 : 0)}
-                            onChange={handleChangeCutOffAmount}
-                            style={{ width: 180, height: 32 }}
+                            onChange={handleChangeAmounts}
+                            style={{ width: 180, height: 45 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.total_quotation_amount')}</label>
-                        {/* <InputNumber
-                            name='total_quotation_amount'
-                            defaultValue={0}
-                            value={data.total_quotation_amount}
-                            disabled={settingForContent.auto_calc}
-                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
-                            parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            onChange={handleChangeTotalQuotationAmount}
-                            style={{
-                                width: 180,
-                            }}
-                        /> */}
                         <Input
                             name='total_quotation_amount'
                             prefix='&#8361;'
                             defaultValue={data.total_quotation_amount}
                             value={ConvertCurrency0(data.total_quotation_amount, settingForContent.show_decimal ? 4 : 0)}
                             disabled={settingForContent.auto_calc}
-                            onChange={handleChangeTotalQuotationAmount}
-                            style={{ width: 180, height: 32 }}
+                            onChange={handleChangeAmounts}
+                            style={{ width: 180, height: 45 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.total_cost_price')}</label>
-                        {/* <InputNumber
-                            name='total_cost_price'
-                            defaultValue={0}
-                            value={data.total_cost_price}
-                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
-                            parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            onChange={handleChangeTotalCostPrice}
-                            style={{
-                                width: 180,
-                            }}
-                        /> */}
                         <Input
                             name='total_cost_price'
                             prefix='&#8361;'
                             defaultValue={data.total_cost_price}
                             value={ConvertCurrency0(data.total_cost_price, settingForContent.show_decimal ? 4 : 0)}
-                            onChange={handleChangeTotalCostPrice}
-                            style={{ width: 180, height: 32 }}
+                            onChange={handleChangeAmounts}
+                            style={{ width: 180, height: 45 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.profit')}</label>
-                        {/* <InputNumber
-                            name='profit'
-                            defaultValue={0}
-                            value={data.profit}
-                            disabled={settingForContent.auto_calc}
-                            formatter={(value) => ConvertCurrency(value, settingForContent.show_decimal ? 4 : 0)}
-                            parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                            onChange={handleChangeProfit}
-                            style={{
-                                width: 180,
-                            }}
-                        /> */}
                         <Input
                             name='profit'
                             prefix='&#8361;'
                             defaultValue={data.profit}
                             value={ConvertCurrency0(data.profit, settingForContent.show_decimal ? 4 : 0)}
                             disabled={settingForContent.auto_calc}
-                            onChange={handleChangeProfit}
-                            style={{ width: 180, height: 32 }}
+                            onChange={handleChangeAmounts}
+                            style={{ width: 180, height: 45 }}
                         />
                     </Space.Compact>
                     <Space.Compact direction="vertical">
                         <label >{t('quotation.profit_rate')}</label>
-                        {/* <InputNumber
-                            name='profit_rate'
-                            defaultValue={0}
-                            value={data.profit_rate}
-                            disabled={settingForContent.auto_calc}
-                            formatter={ConvertRate}
-                            parser={(value) => value?.replace('%', '')}
-                            onChange={handleChangeProfitRate}
-                            style={{
-                                width: 180,
-                            }}
-                        /> */}
                         <Input
                             name='profit_rate'
                             suffix='%'
                             defaultValue={data.profit_rate}
                             value={data.profit_rate}
                             disabled={settingForContent.auto_calc}
-                            onChange={handleChangeProfitRate}
-                            style={{ width: 180, height: 32 }}
+                            onChange={handleChangeRates}
+                            style={{ width: 180, height: 45 }}
                         />
                     </Space.Compact>
                 </Flex>

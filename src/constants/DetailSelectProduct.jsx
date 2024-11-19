@@ -8,10 +8,11 @@ const SearchInput = (props) => {
     const { addonBefore, title, name, value, disabled, onChange, style } = props;
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     return (
-        <div className="ant-space-item" style={style}>
+        <div className="ant-space-item">
             <span className='ant-input-group-wrapper
                 ant-input-group-wrapper-outlined
                 css-dev-only-do-not-override-5wsri9'
+                style={style}
             >
                 <span className='ant-input-wrapper ant-input-group css-dev-only-do-not-override-5wsri9'>
                     <span className='ant-input-group-addon'>
@@ -21,7 +22,7 @@ const SearchInput = (props) => {
                         className="ant-input detail-input-extra"
                         name={ name }
                         placeholder={ title }
-                        style={{ backgroundColor: 'white', borderTopRightRadius: '5px', borderBottomRightRadius: '5px' }}
+                        style={{ width: '100%', backgroundColor: 'white', borderTopRightRadius: '5px', borderBottomRightRadius: '5px' }}
                         value={ value }
                         disabled
                     />

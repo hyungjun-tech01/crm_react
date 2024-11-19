@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Input } from 'antd';
 import Select from 'react-select';
 import DatePicker from "react-datepicker";
@@ -7,7 +7,7 @@ import { FiSearch } from "react-icons/fi";
 
 import * as DOMPurify from "dompurify";
 
-import { ConvertCurrency } from './functions';
+import { ConvertCurrency0, ConvertRate0 } from './functions';
 import PopupPostCode from "./PostCode";
 import SelectListModal from './SelectListModal';
 import QuillEditor from "./QuillEditor";
@@ -28,7 +28,7 @@ const DateInput = (props) => {
                     </span>
                     {showTime ?
                         <DatePicker
-                            className="ant-input-custom css-dev-only-do-not-override-5wsri9 ant-input-outlined"
+                            className="ant-input css-dev-only-do-not-override-5wsri9 ant-input-outlined"
                             name={name}
                             selected={value}
                             onChange={onChange}
@@ -37,7 +37,7 @@ const DateInput = (props) => {
                             disabled={disabled}
                         /> :
                         <DatePicker
-                            className="ant-input-custom css-dev-only-do-not-override-5wsri9 ant-input-outlined"
+                            className="ant-input css-dev-only-do-not-override-5wsri9 ant-input-outlined"
                             name={name}
                             selected={value}
                             onChange={onChange}
@@ -160,11 +160,11 @@ const AddressInput = (props) => {
                         {addonBefore}
                     </span>
                     <input
-                        className="ant-input-custom detail-input-extra"
+                        className="ant-input detail-input-extra"
                         name={name}
                         placeholder={title}
                         onChange={handleChange}
-                        style={{ backgroundColor: 'white', borderTopRightRadius: '5px', borderBottomRightRadius: '5px' }}
+                        style={{ width: '100%', backgroundColor: 'white', borderTopRightRadius: '5px', borderBottomRightRadius: '5px' }}
                         value={value}
                         disabled={disabled}
                     />
@@ -209,10 +209,10 @@ const SearchInput = (props) => {
                         {addonBefore}
                     </span>
                     <input
-                        className="ant-input-custom detail-input-extra"
+                        className="ant-input detail-input-extra"
                         name={name}
                         placeholder={title}
-                        style={{ backgroundColor: 'white', borderTopRightRadius: '5px', borderBottomRightRadius: '5px' }}
+                        style={{ width: '100%', backgroundColor: 'white', borderTopRightRadius: '5px', borderBottomRightRadius: '5px' }}
                         value={value}
                         disabled
                     />
@@ -286,18 +286,32 @@ const DetailCardItem = (props) => {
                 : defaultValue
             ));
 
-    const widthValue = detail['extra'] ? (detail.extra === 'long' ? 768 : (detail.extra === 'modal' ? 470 : 380)) : 380;
+    const widthValue = detail['extra']
+        ? (detail.extra === 'long'
+            ? 768 : (detail.extra === 'modal'
+                ? 470 : 380)) : 380;
 
     const SharedProps = {
         name: name,
         addonBefore: <div className='detail-card-before'>{title}</div>,
-        value: !!detail['price'] ? ConvertCurrency(currentValue) : currentValue,
         disabled: detail.disabled ? detail.disabled : false,
+    };
+
+    if(!!detail['price']) {
+        SharedProps.value = ConvertCurrency0(currentValue, detail['decimal'] ? 4 : 0);
+        SharedProps.prefix= '₩';
+    } else if(!!detail['price0']) {
+        SharedProps.value = ConvertCurrency0(currentValue, detail['decimal'] ? 4 : 0);
+    } else if(!!detail['value']) {
+        SharedProps.value = ConvertRate0(currentValue);
+        SharedProps.suffix = '%';
+    } else {
+        SharedProps.value = currentValue;
     };
 
     switch (detail.type) {
         case 'label':
-            return <Input {...SharedProps} onChange={detail.editing} style={{ width: widthValue, height: 38 }} />;
+            return <Input {...SharedProps} onChange={detail.editing} style={{ width: widthValue }} />;
         case 'date':
             const timeformat = detail.time ? "yyyy-MM-dd hh:mm:ss" : "yyyy-MM-dd";
             return <DateInput {...SharedProps} format={timeformat} showTime={detail.time} onChange={(date) => detail.editing(name, date)} style={{ width: widthValue, height: 38 }} />;

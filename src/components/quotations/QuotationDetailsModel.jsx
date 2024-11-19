@@ -29,7 +29,7 @@ import DetailTitleItem from "../../constants/DetailTitleItem";
 import MessageModal from "../../constants/MessageModal";
 import QuotationView from "./QuotationtView";
 import QuotationContents from "./QuotationContents";
-import { ConvertCurrency } from "../../constants/functions";
+import { ConvertCurrency, ConvertCurrency0 } from "../../constants/functions";
 
 
 const QuotationDetailsModel = () => {
@@ -160,7 +160,6 @@ const QuotationDetailsModel = () => {
     setContentColumns(data);
 
     const tempContentColumns = ConvertHeaderInfosToString(data);
-    console.log('handleChangeContentColumns : ', tempContentColumns);
     
     const updatedQuotation = {
       ...editedDetailValues,
@@ -170,23 +169,27 @@ const QuotationDetailsModel = () => {
   };
 
   const handleChangeQuotationContents = (data) => {
+    if(typeof data !== 'object' || !Array.isArray(data)) return;
+
     setQuotationContents(data);
 
     let tempContents = "";
     if(data.length !== 0) {
-      tempContents = JSON.stringify(data);
-    }
-    console.log('handleChangeContentColumns : ', tempContents);
-
-    const updatedQuotation = {
-      ...editedDetailValues,
-      quotation_contents: tempContents,
+      const modifiedContents = data.map(item => {
+        delete item.index;
+        return item;
+      });
+      tempContents = JSON.stringify(modifiedContents);
     };
-    setEditedDetailValues(updatedQuotation);
+
+    setEditedDetailValues(prev => ({
+      ...prev,
+      quotation_contents: tempContents
+    }));
   };
 
   const handleChangeContentData = (data) => {
-    let updatedValues = { ...editedDetailValues };
+    let updatedValues = {};
     if(contentData.list_price !== data.list_price) updatedValues['list_price'] = data.list_price;
     if(contentData.list_price_dc !== data.list_price_dc) updatedValues['list_price_dc'] = data.list_price_dc;
     if(contentData.sub_total_amount !== data.sub_total_amount) updatedValues['sub_total_amount'] = data.sub_total_amount;
@@ -201,7 +204,10 @@ const QuotationDetailsModel = () => {
     if(contentData.profit_rate !== data.profit_rate) updatedValues['profit_rate'] = data.profit_rate;
 
     setContentData(data);
-    setEditedDetailValues(updatedValues);
+    setEditedDetailValues(prev => ({
+      ...prev,
+      ...updatedValues
+    }));
   };
 
   
@@ -257,7 +263,6 @@ const QuotationDetailsModel = () => {
   }, [cookies.myLationCrmUserId, modifyQuotation, editedDetailValues, selectedQuotation]);
 
   const handleInitialize = useCallback(() => {
-    console.log('QuotationDetails / handleInitialize: ', selectedQuotation);
     // initialize columns of content table --------------------------------------------
     const tempColumnValues = selectedQuotation.quotation_table.split('|');
     let tempColumns = [];
@@ -277,7 +282,10 @@ const QuotationDetailsModel = () => {
           width: numWidth,
           render: QuotationContentItems[tempIndex].type === 'price'
             ? (text, record) => <>{ConvertCurrency(text)}</>
-            : (text, record) => <>{text}</>,
+            : ( QuotationContentItems[tempIndex].type === 'price0'
+                ? (text, record) => <>{ConvertCurrency0(text)}</>
+                : (text, record) => <>{text}</>
+              )
         })
       };
       temp_i++;
@@ -286,7 +294,11 @@ const QuotationDetailsModel = () => {
     setContentColumns(tempColumns);
 
     // initialize contents of content table --------------------------------------------
-    const selectedContents = JSON.parse(selectedQuotation.quotation_contents);
+    const parsedContents = JSON.parse(selectedQuotation.quotation_contents);
+    const selectedContents = parsedContents.map((item, idx) => ({
+      index : idx,
+      ...item
+    }));
     setQuotationContents(selectedContents);
 
 
@@ -320,8 +332,6 @@ const QuotationDetailsModel = () => {
       profit_rate: isNaN(profitRate) ? 0 : profitRate,
     };
     setContentData(tempData);
-    console.log('QuotationDetails / handleInitialize / prices : ', tempData);
-    
     setEditedDetailValues(null);
   }, [selectedQuotation]);
 
@@ -334,11 +344,10 @@ const QuotationDetailsModel = () => {
 
   //===== useEffect functions =============================================== 
   useEffect(() => {
-    console.log('QuotationDetailsModel / useEffect');
     if (selectedQuotation !== defaultQuotation) {
       handleInitialize();
     };
-  }, [selectedQuotation]);
+  }, [selectedQuotation, handleInitialize]);
 
   useEffect(() => {
     const detailViewStatus = localStorage.getItem("isFullScreen");

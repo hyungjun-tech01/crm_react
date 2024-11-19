@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Table } from "antd";
@@ -19,7 +19,6 @@ import MultiQueryModal from "../../constants/MultiQueryModal";
 import {
   atomFilteredQuotationArray,
   atomQuotationState,
-  atomSelectedCategory,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { compareCompanyName, compareText, ConvertCurrency, formatDate } from "../../constants/functions";
@@ -53,7 +52,6 @@ const Quotations = () => {
   const [ nowLoading, setNowLoading ] = useState(true);
   const [initAddNewQuotation, setInitAddNewQuotation] = useState(false);
   const [initEditQuotation, setInitEditQuotation] = useState(false);
-  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -172,7 +170,6 @@ const Quotations = () => {
 
   const handleClickQuotation = (code) => {
     setCurrentQuotation(code);
-    // setSelectedCategory({category: 'quotation', item_code: code});
     setTimeout(() => {
       openModal('quotation-details','initialize_quotation');
     }, 250);
