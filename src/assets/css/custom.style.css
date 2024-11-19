@@ -2,6 +2,9 @@
     display: flex;
     justify-content: space-between;
     flex-direction: row;
+    margin: 10px 0;
+    padding: 10px 10px;
+    background: #f3f1f1;
 }
 .edit-content {
     position: absolute;
