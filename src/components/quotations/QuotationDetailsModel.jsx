@@ -176,8 +176,9 @@ const QuotationDetailsModel = () => {
     let tempContents = "";
     if(data.length !== 0) {
       const modifiedContents = data.map(item => {
-        delete item.index;
-        return item;
+        const tempData = { ...item};
+        delete tempData.index;
+        return tempData;
       });
       tempContents = JSON.stringify(modifiedContents);
     };
@@ -296,8 +297,8 @@ const QuotationDetailsModel = () => {
     // initialize contents of content table --------------------------------------------
     const parsedContents = JSON.parse(selectedQuotation.quotation_contents);
     const selectedContents = parsedContents.map((item, idx) => ({
+      ...item,
       index : idx,
-      ...item
     }));
     setQuotationContents(selectedContents);
 

@@ -523,7 +523,6 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
         setSettingForContent({
             ...settingForContent,
             action: 'ADD',
-            index: contents.length + 1,
             title: t('quotation.add_content'),
         });
 
@@ -569,16 +568,19 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
         setSettingForContent({
             ...settingForContent,
             action: 'UPDATE',
-            index: data.index,
             title: t('quotation.modify_content'),
         });
 
         const tempOrgContentValues = {};
         Object.keys(data).forEach(keyVal => {
-            if (!!data[keyVal] && !!QuotationContentItems[keyVal]) {
+            if (!!QuotationContentItems[keyVal]) {
                 tempOrgContentValues[ QuotationContentItems[keyVal].name ]
-                    = QuotationContentItems[keyVal].type === 'price' || QuotationContentItems[keyVal].type === 'value'
+                    = QuotationContentItems[keyVal].type === 'price'
+                        || QuotationContentItems[keyVal].type === 'price0'
+                        || QuotationContentItems[keyVal].type === 'value'
                         ? Number(data[keyVal]) : data[keyVal]
+            } else {
+                tempOrgContentValues[keyVal] = data[keyVal];
             };
         });
         setOrgContentModalValues(tempOrgContentValues);
@@ -617,12 +619,13 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
             ...orgContentModalValues,
             ...editedContentModalValues,
         };
-        if (!finalData.product_name || !finalData.quotation_amount) {
+        console.log('handleContentModalOk / input :', finalData);
+        if (!finalData.product_name || finalData.product_name === "" || !finalData.quotation_amount ) {
             setMessage({ title: '필요 항목 누락', message: '필요 값 - 제품명 또는 견적 가격 - 이 없습니다.' });
             const tempContents = (
                 <>
                     <p>하기 정보는 필수 입력 사항입니다.</p>
-                    {!finalData.product_name && <div> - 제품명</div>}
+                    {(!finalData.product_name || finalData.product_name === "") && <div> - 제품명</div>}
                     {!finalData.quotation_amount && <div> - 견적 가격</div>}
                 </>
             );
@@ -636,47 +639,48 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
 
         // update Contents -------------------------------------------------
         const updatedContent = {
-            '1': finalData.no || '',
+            '1': finalData.no,
             '2': finalData.product_class_name,
-            '3': finalData.manufacturer || '',
-            '4': finalData.model_name || '',
-            '5': finalData.product_name || '',
-            '6': finalData.material || '',
-            '7': finalData.type || '',
-            '8': finalData.color || '',
-            '9': finalData.standard || '',
-            '10': finalData.detail_desc_on_off || '',
-            '11': finalData.unit || '',
-            '12': finalData.quantity || '',
-            '13': finalData.list_price || '',
-            '14': finalData.dc_rate || '',
-            '15': finalData.unit_price || '',
-            '16': finalData.quotation_amount || '',
-            '17': finalData.cost_price || '',
-            '18': finalData.profit || '',
-            '19': finalData.note || '',
-            '998': finalData.detail_desc || '',
-            index: settingForContent.index,
+            '3': finalData.manufacturer,
+            '4': finalData.model_name,
+            '5': finalData.product_name,
+            '6': finalData.material,
+            '7': finalData.type,
+            '8': finalData.color,
+            '9': finalData.standard,
+            '10': finalData.detail_desc_on_off,
+            '11': finalData.unit,
+            '12': finalData.quantity,
+            '13': finalData.list_price,
+            '14': finalData.dc_rate,
+            '15': finalData.unit_price,
+            '16': finalData.quotation_amount,
+            '17': finalData.cost_price,
+            '18': finalData.profit,
+            '19': finalData.note,
+            '998': finalData.detail_desc,
+            index: settingForContent.action === "ADD" ? contents.length : finalData.index,
             org_unit_price: finalData.org_unit_price,
         };
+        console.log('handleContentModalOk / updated content :', updatedContent);
 
         if (settingForContent.action === "ADD") {
+            console.log('handleContentModalOk / new index :', finalData.index);
             const updatedContents = contents.concat(updatedContent);
+            console.log('handleContentModalOk / updated contents :', updatedContents);
             handleContents(updatedContents);
 
             if (settingForContent.auto_calc) {
                 handleCalculateAmounts(updatedContents);
             };
         } else {  //Update
-            if (updatedContent.index >= contents.length) {
-                console.log('Something Wrong when modifying content');
-                return;
-            };
+            console.log('handleContentModalOk / updated index :', finalData.index);
             const updatedContents = [
-                ...contents.slice(0, updatedContent.index),
+                ...contents.slice(0, finalData.index),
                 updatedContent,
-                ...contents.slice(updatedContent.index + 1,),
+                ...contents.slice(finalData.index + 1,),
             ];
+            console.log('handleContentModalOk / updated contents :', updatedContents);
             handleContents(updatedContents);
 
             if (settingForContent.auto_calc) {
