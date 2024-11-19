@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Space, Switch } from "antd";
+import { InputNumber, Space, Switch } from "antd";
 import {
   atomCurrentQuotation,
   defaultQuotation,
@@ -117,6 +117,7 @@ const QuotationDetailsModel = () => {
 
   //===== Handles to handle 'Contents' =================================================
   const [contentColumns, setContentColumns] = useState([]);
+  const [totalColumnWidth, setTotalColumnWidth] = useState(0);
   const [quotationContents, setQuotationContents] = useState([]);
   const [contentData, setContentData] = useState({
     name: '',
@@ -158,6 +159,12 @@ const QuotationDetailsModel = () => {
 
   const handleChangeContentColumns = (data) => {
     setContentColumns(data);
+
+    let tempTotalColumnWidth = 0;
+    data.forEach(column => {
+      tempTotalColumnWidth += column.width;
+    });
+    setTotalColumnWidth(tempTotalColumnWidth);
 
     const tempContentColumns = ConvertHeaderInfosToString(data);
     
@@ -267,6 +274,7 @@ const QuotationDetailsModel = () => {
     // initialize columns of content table --------------------------------------------
     const tempColumnValues = selectedQuotation.quotation_table.split('|');
     let tempColumns = [];
+    let tempTotalWidth = 0;
     let temp_i = 0;
 
     while (true) {
@@ -275,6 +283,7 @@ const QuotationDetailsModel = () => {
 
       const numWidth = Number(tempColumnValues[num_i]);
       if (!isNaN(numWidth) && numWidth > 0) {
+        tempTotalWidth += numWidth;
         const tempIndex = tempColumnValues[num_i - 2];
         const tempTitle = tempColumnValues[num_i - 1];
         tempColumns.push({
@@ -293,6 +302,7 @@ const QuotationDetailsModel = () => {
     };
 
     setContentColumns(tempColumns);
+    setTotalColumnWidth(tempTotalWidth);
 
     // initialize contents of content table --------------------------------------------
     const parsedContents = JSON.parse(selectedQuotation.quotation_contents);
@@ -501,8 +511,35 @@ const QuotationDetailsModel = () => {
                         {/*---- End   -- Tab : Detail Quotation ------------------------------------------------------------*/}
                         {/*---- Start -- Tab : PDF View - Quotation --------------------------------------------------------*/}
                         <div className="tab-pane task-related p-0" id="sub-quotation-pdf-view">
-                          {selectedQuotation && (selectedQuotation.quotation_contents.length > 0) &&
-                            <QuotationView />
+                          {!!selectedQuotation && (quotationContents.length > 0) &&
+                            <div className="crms-tasks">
+                              <div className="tasks__item crms-task-item">
+                                <p>
+                                  <Space
+                                    align="start"
+                                    direction="horizontal"
+                                    size="small"
+                                    style={{ display: 'flex', marginBottom: '0.5rem' }}
+                                    wrap
+                                  >
+                                    { contentColumns.map((item, index) => {
+                                      const itemName = QuotationContentItems[item.dataIndex].name;
+                                      if(itemName === 'detail_desc_on_off') return null;
+                                      return (
+                                        <div key={index}>
+                                          <div>{item.title}</div>
+                                            <InputNumber
+                                              name={QuotationContentItems[item.dataIndex].name}
+                                              value={item.width}
+                                            />
+                                        </div>
+                                      )
+                                    })}
+                                  </Space>
+                                </p>
+                                <QuotationView />
+                              </div>
+                            </div>
                           }
                         </div>
                         {/*---- End   -- Tab : PDF View - Quotation---------------------------------------------------------*/}

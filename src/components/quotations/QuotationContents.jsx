@@ -619,7 +619,6 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
             ...orgContentModalValues,
             ...editedContentModalValues,
         };
-        console.log('handleContentModalOk / input :', finalData);
         if (!finalData.product_name || finalData.product_name === "" || !finalData.quotation_amount ) {
             setMessage({ title: '필요 항목 누락', message: '필요 값 - 제품명 또는 견적 가격 - 이 없습니다.' });
             const tempContents = (
@@ -662,25 +661,20 @@ const QuotationContents = ({ data, handleData, columns, handleColumns, contents,
             index: settingForContent.action === "ADD" ? contents.length : finalData.index,
             org_unit_price: finalData.org_unit_price,
         };
-        console.log('handleContentModalOk / updated content :', updatedContent);
 
         if (settingForContent.action === "ADD") {
-            console.log('handleContentModalOk / new index :', finalData.index);
             const updatedContents = contents.concat(updatedContent);
-            console.log('handleContentModalOk / updated contents :', updatedContents);
             handleContents(updatedContents);
 
             if (settingForContent.auto_calc) {
                 handleCalculateAmounts(updatedContents);
             };
         } else {  //Update
-            console.log('handleContentModalOk / updated index :', finalData.index);
             const updatedContents = [
                 ...contents.slice(0, finalData.index),
                 updatedContent,
                 ...contents.slice(finalData.index + 1,),
             ];
-            console.log('handleContentModalOk / updated contents :', updatedContents);
             handleContents(updatedContents);
 
             if (settingForContent.auto_calc) {
