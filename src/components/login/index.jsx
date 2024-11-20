@@ -3,12 +3,13 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Link, useHistory } from "react-router-dom";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { Alert } from 'antd';
 import LOGO from "../../assets/images/nodeData.png";
 import priorLOGO from "../../assets/images/priorNodeData.png"
 import { apiLoginValidate } from "../../repository/user.jsx";
-import {atomCurrentUser} from "../../atoms/atomsUser.jsx";
+import { atomCurrentUser, atomAccountInfo, defaultAccount } from "../../atoms/atomsUser.jsx";
+import { AccountRepo } from "../../repository/account";
 
 const createMessage = (error) => {
   if (!error) {
@@ -54,6 +55,8 @@ const Login = () => {
   const [loginUserId, setLoginUserId] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState({message:"", type:"", description:""});
+  const { loadAccount } = useRecoilValue(AccountRepo);
+  const setAccountInfo = useSetRecoilState(atomAccountInfo);
 
   const onMessageDismiss = () => {
     setLoginError({message:"", type:"", description:""});
@@ -85,12 +88,14 @@ const Login = () => {
         setCookie("myLationCrmUserName", res.userName);
         setCookie("myLationCrmAuthToken", res.token);
         setCurrentUser(res);
+        loadAccount();
         history.push("/");
       } else {
         setLoginError(createMessage(res));          
         removeCookie('UserId');
         removeCookie('UserName');
         removeCookie('AuthToken');
+        setAccountInfo(defaultAccount);
       }
     });
   },[loginUserId, loginPassword]);

@@ -488,29 +488,6 @@ export const atomTaxInvoiceState = atom({
     default: 0,
 });
 
-//----- Account Info ------------------------
-export const defaultAccountInfo = {
-    account_code: null,
-    business_registration_code: null,
-    company_name: null,
-    company_name_en: null,
-    ceo_name: null,
-    company_address: null,
-    company_zip_code: null,
-    business_type: null,
-    business_item: null,
-    phone_number: null,
-    fax_number: null,
-    email: null,
-    homepage: null,
-    memo: null,
-    event: null,
-};
-export const atomAccountInfo = atom({
-    key: "accountInfo",
-    default: defaultAccountInfo,
-});
-
 //----- Attchments for Consulting ------------------------
 export const atomRequestAttachmentCode = atom({
     key: "requestAttachmentCode",

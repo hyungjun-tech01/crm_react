@@ -3,11 +3,10 @@ import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { InputNumber, Space, Switch } from "antd";
+import { Input, Flex, Space, Switch } from "antd";
 import {
   atomCurrentQuotation,
   defaultQuotation,
-  atomQuotationState,
 } from "../../atoms/atoms";
 import {
   atomUsersForSelection,
@@ -117,7 +116,6 @@ const QuotationDetailsModel = () => {
 
   //===== Handles to handle 'Contents' =================================================
   const [contentColumns, setContentColumns] = useState([]);
-  const [totalColumnWidth, setTotalColumnWidth] = useState(0);
   const [quotationContents, setQuotationContents] = useState([]);
   const [contentData, setContentData] = useState({
     name: '',
@@ -218,6 +216,27 @@ const QuotationDetailsModel = () => {
     }));
   };
 
+  const handleChangeViewColumnWidth = (event) => {
+    const targetName = event.target.name;
+    const targetValue = event.target.value;
+
+    const realValue = Number(targetValue);
+    if(isNaN(realValue)) return;
+
+    const foundIdx = contentColumns.findIndex(item => QuotationContentItems[item.dataIndex].name === targetName);
+    if(foundIdx === -1) return;
+
+    const updatedColumn = {
+      ...contentColumns.at(foundIdx),
+      viewWidth: realValue,
+    };
+    const updatedColumns = [
+      ...contentColumns.slice(0, foundIdx),
+      updatedColumn,
+      ...contentColumns.slice(foundIdx + 1,)
+    ];
+    setContentColumns(updatedColumns);
+  };
   
 
   //===== Handles to handle this =================================================
@@ -273,8 +292,8 @@ const QuotationDetailsModel = () => {
   const handleInitialize = useCallback(() => {
     // initialize columns of content table --------------------------------------------
     const tempColumnValues = selectedQuotation.quotation_table.split('|');
+    
     let tempColumns = [];
-    let tempTotalWidth = 0;
     let temp_i = 0;
 
     while (true) {
@@ -283,13 +302,12 @@ const QuotationDetailsModel = () => {
 
       const numWidth = Number(tempColumnValues[num_i]);
       if (!isNaN(numWidth) && numWidth > 0) {
-        tempTotalWidth += numWidth;
         const tempIndex = tempColumnValues[num_i - 2];
-        const tempTitle = tempColumnValues[num_i - 1];
         tempColumns.push({
-          title: tempTitle,
+          title: tempColumnValues[num_i - 1],
           dataIndex: tempIndex,
-          width: numWidth,
+          width: QuotationContentItems[tempIndex].width,
+          viewWidth: numWidth,
           render: QuotationContentItems[tempIndex].type === 'price'
             ? (text, record) => <>{ConvertCurrency(text)}</>
             : ( QuotationContentItems[tempIndex].type === 'price0'
@@ -302,7 +320,6 @@ const QuotationDetailsModel = () => {
     };
 
     setContentColumns(tempColumns);
-    setTotalColumnWidth(tempTotalWidth);
 
     // initialize contents of content table --------------------------------------------
     const parsedContents = JSON.parse(selectedQuotation.quotation_contents);
@@ -512,33 +529,28 @@ const QuotationDetailsModel = () => {
                         {/*---- Start -- Tab : PDF View - Quotation --------------------------------------------------------*/}
                         <div className="tab-pane task-related p-0" id="sub-quotation-pdf-view">
                           {!!selectedQuotation && (quotationContents.length > 0) &&
-                            <div className="crms-tasks">
-                              <div className="tasks__item crms-task-item">
-                                <p>
-                                  <Space
-                                    align="start"
-                                    direction="horizontal"
-                                    size="small"
-                                    style={{ display: 'flex', marginBottom: '0.5rem' }}
-                                    wrap
-                                  >
-                                    { contentColumns.map((item, index) => {
-                                      const itemName = QuotationContentItems[item.dataIndex].name;
-                                      if(itemName === 'detail_desc_on_off') return null;
-                                      return (
-                                        <div key={index}>
-                                          <div>{item.title}</div>
-                                            <InputNumber
-                                              name={QuotationContentItems[item.dataIndex].name}
-                                              value={item.width}
-                                            />
-                                        </div>
-                                      )
-                                    })}
-                                  </Space>
-                                </p>
-                                <QuotationView />
-                              </div>
+                            <div>
+                              <Flex wrap gap="small" style={{ margin: '1rem', paddingLeft: '1rem' }} >
+                                { contentColumns.map((item, index) => {
+                                  if(!QuotationContentItems[item.dataIndex].view) return null;
+                                  return (
+                                    <div key={index}>
+                                      <div><b>{item.title}</b></div>
+                                        <Input
+                                          name={QuotationContentItems[item.dataIndex].name}
+                                          value={item.viewWidth}
+                                          onChange={handleChangeViewColumnWidth}
+                                          style={{width: 100}}
+                                        />
+                                    </div>
+                                  )
+                                })}
+                              </Flex>
+                              <QuotationView
+                                columns={contentColumns}
+                                contents={quotationContents}
+                                data={contentData}
+                              />
                             </div>
                           }
                         </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { selector } from "recoil";
-import { atomAccountInfo, atomAccountState,defaultAccount } from '../atoms/atomsUser';
+import { atomAccountInfo, atomAccountState, defaultAccount } from '../atoms/atomsUser';
 
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
