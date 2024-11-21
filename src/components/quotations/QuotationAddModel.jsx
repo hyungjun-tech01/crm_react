@@ -115,6 +115,17 @@ const QuotationAddModel = ({ init, handleInit }) => {
     };
   }, [quotationChange, contentData]);
 
+  const handleChangeLeadName = (data) => {
+    setQuotationChange(data);
+    if(!!data.lead_name && data.lead_name !== "" ){
+      const updatedContentData = {
+        ...contentData,
+        name: data.lead_name
+      };
+      setContentData(updatedContentData);
+    }
+  };
+
 
   //===== Handles to handle 'Contents' =================================================
   const [contentColumns, setContentColumns] = useState([]);
@@ -316,6 +327,8 @@ const QuotationAddModel = ({ init, handleInit }) => {
       } else {
         tempQuotationColumn = columnSettings.map(col => ({
           ...col,
+          width: col.width || QuotationContentItems[col.dataIndex].width,
+          viewWidth: col.viewWidth || QuotationContentItems[col.dataIndex].width,
           render: QuotationContentItems[col.dataIndex].type === 'price'
           ? (text, record) => <>{ConvertCurrency(text)}</>
           : ( QuotationContentItems[col.dataIndex].type === 'price0'
@@ -475,7 +488,7 @@ const QuotationAddModel = ({ init, handleInit }) => {
                   required
                   defaultValue={quotationChange.lead_name}
                   edited={quotationChange}
-                  setEdited={setQuotationChange}
+                  setEdited={handleChangeLeadName}
                   handleOpen={handlePopupOpen}
                 />
               </div>

@@ -102,14 +102,14 @@ export const QuotationContentItems = {
     '10': { name: 'detail_desc_on_off', title: 'quotation.detail_desc', content: true, view: false, type:'select', width: 50},
     '11': { name: 'unit', title: 'common.unit', content: true, view: true, type:'label', width: 25 },
     '12': { name: 'quantity', title: 'common.quantity', content: true, view: true, type:'price0', width: 50},
-    '13': { name: 'list_price', title: 'quotation.list_price', content: true, view: true, type:'price', width: 50},
-    '14': { name: 'dc_rate', title: 'quotation.discount_rate', content: true, view: true, type: 'value', width: 30},
-    '15': { name: 'unit_price', title: 'quotation.quotation_unit_price', content: true, view: true, type:'price', width: 100},
-    '16': { name: 'quotation_amount', title: 'quotation.quotation_amount', content: true, view: true, type:'price', width: 50},
-    '17': { name: 'cost_price', title: 'quotation.cost_price', content: true, view: false, type:'price', width: 50},
-    '18': { name: 'profit', title: 'quotation.profit', content: true, view: false, type:'price', width: 50},
+    '13': { name: 'list_price', title: 'quotation.list_price', content: true, view: true, type:'price', width: 80},
+    '14': { name: 'dc_rate', title: 'quotation.discount_rate', content: true, view: true, type: 'value', width: 40},
+    '15': { name: 'unit_price', title: 'quotation.quotation_unit_price', content: true, view: true, type:'price', width: 80},
+    '16': { name: 'quotation_amount', title: 'quotation.quotation_amount', content: true, view: true, type:'price', width: 100},
+    '17': { name: 'cost_price', title: 'quotation.cost_price', content: true, view: false, type:'price', width: 80},
+    '18': { name: 'profit', title: 'quotation.profit', content: true, view: false, type:'price', width: 80},
     '19': { name: 'note', title: 'quotation.note', content: true, view: true, type:'textarea', width: 75},
-    '998': { name: 'detail_desc', title: 'quotation.detail_desc', content: true, view: false, type:'textarea', width: 100},
+    '998': { name: 'detail_desc', title: 'quotation.detail_desc', content: true, view: false, type:'textarea', width: 150},
 }
 
 export const QuotationRepo = selector({
