@@ -685,9 +685,10 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
 
   const handleIssueInvoice = () => {
     // Save this transactions -------------------------
-    if (transactionChange && Object.keys(transactionChange).length > 0) {
+    if (!!transactionChange && Object.keys(transactionChange).length > 0) {
       handleSaveTransaction('Invoice');
     } else {
+      handleClose();
       handleShowInvoice();
     };
   };
@@ -740,33 +741,20 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
     setTransactionForPrint(null);
     setContentsForPrint(null);
     // document.querySelector("#add_new_transaction_form").reset();
-
-    if (currentCompany !== defaultCompany){
-      setTransactionChange({
-        company_code: currentCompany.company_code,
-        company_name: currentCompany.company_name,
-        ceo_name: currentCompany.ceo_name,
-        company_address: currentCompany.company_address,
-        business_type: currentCompany.business_type,
-        business_item: currentCompany.business_item,
-        business_registration_code: currentCompany.business_registration_code,
-      });
-    };
-  }, [ currentCompany ]);
+  }, [trans_types]);
 
   const handleClose = () => {
-    setTimeout(() => {
-      closeModal();
-    }, 250);
+    closeModal();
   };
 
   //===== useEffect functions =============================================== 
   useEffect(() => {
     if (!init) return;
-
+    
     if ((companyState & 1) === 0) return;
 
     if (handleInit) handleInit(false);
+    
     handleInitialize();
 
     if (currentTransaction !== defaultTransaction) {
@@ -811,22 +799,38 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
         card_number: currentTransaction.card_number,
       }
       setOrgReceiptModalData(tempReceiptData);
-
-      // 모달 내부 페이지의 히스토리 상태 추가
-      history.pushState({ modalInternal: true }, '', location.href);
-
-      const handlePopState = (event) => {
-          if (event.state && event.state.modalInternal) {
-          // 뒤로 가기를 방지하기 위해 다시 히스토리를 푸시
-          history.pushState({ modalInternal: true }, '', location.href);
-          }
+      setTransactionChange({});
+    } else {
+      if (currentCompany !== defaultCompany){
+        setTransactionChange({
+          company_code: currentCompany.company_code,
+          company_name: currentCompany.company_name,
+          ceo_name: currentCompany.ceo_name,
+          company_address: currentCompany.company_address,
+          business_type: currentCompany.business_type,
+          business_item: currentCompany.business_item,
+          business_registration_code: currentCompany.business_registration_code,
+        });
+      } else {
+        setTransactionChange({});
       };
-
-      // popstate 이벤트 리스너 추가 (중복 추가 방지)
-      window.addEventListener('popstate', handlePopState);
     };
   }, [init, companyState, currentTransaction, handleInit, handleInitialize, trans_types, currentCompany, dataForTransaction]);
 
+  useEffect(()=>{
+    // 모달 내부 페이지의 히스토리 상태 추가
+    history.pushState({ modalInternal: true }, '', location.href);
+
+    const handlePopState = (event) => {
+        if (event.state && event.state.modalInternal) {
+        // 뒤로 가기를 방지하기 위해 다시 히스토리를 푸시
+        history.pushState({ modalInternal: true }, '', location.href);
+        }
+    };
+
+    // popstate 이벤트 리스너 추가 (중복 추가 방지)
+    window.addEventListener('popstate', handlePopState);
+  }, []);
 
   return (
     <div
@@ -1197,24 +1201,26 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
                         </Col>
                       </Row>
                     </div>
-                    <div className="text-center">
-                      <button
-                        type="button"
-                        className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                        onClick={handleSaveTransaction}
-                      >
-                        {t('common.save')}
-                      </button>
-                      &nbsp;&nbsp;
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-rounded"
-                        data-bs-dismiss="modal"
-                        onClick={handleClose}
-                      >
-                        {t('common.cancel')}
-                      </button>
-                    </div>
+                    { Object.keys(transactionChange).length > 0 &&
+                      <div className="text-center">
+                        <button
+                          type="button"
+                          className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                          onClick={handleSaveTransaction}
+                        >
+                          {t('common.save')}
+                        </button>
+                        &nbsp;&nbsp;
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-rounded"
+                          data-bs-dismiss="modal"
+                          onClick={handleClose}
+                        >
+                          {t('common.cancel')}
+                        </button>
+                      </div>
+                     }
                   </form>
                 </div>
                 <div className="tab-pane show" id="transaction-print">

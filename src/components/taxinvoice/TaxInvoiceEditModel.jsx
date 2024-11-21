@@ -92,7 +92,6 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
   const [isTaxInvoice, setIsTaxInvoice] = useState(true);
   const [selectValues, setSelectValue] = useState({})
   const [selectedContentRowKeys, setSelectedContentRowKeys] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useRecoilState(atomSelectedCategory);
   const [showSaveButton, setShowSaveButton] = useState(false);
 
   const handleItemChange = useCallback((e) => {
@@ -260,19 +259,6 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [orgContentModalData, setOrgContentModalData] = useState({});
   const [editedContentModalData, setEditedContentModalData] = useState({});
-
-  const handleFormatter = useCallback((value) => {
-    if (value === undefined || value === null || value === '') return '';
-    let ret = value;
-    if (typeof value === 'string') {
-      ret = Number(value);
-      if (isNaN(ret)) return;
-    };
-
-    return invoiceData.show_decimal
-      ? ret?.toFixed(4).replace(/\d(?=(\d{3})+\.)/g, '$&,')
-      : ret?.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  }, [invoiceData.show_decimal]);
 
   const handleAmountCalculation = (data) => {
     let supply_price = 0, tax_price = 0, total_price = 0;
@@ -693,10 +679,7 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
           inputData = { ...currentTaxInvoice };
           setShowSaveButton(false);
         } else {
-          if ((selectedCategory.category === 'company')
-            && (currentCompany !== defaultCompany)
-            && (selectedCategory.item_code === currentCompany.company_code)
-          ) {
+          if (currentCompany !== defaultCompany) {
             setShowSaveButton(true);
             inputData = {
               ...default_invoice_data,
@@ -811,7 +794,9 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
       }
       setInvoiceChange({});
     };
+  }, [contents, data, companyState, init, currentTaxInvoice, currentCompany]);
 
+  useEffect(() => {
     // 모달 내부 페이지의 히스토리 상태 추가
     history.pushState({ modalInternal: true }, '', location.href);
 
@@ -824,7 +809,7 @@ const TaxInvoiceEditModel = ({ init, handleInit, data, contents }) => {
 
     // popstate 이벤트 리스너 추가 (중복 추가 방지)
     window.addEventListener('popstate', handlePopState);
-  }, [contents, data, companyState, init, currentTaxInvoice, selectedCategory, currentCompany]);
+  }, []);
 
 
   return (

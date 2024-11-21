@@ -29,7 +29,7 @@ export const SettingsRepo = selector({
         };
         const openModal = getCallback(({ set, snapshot }) => async (modalId, command=null) => {
             if(!modalId) return;
-            // console.log(' - Check input :', modalId);
+            console.log(' - Check input :', modalId);
             const modalInfoStack = await snapshot.getPromise(atomModalInfoStack);
             if(modalInfoStack.length > 0){
                 const lastModalId = modalInfoStack.at(-1).id;
@@ -55,7 +55,7 @@ export const SettingsRepo = selector({
                 };
             };
             const updatedModalInfoStack = modalInfoStack.concat({id:modalId, command:command});
-            // console.log(' - Modals in Stack :', updatedModalInfoStack);
+            console.log(' - Modals in Stack :', updatedModalInfoStack);
             set(atomModalInfoStack, updatedModalInfoStack);
         });
         const closeModal = getCallback(({ set, snapshot }) => async (command) => {
@@ -92,7 +92,7 @@ export const SettingsRepo = selector({
                         };
                     }
                 };
-                // console.log(' - Modals in Stack :', updatedModalInfoStack);
+                console.log(' - Modals in Stack :', updatedModalInfoStack);
                 set(atomModalInfoStack, updatedModalInfoStack);
             };
             if(command || gottenCommand){

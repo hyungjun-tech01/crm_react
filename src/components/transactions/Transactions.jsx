@@ -368,7 +368,7 @@ const Transactions = () => {
             setInitTaxInvoice(true);
             setTimeout(()=>{
               openModal('edit_tax_invoice');
-            })
+            }, 250);
           }}
           setTaxInvoiceData={setTaxInvoiceData}
           setTaxInvoiceContents={setTaxInvoiceContents}

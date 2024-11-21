@@ -396,6 +396,9 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
       handleInitialize();
       handleInit(false);
     }
+  }, [init, selectedCompany, currentCompanyCode, loadCompanyMAContracts, searchPurchases, searchTransactions, searchTaxInvoices, handleInit, setPurchasesByCompany, setTransactionByCompany, setTaxInvoiceByCompany]);
+
+  useEffect(()=>{
     // 모달 내부 페이지의 히스토리 상태 추가
     history.pushState({ modalInternal: true }, '', location.href);
 
@@ -405,10 +408,10 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
         history.replaceState({ modalInternal: true }, '', location.href);
       }
     };
-  
+
     // popstate 이벤트 리스너 추가 (중복 추가 방지)
     window.addEventListener('popstate', handlePopState);
-  }, [init, selectedCompany, currentCompanyCode, loadCompanyMAContracts, searchPurchases, searchTransactions, searchTaxInvoices, handleInit, setPurchasesByCompany, setTransactionByCompany, setTaxInvoiceByCompany]);
+  }, []);
 
 
   return (
@@ -621,7 +624,7 @@ const CompanyDetailsModel = ({ init, handleInit }) => {
           setInitTaxInvoice(true);
           setTimeout(()=>{
             openModal('edit_tax_invoice');
-          })
+          }, 250);
         }} 
         setTaxInvoiceData={setTaxInvoiceData}
         setTaxInvoiceContents={setTaxInvoiceContents}
