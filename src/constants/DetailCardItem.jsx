@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Input } from 'antd';
+import { Button, Input } from 'antd';
 import Select from 'react-select';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -250,8 +250,11 @@ const ContentInput = (props) => {
 
     return (
         <div className="detail-content-item">
-            <div className='detail-content-title'>
-                {addonBefore}
+            <div style={{ display:'flex',flexDirection:'row',justifyContent:'space-between',alignItems:'end' }}>
+                <div className='detail-content-title'>
+                    {addonBefore}
+                </div>
+                { !editable && <Button type='dashed' onClick={()=>handleEditable(editableKey)}>Click here to edit the below</Button> }
             </div>
             { editable ?
                 <div className='detail-content-editor'>
@@ -268,7 +271,6 @@ const ContentInput = (props) => {
                     dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(String(value || '')),
                     }}
-                    onClick={()=>handleEditable(editableKey)}
                 />
             }
         </div>
