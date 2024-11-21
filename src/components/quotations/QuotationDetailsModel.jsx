@@ -3,11 +3,10 @@ import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
-import { Space, Switch } from "antd";
+import { Input, Flex, Space, Switch } from "antd";
 import {
   atomCurrentQuotation,
   defaultQuotation,
-  atomQuotationState,
 } from "../../atoms/atoms";
 import {
   atomUsersForSelection,
@@ -87,6 +86,17 @@ const QuotationDetailsModel = () => {
         [name]: selected.value,
       }
       setEditedDetailValues(tempEdited);
+
+      if(name === 'sales_representative'
+        || name === 'delivery_period'
+        || name === 'payment_type'
+      ) {
+        const tempContentData = {
+          ...contentData,
+          [name]: selected.value
+        };
+        setContentData(tempContentData);
+      };
     }
   }, [editedDetailValues, selectedQuotation]);
 
@@ -120,6 +130,10 @@ const QuotationDetailsModel = () => {
   const [quotationContents, setQuotationContents] = useState([]);
   const [contentData, setContentData] = useState({
     name: '',
+    sales_representative: '',
+    quotation_expiration_date: null,
+    delivery_period: null,
+    payment_type: null,
     list_price: 0,
     list_price_dc: 0,
     sub_total_amount: 0,
@@ -149,7 +163,7 @@ const QuotationDetailsModel = () => {
       if (foundIdx === -1) {
         ret += '0';
       } else {
-        ret += data[foundIdx]['width'] || '100';
+        ret += data[foundIdx]['viewWidth'] || '100';
       }
     });
 
@@ -211,6 +225,35 @@ const QuotationDetailsModel = () => {
     }));
   };
 
+  const handleChangeViewColumnWidth = (event) => {
+    const targetName = event.target.name;
+    const targetValue = event.target.value;
+
+    const realValue = Number(targetValue);
+    if(isNaN(realValue)) return;
+
+    const foundIdx = contentColumns.findIndex(item => QuotationContentItems[item.dataIndex].name === targetName);
+    if(foundIdx === -1) return;
+
+    const updatedColumn = {
+      ...contentColumns.at(foundIdx),
+      viewWidth: realValue,
+    };
+    const updatedColumns = [
+      ...contentColumns.slice(0, foundIdx),
+      updatedColumn,
+      ...contentColumns.slice(foundIdx + 1,)
+    ];
+    setContentColumns(updatedColumns);
+
+    const tempContentColumns = ConvertHeaderInfosToString(updatedColumns);
+    
+    const updatedQuotation = {
+      ...editedDetailValues,
+      quotation_table: tempContentColumns,
+    };
+    setEditedDetailValues(updatedQuotation);
+  };
   
 
   //===== Handles to handle this =================================================
@@ -266,6 +309,7 @@ const QuotationDetailsModel = () => {
   const handleInitialize = useCallback(() => {
     // initialize columns of content table --------------------------------------------
     const tempColumnValues = selectedQuotation.quotation_table.split('|');
+    
     let tempColumns = [];
     let temp_i = 0;
 
@@ -276,11 +320,11 @@ const QuotationDetailsModel = () => {
       const numWidth = Number(tempColumnValues[num_i]);
       if (!isNaN(numWidth) && numWidth > 0) {
         const tempIndex = tempColumnValues[num_i - 2];
-        const tempTitle = tempColumnValues[num_i - 1];
         tempColumns.push({
-          title: tempTitle,
+          title: tempColumnValues[num_i - 1],
           dataIndex: tempIndex,
-          width: numWidth,
+          width: QuotationContentItems[tempIndex].width,
+          viewWidth: numWidth,
           render: QuotationContentItems[tempIndex].type === 'price'
             ? (text, record) => <>{ConvertCurrency(text)}</>
             : ( QuotationContentItems[tempIndex].type === 'price0'
@@ -319,6 +363,10 @@ const QuotationDetailsModel = () => {
 
     const tempData = {
       name : selectedQuotation.lead_name,
+      sales_representative: selectedQuotation.sales_representative,
+      quotation_expiration_date: selectedQuotation.quotation_expiration_date,
+      delivery_period: selectedQuotation.delivery_period,
+      payment_type: selectedQuotation.payment_type,
       list_price: isNaN(listPrice) ? 0 : listPrice,
       list_price_dc: isNaN(listtPriceDc) ? 0 : listtPriceDc,
       sub_total_amount: isNaN(subTotalAmount) ? 0 : subTotalAmount,
@@ -477,36 +525,58 @@ const QuotationDetailsModel = () => {
                               handleContents={handleChangeQuotationContents}
                             />
                           </div>
-                          {editedDetailValues !== null &&
-                            Object.keys(editedDetailValues).length !== 0 && (
-                              <div className="text-center py-3">
-                                <button
-                                  type="button"
-                                  className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                                  onClick={handleSaveAll}
-                                >
-                                  {t('common.save')}
-                                </button>
-                                &nbsp;&nbsp;
-                                <button
-                                  type="button"
-                                  className="btn btn-secondary btn-rounded"
-                                  onClick={handleClose}
-                                >
-                                  {t('common.cancel')}
-                                </button>
-                              </div>
-                            )}
                         </div>
                         {/*---- End   -- Tab : Detail Quotation ------------------------------------------------------------*/}
                         {/*---- Start -- Tab : PDF View - Quotation --------------------------------------------------------*/}
                         <div className="tab-pane task-related p-0" id="sub-quotation-pdf-view">
-                          {selectedQuotation && (selectedQuotation.quotation_contents.length > 0) &&
-                            <QuotationView />
+                          {!!selectedQuotation && (quotationContents.length > 0) &&
+                            <div>
+                              <Flex wrap gap="small" style={{ margin: '1rem', paddingLeft: '1rem' }} >
+                                { contentColumns.map((item, index) => {
+                                  if(!QuotationContentItems[item.dataIndex].view) return null;
+                                  return (
+                                    <div key={index}>
+                                      <div><b>{item.title}</b></div>
+                                        <Input
+                                          name={QuotationContentItems[item.dataIndex].name}
+                                          value={item.viewWidth}
+                                          onChange={handleChangeViewColumnWidth}
+                                          style={{width: 100}}
+                                        />
+                                    </div>
+                                  )
+                                })}
+                              </Flex>
+                              <QuotationView
+                                columns={contentColumns}
+                                contents={quotationContents}
+                                viewData={contentData}
+                              />
+                            </div>
                           }
                         </div>
                         {/*---- End   -- Tab : PDF View - Quotation---------------------------------------------------------*/}
                       </div>
+                      {editedDetailValues !== null &&
+                        Object.keys(editedDetailValues).length !== 0 && (
+                          <div className="text-center py-3">
+                            <button
+                              type="button"
+                              className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                              onClick={handleSaveAll}
+                            >
+                              {t('common.save')}
+                            </button>
+                            &nbsp;&nbsp;
+                            <button
+                              type="button"
+                              className="btn btn-secondary btn-rounded"
+                              onClick={handleClose}
+                            >
+                              {t('common.cancel')}
+                            </button>
+                          </div>
+                        )}
                     </div>
                   </div>
                 </div>
