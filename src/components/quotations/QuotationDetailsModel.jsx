@@ -54,6 +54,25 @@ const QuotationDetailsModel = () => {
 
   //===== Handles to edit 'Quotation Details' =========================================
   const [editedDetailValues, setEditedDetailValues] = useState({});
+  const [contentData, setContentData] = useState({
+    name: '',
+    sales_representative: '',
+    quotation_expiration_date: null,
+    delivery_period: null,
+    payment_type: null,
+    list_price: 0,
+    list_price_dc: 0,
+    sub_total_amount: 0,
+    dc_rate: 0,
+    dc_amount: 0,
+    quotation_amount: 0,
+    tax_amount: 0,
+    cutoff_amount: 0,
+    total_quotation_amount: 0,
+    total_cost_price: 0,
+    profit: 0,
+    profit_rate: 0,
+  });
 
   const handleDetailChange = useCallback((e) => {
     if (e.target.value !== selectedQuotation[e.target.name]) {
@@ -98,7 +117,7 @@ const QuotationDetailsModel = () => {
         setContentData(tempContentData);
       };
     }
-  }, [editedDetailValues, selectedQuotation]);
+  }, [editedDetailValues, selectedQuotation, contentData]);
 
   const qotation_items_info = [
     { key: 'quotation_type', title: 'quotation.quotation_type', detail: { type: 'select', options: QuotationTypes, editing: handleDetailSelectChange } },
@@ -128,25 +147,7 @@ const QuotationDetailsModel = () => {
   //===== Handles to handle 'Contents' =================================================
   const [contentColumns, setContentColumns] = useState([]);
   const [quotationContents, setQuotationContents] = useState([]);
-  const [contentData, setContentData] = useState({
-    name: '',
-    sales_representative: '',
-    quotation_expiration_date: null,
-    delivery_period: null,
-    payment_type: null,
-    list_price: 0,
-    list_price_dc: 0,
-    sub_total_amount: 0,
-    dc_rate: 0,
-    dc_amount: 0,
-    quotation_amount: 0,
-    tax_amount: 0,
-    cutoff_amount: 0,
-    total_quotation_amount: 0,
-    total_cost_price: 0,
-    profit: 0,
-    profit_rate: 0,
-  });
+  
 
   const ConvertHeaderInfosToString = (data) => {
     let ret = '';
