@@ -20,139 +20,136 @@ import * as bootstrap from '../../assets/js/bootstrap.bundle';
 const Users = () => {
   const { t } = useTranslation();
 
-    const currentUser = useRecoilValue(atomCurrentUser);
-    const { loadUsers, setCurrentUser , tryLoadAllUsers, filterUsers, setCurrentModifyUser} = useRecoilValue(UserRepo);
+  const currentUser = useRecoilValue(atomCurrentUser);
+  const { loadUsers, setCurrentUser , tryLoadAllUsers, filterUsers, setCurrentModifyUser} = useRecoilValue(UserRepo);
 
-    const allUsers = useRecoilValue(atomAllUsers);
-    const filteredUser = useRecoilValue(atomFilteredUserArray);
+  const allUsers = useRecoilValue(atomAllUsers);
+  const filteredUser = useRecoilValue(atomFilteredUserArray);
 
-//===== Handles to this =============================================================
-const [ nowLoading, setNowLoading ] = useState(false);
-const [searchCondition, setSearchCondition] = useState("");
-const [statusSearch, setStatusSearch] = useState('common.all');
-const [ expanded, setExpaned ] = useState(false);
+  //===== Handles to this =============================================================
+  const [ nowLoading, setNowLoading ] = useState(false);
+  const [searchCondition, setSearchCondition] = useState("");
+  const [statusSearch, setStatusSearch] = useState('common.all');
+  const [ expanded, setExpaned ] = useState(false);
 
-const userState = useRecoilValue(atomUserState);
+  const userState = useRecoilValue(atomUserState);
 
-const [initToAddUser, setInitToAddUser] = useState(false);
-const [initToEditUser, setInitToEditUser] = useState(false);
-
-
-const handleAddNewCompanyClicked = useCallback(() => {
-  setInitToAddUser(true);
-}, [setInitToAddUser]);
+  const [initToAddUser, setInitToAddUser] = useState(false);
+  const [initToEditUser, setInitToEditUser] = useState(false);
 
 
-const handleSearchCondition = (newValue) => {
-  setSearchCondition(newValue);
-  filterUsers(statusSearch, newValue);
-};
-
-const handleStatusSearch = (newValue) => {
-  setStatusSearch(newValue);
-  
-  tryLoadAllUsers();
-
-  setExpaned(false);
-  setSearchCondition("");
-};
-
-// --- Functions used for Table ------------------------------
-
-const handleClickUser = useCallback((id) => {
-  console.log('[User] set current user : ', id);
-  setInitToEditUser(true);
-  setCurrentModifyUser(id);
-  //setSelectedCategory({category: 'company', item_code: id});
-  setTimeout(()=>{
-    const modalElement = document.getElementById('user-details-modal');
-   // console.log('modalElement',modalElement);
-    let myModal = new bootstrap.Modal(document.getElementById('user-details-model'), {
-      keyboard: false
-    });
-      myModal.show();
-  }, 500);
-  
-}, [setCurrentModifyUser]);
-
-const columns = [
-  {
-    title: t('user.user_id'),
-    dataIndex: "userId",
-    render: (text, record) => (
-      <>{text}</>
-    ),
-    sorter: (a, b) => compareText(a.userId, b.userId),
-  },
-  {
-    title: t('user.name'),
-    dataIndex: "userName",
-    render: (text, record) => <>{text}</>,
-    sorter: (a, b) => compareText(a.userName, b.userName),
-  },
-  {
-    title: t('user.department'),
-    dataIndex: "department",
-    render: (text, record) => <>{text}</>,
-    sorter: (a, b) => compareText(a.department, b.department),
-  },
-  {
-    title: t('user.position'),
-    dataIndex: "position",
-    render: (text, record) => <>{text}</>,
-    sorter: (a, b) => compareText(a.position, b.position),
-  },
-  {
-    title: t('user.is_work'),
-    dataIndex: "isWork",
-    render: (text, record) => <>{text}</>,
-    sorter: (a, b) => compareText(a.isWork, b.isWork),
-  },  
-  {
-    title: t('user.job_type'),
-    dataIndex: "jobType",
-    render: (text, record) => <>{text}</>,
-    sorter: (a, b) => compareText(a.jobType, b.jobType),
-  },
-  {
-    title: t('user.user_role'),
-    dataIndex: "userRole",
-    render: (text, record) => <>{text}</>,
-    sorter: (a, b) => compareText(a.userRole, b.userRole),
-  },
-];
+  const handleAddNewCompanyClicked = useCallback(() => {
+    setInitToAddUser(true);
+  }, [setInitToAddUser]);
 
 
-const [cookies] = useCookies([
-  "myLationCrmUserId",
-  "myLationCrmUserName",
-  "myLationCrmAuthToken",
-]);    
+  const handleSearchCondition = (newValue) => {
+    setSearchCondition(newValue);
+    filterUsers(statusSearch, newValue);
+  };
 
-useEffect(() => {
-    if (currentUser.userId === "") {  
-      loadUsers(cookies.myLationCrmUserId);
-    }
+  const handleStatusSearch = (newValue) => {
+    setStatusSearch(newValue);
+    
     tryLoadAllUsers();
 
-    if(((userState & 1) === 1) && ((userState & 1) === 1)){
-      setNowLoading(false);
-    };
+    setExpaned(false);
+    setSearchCondition("");
+  };
 
-    // 모달 내부 페이지의 히스토리 상태 추가
-    history.pushState({ modalInternal: true }, '', location.href);
+  // --- Functions used for Table ------------------------------
 
-    const handlePopState = (event) => {
-      if (event.state && event.state.modalInternal) {
-        // 뒤로 가기를 방지하기 위해 다시 히스토리를 푸시
-        history.pushState({ modalInternal: true }, '', location.href);
+  const handleClickUser = useCallback((id) => {
+    console.log('[User] set current user : ', id);
+    setInitToEditUser(true);
+    setCurrentModifyUser(id);
+    setTimeout(()=>{
+      let myModal = new bootstrap.Modal(document.getElementById('user-details-model'), {
+        keyboard: false
+      });
+        myModal.show();
+    }, 500);
+    
+  }, [setCurrentModifyUser]);
+
+  const columns = [
+    {
+      title: t('user.user_id'),
+      dataIndex: "userId",
+      render: (text, record) => (
+        <>{text}</>
+      ),
+      sorter: (a, b) => compareText(a.userId, b.userId),
+    },
+    {
+      title: t('user.name'),
+      dataIndex: "userName",
+      render: (text, record) => <>{text}</>,
+      sorter: (a, b) => compareText(a.userName, b.userName),
+    },
+    {
+      title: t('user.department'),
+      dataIndex: "department",
+      render: (text, record) => <>{text}</>,
+      sorter: (a, b) => compareText(a.department, b.department),
+    },
+    {
+      title: t('user.position'),
+      dataIndex: "position",
+      render: (text, record) => <>{text}</>,
+      sorter: (a, b) => compareText(a.position, b.position),
+    },
+    {
+      title: t('user.is_work'),
+      dataIndex: "isWork",
+      render: (text, record) => <>{text}</>,
+      sorter: (a, b) => compareText(a.isWork, b.isWork),
+    },  
+    {
+      title: t('user.job_type'),
+      dataIndex: "jobType",
+      render: (text, record) => <>{text}</>,
+      sorter: (a, b) => compareText(a.jobType, b.jobType),
+    },
+    {
+      title: t('user.user_role'),
+      dataIndex: "userRole",
+      render: (text, record) => <>{text}</>,
+      sorter: (a, b) => compareText(a.userRole, b.userRole),
+    },
+  ];
+
+
+  const [cookies] = useCookies([
+    "myLationCrmUserId",
+    "myLationCrmUserName",
+    "myLationCrmAuthToken",
+  ]);    
+
+  useEffect(() => {
+      if (currentUser.userId === "") {  
+        loadUsers(cookies.myLationCrmUserId);
       }
-    };
-  
-    // popstate 이벤트 리스너 추가 (중복 추가 방지)
-    window.addEventListener('popstate', handlePopState);
+      tryLoadAllUsers();
 
-  }, [currentUser, loadUsers]);    
+      if(((userState & 1) === 1) && ((userState & 1) === 1)){
+        setNowLoading(false);
+      };
+
+      // 모달 내부 페이지의 히스토리 상태 추가
+      history.pushState({ modalInternal: true }, '', location.href);
+
+      const handlePopState = (event) => {
+        if (event.state && event.state.modalInternal) {
+          // 뒤로 가기를 방지하기 위해 다시 히스토리를 푸시
+          history.pushState({ modalInternal: true }, '', location.href);
+        }
+      };
+    
+      // popstate 이벤트 리스너 추가 (중복 추가 방지)
+      window.addEventListener('popstate', handlePopState);
+
+    }, [currentUser, loadUsers]);
 
     return (
       <HelmetProvider>

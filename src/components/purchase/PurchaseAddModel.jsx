@@ -8,7 +8,6 @@ import {
     atomCurrentPurchase,
     defaultMAContract,
     atomCurrentCompany,
-    atomSelectedCategory,
     defaultCompany,
     defaultPurchase,
     atomCurrentLead,
@@ -257,7 +256,6 @@ const PurchaseAddModel = ({ init, handleInit }) => {
 
     //===== Handles to handle this ================================================= 
     const [needInit, setNeedInit] = useState(false);
-    const selectedCategory = useRecoilValue(atomSelectedCategory);
 
     const handlePopupOpen = (open) => {
         if (open) {
@@ -343,12 +341,7 @@ const PurchaseAddModel = ({ init, handleInit }) => {
     const handleInitialize = useCallback(() => {
         // document.querySelector("#add_new_purchase_form").reset();
 
-        if ((currentCompany !== defaultCompany)
-            && (
-                ((selectedCategory.category === 'company') && (selectedCategory.item_code === currentCompany.company_code))
-                || ((selectedCategory.category === 'lead') && (selectedCategory.item_code === currentLead.lead_code))
-            )
-        ) {
+        if(currentCompany !== defaultCompany) {
             setPurchaseChange({
                 ...defaultPurchase,
                 company_code: currentCompany.company_code,
@@ -359,7 +352,7 @@ const PurchaseAddModel = ({ init, handleInit }) => {
             setPurchaseChange({ ...defaultPurchase });
         }
         setNeedInit(false);
-    }, [currentCompany, selectedCategory]);
+    }, [currentCompany]);
 
     const handleClose = () => {
         setTimeout(() => {

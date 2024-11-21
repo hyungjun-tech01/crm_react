@@ -506,12 +506,6 @@ export const atomActionAttachments = atom({
     default: [],
 });
 
-//----- Selected Item ------------------------
-export const atomSelectedCategory = atom({
-    key: "selectedCategory",
-    default: { category: null, item_code: null },
-});
-
 //----- Modal State ------------------------
 export const atomModalInfoStack = atom({
     key: "modalInfoStack",

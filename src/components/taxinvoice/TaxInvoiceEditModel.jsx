@@ -16,7 +16,6 @@ import {
   atomCompanyState,
   atomCurrentCompany,
   atomCurrentTaxInvoice,
-  atomSelectedCategory,
   defaultCompany,
   defaultTaxInvoice,
 } from "../../atoms/atoms";

@@ -26,7 +26,6 @@ import {
   atomFilteredConsultingArray,
   atomLeadState,
   atomConsultingState,
-  atomSelectedCategory,
   defaultConsulting,
 } from "../../atoms/atoms"; 
 import { compareCompanyName, compareText } from "../../constants/functions";
@@ -68,7 +67,6 @@ const Consultings = () => {
   //===== Handles to deal 'Consultings' ========================================
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ initDataAddConsulting, setInitDataAddConsulting ] = useState(defaultConsulting);
-  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -186,7 +184,6 @@ const Consultings = () => {
 
   const handleClickCompany = (code) => {
     setCurrentCompany(code);
-    setSelectedCategory({category: 'company', item_code: code});
     setTimeout(()=>{
       openModal('company-details')
     }, 250);
@@ -194,7 +191,6 @@ const Consultings = () => {
 
   const handleClickLead = (code) => {
     setCurrentLead(code);
-    setSelectedCategory({category: 'lead', item_code: code});
     setTimeout(()=>{
       openModal('leads-details')
     }, 250);

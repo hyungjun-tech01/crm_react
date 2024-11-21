@@ -8,7 +8,6 @@ import { atomCurrentPurchase
     atomCurrentCompany,
     defaultCompany,
     atomPurchaseByCompany,
-    atomSelectedCategory
 } from '../atoms/atoms';
 
 import Paths from "../constants/Paths";
@@ -182,9 +181,8 @@ export const PurchaseRepo = selector({
                     set(atomFilteredPurchaseArray, updatedFiltered);
 
                     //----- Update PurchaseByCompany --------------------//
-                    const selectedCategory = await snapshot.getPromise(atomSelectedCategory);
-                    if((selectedCategory.category === 'company')
-                        && (selectedCategory.item_code === updatedNewPurchase.company_code)) {
+                    const currentCompany = await snapshot.getPromise(atomCurrentCompany);
+                    if(currentCompany !== defaultCompany) {
                         const purchaseByCompany = await snapshot.getPromise(atomPurchaseByCompany);
                         const updated = [
                             updatedNewPurchase,

@@ -336,7 +336,7 @@ const LeadAddModel = ({ init, handleInit }) => {
                                             type='text'
                                             name='dm_exist'
                                             defaultValue={leadChange.dm_exist}
-                                            onChange={handleSelectChange}
+                                            onChange={handleLeadChange}
                                         />
                                     </div>
                                     <div className="form-group row">

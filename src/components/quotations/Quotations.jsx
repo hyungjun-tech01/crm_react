@@ -157,14 +157,12 @@ const Quotations = () => {
   // const handleClickCompany = useCallback((code) => {
   //   console.log("[Consulting] set current company : ", code);
   //   setCurrentCompany(code);
-  //   setSelectedCategory({category: 'company', item_code: code});
   //   openModal('company-details');
   // }, []);
 
   // const handleClickLead = useCallback((code) => {
   //   console.log("[Consulting] set current lead : ", code);
   //   setCurrentLead(code);
-  //   setSelectedCategory({category: 'lead', item_code: code});
   //   openModal('leads-details');
   // }, []);
 

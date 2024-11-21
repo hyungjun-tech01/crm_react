@@ -15,7 +15,6 @@ import {
   defaultPurchase,
   atomCurrentCompany,
   defaultCompany,
-  atomSelectedCategory,
 } from "../../atoms/atoms";
 import { PurchaseRepo } from "../../repository/purchase";
 import { ProductTypeOptions } from "../../repository/product";

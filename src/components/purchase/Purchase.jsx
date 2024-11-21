@@ -7,7 +7,6 @@ import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import {
   atomFilteredPurchaseArray,
   atomPurchaseState,
-  atomSelectedCategory,
 } from "../../atoms/atoms";
 import { CompanyRepo } from "../../repository/company";
 import { PurchaseRepo } from "../../repository/purchase";
@@ -50,7 +49,6 @@ const Purchase = () => {
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ initAddNewPurchase, setInitAddNewPurchase ] = useState(false);
   const [ tableData, setTableData ] = useState([]);
-  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
   
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -153,9 +151,8 @@ const Purchase = () => {
   // --- Functions used for Table ------------------------------
   const handleClickPurchase = useCallback((code)=>{
     setCurrentPurchase(code);
-    setSelectedCategory({category: 'purchase', item_code: code});
     openModal('purchase-details', 'initialize_purchase');
-  },[setCurrentPurchase, setSelectedCategory]);
+  },[setCurrentPurchase]);
 
   const handleAddNewPurchaseClicked = useCallback(() => {
     setInitAddNewPurchase(true);
@@ -252,50 +249,28 @@ const Purchase = () => {
             };
             return {
               ...purchase,
-              //company_name: res.data[0].company_name,
-              //company_name_en: res.data[0].company_name_en,
               ma_remain_date: remain_date,
             }
-      });
-        // const foundIdx = allCompanyData.findIndex(company => company.company_code === purchase.company_code);
-        // const found = searchCompanies('company_code', purchase.company_code, true);
-        //found.then(res => {
-        //  if(res.result) {
-            // let remain_date = '';
-            // if(purchase.ma_finish_date) {
-            //   const calc_remain_date = Math.ceil((new Date(purchase.ma_finish_date).getTime() - new Date().getTime())/86400000);
-            //   if(calc_remain_date >= 0){
-            //     remain_date = calc_remain_date;
-            //   };
-            // };
-            // return {
-            //   ...purchase,
-            //   //company_name: res.data[0].company_name,
-            //   //company_name_en: res.data[0].company_name_en,
-            //   ma_remain_date: remain_date,
-            // }
-        //  } else {
-        //    return null;
-        //  };
-      //  });
-      // });
+      }); 
+
       setTableData(modifiedData);
-
-      // 모달 내부 페이지의 히스토리 상태 추가
-      history.pushState({ modalInternal: true }, '', location.href);
-
-      const handlePopState = (event) => {
-          if (event.state && event.state.modalInternal) {
-          // 뒤로 가기를 방지하기 위해 다시 히스토리를 푸시
-          history.pushState({ modalInternal: true }, '', location.href);
-          }
-      };
-
-      // popstate 이벤트 리스너 추가 (중복 추가 방지)
-      window.addEventListener('popstate', handlePopState);      
-
     };
   }, [dates, filteredPurchase, purchaseState, queryConditions, searchCompanies, singleDate, userState]);
+
+  useEffect(()=>{
+    // 모달 내부 페이지의 히스토리 상태 추가
+    history.pushState({ modalInternal: true }, '', location.href);
+
+    const handlePopState = (event) => {
+        if (event.state && event.state.modalInternal) {
+        // 뒤로 가기를 방지하기 위해 다시 히스토리를 푸시
+        history.pushState({ modalInternal: true }, '', location.href);
+        }
+    };
+
+    // popstate 이벤트 리스너 추가 (중복 추가 방지)
+    window.addEventListener('popstate', handlePopState);      
+  }, []);
 
 
   return (

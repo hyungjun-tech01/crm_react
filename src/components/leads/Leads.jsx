@@ -12,7 +12,6 @@ import {
   atomFilteredLeadArray,
   atomCompanyState,
   atomLeadState,
-  atomSelectedCategory,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { UserRepo } from "../../repository/user";
@@ -55,7 +54,6 @@ const Leads = () => {
   const [ nowLoading, setNowLoading ] = useState(true);
   const [ initToAddLead, setInitToAddLead ] = useState(false);
   const [ initToEditLead, setInitToEditLead ] = useState(false);
-  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
@@ -163,13 +161,12 @@ const Leads = () => {
   const handleClickLeadName = useCallback((leadCode, companyCode) => {
     setInitToEditLead(true);
     setCurrentLead(leadCode);
-    setSelectedCategory({category: 'lead', item_code: leadCode});
     setCurrentCompany(companyCode);   // 현재 company 세팅 
     
     setTimeout(() => {
       openModal('leads-details', 'initialize_lead');
     }, 250);
-  }, [setCurrentCompany, setCurrentLead, setSelectedCategory]);
+  }, [setCurrentCompany, setCurrentLead]);
 
 
   const [ expanded, setExpaned ] = useState(false);

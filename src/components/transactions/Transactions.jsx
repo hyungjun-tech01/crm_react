@@ -16,7 +16,6 @@ import {
   atomFilteredTransactionArray,
   atomCompanyState,
   atomTransactionState,
-  atomSelectedCategory,
 } from "../../atoms/atoms";
 import { atomUserState } from "../../atoms/atomsUser";
 import { UserRepo } from "../../repository/user";
@@ -57,7 +56,6 @@ const Transactions = () => {
   const [initTaxInvoice, setInitTaxInvoice] = useState(false);
   const [taxInvoiceData, setTaxInvoiceData] = useState(null);
   const [taxInvoiceContents, setTaxInvoiceContents] = useState(null);
-  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [expanded, setExpaned] = useState(false);
@@ -223,7 +221,6 @@ const Transactions = () => {
   const handleOpenTransactoin = (code) => {
     setCurrentTransaction(code)
     setInitTransaction(true);
-    setSelectedCategory({category: 'transaction', item_code: code});
 
     setTimeout(() => {
       openModal('edit_transaction','initialize_transaction');

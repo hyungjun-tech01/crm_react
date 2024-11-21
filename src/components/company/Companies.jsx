@@ -7,7 +7,7 @@ import { useCookies } from "react-cookie";
 
 import { ItemRender, onShowSizeChange, ShowTotal } from "../paginationfunction";
 import { CompanyRepo } from "../../repository/company";
-import { atomCompanyState, atomFilteredCompanyArray, atomSelectedCategory } from "../../atoms/atoms";
+import { atomCompanyState, atomFilteredCompanyArray } from "../../atoms/atoms";
 import { compareCompanyName, compareText } from "../../constants/functions";
 import { UserRepo } from '../../repository/user';
 import { SettingsRepo } from "../../repository/settings";
@@ -42,7 +42,6 @@ const Companies = () => {
 
   //===== Handles to this =============================================================
   const [ nowLoading, setNowLoading ] = useState(true);
-  const setSelectedCategory = useSetRecoilState(atomSelectedCategory);
 
   const [searchCondition, setSearchCondition] = useState("");
   const [statusSearch, setStatusSearch] = useState('common.all');
@@ -238,7 +237,6 @@ const Companies = () => {
   const handleEditCompany = useCallback((id) => {
     setInitToEditCompany(true);
     setCurrentCompany(id);
-    setSelectedCategory({category: 'company', item_code: id});
     setTimeout(()=>{
       openModal('company-details','initialize_company');
     }, 250);
