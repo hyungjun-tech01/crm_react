@@ -86,6 +86,17 @@ const QuotationDetailsModel = () => {
         [name]: selected.value,
       }
       setEditedDetailValues(tempEdited);
+
+      if(name === 'sales_representative'
+        || name === 'delivery_period'
+        || name === 'payment_type'
+      ) {
+        const tempContentData = {
+          ...contentData,
+          [name]: selected.value
+        };
+        setContentData(tempContentData);
+      };
     }
   }, [editedDetailValues, selectedQuotation]);
 
@@ -119,6 +130,10 @@ const QuotationDetailsModel = () => {
   const [quotationContents, setQuotationContents] = useState([]);
   const [contentData, setContentData] = useState({
     name: '',
+    sales_representative: '',
+    quotation_expiration_date: null,
+    delivery_period: null,
+    payment_type: null,
     list_price: 0,
     list_price_dc: 0,
     sub_total_amount: 0,
@@ -148,7 +163,7 @@ const QuotationDetailsModel = () => {
       if (foundIdx === -1) {
         ret += '0';
       } else {
-        ret += data[foundIdx]['width'] || '100';
+        ret += data[foundIdx]['viewWidth'] || '100';
       }
     });
 
@@ -157,12 +172,6 @@ const QuotationDetailsModel = () => {
 
   const handleChangeContentColumns = (data) => {
     setContentColumns(data);
-
-    let tempTotalColumnWidth = 0;
-    data.forEach(column => {
-      tempTotalColumnWidth += column.width;
-    });
-    setTotalColumnWidth(tempTotalColumnWidth);
 
     const tempContentColumns = ConvertHeaderInfosToString(data);
     
@@ -236,6 +245,14 @@ const QuotationDetailsModel = () => {
       ...contentColumns.slice(foundIdx + 1,)
     ];
     setContentColumns(updatedColumns);
+
+    const tempContentColumns = ConvertHeaderInfosToString(updatedColumns);
+    
+    const updatedQuotation = {
+      ...editedDetailValues,
+      quotation_table: tempContentColumns,
+    };
+    setEditedDetailValues(updatedQuotation);
   };
   
 
@@ -346,6 +363,10 @@ const QuotationDetailsModel = () => {
 
     const tempData = {
       name : selectedQuotation.lead_name,
+      sales_representative: selectedQuotation.sales_representative,
+      quotation_expiration_date: selectedQuotation.quotation_expiration_date,
+      delivery_period: selectedQuotation.delivery_period,
+      payment_type: selectedQuotation.payment_type,
       list_price: isNaN(listPrice) ? 0 : listPrice,
       list_price_dc: isNaN(listtPriceDc) ? 0 : listtPriceDc,
       sub_total_amount: isNaN(subTotalAmount) ? 0 : subTotalAmount,
@@ -504,26 +525,6 @@ const QuotationDetailsModel = () => {
                               handleContents={handleChangeQuotationContents}
                             />
                           </div>
-                          {editedDetailValues !== null &&
-                            Object.keys(editedDetailValues).length !== 0 && (
-                              <div className="text-center py-3">
-                                <button
-                                  type="button"
-                                  className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
-                                  onClick={handleSaveAll}
-                                >
-                                  {t('common.save')}
-                                </button>
-                                &nbsp;&nbsp;
-                                <button
-                                  type="button"
-                                  className="btn btn-secondary btn-rounded"
-                                  onClick={handleClose}
-                                >
-                                  {t('common.cancel')}
-                                </button>
-                              </div>
-                            )}
                         </div>
                         {/*---- End   -- Tab : Detail Quotation ------------------------------------------------------------*/}
                         {/*---- Start -- Tab : PDF View - Quotation --------------------------------------------------------*/}
@@ -549,13 +550,33 @@ const QuotationDetailsModel = () => {
                               <QuotationView
                                 columns={contentColumns}
                                 contents={quotationContents}
-                                data={contentData}
+                                viewData={contentData}
                               />
                             </div>
                           }
                         </div>
                         {/*---- End   -- Tab : PDF View - Quotation---------------------------------------------------------*/}
                       </div>
+                      {editedDetailValues !== null &&
+                        Object.keys(editedDetailValues).length !== 0 && (
+                          <div className="text-center py-3">
+                            <button
+                              type="button"
+                              className="border-0 btn btn-primary btn-gradient-primary btn-rounded"
+                              onClick={handleSaveAll}
+                            >
+                              {t('common.save')}
+                            </button>
+                            &nbsp;&nbsp;
+                            <button
+                              type="button"
+                              className="btn btn-secondary btn-rounded"
+                              onClick={handleClose}
+                            >
+                              {t('common.cancel')}
+                            </button>
+                          </div>
+                        )}
                     </div>
                   </div>
                 </div>

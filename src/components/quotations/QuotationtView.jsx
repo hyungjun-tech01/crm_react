@@ -3,7 +3,7 @@ import { useRecoilValue } from 'recoil';
 import { PDFViewer, Font, Page, Text, View, Document, StyleSheet, Svg, Rect, Image, Path } from '@react-pdf/renderer';
 import { atomCurrentQuotation, defaultQuotation } from "../../atoms/atoms";
 import { atomAllUsers, atomAccountInfo } from '../../atoms/atomsUser';
-import { QuotationExpiry, QuotationDelivery, QuotationPayment } from '../../repository/quotation';
+import { QuotationExpiry, QuotationDelivery, QuotationPayment, QuotationContentItems } from '../../repository/quotation';
 import NotoSansRegular from "../../fonts/NotoSansKR-Regular.ttf";
 import NotoSansBold from "../../fonts/NotoSansKR-Bold.ttf";
 import NotoSansLight from "../../fonts/NotoSansKR-Light.ttf";
@@ -181,27 +181,18 @@ Font.register({
 });
 
 
-const QuotationView = ({columns, contents, data}) => {
+const QuotationView = ({columns, contents, viewData}) => {
     const currentQuotation = useRecoilValue(atomCurrentQuotation);
     const allUsers = useRecoilValue(atomAllUsers);
     const accountInfo = useRecoilValue(atomAccountInfo);
-    const [ viewSetting, setViewSetting ] = useState({});
     const [ salesRespInfo, setSalesRespInfo ] = useState({});
     const [ quotationCondition, setQuotationCondition ] = useState({});
 
     useEffect(() => {
         if(currentQuotation && currentQuotation !== defaultQuotation){
-            // set Setting ------------------------
-            if(Number(currentQuotation.tax_amount) === 0){
-                const tempSetting = {
-                    vat_included : false,
-                };
-                setViewSetting(tempSetting);
-            };
-
             // get info of sales representative -----------
-            if(currentQuotation.sales_representative){
-                const salesman = allUsers.filter(item => item.userName === currentQuotation.sales_representative);
+            if(viewData.sales_representative !== ''){
+                const salesman = allUsers.filter(item => item.userName === viewData.sales_representative);
                 if(salesman.length > 0){
                     setSalesRespInfo({
                         userID: salesman[0].userId,
@@ -212,16 +203,16 @@ const QuotationView = ({columns, contents, data}) => {
             }
 
             // get info of quotation condition -----------
-            // console.log('Check data :', currentQuotation);
-            const foundExpiryArray = QuotationExpiry.filter(item => item.value === currentQuotation.quotation_expiration_date);
-            const tempExpiry = (foundExpiryArray.length > 0) ? foundExpiryArray[0].label : currentQuotation.quotation_expiration_date;
-            const foundDeliveryArray = QuotationDelivery.filter(item => item.value === currentQuotation.delivery_period);
-            const tempDelivery = (foundDeliveryArray.length > 0) ? foundDeliveryArray[0].label : currentQuotation.delivery_period;
-            const foundPaymentArray = QuotationPayment.filter(item => item.value === currentQuotation.payment_type);
-            const tempPayment = (foundPaymentArray.length > 0) ? foundPaymentArray[0].label : currentQuotation.payment_type;
-            setQuotationCondition({expiry: tempExpiry, delivery: tempDelivery, payment: tempPayment});
+            const foundExpiryArray = QuotationExpiry.filter(item => item.value === viewData.quotation_expiration_date);
+            const tempExpiry = (foundExpiryArray.length > 0) ? foundExpiryArray[0].label : viewData.quotation_expiration_date;
+            const foundDeliveryArray = QuotationDelivery.filter(item => item.value === viewData.delivery_period);
+            const tempDelivery = (foundDeliveryArray.length > 0) ? foundDeliveryArray[0].label : viewData.delivery_period;
+            const foundPaymentArray = QuotationPayment.filter(item => item.value === viewData.payment_type);
+            const tempPayment = (foundPaymentArray.length > 0) ? foundPaymentArray[0].label : viewData.payment_type;
+            const foundTaxIncluded = viewData.tax_amount === 0 ? false : true;
+            setQuotationCondition({expiry: tempExpiry, delivery: tempDelivery, payment: tempPayment, tax_included: foundTaxIncluded});
         }
-    }, [currentQuotation]);
+    }, [viewData, currentQuotation]);
 
     return (
         <PDFViewer style={{width: '100%', minHeight: '320px', height: '640px'}}>
@@ -276,39 +267,54 @@ const QuotationView = ({columns, contents, data}) => {
                         <Text style={Styles.text}>{currentQuotation.upper_memo}</Text>
                         <View style={{width:'100%',height:20,margin:0,padding:1,borderTop:1,borderLeft:1,borderRight:1,flexGrow:0}}>
                             <Text style={Styles.textBold}>
-                                    견적합계: 일금{ConvertKoreanAmount(data.total_quotation_amount)}원정
-                                    (&#8361;{ConvertCurrency(data.total_quotation_amount)})
-                                    ({viewSetting.vat_included ? 'VAT포함' : 'VAT별도'})
+                                    견적합계: 일금{ConvertKoreanAmount(viewData.total_quotation_amount)}원정
+                                    ({ConvertCurrency(viewData.total_quotation_amount)})
+                                    ({quotationCondition.vat_included ? 'VAT포함' : 'VAT별도'})
                             </Text>
                         </View>
                     </View>
                     {/*----- Table ---------------------------------------------*/}
                     <View style={{width:'100%',height:20,margin:0,padding:0,border:1,backgroundColor:"#cccccc",flexDirection:'row',flexGrow:0}} fixed>
-                        { columns && columns.map((column, index) => 
-                            index !== (columns.length - 1) ? (
-                                <View key={column.dataIndex} style={{width: column.viewWidth, margin:0,padding:0,borderRight:1}} >
-                                    <Text style={Styles.text}>{column.title}</Text>
-                                </View>
-                                ) : (
-                                <View key={column.dataIndex} style={{width: column.viewWidth,margin:0,padding:0,border:0}} >
-                                    <Text style={Styles.text}>{column.title}</Text>
-                                </View>)
-                        )}
+                        { columns && columns.map((column, index) => {
+                            if(!QuotationContentItems[column.dataIndex].view) return null;
+                            if(index !== (columns.length - 1)) {
+                                return (
+                                    <View key={column.dataIndex} style={{width: column.viewWidth, margin:0,padding:0,borderRight:1}} >
+                                        <Text style={Styles.text}>{column.title}</Text>
+                                    </View>
+                                )
+                            } else {
+                                return (
+                                    <View key={column.dataIndex} style={{width: column.viewWidth,margin:0,padding:0,border:0}} >
+                                        <Text style={Styles.text}>{column.title}</Text>
+                                    </View>
+                                )
+                            }
+                        })}
                     </View>
                     { contents.map((content, index) => 
                         <View key={index} style={{width:'100%',margin:0,padding:0,borderRight:1,borderLeft:1,flexDirection:'row',flexGrow: 1}}>
-                            { columns && columns.map((item, index) => 
-                                index !== (columns.length - 1) ? (
-                                    <View key={item.dataIndex} wrap style={{width: item.viewWidth,margin:0,padding:0,borderRight:1}}>
-                                        { content[item.dataIndex] && <Text style={Styles.text}>{content[item.dataIndex]}</Text>}
-                                        { item.dataIndex === '5' && content['998'] && ConvertComment(content['998'])}
-                                    </View>
-                                ) : (
-                                    <View key={item.dataIndex} wrap style={{width: item.viewWidth,margin:0,padding:0,border:0}}>
-                                        { content[item.dataIndex] && <Text style={Styles.text}>{ConvertCurrency(content[item.dataIndex])}</Text>}
-                                    </View>
-                                )
-                            )}
+                            { columns && columns.map((item, index) => {
+                                if(!QuotationContentItems[item.dataIndex].view) return null;
+                                if(index !== (columns.length - 1)) {
+                                    return (
+                                        <View key={item.dataIndex} wrap style={{width: item.viewWidth,margin:0,padding:0,borderRight:1}}>
+                                            { content[item.dataIndex] && <Text style={Styles.text}>{
+                                                QuotationContentItems[item.dataIndex].type === 'price'
+                                                    ? ConvertCurrency(content[item.dataIndex])
+                                                    : content[item.dataIndex]
+                                                }</Text>}
+                                            { item.dataIndex === '5' && content['998'] && ConvertComment(content['998'])}
+                                        </View>
+                                    )
+                                } else {
+                                    return (
+                                        <View key={item.dataIndex} wrap style={{width: item.viewWidth,margin:0,padding:0,border:0}}>
+                                            { content[item.dataIndex] && <Text style={Styles.text}>{ConvertCurrency(content[item.dataIndex])}</Text>}
+                                        </View>
+                                    )
+                                }
+                            })}
                         </View>
                     )}
                     {columns.length > 0 &&
@@ -322,10 +328,10 @@ const QuotationView = ({columns, contents, data}) => {
                                     <Text style={Styles.text}>중간합계</Text>
                                 </View>
                                 <View key={columns.at(-1).dataIndex} style={{width: columns.at(-1).viewWidth,margin:0,padding:0,borderBottom:1,flexGrow:0}} >
-                                    <Text style={Styles.text}>{ConvertCurrency(data.sub_total_amount)}</Text>
+                                    <Text style={Styles.text}>{ConvertCurrency(viewData.sub_total_amount)}</Text>
                                 </View>
                             </View>
-                            { viewSetting.vat_included &&
+                            { quotationCondition.vat_included &&
                                 <View style={{width:'100%',height:24,margin:0,padding:0,border:0,flexDirection:'row',flexGrow:0}}>
                                     <View style={{margin:0,padding:0,borderRight:1,flexGrow:1}}>
                                         <Text style={Styles.text}>{}</Text>

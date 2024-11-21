@@ -99,7 +99,7 @@ export const QuotationContentItems = {
     '7': { name: 'type', title: 'common.type', content: true, view: true, type: 'label', width: 40},
     '8': { name: 'color', title: 'common.color', content: true, view: true, type: 'label', width: 40},
     '9': { name: 'standard', title: 'common.standard', content: true, view: true, type:'label', width: 50},
-    '10': { name: 'detail_desc_on_off', title: 'quotation.detail_desc', content: true, view: true, type:'select', width: 25},
+    '10': { name: 'detail_desc_on_off', title: 'quotation.detail_desc', content: true, view: false, type:'select', width: 25},
     '11': { name: 'unit', title: 'common.unit', content: true, view: true, type:'label', width: 25 },
     '12': { name: 'quantity', title: 'common.quantity', content: true, view: true, type:'price0', width: 30},
     '13': { name: 'list_price', title: 'quotation.list_price', content: true, view: true, type:'price', width: 50},
