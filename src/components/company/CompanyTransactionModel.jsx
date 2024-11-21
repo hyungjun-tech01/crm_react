@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
 import { Add } from "@mui/icons-material";
 
-import { atomTransactionByCompany, defaultTransaction } from '../../atoms/atoms';
-import { TransactionRepo } from '../../repository/transaction';
+import { atomCurrentTransaction, atomTransactionByCompany, defaultTransaction } from '../../atoms/atoms';
 import { SettingsRepo } from '../../repository/settings';
+
 
 const CompanyTransactionModel = ({ openTransaction }) => {
     const { t } = useTranslation();
@@ -16,7 +16,7 @@ const CompanyTransactionModel = ({ openTransaction }) => {
 
     //===== [RecoilState] Related with Transaction ======================================
     const transactionByCompany = useRecoilValue(atomTransactionByCompany);
-    const { setCurrentTransaction } = useRecoilValue(TransactionRepo);
+    const setCurrentTransaction = useSetRecoilState(atomCurrentTransaction);
 
 
     //===== [RecoilState] Related with Settings ======================================
@@ -27,19 +27,19 @@ const CompanyTransactionModel = ({ openTransaction }) => {
     const [selectedTransactionRowKeys, setSelectedTransactionRowKeys] = useState([]);
 
     const handleSelectTransaction = (value) => {
-        setCurrentTransaction(value.transaction_code);
+        setCurrentTransaction(value);
         setTimeout(()=>{
             openTransaction(true);
             openModal('edit_transaction');
-        }, 250);
+        }, 100);
     };
 
     const handleAddNewTransaction = () => {
-        setCurrentTransaction();
+        setCurrentTransaction(defaultTransaction);
         setTimeout(()=>{
             openTransaction(true);
             openModal('edit_transaction');
-        }, 250);
+        }, 100);
     };
 
     const transactionRowSelection = {
@@ -113,18 +113,18 @@ const CompanyTransactionModel = ({ openTransaction }) => {
 
     useEffect(() => {
         // console.log('[CompanyTransactionModel] called!');
-    // 모달 내부 페이지의 히스토리 상태 추가
-    history.pushState({ modalInternal: true }, '', location.href);
+        // 모달 내부 페이지의 히스토리 상태 추가
+        history.pushState({ modalInternal: true }, '', location.href);
 
-    const handlePopState = (event) => {
-      if (event.state && event.state.modalInternal) {
-        // 뒤로 가기를 방지하기 위해 다시 히스토리를 푸시
-        history.replaceState({ modalInternal: true }, '', location.href);
-      }
-    };
-  
-    // popstate 이벤트 리스너 추가 (중복 추가 방지)
-    window.addEventListener('popstate', handlePopState);        
+        const handlePopState = (event) => {
+        if (event.state && event.state.modalInternal) {
+            // 뒤로 가기를 방지하기 위해 다시 히스토리를 푸시
+            history.replaceState({ modalInternal: true }, '', location.href);
+        }
+        };
+    
+        // popstate 이벤트 리스너 추가 (중복 추가 방지)
+        window.addEventListener('popstate', handlePopState);        
     }, [transactionByCompany]);
 
     return (

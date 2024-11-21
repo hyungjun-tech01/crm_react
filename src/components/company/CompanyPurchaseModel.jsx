@@ -89,7 +89,7 @@ const CompanyPurchaseModel = (props) => {
                 const selectedValue = selectedRows.at(0);
                 handleSelectPurchase(selectedValue);
             } else {
-                setCurrentPurchase();
+                setCurrentPurchase(defaultPurchase);
             };
         },
         getCheckboxProps: (record) => ({

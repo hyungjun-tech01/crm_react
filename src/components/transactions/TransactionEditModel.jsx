@@ -54,6 +54,7 @@ const default_receipt_data = {
   card_number: '',
 };
 
+
 const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceData, setTaxInvoiceContents }) => {
   const { t } = useTranslation();
   const [cookies] = useCookies(["myLationCrmUserId"]);
@@ -731,7 +732,6 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
     setShowDecimal(0);
     setDataForTransaction({ ...default_transaction_data });
     setDisableItems(false);
-    setTransactionChange({});
     setTransactionContents([]);
     setOrgReceiptModalData({ ...default_receipt_data });
     setEditedReceiptModalData({});
@@ -740,7 +740,19 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
     setTransactionForPrint(null);
     setContentsForPrint(null);
     // document.querySelector("#add_new_transaction_form").reset();
-  }, []);
+
+    if (currentCompany !== defaultCompany){
+      setTransactionChange({
+        company_code: currentCompany.company_code,
+        company_name: currentCompany.company_name,
+        ceo_name: currentCompany.ceo_name,
+        company_address: currentCompany.company_address,
+        business_type: currentCompany.business_type,
+        business_item: currentCompany.business_item,
+        business_registration_code: currentCompany.business_registration_code,
+      });
+    };
+  }, [ currentCompany ]);
 
   const handleClose = () => {
     setTimeout(() => {
@@ -780,18 +792,6 @@ const TransactionEditModel = ({ init, handleInit, openTaxInvoice, setTaxInvoiceD
           valance_final: Number(currentTransaction.paid_money) - Number(currentTransaction.total_price),
         };
         setDataForTransaction(tempData);
-      };
-
-      if (currentCompany !== defaultCompany){
-        setTransactionChange({
-          company_code: currentCompany.company_code,
-          company_name: currentCompany.company_name,
-          ceo_name: currentCompany.ceo_name,
-          company_address: currentCompany.company_address,
-          business_type: currentCompany.business_type,
-          business_item: currentCompany.business_item,
-          business_registration_code: currentCompany.business_registration_code,
-        });
       };
 
       const tempTransaction = {

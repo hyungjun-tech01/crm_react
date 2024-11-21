@@ -1,15 +1,14 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { useRecoilValue } from "recoil";
+import React, { useEffect, useState } from 'react';
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useTranslation } from "react-i18next";
 import { Table } from "antd";
 import { ItemRender, ShowTotal } from "../paginationfunction";
 import { ConvertCurrency, formatDate } from "../../constants/functions";
-import * as bootstrap from '../../assets/js/bootstrap.bundle';
 import { Add } from "@mui/icons-material";
 
-import { atomTaxInvoiceByCompany } from '../../atoms/atoms';
-import { TaxInvoiceRepo } from '../../repository/tax_invoice';
+import { atomCurrentTaxInvoice, atomTaxInvoiceByCompany, defaultTaxInvoice } from '../../atoms/atoms';
 import { SettingsRepo } from '../../repository/settings';
+
 
 const CompanyTaxInvoiceModel = (props) => {
     const { openTaxInvoice } = props;
@@ -18,7 +17,7 @@ const CompanyTaxInvoiceModel = (props) => {
 
     //===== [RecoilState] Related with TaxInvoice ======================================
     const taxInvoiceByCompany = useRecoilValue(atomTaxInvoiceByCompany);
-    const { setCurrentTaxInvoice } = useRecoilValue(TaxInvoiceRepo);
+    const setCurrentTaxInvoice = useSetRecoilState(atomCurrentTaxInvoice);
 
 
     //===== [RecoilState] Related with Settings ======================================
@@ -28,20 +27,20 @@ const CompanyTaxInvoiceModel = (props) => {
     // --- Variables for only TaxInvoice ------------------------------------------------
     const [selectedTaxInvoiceRowKeys, setSelectedTaxInvoiceRowKeys] = useState([]);
 
-    const handleSelectTaxInvoice = (code) => {
-        setCurrentTaxInvoice(code);
+    const handleSelectTaxInvoice = (value) => {
+        setCurrentTaxInvoice(value);
         setTimeout(()=>{
             openTaxInvoice(true);
             openModal('edit_tax_invoice');
-        }, 250);
+        }, 100);
     };
 
     const handleAddNewTaxInvoice = () => {
-        setCurrentTaxInvoice();
+        setCurrentTaxInvoice(defaultTaxInvoice);
         setTimeout(()=>{
             openTaxInvoice(true);
             openModal('edit_tax_invoice');
-        }, 250);
+        }, 100);
     };
 
     const taxInvoiceRowSelection = {
@@ -53,9 +52,9 @@ const CompanyTaxInvoiceModel = (props) => {
             if (selectedRows.length > 0) {
                 // Set data to edit selected purchase ----------------------
                 const selectedValue = selectedRows.at(0);
-                handleSelectTaxInvoice(selectedValue.tax_invoice_code);
+                handleSelectTaxInvoice(selectedValue);
             } else {
-                setCurrentTaxInvoice();
+                setCurrentTaxInvoice(defaultTaxInvoice);
             };
         },
         getCheckboxProps: (record) => ({
@@ -167,7 +166,7 @@ const CompanyTaxInvoiceModel = (props) => {
                                 return {
                                     onClick: (event) => {
                                         setSelectedTaxInvoiceRowKeys([record.tax_invoice_code]);
-                                        handleSelectTaxInvoice(record.tax_invoice_code);
+                                        handleSelectTaxInvoice(record);
                                     }, // click row
                                 };
                             }}
