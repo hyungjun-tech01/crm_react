@@ -3,12 +3,12 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useCookies } from "react-cookie";
 import { useTranslation } from "react-i18next";
 import { Link, useHistory } from "react-router-dom";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { Alert } from 'antd';
 import LOGO from "../../assets/images/nodeData.png";
 import priorLOGO from "../../assets/images/priorNodeData.png"
 import { apiLoginValidate } from "../../repository/user.jsx";
-import { atomCurrentUser, atomAccountInfo, defaultAccount } from "../../atoms/atomsUser.jsx";
+import { atomCurrentUser } from "../../atoms/atomsUser.jsx";
 import { AccountRepo } from "../../repository/account";
 
 const createMessage = (error) => {
@@ -49,6 +49,7 @@ const Login = () => {
     "myLationCrmUserId",
     "myLationCrmUserName",
     "myLationCrmAuthToken",
+    "myLationCrmAccountInfo",
   ]);
   const [currentUser, setCurrentUser] = useRecoilState(atomCurrentUser);
   const history = useHistory();
@@ -56,7 +57,6 @@ const Login = () => {
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState({message:"", type:"", description:""});
   const { loadAccount } = useRecoilValue(AccountRepo);
-  const setAccountInfo = useSetRecoilState(atomAccountInfo);
 
   const onMessageDismiss = () => {
     setLoginError({message:"", type:"", description:""});
@@ -78,26 +78,30 @@ const Login = () => {
   //   };
 
 
-  const handleCheckLogin = useCallback((event) => {
+  const handleCheckLogin = useCallback(async (event) => {
     event.preventDefault();
-    const response = apiLoginValidate(loginUserId, loginPassword);
-    response.then((res) => {
-      console.log("res", res);
-      if (res.message === "success") {  
-        setCookie("myLationCrmUserId", res.userId);
-        setCookie("myLationCrmUserName", res.userName);
-        setCookie("myLationCrmAuthToken", res.token);
-        setCurrentUser(res);
-        loadAccount();
-        history.push("/");
-      } else {
-        setLoginError(createMessage(res));          
-        removeCookie('UserId');
-        removeCookie('UserName');
-        removeCookie('AuthToken');
-        setAccountInfo(defaultAccount);
-      }
-    });
+    const res = await apiLoginValidate(loginUserId, loginPassword);
+    console.log("user", res);
+      
+    if (res.message === "success") {  
+      setCookie("myLationCrmUserId", res.userId);
+      setCookie("myLationCrmUserName", res.userName);
+      setCookie("myLationCrmAuthToken", res.token);
+      setCurrentUser(res);
+      
+      const accountInfo = await loadAccount();
+      console.log("account", accountInfo);
+      if(!!accountInfo) {
+        setCookie("myLationCrmAccountInfo", accountInfo)
+      };
+      history.push("/");
+    } else {
+      setLoginError(createMessage(res));          
+      removeCookie('myLationCrmUserId');
+      removeCookie('myLationCrmUserName');
+      removeCookie('myLationCrmAuthToken');
+      removeCookie('myLationCrmAccountInfo');
+    }
   },[loginUserId, loginPassword]);
 
   return (

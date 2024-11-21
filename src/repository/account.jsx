@@ -18,18 +18,21 @@ export const AccountRepo = selector({
                     set(atomAccountInfo, defaultAccount);
                     const loadStates = await snapshot.getPromise(atomAccountState);
                     set(atomAccountState, (loadStates & ~1));
-                    return;
+                    return null;
                 }
                 set(atomAccountInfo, data);
 
                 //----- Change loading state -----------------------------------
                 const loadStates = await snapshot.getPromise(atomAccountState);
                 set(atomAccountState, (loadStates | 1));
+
+                return data;
             }
             catch (err) {
                 console.error(`loadUsers / Error : ${err}`);
                 const loadStates = await snapshot.getPromise(atomAccountState);
                 set(atomAccountState, (loadStates & ~1));
+                return null;
             };
         });
         /////////////////////modify User /////////////////////////////

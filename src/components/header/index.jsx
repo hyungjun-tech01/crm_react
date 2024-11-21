@@ -11,7 +11,7 @@ import { FiBell, FiTable } from "react-icons/fi";
 import { BiBuildings, BiCalculator, BiClipboard, BiMessageRounded, BiReceipt, BiShoppingBag, BiUser, BiWallet } from "react-icons/bi";
 
 const Header = (props) => {
-  const [cookies, removeCookie ] = useCookies(["myLationCrmUserId", "myLationCrmUserName", "myLationCrmAuthToken"]);
+  const [cookies, removeCookie ] = useCookies(["myLationCrmUserId", "myLationCrmUserName", "myLationCrmAuthToken", "myLationCrmAccountInfo"]);
   const history = useHistory();
   const { i18n, t } = useTranslation();
   const currentUser = useRecoilValue(atomCurrentUser);
@@ -57,6 +57,7 @@ const Header = (props) => {
     removeCookie("myLationCrmUserId");
     removeCookie("myLationCrmUserName");
     removeCookie("myLationCrmAuthToken");
+    removeCookie("myLationCrmAccountInfo");
     history.push("/login");
   };
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useCookies } from "react-cookie";
 import { useRecoilValue } from 'recoil';
 import { PDFViewer, Font, Page, Text, View, Document, StyleSheet, Svg, Rect, Image, Path } from '@react-pdf/renderer';
 import { atomCurrentQuotation, defaultQuotation } from "../../atoms/atoms";
@@ -182,6 +183,7 @@ Font.register({
 
 
 const QuotationView = ({columns, contents, viewData}) => {
+    const [ cookies ] = useCookies(["myLationCrmAccountInfo"]);
     const currentQuotation = useRecoilValue(atomCurrentQuotation);
     const allUsers = useRecoilValue(atomAllUsers);
     const accountInfo = useRecoilValue(atomAccountInfo);
@@ -255,13 +257,13 @@ const QuotationView = ({columns, contents, viewData}) => {
                                 <Text x="8" y="80" style={Styles.text}>급</Text>
                                 <Text x="8" y="110" style={Styles.text}>자</Text>
 
-                                <Text x="43" y="15" style={Styles.supplierText}>등록번호</Text><Text x="110" y="15" style={Styles.supplierText}>{accountInfo.business_registration_code}</Text>
-                                <Text x="53" y="35" style={Styles.supplierText}>상호</Text><Text x="110" y="35" style={Styles.supplierText}>{accountInfo.company_name}</Text>
-                                <Text x="43" y="55" style={Styles.supplierText}>대표자명</Text><Text x="110" y="55" style={Styles.supplierText}>{accountInfo.ceo_name}</Text>
+                                <Text x="43" y="15" style={Styles.supplierText}>등록번호</Text><Text x="110" y="15" style={Styles.supplierText}>{cookies.myLationCrmAccountInfo.business_registration_code}</Text>
+                                <Text x="53" y="35" style={Styles.supplierText}>상호</Text><Text x="110" y="35" style={Styles.supplierText}>{cookies.myLationCrmAccountInfo.company_name}</Text>
+                                <Text x="43" y="55" style={Styles.supplierText}>대표자명</Text><Text x="110" y="55" style={Styles.supplierText}>{cookies.myLationCrmAccountInfo.ceo_name}</Text>
                                 <Text x="53" y="80" style={Styles.supplierText}>주소</Text><Text x="110" y="73" style={Styles.supplierText}>서울특별시 금천구 가산디지털 1로 128</Text><Text x="110" y="86" style={Styles.supplierText}>1811 (STX V-Tower)</Text>
-                                <Text x="41" y="110" style={Styles.supplierText}>업태/종목</Text><Text x="110" y="103" style={Styles.supplierText}>도소매서비스/컴퓨터및주변기기, S/W개발,</Text><Text x="110" y="116" style={Styles.supplierText}>공급, 자문</Text>
-                                <Text x="45" y="135" style={Styles.supplierText}>회사전화</Text><Text x="110" y="135" style={Styles.supplierText}>{accountInfo.phone_number}</Text>
-                                <Text x="45" y="155" style={Styles.supplierText}>회사팩스</Text><Text x="110" y="155" style={Styles.supplierText}>{accountInfo.fax_number}</Text>
+                                <Text x="41" y="110" style={Styles.supplierText}>업태/종목</Text><Text x="110" y="103" style={Styles.supplierText}>{cookies.myLationCrmAccountInfo.business_type}</Text><Text x="110" y="116" style={Styles.supplierText}>{cookies.myLationCrmAccountInfo.business_item}</Text>
+                                <Text x="45" y="135" style={Styles.supplierText}>회사전화</Text><Text x="110" y="135" style={Styles.supplierText}>{cookies.myLationCrmAccountInfo.phone_number}</Text>
+                                <Text x="45" y="155" style={Styles.supplierText}>회사팩스</Text><Text x="110" y="155" style={Styles.supplierText}>{cookies.myLationCrmAccountInfo.fax_number}</Text>
                             </Svg>
                         </View>
                         <Text style={Styles.text}>{currentQuotation.upper_memo}</Text>
