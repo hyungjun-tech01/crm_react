@@ -14,7 +14,7 @@ export const AccountRepo = selector({
                 const response = await fetch(`${BASE_PATH}/getaccountinfo`);
                 const data = await response.json();
                 if (data.message) {
-                    console.log('loadUsers message:', data.message);
+                    // console.log('loadUsers message:', data.message);
                     set(atomAccountInfo, defaultAccount);
                     const loadStates = await snapshot.getPromise(atomAccountState);
                     set(atomAccountState, (loadStates & ~1));
@@ -29,7 +29,7 @@ export const AccountRepo = selector({
                 return data;
             }
             catch (err) {
-                console.error(`loadUsers / Error : ${err}`);
+                // console.error(`loadUsers / Error : ${err}`);
                 const loadStates = await snapshot.getPromise(atomAccountState);
                 set(atomAccountState, (loadStates & ~1));
                 return null;
@@ -38,7 +38,7 @@ export const AccountRepo = selector({
         /////////////////////modify User /////////////////////////////
         const modifyAccount = getCallback(({ set, snapshot }) => async (newAccount) => {
             const input_json = JSON.stringify(newAccount);
-            console.log(`[ modifyCompany ] input : `, input_json);
+            // console.log(`[ modifyCompany ] input : `, input_json);
             try {
                 const response = await fetch(`${BASE_PATH}/modifyUser`, {
                     method: "POST",
@@ -47,7 +47,7 @@ export const AccountRepo = selector({
                 });
                 const data = await response.json();
                 if (data.message !== "success") {
-                    console.log('\t[ modifyUser ] message:', data.message);
+                    // console.log('\t[ modifyUser ] message:', data.message);
                     return false;
                 };
 
@@ -61,7 +61,7 @@ export const AccountRepo = selector({
                     };
                     set(atomAccountInfo, modifiedUser);
                    
-                    console.log('modifiedUser', atomAccountInfo, modifiedUser);
+                    // console.log('modifiedUser', atomAccountInfo, modifiedUser);
                     return true;
                 }
             } catch (err) {

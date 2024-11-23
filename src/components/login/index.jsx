@@ -90,7 +90,7 @@ const Login = () => {
       setCurrentUser(res);
       
       const accountInfo = await loadAccount();
-      console.log("account", accountInfo);
+      // console.log("account", accountInfo);
       if(!!accountInfo) {
         setCookie("myLationCrmAccountInfo", accountInfo)
       };

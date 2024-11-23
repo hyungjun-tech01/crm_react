@@ -189,6 +189,8 @@ const QuotationView = ({columns, contents, viewData}) => {
     const accountInfo = useRecoilValue(atomAccountInfo);
     const [ salesRespInfo, setSalesRespInfo ] = useState({});
     const [ quotationCondition, setQuotationCondition ] = useState({});
+    const [ accountAddress, setAccountAddress ] = useState([]);
+    const [ accountBusinessInfo, setBusinessInfo ] = useState([]);
 
     useEffect(() => {
         if(currentQuotation && currentQuotation !== defaultQuotation){
@@ -213,8 +215,76 @@ const QuotationView = ({columns, contents, viewData}) => {
             const tempPayment = (foundPaymentArray.length > 0) ? foundPaymentArray[0].label : viewData.payment_type;
             const foundTaxIncluded = viewData.tax_amount === 0 ? false : true;
             setQuotationCondition({expiry: tempExpiry, delivery: tempDelivery, payment: tempPayment, tax_included: foundTaxIncluded});
+
+            // set address ---------------------------
+            let companyAddress = '';
+            if(!!cookies.myLationCrmAccountInfo && !!cookies.myLationCrmAccountInfo.company_address) {
+                companyAddress = cookies.myLationCrmAccountInfo.company_address;
+            } else {
+                companyAddress = currentQuotation.company_address;
+            };
+            if(companyAddress !== ''){
+                const maxTextLength = 25
+                ;
+                if(companyAddress.length > maxTextLength) {
+                    let count = 0;
+                    let tempAddress = [];
+                    let tempAddressPart = '';
+                    const splittedAddress = companyAddress.split(' ');
+                    while(count < splittedAddress.length) {
+                        const checkAddress = tempAddressPart + ' ' + splittedAddress[count];
+                        if(checkAddress.length > maxTextLength) {
+                            tempAddress.push(tempAddressPart);
+                            tempAddressPart = splittedAddress[count];
+                        } else {
+                            tempAddressPart = checkAddress;
+                        }
+                        count++;
+                    };
+                    if(tempAddressPart !== '') {
+                        tempAddress.push(tempAddressPart);
+                    };
+                    setAccountAddress(tempAddress);
+                } else {
+                    setAccountAddress([companyAddress]);
+                }
+            };
+
+            // set business item -----------------------------
+            let businessInfo = '';
+            if(!!cookies.myLationCrmAccountInfo && !!cookies.myLationCrmAccountInfo.business_type && !!cookies.myLationCrmAccountInfo.business_item) {
+                businessInfo = cookies.myLationCrmAccountInfo.business_type + ' / ' + cookies.myLationCrmAccountInfo.business_item;
+            } else {
+                businessInfo = currentQuotation.business_type + ' / ' + currentQuotation.business_item;
+            };
+            if(businessInfo !== ''){
+                const maxTextLength = 25
+                ;
+                if(businessInfo.length > maxTextLength) {
+                    let count = 0;
+                    let tempBusinessInfo = [];
+                    let tempBusinessInfoPart = '';
+                    const splittedAddress = businessInfo.split(' ');
+                    while(count < splittedAddress.length) {
+                        const checkAddress = tempBusinessInfoPart + ' ' + splittedAddress[count];
+                        if(checkAddress.length > maxTextLength) {
+                            tempBusinessInfo.push(tempBusinessInfoPart);
+                            tempBusinessInfoPart = splittedAddress[count];
+                        } else {
+                            tempBusinessInfoPart = checkAddress;
+                        }
+                        count++;
+                    };
+                    if(tempBusinessInfoPart !== '') {
+                        tempBusinessInfo.push(tempBusinessInfoPart);
+                    };
+                    setBusinessInfo(tempBusinessInfo);
+                } else {
+                    setBusinessInfo([businessInfo]);
+                }
+            };
         }
-    }, [viewData, currentQuotation]);
+    }, [ viewData, currentQuotation, cookies.myLationCrmAccountInfo ]);
 
     return (
         <PDFViewer style={{width: '100%', minHeight: '320px', height: '640px'}}>
@@ -260,8 +330,22 @@ const QuotationView = ({columns, contents, viewData}) => {
                                 <Text x="43" y="15" style={Styles.supplierText}>등록번호</Text><Text x="110" y="15" style={Styles.supplierText}>{cookies.myLationCrmAccountInfo.business_registration_code}</Text>
                                 <Text x="53" y="35" style={Styles.supplierText}>상호</Text><Text x="110" y="35" style={Styles.supplierText}>{cookies.myLationCrmAccountInfo.company_name}</Text>
                                 <Text x="43" y="55" style={Styles.supplierText}>대표자명</Text><Text x="110" y="55" style={Styles.supplierText}>{cookies.myLationCrmAccountInfo.ceo_name}</Text>
-                                <Text x="53" y="80" style={Styles.supplierText}>주소</Text><Text x="110" y="73" style={Styles.supplierText}>서울특별시 금천구 가산디지털 1로 128</Text><Text x="110" y="86" style={Styles.supplierText}>1811 (STX V-Tower)</Text>
-                                <Text x="41" y="110" style={Styles.supplierText}>업태/종목</Text><Text x="110" y="103" style={Styles.supplierText}>{cookies.myLationCrmAccountInfo.business_type}</Text><Text x="110" y="116" style={Styles.supplierText}>{cookies.myLationCrmAccountInfo.business_item}</Text>
+                                <Text x="53" y="80" style={Styles.supplierText}>주소</Text>
+                                { accountAddress.length > 1 ? 
+                                    <>
+                                        <Text x="110" y="73" style={Styles.supplierText}>{accountAddress.at(0)}</Text>
+                                        <Text x="110" y="86" style={Styles.supplierText}>{accountAddress.at(1)}</Text>
+                                    </> :
+                                        <Text x="110" y="80" style={Styles.supplierText}>{accountAddress.at(0)}</Text>
+                                }
+                                <Text x="41" y="110" style={Styles.supplierText}>업태/종목</Text>
+                                { accountBusinessInfo.length > 1 ?
+                                    <>
+                                        <Text x="110" y="103" style={Styles.supplierText}>{accountBusinessInfo.at(0)}</Text>
+                                        <Text x="110" y="116" style={Styles.supplierText}>{accountBusinessInfo.at(1)}</Text>
+                                    </> :
+                                        <Text x="110" y="110" style={Styles.supplierText}>{accountBusinessInfo.at(0)}</Text>
+                                }
                                 <Text x="45" y="135" style={Styles.supplierText}>회사전화</Text><Text x="110" y="135" style={Styles.supplierText}>{cookies.myLationCrmAccountInfo.phone_number}</Text>
                                 <Text x="45" y="155" style={Styles.supplierText}>회사팩스</Text><Text x="110" y="155" style={Styles.supplierText}>{cookies.myLationCrmAccountInfo.fax_number}</Text>
                             </Svg>
