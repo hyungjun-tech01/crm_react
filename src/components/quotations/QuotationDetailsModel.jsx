@@ -236,15 +236,18 @@ const QuotationDetailsModel = () => {
     const foundIdx = contentColumns.findIndex(item => QuotationContentItems[item.dataIndex].name === targetName);
     if(foundIdx === -1) return;
 
+    const previousWidth = contentColumns.at(foundIdx).viewWidth;
     const updatedColumn = {
       ...contentColumns.at(foundIdx),
       viewWidth: realValue,
     };
+
     const updatedColumns = [
       ...contentColumns.slice(0, foundIdx),
       updatedColumn,
       ...contentColumns.slice(foundIdx + 1,)
     ];
+    updatedColumns.at(-1).viewWidth = updatedColumns.at(-1).viewWidth - realValue + previousWidth;
     setContentColumns(updatedColumns);
 
     const tempContentColumns = ConvertHeaderInfosToString(updatedColumns);
@@ -313,6 +316,7 @@ const QuotationDetailsModel = () => {
     
     let tempColumns = [];
     let temp_i = 0;
+    let tempSumWidth = 0;
 
     while (true) {
       const num_i = 3 * temp_i + 2;
@@ -321,6 +325,7 @@ const QuotationDetailsModel = () => {
       const numWidth = Number(tempColumnValues[num_i]);
       if (!isNaN(numWidth) && numWidth > 0) {
         const tempIndex = tempColumnValues[num_i - 2];
+        if(tempIndex !== '10') tempSumWidth += numWidth;
         tempColumns.push({
           title: tempColumnValues[num_i - 1],
           dataIndex: tempIndex,
@@ -336,7 +341,7 @@ const QuotationDetailsModel = () => {
       };
       temp_i++;
     };
-
+    tempColumns.at(-1).viewWidth = 553 - tempSumWidth + tempColumns.at(-1).viewWidth;
     setContentColumns(tempColumns);
 
     // initialize contents of content table --------------------------------------------
@@ -542,6 +547,7 @@ const QuotationDetailsModel = () => {
                                           name={QuotationContentItems[item.dataIndex].name}
                                           value={item.viewWidth}
                                           onChange={handleChangeViewColumnWidth}
+                                          disabled={index === contentColumns.length - 1}
                                           style={{width: 100}}
                                         />
                                     </div>

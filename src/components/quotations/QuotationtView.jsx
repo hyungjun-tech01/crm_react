@@ -355,7 +355,7 @@ const QuotationView = ({columns, contents, viewData}) => {
                             <Text style={Styles.textBold}>
                                     견적합계: 일금{ConvertKoreanAmount(viewData.total_quotation_amount)}원정
                                     ({ConvertCurrency(viewData.total_quotation_amount)})
-                                    ({quotationCondition.vat_included ? 'VAT포함' : 'VAT별도'})
+                                    ({quotationCondition.tax_included ? 'VAT포함' : 'VAT별도'})
                             </Text>
                         </View>
                     </View>
@@ -417,7 +417,7 @@ const QuotationView = ({columns, contents, viewData}) => {
                                     <Text style={Styles.text}>{ConvertCurrency(viewData.sub_total_amount)}</Text>
                                 </View>
                             </View>
-                            { quotationCondition.vat_included &&
+                            { quotationCondition.tax_included &&
                                 <View style={{width:'100%',height:24,margin:0,padding:0,border:0,flexDirection:'row',flexGrow:0}}>
                                     <View style={{margin:0,padding:0,borderRight:1,flexGrow:1}}>
                                         <Text style={Styles.text}>{}</Text>
@@ -434,10 +434,10 @@ const QuotationView = ({columns, contents, viewData}) => {
                                     <Text style={Styles.text}>{}</Text>
                                 </View>
                                 { columns.length > 0 && <>
-                                    <View key={columns.at(-2).dataIndex} style={{width: columns.at(-2).viewWidth,margin:0,padding:0,borderRight:1,flexGrow:0, backgroundColor: '#aaaaaa'}} >
+                                    <View key={columns.at(-2).dataIndex} style={{width: columns.at(-2).viewWidth,margin:0,padding:0,borderRight:1,flexGrow:0, backgroundColor: '#aaaaaa'}} debug>
                                         <Text style={Styles.text}>견적합계</Text>
                                     </View>
-                                    <View key={columns.at(-1).dataIndex} style={{width: columns.at(-1).viewWidth,margin:0,padding:0,flexGrow:0}} >
+                                    <View key={columns.at(-1).dataIndex} style={{width: columns.at(-1).viewWidth,margin:0,padding:0,flexGrow:0}} debug>
                                         <Text style={Styles.text}>{ConvertCurrency(currentQuotation.total_quotation_amount)}</Text>
                                     </View>
                                 </>}
